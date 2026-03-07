@@ -30,8 +30,6 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
 export default async function StoreLayout({ children, params }: LayoutProps) {
   const { domain } = await params;
   const store: any = await getStoreByDomain(domain);
-
-  console.log(store.pixels);
   
 
   if (!store) {

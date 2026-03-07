@@ -158,7 +158,7 @@ export default function LandingPageView({
     <div className="min-h-screen bg-gray-50" dir="rtl">
 
       {/* ── Hero image ── */}
-      <div className="relative w-full bg-gray-900">
+      <div className="max-w-2xl mx-auto relative w-full bg-gray-900">
         {allImages.length > 0 && (
           <img src={allImages[selectedImage]} alt={product.name} className="w-full h-auto block" />
         )}

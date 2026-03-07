@@ -694,7 +694,7 @@ export function Details({
         {/* Description */}
         {product.desc && (
           <section className="mt-16 pt-12 border-t border-gray-100">
-            <div className="max-w-3xl">
+            <div className="">
               <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                 <FileText className="w-5 h-5" /> وصف المنتج
               </h2>

@@ -752,7 +752,6 @@ export function Details({
         {product.desc && (
           <section className="mt-20 pt-14 border-t border-[#E4E0DB]">
             <div className="flex items-center gap-5 mb-8">
-              <span className="block h-px w-8 bg-[#E4E0DB]" />
               <h2
                 className="text-xs tracking-[0.2em] uppercase text-[#8A8580]"
               >
@@ -760,7 +759,7 @@ export function Details({
               </h2>
             </div>
             <div
-              className="text-sm leading-relaxed max-w-2xl text-[#5A5753] font-light"
+              className="text-sm leading-relaxed text-[#5A5753] font-light"
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(product.desc, {
                   ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'span'],

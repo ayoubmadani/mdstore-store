@@ -772,7 +772,7 @@ export function Details({
               <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: '#00E5FF' }}>◈ PRODUCT_DESCRIPTION</span>
               <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(0,229,255,0.3), transparent)' }} />
             </div>
-            <div className="max-w-3xl p-6" style={{ border: '1px solid #0D2030', backgroundColor: '#080F1A' }}>
+            <div className="p-6" style={{ border: '1px solid #0D2030', backgroundColor: '#080F1A' }}>
               <div className="text-sm leading-relaxed" style={{ color: '#4A7A8A' }}
                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc, { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'span'], ALLOWED_ATTR: ['class', 'style'] }) }}
               />
