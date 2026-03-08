@@ -1682,7 +1682,7 @@ export function ProductForm({
   }, [selectedWilayaData, formData.typeLivraison]);
 
   const finalPrice    = getFinalPrice();
-  const getTotalPrice = () => finalPrice * formData.quantity + getPriceLivraison();
+  const getTotalPrice = () => finalPrice * formData.quantity + +getPriceLivraison();
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -1700,11 +1700,7 @@ export function ProductForm({
     setFormErrors({});
     setSubmitting(true);
     try {
-      await axios.post(`${API_URL}/orders/create`, {
-        ...formData, productId: product.id, storeId: product.store.id,
-        userId, selectedOffer, selectedVariants, platform: platform || 'store',
-        finalPrice, totalPrice: getTotalPrice(), priceLivraison: getPriceLivraison(),
-      });
+      await axios.post(`${API_URL}/orders`, { ...formData, customerWilayaId: +formData.customerWelaya,customerCommuneId: +formData.customerCommune, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceShip : getPriceLivraison(), });
       if (typeof window !== 'undefined') {
         localStorage.setItem('customerId', formData.customerId || '');
       }

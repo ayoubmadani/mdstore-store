@@ -815,7 +815,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const getPriceLivraison = useCallback(():number => { if(!selectedWilayaData) return 0; return formData.typeLivraison==='home'?selectedWilayaData.livraisonHome:selectedWilayaData.livraisonOfice; },[selectedWilayaData,formData.typeLivraison]);
   useEffect(() => { if(selectedWilayaData) setFormData(f=>({...f,priceLoss:selectedWilayaData.livraisonReturn})); },[selectedWilayaData]);
   const finalPrice = getFinalPrice();
-  const getTotalPrice = () => finalPrice*formData.quantity+getPriceLivraison();
+  const getTotalPrice = () => finalPrice*formData.quantity+ +getPriceLivraison();
   const validate = () => {
     const e:Record<string,string>={};
     if(!formData.customerName.trim())  e.customerName='الاسم مطلوب';
@@ -826,7 +826,8 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   };
   const handleSubmit = async (e:React.FormEvent) => {
     e.preventDefault(); const errs=validate(); if(Object.keys(errs).length){setFormErrors(errs);return;} setFormErrors({}); setSubmitting(true);
-    try { const payload={...formData,productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice,totalPrice:getTotalPrice(),priceLivraison:getPriceLivraison()}; await axios.post(`${API_URL}/orders/create`,payload); if(typeof window!=='undefined'&&formData.customerId) localStorage.setItem('customerId',formData.customerId); router.push(`/lp/${domain}/successfully`); } catch(err){console.error(err);} finally{setSubmitting(false);}
+    try { const payload={ ...formData, customerWilayaId: +formData.customerWelaya,customerCommuneId: +formData.customerCommune, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceShip : getPriceLivraison(), }; 
+    await axios.post(`${API_URL}/orders`,payload); if(typeof window!=='undefined'&&formData.customerId) localStorage.setItem('customerId',formData.customerId); router.push(`/lp/${domain}/successfully`); } catch(err){console.error(err);} finally{setSubmitting(false);}
   };
   const focusStyle = (e:React.FocusEvent<any>) => { e.target.style.borderColor='var(--blush-deep)'; e.target.style.boxShadow='0 0 0 3px rgba(242,196,206,0.25)'; };
   const blurStyle  = (e:React.FocusEvent<any>, hasErr?:boolean) => { e.target.style.borderColor=hasErr?'var(--rose)':'var(--border)'; e.target.style.boxShadow='none'; };

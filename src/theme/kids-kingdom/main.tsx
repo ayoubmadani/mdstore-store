@@ -1096,7 +1096,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   useEffect(() => { if(selectedWilayaData) setFormData(f=>({...f,priceLoss:selectedWilayaData.livraisonReturn})); },[selectedWilayaData]);
 
   const finalPrice = getFinalPrice();
-  const getTotalPrice = () => finalPrice*formData.quantity+getPriceLivraison();
+  const getTotalPrice = () => finalPrice*formData.quantity+ +getPriceLivraison();
 
   const validate = () => {
     const e:Record<string,string>={};
@@ -1109,7 +1109,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   const handleSubmit = async (e:React.FormEvent) => {
     e.preventDefault(); const errs=validate(); if(Object.keys(errs).length){setFormErrors(errs);return;} setFormErrors({}); setSubmitting(true);
-    try { await axios.post(`${API_URL}/orders/create`,{ ...formData, productId:product.id, storeId:product.store.id, userId, selectedOffer, selectedVariants, platform:platform||'store', finalPrice, totalPrice:getTotalPrice(), priceLivraison:getPriceLivraison() }); if(typeof window!=='undefined'&&formData.customerId) localStorage.setItem('customerId',formData.customerId); router.push(`/lp/${domain}/successfully`); } catch(err){console.error(err);} finally{setSubmitting(false);}
+    try { await axios.post(`${API_URL}/orders`,{ ...formData, customerWilayaId: +formData.customerWelaya,customerCommuneId: +formData.customerCommune, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceShip : getPriceLivraison(), }); if(typeof window!=='undefined'&&formData.customerId) localStorage.setItem('customerId',formData.customerId); router.push(`/lp/${domain}/successfully`); } catch(err){console.error(err);} finally{setSubmitting(false);}
   };
 
   const onFocus = (e:React.FocusEvent<any>) => { e.target.style.borderColor='var(--sky)'; e.target.style.boxShadow='0 0 0 4px rgba(78,205,196,0.15)'; };
