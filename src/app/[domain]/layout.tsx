@@ -31,6 +31,7 @@ export default async function StoreLayout({ children, params }: LayoutProps) {
   const { domain } = await params;
   const store: any = await getStoreByDomain(domain);
   
+  
 
   if (!store) {
     notFound();

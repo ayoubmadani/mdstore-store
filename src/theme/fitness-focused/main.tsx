@@ -925,7 +925,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [communes,        setCommunes]        = useState<Commune[]>([]);
   const [loadingCommunes, setLoadingCommunes] = useState(false);
   const [formData, setFormData] = useState({
-    customerId: '', customerName: '', customerPhone: '',
+    customerId: localStorage.getItem("customerId"), customerName: '', customerPhone: '',
     customerWelaya: '', customerCommune: '',
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',

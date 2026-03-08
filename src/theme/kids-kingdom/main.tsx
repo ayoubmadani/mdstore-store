@@ -1076,7 +1076,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [wilayas,setWilayas] = useState<Wilaya[]>([]);
   const [communes,setCommunes] = useState<Commune[]>([]);
   const [loadingCommunes,setLoadingCommunes] = useState(false);
-  const [formData,setFormData] = useState({ customerId:'', customerName:'', customerPhone:'', customerWelaya:'', customerCommune:'', quantity:1, priceLoss:0, typeLivraison:'home' as 'home'|'office' });
+  const [formData,setFormData] = useState({ customerId:localStorage.getItem("customerId"), customerName:'', customerPhone:'', customerWelaya:'', customerCommune:'', quantity:1, priceLoss:0, typeLivraison:'home' as 'home'|'office' });
   const [formErrors,setFormErrors] = useState<Record<string,string>>({});
   const [submitting,setSubmitting] = useState(false);
 
