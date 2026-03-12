@@ -15,6 +15,7 @@ import {
   Target, Zap, Award,
 } from 'lucide-react';
 import { Store } from '@/types/store';
+import { customLengthName } from '@/hallper/theme-hallper';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -494,7 +495,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
         </button>
 
         {/* Hover CTA */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 transition-all duration-400"
+        <div className="absolute hidden bottom-0 left-0 right-0 p-3 transition-all duration-400"
           style={{ transform:hovered?'translateY(0)':'translateY(110%)', opacity:hovered?1:0 }}>
           <Link href={`/${store.subdomain}/product/${product.slug||product.id}`}
             className="btn-alpine flex items-center justify-center gap-2 w-full py-3 text-xs font-bold tracking-[0.15em] text-white"
@@ -530,10 +531,10 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
               <span className="ml-2 text-xs line-through" style={{ color:'var(--text-dim)' }}>{product.priceOriginal}</span>
             )}
           </div>
-          <div className="w-8 h-8 flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+          <Link href={`/${store.subdomain}/product/${product.slug||product.id}`} className="w-8 h-8 flex items-center justify-center transition-all duration-300 group-hover:scale-110"
             style={{ border:'1px solid var(--border-lt)', color:'var(--ice)', backgroundColor:'rgba(120,196,208,0.08)' }}>
             <ArrowRight className="w-3.5 h-3.5"/>
-          </div>
+          </Link>
         </div>
       </div>
     </div>
@@ -789,7 +790,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
           <nav className="flex items-center gap-2 text-xs font-bold tracking-[0.15em]" style={{ color:'var(--text-dim)' }}>
             <span>⛰ {isRTL?'الرئيسية':'BASE CAMP'}</span>
             <span style={{ color:'var(--rust)' }}>›</span>
-            <span style={{ color:'var(--cream)', fontFamily:"'Bebas Neue',cursive", letterSpacing:'0.08em', fontSize:'0.95rem' }}>{product.name}</span>
+            <span style={{ color:'var(--cream)', fontFamily:"'Bebas Neue',cursive", letterSpacing:'0.08em', fontSize:'0.95rem' }}>{customLengthName(product.name, 20)}</span>
           </nav>
           <div className="flex items-center gap-2">
             <button onClick={toggleWishlist} className="w-9 h-9 flex items-center justify-center transition-all"
@@ -1022,7 +1023,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   useEffect(()=>{ if(selectedWilayaData) setFormData(f=>({...f,priceLoss:selectedWilayaData.livraisonReturn})); },[selectedWilayaData]);
 
   const finalPrice=getFinalPrice();
-  const getTotalPrice=()=>finalPrice*formData.quantity+getPriceLivraison();
+  const getTotalPrice=()=>finalPrice*formData.quantity+ +getPriceLivraison();
   const validate=()=>{
     const e:Record<string,string>={};
     if(!formData.customerName.trim())  e.customerName='الاسم مطلوب';
@@ -1120,7 +1121,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             {[{l:'ITEM',v:product.name},{l:'UNIT PRICE',v:`${finalPrice.toLocaleString()} دج`},{l:'QUANTITY',v:`× ${formData.quantity}`},{l:'LOGISTICS',v:selectedWilayaData?`${getPriceLivraison().toLocaleString()} دج`:'TBD'}].map(row=>(
               <div key={row.l} className="flex justify-between items-center">
                 <span className="spec-label">{row.l}</span>
-                <span className="text-xs font-bold" style={{ color:'var(--cream)' }}>{row.v}</span>
+                <span className="text-xs font-bold" style={{ color:'var(--cream)' }}>{customLengthName(row.v , 20)}</span>
               </div>
             ))}
             <div className="pt-3" style={{ borderTop:'1px solid var(--border)' }}>
