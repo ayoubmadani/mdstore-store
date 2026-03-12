@@ -682,7 +682,7 @@ export function Home({ store }: any) {
           </div>
           {store.categories?.length>0?(
             <div className="flex flex-wrap gap-3">
-              <Link href={`/${store.domain}`}
+              <Link href={`/${store.subdomain}`}
                 className="btn-alpine flex items-center gap-2 px-7 py-3 text-xs font-bold tracking-[0.15em] text-white"
                 style={{ background:'linear-gradient(135deg, var(--rust), var(--rust-dk))', boxShadow:'0 4px 16px var(--glow-rust)' }}>
                 <Target className="w-3.5 h-3.5"/> {t.all}
@@ -691,7 +691,7 @@ export function Home({ store }: any) {
                 const cols=['var(--ice)','var(--moss-lt)','var(--sand)','var(--rust-lt)','var(--stone-lt)'];
                 const col=cols[idx%cols.length];
                 return (
-                  <Link key={cat.id} href={`/${store.domain}?category=${cat.id}`}
+                  <Link key={cat.id} href={`/${store.subdomain}?category=${cat.id}`}
                     className="btn-alpine flex items-center gap-2 px-6 py-3 text-xs font-bold tracking-[0.15em] transition-all"
                     style={{ border:`1px solid ${col}`, color:col, backgroundColor:`${col}10` }}
                     onMouseEnter={e=>{const el=e.currentTarget as HTMLElement; el.style.backgroundColor=col; el.style.color='var(--slate)';}}
