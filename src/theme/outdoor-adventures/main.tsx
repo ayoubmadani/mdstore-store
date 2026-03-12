@@ -465,7 +465,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
   const accents=['var(--rust)','var(--ice-dk)','var(--moss-lt)','var(--sand)','var(--rust-lt)'];
   const accent=accents[parseInt(product.id)%accents.length];
   return (
-    <div className="card-alpine flex flex-col overflow-hidden"
+    <div className="card-alpine flex flex-col overflow-hidden mb-4"
       style={{ backgroundColor:'var(--slate-lt)', border:'1px solid var(--border)' }}
       onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)}>
       {/* Image */}
