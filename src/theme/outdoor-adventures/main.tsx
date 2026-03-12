@@ -722,7 +722,7 @@ export function Home({ store }: any) {
             <div className="hidden md:block"><Crosshair size={70} color="rgba(196,66,26,0.3)" spin/></div>
           </div>
           {store.products?.length>0?(
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-px" style={{ border:'1px solid var(--border)', backgroundColor:'var(--border)' }}>
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-px" style={{ border:'1px solid var(--border)', backgroundColor:'var(--border)' }}>
               {store.products.map((product:any)=>{
                 const displayImage=product.productImage||product.imagesProduct?.[0]?.imageUrl||store.design?.logoUrl;
                 const discount=product.priceOriginal?Math.round(((product.priceOriginal-product.price)/product.priceOriginal)*100):0;
