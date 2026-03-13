@@ -7,233 +7,60 @@ import { useRouter } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, Heart, ChevronDown, ChevronLeft, ChevronRight,
-  AlertCircle, X, Infinity, Share2, MapPin, Phone,
-  User, ShieldCheck, Lock, Database, Globe, Bell,
-  CheckCircle2, Scale, CreditCard, Ban,
-  Cookie as CookieIcon, Settings, MousePointer2, ToggleRight,
-  Shield, ArrowRight, Mountain, Wind, Thermometer, Compass,
-  Target, Zap, Award,
+  AlertCircle, X, Share2, Phone, User, ToggleRight,
+  Shield, ArrowRight, Plus, Minus, Mountain, CheckCircle2,
 } from 'lucide-react';
 import { Store } from '@/types/store';
-import { customLengthName } from '@/hallper/theme-hallper';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
-// ─── DESIGN SYSTEM ────────────────────────────────────────────
-const FONT_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+const CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
   *, *::before, *::after { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
 
   :root {
-    --slate:     #0F1923;
-    --slate-lt:  #1A2836;
-    --slate-md:  #253547;
-    --rust:      #C4421A;
-    --rust-lt:   #E05A2E;
-    --rust-dk:   #9E3214;
-    --ice:       #78C4D0;
-    --ice-lt:    #A8DCE6;
-    --ice-dk:    #4E9EAA;
-    --moss:      #3D5A3E;
-    --moss-lt:   #5A7D5B;
-    --sand:      #C8A97E;
-    --sand-lt:   #DEC49A;
-    --stone:     #8A9BA8;
-    --stone-lt:  #B2C0CA;
-    --cream:     #F0EAE0;
-    --cream-dk:  #DDD5C8;
-    --text-h:    #F0EAE0;
-    --text-b:    #C8D4DC;
-    --text-dim:  #7A8E9A;
-    --border:    rgba(120,196,208,0.18);
-    --border-lt: rgba(120,196,208,0.30);
-    --glow-rust: rgba(196,66,26,0.35);
-    --glow-ice:  rgba(120,196,208,0.25);
+    --white: #FAFAF8;
+    --stone: #F2EFE9;
+    --ink:   #1C1C1A;
+    --mid:   #6B6B68;
+    --dim:   #AEADA9;
+    --line:  rgba(28,28,26,0.12);
+    --green: #2C4A2E;
+    --amber: #C26B2A;
   }
 
-  ::-webkit-scrollbar { width:6px; }
-  ::-webkit-scrollbar-track { background: var(--slate); }
-  ::-webkit-scrollbar-thumb { background: linear-gradient(180deg,var(--rust),var(--ice)); border-radius:0; }
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-thumb { background: var(--ink); }
 
-  @keyframes snow-fall {
-    0%   { opacity:0; transform: translateY(-15px) rotate(0deg); }
-    12%  { opacity:0.8; }
-    88%  { opacity:0.3; }
-    100% { opacity:0; transform: translateY(105vh) rotate(720deg) translateX(20px); }
-  }
-  @keyframes crosshair-spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
-  @keyframes pulse-rust {
-    0%,100% { box-shadow: 0 0 0 0 var(--glow-rust); }
-    50%     { box-shadow: 0 0 0 8px transparent; }
-  }
-  @keyframes slide-up   { from{opacity:0;transform:translateY(32px);} to{opacity:1;transform:translateY(0);} }
-  @keyframes slide-in-l { from{opacity:0;transform:translateX(-32px);} to{opacity:1;transform:translateX(0);} }
-  @keyframes scan-line  { 0%{top:-100%;} 100%{top:200%;} }
-  @keyframes altitude-fill { from{stroke-dashoffset:220;} to{stroke-dashoffset:0;} }
-  @keyframes marquee-gear { 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
-  @keyframes blink-dot { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
-  @keyframes compass-needle { 0%,100%{transform:rotate(-8deg);} 50%{transform:rotate(8deg);} }
+  @keyframes fade-in { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  .fi   { animation: fade-in 0.6s cubic-bezier(0.22,1,0.36,1) both; }
+  .fi-1 { animation-delay: 0.1s; }
+  .fi-2 { animation-delay: 0.2s; }
+  .fi-3 { animation-delay: 0.32s; }
 
-  .slide-up    { animation: slide-up   0.7s cubic-bezier(0.22,1,0.36,1) both; }
-  .slide-in-l  { animation: slide-in-l 0.7s cubic-bezier(0.22,1,0.36,1) both; }
-  .slide-up-d1 { animation-delay:0.1s; }
-  .slide-up-d2 { animation-delay:0.25s; }
-  .slide-up-d3 { animation-delay:0.42s; }
-  .slide-up-d4 { animation-delay:0.6s; }
+  @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-  /* Topographic line bg */
-  .topo-bg {
-    background-image: repeating-radial-gradient(
-      ellipse 80% 60% at 60% 45%,
-      transparent 0px, transparent 18px,
-      rgba(120,196,208,0.055) 18px, rgba(120,196,208,0.055) 19px,
-      transparent 19px, transparent 38px,
-      rgba(120,196,208,0.04) 38px, rgba(120,196,208,0.04) 39px
-    );
-  }
+  .card-img img { transition: transform 0.5s cubic-bezier(0.22,1,0.36,1); }
+  .gear-card:hover .card-img img { transform: scale(1.04); }
+  .gear-card { transition: transform 0.35s cubic-bezier(0.22,1,0.36,1); }
+  .gear-card:hover { transform: translateY(-4px); }
 
-  /* Grid crosshair pattern */
-  .crosshair-grid {
-    background-image:
-      linear-gradient(rgba(120,196,208,0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(120,196,208,0.06) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
+  .btn { display:inline-flex; align-items:center; gap:8px; padding:12px 24px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; letter-spacing:0.03em; cursor:pointer; transition:all 0.22s; border:none; text-decoration:none; border-radius:2px; }
+  .btn-dark  { background:var(--ink); color:var(--white); }
+  .btn-dark:hover  { background:var(--green); }
+  .btn-ghost { background:transparent; color:var(--ink); border:1px solid var(--line); }
+  .btn-ghost:hover { border-color:var(--ink); }
 
-  /* Diagonal slash cut */
-  .slash-bottom {
-    clip-path: polygon(0 0, 100% 0, 100% 82%, 0 100%);
-  }
-  .slash-top {
-    clip-path: polygon(0 10%, 100% 0, 100% 100%, 0 100%);
-  }
+  .inp { width:100%; padding:11px 13px; font-family:'DM Sans',sans-serif; font-size:13px; background:var(--white); border:1px solid var(--line); color:var(--ink); outline:none; transition:border-color 0.2s; border-radius:2px; }
+  .inp:focus { border-color:var(--ink); }
+  .inp::placeholder { color:var(--dim); }
+  .inp-err { border-color:var(--amber) !important; }
+  select.inp { appearance:none; cursor:pointer; }
 
-  /* Card accent border */
-  .card-alpine {
-    position: relative;
-    transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease;
-  }
-  .card-alpine::before {
-    content:''; position:absolute; left:0; top:0; width:4px; height:100%;
-    background: linear-gradient(180deg, var(--rust), var(--ice));
-    transition: width 0.3s ease;
-  }
-  .card-alpine:hover { transform: translateX(4px) translateY(-4px); box-shadow: -4px 12px 40px rgba(196,66,26,0.25); }
-  .card-alpine:hover::before { width:6px; }
-
-  /* Technical button */
-  .btn-alpine {
-    position:relative; overflow:hidden; clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 100%, 12px 100%);
-    transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
-    letter-spacing: 0.12em;
-  }
-  .btn-alpine:hover { transform: translateY(-2px); filter: brightness(1.1); }
-  .btn-alpine:active { transform: scale(0.97); }
-
-  /* Spec label */
-  .spec-label {
-    font-family: 'DM Sans', sans-serif; font-size:9px; font-weight:700;
-    letter-spacing:0.22em; text-transform:uppercase; color:var(--text-dim);
-  }
-
-  /* Scan line effect on hero */
-  .scan-overlay::after {
-    content:''; position:absolute; left:0; width:100%; height:2px;
-    background: linear-gradient(transparent, rgba(120,196,208,0.15), transparent);
-    animation: scan-line 4s linear infinite;
-    pointer-events:none;
-  }
-
-  .marquee-wrap  { overflow:hidden; white-space:nowrap; }
-  .marquee-inner { display:inline-block; animation: marquee-gear 22s linear infinite; }
-
-  .tag-alpine {
-    display:inline-flex; align-items:center; gap:5px;
-    padding: 3px 10px; font-size:9px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase;
-    font-family:'DM Sans',sans-serif;
-    background: rgba(196,66,26,0.15); border: 1px solid rgba(196,66,26,0.4); color:var(--rust-lt);
-  }
-
-  .noise-overlay::before {
-    content:''; position:absolute; inset:0; pointer-events:none; z-index:1;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    opacity:0.05; mix-blend-mode:screen;
-  }
+  .lbl { font-family:'DM Sans',sans-serif; font-size:11px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--mid); }
 `;
 
-// ─── SVG COMPONENTS ───────────────────────────────────────────
-
-function MountainRange({ width=800, height=160, color='rgba(120,196,208,0.12)', accent='rgba(196,66,26,0.25)' }: any) {
-  return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} fill="none" preserveAspectRatio="none" style={{ display:'block' }}>
-      {/* Back range */}
-      <polygon points={`0,${height} 80,60 160,100 260,30 380,80 480,20 600,70 700,35 ${width},90 ${width},${height}`} fill={color}/>
-      {/* Front range */}
-      <polygon points={`0,${height} 100,90 200,120 320,55 440,100 540,45 660,95 760,60 ${width},110 ${width},${height}`} fill={accent}/>
-      {/* Snow caps */}
-      <polygon points="260,30 240,50 280,50"   fill="rgba(240,234,224,0.5)"/>
-      <polygon points="480,20 462,42 498,42"   fill="rgba(240,234,224,0.55)"/>
-      <polygon points="700,35 682,56 718,56"   fill="rgba(240,234,224,0.45)"/>
-    </svg>
-  );
-}
-
-function Crosshair({ size=80, color='rgba(120,196,208,0.5)', spin=false }: any) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 80 80" fill="none"
-      style={{ animation: spin ? 'crosshair-spin 12s linear infinite' : 'none' }}>
-      <circle cx="40" cy="40" r="36" stroke={color} strokeWidth="1" strokeDasharray="4 6"/>
-      <circle cx="40" cy="40" r="20" stroke={color} strokeWidth="1"/>
-      <circle cx="40" cy="40" r="3"  fill={color}/>
-      <line x1="40" y1="4"  x2="40" y2="18" stroke={color} strokeWidth="1.5"/>
-      <line x1="40" y1="62" x2="40" y2="76" stroke={color} strokeWidth="1.5"/>
-      <line x1="4"  y1="40" x2="18" y2="40" stroke={color} strokeWidth="1.5"/>
-      <line x1="62" y1="40" x2="76" y2="40" stroke={color} strokeWidth="1.5"/>
-    </svg>
-  );
-}
-
-function DiamondDivider() {
-  return (
-    <div className="flex items-center gap-3 my-6">
-      <div className="flex-1 h-px" style={{ background:'linear-gradient(90deg, transparent, var(--rust))' }}/>
-      <div className="w-3 h-3 rotate-45" style={{ backgroundColor:'var(--rust)', boxShadow:'0 0 10px var(--glow-rust)' }}/>
-      <div className="flex-1 h-px" style={{ background:'linear-gradient(90deg, var(--rust), transparent)' }}/>
-    </div>
-  );
-}
-
-function FallingSnow() {
-  const flakes = useMemo(() => Array.from({ length:20 }, (_,i) => ({
-    id: i,
-    left:     `${(i * 5.1) % 100}%`,
-    delay:    `${(i * 0.55) % 12}s`,
-    duration: `${10 + (i * 0.8) % 10}s`,
-    size:     3 + (i * 0.7) % 6,
-    shape:    i % 3, // 0=circle, 1=star, 2=diamond
-  })), []);
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex:0 }}>
-      {flakes.map(f => (
-        <div key={f.id} style={{ position:'absolute', left:f.left, top:'-15px', opacity:0,
-          animation:`snow-fall ${f.duration} ${f.delay} ease-in infinite` }}>
-          {f.shape === 0 && <div style={{ width:f.size, height:f.size, borderRadius:'50%', backgroundColor:'rgba(240,234,224,0.7)' }}/>}
-          {f.shape === 1 && (
-            <svg width={f.size+4} height={f.size+4} viewBox="0 0 12 12" fill="none">
-              <line x1="6" y1="0" x2="6" y2="12" stroke="rgba(168,220,230,0.7)" strokeWidth="1.5"/>
-              <line x1="0" y1="6" x2="12" y2="6" stroke="rgba(168,220,230,0.7)" strokeWidth="1.5"/>
-              <line x1="1.8" y1="1.8" x2="10.2" y2="10.2" stroke="rgba(168,220,230,0.5)" strokeWidth="1"/>
-              <line x1="10.2" y1="1.8" x2="1.8" y2="10.2" stroke="rgba(168,220,230,0.5)" strokeWidth="1"/>
-            </svg>
-          )}
-          {f.shape === 2 && <div style={{ width:f.size, height:f.size, transform:'rotate(45deg)', backgroundColor:'rgba(200,169,126,0.6)' }}/>}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ─── TYPES ────────────────────────────────────────────────────
+/* ── TYPES ──────────────────────────────────────────────────── */
 interface Offer     { id:string; name:string; quantity:number; price:number; }
 interface Variant   { id:string; name:string; value:string; }
 interface Attribute { id:string; type:string; name:string; displayMode?:'color'|'image'|'text'|null; variants:Variant[]; }
@@ -242,7 +69,6 @@ interface VariantAttributeEntry { attrId:string; attrName:string; displayMode:'c
 interface VariantDetail { id:string|number; name:VariantAttributeEntry[]; price:number; stock:number; autoGenerate:boolean; }
 interface Wilaya  { id:string; name:string; ar_name:string; livraisonHome:number; livraisonOfice:number; livraisonReturn:number; }
 interface Commune { id:string; name:string; ar_name:string; wilayaId:string; }
-
 export interface Product {
   id:string; name:string; price:string|number; priceOriginal?:string|number; desc?:string;
   productImage?:string; imagesProduct?:ProductImage[]; offers?:Offer[]; attributes?:Attribute[];
@@ -254,35 +80,17 @@ export interface ProductFormProps {
   selectedOffer:string|null; setSelectedOffer:(id:string|null)=>void;
   selectedVariants:Record<string,string>; platform?:string; priceLoss?:number;
 }
-
 function variantMatches(d:VariantDetail, sel:Record<string,string>): boolean {
-  return Object.entries(sel).every(([n,v]) => d.name.some(e => e.attrName===n && e.value===v));
+  return Object.entries(sel).every(([n,v])=>d.name.some(e=>e.attrName===n&&e.value===v));
 }
-const fetchWilayas  = async (uid:string): Promise<Wilaya[]>  => { try { const {data} = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}`); return data||[]; } catch { return []; }};
-const fetchCommunes = async (wid:string): Promise<Commune[]> => { try { const {data} = await axios.get(`${API_URL}/shipping/get-communes/${wid}`); return data||[]; } catch { return []; }};
+const fetchWilayas  = async (uid:string): Promise<Wilaya[]>  => { try { const {data}=await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}`); return data||[]; } catch { return []; }};
+const fetchCommunes = async (wid:string): Promise<Commune[]> => { try { const {data}=await axios.get(`${API_URL}/shipping/get-communes/${wid}`); return data||[]; } catch { return []; }};
 
-
-// ─── MAIN ─────────────────────────────────────────────────────
+/* ── MAIN ───────────────────────────────────────────────────── */
 export default function Main({ store, children }: any) {
   return (
-    <div style={{ minHeight:'100vh', backgroundColor:'var(--slate)', fontFamily:"'DM Sans',sans-serif", color:'var(--text-b)' }}>
-      <style>{FONT_CSS}</style>
-      {store.topBar?.enabled && store.topBar?.text && (
-        <div className="marquee-wrap py-2" style={{ backgroundColor:'var(--rust)', borderBottom:'1px solid var(--rust-dk)' }}>
-          <div className="marquee-inner">
-            {Array(10).fill(null).map((_,i) => (
-              <span key={i} className="mx-8 text-white font-bold text-xs tracking-[0.2em] uppercase inline-flex items-center gap-3">
-                <Mountain className="w-3 h-3 opacity-70"/> {store.topBar.text}
-              </span>
-            ))}
-            {Array(10).fill(null).map((_,i) => (
-              <span key={`b${i}`} className="mx-8 text-white font-bold text-xs tracking-[0.2em] uppercase inline-flex items-center gap-3">
-                <Mountain className="w-3 h-3 opacity-70"/> {store.topBar.text}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+    <div style={{ minHeight:'100vh', backgroundColor:'var(--white)', fontFamily:"'DM Sans',sans-serif", color:'var(--ink)' }}>
+      <style>{CSS}</style>
       <Navbar store={store}/>
       <main>{children}</main>
       <Footer store={store}/>
@@ -290,712 +98,474 @@ export default function Main({ store, children }: any) {
   );
 }
 
-// ─── NAVBAR ───────────────────────────────────────────────────
+/* ── NAVBAR ─────────────────────────────────────────────────── */
 export function Navbar({ store }: { store: Store }) {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
   const isRTL = store.language === 'ar';
-  useEffect(()=>{ const h=()=>setScrolled(window.scrollY>20); window.addEventListener('scroll',h); return ()=>window.removeEventListener('scroll',h); },[]);
+  useEffect(()=>{ const h=()=>setScrolled(window.scrollY>10); window.addEventListener('scroll',h); return ()=>window.removeEventListener('scroll',h); },[]);
 
-  const nav = [
-    { href:`/${store.subdomain}`,         label:isRTL?'الرئيسية':'BASE CAMP', icon:<Mountain className="w-3.5 h-3.5"/> },
-    { href:`/${store.subdomain}/contact`, label:isRTL?'اتصل بنا':'CONTACT',   icon:<Compass  className="w-3.5 h-3.5"/> },
-    { href:`/${store.subdomain}/Privacy`, label:isRTL?'الخصوصية':'POLICY',    icon:<Shield   className="w-3.5 h-3.5"/> },
+  const links = [
+    { href:`/${store.subdomain}`,         label:isRTL?'الرئيسية':'Shop'    },
+    { href:`/${store.subdomain}/contact`, label:isRTL?'اتصل بنا':'Contact' },
   ];
-  const initials = store.name.split(' ').filter(Boolean).map((w:string)=>w[0]).join('').slice(0,2).toUpperCase();
 
   return (
-    <nav className="sticky top-0 z-50 transition-all duration-300" dir={isRTL?'rtl':'ltr'}
-      style={{ backgroundColor:scrolled?'rgba(15,25,35,0.97)':'rgba(15,25,35,0.85)', backdropFilter:'blur(20px)', borderBottom:`1px solid ${scrolled?'rgba(196,66,26,0.4)':'transparent'}`, boxShadow:scrolled?'0 4px 32px rgba(0,0,0,0.6)':'none' }}>
-      {/* Top accent line */}
-      <div className="h-0.5" style={{ background:'linear-gradient(90deg, var(--rust), var(--ice), var(--rust))' }}/>
-      <div className="max-w-7xl mx-auto px-5 lg:px-10">
-        <div className="flex items-center justify-between py-4">
-          {/* Logo */}
-          <Link href={`/${store.subdomain}`} className="flex items-center gap-3 group">
-            <div className="relative w-11 h-11 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-105"
-              style={{ backgroundColor:'var(--rust)', clipPath:'polygon(0 0, calc(100% - 10px) 0, 100% 100%, 10px 100%)', boxShadow:'0 0 20px var(--glow-rust)' }}>
-              {store.design.logoUrl
-                ? <img src={store.design.logoUrl} alt={store.name} className="w-full h-full object-cover"/>
-                : <span style={{ fontFamily:"'Bebas Neue',cursive", fontSize:'1.3rem', color:'white', letterSpacing:'0.05em' }}>{initials}</span>
-              }
-            </div>
-            <div>
-              <span className="block" style={{ fontFamily:"'Bebas Neue',cursive", fontSize:'1.5rem', color:'var(--cream)', letterSpacing:'0.1em', lineHeight:1 }}>
-                {store.name}
-              </span>
-              <span className="block text-[8px] font-bold tracking-[0.28em] uppercase" style={{ color:'var(--rust-lt)' }}>
-                {isRTL?'⛰ مغامرات الهواء الطلق':'⛰ OUTDOOR ADVENTURES'}
-              </span>
-            </div>
-          </Link>
+    <nav dir={isRTL?'rtl':'ltr'} style={{ position:'sticky', top:0, zIndex:50, backgroundColor:scrolled?'rgba(250,250,248,0.94)':'var(--white)', backdropFilter:scrolled?'blur(14px)':'none', borderBottom:'1px solid var(--line)', transition:'all 0.3s' }}>
 
-          {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-6">
-            {nav.map(item => (
-              <Link key={item.href} href={item.href}
-                className="relative flex items-center gap-1.5 text-xs font-bold tracking-[0.18em] transition-colors group"
-                style={{ color:'var(--stone-lt)' }}
-                onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--ice)';}}
-                onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--stone-lt)';}}>
-                {item.icon}{item.label}
-                <span className="absolute -bottom-1 left-0 h-0.5 w-0 group-hover:w-full transition-all duration-300" style={{ background:'var(--ice)' }}/>
-              </Link>
+      {store.topBar?.enabled && store.topBar?.text && (
+        <div style={{ backgroundColor:'var(--green)', padding:'7px 0', overflow:'hidden', whiteSpace:'nowrap' }}>
+          <div style={{ display:'inline-block', animation:'ticker 22s linear infinite' }}>
+            {Array(12).fill(null).map((_,i)=>(
+              <span key={i} style={{ fontFamily:"'DM Sans',sans-serif", fontSize:'11px', letterSpacing:'0.08em', color:'rgba(250,250,248,0.8)', margin:'0 36px' }}>
+                {store.topBar.text}
+              </span>
             ))}
-            <Link href={`/${store.subdomain}`}
-              className="btn-alpine flex items-center gap-2 px-7 py-3 text-xs font-bold tracking-[0.15em] text-white"
-              style={{ background:'linear-gradient(135deg, var(--rust), var(--rust-dk))', boxShadow:'0 4px 20px var(--glow-rust)' }}>
-              <Target className="w-3.5 h-3.5"/> {isRTL?'تسوق الآن':'GEAR UP'}
-            </Link>
+            {Array(12).fill(null).map((_,i)=>(
+              <span key={`b${i}`} style={{ fontFamily:"'DM Sans',sans-serif", fontSize:'11px', letterSpacing:'0.08em', color:'rgba(250,250,248,0.8)', margin:'0 36px' }}>
+                {store.topBar.text}
+              </span>
+            ))}
           </div>
+        </div>
+      )}
 
-          {/* Mobile toggle */}
-          <button onClick={()=>setMenuOpen(p=>!p)} className="md:hidden w-10 h-10 flex items-center justify-center"
-            style={{ border:'1px solid var(--border-lt)', color:'var(--ice)', backgroundColor:'rgba(120,196,208,0.08)' }}>
-            {menuOpen?<X className="w-5 h-5"/>:<Mountain className="w-5 h-5"/>}
-          </button>
+      <div style={{ maxWidth:'1200px', margin:'0 auto', padding:'0 24px', display:'flex', alignItems:'center', justifyContent:'space-between', height:'60px' }}>
+        <Link href={`/${store.subdomain}`} style={{ display:'flex', alignItems:'center', gap:'10px', textDecoration:'none' }}>
+          <div style={{ width:'32px', height:'32px', backgroundColor:'var(--green)', display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'2px', flexShrink:0, overflow:'hidden' }}>
+            {store.design?.logoUrl
+              ? <img src={store.design.logoUrl} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+              : <Mountain style={{ width:'16px', height:'16px', color:'var(--white)' }}/>
+            }
+          </div>
+          <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:'1.15rem', color:'var(--ink)' }}>{store.name}</span>
+        </Link>
+
+        <div style={{ display:'flex', alignItems:'center', gap:'32px' }} className="hidden md:flex">
+          {links.map(l=>(
+            <Link key={l.href} href={l.href} style={{ fontSize:'14px', color:'var(--mid)', textDecoration:'none', transition:'color 0.2s' }}
+              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--ink)';}}
+              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mid)';}}>
+              {l.label}
+            </Link>
+          ))}
+          <a href="#gear" className="btn btn-dark" style={{ padding:'9px 20px' }}>
+            {isRTL?'تسوق الآن':'Shop Now'}
+          </a>
         </div>
 
-        <div className={`md:hidden overflow-hidden transition-all duration-300 ${menuOpen?'max-h-52 pb-5':'max-h-0'}`}>
-          <div className="pt-4 space-y-1" style={{ borderTop:'1px solid var(--border)' }}>
-            {nav.map(item => (
-              <Link key={item.href} href={item.href} onClick={()=>setMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-3 text-xs font-bold tracking-[0.18em] transition-all"
-                style={{ color:'var(--stone-lt)', borderLeft:'2px solid transparent' }}
-                onMouseEnter={e=>{const el=e.currentTarget as HTMLElement; el.style.color='var(--ice)'; el.style.borderLeftColor='var(--rust)'; el.style.paddingLeft='1rem';}}
-                onMouseLeave={e=>{const el=e.currentTarget as HTMLElement; el.style.color='var(--stone-lt)'; el.style.borderLeftColor='transparent'; el.style.paddingLeft='0.75rem';}}>
-                {item.icon}{item.label}
-              </Link>
-            ))}
-          </div>
+        <button onClick={()=>setOpen(p=>!p)} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--ink)', padding:'4px', display:'flex' }} className="md:hidden">
+          {open ? <X style={{ width:'20px', height:'20px' }}/> : <Mountain style={{ width:'20px', height:'20px' }}/>}
+        </button>
+      </div>
+
+      <div style={{ maxHeight:open?'160px':'0', overflow:'hidden', transition:'max-height 0.3s ease', borderTop:open?'1px solid var(--line)':'none' }}>
+        <div style={{ padding:'8px 24px 16px' }}>
+          {links.map(l=>(
+            <Link key={l.href} href={l.href} onClick={()=>setOpen(false)}
+              style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 0', fontSize:'14px', color:'var(--mid)', textDecoration:'none', borderBottom:'1px solid var(--line)' }}>
+              {l.label} <ArrowRight style={{ width:'13px', height:'13px' }}/>
+            </Link>
+          ))}
         </div>
       </div>
     </nav>
   );
 }
 
-// ─── FOOTER ───────────────────────────────────────────────────
+/* ── FOOTER ─────────────────────────────────────────────────── */
 export function Footer({ store }: any) {
+  const year = new Date().getFullYear();
   const isRTL = store.language === 'ar';
   return (
-    <footer className="relative overflow-hidden noise-overlay" style={{ backgroundColor:'var(--slate)', fontFamily:"'DM Sans',sans-serif" }}>
-      {/* Mountain silhouette */}
-      <div className="absolute bottom-0 left-0 right-0 opacity-8 pointer-events-none">
-        <MountainRange width={1440} height={200} color="rgba(26,40,54,0.8)" accent="rgba(37,53,71,0.9)"/>
-      </div>
-      <div className="h-0.5" style={{ background:'linear-gradient(90deg, var(--rust), var(--ice), var(--moss-lt), var(--rust))' }}/>
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pb-12" style={{ borderBottom:'1px solid var(--border)' }}>
-          {/* Brand */}
-          <div className="space-y-5">
-            <div>
-              <p className="font-bold mb-1" style={{ fontFamily:"'Bebas Neue',cursive", fontSize:'2rem', color:'var(--cream)', letterSpacing:'0.1em', lineHeight:1 }}>{store.name}</p>
-              <p className="text-[9px] font-bold tracking-[0.28em] uppercase" style={{ color:'var(--rust-lt)' }}>⛰ OUTDOOR ADVENTURES</p>
+    <footer dir={isRTL?'rtl':'ltr'} style={{ backgroundColor:'var(--green)', color:'rgba(250,250,248,0.8)', fontFamily:"'DM Sans',sans-serif" }}>
+      <div style={{ maxWidth:'1200px', margin:'0 auto', padding:'56px 24px 36px' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'40px', paddingBottom:'40px', borderBottom:'1px solid rgba(250,250,248,0.1)' }}>
+          <div>
+            <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'16px' }}>
+              <div style={{ width:'30px', height:'30px', border:'1px solid rgba(250,250,248,0.25)', display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'2px' }}>
+                <Mountain style={{ width:'14px', height:'14px', color:'var(--white)' }}/>
+              </div>
+              <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:'1.05rem', color:'var(--white)' }}>{store.name}</span>
             </div>
-            <p className="text-sm leading-relaxed" style={{ color:'var(--text-dim)' }}>
-              {isRTL?'معدات متخصصة للمغامرات والرياضات الخارجية. جودة احترافية لكل المغامرين.':'Professional-grade gear for explorers who refuse to stay indoors. Built to survive anything.'}
+            <p style={{ fontSize:'13px', lineHeight:'1.8', color:'rgba(250,250,248,0.5)', maxWidth:'220px', fontWeight:300 }}>
+              {isRTL?'معدات المغامرة الأصيلة.':'Authentic outdoor gear for the Algerian wild.'}
             </p>
-            <div className="flex gap-3">
-              {['SUMMIT READY','FIELD TESTED','GEAR CERTIFIED'].map(b=>(
-                <span key={b} className="tag-alpine text-[8px]">{b}</span>
-              ))}
-            </div>
           </div>
 
-          {/* Nav links */}
           <div>
-            <p className="spec-label mb-5">// NAVIGATE</p>
-            <div className="space-y-2">
+            <p className="lbl" style={{ color:'rgba(250,250,248,0.35)', marginBottom:'16px' }}>{isRTL?'روابط':'Links'}</p>
+            <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
               {[
-                { href:`/${store.subdomain}/Privacy`, label:isRTL?'سياسة الخصوصية':'PRIVACY POLICY' },
-                { href:`/${store.subdomain}/Terms`,   label:isRTL?'شروط الخدمة'    :'TERMS OF SERVICE' },
-                { href:`/${store.subdomain}/Cookies`, label:isRTL?'ملفات الارتباط' :'COOKIE POLICY' },
-                { href:`/${store.subdomain}/contact`, label:isRTL?'اتصل بنا'        :'CONTACT BASE' },
-              ].map(l=>(
-                <a key={l.href} href={l.href} className="flex items-center gap-2 text-xs font-bold tracking-[0.14em] transition-all"
-                  style={{ color:'var(--text-dim)', borderLeft:'2px solid transparent', paddingLeft:'0', display:'flex' }}
-                  onMouseEnter={e=>{const el=e.currentTarget as HTMLElement; el.style.color='var(--ice)'; el.style.borderLeftColor='var(--rust)'; el.style.paddingLeft='8px';}}
-                  onMouseLeave={e=>{const el=e.currentTarget as HTMLElement; el.style.color='var(--text-dim)'; el.style.borderLeftColor='transparent'; el.style.paddingLeft='0';}}>
-                  <ArrowRight className="w-3 h-3 opacity-50"/> {l.label}
+                [`/${store.subdomain}/Privacy`, isRTL?'الخصوصية':'Privacy'],
+                [`/${store.subdomain}/Terms`,   isRTL?'الشروط':'Terms'],
+                [`/${store.subdomain}/Cookies`, isRTL?'الكوكيز':'Cookies'],
+                [`/${store.subdomain}/contact`, isRTL?'اتصل بنا':'Contact'],
+              ].map(([href,label])=>(
+                <a key={href} href={href} style={{ fontSize:'13px', color:'rgba(250,250,248,0.45)', textDecoration:'none', transition:'color 0.2s' }}
+                  onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--white)';}}
+                  onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='rgba(250,250,248,0.45)';}}>
+                  {label}
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Coordinates card */}
           <div>
-            <p className="spec-label mb-4">// FIELD REPORT</p>
-            <div className="p-5 relative overflow-hidden" style={{ border:'1px solid var(--border-lt)', backgroundColor:'rgba(120,196,208,0.04)' }}>
-              <div className="absolute top-3 right-3 opacity-30"><Crosshair size={50} color="var(--ice)"/></div>
-              <div className="space-y-3">
-                {[
-                  { l:'LATITUDE',  v:'36.7538° N' },
-                  { l:'LONGITUDE', v:'3.0588° E'  },
-                  { l:'ALTITUDE',  v:'2,308 m'    },
-                  { l:'STATUS',    v:'OPERATIONAL' },
-                ].map(r=>(
-                  <div key={r.l} className="flex justify-between items-center">
-                    <span className="spec-label">{r.l}</span>
-                    <span className="text-xs font-bold" style={{ fontFamily:"'Bebas Neue',cursive", letterSpacing:'0.1em', color: r.l==='STATUS'?'var(--moss-lt)':'var(--ice)' }}>{r.v}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4 pt-3" style={{ borderTop:'1px solid var(--border)' }}>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor:'var(--moss-lt)', animation:'blink-dot 1.5s ease-in-out infinite' }}/>
-                  <span className="spec-label">STORE ONLINE · READY FOR ORDERS</span>
-                </div>
-              </div>
-            </div>
+            <p className="lbl" style={{ color:'rgba(250,250,248,0.35)', marginBottom:'16px' }}>{isRTL?'تواصل':'Contact'}</p>
+            <p style={{ fontSize:'13px', color:'rgba(250,250,248,0.5)', display:'flex', alignItems:'center', gap:'8px', marginBottom:'8px' }}>
+              <Phone style={{ width:'12px', height:'12px', flexShrink:0 }}/> +213 550 000 000
+            </p>
+            <p style={{ fontSize:'13px', color:'rgba(250,250,248,0.5)', fontWeight:300 }}>Algiers, Algeria</p>
           </div>
         </div>
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="spec-label">© {new Date().getFullYear()} {store.name} · {isRTL?'جميع الحقوق محفوظة':'ALL RIGHTS RESERVED'}</p>
-          <p className="spec-label">OUTDOOR ADVENTURES THEME · ALPINE SERIES</p>
+        <div style={{ paddingTop:'20px', display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:'8px' }}>
+          <p style={{ fontSize:'12px', color:'rgba(250,250,248,0.25)' }}>© {year} {store.name}</p>
+          <p style={{ fontSize:'12px', color:'rgba(250,250,248,0.25)' }}>Outdoor Theme</p>
         </div>
       </div>
     </footer>
   );
 }
 
-
-// ─── CARD ─────────────────────────────────────────────────────
+/* ── CARD ───────────────────────────────────────────────────── */
 export function Card({ product, displayImage, discount, isRTL, store, viewDetails }: any) {
-  const [hovered, setHovered] = useState(false);
-  const accents=['var(--rust)','var(--ice-dk)','var(--moss-lt)','var(--sand)','var(--rust-lt)'];
-  const accent=accents[parseInt(product.id)%accents.length];
+  const [hov, setHov] = useState(false);
+  const price = typeof product.price==='string' ? parseFloat(product.price) : product.price as number;
   return (
-    <div className="card-alpine flex flex-col overflow-hidden mb-4"
-      style={{ backgroundColor:'var(--slate-lt)', border:'1px solid var(--border)' }}
-      onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)}>
-      {/* Image */}
-      <div className="relative overflow-hidden" style={{ aspectRatio:'1', backgroundColor:'var(--slate-md)' }}>
+    <div className="gear-card" onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}>
+      <div className="card-img" style={{ position:'relative', aspectRatio:'4/5', overflow:'hidden', backgroundColor:'var(--stone)', borderRadius:'2px' }}>
         {displayImage
-          ? <img src={displayImage} alt={product.name} className="w-full h-full object-cover transition-transform duration-500" style={{ transform:hovered?'scale(1.07)':'scale(1)' }}/>
-          : <div className="w-full h-full flex flex-col items-center justify-center crosshair-grid">
-              <Mountain className="w-12 h-12" style={{ color:'var(--slate-md)' }}/>
-              <span className="spec-label mt-2">NO IMAGE</span>
+          ? <img src={displayImage} alt={product.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
+          : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <Mountain style={{ width:'36px', height:'36px', color:'var(--dim)' }}/>
             </div>
         }
-        {/* Top overlay gradient */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background:'linear-gradient(to bottom, rgba(15,25,35,0.3) 0%, transparent 40%, rgba(15,25,35,0.6) 100%)' }}/>
-
-        {/* Discount badge — diagonal cut */}
-        {discount>0&&(
-          <div className="absolute top-3 left-0 px-3 py-1.5 text-[10px] font-bold tracking-wider text-white"
-            style={{ backgroundColor:'var(--rust)', clipPath:'polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%)', boxShadow:'4px 4px 16px var(--glow-rust)' }}>
-            -{discount}% OFF
+        <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(28,28,26,0.55) 0%, transparent 55%)', pointerEvents:'none', opacity:hov?1:0, transition:'opacity 0.3s' }}/>
+        {discount>0 && (
+          <div style={{ position:'absolute', top:'10px', left:'10px', backgroundColor:'var(--amber)', color:'white', fontSize:'11px', fontWeight:500, padding:'3px 8px', borderRadius:'2px' }}>
+            -{discount}%
           </div>
         )}
-
-        {/* Wishlist */}
-        <button className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center transition-all duration-300"
-          style={{ border:'1px solid var(--border-lt)', backgroundColor:'rgba(15,25,35,0.75)', color:'var(--sand)', opacity:hovered?1:0, transform:hovered?'scale(1)':'scale(0.7)' }}>
-          <Heart className="w-3.5 h-3.5"/>
-        </button>
-
-        {/* Hover CTA */}
-        <div className="absolute hidden bottom-0 left-0 right-0 p-3 transition-all duration-400"
-          style={{ transform:hovered?'translateY(0)':'translateY(110%)', opacity:hovered?1:0 }}>
+        <div style={{ position:'absolute', bottom:'12px', left:'12px', right:'12px', opacity:hov?1:0, transform:hov?'translateY(0)':'translateY(6px)', transition:'all 0.3s' }}>
           <Link href={`/${store.subdomain}/product/${product.slug||product.id}`}
-            className="btn-alpine flex items-center justify-center gap-2 w-full py-3 text-xs font-bold tracking-[0.15em] text-white"
-            style={{ background:`linear-gradient(135deg, var(--rust), var(--rust-dk))`, boxShadow:'0 4px 16px var(--glow-rust)' }}>
-            <Target className="w-3.5 h-3.5"/> {viewDetails}
+            className="btn btn-dark" style={{ width:'100%', justifyContent:'center', fontSize:'12px', padding:'10px' }}>
+            {viewDetails} <ArrowRight style={{ width:'12px', height:'12px' }}/>
           </Link>
         </div>
       </div>
-
-      {/* Content */}
-      <div className="p-4 flex flex-col flex-1 relative">
-        {/* Accent accent-color left border highlight on hover */}
-        <div className="flex gap-0.5 mb-3">
-          {[...Array(5)].map((_,i)=><Star key={i} className={`w-2.5 h-2.5 ${i<4?'fill-current':''}`} style={{ color:'var(--sand)' }}/>)}
-          <span className="ml-1 text-[9px] font-bold" style={{ color:'var(--text-dim)' }}>4.8</span>
+      <div style={{ padding:'12px 2px' }}>
+        <div style={{ display:'flex', gap:'2px', marginBottom:'5px' }}>
+          {[...Array(5)].map((_,i)=><Star key={i} style={{ width:'10px', height:'10px', fill:i<4?'var(--amber)':'none', color:'var(--amber)' }}/>)}
         </div>
-        <h3 className="font-bold mb-2 leading-tight line-clamp-2"
-          style={{ fontFamily:"'Bebas Neue',cursive", fontSize:'1.15rem', color:'var(--cream)', letterSpacing:'0.06em' }}>
-          {product.name}
-        </h3>
-        {product.desc&&(
-          <div className="text-xs mb-3 line-clamp-2 leading-relaxed" style={{ color:'var(--text-dim)' }}
-            dangerouslySetInnerHTML={{ __html:product.desc }}/>
-        )}
-        <div className="mt-auto pt-3 flex items-end justify-between" style={{ borderTop:'1px solid var(--border)' }}>
-          <div>
-            <p className="spec-label mb-0.5">FIELD PRICE</p>
-            <span className="font-bold" style={{ fontFamily:"'Bebas Neue',cursive", fontSize:'1.6rem', color:accent, letterSpacing:'0.06em', lineHeight:1 }}>
-              {product.price}
-            </span>
-            <span className="ml-1 text-xs font-bold" style={{ color:'var(--text-dim)' }}>{store.currency}</span>
-            {product.priceOriginal&&product.priceOriginal>product.price&&(
-              <span className="ml-2 text-xs line-through" style={{ color:'var(--text-dim)' }}>{product.priceOriginal}</span>
-            )}
-          </div>
-          <Link href={`/${store.subdomain}/product/${product.slug||product.id}`} className="w-8 h-8 flex items-center justify-center transition-all duration-300 group-hover:scale-110"
-            style={{ border:'1px solid var(--border-lt)', color:'var(--ice)', backgroundColor:'rgba(120,196,208,0.08)' }}>
-            <ArrowRight className="w-3.5 h-3.5"/>
-          </Link>
+        <h3 style={{ fontFamily:"'DM Serif Display',serif", fontSize:'1rem', color:'var(--ink)', marginBottom:'5px', lineHeight:1.3 }}>{product.name}</h3>
+        <div style={{ display:'flex', alignItems:'baseline', gap:'8px' }}>
+          <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:'1.15rem', color:'var(--ink)' }}>{price.toLocaleString()}</span>
+          <span style={{ fontSize:'12px', color:'var(--mid)' }}>دج</span>
+          {product.priceOriginal && parseFloat(String(product.priceOriginal))>price && (
+            <span style={{ fontSize:'12px', color:'var(--dim)', textDecoration:'line-through' }}>{parseFloat(String(product.priceOriginal)).toLocaleString()}</span>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-// ─── HOME ─────────────────────────────────────────────────────
+/* ── HOME ───────────────────────────────────────────────────── */
 export function Home({ store }: any) {
   const isRTL = store.language === 'ar';
-  const dir   = isRTL ? 'rtl' : 'ltr';
+  const products: any[] = store.products || [];
   const t = {
-    badge:      isRTL?'⛰ معدات احترافية'         :'⛰ PROFESSIONAL GRADE GEAR',
-    heroTitle:  isRTL?'الطبيعة\nتنتظرك'            :'CONQUER\nEVERY SUMMIT',
-    heroSub:    isRTL?'معدات ومستلزمات خارجية احترافية للمغامرين الحقيقيين.':"Field-tested gear for extreme conditions. From base camp to summit — we've got you covered.",
-    heroBtn:    isRTL?'⛺ تسوق المعدات'            :'⛺ GEAR UP NOW',
-    heroBtn2:   isRTL?'📋 العروض'                 :'📋 VIEW DEALS',
-    categories: isRTL?'تصفح الفئات'                :'BROWSE CATEGORIES',
-    all:        isRTL?'الكل'                         :'ALL GEAR',
-    products:   isRTL?'معداتنا الميدانية'            :'FIELD EQUIPMENT',
-    noProducts: isRTL?'لا توجد منتجات بعد'           :'NO GEAR LOADED YET',
-    viewDetails:isRTL?'عرض التفاصيل'                 :'INSPECT GEAR',
+    badge:       isRTL?'مجموعة جديدة':'New Collection',
+    shopNow:     isRTL?'تسوق الآن':'Shop Now',
+    browse:      isRTL?'الفئات':'Browse',
+    gearTitle:   isRTL?'المنتجات':'Our Gear',
+    viewDetails: isRTL?'عرض التفاصيل':'View Details',
+    noItems:     isRTL?'لا توجد منتجات':'No products yet',
+    allGear:     isRTL?'الكل':'All',
+    whyTitle:    isRTL?'لماذا نحن':'Why Choose Us',
   };
 
-  const specs = [
-    { icon:<Thermometer className="w-5 h-5"/>, label:'TEMP RANGE', val:'-40°C / +50°C', color:'var(--ice)' },
-    { icon:<Wind className="w-5 h-5"/>,        label:'WIND RATING', val:'FORCE 10',      color:'var(--sand)' },
-    { icon:<Mountain className="w-5 h-5"/>,    label:'ALTITUDE',    val:'8,849 M',        color:'var(--moss-lt)' },
-    { icon:<Zap className="w-5 h-5"/>,         label:'DURABILITY',  val:'MILITARY GR.',  color:'var(--rust-lt)' },
+  const features = [
+    { icon:'🏔️', title:isRTL?'جودة عالية':'Quality Gear',  desc:isRTL?'كل قطعة مختبرة.':'Field-tested quality.' },
+    { icon:'📦', title:isRTL?'توصيل سريع':'Fast Delivery',  desc:isRTL?'48 ساعة لبابك.':'48h to your door.'    },
+    { icon:'🔄', title:isRTL?'إرجاع مجاني':'Free Returns',  desc:isRTL?'30 يوم إرجاع.':'30-day free returns.'  },
+    { icon:'✅', title:isRTL?'100% أصيل':'100% Authentic',  desc:isRTL?'منتجات أصلية فقط.':'Original products.'  },
   ];
 
   return (
-    <div dir={dir} style={{ backgroundColor:'var(--slate)', fontFamily:"'DM Sans',sans-serif" }}>
+    <div dir={isRTL?'rtl':'ltr'}>
 
-      {/* ── HERO ── */}
-      <section className="relative overflow-hidden scan-overlay" style={{ minHeight:'100vh', display:'flex', alignItems:'center' }}>
-        <FallingSnow/>
-        {/* Topo background */}
-        <div className="absolute inset-0 topo-bg pointer-events-none"/>
-        {/* Crosshair grid */}
-        <div className="absolute inset-0 crosshair-grid pointer-events-none opacity-40"/>
-        {/* Dark gradient */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background:'linear-gradient(135deg, rgba(15,25,35,0.97) 0%, rgba(15,25,35,0.7) 60%, rgba(15,25,35,0.4) 100%)' }}/>
-        {/* Mountain silhouette bottom */}
-        <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ zIndex:1 }}>
-          <MountainRange width={1440} height={220} color="rgba(26,40,54,0.9)" accent="rgba(37,53,71,0.8)"/>
-        </div>
-        {/* Rust glow blob */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none opacity-5"
-          style={{ background:'radial-gradient(circle, var(--rust), transparent 70%)' }}/>
-        {/* Decorative crosshairs */}
-        <div className="absolute top-16 right-16 hidden lg:block pointer-events-none"><Crosshair size={120} color="rgba(120,196,208,0.2)" spin/></div>
-        <div className="absolute bottom-40 left-8 hidden xl:block pointer-events-none"><Crosshair size={60} color="rgba(196,66,26,0.2)"/></div>
-
-        {store.hero?.imageUrl&&(
-          <div className="absolute inset-0 pointer-events-none"><img src={store.hero.imageUrl} alt="" className="w-full h-full object-cover" style={{ opacity:0.1 }}/></div>
+      {/* HERO */}
+      <section style={{ position:'relative', height:'92vh', minHeight:'540px', overflow:'hidden', backgroundColor:'var(--green)' }}>
+        {store.hero?.imageUrl && (
+          <img src={store.hero.imageUrl} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', opacity:0.6, display:'block' }}/>
         )}
+        <div style={{ position:'absolute', inset:0, background:'linear-gradient(to right, rgba(28,28,26,0.72) 0%, rgba(28,28,26,0.18) 65%, transparent 100%)' }}/>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 w-full pt-16">
-          <div className="max-w-3xl">
-            {/* Badge */}
-            <div className="slide-up inline-flex items-center gap-2 mb-6 px-4 py-2 text-xs font-bold tracking-[0.2em]"
-              style={{ border:'1px solid rgba(196,66,26,0.5)', backgroundColor:'rgba(196,66,26,0.1)', color:'var(--rust-lt)' }}>
-              <Target className="w-3 h-3"/> {t.badge}
-            </div>
-
-            {/* Title */}
-            <h1 className="slide-up slide-up-d1 whitespace-pre-line mb-2"
-              style={{ fontFamily:"'Bebas Neue',cursive", fontSize:'clamp(4.5rem,13vw,11rem)', color:'var(--cream)', letterSpacing:'0.06em', lineHeight:0.9 }}>
-              {store.hero?.title||t.heroTitle}
-            </h1>
-
-            {/* Accent line */}
-            <div className="slide-up slide-up-d1 flex items-center gap-4 mb-6">
-              <div className="h-1 w-16" style={{ background:'linear-gradient(90deg, var(--rust), transparent)' }}/>
-              <DiamondDivider/>
-              <div className="h-1 w-16" style={{ background:'linear-gradient(90deg, transparent, var(--ice))' }}/>
-            </div>
-
-            <p className="slide-up slide-up-d2 text-base leading-relaxed mb-10 max-w-lg" style={{ color:'var(--text-b)', fontWeight:400 }}>
-              {store.hero?.subtitle||t.heroSub}
-            </p>
-
-            {/* CTAs */}
-            <div className="slide-up slide-up-d3 flex flex-wrap gap-4 mb-12">
-              <a href="#products" className="btn-alpine flex items-center gap-2.5 px-10 py-4 text-sm font-bold tracking-[0.15em] text-white"
-                style={{ background:'linear-gradient(135deg, var(--rust), var(--rust-dk))', boxShadow:'0 8px 32px var(--glow-rust)' }}>
-                <Mountain className="w-4 h-4"/> {t.heroBtn}
-              </a>
-              <a href="#categories" className="btn-alpine flex items-center gap-2.5 px-10 py-4 text-sm font-bold tracking-[0.15em]"
-                style={{ border:'1px solid var(--border-lt)', color:'var(--ice)', backgroundColor:'rgba(120,196,208,0.07)' }}>
-                {t.heroBtn2} <ArrowRight className="w-4 h-4"/>
-              </a>
-            </div>
-
-            {/* Spec bar */}
-            <div className="slide-up slide-up-d4 grid grid-cols-2 sm:grid-cols-4 gap-px"
-              style={{ border:'1px solid var(--border)', backgroundColor:'var(--border)' }}>
-              {specs.map((s,i)=>(
-                <div key={i} className="flex flex-col gap-2 p-4" style={{ backgroundColor:'rgba(15,25,35,0.95)' }}>
-                  <div style={{ color:s.color }}>{s.icon}</div>
-                  <p className="spec-label">{s.label}</p>
-                  <p className="font-bold text-xs" style={{ fontFamily:"'Bebas Neue',cursive", color:'var(--cream)', letterSpacing:'0.08em', fontSize:'1rem' }}>{s.val}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom slash cut */}
-        <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none" style={{ zIndex:2, background:'linear-gradient(180deg, transparent, var(--slate-lt))' }}/>
-      </section>
-
-      {/* ── GEAR BADGES ── */}
-      <section style={{ backgroundColor:'var(--slate-lt)', borderBottom:'1px solid var(--border)' }}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-px" style={{ border:'1px solid var(--border)', backgroundColor:'var(--border)' }}>
-            {[
-              { icon:<Award className="w-5 h-5"/>,       col:'var(--rust-lt)',  label:'FIELD TESTED',  desc:isRTL?'اختبر في أقسى الظروف':'Proven in extreme conditions' },
-              { icon:<Shield className="w-5 h-5"/>,      col:'var(--ice)',      label:'BATTLE READY',  desc:isRTL?'تصميم عسكري':'Military-grade durability' },
-              { icon:<Zap className="w-5 h-5"/>,         col:'var(--sand)',     label:'LIGHTWEIGHT',   desc:isRTL?'خفيف وقوي':'Light enough to carry far' },
-            ].map((b,i)=>(
-              <div key={i} className="flex items-center gap-4 px-6 py-6 transition-all" style={{ backgroundColor:'var(--slate-lt)' }}
-                onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.backgroundColor='var(--slate-md)';}}
-                onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.backgroundColor='var(--slate-lt)';}}>
-                <div className="w-10 h-10 flex items-center justify-center" style={{ border:`1px solid ${b.col}`, color:b.col, backgroundColor:`${b.col}12` }}>{b.icon}</div>
-                <div>
-                  <p className="font-bold text-xs tracking-[0.15em]" style={{ fontFamily:"'Bebas Neue',cursive", color:'var(--cream)', fontSize:'1rem' }}>{b.label}</p>
-                  <p className="spec-label mt-0.5">{b.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CATEGORIES ── */}
-      <section id="categories" className="py-20" style={{ backgroundColor:'var(--slate)' }}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <p className="spec-label mb-2">// FILTER BY TERRAIN</p>
-              <h2 style={{ fontFamily:"'Bebas Neue',cursive", fontSize:'clamp(2rem,5vw,4rem)', color:'var(--cream)', letterSpacing:'0.08em', lineHeight:1 }}>{t.categories}</h2>
-            </div>
-            <DiamondDivider/>
-          </div>
-          {store.categories?.length>0?(
-            <div className="flex flex-wrap gap-3">
-              <Link href={`/${store.subdomain}`}
-                className="btn-alpine flex items-center gap-2 px-7 py-3 text-xs font-bold tracking-[0.15em] text-white"
-                style={{ background:'linear-gradient(135deg, var(--rust), var(--rust-dk))', boxShadow:'0 4px 16px var(--glow-rust)' }}>
-                <Target className="w-3.5 h-3.5"/> {t.all}
-              </Link>
-              {store.categories.map((cat:any,idx:number)=>{
-                const cols=['var(--ice)','var(--moss-lt)','var(--sand)','var(--rust-lt)','var(--stone-lt)'];
-                const col=cols[idx%cols.length];
-                return (
-                  <Link key={cat.id} href={`/${store.subdomain}?category=${cat.id}`}
-                    className="btn-alpine flex items-center gap-2 px-6 py-3 text-xs font-bold tracking-[0.15em] transition-all"
-                    style={{ border:`1px solid ${col}`, color:col, backgroundColor:`${col}10` }}
-                    onMouseEnter={e=>{const el=e.currentTarget as HTMLElement; el.style.backgroundColor=col; el.style.color='var(--slate)';}}
-                    onMouseLeave={e=>{const el=e.currentTarget as HTMLElement; el.style.backgroundColor=`${col}10`; el.style.color=col;}}>
-                    {cat.name}
-                  </Link>
-                );
-              })}
-            </div>
-          ):(
-            <div className="py-20 text-center crosshair-grid" style={{ border:'1px dashed var(--border-lt)' }}>
-              <Mountain className="w-12 h-12 mx-auto mb-3" style={{ color:'var(--slate-md)' }}/>
-              <p className="spec-label">NO CATEGORIES DEPLOYED</p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ── PRODUCTS ── */}
-      <section id="products" className="py-20" style={{ backgroundColor:'var(--slate-lt)' }}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="flex items-end justify-between mb-12">
-            <div>
-              <p className="spec-label mb-2">// EQUIPMENT MANIFEST</p>
-              <h2 style={{ fontFamily:"'Bebas Neue',cursive", fontSize:'clamp(2rem,5vw,4rem)', color:'var(--cream)', letterSpacing:'0.08em', lineHeight:1 }}>{t.products}</h2>
-              <p className="spec-label mt-1">{store.products?.length||0} {isRTL?'عنصر متوفر':'ITEMS IN STOCK'}</p>
-            </div>
-            <div className="hidden md:block"><Crosshair size={70} color="rgba(196,66,26,0.3)" spin/></div>
-          </div>
-          {store.products?.length>0?(
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-px" style={{ border:'1px solid var(--border)', backgroundColor:'var(--border)' }}>
-              {store.products.map((product:any)=>{
-                const displayImage=product.productImage||product.imagesProduct?.[0]?.imageUrl||store.design?.logoUrl;
-                const discount=product.priceOriginal?Math.round(((product.priceOriginal-product.price)/product.priceOriginal)*100):0;
-                return <Card key={product.id} product={product} displayImage={displayImage} discount={discount} isRTL={isRTL} store={store} viewDetails={t.viewDetails}/>;
-              })}
-            </div>
-          ):(
-            <div className="py-40 text-center crosshair-grid" style={{ border:'1px dashed var(--border-lt)' }}>
-              <Mountain className="w-16 h-16 mx-auto mb-4" style={{ color:'var(--slate-md)' }}/>
-              <p className="font-bold" style={{ fontFamily:"'Bebas Neue',cursive", fontSize:'2rem', color:'var(--stone)', letterSpacing:'0.1em' }}>{t.noProducts}</p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ── SUMMIT BANNER ── */}
-      <section className="relative overflow-hidden py-28 noise-overlay" style={{ backgroundColor:'var(--slate)' }}>
-        <div className="absolute inset-0 topo-bg pointer-events-none opacity-60"/>
-        <div className="absolute inset-0 crosshair-grid pointer-events-none opacity-30"/>
-        <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
-          <MountainRange width={1440} height={160} color="rgba(26,40,54,0.7)" accent="rgba(37,53,71,0.6)"/>
-        </div>
-        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 pointer-events-none hidden lg:block">
-          <Crosshair size={200} color="rgba(120,196,208,0.08)" spin/>
-        </div>
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 text-xs font-bold tracking-[0.2em]"
-            style={{ border:'1px solid rgba(196,66,26,0.4)', backgroundColor:'rgba(196,66,26,0.08)', color:'var(--rust-lt)' }}>
-            <Target className="w-3 h-3"/> SUMMIT READY
-          </div>
-          <h2 className="font-bold mb-4" style={{ fontFamily:"'Bebas Neue',cursive", fontSize:'clamp(3.5rem,10vw,9rem)', color:'var(--cream)', letterSpacing:'0.06em', lineHeight:0.9 }}>
-            {isRTL?'جهّز نفسك\nللقمة':'BUILT FOR\nTHE EXTREME'}
-          </h2>
-          <div className="flex justify-center my-6"><DiamondDivider/></div>
-          <p className="text-base leading-relaxed mb-10 max-w-lg mx-auto" style={{ color:'var(--text-b)' }}>
-            {isRTL?'معدات احترافية لكل من يحب الطبيعة والمغامرة. لأن الجبل لا يرحم المهمل.':'Every piece of gear is field-tested by professionals who know that the mountain has no mercy for poor equipment.'}
+        <div style={{ position:'relative', zIndex:2, height:'100%', display:'flex', flexDirection:'column', justifyContent:'center', padding:'0 8vw', maxWidth:'680px' }}>
+          <p className="fi lbl" style={{ color:'rgba(250,250,248,0.65)', marginBottom:'14px' }}>{t.badge}</p>
+          <h1 className="fi fi-1" style={{ fontFamily:"'DM Serif Display',serif", fontStyle:'italic', fontSize:'clamp(3rem,7vw,6rem)', color:'var(--white)', lineHeight:1.02, marginBottom:'18px', letterSpacing:'-0.01em' }}>
+            {store.hero?.title || (isRTL?<>اكتشف<br/>الطبيعة</>:<>Explore<br/>the Wild</>)}
+          </h1>
+          <p className="fi fi-2" style={{ fontSize:'16px', lineHeight:1.7, color:'rgba(250,250,248,0.65)', marginBottom:'30px', maxWidth:'360px', fontWeight:300 }}>
+            {store.hero?.subtitle || (isRTL?'معدات المغامرة الأصيلة للجزائر.':'Authentic outdoor gear for Algeria.')}
           </p>
-          <div className="flex justify-center gap-4 flex-wrap">
-            <a href="#products" className="btn-alpine flex items-center gap-2 px-10 py-4 text-sm font-bold tracking-[0.15em] text-white"
-              style={{ background:'linear-gradient(135deg, var(--rust), var(--rust-dk))', boxShadow:'0 8px 32px var(--glow-rust)' }}>
-              <Mountain className="w-4 h-4"/> {isRTL?'تسوق الآن':'SHOP THE RANGE'}
+          <div className="fi fi-3" style={{ display:'flex', gap:'10px', flexWrap:'wrap' }}>
+            <a href="#gear" className="btn btn-dark" style={{ padding:'13px 28px' }}>
+              {t.shopNow} <ArrowRight style={{ width:'14px', height:'14px' }}/>
             </a>
-            <a href="#categories" className="btn-alpine flex items-center gap-2 px-10 py-4 text-sm font-bold tracking-[0.15em]"
-              style={{ border:'1px solid var(--ice)', color:'var(--ice)', backgroundColor:'rgba(120,196,208,0.06)' }}>
-              <Compass className="w-4 h-4"/> {isRTL?'استكشف':'EXPLORE'}
-            </a>
+            {store.categories?.length>0 && (
+              <a href="#cats" className="btn btn-ghost" style={{ padding:'13px 28px', border:'1px solid rgba(250,250,248,0.3)', color:'var(--white)' }}>
+                {t.browse}
+              </a>
+            )}
           </div>
+        </div>
+
+        {/* Stats strip */}
+        <div style={{ position:'absolute', bottom:0, left:0, right:0, display:'grid', gridTemplateColumns:'repeat(3,1fr)', borderTop:'1px solid rgba(250,250,248,0.1)' }}>
+          {[
+            { n:`${products.length||'∞'}`, l:isRTL?'منتج':'Products' },
+            { n:'48H',                     l:isRTL?'توصيل':'Delivery' },
+            { n:'100%',                    l:isRTL?'أصيل':'Authentic' },
+          ].map((s,i)=>(
+            <div key={i} style={{ padding:'16px 24px', backgroundColor:'rgba(28,28,26,0.5)', backdropFilter:'blur(8px)', borderRight:i<2?'1px solid rgba(250,250,248,0.1)':'none' }}>
+              <p style={{ fontFamily:"'DM Serif Display',serif", fontSize:'1.5rem', color:'var(--white)', lineHeight:1, margin:0 }}>{s.n}</p>
+              <p style={{ fontSize:'11px', color:'rgba(250,250,248,0.45)', margin:'4px 0 0', fontWeight:300 }}>{s.l}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CATEGORIES */}
+      {store.categories?.length>0 && (
+        <section id="cats" style={{ padding:'40px 0', borderBottom:'1px solid var(--line)' }}>
+          <div style={{ maxWidth:'1200px', margin:'0 auto', padding:'0 24px' }}>
+            <p className="lbl" style={{ marginBottom:'16px' }}>{t.browse}</p>
+            <div style={{ display:'flex', flexWrap:'wrap', gap:'8px' }}>
+              <Link href={`/${store.domain}`}
+                style={{ padding:'9px 20px', fontSize:'13px', fontWeight:500, backgroundColor:'var(--ink)', color:'var(--white)', textDecoration:'none', borderRadius:'2px' }}>
+                {t.allGear}
+              </Link>
+              {store.categories.map((cat:any)=>(
+                <Link key={cat.id} href={`/${store.domain}?category=${cat.id}`}
+                  style={{ padding:'9px 20px', fontSize:'13px', fontWeight:400, border:'1px solid var(--line)', color:'var(--mid)', textDecoration:'none', borderRadius:'2px', transition:'all 0.18s' }}
+                  onMouseEnter={e=>{const el=e.currentTarget as HTMLElement; el.style.borderColor='var(--ink)'; el.style.color='var(--ink)';}}
+                  onMouseLeave={e=>{const el=e.currentTarget as HTMLElement; el.style.borderColor='var(--line)'; el.style.color='var(--mid)';}}>
+                  {cat.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* PRODUCT GRID */}
+      <section id="gear" style={{ padding:'72px 0' }}>
+        <div style={{ maxWidth:'1200px', margin:'0 auto', padding:'0 24px' }}>
+          <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:'36px' }}>
+            <div>
+              <p className="lbl" style={{ marginBottom:'8px' }}>{isRTL?'استعرض الكل':'Browse all'}</p>
+              <h2 style={{ fontFamily:"'DM Serif Display',serif", fontStyle:'italic', fontSize:'clamp(1.8rem,3vw,2.8rem)', color:'var(--ink)', margin:0 }}>{t.gearTitle}</h2>
+            </div>
+            <p style={{ fontSize:'13px', color:'var(--dim)', fontWeight:300 }}>{products.length} {isRTL?'منتج':'items'}</p>
+          </div>
+
+          {products.length===0 ? (
+            <div style={{ padding:'96px 0', textAlign:'center' }}>
+              <Mountain style={{ width:'48px', height:'48px', color:'var(--dim)', margin:'0 auto 16px' }}/>
+              <p style={{ fontFamily:"'DM Serif Display',serif", fontStyle:'italic', fontSize:'1.4rem', color:'var(--dim)' }}>{t.noItems}</p>
+            </div>
+          ) : (
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(240px, 1fr))', gap:'32px 20px' }}>
+              {products.map((p:any)=>{
+                const img = p.productImage||p.imagesProduct?.[0]?.imageUrl||store.design?.logoUrl;
+                const disc = p.priceOriginal ? Math.round(((p.priceOriginal-p.price)/p.priceOriginal)*100) : 0;
+                return <Card key={p.id} product={p} displayImage={img} discount={disc} isRTL={isRTL} store={store} viewDetails={t.viewDetails}/>;
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* WHY US */}
+      <section style={{ padding:'72px 0', backgroundColor:'var(--stone)' }}>
+        <div style={{ maxWidth:'1200px', margin:'0 auto', padding:'0 24px' }}>
+          <div style={{ textAlign:'center', marginBottom:'48px' }}>
+            <p className="lbl" style={{ marginBottom:'10px' }}>{isRTL?'مميزاتنا':'Our Promise'}</p>
+            <h2 style={{ fontFamily:"'DM Serif Display',serif", fontStyle:'italic', fontSize:'clamp(1.8rem,3vw,2.8rem)', color:'var(--ink)', margin:0 }}>
+              {t.whyTitle}
+            </h2>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:'28px' }}>
+            {features.map((f,i)=>(
+              <div key={i} style={{ textAlign:'center', padding:'28px 16px' }}>
+                <div style={{ fontSize:'2.4rem', marginBottom:'14px' }}>{f.icon}</div>
+                <h3 style={{ fontFamily:"'DM Serif Display',serif", fontSize:'1.05rem', color:'var(--ink)', marginBottom:'8px' }}>{f.title}</h3>
+                <p style={{ fontSize:'13px', color:'var(--mid)', lineHeight:1.7, fontWeight:300 }}>{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section style={{ backgroundColor:'var(--green)', padding:'80px 24px', textAlign:'center', position:'relative', overflow:'hidden' }}>
+        {store.hero?.imageUrl && <img src={store.hero.imageUrl} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', opacity:0.1, display:'block' }}/>}
+        <div style={{ position:'relative', zIndex:2 }}>
+          <p className="lbl" style={{ color:'rgba(250,250,248,0.45)', marginBottom:'12px' }}>{isRTL?'جاهز؟':'Ready to gear up?'}</p>
+          <h2 style={{ fontFamily:"'DM Serif Display',serif", fontStyle:'italic', fontSize:'clamp(2rem,5vw,4rem)', color:'var(--white)', lineHeight:1.05, marginBottom:'24px' }}>
+            {isRTL?'الطبيعة تنتظرك':'The Wild Awaits'}
+          </h2>
+          <a href="#gear" className="btn" style={{ backgroundColor:'var(--white)', color:'var(--green)', padding:'14px 32px', display:'inline-flex' }}>
+            {isRTL?'تسوق الآن':'Shop the Collection'} <ArrowRight style={{ width:'14px', height:'14px' }}/>
+          </a>
         </div>
       </section>
     </div>
   );
 }
 
-
-// ─── DETAILS ──────────────────────────────────────────────────
+/* ── DETAILS ────────────────────────────────────────────────── */
 export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, isRTL }: any) {
-  const [selectedImage, setSelectedImage] = useState(0);
-  const accents=['var(--rust)','var(--ice-dk)','var(--moss-lt)','var(--sand)','var(--rust-lt)'];
-  const accent=accents[parseInt(product.id)%accents.length];
+  const [sel, setSel] = useState(0);
   return (
-    <div className="min-h-screen" dir={isRTL?'rtl':'ltr'} style={{ backgroundColor:'var(--slate)', fontFamily:"'DM Sans',sans-serif" }}>
-      {/* Breadcrumb header */}
-      <header className="py-4 sticky top-0 z-40" style={{ backgroundColor:'rgba(15,25,35,0.97)', backdropFilter:'blur(20px)', borderBottom:'1px solid var(--border)' }}>
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
-          <nav className="flex items-center gap-2 text-xs font-bold tracking-[0.15em]" style={{ color:'var(--text-dim)' }}>
-            <span>⛰ {isRTL?'الرئيسية':'BASE CAMP'}</span>
-            <span style={{ color:'var(--rust)' }}>›</span>
-            <span style={{ color:'var(--cream)', fontFamily:"'Bebas Neue',cursive", letterSpacing:'0.08em', fontSize:'0.95rem' }}>{customLengthName(product.name, 20)}</span>
-          </nav>
-          <div className="flex items-center gap-2">
-            <button onClick={toggleWishlist} className="w-9 h-9 flex items-center justify-center transition-all"
-              style={{ border:'1px solid var(--border-lt)', backgroundColor:isWishlisted?'var(--rust)':'transparent', color:isWishlisted?'white':'var(--sand)' }}>
-              <Heart className={`w-3.5 h-3.5 ${isWishlisted?'fill-current':''}`}/>
-            </button>
-            <button onClick={handleShare} className="w-9 h-9 flex items-center justify-center" style={{ border:'1px solid var(--border)', color:'var(--text-dim)' }}>
-              <Share2 className="w-3.5 h-3.5"/>
-            </button>
-            <div className="flex items-center gap-2 px-3 py-1.5 text-[9px] font-bold tracking-[0.18em]"
-              style={{ border:`1px solid ${inStock?'var(--moss-lt)':'var(--rust)'}`, color:inStock?'var(--moss-lt)':'var(--rust)', backgroundColor:'transparent' }}>
-              <span className={`w-1.5 h-1.5 ${inStock?'bg-green-400 animate-pulse':'bg-red-500'}`}/>
-              {inStock?(isRTL?'متوفر':'IN STOCK'):(isRTL?'نفد':'OUT OF STOCK')}
-            </div>
-          </div>
+    <div dir={isRTL?'rtl':'ltr'} style={{ backgroundColor:'var(--white)' }}>
+      <div style={{ padding:'11px 24px', borderBottom:'1px solid var(--line)', display:'flex', alignItems:'center', gap:'8px', fontSize:'13px', color:'var(--dim)' }}>
+        <span>{isRTL?'الرئيسية':'Home'}</span><span>/</span>
+        <span style={{ color:'var(--ink)' }}>{product.name.slice(0,36)}</span>
+        <div style={{ marginLeft:'auto', display:'flex', gap:'8px' }}>
+          <button onClick={toggleWishlist} style={{ width:'32px', height:'32px', display:'flex', alignItems:'center', justifyContent:'center', border:`1px solid ${isWishlisted?'var(--amber)':'var(--line)'}`, background:isWishlisted?'rgba(194,107,42,0.1)':'transparent', cursor:'pointer', color:isWishlisted?'var(--amber)':'var(--mid)', borderRadius:'2px' }}>
+            <Heart style={{ width:'13px', height:'13px', fill:isWishlisted?'currentColor':'none' }}/>
+          </button>
+          <button onClick={handleShare} style={{ width:'32px', height:'32px', display:'flex', alignItems:'center', justifyContent:'center', border:'1px solid var(--line)', background:'transparent', cursor:'pointer', color:'var(--mid)', borderRadius:'2px' }}>
+            <Share2 style={{ width:'13px', height:'13px' }}/>
+          </button>
         </div>
-      </header>
+      </div>
 
-      <main className="max-w-6xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          {/* Gallery */}
-          <div className="space-y-3">
-            <div className="relative overflow-hidden group" style={{ aspectRatio:'1', border:`2px solid ${accent}40`, backgroundColor:'var(--slate-lt)' }}>
-              {allImages.length>0
-                ? <img src={allImages[selectedImage]} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"/>
-                : <div className="w-full h-full flex items-center justify-center crosshair-grid">
-                    <Mountain className="w-16 h-16" style={{ color:'var(--slate-md)' }}/>
-                  </div>
-              }
-              <div className="absolute inset-0 pointer-events-none" style={{ background:'linear-gradient(to bottom, rgba(15,25,35,0.2) 0%, transparent 40%, rgba(15,25,35,0.5) 100%)' }}/>
-              {discount>0&&(
-                <div className="absolute top-4 left-0 px-4 py-2 text-xs font-bold tracking-wider text-white"
-                  style={{ backgroundColor:'var(--rust)', clipPath:'polygon(0 0, 100% 0, calc(100%-10px) 100%, 0 100%)', boxShadow:'4px 4px 20px var(--glow-rust)' }}>
-                  -{discount}% OFF
-                </div>
-              )}
-              <div className="absolute top-4 right-4 opacity-30 group-hover:opacity-60 transition-opacity"><Crosshair size={50} color="var(--ice)" spin/></div>
-              {allImages.length>1&&(
-                <>
-                  <button onClick={()=>setSelectedImage(p=>p===0?allImages.length-1:p-1)} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
-                    style={{ border:'1px solid var(--border-lt)', backgroundColor:'rgba(15,25,35,0.85)', color:'var(--ice)' }}>
-                    <ChevronLeft className="w-4 h-4"/>
-                  </button>
-                  <button onClick={()=>setSelectedImage(p=>p===allImages.length-1?0:p+1)} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
-                    style={{ border:'1px solid var(--border-lt)', backgroundColor:'rgba(15,25,35,0.85)', color:'var(--ice)' }}>
-                    <ChevronRight className="w-4 h-4"/>
-                  </button>
-                </>
-              )}
-              {!inStock&&!autoGen&&(
-                <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor:'rgba(15,25,35,0.85)' }}>
-                  <div className="px-6 py-3 text-xs font-bold tracking-[0.2em]" style={{ border:'1px solid var(--rust)', color:'var(--rust-lt)' }}>
-                    OUT OF STOCK
-                  </div>
-                </div>
-              )}
-            </div>
-            {allImages.length>1&&(
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {allImages.map((img:string,idx:number)=>(
-                  <button key={idx} onClick={()=>setSelectedImage(idx)} className="shrink-0 w-16 h-16 overflow-hidden transition-all"
-                    style={{ border:`2px solid ${selectedImage===idx?accent:'var(--border)'}`, opacity:selectedImage===idx?1:0.5 }}>
-                    <img src={img} alt="" className="w-full h-full object-cover"/>
-                  </button>
-                ))}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', maxWidth:'1200px', margin:'0 auto', padding:'0 24px' }}>
+        {/* Gallery */}
+        <div style={{ paddingRight:'40px', paddingTop:'36px', position:'sticky', top:'72px', height:'fit-content' }}>
+          <div style={{ position:'relative', aspectRatio:'4/5', overflow:'hidden', backgroundColor:'var(--stone)', borderRadius:'2px', marginBottom:'10px' }}>
+            {allImages.length>0
+              ? <img src={allImages[sel]} alt={product.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
+              : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center' }}><Mountain style={{ width:'56px', height:'56px', color:'var(--dim)' }}/></div>
+            }
+            {discount>0 && <div style={{ position:'absolute', top:'10px', left:'10px', backgroundColor:'var(--amber)', color:'white', fontSize:'11px', fontWeight:500, padding:'3px 8px', borderRadius:'2px' }}>-{discount}%</div>}
+            {allImages.length>1 && (
+              <>
+                <button onClick={()=>setSel(p=>p===0?allImages.length-1:p-1)} style={{ position:'absolute', left:'10px', top:'50%', transform:'translateY(-50%)', width:'32px', height:'32px', border:'none', borderRadius:'50%', backgroundColor:'rgba(250,250,248,0.92)', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <ChevronLeft style={{ width:'14px', height:'14px' }}/>
+                </button>
+                <button onClick={()=>setSel(p=>p===allImages.length-1?0:p+1)} style={{ position:'absolute', right:'10px', top:'50%', transform:'translateY(-50%)', width:'32px', height:'32px', border:'none', borderRadius:'50%', backgroundColor:'rgba(250,250,248,0.92)', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <ChevronRight style={{ width:'14px', height:'14px' }}/>
+                </button>
+              </>
+            )}
+            {!inStock&&!autoGen && (
+              <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', backgroundColor:'rgba(250,250,248,0.85)', backdropFilter:'blur(4px)' }}>
+                <span style={{ fontFamily:"'DM Serif Display',serif", fontStyle:'italic', fontSize:'2rem', color:'var(--mid)' }}>Sold Out</span>
               </div>
             )}
-            {/* Spec bar */}
-            <div className="grid grid-cols-3 gap-px" style={{ border:'1px solid var(--border)', backgroundColor:'var(--border)' }}>
-              {[{e:'🛡️',l:isRTL?'متين':'DURABLE'},{e:'🚀',l:isRTL?'سريع':'FAST SHIP'},{e:'⛰',l:isRTL?'معتمد':'CERTIFIED'}].map((b,i)=>(
-                <div key={i} className="flex flex-col items-center gap-1.5 py-4" style={{ backgroundColor:'var(--slate-lt)' }}>
-                  <span className="text-lg">{b.e}</span>
-                  <span className="spec-label text-center">{b.l}</span>
-                </div>
+          </div>
+          {allImages.length>1 && (
+            <div style={{ display:'flex', gap:'8px', flexWrap:'wrap' }}>
+              {allImages.slice(0,5).map((img:string,idx:number)=>(
+                <button key={idx} onClick={()=>setSel(idx)} style={{ width:'54px', height:'54px', overflow:'hidden', border:`2px solid ${sel===idx?'var(--ink)':'var(--line)'}`, cursor:'pointer', padding:0, background:'none', borderRadius:'2px', opacity:sel===idx?1:0.55 }}>
+                  <img src={img} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
+                </button>
               ))}
             </div>
-          </div>
-
-          {/* Info panel */}
-          <div className="space-y-6">
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-1 h-5" style={{ background:`linear-gradient(180deg, ${accent}, transparent)` }}/>
-                <span className="spec-label">PRODUCT / GEAR ITEM</span>
-              </div>
-              <h1 className="mb-3" style={{ fontFamily:"'Bebas Neue',cursive", fontWeight:400, fontSize:'clamp(2rem,4vw,3.5rem)', color:'var(--cream)', letterSpacing:'0.06em', lineHeight:1 }}>
-                {product.name}
-              </h1>
-              <div className="flex items-center gap-3">
-                <div className="flex gap-0.5">{[...Array(5)].map((_,i)=><Star key={i} className={`w-3.5 h-3.5 ${i<4?'fill-current':''}`} style={{ color:'var(--sand)' }}/>)}</div>
-                <span className="spec-label">4.8 / 5.0 · 128 {isRTL?'تقييم':'FIELD REVIEWS'}</span>
-              </div>
-            </div>
-
-            {/* Price */}
-            <div className="p-5 relative overflow-hidden" style={{ border:`1px solid ${accent}40`, backgroundColor:'rgba(15,25,35,0.5)' }}>
-              <div className="absolute top-0 left-0 w-1 h-full" style={{ background:`linear-gradient(180deg, ${accent}, transparent)` }}/>
-              <div className="absolute top-3 right-3 opacity-20"><Crosshair size={60} color={accent}/></div>
-              <p className="spec-label mb-2">// FIELD PRICE</p>
-              <div className="flex items-baseline gap-3">
-                <span className="font-bold" style={{ fontFamily:"'Bebas Neue',cursive", fontSize:'4rem', color:accent, lineHeight:1, letterSpacing:'0.04em' }}>
-                  {finalPrice.toLocaleString()}
-                </span>
-                <span className="text-sm font-bold" style={{ color:'var(--text-b)' }}>دج</span>
-                {product.priceOriginal&&parseFloat(product.priceOriginal)>finalPrice&&(
-                  <div>
-                    <span className="text-sm line-through block" style={{ color:'var(--text-dim)' }}>{parseFloat(product.priceOriginal).toLocaleString()} دج</span>
-                    <span className="text-xs font-bold" style={{ color:'var(--rust-lt)' }}>SAVE {(parseFloat(product.priceOriginal)-finalPrice).toLocaleString()} دج</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Stock */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-[0.18em]"
-              style={{ border:`1px solid ${autoGen?'var(--sand)':inStock?'var(--moss-lt)':'var(--rust)'}`, color:autoGen?'var(--sand)':inStock?'var(--moss-lt)':'var(--rust)', backgroundColor:'transparent' }}>
-              {autoGen?<Infinity className="w-3.5 h-3.5"/>:inStock?<span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"/>:<X className="w-3.5 h-3.5"/>}
-              {autoGen?'UNLIMITED STOCK':inStock?'IN STOCK — READY TO SHIP':'OUT OF STOCK'}
-            </div>
-
-            {/* Offers */}
-            {product.offers?.length>0&&(
-              <div>
-                <DiamondDivider/>
-                <p className="spec-label mb-3">// SELECT PACKAGE</p>
-                <div className="space-y-2">
-                  {product.offers.map((offer:any)=>(
-                    <label key={offer.id} className="flex items-center justify-between p-4 cursor-pointer transition-all"
-                      style={{ border:`1px solid ${selectedOffer===offer.id?accent:'var(--border)'}`, backgroundColor:selectedOffer===offer.id?`${accent}08`:'transparent' }}>
-                      <div className="flex items-center gap-3">
-                        <div className="w-4 h-4 flex items-center justify-center" style={{ border:`1px solid ${selectedOffer===offer.id?accent:'var(--border)'}` }}>
-                          {selectedOffer===offer.id&&<div className="w-2 h-2" style={{ backgroundColor:accent }}/>}
-                        </div>
-                        <input type="radio" name="offer" value={offer.id} checked={selectedOffer===offer.id} onChange={()=>setSelectedOffer(offer.id)} className="sr-only"/>
-                        <div>
-                          <p className="text-sm font-bold" style={{ color:'var(--cream)' }}>{offer.name}</p>
-                          <p className="spec-label">QTY: {offer.quantity}</p>
-                        </div>
-                      </div>
-                      <span className="font-bold" style={{ fontFamily:"'Bebas Neue',cursive", fontSize:'1.4rem', color:accent, letterSpacing:'0.06em' }}>
-                        {offer.price.toLocaleString()} <span className="text-xs">دج</span>
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Attributes */}
-            {allAttrs.map((attr:any)=>(
-              <div key={attr.id}>
-                <DiamondDivider/>
-                <p className="spec-label mb-3">// SELECT {attr.name.toUpperCase()}</p>
-                {attr.displayMode==='color'?(
-                  <div className="flex gap-2 flex-wrap">
-                    {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} title={v.name} className="w-9 h-9 transition-all" style={{ backgroundColor:v.value, boxShadow:s?`0 0 0 2px var(--slate),0 0 0 4px ${accent}`:'0 2px 8px rgba(0,0,0,0.3)', transform:s?'scale(1.15)':'scale(1)' }}/>;
-                    })}
-                  </div>
-                ):attr.displayMode==='image'?(
-                  <div className="flex gap-2 flex-wrap">
-                    {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} className="w-14 h-14 overflow-hidden transition-all" style={{ border:`2px solid ${s?accent:'var(--border)'}`, opacity:s?1:0.5 }}><img src={v.value} alt={v.name} className="w-full h-full object-cover"/></button>; })}
-                  </div>
-                ):(
-                  <div className="flex flex-wrap gap-2">
-                    {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} className="btn-alpine px-5 py-2.5 text-xs font-bold tracking-[0.12em] transition-all" style={{ border:`1px solid ${s?accent:'var(--border)'}`, backgroundColor:s?`${accent}15`:'transparent', color:s?accent:'var(--text-b)' }}>{v.name}</button>; })}
-                  </div>
-                )}
-              </div>
-            ))}
-
-            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants}/>
-          </div>
+          )}
         </div>
 
-        {product.desc&&(
-          <section className="mt-20 pt-12" style={{ borderTop:'1px solid var(--border)' }}>
-            <DiamondDivider/>
-            <h2 className="mb-8" style={{ fontFamily:"'Bebas Neue',cursive", fontWeight:400, fontSize:'2.5rem', color:'var(--cream)', letterSpacing:'0.1em' }}>
-              // GEAR SPECIFICATIONS
-            </h2>
-            <div className="p-8 relative overflow-hidden crosshair-grid" style={{ border:'1px solid var(--border)', backgroundColor:'var(--slate-lt)' }}>
-              <div className="absolute top-4 right-4 opacity-10"><Crosshair size={80} color="var(--ice)" spin/></div>
-              <div className="relative z-10 text-sm leading-relaxed" style={{ color:'var(--text-b)' }}
-                dangerouslySetInnerHTML={{ __html:DOMPurify.sanitize(product.desc,{ ALLOWED_TAGS:['p','br','strong','em','ul','ol','li','h1','h2','h3','h4','span'],ALLOWED_ATTR:['class','style'] })}}/>
+        {/* Info */}
+        <div style={{ paddingTop:'36px', paddingBottom:'60px', paddingLeft:'40px', borderLeft:'1px solid var(--line)' }}>
+          <p className="lbl" style={{ marginBottom:'10px' }}>{isRTL?'معدات خارجية':'Outdoor Gear'}</p>
+          <h1 style={{ fontFamily:"'DM Serif Display',serif", fontStyle:'italic', fontSize:'clamp(1.8rem,3.5vw,3rem)', color:'var(--ink)', lineHeight:0.95, marginBottom:'14px' }}>
+            {product.name}
+          </h1>
+          <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'22px', paddingBottom:'22px', borderBottom:'1px solid var(--line)' }}>
+            {[...Array(5)].map((_,i)=><Star key={i} style={{ width:'12px', height:'12px', fill:i<4?'var(--amber)':'none', color:'var(--amber)' }}/>)}
+            <span style={{ fontSize:'12px', color:'var(--mid)' }}>4.8 (128)</span>
+            <span style={{ marginLeft:'auto', padding:'4px 10px', backgroundColor:inStock||autoGen?'rgba(44,74,46,0.1)':'rgba(194,107,42,0.1)', color:inStock||autoGen?'var(--green)':'var(--amber)', fontSize:'11px', fontWeight:500, borderRadius:'2px' }}>
+              {autoGen?'∞ In Stock':inStock?'In Stock':'Sold Out'}
+            </span>
+          </div>
+
+          <div style={{ marginBottom:'22px' }}>
+            <div style={{ display:'flex', alignItems:'baseline', gap:'10px' }}>
+              <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:'2.8rem', color:'var(--ink)', lineHeight:1, letterSpacing:'-0.02em' }}>{finalPrice.toLocaleString()}</span>
+              <span style={{ fontSize:'14px', color:'var(--mid)' }}>دج</span>
+              {product.priceOriginal && parseFloat(product.priceOriginal)>finalPrice && (
+                <span style={{ fontSize:'13px', textDecoration:'line-through', color:'var(--dim)' }}>{parseFloat(product.priceOriginal).toLocaleString()}</span>
+              )}
             </div>
-          </section>
-        )}
-      </main>
+          </div>
+
+          {product.offers?.length>0 && (
+            <div style={{ marginBottom:'22px', paddingBottom:'22px', borderBottom:'1px solid var(--line)' }}>
+              <p className="lbl" style={{ marginBottom:'10px' }}>{isRTL?'اختر الباقة':'Bundle'}</p>
+              {product.offers.map((offer:any)=>(
+                <label key={offer.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 14px', border:`1px solid ${selectedOffer===offer.id?'var(--ink)':'var(--line)'}`, cursor:'pointer', borderRadius:'2px', marginBottom:'6px', transition:'all 0.18s', backgroundColor:selectedOffer===offer.id?'var(--stone)':'transparent' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
+                    <div style={{ width:'16px', height:'16px', borderRadius:'50%', border:`2px solid ${selectedOffer===offer.id?'var(--ink)':'var(--line)'}`, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                      {selectedOffer===offer.id&&<div style={{ width:'8px', height:'8px', borderRadius:'50%', background:'var(--ink)' }}/>}
+                    </div>
+                    <input type="radio" name="offer" value={offer.id} checked={selectedOffer===offer.id} onChange={()=>setSelectedOffer(offer.id)} style={{ display:'none' }}/>
+                    <div>
+                      <p style={{ fontSize:'13px', fontWeight:500, color:'var(--ink)', margin:0 }}>{offer.name}</p>
+                      <p style={{ fontSize:'11px', color:'var(--mid)', margin:0 }}>Qty: {offer.quantity}</p>
+                    </div>
+                  </div>
+                  <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:'1.15rem', color:'var(--ink)' }}>{offer.price.toLocaleString()} <span style={{ fontFamily:"'DM Sans',sans-serif", fontWeight:300, fontSize:'12px', color:'var(--mid)' }}>دج</span></span>
+                </label>
+              ))}
+            </div>
+          )}
+
+          {allAttrs.map((attr:any)=>(
+            <div key={attr.id} style={{ marginBottom:'18px', paddingBottom:'18px', borderBottom:'1px solid var(--line)' }}>
+              <p className="lbl" style={{ marginBottom:'10px' }}>{attr.name}</p>
+              {attr.displayMode==='color' ? (
+                <div style={{ display:'flex', flexWrap:'wrap', gap:'8px' }}>
+                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} title={v.name} style={{ width:'28px', height:'28px', backgroundColor:v.value, border:'3px solid transparent', cursor:'pointer', borderRadius:'50%', outline:s?'2px solid var(--ink)':'none', outlineOffset:'2px' }}/>;})}
+                </div>
+              ):attr.displayMode==='image' ? (
+                <div style={{ display:'flex', flexWrap:'wrap', gap:'6px' }}>
+                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} style={{ width:'52px', height:'52px', overflow:'hidden', border:`2px solid ${s?'var(--ink)':'var(--line)'}`, cursor:'pointer', padding:0, borderRadius:'2px' }}><img src={v.value} alt={v.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/></button>;})}
+                </div>
+              ):(
+                <div style={{ display:'flex', flexWrap:'wrap', gap:'6px' }}>
+                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} style={{ padding:'8px 16px', border:`1px solid ${s?'var(--ink)':'var(--line)'}`, backgroundColor:s?'var(--ink)':'transparent', color:s?'var(--white)':'var(--mid)', fontSize:'13px', cursor:'pointer', borderRadius:'2px', transition:'all 0.18s' }}>{v.name}</button>;})}
+                </div>
+              )}
+            </div>
+          ))}
+
+          <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants}/>
+
+          {product.desc && (
+            <div style={{ marginTop:'28px', paddingTop:'22px', borderTop:'1px solid var(--line)' }}>
+              <p className="lbl" style={{ marginBottom:'12px' }}>{isRTL?'التفاصيل':'Description'}</p>
+              <div style={{ fontSize:'14px', lineHeight:'1.8', color:'var(--mid)', fontWeight:300 }}
+                dangerouslySetInnerHTML={{ __html:DOMPurify.sanitize(product.desc,{ALLOWED_TAGS:['p','br','strong','em','ul','ol','li','h1','h2','h3','h4','span'],ALLOWED_ATTR:['class','style']})}}/>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
 
-
-// ─── PRODUCT FORM ─────────────────────────────────────────────
-const inputSt = (err?:boolean): React.CSSProperties => ({
-  width:'100%', padding:'12px 16px', fontSize:'0.875rem', fontWeight:500,
-  backgroundColor:'rgba(15,25,35,0.6)', border:`1px solid ${err?'var(--rust)':'var(--border-lt)'}`,
-  borderRadius:0, color:'var(--cream)', outline:'none',
-  fontFamily:"'DM Sans',sans-serif", transition:'border-color 0.25s, box-shadow 0.25s',
-});
-const FieldWrapper = ({ error, label, children }: { error?:string; label?:string; children:React.ReactNode }) => (
-  <div className="space-y-1.5">
-    {label&&<label className="block spec-label">{label}</label>}
+/* ── PRODUCT FORM ────────────────────────────────────────────── */
+const FR = ({ error, label, children }: { error?:string; label?:string; children:React.ReactNode }) => (
+  <div style={{ marginBottom:'12px' }}>
+    {label && <p className="lbl" style={{ marginBottom:'6px' }}>{label}</p>}
     {children}
-    {error&&<p className="text-xs font-bold flex items-center gap-1" style={{ color:'var(--rust-lt)' }}><AlertCircle className="w-3 h-3"/>{error}</p>}
+    {error && <p style={{ fontSize:'11px', color:'var(--amber)', marginTop:'4px', display:'flex', alignItems:'center', gap:'4px' }}><AlertCircle style={{ width:'10px', height:'10px' }}/>{error}</p>}
   </div>
 );
 
@@ -1003,354 +573,263 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const router = useRouter();
   const [wilayas,setWilayas]   = useState<Wilaya[]>([]);
   const [communes,setCommunes] = useState<Commune[]>([]);
-  const [loadingCommunes,setLoadingCommunes] = useState(false);
-  const [formData,setFormData] = useState({ customerId:'', customerName:'', customerPhone:'', customerWelaya:'', customerCommune:'', quantity:1, priceLoss:0, typeLivraison:'home' as 'home'|'office' });
-  const [formErrors,setFormErrors] = useState<Record<string,string>>({});
-  const [submitting,setSubmitting] = useState(false);
+  const [loadingC,setLC]       = useState(false);
+  const [fd,setFd] = useState({ customerId:'', customerName:'', customerPhone:'', customerWelaya:'', customerCommune:'', quantity:1, priceLoss:0, typeLivraison:'home' as 'home'|'office' });
+  const [errors,setErrors] = useState<Record<string,string>>({});
+  const [sub,setSub] = useState(false);
 
   useEffect(()=>{ if(userId) fetchWilayas(userId).then(setWilayas); },[userId]);
-  useEffect(()=>{ if(typeof window!=='undefined'){ const id=localStorage.getItem('customerId'); if(id) setFormData(p=>({...p,customerId:id})); } },[]);
-  useEffect(()=>{ if(!formData.customerWelaya){setCommunes([]);return;} setLoadingCommunes(true); fetchCommunes(formData.customerWelaya).then(d=>{setCommunes(d);setLoadingCommunes(false);}); },[formData.customerWelaya]);
+  useEffect(()=>{ if(typeof window!=='undefined'){ const id=localStorage.getItem('customerId'); if(id) setFd(p=>({...p,customerId:id})); } },[]);
+  useEffect(()=>{ if(!fd.customerWelaya){setCommunes([]);return;} setLC(true); fetchCommunes(fd.customerWelaya).then(d=>{setCommunes(d);setLC(false);}); },[fd.customerWelaya]);
 
-  const selectedWilayaData=useMemo(()=>wilayas.find(w=>String(w.id)===String(formData.customerWelaya)),[wilayas,formData.customerWelaya]);
-  const getFinalPrice=useCallback(():number=>{
+  const selW  = useMemo(()=>wilayas.find(w=>String(w.id)===String(fd.customerWelaya)),[wilayas,fd.customerWelaya]);
+  const getFP = useCallback(():number=>{
     const base=typeof product.price==='string'?parseFloat(product.price):product.price as number;
-    const offer=product.offers?.find(o=>o.id===selectedOffer); if(offer) return offer.price;
-    if(product.variantDetails?.length&&Object.keys(selectedVariants).length>0){ const m=product.variantDetails.find(v=>variantMatches(v,selectedVariants)); if(m&&m.price!==-1) return m.price; }
+    const off=product.offers?.find((o:any)=>o.id===selectedOffer); if(off) return off.price;
+    if(product.variantDetails?.length&&Object.keys(selectedVariants).length>0){ const m=product.variantDetails.find((v:any)=>variantMatches(v,selectedVariants)); if(m&&m.price!==-1) return m.price; }
     return base;
   },[product,selectedOffer,selectedVariants]);
-  const getPriceLivraison=useCallback(():number=>{ if(!selectedWilayaData) return 0; return formData.typeLivraison==='home'?selectedWilayaData.livraisonHome:selectedWilayaData.livraisonOfice; },[selectedWilayaData,formData.typeLivraison]);
-  useEffect(()=>{ if(selectedWilayaData) setFormData(f=>({...f,priceLoss:selectedWilayaData.livraisonReturn})); },[selectedWilayaData]);
+  const getLiv = useCallback(():number=>{ if(!selW) return 0; return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice; },[selW,fd.typeLivraison]);
+  useEffect(()=>{ if(selW) setFd(f=>({...f,priceLoss:selW.livraisonReturn})); },[selW]);
 
-  const finalPrice=getFinalPrice();
-  const getTotalPrice=()=>finalPrice*formData.quantity+ +getPriceLivraison();
+  const fp=getFP(); const total=()=>fp*fd.quantity+getLiv();
   const validate=()=>{
     const e:Record<string,string>={};
-    if(!formData.customerName.trim())  e.customerName='الاسم مطلوب';
-    if(!formData.customerPhone.trim()) e.customerPhone='رقم الهاتف مطلوب';
-    if(!formData.customerWelaya)       e.customerWelaya='الولاية مطلوبة';
-    if(!formData.customerCommune)      e.customerCommune='البلدية مطلوبة';
+    if(!fd.customerName.trim())  e.customerName='الاسم مطلوب';
+    if(!fd.customerPhone.trim()) e.customerPhone='رقم الهاتف مطلوب';
+    if(!fd.customerWelaya)       e.customerWelaya='الولاية مطلوبة';
+    if(!fd.customerCommune)      e.customerCommune='البلدية مطلوبة';
     return e;
   };
   const handleSubmit=async(e:React.FormEvent)=>{
-    e.preventDefault(); const errs=validate(); if(Object.keys(errs).length){setFormErrors(errs);return;} setFormErrors({}); setSubmitting(true);
-    try { await axios.post(`${API_URL}/orders`,{ ...formData, customerWilayaId: +formData.customerWelaya,customerCommuneId: +formData.customerCommune, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceShip : getPriceLivraison(), }); if(typeof window!=='undefined'&&formData.customerId) localStorage.setItem('customerId',formData.customerId); router.push(`/lp/${domain}/successfully`); } catch(err){console.error(err);} finally{setSubmitting(false);}
+    e.preventDefault(); const er=validate(); if(Object.keys(er).length){setErrors(er);return;} setErrors({}); setSub(true);
+    try{ await axios.post(`${API_URL}/orders/create`,{...fd,productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()}); if(typeof window!=='undefined'&&fd.customerId) localStorage.setItem('customerId',fd.customerId); router.push(`/lp/${domain}/successfully`); }catch(err){console.error(err);}finally{setSub(false);}
   };
-  const onFocus=(e:React.FocusEvent<any>)=>{ e.target.style.borderColor='var(--ice)'; e.target.style.boxShadow='0 0 0 3px rgba(120,196,208,0.12)'; };
-  const onBlur=(e:React.FocusEvent<any>,err?:boolean)=>{ e.target.style.borderColor=err?'var(--rust)':'var(--border-lt)'; e.target.style.boxShadow='none'; };
 
   return (
-    <div style={{ borderTop:'1px solid var(--border)', paddingTop:'1.5rem' }}>
-      <DiamondDivider/>
-      <h3 className="flex items-center gap-2 mb-6" style={{ fontFamily:"'Bebas Neue',cursive", fontWeight:400, fontSize:'1.8rem', color:'var(--cream)', letterSpacing:'0.1em' }}>
-        <Target className="w-5 h-5" style={{ color:'var(--rust)' }}/> DEPLOY ORDER
-      </h3>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <FieldWrapper error={formErrors.customerName} label="// OPERATOR NAME">
-            <div className="relative">
-              <User className="absolute right-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-dim)' }}/>
-              <input type="text" value={formData.customerName} onChange={e=>setFormData({...formData,customerName:e.target.value})} placeholder="الاسم الكامل" style={{ ...inputSt(!!formErrors.customerName), paddingRight:'2.5rem' }} onFocus={onFocus} onBlur={e=>onBlur(e,!!formErrors.customerName)}/>
+    <div style={{ marginTop:'22px', paddingTop:'20px', borderTop:'1px solid var(--line)' }}>
+      <form onSubmit={handleSubmit}>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px' }}>
+          <FR error={errors.customerName} label="الاسم">
+            <div style={{ position:'relative' }}>
+              <User style={{ position:'absolute', right:'11px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
+              <input type="text" value={fd.customerName} onChange={e=>setFd({...fd,customerName:e.target.value})} placeholder="الاسم الكامل" className={`inp${errors.customerName?' inp-err':''}`} style={{ paddingRight:'34px' }} onFocus={e=>{e.target.style.borderColor='var(--ink)';}} onBlur={e=>{e.target.style.borderColor=errors.customerName?'var(--amber)':'var(--line)';}}/>
             </div>
-          </FieldWrapper>
-          <FieldWrapper error={formErrors.customerPhone} label="// RADIO FREQ.">
-            <div className="relative">
-              <Phone className="absolute right-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-dim)' }}/>
-              <input type="tel" value={formData.customerPhone} onChange={e=>setFormData({...formData,customerPhone:e.target.value})} placeholder="0X XX XX XX XX" style={{ ...inputSt(!!formErrors.customerPhone), paddingRight:'2.5rem' }} onFocus={onFocus} onBlur={e=>onBlur(e,!!formErrors.customerPhone)}/>
+          </FR>
+          <FR error={errors.customerPhone} label="الهاتف">
+            <div style={{ position:'relative' }}>
+              <Phone style={{ position:'absolute', right:'11px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
+              <input type="tel" value={fd.customerPhone} onChange={e=>setFd({...fd,customerPhone:e.target.value})} placeholder="0X XX XX XX XX" className={`inp${errors.customerPhone?' inp-err':''}`} style={{ paddingRight:'34px' }} onFocus={e=>{e.target.style.borderColor='var(--ink)';}} onBlur={e=>{e.target.style.borderColor=errors.customerPhone?'var(--amber)':'var(--line)';}}/>
             </div>
-          </FieldWrapper>
+          </FR>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <FieldWrapper error={formErrors.customerWelaya} label="// WILAYA SECTOR">
-            <div className="relative">
-              <MapPin className="absolute right-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-dim)' }}/>
-              <ChevronDown className="absolute left-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-dim)' }}/>
-              <select value={formData.customerWelaya} onChange={e=>setFormData({...formData,customerWelaya:e.target.value,customerCommune:''})} style={{ ...inputSt(!!formErrors.customerWelaya), paddingRight:'2.5rem', appearance:'none' as any, cursor:'pointer' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px', marginTop:'10px' }}>
+          <FR error={errors.customerWelaya} label="الولاية">
+            <div style={{ position:'relative' }}>
+              <ChevronDown style={{ position:'absolute', left:'11px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
+              <select value={fd.customerWelaya} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})} className={`inp${errors.customerWelaya?' inp-err':''}`} style={{ paddingLeft:'30px' }} onFocus={e=>{e.target.style.borderColor='var(--ink)';}} onBlur={e=>{e.target.style.borderColor=errors.customerWelaya?'var(--amber)':'var(--line)';}}>
                 <option value="">اختر الولاية</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
               </select>
             </div>
-          </FieldWrapper>
-          <FieldWrapper error={formErrors.customerCommune} label="// COMMUNE GRID">
-            <div className="relative">
-              <MapPin className="absolute right-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-dim)' }}/>
-              <ChevronDown className="absolute left-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-dim)' }}/>
-              <select value={formData.customerCommune} disabled={!formData.customerWelaya||loadingCommunes} onChange={e=>setFormData({...formData,customerCommune:e.target.value})} style={{ ...inputSt(!!formErrors.customerCommune), paddingRight:'2.5rem', appearance:'none' as any, cursor:'pointer', opacity:!formData.customerWelaya?0.4:1 }}>
-                <option value="">{loadingCommunes?'SCANNING...':'اختر البلدية'}</option>{communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}
+          </FR>
+          <FR error={errors.customerCommune} label="البلدية">
+            <div style={{ position:'relative' }}>
+              <ChevronDown style={{ position:'absolute', left:'11px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
+              <select value={fd.customerCommune} disabled={!fd.customerWelaya||loadingC} onChange={e=>setFd({...fd,customerCommune:e.target.value})} className={`inp${errors.customerCommune?' inp-err':''}`} style={{ paddingLeft:'30px', opacity:!fd.customerWelaya?0.4:1 }} onFocus={e=>{e.target.style.borderColor='var(--ink)';}} onBlur={e=>{e.target.style.borderColor=errors.customerCommune?'var(--amber)':'var(--line)';}}>
+                <option value="">{loadingC?'...':'اختر البلدية'}</option>{communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
             </div>
-          </FieldWrapper>
+          </FR>
         </div>
 
-        {/* Delivery mode */}
-        <div>
-          <p className="spec-label mb-3">// EXTRACTION METHOD</p>
-          <div className="grid grid-cols-2 gap-px" style={{ border:'1px solid var(--border)', backgroundColor:'var(--border)' }}>
+        <FR label="طريقة التوصيل">
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px', marginTop:'2px' }}>
             {(['home','office'] as const).map(type=>(
-              <button key={type} type="button" onClick={()=>setFormData(p=>({...p,typeLivraison:type}))} className="flex flex-col items-center gap-2 py-5 transition-all"
-                style={{ backgroundColor: formData.typeLivraison===type?'rgba(196,66,26,0.12)':'var(--slate-lt)', borderTop:`3px solid ${formData.typeLivraison===type?'var(--rust)':'transparent'}` }}>
-                <span className="text-2xl">{type==='home'?'🏕️':'🏢'}</span>
-                <p className="spec-label" style={{ color:formData.typeLivraison===type?'var(--rust-lt)':'var(--text-dim)' }}>
-                  {type==='home'?'HOME DROP':'OFFICE PICK'}
+              <button key={type} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:type}))}
+                style={{ padding:'12px', border:`1px solid ${fd.typeLivraison===type?'var(--ink)':'var(--line)'}`, backgroundColor:fd.typeLivraison===type?'var(--stone)':'transparent', cursor:'pointer', textAlign:'left', borderRadius:'2px', transition:'all 0.18s' }}>
+                <p style={{ fontSize:'12px', fontWeight:500, color:fd.typeLivraison===type?'var(--ink)':'var(--mid)', margin:'0 0 4px' }}>
+                  {type==='home'?'توصيل للبيت':'توصيل للمكتب'}
                 </p>
-                {selectedWilayaData&&<p className="text-xs font-bold" style={{ fontFamily:"'Bebas Neue',cursive", color:'var(--cream)', letterSpacing:'0.08em' }}>{(type==='home'?selectedWilayaData.livraisonHome:selectedWilayaData.livraisonOfice).toLocaleString()} دج</p>}
+                {selW && <p style={{ fontFamily:"'DM Serif Display',serif", fontSize:'1.1rem', color:fd.typeLivraison===type?'var(--amber)':'var(--dim)', margin:0 }}>
+                  {(type==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} <span style={{ fontFamily:"'DM Sans',sans-serif", fontWeight:300, fontSize:'11px' }}>دج</span>
+                </p>}
               </button>
             ))}
           </div>
-        </div>
+        </FR>
 
-        {/* Quantity */}
-        <FieldWrapper label="// UNIT COUNT">
-          <div className="flex items-center gap-4">
-            <button type="button" onClick={()=>setFormData(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} className="w-10 h-10 flex items-center justify-center text-xl font-bold transition-all"
-              style={{ border:'1px solid var(--border-lt)', color:'var(--ice)', backgroundColor:'transparent' }}
-              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.backgroundColor='rgba(120,196,208,0.1)';}}
-              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.backgroundColor='transparent';}}>−</button>
-            <span className="w-12 text-center font-bold" style={{ fontFamily:"'Bebas Neue',cursive", fontSize:'2rem', color:'var(--cream)', letterSpacing:'0.1em' }}>{formData.quantity}</span>
-            <button type="button" onClick={()=>setFormData(p=>({...p,quantity:p.quantity+1}))} className="w-10 h-10 flex items-center justify-center text-xl font-bold transition-all"
-              style={{ border:'1px solid var(--border-lt)', color:'var(--ice)', backgroundColor:'transparent' }}
-              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.backgroundColor='rgba(120,196,208,0.1)';}}
-              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.backgroundColor='transparent';}}>+</button>
+        <FR label="الكمية">
+          <div style={{ display:'inline-flex', alignItems:'center', border:'1px solid var(--line)', borderRadius:'2px' }}>
+            <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))}
+              style={{ width:'36px', height:'36px', display:'flex', alignItems:'center', justifyContent:'center', border:'none', borderRight:'1px solid var(--line)', background:'transparent', cursor:'pointer', color:'var(--ink)', transition:'background 0.18s' }}
+              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--stone)';}}
+              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>
+              <Minus style={{ width:'12px', height:'12px' }}/>
+            </button>
+            <span style={{ width:'44px', textAlign:'center', fontFamily:"'DM Serif Display',serif", fontSize:'1.2rem', color:'var(--ink)' }}>{fd.quantity}</span>
+            <button type="button" onClick={()=>setFd(p=>({...p,quantity:p.quantity+1}))}
+              style={{ width:'36px', height:'36px', display:'flex', alignItems:'center', justifyContent:'center', border:'none', borderLeft:'1px solid var(--line)', background:'transparent', cursor:'pointer', color:'var(--ink)', transition:'background 0.18s' }}
+              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--stone)';}}
+              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>
+              <Plus style={{ width:'12px', height:'12px' }}/>
+            </button>
           </div>
-        </FieldWrapper>
+        </FR>
 
-        {/* Order manifest */}
-        <div className="p-5 relative crosshair-grid" style={{ border:'1px solid var(--border-lt)', backgroundColor:'rgba(15,25,35,0.5)' }}>
-          <div className="absolute top-3 right-3 opacity-15"><Crosshair size={55} color="var(--rust)"/></div>
-          <p className="spec-label mb-4">// MISSION MANIFEST</p>
-          <div className="space-y-2.5 relative z-10">
-            {[{l:'ITEM',v:product.name},{l:'UNIT PRICE',v:`${finalPrice.toLocaleString()} دج`},{l:'QUANTITY',v:`× ${formData.quantity}`},{l:'LOGISTICS',v:selectedWilayaData?`${getPriceLivraison().toLocaleString()} دج`:'TBD'}].map(row=>(
-              <div key={row.l} className="flex justify-between items-center">
-                <span className="spec-label">{row.l}</span>
-                <span className="text-xs font-bold" style={{ color:'var(--cream)' }}>{customLengthName(row.v , 20)}</span>
-              </div>
-            ))}
-            <div className="pt-3" style={{ borderTop:'1px solid var(--border)' }}>
-              <div className="flex justify-between items-baseline">
-                <span className="spec-label">TOTAL COST</span>
-                <span className="font-bold" style={{ fontFamily:"'Bebas Neue',cursive", fontSize:'2.2rem', color:'var(--rust-lt)', letterSpacing:'0.06em' }}>
-                  {getTotalPrice().toLocaleString()}<span className="text-sm ml-1">دج</span>
-                </span>
-              </div>
+        <div style={{ border:'1px solid var(--line)', borderRadius:'2px', marginBottom:'14px', overflow:'hidden' }}>
+          <div style={{ padding:'9px 14px', backgroundColor:'var(--stone)', borderBottom:'1px solid var(--line)' }}>
+            <p className="lbl">ملخص الطلب</p>
+          </div>
+          {[{l:'المنتج',v:product.name.slice(0,22)},{l:'السعر',v:`${fp.toLocaleString()} دج`},{l:'الكمية',v:`× ${fd.quantity}`},{l:'التوصيل',v:selW?`${getLiv().toLocaleString()} دج`:'—'}].map(row=>(
+            <div key={row.l} style={{ display:'flex', justifyContent:'space-between', padding:'7px 14px', borderBottom:'1px solid var(--line)' }}>
+              <span style={{ fontSize:'12px', color:'var(--mid)' }}>{row.l}</span>
+              <span style={{ fontSize:'13px', fontWeight:500, color:'var(--ink)' }}>{row.v}</span>
             </div>
+          ))}
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', padding:'11px 14px', backgroundColor:'var(--stone)' }}>
+            <span style={{ fontSize:'12px', color:'var(--mid)' }}>المجموع</span>
+            <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:'1.6rem', color:'var(--ink)' }}>
+              {total().toLocaleString()} <span style={{ fontFamily:"'DM Sans',sans-serif", fontWeight:300, fontSize:'12px', color:'var(--mid)' }}>دج</span>
+            </span>
           </div>
         </div>
 
-        <button type="submit" disabled={submitting} className="btn-alpine w-full py-4 flex items-center justify-center gap-3 text-sm font-bold tracking-[0.18em] text-white"
-          style={{ background:submitting?'var(--slate-md)':'linear-gradient(135deg, var(--rust), var(--rust-dk))', boxShadow:submitting?'none':'0 8px 32px var(--glow-rust)', cursor:submitting?'not-allowed':'pointer' }}>
-          {submitting
-            ?<><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"/> PROCESSING…</>
-            :<><Target className="w-4 h-4"/> CONFIRM ORDER &amp; DEPLOY</>
-          }
+        <button type="submit" disabled={sub} className="btn btn-dark"
+          style={{ width:'100%', justifyContent:'center', padding:'14px', fontSize:'14px', cursor:sub?'not-allowed':'pointer', opacity:sub?0.7:1 }}>
+          {sub?'جاري المعالجة...':'تأكيد الطلب'}{!sub && <ArrowRight style={{ width:'14px', height:'14px' }}/>}
         </button>
-        <p className="text-[9px] text-center font-bold flex items-center justify-center gap-2 tracking-[0.18em]" style={{ color:'var(--text-dim)' }}>
-          <Shield className="w-3 h-3"/> ENCRYPTED · SECURE TRANSMISSION
+        <p style={{ fontSize:'11px', color:'var(--dim)', textAlign:'center', marginTop:'8px', display:'flex', alignItems:'center', justifyContent:'center', gap:'5px' }}>
+          <Shield style={{ width:'10px', height:'10px' }}/> دفع آمن ومشفر
         </p>
       </form>
     </div>
   );
 }
 
-
-// ─── STATIC PAGES ─────────────────────────────────────────────
+/* ── STATIC PAGES ────────────────────────────────────────────── */
 export function StaticPage({ page }: { page:string }) {
   const p = page.toLowerCase();
   return <>{p==='privacy'&&<Privacy/>}{p==='terms'&&<Terms/>}{p==='cookies'&&<Cookies/>}{p==='contact'&&<Contact/>}</>;
 }
 
-function PageWrapper({ children, icon, title, subtitle, code }: { children:React.ReactNode; icon:React.ReactNode; title:string; subtitle:string; code:string }) {
-  return (
-    <div className="min-h-screen" style={{ backgroundColor:'var(--slate)', fontFamily:"'DM Sans',sans-serif" }}>
-      {/* Header */}
-      <div className="relative overflow-hidden py-24 noise-overlay" style={{ backgroundColor:'var(--slate-lt)' }}>
-        <div className="absolute inset-0 topo-bg pointer-events-none"/>
-        <div className="absolute inset-0 crosshair-grid pointer-events-none opacity-40"/>
-        <div className="absolute top-6 right-12 hidden lg:block pointer-events-none opacity-20"><Crosshair size={120} color="var(--ice)" spin/></div>
-        <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
-          <MountainRange width={1440} height={100} color="rgba(15,25,35,0.9)" accent="rgba(26,40,54,0.8)"/>
-        </div>
-        <div className="relative z-10 max-w-4xl mx-auto px-6">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 flex items-center justify-center" style={{ border:'1px solid var(--rust)', backgroundColor:'rgba(196,66,26,0.12)', color:'var(--rust-lt)' }}>
-              {icon}
-            </div>
-            <span className="spec-label text-[10px]">REF: {code}</span>
-          </div>
-          <h1 className="mb-3" style={{ fontFamily:"'Bebas Neue',cursive", fontWeight:400, fontSize:'clamp(3rem,8vw,7rem)', color:'var(--cream)', letterSpacing:'0.08em', lineHeight:0.9 }}>
-            {title}
-          </h1>
-          <div className="flex items-center gap-4 mt-4">
-            <div className="h-0.5 w-12" style={{ background:'linear-gradient(90deg, var(--rust), transparent)' }}/>
-            <p className="text-sm" style={{ color:'var(--text-b)' }}>{subtitle}</p>
-          </div>
-        </div>
+const Shell = ({ children, title }: { children:React.ReactNode; title:string }) => (
+  <div style={{ backgroundColor:'var(--white)', minHeight:'100vh' }}>
+    <div style={{ backgroundColor:'var(--green)', padding:'72px 24px 48px' }}>
+      <div style={{ maxWidth:'720px', margin:'0 auto' }}>
+        <h1 style={{ fontFamily:"'DM Serif Display',serif", fontStyle:'italic', fontSize:'clamp(2.5rem,6vw,5rem)', color:'var(--white)', lineHeight:0.95, margin:0 }}>{title}</h1>
       </div>
-      {/* Content */}
-      <div className="max-w-3xl mx-auto px-6 lg:px-10 pt-12 pb-24">{children}</div>
     </div>
-  );
-}
+    <div style={{ maxWidth:'720px', margin:'0 auto', padding:'48px 24px 80px' }}>{children}</div>
+  </div>
+);
 
-function InfoCard({ icon, title, desc, badge, badgeColor='var(--ice)' }: { icon:React.ReactNode; title:string; desc:string; badge?:string; badgeColor?:string }) {
-  return (
-    <div className="flex gap-5 p-5 mb-3 transition-all duration-300 card-alpine cursor-default"
-      style={{ border:'1px solid var(--border)', backgroundColor:'var(--slate-lt)' }}>
-      <div className="w-10 h-10 flex items-center justify-center flex-shrink-0" style={{ border:`1px solid ${badgeColor}`, color:badgeColor, backgroundColor:`${badgeColor}10` }}>{icon}</div>
-      <div className="flex-1">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
-          <h3 className="font-bold" style={{ fontFamily:"'Bebas Neue',cursive", fontWeight:400, fontSize:'1.15rem', color:'var(--cream)', letterSpacing:'0.08em' }}>{title}</h3>
-          {badge&&<span className="text-[8px] font-bold tracking-[0.2em] px-2 py-1" style={{ border:`1px solid ${badgeColor}40`, color:badgeColor, backgroundColor:`${badgeColor}10` }}>{badge}</span>}
-        </div>
-        <p className="text-sm leading-relaxed" style={{ color:'var(--text-b)' }}>{desc}</p>
-      </div>
+const IB = ({ title, body, tag }: { title:string; body:string; tag?:string }) => (
+  <div style={{ paddingBottom:'18px', marginBottom:'18px', borderBottom:'1px solid var(--line)' }}>
+    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'7px' }}>
+      <h3 style={{ fontFamily:"'DM Serif Display',serif", fontStyle:'italic', fontSize:'1.05rem', color:'var(--ink)', margin:0 }}>{title}</h3>
+      {tag && <span className="lbl" style={{ padding:'3px 8px', border:'1px solid var(--line)', borderRadius:'2px' }}>{tag}</span>}
     </div>
-  );
-}
+    <p style={{ fontSize:'13px', lineHeight:'1.8', color:'var(--mid)', fontWeight:300, margin:0 }}>{body}</p>
+  </div>
+);
 
 export function Privacy() {
   return (
-    <PageWrapper icon={<Lock size={20}/>} title="PRIVACY PROTOCOL" subtitle="How we protect your operational data." code="DOC-PRV-001">
-      <DiamondDivider/>
-      <InfoCard icon={<Database size={16}/>}    title="DATA COLLECTED"    desc="Only mission-critical info: your name, contact, and delivery details. Nothing more, nothing less." badgeColor="var(--ice)"/>
-      <InfoCard icon={<Shield size={16}/>}      title="PROTECTION LEVEL"  desc="Military-grade encryption on all personal data. Your info is locked tighter than a mountain safe." badgeColor="var(--rust-lt)"/>
-      <InfoCard icon={<Globe size={16}/>}       title="DATA SHARING"      desc="We never sell your data. Shared only with our trusted logistics partners — and only what's needed." badgeColor="var(--moss-lt)"/>
-      <InfoCard icon={<Bell size={16}/>}        title="POLICY UPDATES"    desc="You'll be notified of changes. Full transparency is part of our code of conduct." badgeColor="var(--sand)"/>
-      <div className="mt-8 p-4 flex items-center gap-3" style={{ border:'1px solid rgba(120,196,208,0.3)', backgroundColor:'rgba(120,196,208,0.05)' }}>
-        <CheckCircle2 size={16} style={{ color:'var(--ice)', flexShrink:0 }}/>
-        <p className="spec-label">LAST UPDATED: FEBRUARY 2026 · REVIEWED QUARTERLY</p>
-      </div>
-    </PageWrapper>
+    <Shell title="Privacy Policy">
+      <IB title="Data We Collect" body="Only name, phone, and delivery address. Nothing more."/>
+      <IB title="How We Use It"   body="Exclusively to process and ship your order."/>
+      <IB title="Security"        body="Industry-standard encryption protects all your data."/>
+      <IB title="Sharing"         body="We never sell your data. Shared only with delivery partners."/>
+      <p style={{ fontSize:'11px', color:'var(--dim)', marginTop:'20px' }}>Last updated: February 2026</p>
+    </Shell>
   );
 }
 
 export function Terms() {
   return (
-    <PageWrapper icon={<Scale size={20}/>} title="TERMS OF ENGAGEMENT" subtitle="The rules of the field — clear and fair for all operators." code="DOC-TRM-002">
-      <DiamondDivider/>
-      <InfoCard icon={<User size={16}/>}        title="YOUR ACCOUNT"      desc="Keep your credentials secured. You're fully responsible for all activity under your login." badgeColor="var(--ice)"/>
-      <InfoCard icon={<CreditCard size={16}/>}  title="PAYMENTS"          desc="All prices displayed are final with zero hidden charges. What you see in the field, you pay." badgeColor="var(--sand)"/>
-      <InfoCard icon={<Ban size={16}/>}         title="PROHIBITED ITEMS"  desc="No counterfeit, dangerous, or prohibited goods. We maintain a safe and honest marketplace." badgeColor="var(--rust-lt)"/>
-      <InfoCard icon={<Scale size={16}/>}       title="GOVERNING LAW"     desc="All disputes governed by Algerian law. Resolved fairly through established legal procedures." badgeColor="var(--moss-lt)"/>
-      <div className="mt-8 p-4 flex items-start gap-3" style={{ border:'1px solid rgba(196,66,26,0.3)', backgroundColor:'rgba(196,66,26,0.05)' }}>
-        <AlertCircle size={16} style={{ color:'var(--rust-lt)', flexShrink:0, marginTop:2 }}/>
-        <p className="spec-label">TERMS MAY BE UPDATED. CONTINUED USE CONSTITUTES ACCEPTANCE OF CURRENT VERSION.</p>
-      </div>
-    </PageWrapper>
+    <Shell title="Terms of Service">
+      <IB title="Your Account"   body="You are responsible for keeping your credentials secure."/>
+      <IB title="Payments"       body="No hidden fees. The displayed price is exactly what you pay."/>
+      <IB title="Prohibited Use" body="Authentic products only. No counterfeit goods." tag="Strict"/>
+      <IB title="Governing Law"  body="Governed by Algerian law. Disputes via official channels."/>
+      <p style={{ fontSize:'12px', color:'var(--dim)', marginTop:'20px', padding:'12px 14px', border:'1px solid var(--line)', borderRadius:'2px' }}>
+        These terms may update. Continued use means acceptance.
+      </p>
+    </Shell>
   );
 }
 
 export function Cookies() {
   return (
-    <PageWrapper icon={<CookieIcon size={20}/>} title="COOKIE DEPLOYMENT" subtitle="Small files that make your mission smoother." code="DOC-CKI-003">
-      <DiamondDivider/>
-      <InfoCard icon={<ShieldCheck size={16}/>}   title="ESSENTIAL COOKIES"   desc="Core operations — keeps your session active, cart live, and store functional. Cannot be disabled." badge="ALWAYS ACTIVE" badgeColor="var(--moss-lt)"/>
-      <InfoCard icon={<Settings size={16}/>}      title="PREFERENCE COOKIES"  desc="Remembers your terrain settings: language, region, and display preferences." badge="OPTIONAL" badgeColor="var(--ice)"/>
-      <InfoCard icon={<MousePointer2 size={16}/>} title="ANALYTICS COOKIES"   desc="Helps us improve your route through the store. Fully anonymized navigation data." badge="OPTIONAL" badgeColor="var(--sand)"/>
-      <div className="mt-8 p-5" style={{ border:'1px solid var(--border-lt)', backgroundColor:'rgba(15,25,35,0.5)' }}>
-        <div className="flex gap-4 items-start">
-          <ToggleRight size={18} style={{ color:'var(--rust-lt)', flexShrink:0, marginTop:2 }}/>
-          <div>
-            <p className="font-bold mb-1" style={{ fontFamily:"'Bebas Neue',cursive", fontWeight:400, fontSize:'1.2rem', color:'var(--cream)', letterSpacing:'0.08em' }}>YOUR COOKIE CONTROL</p>
-            <p className="text-sm leading-relaxed" style={{ color:'var(--text-b)' }}>Adjust cookie preferences via browser settings anytime. Optional cookies can be disabled without breaking core functionality.</p>
-          </div>
-        </div>
+    <Shell title="Cookie Policy">
+      <IB title="Essential"   body="Required for login, cart, and checkout. Always active." tag="Required"/>
+      <IB title="Preferences" body="Saves your language and region settings." tag="Optional"/>
+      <IB title="Analytics"   body="Anonymous usage data to improve your experience." tag="Optional"/>
+      <div style={{ marginTop:'20px', padding:'14px 16px', border:'1px solid var(--line)', borderRadius:'2px', display:'flex', gap:'10px', alignItems:'flex-start' }}>
+        <ToggleRight style={{ width:'18px', height:'18px', color:'var(--green)', flexShrink:0, marginTop:'1px' }}/>
+        <p style={{ fontSize:'13px', color:'var(--mid)', lineHeight:'1.8', fontWeight:300, margin:0 }}>
+          Manage cookies through your browser settings. Disabling essential cookies may affect functionality.
+        </p>
       </div>
-    </PageWrapper>
+    </Shell>
   );
 }
 
 export function Contact() {
-  const [formState,setFormState] = useState({ name:'', email:'', message:'' });
-  const [sent,setSent] = useState(false);
-  const channels = [
-    { emoji:'📡', label:'FREQUENCY', val:'hello@outdoor.dz', href:'mailto:hello@outdoor.dz' },
-    { emoji:'📞', label:'RADIO',     val:'+213 550 123 456', href:'tel:+213550123456'        },
-    { emoji:'📍', label:'BASE CAMP', val:'Alger, Algérie',   href:undefined                 },
-  ];
+  const [form, setForm] = useState({ name:'', email:'', message:'' });
+  const [sent, setSent] = useState(false);
   return (
-    <div className="min-h-screen" style={{ backgroundColor:'var(--slate)', fontFamily:"'DM Sans',sans-serif" }}>
-      {/* Hero */}
-      <div className="relative overflow-hidden py-28 noise-overlay" style={{ backgroundColor:'var(--slate-lt)' }}>
-        <div className="absolute inset-0 topo-bg pointer-events-none"/>
-        <div className="absolute inset-0 crosshair-grid pointer-events-none opacity-40"/>
-        <div className="absolute top-8 right-12 hidden lg:block pointer-events-none opacity-20"><Crosshair size={150} color="var(--ice)" spin/></div>
-        <div className="absolute bottom-0 left-0 right-0 pointer-events-none">
-          <MountainRange width={1440} height={120} color="rgba(15,25,35,0.9)" accent="rgba(26,40,54,0.8)"/>
-        </div>
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 text-xs font-bold tracking-[0.2em]"
-            style={{ border:'1px solid rgba(196,66,26,0.4)', backgroundColor:'rgba(196,66,26,0.1)', color:'var(--rust-lt)' }}>
-            <Compass className="w-3 h-3"/> OPEN CHANNEL
-          </div>
-          <h1 className="mb-4" style={{ fontFamily:"'Bebas Neue',cursive", fontWeight:400, fontSize:'clamp(4rem,12vw,10rem)', color:'var(--cream)', letterSpacing:'0.06em', lineHeight:0.9 }}>
-            TRANSMIT
-          </h1>
-          <p className="text-base" style={{ color:'var(--text-b)' }}>We respond within 24 hours. No matter the altitude.</p>
+    <div style={{ backgroundColor:'var(--white)', minHeight:'100vh' }}>
+      <div style={{ backgroundColor:'var(--green)', padding:'72px 24px 48px' }}>
+        <div style={{ maxWidth:'720px', margin:'0 auto' }}>
+          <h1 style={{ fontFamily:"'DM Serif Display',serif", fontStyle:'italic', fontSize:'clamp(2.5rem,6vw,5rem)', color:'var(--white)', lineHeight:0.95, margin:0 }}>Get in Touch.</h1>
+          <p style={{ fontSize:'14px', color:'rgba(250,250,248,0.55)', marginTop:'12px', fontWeight:300 }}>We reply within 24 hours.</p>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 pt-12 pb-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Channels */}
-          <div>
-            <p className="spec-label mb-6">// CONTACT CHANNELS</p>
-            <div className="space-y-2">
-              {channels.map(item=>(
-                <a key={item.label} href={item.href||'#'} className="card-alpine flex items-center gap-4 p-5 transition-all" style={{ border:'1px solid var(--border)', backgroundColor:'var(--slate-lt)', textDecoration:'none' }}>
-                  <span className="text-2xl">{item.emoji}</span>
-                  <div>
-                    <p className="spec-label">{item.label}</p>
-                    <p className="text-sm font-bold" style={{ color:'var(--cream)' }}>{item.val}</p>
-                  </div>
-                  <ArrowRight className="w-4 h-4 ml-auto" style={{ color:'var(--ice)' }}/>
-                </a>
-              ))}
-            </div>
-            {/* Status panel */}
-            <div className="mt-6 p-5 crosshair-grid" style={{ border:'1px solid var(--border-lt)', backgroundColor:'rgba(15,25,35,0.5)' }}>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-2 h-2" style={{ backgroundColor:'var(--moss-lt)', animation:'blink-dot 1.5s ease-in-out infinite' }}/>
-                <p className="spec-label">COMMAND CENTER STATUS</p>
+      <div style={{ maxWidth:'900px', margin:'0 auto', padding:'56px 24px 80px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:'56px' }}>
+        <div>
+          <p className="lbl" style={{ marginBottom:'20px' }}>Contact info</p>
+          {[{icon:'📧',label:'Email',val:'hello@outdoors.dz',href:'mailto:hello@outdoors.dz'},{icon:'📞',label:'Phone',val:'+213 550 123 456',href:'tel:+213550123456'},{icon:'📍',label:'Location',val:'Algiers, Algeria',href:undefined}].map(item=>(
+            <a key={item.label} href={item.href||'#'} style={{ display:'flex', alignItems:'center', gap:'14px', padding:'14px 0', borderBottom:'1px solid var(--line)', textDecoration:'none' }}>
+              <span style={{ fontSize:'1.2rem' }}>{item.icon}</span>
+              <div>
+                <p className="lbl" style={{ marginBottom:'2px' }}>{item.label}</p>
+                <p style={{ fontSize:'13px', color:'var(--ink)', margin:0 }}>{item.val}</p>
               </div>
-              {[{l:'RESPONSE TIME',v:'< 24 HOURS'},{l:'CURRENT STATUS',v:'OPERATIONAL'},{l:'TEAM ONLINE',v:'YES'}].map(r=>(
-                <div key={r.l} className="flex justify-between items-center py-1.5" style={{ borderBottom:'1px solid var(--border)' }}>
-                  <span className="spec-label">{r.l}</span>
-                  <span className="text-xs font-bold" style={{ fontFamily:"'Bebas Neue',cursive", color:'var(--ice)', letterSpacing:'0.08em' }}>{r.v}</span>
+              {item.href && <ArrowRight style={{ width:'13px', height:'13px', color:'var(--dim)', marginLeft:'auto' }}/>}
+            </a>
+          ))}
+        </div>
+
+        <div>
+          <p className="lbl" style={{ marginBottom:'20px' }}>Send a message</p>
+          {sent ? (
+            <div style={{ minHeight:'220px', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', border:'1px solid var(--line)', borderRadius:'2px', textAlign:'center', backgroundColor:'var(--stone)' }}>
+              <CheckCircle2 style={{ width:'30px', height:'30px', color:'var(--green)', marginBottom:'12px' }}/>
+              <p style={{ fontFamily:"'DM Serif Display',serif", fontStyle:'italic', fontSize:'1.3rem', color:'var(--ink)', margin:0 }}>Message sent!</p>
+              <p style={{ fontSize:'13px', color:'var(--mid)', marginTop:'4px', fontWeight:300 }}>We will be in touch soon.</p>
+            </div>
+          ) : (
+            <form onSubmit={e=>{e.preventDefault();setSent(true);}} style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
+              {[{label:'Your name',type:'text',key:'name',ph:'Full name'},{label:'Email',type:'email',key:'email',ph:'your@email.com'}].map(f=>(
+                <div key={f.key}>
+                  <p className="lbl" style={{ marginBottom:'6px' }}>{f.label}</p>
+                  <input type={f.type} value={(form as any)[f.key]} onChange={e=>setForm({...form,[f.key]:e.target.value})} placeholder={f.ph} required className="inp"
+                    onFocus={e=>{e.target.style.borderColor='var(--ink)';}} onBlur={e=>{e.target.style.borderColor='var(--line)';}}/>
                 </div>
               ))}
-            </div>
-          </div>
-
-          {/* Form */}
-          <div>
-            <p className="spec-label mb-6">// TRANSMIT MESSAGE</p>
-            {sent?(
-              <div className="py-20 text-center crosshair-grid" style={{ border:'1px dashed var(--border-lt)' }}>
-                <CheckCircle2 className="w-12 h-12 mx-auto mb-4" style={{ color:'var(--moss-lt)' }}/>
-                <p className="font-bold" style={{ fontFamily:"'Bebas Neue',cursive", fontWeight:400, fontSize:'2rem', color:'var(--cream)', letterSpacing:'0.1em' }}>MESSAGE TRANSMITTED</p>
-                <p className="spec-label mt-2">WE'LL RESPOND WITHIN 24 HOURS</p>
+              <div>
+                <p className="lbl" style={{ marginBottom:'6px' }}>Message</p>
+                <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="How can we help?" rows={4} required className="inp"
+                  style={{ resize:'none' as any }}
+                  onFocus={e=>{e.target.style.borderColor='var(--ink)';}} onBlur={e=>{e.target.style.borderColor='var(--line)';}}/>
               </div>
-            ):(
-              <form onSubmit={e=>{e.preventDefault();setSent(true);}} className="space-y-4">
-                {[{label:'// OPERATOR NAME',type:'text',val:formState.name,ph:'Your name',key:'name'},{label:'// EMAIL FREQ.',type:'email',val:formState.email,ph:'your@email.com',key:'email'}].map(f=>(
-                  <FieldWrapper key={f.key} label={f.label}>
-                    <input type={f.type} value={f.val} onChange={e=>setFormState({...formState,[f.key]:e.target.value})} placeholder={f.ph} style={inputSt()} required
-                      onFocus={e=>{e.target.style.borderColor='var(--ice)';e.target.style.boxShadow='0 0 0 3px rgba(120,196,208,0.12)';}}
-                      onBlur={e=>{e.target.style.borderColor='var(--border-lt)';e.target.style.boxShadow='none';}}/>
-                  </FieldWrapper>
-                ))}
-                <FieldWrapper label="// MESSAGE CONTENT">
-                  <textarea value={formState.message} onChange={e=>setFormState({...formState,message:e.target.value})} placeholder="Your message..." rows={5}
-                    style={{ ...inputSt(), resize:'none' as any }} required
-                    onFocus={e=>{e.target.style.borderColor='var(--ice)';e.target.style.boxShadow='0 0 0 3px rgba(120,196,208,0.12)';}}
-                    onBlur={e=>{e.target.style.borderColor='var(--border-lt)';e.target.style.boxShadow='none';}}/>
-                </FieldWrapper>
-                <button type="submit" className="btn-alpine w-full py-4 flex items-center justify-center gap-2 text-sm font-bold tracking-[0.18em] text-white"
-                  style={{ background:'linear-gradient(135deg, var(--rust), var(--rust-dk))', boxShadow:'0 8px 32px var(--glow-rust)' }}>
-                  <Target className="w-4 h-4"/> TRANSMIT MESSAGE
-                </button>
-              </form>
-            )}
-          </div>
+              <button type="submit" className="btn btn-dark" style={{ justifyContent:'center', width:'100%', padding:'13px' }}>
+                Send Message <ArrowRight style={{ width:'13px', height:'13px' }}/>
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>
