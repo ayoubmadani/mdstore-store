@@ -291,12 +291,12 @@ export function Navbar({ store }: { store: Store }) {
           <div style={{ display:'inline-block', animation:'ticker-run 20s linear infinite' }}>
             {Array(10).fill(null).map((_,i)=>(
               <span key={i} style={{ fontFamily:"'IBM Plex Mono',monospace", fontSize:'8px', letterSpacing:'0.2em', color:'var(--bone)', margin:'0 32px' }}>
-                ◆ {store.topBar.text.toUpperCase()}
+                ◆ {""}
               </span>
             ))}
             {Array(10).fill(null).map((_,i)=>(
               <span key={`b${i}`} style={{ fontFamily:"'IBM Plex Mono',monospace", fontSize:'8px', letterSpacing:'0.2em', color:'var(--bone)', margin:'0 32px' }}>
-                ◆ {store.topBar.text.toUpperCase()}
+                ◆ {""}
               </span>
             ))}
           </div>
@@ -649,7 +649,7 @@ export function Home({ store }: any) {
               ].map((s,i) => (
                 <div key={i} style={{ padding:'14px 12px', backgroundColor:'var(--bone)' }}>
                   <p style={{ fontFamily:"'Playfair Display',serif", fontWeight:900, fontSize:'1.8rem', color:'var(--forest)', letterSpacing:'-0.02em', lineHeight:1, margin:0 }}>{s.n}</p>
-                  <p style={{ fontFamily:"'IBM Plex Mono',monospace", fontSize:'7px', letterSpacing:'0.2em', color:'var(--mid)', marginTop:'4px', margin:0, marginTop:'4px', textTransform:'uppercase' }}>{s.l}</p>
+                  <p style={{ fontFamily:"'IBM Plex Mono',monospace", fontSize:'7px', letterSpacing:'0.2em', color:'var(--mid)', marginTop:'4px', margin:0, textTransform:'uppercase' }}>{s.l}</p>
                 </div>
               ))}
             </div>
