@@ -58,6 +58,37 @@ const CSS = `
   select.inp { appearance:none; cursor:pointer; }
 
   .lbl { font-family:'DM Sans',sans-serif; font-size:11px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--mid); }
+
+  /* ── RESPONSIVE ── */
+  .nav-links { display:flex; align-items:center; gap:32px; }
+  .nav-toggle { display:none; }
+
+  .footer-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:40px; }
+  .details-grid { display:grid; grid-template-columns:1fr 1fr; }
+  .contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:56px; }
+  .stats-strip  { display:grid; grid-template-columns:repeat(3,1fr); }
+  .form-2col    { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .delivery-2col{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+
+  .details-left { padding-right:40px; padding-top:36px; position:sticky; top:72px; height:fit-content; }
+  .details-right { padding-top:36px; padding-bottom:60px; padding-left:40px; border-left:1px solid var(--line); }
+
+  @media (max-width: 900px) {
+    .footer-grid { grid-template-columns:1fr 1fr; }
+    .details-grid { grid-template-columns:1fr; }
+    .details-left { position:static; padding-right:0; padding-top:24px; border-right:none; }
+    .details-right { padding-left:0; padding-top:24px; border-left:none; border-top:1px solid var(--line); }
+    .contact-grid { grid-template-columns:1fr; gap:36px; }
+  }
+
+  @media (max-width: 640px) {
+    .nav-links { display:none; }
+    .nav-toggle { display:flex; }
+    .footer-grid { grid-template-columns:1fr; gap:28px; }
+    .stats-strip { grid-template-columns:repeat(3,1fr); }
+    .form-2col   { grid-template-columns:1fr; }
+    .delivery-2col { grid-template-columns:1fr 1fr; }
+  }
 `;
 
 /* ── TYPES ──────────────────────────────────────────────────── */
@@ -141,7 +172,7 @@ export function Navbar({ store }: { store: Store }) {
           <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:'1.15rem', color:'var(--ink)' }}>{store.name}</span>
         </Link>
 
-        <div style={{ display:'flex', alignItems:'center', gap:'32px' }} className="hidden md:flex">
+        <div className="nav-links">
           {links.map(l=>(
             <Link key={l.href} href={l.href} style={{ fontSize:'14px', color:'var(--mid)', textDecoration:'none', transition:'color 0.2s' }}
               onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--ink)';}}
@@ -154,7 +185,7 @@ export function Navbar({ store }: { store: Store }) {
           </a>
         </div>
 
-        <button onClick={()=>setOpen(p=>!p)} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--ink)', padding:'4px', display:'flex' }} className="md:hidden">
+        <button onClick={()=>setOpen(p=>!p)} className="nav-toggle" style={{ background:'none', border:'none', cursor:'pointer', color:'var(--ink)', padding:'4px', alignItems:'center', justifyContent:'center' }}>
           {open ? <X style={{ width:'20px', height:'20px' }}/> : <Mountain style={{ width:'20px', height:'20px' }}/>}
         </button>
       </div>
@@ -180,7 +211,7 @@ export function Footer({ store }: any) {
   return (
     <footer dir={isRTL?'rtl':'ltr'} style={{ backgroundColor:'var(--green)', color:'rgba(250,250,248,0.8)', fontFamily:"'DM Sans',sans-serif" }}>
       <div style={{ maxWidth:'1200px', margin:'0 auto', padding:'56px 24px 36px' }}>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'40px', paddingBottom:'40px', borderBottom:'1px solid rgba(250,250,248,0.1)' }}>
+        <div className="footer-grid" style={{ paddingBottom:'40px', borderBottom:'1px solid rgba(250,250,248,0.1)' }}>
           <div>
             <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'16px' }}>
               <div style={{ width:'30px', height:'30px', border:'1px solid rgba(250,250,248,0.25)', display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'2px' }}>
@@ -324,7 +355,7 @@ export function Home({ store }: any) {
         </div>
 
         {/* Stats strip */}
-        <div style={{ position:'absolute', bottom:0, left:0, right:0, display:'grid', gridTemplateColumns:'repeat(3,1fr)', borderTop:'1px solid rgba(250,250,248,0.1)' }}>
+        <div className="stats-strip" style={{ position:'absolute', bottom:0, left:0, right:0, borderTop:'1px solid rgba(250,250,248,0.1)' }}>
           {[
             { n:`${products.length||'∞'}`, l:isRTL?'منتج':'Products' },
             { n:'48H',                     l:isRTL?'توصيل':'Delivery' },
@@ -445,9 +476,9 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
         </div>
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', maxWidth:'1200px', margin:'0 auto', padding:'0 24px' }}>
+      <div className="details-grid" style={{ maxWidth:'1200px', margin:'0 auto', padding:'0 24px' }}>
         {/* Gallery */}
-        <div style={{ paddingRight:'40px', paddingTop:'36px', position:'sticky', top:'72px', height:'fit-content' }}>
+        <div className="details-left">
           <div style={{ position:'relative', aspectRatio:'4/5', overflow:'hidden', backgroundColor:'var(--stone)', borderRadius:'2px', marginBottom:'10px' }}>
             {allImages.length>0
               ? <img src={allImages[sel]} alt={product.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
@@ -482,7 +513,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
         </div>
 
         {/* Info */}
-        <div style={{ paddingTop:'36px', paddingBottom:'60px', paddingLeft:'40px', borderLeft:'1px solid var(--line)' }}>
+        <div className="details-right">
           <p className="lbl" style={{ marginBottom:'10px' }}>{isRTL?'معدات خارجية':'Outdoor Gear'}</p>
           <h1 style={{ fontFamily:"'DM Serif Display',serif", fontStyle:'italic', fontSize:'clamp(1.8rem,3.5vw,3rem)', color:'var(--ink)', lineHeight:0.95, marginBottom:'14px' }}>
             {product.name}
@@ -609,7 +640,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   return (
     <div style={{ marginTop:'22px', paddingTop:'20px', borderTop:'1px solid var(--line)' }}>
       <form onSubmit={handleSubmit}>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px' }}>
+        <div className="form-2col">
           <FR error={errors.customerName} label="الاسم">
             <div style={{ position:'relative' }}>
               <User style={{ position:'absolute', right:'11px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
@@ -623,7 +654,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
           </FR>
         </div>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px', marginTop:'10px' }}>
+        <div className="form-2col" style={{ marginTop:'10px' }}>
           <FR error={errors.customerWelaya} label="الولاية">
             <div style={{ position:'relative' }}>
               <ChevronDown style={{ position:'absolute', left:'11px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
@@ -643,7 +674,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         </div>
 
         <FR label="طريقة التوصيل">
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px', marginTop:'2px' }}>
+          <div className="delivery-2col" style={{ marginTop:'2px' }}>
             {(['home','office'] as const).map(type=>(
               <button key={type} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:type}))}
                 style={{ padding:'12px', border:`1px solid ${fd.typeLivraison===type?'var(--ink)':'var(--line)'}`, backgroundColor:fd.typeLivraison===type?'var(--stone)':'transparent', cursor:'pointer', textAlign:'left', borderRadius:'2px', transition:'all 0.18s' }}>
@@ -787,7 +818,7 @@ export function Contact() {
         </div>
       </div>
 
-      <div style={{ maxWidth:'900px', margin:'0 auto', padding:'56px 24px 80px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:'56px' }}>
+      <div className="contact-grid" style={{ maxWidth:'900px', margin:'0 auto', padding:'56px 24px 80px' }}>
         <div>
           <p className="lbl" style={{ marginBottom:'20px' }}>Contact info</p>
           {[{icon:'📧',label:'Email',val:'hello@outdoors.dz',href:'mailto:hello@outdoors.dz'},{icon:'📞',label:'Phone',val:'+213 550 123 456',href:'tel:+213550123456'},{icon:'📍',label:'Location',val:'Algiers, Algeria',href:undefined}].map(item=>(
