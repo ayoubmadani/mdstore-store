@@ -108,6 +108,33 @@ const FONT_CSS = `
     background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
     mix-blend-mode:multiply; opacity:0.06;
   }
+
+  /* ── RESPONSIVE LAYOUT CLASSES ── */
+  .nav-ticker  { flex:1; margin:0 32px; overflow:hidden; border-left:1px solid var(--ink); border-right:1px solid var(--ink); padding:0 16px; height:100%; display:flex; align-items:center; }
+  .stats-4     { display:grid; grid-template-columns:repeat(4,1fr); }
+  .details-split { display:grid; grid-template-columns:1fr 1fr; }
+  .details-img   { border-right:1px solid var(--ink); position:sticky; top:52px; height:calc(100vh - 52px); overflow:hidden; }
+  .details-info  { padding:28px 26px; overflow-y:auto; }
+  .contact-grid-z { display:grid; grid-template-columns:1fr 1fr; gap:36px; }
+  .form-2col-z    { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .delivery-cols  { display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--ink); }
+
+  @media (max-width: 900px) {
+    .details-split  { grid-template-columns:1fr; }
+    .details-img    { position:static; height:60vw; min-height:280px; border-right:none; border-bottom:1px solid var(--ink); }
+    .details-info   { padding:20px 16px; }
+    .contact-grid-z { grid-template-columns:1fr; gap:28px; }
+  }
+
+  @media (max-width: 640px) {
+    .nav-ticker  { display:none; }
+    .stats-4     { grid-template-columns:repeat(2,1fr); }
+    .zc          { min-height:240px; }
+    .zs-half     { grid-template-columns:1fr; }
+    .form-2col-z { grid-template-columns:1fr; }
+    .delivery-cols { grid-template-columns:1fr; }
+    .delivery-cols button:first-child { border-right:none; border-bottom:1px solid var(--ink); }
+  }
 `;
 
 /* ── TYPES ─────────────────────────────────────────────────── */
@@ -196,7 +223,7 @@ export default function Main({ store, children }: any) {
         </Link>
 
         {/* Ticker strip */}
-        <div style={{ flex:1, margin:'0 32px', overflow:'hidden', borderLeft:'1px solid var(--ink)', borderRight:'1px solid var(--ink)', padding:'0 16px', height:'100%', display:'flex', alignItems:'center' }} className="hidden md:flex">
+        <div className="nav-ticker" style={{ height:'100%' }}>
           {store.topBar?.enabled && store.topBar?.text ? (
             <div className="ticker-w" style={{ width:'100%' }}>
               <div className="ticker-i" style={{ fontFamily:"'Space Mono',monospace", fontSize:'8px', letterSpacing:'0.2em', color:'var(--punch)' }}>
@@ -402,7 +429,7 @@ export function Home({ store }: any) {
         </div>
 
         {/* Stats strip at bottom of hero */}
-        <div style={{ position:'relative', zIndex:4, borderTop:'1px solid rgba(242,239,232,0.1)', display:'grid', gridTemplateColumns:'repeat(4,1fr)', marginTop:'40px' }}>
+        <div className="stats-4" style={{ position:'relative', zIndex:4, borderTop:'1px solid rgba(242,239,232,0.1)', marginTop:'40px' }}>
           {[
             { n:'100%', l:isRTL?'أصيل':'AUTHENTIC' },
             { n:`${products.length||'∞'}`, l:isRTL?'قطعة':'PIECES' },
@@ -528,10 +555,10 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
       </div>
 
       {/* Split layout: image left, info right */}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr' }}>
+      <div className="details-split">
 
         {/* LEFT — sticky image */}
-        <div style={{ borderRight:'1px solid var(--ink)', position:'sticky', top:'52px', height:'calc(100vh - 52px)', overflow:'hidden' }}>
+        <div className="details-img">
           <div style={{ position:'relative', width:'100%', height:'100%' }}>
             {allImages.length > 0
               ? <img src={allImages[selectedImage]} alt={product.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
@@ -567,7 +594,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
         </div>
 
         {/* RIGHT — scrollable info */}
-        <div style={{ padding:'28px 26px', overflowY:'auto' }}>
+        <div className="details-info">
           <h1 style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(1.5rem,3.5vw,3rem)', color:'var(--ink)', letterSpacing:'-0.02em', lineHeight:0.9, textTransform:'uppercase', marginBottom:'16px' }}>
             {product.name}
           </h1>
@@ -714,7 +741,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     <div style={{ marginTop:'22px', paddingTop:'22px', borderTop:'2px solid var(--ink)' }}>
       <p style={{ fontSize:'8px', letterSpacing:'0.2em', color:'var(--ash)', marginBottom:'14px', fontFamily:"'Space Mono',monospace" }}>/ ORDER FORM</p>
       <form onSubmit={handleSubmit}>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px', marginBottom:'0' }}>
+        <div className="form-2col-z" style={{ marginBottom:'0' }}>
           <FR error={errors.customerName} label="NAME">
             <div style={{ position:'relative' }}>
               <User style={{ position:'absolute', right:'10px', top:'50%', transform:'translateY(-50%)', width:'11px', height:'11px', color:'var(--mist)', pointerEvents:'none' }}/>
@@ -728,7 +755,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
           </FR>
         </div>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px', marginBottom:'0', marginTop:'8px' }}>
+        <div className="form-2col-z" style={{ marginBottom:'0', marginTop:'8px' }}>
           <FR error={errors.customerWelaya} label="WILAYA">
             <div style={{ position:'relative' }}>
               <ChevronDown style={{ position:'absolute', left:'10px', top:'50%', transform:'translateY(-50%)', width:'11px', height:'11px', color:'var(--mist)', pointerEvents:'none' }}/>
@@ -749,7 +776,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
         {/* Delivery toggle */}
         <FR label="DELIVERY">
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', border:'1px solid var(--ink)' }}>
+          <div className="delivery-cols">
             {(['home','office'] as const).map((type, i) => (
               <button key={type} type="button" onClick={() => setFd(p=>({...p,typeLivraison:type}))}
                 style={{ padding:'13px 10px', border:'none', borderRight:i===0?'1px solid var(--ink)':'none', backgroundColor:fd.typeLivraison===type?'var(--ink)':'transparent', cursor:'pointer', textAlign:'left', borderTop:`3px solid ${fd.typeLivraison===type?'var(--punch)':'transparent'}`, transition:'all 0.18s' }}>
@@ -902,7 +929,7 @@ export function Contact() {
         <h1 style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(3rem,9vw,9rem)', color:'var(--paper)', letterSpacing:'-0.04em', lineHeight:0.88, position:'relative', zIndex:2 }}>HIT US.</h1>
         <p style={{ fontSize:'9px', letterSpacing:'0.2em', color:'rgba(242,239,232,0.55)', marginTop:'14px', position:'relative', zIndex:2 }}>WE REPLY WITHIN 24H · NO CAP</p>
       </div>
-      <div style={{ maxWidth:'860px', margin:'0 auto', padding:'44px 24px 80px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:'36px' }}>
+      <div className="contact-grid-z" style={{ maxWidth:'860px', margin:'0 auto', padding:'44px 24px 80px' }}>
         {/* Channels */}
         <div>
           <p style={{ fontSize:'8px', letterSpacing:'0.22em', color:'var(--ash)', marginBottom:'14px' }}>/ CONTACT CHANNELS</p>
