@@ -124,7 +124,6 @@ export function Navbar({ store }: { store: Store }) {
   const [scrolled,   setScrolled]   = useState(false);
   const [tick,       setTick]       = useState(true);
   const [clock,      setClock]      = useState('');
-  const isRTL = store.language === 'ar';
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -138,16 +137,16 @@ export function Navbar({ store }: { store: Store }) {
   }, []);
 
   useEffect(() => {
-    const update = () => setClock(new Date().toLocaleTimeString('en', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    const update = () => setClock(new Date().toLocaleTimeString('ar', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }));
     update();
     const id = setInterval(update, 1000);
     return () => clearInterval(id);
   }, []);
 
   const navItems = [
-    { href: `/${store.subdomain}`,         label: isRTL ? 'الرئيسية'       : 'HOME',    code: '01' },
-    { href: `/${store.subdomain}/contact`, label: isRTL ? 'اتصل بنا'       : 'CONTACT', code: '02' },
-    { href: `/${store.subdomain}/Privacy`, label: isRTL ? 'سياسة الخصوصية' : 'PRIVACY', code: '03' },
+    { href: `/${store.subdomain}`,         label: 'الرئيسية',        code: '٠١' },
+    { href: `/${store.subdomain}/contact`, label: 'اتصل بنا',        code: '٠٢' },
+    { href: `/${store.subdomain}/Privacy`, label: 'سياسة الخصوصية', code: '٠٣' },
   ];
 
   const initials = store.name.split(' ').filter(Boolean).map((w: string) => w[0].toUpperCase()).join('');
@@ -156,14 +155,14 @@ export function Navbar({ store }: { store: Store }) {
     <nav
       className={`sticky top-0 z-50 transition-all duration-500 ${scrolled ? 'shadow-[0_4px_30px_rgba(0,229,255,0.08)]' : ''}`}
       style={{ backgroundColor: scrolled ? 'rgba(5,11,20,0.97)' : '#050B14', backdropFilter: scrolled ? 'blur(12px)' : 'none', borderBottom: '1px solid #0D1F2D', fontFamily: "'JetBrains Mono', monospace" }}
-      dir={isRTL ? 'rtl' : 'ltr'}
+      dir="rtl"
     >
       <div className="h-0.5 w-full" style={{ background: 'linear-gradient(90deg, transparent, #00E5FF 40%, #39FF14 60%, transparent)' }} />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <div className="flex justify-between items-center h-16">
 
-          {/* Logo */}
+          {/* الشعار */}
           <Link href={`/${store.subdomain}`} className="flex items-center gap-3 group">
             <div className="relative">
               <div className="w-9 h-9 flex items-center justify-center" style={{ border: '1px solid #00E5FF', boxShadow: '0 0 12px rgba(0,229,255,0.25)', background: 'rgba(0,229,255,0.05)' }}>
@@ -180,13 +179,13 @@ export function Navbar({ store }: { store: Store }) {
               </span>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#39FF14' }} />
-                <span className="text-[9px] tracking-widest" style={{ color: '#39FF14' }}>ONLINE</span>
-                <span className="text-[9px]" style={{ color: '#1A3A4A' }}>| SYS.ACTIVE</span>
+                <span className="text-[9px] tracking-widest" style={{ color: '#39FF14' }}>متصل</span>
+                <span className="text-[9px]" style={{ color: '#1A3A4A' }}>| النظام_نشط</span>
               </div>
             </div>
           </Link>
 
-          {/* Desktop nav */}
+          {/* قائمة سطح المكتب */}
           <div className="hidden md:flex items-center gap-8">
             {navItems.map(item => (
               <Link key={item.href} href={item.href} className="tech-nav-link flex items-center gap-2 text-[11px] tracking-widest transition-colors duration-200 group" style={{ color: '#6A8A9A' }}>
@@ -200,8 +199,8 @@ export function Navbar({ store }: { store: Store }) {
             </div>
           </div>
 
-          {/* Mobile toggle */}
-          <button onClick={() => setIsMenuOpen(p => !p)} className="md:hidden p-2 flex flex-col gap-1.5 items-end" aria-label="Toggle menu">
+          {/* زر القائمة للجوال */}
+          <button onClick={() => setIsMenuOpen(p => !p)} className="md:hidden p-2 flex flex-col gap-1.5 items-end" aria-label="تبديل القائمة">
             {isMenuOpen
               ? <Zap className="w-5 h-5" style={{ color: '#00E5FF' }} />
               : (<><span className="block h-px w-5" style={{ backgroundColor: '#00E5FF' }} /><span className="block h-px w-3" style={{ backgroundColor: '#00E5FF' }} /><span className="block h-px w-5" style={{ backgroundColor: '#00E5FF' }} /></>)
@@ -209,7 +208,7 @@ export function Navbar({ store }: { store: Store }) {
           </button>
         </div>
 
-        {/* Mobile menu */}
+        {/* قائمة الجوال */}
         <div className={`md:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? 'max-h-56 pb-5' : 'max-h-0'}`}>
           <div className="pt-4 flex flex-col gap-4" style={{ borderTop: '1px solid #0D1F2D' }}>
             {navItems.map(item => (
@@ -228,18 +227,18 @@ export function Navbar({ store }: { store: Store }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// FOOTER — FIX: 'Cookise' → 'Cookies'
+// FOOTER
 // ─────────────────────────────────────────────────────────────
 
 export function Footer({ store }: any) {
   return (
-    <footer style={{ backgroundColor: '#020810', borderTop: '1px solid #0D1F2D', fontFamily: "'JetBrains Mono', monospace", position: 'relative', overflow: 'hidden' }}>
+    <footer dir="rtl" style={{ backgroundColor: '#020810', borderTop: '1px solid #0D1F2D', fontFamily: "'JetBrains Mono', monospace", position: 'relative', overflow: 'hidden' }}>
       <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
       <div className="relative max-w-7xl mx-auto px-6 lg:px-10 py-14">
         <div className="flex flex-col md:flex-row justify-between gap-10 pb-10" style={{ borderBottom: '1px solid #0D1F2D' }}>
 
-          {/* Brand */}
+          {/* العلامة التجارية */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 flex items-center justify-center" style={{ border: '1px solid rgba(0,229,255,0.4)', boxShadow: '0 0 10px rgba(0,229,255,0.15)' }}>
@@ -251,22 +250,22 @@ export function Footer({ store }: any) {
               <span className="text-sm tracking-widest font-bold" style={{ color: '#C8D8E8', fontFamily: "'Orbitron', sans-serif", letterSpacing: '0.12em' }}>{store.name}</span>
             </div>
             <p className="text-[11px] leading-relaxed max-w-xs" style={{ color: '#2A5A6A' }}>
-              // NEXT-GEN COMMERCE PLATFORM<br />
-              // POWERED BY INNOVATION ENGINE v4.2
+              // منصة تجارة الجيل القادم<br />
+              // مدعومة بمحرك الابتكار v4.2
             </p>
             <div className="flex items-center gap-2 text-[10px]">
               <span className="animate-pulse" style={{ color: '#39FF14' }}>●</span>
-              <span style={{ color: '#39FF14' }}>ALL SYSTEMS OPERATIONAL</span>
+              <span style={{ color: '#39FF14' }}>جميع الأنظمة تعمل بكفاءة</span>
             </div>
           </div>
 
-          {/* Links */}
+          {/* الروابط */}
           <div className="flex flex-col gap-3">
-            <p className="text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: '#00E5FF' }}>// NAVIGATION</p>
+            <p className="text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: '#00E5FF' }}>// التنقل</p>
             {[
-              { href: `/${store.subdomain}/Privacy`, label: 'PRIVACY_POLICY'  },
-              { href: `/${store.subdomain}/Terms`,   label: 'TERMS_OF_USE'    },
-              { href: `/${store.subdomain}/Cookies`, label: 'COOKIE_PROTOCOL' }, // FIX: Cookise → Cookies
+              { href: `/${store.subdomain}/Privacy`, label: 'سياسة_الخصوصية'     },
+              { href: `/${store.subdomain}/Terms`,   label: 'شروط_الاستخدام'     },
+              { href: `/${store.subdomain}/Cookies`, label: 'بروتوكول_الكوكيز'  },
             ].map(link => (
               <a key={link.href} href={link.href} className="flex items-center gap-2 text-[11px] tracking-wider hover:text-[#00E5FF] transition-colors group" style={{ color: '#3A6070' }}>
                 <span className="group-hover:text-[#39FF14] transition-colors" style={{ color: '#1A3040' }}>›</span>
@@ -277,10 +276,10 @@ export function Footer({ store }: any) {
         </div>
 
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-[10px] tracking-widest" style={{ color: '#1A3A4A' }}>© {new Date().getFullYear()} {store.name.toUpperCase()} — ALL RIGHTS RESERVED</p>
+          <p className="text-[10px] tracking-widest" style={{ color: '#1A3A4A' }}>© {new Date().getFullYear()} {store.name.toUpperCase()} — جميع الحقوق محفوظة</p>
           <div className="flex items-center gap-2 text-[10px]" style={{ color: '#1A3040' }}>
             <span style={{ color: '#00E5FF', opacity: 0.4 }}>◈</span>
-            <span>TECH INNOVATION THEME</span>
+            <span>ثيم الابتكار التقني</span>
             <span style={{ color: '#00E5FF', opacity: 0.4 }}>◈</span>
           </div>
         </div>
@@ -290,10 +289,10 @@ export function Footer({ store }: any) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// CARD — FIX: scale-108 → scale-105
+// CARD
 // ─────────────────────────────────────────────────────────────
 
-export function Card({ product, displayImage, discount, isRTL, store, viewDetails }: any) {
+export function Card({ product, displayImage, discount, store, viewDetails }: any) {
   return (
     <div
       className="group relative flex flex-col overflow-hidden transition-all duration-300"
@@ -305,7 +304,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
       <span className="absolute bottom-0 right-0 w-4 h-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity" style={{ borderBottom: '1.5px solid #00E5FF', borderRight: '1.5px solid #00E5FF' }} />
 
       <div className="absolute top-3 left-3 z-10 text-[9px] tracking-widest px-1.5 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity" style={{ backgroundColor: 'rgba(0,229,255,0.08)', border: '1px solid rgba(0,229,255,0.2)', color: '#00E5FF' }}>
-        SYS_{String(product.id).slice(-3).toUpperCase()}
+        وحدة_{String(product.id).slice(-3).toUpperCase()}
       </div>
 
       <div className="relative h-56 overflow-hidden" style={{ backgroundColor: '#040C16' }}>
@@ -316,7 +315,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
             <div className="w-12 h-12 flex items-center justify-center" style={{ border: '1px solid #0D2030' }}>
               <Zap className="w-6 h-6" style={{ color: '#1A4A5A' }} />
             </div>
-            <span className="text-[10px] tracking-widest" style={{ color: '#1A3A4A' }}>NO_IMAGE.ERR</span>
+            <span className="text-[10px] tracking-widest" style={{ color: '#1A3A4A' }}>لا_توجد_صورة</span>
           </div>
         )}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" style={{ background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,255,0.015) 2px, rgba(0,229,255,0.015) 4px)' }} />
@@ -326,7 +325,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
           </div>
         )}
         <div className="absolute bottom-0 left-0 right-0 py-1 px-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300" style={{ backgroundColor: 'rgba(0,229,255,0.08)', borderTop: '1px solid rgba(0,229,255,0.15)' }}>
-          <p className="text-[9px] tracking-widest" style={{ color: '#00E5FF' }}>◉ UNIT_SCAN COMPLETE</p>
+          <p className="text-[9px] tracking-widest" style={{ color: '#00E5FF' }}>◉ اكتمل_فحص_الوحدة</p>
         </div>
       </div>
 
@@ -366,29 +365,15 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
 // ─────────────────────────────────────────────────────────────
 
 export const Home = ({ store }: any) => {
-  const isRTL = store.language === 'ar';
-  const dir   = isRTL ? 'rtl' : 'ltr';
-
-  const t = {
-    categories:       isRTL ? 'التصنيفات'                    : 'CATEGORIES',
-    noCategoriesDesc: isRTL ? 'لم يتم إضافة أي تصنيفات بعد'  : 'No data streams available',
-    products:         isRTL ? 'المنتجات'                     : 'PRODUCT DATABASE',
-    noProducts:       isRTL ? 'لا توجد منتجات'               : 'DATABASE EMPTY',
-    noProductsDesc:   isRTL ? 'لم يتم إضافة أي منتجات بعد'   : 'No records found in registry',
-    viewDetails:      isRTL ? 'عرض التفاصيل'                 : 'ACCESS →',
-    all:              isRTL ? 'الكل'                          : 'ALL',
-    explore:          isRTL ? 'استكشف المنتجات'               : 'EXPLORE CATALOG',
-  };
-
   const stats = [
-    { icon: <Cpu className="w-4 h-4" />,    label: isRTL ? 'منتج نشط'     : 'ACTIVE UNITS',  val: store.products?.length  || 0 },
-    { icon: <Globe2 className="w-4 h-4" />, label: isRTL ? 'تصنيف'        : 'CATEGORIES',    val: store.categories?.length || 0 },
-    { icon: <Shield className="w-4 h-4" />, label: isRTL ? 'أمان كامل'    : 'SECURE',        val: '100%' },
-    { icon: <Zap className="w-4 h-4" />,    label: isRTL ? 'سرعة التوصيل' : 'FAST DELIVERY', val: '24H' },
+    { icon: <Cpu className="w-4 h-4" />,    label: 'وحدات_نشطة',    val: store.products?.length  || 0 },
+    { icon: <Globe2 className="w-4 h-4" />, label: 'التصنيفات',      val: store.categories?.length || 0 },
+    { icon: <Shield className="w-4 h-4" />, label: 'أمان_كامل',      val: '١٠٠٪' },
+    { icon: <Zap className="w-4 h-4" />,    label: 'توصيل_سريع',     val: '٢٤ ساعة' },
   ];
 
   return (
-    <div className="min-h-screen" dir={dir} style={{ backgroundColor: '#050B14', fontFamily: "'JetBrains Mono', monospace" }}>
+    <div className="min-h-screen" dir="rtl" style={{ backgroundColor: '#050B14', fontFamily: "'JetBrains Mono', monospace" }}>
 
       {/* ── HERO ── */}
       <section className="relative flex items-center justify-center overflow-hidden" style={{ minHeight: '90vh' }}>
@@ -401,13 +386,13 @@ export const Home = ({ store }: any) => {
         </div>
 
         <div className="absolute top-12 right-12 text-[10px] tracking-widest hidden lg:block" style={{ color: '#1A4A5A' }}>
-          <div>SYS.VERSION_4.2.1</div>
-          <div>NODE_STATUS: <span style={{ color: '#39FF14' }}>ACTIVE</span></div>
-          <div>UPTIME: 99.98%</div>
+          <div>إصدار_النظام: ٤.٢.١</div>
+          <div>حالة_العقدة: <span style={{ color: '#39FF14' }}>نشطة</span></div>
+          <div>وقت_التشغيل: ٩٩.٩٨٪</div>
         </div>
         <div className="absolute bottom-16 left-12 text-[10px] tracking-widest hidden lg:block" style={{ color: '#1A4A5A' }}>
-          <div>LAT: 36.7372°N</div><div>LON: 3.0862°E</div>
-          <div>SIGNAL: <span style={{ color: '#00E5FF' }}>████████░░</span></div>
+          <div>خط_العرض: 36.73°N</div><div>خط_الطول: 3.09°E</div>
+          <div>الإشارة: <span style={{ color: '#00E5FF' }}>████████░░</span></div>
         </div>
 
         <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
@@ -419,7 +404,7 @@ export const Home = ({ store }: any) => {
           <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5" style={{ border: '1px solid rgba(0,229,255,0.3)', backgroundColor: 'rgba(0,229,255,0.04)' }}>
             <span className="animate-pulse w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#39FF14' }} />
             <span className="text-[10px] tracking-widest uppercase" style={{ color: '#00E5FF' }}>
-              {isRTL ? 'النظام نشط ومتاح' : 'SYSTEM ONLINE — READY TO DEPLOY'}
+              النظام_متصل — جاهز_للنشر
             </span>
           </div>
           {store.hero.title && (
@@ -434,14 +419,14 @@ export const Home = ({ store }: any) => {
           )}
           <div className="flex flex-wrap gap-4 justify-center">
             <a href="#products" className="flex items-center gap-2 px-8 py-3.5 text-xs tracking-widest font-bold uppercase transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,229,255,0.3)]" style={{ backgroundColor: '#00E5FF', color: '#020810' }}>
-              <Zap className="w-3.5 h-3.5" /> {t.explore}
+              <Zap className="w-3.5 h-3.5" /> استكشف_المنتجات
             </a>
             <a href="#categories" className="flex items-center gap-2 px-8 py-3.5 text-xs tracking-widest uppercase transition-all duration-300"
               style={{ border: '1px solid rgba(0,229,255,0.3)', color: '#00E5FF', backgroundColor: 'transparent' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(0,229,255,0.06)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
             >
-              {isRTL ? 'استعرض التصنيفات' : 'VIEW CATEGORIES'}
+              عرض_التصنيفات
             </a>
           </div>
         </div>
@@ -469,9 +454,9 @@ export const Home = ({ store }: any) => {
       <section id="categories" className="py-20">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex items-center gap-5 mb-12">
-            <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: '#00E5FF' }}>◈ {t.categories}</span>
+            <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: '#00E5FF' }}>◈ التصنيفات</span>
             <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(0,229,255,0.3), transparent)' }} />
-            <span className="text-[10px]" style={{ color: '#1A3A4A' }}>DB_MODULE_02</span>
+            <span className="text-[10px]" style={{ color: '#1A3A4A' }}>وحدة_قاعدة_البيانات_٠٢</span>
           </div>
           {store.categories && store.categories.length > 0 ? (
             <div className="flex flex-wrap gap-3">
@@ -481,7 +466,7 @@ export const Home = ({ store }: any) => {
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(0,229,255,0.12)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(0,229,255,0.04)'; }}
               >
-                <span style={{ color: '#39FF14' }}>◉</span> {t.all}
+                <span style={{ color: '#39FF14' }}>◉</span> الكل
               </Link>
               {store.categories.map((cat: any, i: number) => (
                 <Link key={cat.id} href={`/${store.domain}?category=${cat.id}`}
@@ -496,7 +481,7 @@ export const Home = ({ store }: any) => {
             </div>
           ) : (
             <div className="py-12 text-center" style={{ border: '1px dashed #0D2030' }}>
-              <p className="text-[11px] tracking-widest" style={{ color: '#1A4A5A' }}>// {t.noCategoriesDesc}</p>
+              <p className="text-[11px] tracking-widest" style={{ color: '#1A4A5A' }}>// لا تتوفر تيارات بيانات</p>
             </div>
           )}
         </div>
@@ -506,9 +491,9 @@ export const Home = ({ store }: any) => {
       <section id="products" className="pb-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex items-center gap-5 mb-12">
-            <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: '#00E5FF' }}>◈ {t.products}</span>
+            <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: '#00E5FF' }}>◈ قاعدة_بيانات_المنتجات</span>
             <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(0,229,255,0.3), transparent)' }} />
-            <span className="text-[10px]" style={{ color: '#1A3A4A' }}>RECORDS: {store.products?.length || 0}</span>
+            <span className="text-[10px]" style={{ color: '#1A3A4A' }}>السجلات: {store.products?.length || 0}</span>
           </div>
           {store.products && store.products.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -516,14 +501,14 @@ export const Home = ({ store }: any) => {
                 const displayImage = product.productImage || product.imagesProduct?.[0]?.imageUrl || store.design?.logoUrl;
                 const discount = product.priceOriginal
                   ? Math.round(((product.priceOriginal - product.price) / product.priceOriginal) * 100) : 0;
-                return <Card key={product.id} product={product} displayImage={displayImage} discount={discount} isRTL={isRTL} store={store} viewDetails={t.viewDetails} />;
+                return <Card key={product.id} product={product} displayImage={displayImage} discount={discount} store={store} viewDetails="عرض_التفاصيل" />;
               })}
             </div>
           ) : (
             <div className="py-24 text-center" style={{ border: '1px dashed #0D2030' }}>
               <Zap className="w-10 h-10 mx-auto mb-4 opacity-20" style={{ color: '#00E5FF' }} />
-              <p className="text-xs tracking-widest mb-2" style={{ color: '#1A4A5A', fontFamily: "'Orbitron', sans-serif" }}>{t.noProducts}</p>
-              <p className="text-[10px] tracking-widest" style={{ color: '#0D2A3A' }}>// {t.noProductsDesc}</p>
+              <p className="text-xs tracking-widest mb-2" style={{ color: '#1A4A5A', fontFamily: "'Orbitron', sans-serif" }}>قاعدة_البيانات_فارغة</p>
+              <p className="text-[10px] tracking-widest" style={{ color: '#0D2A3A' }}>// لم يتم العثور على سجلات في السجل</p>
             </div>
           )}
         </div>
@@ -540,7 +525,7 @@ export function Details({
   product, toggleWishlist, isWishlisted, handleShare, discount,
   allImages, allAttrs, finalPrice, inStock, autoGen,
   selectedVariants, setSelectedOffer, selectedOffer,
-  resolvedParams, handleVariantSelection, domain, isRTL,
+  resolvedParams, handleVariantSelection, domain,
 }: any) {
   const [submitSuccess,  setSubmitSuccess]  = useState(false);
   const [showShareToast, setShowShareToast] = useState(false);
@@ -555,24 +540,24 @@ export function Details({
             <Check className="w-3.5 h-3.5 text-black" />
           </div>
           <div>
-            <p className="text-xs font-bold tracking-widest" style={{ color: '#39FF14' }}>ORDER_CONFIRMED.SUCCESS</p>
+            <p className="text-xs font-bold tracking-widest" style={{ color: '#39FF14' }}>تم_تأكيد_الطلب.نجاح</p>
             <p className="text-[10px] mt-0.5" style={{ color: '#2A5A6A' }}>// سنتصل بك خلال 24 ساعة لتأكيد الطلب</p>
           </div>
         </div>
       )}
       {showShareToast && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2 text-[10px] tracking-widest" style={{ backgroundColor: '#050B14', border: '1px solid rgba(0,229,255,0.4)', color: '#00E5FF' }}>
-          <Link2 className="w-3.5 h-3.5" />URL_COPIED
+          <Link2 className="w-3.5 h-3.5" />تم_نسخ_الرابط
         </div>
       )}
 
-      {/* Breadcrumb */}
+      {/* شريط التنقل */}
       <header style={{ borderBottom: '1px solid #0D1F2D', backgroundColor: 'rgba(5,11,20,0.9)', backdropFilter: 'blur(10px)', position: 'sticky', top: 0, zIndex: 40 }}>
         <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between">
           <nav className="flex items-center gap-2 text-[10px] tracking-widest" style={{ color: '#2A5A6A' }}>
-            <span className="hover:text-[#00E5FF] cursor-pointer transition-colors">HOME</span>
+            <span className="hover:text-[#00E5FF] cursor-pointer transition-colors">الرئيسية</span>
             <span style={{ color: '#00E5FF' }}>/</span>
-            <span className="hover:text-[#00E5FF] cursor-pointer transition-colors">CATALOG</span>
+            <span className="hover:text-[#00E5FF] cursor-pointer transition-colors">الكتالوج</span>
             <span style={{ color: '#00E5FF' }}>/</span>
             <span style={{ color: '#C8D8E8' }}>{product.name}</span>
           </nav>
@@ -585,7 +570,7 @@ export function Details({
             </button>
             <div className="flex items-center gap-1.5 px-3 py-1 text-[9px] tracking-widest font-bold" style={{ border: `1px solid ${inStock ? 'rgba(57,255,20,0.3)' : 'rgba(255,59,48,0.3)'}`, backgroundColor: inStock ? 'rgba(57,255,20,0.06)' : 'rgba(255,59,48,0.06)', color: inStock ? '#39FF14' : '#FF3B30' }}>
               <span className={`w-1.5 h-1.5 rounded-full ${inStock ? 'animate-pulse' : ''}`} style={{ backgroundColor: inStock ? '#39FF14' : '#FF3B30' }} />
-              {inStock ? 'IN_STOCK' : 'OUT_OF_STOCK'}
+              {inStock ? 'متوفر_في_المخزون' : 'نفد_المخزون'}
             </div>
           </div>
         </div>
@@ -594,7 +579,7 @@ export function Details({
       <main className="max-w-6xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
 
-          {/* ── Images ── */}
+          {/* ── الصور ── */}
           <div className="space-y-3">
             <div className="relative overflow-hidden group" style={{ aspectRatio: '1', backgroundColor: '#040C16', border: '1px solid #0D2030' }}>
               {allImages.length > 0 ? (
@@ -602,7 +587,7 @@ export function Details({
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center gap-3">
                   <Package className="w-16 h-16" style={{ color: '#0D2030' }} />
-                  <span className="text-[10px] tracking-widest" style={{ color: '#1A3A4A' }}>NO_IMAGE.ERR</span>
+                  <span className="text-[10px] tracking-widest" style={{ color: '#1A3A4A' }}>لا_توجد_صورة</span>
                 </div>
               )}
               <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,229,255,0.012) 3px, rgba(0,229,255,0.012) 4px)' }} />
@@ -618,15 +603,15 @@ export function Details({
               </button>
               {!inStock && !autoGen && (
                 <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(5,11,20,0.85)', backdropFilter: 'blur(4px)' }}>
-                  <div className="px-6 py-3 text-xs tracking-widest font-bold" style={{ border: '1px solid rgba(255,59,48,0.4)', color: '#FF3B30', fontFamily: "'Orbitron', sans-serif" }}>UNIT_UNAVAILABLE</div>
+                  <div className="px-6 py-3 text-xs tracking-widest font-bold" style={{ border: '1px solid rgba(255,59,48,0.4)', color: '#FF3B30', fontFamily: "'Orbitron', sans-serif" }}>الوحدة_غير_متاحة</div>
                 </div>
               )}
               {allImages.length > 1 && (
                 <>
-                  <button onClick={() => setSelectedImage(p => p === 0 ? allImages.length - 1 : p - 1)} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" style={{ backgroundColor: 'rgba(5,11,20,0.8)', border: '1px solid rgba(0,229,255,0.3)', color: '#00E5FF' }}>
+                  <button onClick={() => setSelectedImage((p: number) => p === 0 ? allImages.length - 1 : p - 1)} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" style={{ backgroundColor: 'rgba(5,11,20,0.8)', border: '1px solid rgba(0,229,255,0.3)', color: '#00E5FF' }}>
                     <ChevronRight className="w-4 h-4" />
                   </button>
-                  <button onClick={() => setSelectedImage(p => p === allImages.length - 1 ? 0 : p + 1)} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" style={{ backgroundColor: 'rgba(5,11,20,0.8)', border: '1px solid rgba(0,229,255,0.3)', color: '#00E5FF' }}>
+                  <button onClick={() => setSelectedImage((p: number) => p === allImages.length - 1 ? 0 : p + 1)} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" style={{ backgroundColor: 'rgba(5,11,20,0.8)', border: '1px solid rgba(0,229,255,0.3)', color: '#00E5FF' }}>
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                 </>
@@ -643,12 +628,12 @@ export function Details({
               </div>
             )}
 
-            {/* Trust badges */}
+            {/* شارات الثقة */}
             <div className="grid grid-cols-3 gap-2 mt-4">
               {[
-                { icon: <ShieldCheck className="w-3.5 h-3.5" />, label: isRTL ? 'دفع آمن'     : 'SECURE'    },
-                { icon: <Truck className="w-3.5 h-3.5" />,       label: isRTL ? 'توصيل سريع'  : 'FAST_SHIP' },
-                { icon: <Zap className="w-3.5 h-3.5" />,         label: isRTL ? 'ضمان الجودة' : 'QUALITY'   },
+                { icon: <ShieldCheck className="w-3.5 h-3.5" />, label: 'دفع_آمن'     },
+                { icon: <Truck className="w-3.5 h-3.5" />,       label: 'شحن_سريع'    },
+                { icon: <Zap className="w-3.5 h-3.5" />,         label: 'ضمان_الجودة' },
               ].map((b, i) => (
                 <div key={i} className="flex flex-col items-center gap-1.5 py-3" style={{ border: '1px solid #0D2030', backgroundColor: '#080F1A' }}>
                   <span style={{ color: '#00E5FF' }}>{b.icon}</span>
@@ -658,11 +643,11 @@ export function Details({
             </div>
           </div>
 
-          {/* ── Info + Form ── */}
+          {/* ── المعلومات + النموذج ── */}
           <div className="space-y-7">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[9px] tracking-[0.2em] uppercase" style={{ color: '#00E5FF' }}>◈ PRODUCT_DATA</span>
+                <span className="text-[9px] tracking-[0.2em] uppercase" style={{ color: '#00E5FF' }}>◈ بيانات_المنتج</span>
                 <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(0,229,255,0.3), transparent)' }} />
               </div>
               <h1 className="leading-tight mb-3" style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: 'clamp(1.2rem, 3vw, 1.8rem)', color: '#FFFFFF', letterSpacing: '0.04em' }}>
@@ -674,14 +659,14 @@ export function Details({
                     <span key={i} className="text-sm" style={{ color: i < 4 ? '#00E5FF' : '#1A3A4A' }}>◆</span>
                   ))}
                 </div>
-                <span className="text-[10px] tracking-widest" style={{ color: '#2A5A6A' }}>4.8 RATING | 128 REVIEWS</span>
+                <span className="text-[10px] tracking-widest" style={{ color: '#2A5A6A' }}>التقييم: ٤.٨ | ١٢٨ تقييم</span>
               </div>
             </div>
 
-            {/* Price */}
+            {/* السعر */}
             <div className="p-5 relative" style={{ border: '1px solid #0D2030', backgroundColor: '#080F1A' }}>
               <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, #00E5FF, transparent)' }} />
-              <p className="text-[9px] tracking-widest mb-2" style={{ color: '#2A5A6A' }}>UNIT_PRICE</p>
+              <p className="text-[9px] tracking-widest mb-2" style={{ color: '#2A5A6A' }}>سعر_الوحدة</p>
               <div className="flex items-baseline gap-4">
                 <span className="font-black" style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '2.5rem', color: '#00E5FF', textShadow: '0 0 20px rgba(0,229,255,0.3)' }}>
                   {finalPrice.toLocaleString('ar-DZ')}
@@ -690,22 +675,22 @@ export function Details({
                 {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
                   <div>
                     <span className="text-sm line-through" style={{ color: '#1A4A5A' }}>{parseFloat(product.priceOriginal).toLocaleString('ar-DZ')} دج</span>
-                    <p className="text-[9px] tracking-widest mt-0.5" style={{ color: '#39FF14' }}>SAVE: {(parseFloat(product.priceOriginal) - finalPrice).toLocaleString('ar-DZ')} دج</p>
+                    <p className="text-[9px] tracking-widest mt-0.5" style={{ color: '#39FF14' }}>وفري: {(parseFloat(product.priceOriginal) - finalPrice).toLocaleString('ar-DZ')} دج</p>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Stock */}
+            {/* المخزون */}
             <div className="inline-flex items-center gap-2 px-4 py-2 text-[10px] tracking-widest font-bold" style={{ border: `1px solid ${autoGen ? 'rgba(0,229,255,0.3)' : inStock ? 'rgba(57,255,20,0.3)' : 'rgba(255,59,48,0.3)'}`, backgroundColor: autoGen ? 'rgba(0,229,255,0.04)' : inStock ? 'rgba(57,255,20,0.04)' : 'rgba(255,59,48,0.04)', color: autoGen ? '#00E5FF' : inStock ? '#39FF14' : '#FF3B30' }}>
               {autoGen ? <Infinity className="w-3.5 h-3.5" /> : inStock ? <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" /> : <X className="w-3.5 h-3.5" />}
-              {autoGen ? 'UNLIMITED_STOCK' : inStock ? 'STOCK_AVAILABLE' : 'OUT_OF_STOCK'}
+              {autoGen ? 'مخزون_غير_محدود' : inStock ? 'المخزون_متاح' : 'نفد_المخزون'}
             </div>
 
-            {/* Offers */}
+            {/* الباقات */}
             {product.offers?.length > 0 && (
               <div>
-                <p className="text-[9px] tracking-[0.2em] uppercase mb-3" style={{ color: '#00E5FF' }}>◈ AVAILABLE_PACKAGES</p>
+                <p className="text-[9px] tracking-[0.2em] uppercase mb-3" style={{ color: '#00E5FF' }}>◈ الباقات_المتاحة</p>
                 <div className="space-y-2">
                   {product.offers.map((offer: any) => (
                     <label key={offer.id} className="flex items-center justify-between p-4 cursor-pointer transition-all duration-200" style={{ border: `1px solid ${selectedOffer === offer.id ? 'rgba(0,229,255,0.5)' : '#0D2030'}`, backgroundColor: selectedOffer === offer.id ? 'rgba(0,229,255,0.05)' : '#080F1A', boxShadow: selectedOffer === offer.id ? '0 0 15px rgba(0,229,255,0.1)' : 'none' }}>
@@ -716,7 +701,7 @@ export function Details({
                         <input type="radio" name="offer" value={offer.id} checked={selectedOffer === offer.id} onChange={() => setSelectedOffer(offer.id)} className="sr-only" />
                         <div>
                           <p className="text-xs font-medium" style={{ color: '#C8D8E8' }}>{offer.name}</p>
-                          <p className="text-[9px] tracking-wider mt-0.5" style={{ color: '#2A5A6A' }}>QTY: {offer.quantity}</p>
+                          <p className="text-[9px] tracking-wider mt-0.5" style={{ color: '#2A5A6A' }}>الكمية: {offer.quantity}</p>
                         </div>
                       </div>
                       <span className="font-bold" style={{ color: '#00E5FF', fontFamily: "'Orbitron', sans-serif", fontSize: '1rem' }}>
@@ -728,7 +713,7 @@ export function Details({
               </div>
             )}
 
-            {/* Attributes */}
+            {/* المتغيرات */}
             {allAttrs.map((attr: any) => (
               <div key={attr.id}>
                 <p className="text-[9px] tracking-[0.2em] uppercase mb-3" style={{ color: '#00E5FF' }}>◈ {attr.name}</p>
@@ -765,11 +750,11 @@ export function Details({
           </div>
         </div>
 
-        {/* Description */}
+        {/* الوصف */}
         {product.desc && (
           <section className="mt-20 pt-12" style={{ borderTop: '1px solid #0D1F2D' }}>
             <div className="flex items-center gap-5 mb-8">
-              <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: '#00E5FF' }}>◈ PRODUCT_DESCRIPTION</span>
+              <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: '#00E5FF' }}>◈ وصف_المنتج</span>
               <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(0,229,255,0.3), transparent)' }} />
             </div>
             <div className="p-6" style={{ border: '1px solid #0D2030', backgroundColor: '#080F1A' }}>
@@ -825,7 +810,6 @@ export function ProductForm({
 
   useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
 
-  // FIX — SSR guard pour localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const id = localStorage.getItem('customerId');
@@ -894,21 +878,21 @@ export function ProductForm({
   return (
     <div style={{ borderTop: '1px solid #0D1F2D', paddingTop: '1.75rem', fontFamily: "'JetBrains Mono', monospace" }}>
       <div className="flex items-center gap-3 mb-6">
-        <span className="text-[9px] tracking-[0.25em] uppercase" style={{ color: '#00E5FF' }}>◈ ORDER_FORM</span>
+        <span className="text-[9px] tracking-[0.25em] uppercase" style={{ color: '#00E5FF' }}>◈ نموذج_الطلب</span>
         <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(0,229,255,0.3), transparent)' }} />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
 
-        {/* Name + Phone */}
+        {/* الاسم + الهاتف */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FieldWrapper error={formErrors.customerName} label="CUSTOMER_NAME">
+          <FieldWrapper error={formErrors.customerName} label="اسم_العميل">
             <div className="relative">
               <User className="absolute right-3.5 top-3.5 w-3.5 h-3.5" style={{ color: '#1A4A5A' }} />
               <input type="text" value={formData.customerName} onChange={e => setFormData({ ...formData, customerName: e.target.value })} placeholder="أدخل اسمك" className={`${inputCls(!!formErrors.customerName)} pr-10`} />
             </div>
           </FieldWrapper>
-          <FieldWrapper error={formErrors.customerPhone} label="PHONE_NUMBER">
+          <FieldWrapper error={formErrors.customerPhone} label="رقم_الهاتف">
             <div className="relative">
               <Phone className="absolute right-3.5 top-3.5 w-3.5 h-3.5" style={{ color: '#1A4A5A' }} />
               <input type="tel" value={formData.customerPhone} onChange={e => setFormData({ ...formData, customerPhone: e.target.value })} placeholder="0X XX XX XX XX" className={`${inputCls(!!formErrors.customerPhone)} pr-10`} />
@@ -916,9 +900,9 @@ export function ProductForm({
           </FieldWrapper>
         </div>
 
-        {/* Wilaya + Commune */}
+        {/* الولاية + البلدية */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FieldWrapper error={formErrors.customerWelaya} label="WILAYA_SELECT">
+          <FieldWrapper error={formErrors.customerWelaya} label="اختيار_الولاية">
             <div className="relative">
               <MapPin className="absolute right-3.5 top-3.5 w-3.5 h-3.5" style={{ color: '#1A4A5A' }} />
               <select value={formData.customerWelaya} onChange={e => setFormData({ ...formData, customerWelaya: e.target.value, customerCommune: '' })} className={`${inputCls(!!formErrors.customerWelaya)} pr-10 appearance-none cursor-pointer`} style={{ backgroundColor: '#050B14' }}>
@@ -928,11 +912,11 @@ export function ProductForm({
               <ChevronDown className="absolute left-3.5 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color: '#1A4A5A' }} />
             </div>
           </FieldWrapper>
-          <FieldWrapper error={formErrors.customerCommune} label="COMMUNE_SELECT">
+          <FieldWrapper error={formErrors.customerCommune} label="اختيار_البلدية">
             <div className="relative">
               <MapPin className="absolute right-3.5 top-3.5 w-3.5 h-3.5" style={{ color: '#1A4A5A' }} />
               <select value={formData.customerCommune} disabled={!formData.customerWelaya || loadingCommunes} onChange={e => setFormData({ ...formData, customerCommune: e.target.value })} className={`${inputCls(!!formErrors.customerCommune)} pr-10 appearance-none cursor-pointer disabled:opacity-30`} style={{ backgroundColor: '#050B14' }}>
-                <option value="">{loadingCommunes ? 'LOADING...' : formData.customerWelaya ? 'اختر البلدية' : 'SELECT_WILAYA_FIRST'}</option>
+                <option value="">{loadingCommunes ? 'جاري_التحميل...' : formData.customerWelaya ? 'اختر البلدية' : 'اختر_الولاية_أولاً'}</option>
                 {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
               <ChevronDown className="absolute left-3.5 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color: '#1A4A5A' }} />
@@ -940,9 +924,9 @@ export function ProductForm({
           </FieldWrapper>
         </div>
 
-        {/* Delivery type — FIX: HomeIcon au lieu de Home */}
+        {/* طريقة التوصيل */}
         <div>
-          <p className="text-[9px] tracking-[0.2em] uppercase mb-3" style={{ color: '#2A6A7A' }}>DELIVERY_MODE</p>
+          <p className="text-[9px] tracking-[0.2em] uppercase mb-3" style={{ color: '#2A6A7A' }}>طريقة_التوصيل</p>
           <div className="grid grid-cols-2 gap-3">
             {(['home', 'office'] as const).map(type => (
               <button key={type} type="button" onClick={() => setFormData(p => ({ ...p, typeLivraison: type }))}
@@ -954,7 +938,7 @@ export function ProductForm({
                   : <Building2 className="w-5 h-5" style={{ color: formData.typeLivraison === type ? '#00E5FF' : '#1A4A5A' }} />
                 }
                 <p className="text-[10px] tracking-widest" style={{ color: formData.typeLivraison === type ? '#00E5FF' : '#2A5A6A' }}>
-                  {type === 'home' ? 'HOME_DELIVERY' : 'OFFICE_PICKUP'}
+                  {type === 'home' ? 'توصيل_منزلي' : 'استلام_مكتبي'}
                 </p>
                 {selectedWilayaData && (
                   <p className="text-[9px] font-mono" style={{ color: formData.typeLivraison === type ? 'rgba(0,229,255,0.6)' : '#1A3A4A' }}>
@@ -964,11 +948,11 @@ export function ProductForm({
               </button>
             ))}
           </div>
-          {!selectedWilayaData && <p className="text-[10px] mt-2 text-center tracking-widest" style={{ color: '#1A3A4A' }}>// SELECT_WILAYA_FOR_SHIPPING_COST</p>}
+          {!selectedWilayaData && <p className="text-[10px] mt-2 text-center tracking-widest" style={{ color: '#1A3A4A' }}>// اختر_الولاية_لمعرفة_تكلفة_الشحن</p>}
         </div>
 
-        {/* Quantity */}
-        <FieldWrapper label="QUANTITY_UNITS">
+        {/* الكمية */}
+        <FieldWrapper label="عدد_الوحدات">
           <div className="flex items-center gap-4">
             <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} className="w-10 h-10 flex items-center justify-center text-xl transition-all" style={{ border: '1px solid #0D2030', color: '#00E5FF', backgroundColor: '#080F1A' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(0,229,255,0.08)'; }}
@@ -979,20 +963,20 @@ export function ProductForm({
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(0,229,255,0.08)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#080F1A'; }}
             >+</button>
-            <span className="text-[10px] tracking-widest" style={{ color: '#1A4A5A' }}>UNITS</span>
+            <span className="text-[10px] tracking-widest" style={{ color: '#1A4A5A' }}>وحدة</span>
           </div>
         </FieldWrapper>
 
-        {/* Summary */}
+        {/* ملخص الطلب */}
         <div className="p-5 relative" style={{ border: '1px solid #0D2030', backgroundColor: '#080F1A' }}>
           <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, #00E5FF44, transparent)' }} />
-          <p className="text-[9px] tracking-[0.2em] uppercase mb-4" style={{ color: '#2A5A6A' }}>ORDER_SUMMARY</p>
+          <p className="text-[9px] tracking-[0.2em] uppercase mb-4" style={{ color: '#2A5A6A' }}>ملخص_الطلب</p>
           <div className="space-y-2.5">
             {[
-              { label: 'PRODUCT',    value: product.name },
-              { label: 'UNIT_PRICE', value: `${finalPrice.toLocaleString('ar-DZ')} دج` },
-              { label: 'QUANTITY',   value: `× ${formData.quantity}` },
-              { label: 'SHIPPING',   value: selectedWilayaData ? `${getPriceLivraison().toLocaleString('ar-DZ')} دج` : 'TBD' },
+              { label: 'المنتج',      value: product.name },
+              { label: 'سعر_الوحدة', value: `${finalPrice.toLocaleString('ar-DZ')} دج` },
+              { label: 'الكمية',      value: `× ${formData.quantity}` },
+              { label: 'الشحن',       value: selectedWilayaData ? `${getPriceLivraison().toLocaleString('ar-DZ')} دج` : 'سيتحدد' },
             ].map(row => (
               <div key={row.label} className="flex justify-between items-center">
                 <span className="text-[10px] tracking-widest" style={{ color: '#2A5A6A' }}>{row.label}</span>
@@ -1001,7 +985,7 @@ export function ProductForm({
             ))}
             <div className="pt-3 mt-1" style={{ borderTop: '1px solid #0D2030' }}>
               <div className="flex justify-between items-baseline">
-                <span className="text-[10px] tracking-widest font-bold" style={{ color: '#00E5FF' }}>TOTAL_AMOUNT</span>
+                <span className="text-[10px] tracking-widest font-bold" style={{ color: '#00E5FF' }}>المبلغ_الإجمالي</span>
                 <span className="font-black" style={{ color: '#00E5FF', fontFamily: "'Orbitron', sans-serif", fontSize: '1.6rem', textShadow: '0 0 15px rgba(0,229,255,0.3)' }}>
                   {getTotalPrice().toLocaleString('ar-DZ')}<span className="text-xs mr-1">دج</span>
                 </span>
@@ -1010,7 +994,7 @@ export function ProductForm({
           </div>
         </div>
 
-        {/* Submit */}
+        {/* إرسال */}
         <button type="submit" disabled={submitting}
           className="w-full py-4 flex items-center justify-center gap-3 text-xs tracking-widest uppercase font-bold transition-all duration-300"
           style={{ backgroundColor: submitting ? '#1A4A5A' : '#00E5FF', color: '#020810', cursor: submitting ? 'not-allowed' : 'pointer' }}
@@ -1018,14 +1002,14 @@ export function ProductForm({
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
         >
           {submitting
-            ? <><div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />PROCESSING_ORDER...</>
-            : <><Zap className="w-4 h-4" />CONFIRM_ORDER</>
+            ? <><div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />جاري_معالجة_الطلب...</>
+            : <><Zap className="w-4 h-4" />تأكيد_الطلب</>
           }
         </button>
 
         <p className="text-[10px] text-center tracking-widest flex items-center justify-center gap-1.5" style={{ color: '#1A3A4A' }}>
           <Shield className="w-3 h-3" style={{ color: '#39FF14' }} />
-          <span style={{ color: '#39FF14' }}>ENCRYPTED</span> | SECURE_TRANSACTION_PROTOCOL
+          <span style={{ color: '#39FF14' }}>مشفر</span> | بروتوكول_معاملة_آمنة
         </p>
       </form>
     </div>
@@ -1033,7 +1017,7 @@ export function ProductForm({
 }
 
 // ─────────────────────────────────────────────────────────────
-// STATIC PAGES — FIX: 'cookise' → 'cookies', ContactStaticTest → Contact
+// STATIC PAGES
 // ─────────────────────────────────────────────────────────────
 
 interface StaticPageProps { page: string; }
@@ -1059,9 +1043,9 @@ function PageWrapper({ children, icon, title, subtitle, tag }: {
       <div className="max-w-4xl mx-auto px-6 lg:px-10">
         <div className="mb-14">
           <div className="flex items-center gap-2 mb-8 text-[10px] tracking-widest" style={{ color: '#2A5A6A' }}>
-            <span>SYS</span><span style={{ color: '#00E5FF' }}>/</span>
-            <span>LEGAL</span><span style={{ color: '#00E5FF' }}>/</span>
-            <span style={{ color: '#00E5FF' }}>{tag.toUpperCase()}</span>
+            <span>النظام</span><span style={{ color: '#00E5FF' }}>/</span>
+            <span>قانوني</span><span style={{ color: '#00E5FF' }}>/</span>
+            <span style={{ color: '#00E5FF' }}>{tag}</span>
           </div>
           <div className="flex items-start gap-5">
             <div className="w-12 h-12 flex items-center justify-center flex-shrink-0 mt-1" style={{ border: '1px solid rgba(0,229,255,0.3)', backgroundColor: 'rgba(0,229,255,0.04)', color: '#00E5FF' }}>{icon}</div>
@@ -1104,8 +1088,8 @@ function InfoCard({ icon, title, desc, status }: CardProps) {
 
 export function Privacy() {
   return (
-    <PageWrapper icon={<ShieldCheck size={20} />} title="سياسة الخصوصية" subtitle="في MdStore، نضع خصوصية بياناتك وأمان متجرك على رأس أولوياتنا. إليك كيف نحمي معلوماتك." tag="PRIVACY">
-      <InfoCard icon={<Database size={16} />} title="البيانات التي نجمعها"   desc="نجمع فقط البيانات الضرورية لتشغيل متجرك، مثل الاسم، البريد الإلكتروني، ومعلومات الدفع لضمان تجربة بيع سلسة." />
+    <PageWrapper icon={<ShieldCheck size={20} />} title="سياسة الخصوصية" subtitle="في متجرنا، نضع خصوصية بياناتك وأمان معلوماتك على رأس أولوياتنا. إليك كيف نحمي معلوماتك." tag="الخصوصية">
+      <InfoCard icon={<Database size={16} />} title="البيانات التي نجمعها"   desc="نجمع فقط البيانات الضرورية لتشغيل متجرك، مثل الاسم، البريد الإلكتروني، ومعلومات الطلبات لضمان تجربة بيع سلسة." />
       <InfoCard icon={<Eye size={16} />}      title="كيفية استخدام البيانات" desc="تُستخدم بياناتك لتحسين خدماتنا، ومعالجة الطلبات، وتوفير تقارير ذكية تساعدك في اتخاذ قرارات تجارية أفضل." />
       <InfoCard icon={<Lock size={16} />}     title="حماية المعلومات"         desc="نستخدم تقنيات تشفير متطورة ومعايير أمان عالمية لحماية بياناتك من أي وصول غير مصرح به." />
       <InfoCard icon={<Globe size={16} />}    title="مشاركة البيانات"          desc="نحن لا نبيع بياناتك أبداً. نشاركها فقط مع مزودي الخدمات الموثوقين لإتمام عملياتك التجارية." />
@@ -1114,7 +1098,7 @@ export function Privacy() {
           <Bell size={14} style={{ color: '#39FF14' }} />
           <p className="text-xs" style={{ color: '#3A6A7A' }}>يتم تحديث هذه السياسة دورياً لضمان مواكبة أحدث معايير الأمان.</p>
         </div>
-        <span className="text-[10px] tracking-widest flex-shrink-0 ml-6" style={{ color: '#1A4A5A' }}>UPDATED: 06.02.2026</span>
+        <span className="text-[10px] tracking-widest flex-shrink-0 ml-6" style={{ color: '#1A4A5A' }}>تحديث: 06.02.2026</span>
       </div>
     </PageWrapper>
   );
@@ -1122,7 +1106,7 @@ export function Privacy() {
 
 export function Terms() {
   return (
-    <PageWrapper icon={<FileText size={20} />} title="شروط الاستخدام" subtitle="باستخدامك لمنصة MdStore، فإنك توافق على الالتزام بالشروط والقواعد التالية لضمان بيئة تجارية عادلة وآمنة." tag="TERMS">
+    <PageWrapper icon={<FileText size={20} />} title="شروط الاستخدام" subtitle="باستخدامك لمنصتنا، فإنك توافق على الالتزام بالشروط والقواعد التالية لضمان بيئة تجارية عادلة وآمنة." tag="الشروط">
       <InfoCard icon={<CheckCircle2 size={16} />} title="مسؤولية الحساب"     desc="أنت مسؤول عن الحفاظ على سرية بيانات حسابك وعن جميع الأنشطة التي تحدث تحته. يجب أن تكون المعلومات المقدمة دقيقة ومحدثة." />
       <InfoCard icon={<CreditCard size={16} />}   title="الرسوم والاشتراكات" desc="تخضع خدماتنا لرسوم اشتراك دورية. جميع الرسوم واضحة ولا توجد تكاليف مخفية، ويتم تحصيلها وفقاً للخطة التي تختارها." />
       <InfoCard icon={<Ban size={16} />}           title="المحتوى المحظور"    desc="يُمنع استخدام المنصة لبيع سلع غير قانونية أو انتهاك حقوق الملكية الفكرية. نحتفظ بالحق في إغلاق أي متجر يخالف هذه القوانين." />
@@ -1139,10 +1123,10 @@ export function Terms() {
 
 export function Cookies() {
   return (
-    <PageWrapper icon={<CookieIcon size={20} />} title="سياسة ملفات تعريف الارتباط" subtitle="نحن نستخدم ملفات تعريف الارتباط لتحسين تجربتك، وتخصيص المحتوى، وتحليل حركة المرور على منصتنا." tag="COOKIES">
+    <PageWrapper icon={<CookieIcon size={20} />} title="سياسة ملفات تعريف الارتباط" subtitle="نحن نستخدم ملفات تعريف الارتباط لتحسين تجربتك، وتخصيص المحتوى، وتحليل حركة المرور على منصتنا." tag="الكوكيز">
       <InfoCard icon={<ShieldCheck size={16} />}   title="ملفات ضرورية"    desc="هذه الملفات مطلوبة لتشغيل الوظائف الأساسية للموقع مثل تسجيل الدخول وتأمين سلة التسوق. لا يمكن إيقافها." status="دائماً نشطة" />
       <InfoCard icon={<Settings size={16} />}      title="ملفات التفضيلات" desc="تسمح للموقع بتذكر خياراتك مثل اللغة التي تستخدمها حالياً ومنطقتك الزمنية." status="اختياري" />
-      <InfoCard icon={<MousePointer2 size={16} />} title="ملفات التحليل"   desc="تساعدنا على فهم كيفية تفاعل التجار مع MdStore، مما يسمح لنا بتطوير أدوات بيع أكثر كفاءة." status="اختياري" />
+      <InfoCard icon={<MousePointer2 size={16} />} title="ملفات التحليل"   desc="تساعدنا على فهم كيفية تفاعل الزوار مع المتجر، مما يسمح لنا بتطوير أدوات بيع أكثر كفاءة." status="اختياري" />
       <div className="mt-8 p-6 relative overflow-hidden" style={{ backgroundColor: 'rgba(0,229,255,0.04)', border: '1px solid rgba(0,229,255,0.2)' }}>
         <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, transparent, #00E5FF, transparent)' }} />
         <div className="flex gap-4 items-start">
@@ -1173,9 +1157,8 @@ export function Contact() {
     },
   };
 
-  const isRTL = store.language === 'ar';
   const [typedText, setTypedText] = useState('');
-  const fullText = isRTL ? '> تواصل_معنا --init' : '> contact_system --init';
+  const fullText = '> تواصل_معنا --init';
 
   useEffect(() => {
     let i = 0;
@@ -1188,39 +1171,39 @@ export function Contact() {
   }, []);
 
   const contacts = [
-    { icon: <Mail className="w-4 h-4" />,  label: isRTL ? 'البريد الإلكتروني' : 'EMAIL_ADDRESS', value: store.contact.email,  href: `mailto:${store.contact.email}`, code: 'E01' },
-    { icon: <Phone className="w-4 h-4" />, label: isRTL ? 'رقم الهاتف'        : 'PHONE_LINE',    value: store.contact.phone,  href: `tel:${store.contact.phone}`,    code: 'P01' },
-    { icon: <MapPin className="w-4 h-4" />,label: isRTL ? 'الموقع'            : 'GEO_LOCATION',  value: store.contact.wilaya, href: undefined,                       code: 'G01' },
+    { icon: <Mail className="w-4 h-4" />,  label: 'البريد_الإلكتروني', value: store.contact.email,  href: `mailto:${store.contact.email}`, code: 'ب٠١' },
+    { icon: <Phone className="w-4 h-4" />, label: 'خط_الهاتف',          value: store.contact.phone,  href: `tel:${store.contact.phone}`,    code: 'ه٠١' },
+    { icon: <MapPin className="w-4 h-4" />,label: 'الموقع_الجغرافي',    value: store.contact.wilaya, href: undefined,                       code: 'م٠١' },
   ];
 
   const socials = [
-    { name: 'FACEBOOK', href: store.contact.facebook,                   icon: <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> },
-    { name: 'WHATSAPP', href: `https://wa.me/${store.contact.whatsapp}`, icon: <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.94 3.675 1.438 5.662 1.439h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> },
-    { name: 'TIKTOK',   href: store.contact.tiktok,                     icon: <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.06-2.89-.44-4.11-1.24-.03 2.15-.02 4.31-.02 6.46 0 1.19-.21 2.4-.78 3.46-.94 1.83-2.86 2.92-4.88 3.12-1.84.23-3.83-.24-5.26-1.48-1.57-1.32-2.3-3.43-1.95-5.44.25-1.58 1.15-3.05 2.51-3.9 1.14-.73 2.51-.99 3.84-.81v4.11c-.71-.12-1.47.05-2.05.5-.66.52-.96 1.4-.78 2.21.14.73.72 1.34 1.45 1.5.88.2 1.88-.16 2.37-.93.2-.34.28-.73.28-1.12V0l-.02.02z"/></svg> },
+    { name: 'فيسبوك',  href: store.contact.facebook,                   icon: <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> },
+    { name: 'واتساب', href: `https://wa.me/${store.contact.whatsapp}`, icon: <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.94 3.675 1.438 5.662 1.439h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> },
+    { name: 'تيك_توك', href: store.contact.tiktok,                     icon: <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.06-2.89-.44-4.11-1.24-.03 2.15-.02 4.31-.02 6.46 0 1.19-.21 2.4-.78 3.46-.94 1.83-2.86 2.92-4.88 3.12-1.84.23-3.83-.24-5.26-1.48-1.57-1.32-2.3-3.43-1.95-5.44.25-1.58 1.15-3.05 2.51-3.9 1.14-.73 2.51-.99 3.84-.81v4.11c-.71-.12-1.47.05-2.05.5-.66.52-.96 1.4-.78 2.21.14.73.72 1.34 1.45 1.5.88.2 1.88-.16 2.37-.93.2-.34.28-.73.28-1.12V0l-.02.02z"/></svg> },
   ];
 
   return (
-    <section className="min-h-screen py-20" dir={isRTL ? 'rtl' : 'ltr'} style={{ backgroundColor: '#050B14', fontFamily: "'JetBrains Mono', monospace" }}>
+    <section className="min-h-screen py-20" dir="rtl" style={{ backgroundColor: '#050B14', fontFamily: "'JetBrains Mono', monospace" }}>
       <div className="max-w-3xl mx-auto px-6">
 
-        {/* Terminal header */}
+        {/* رأس الطرفية */}
         <div className="mb-12 p-5" style={{ border: '1px solid #0D2030', backgroundColor: '#040C16' }}>
           <div className="flex items-center gap-2 mb-4">
             <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#FF3B30' }} />
             <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#FF9500' }} />
             <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#39FF14' }} />
-            <span className="ml-4 text-[10px] tracking-widest" style={{ color: '#2A5A6A' }}>CONTACT_TERMINAL_v2.1</span>
+            <span className="ml-4 text-[10px] tracking-widest" style={{ color: '#2A5A6A' }}>طرفية_التواصل_v2.1</span>
           </div>
           <p className="text-sm" style={{ color: '#00E5FF' }}>{typedText}<span className="animate-pulse">▮</span></p>
-          <p className="text-[11px] mt-2" style={{ color: '#1A4A5A' }}>// {isRTL ? 'تهيئة قنوات التواصل...' : 'Initializing communication channels...'}</p>
+          <p className="text-[11px] mt-2" style={{ color: '#1A4A5A' }}>// تهيئة قنوات التواصل...</p>
         </div>
 
         <div className="flex items-center gap-5 mb-10">
-          <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: '#00E5FF' }}>◈ {isRTL ? 'اتصل بنا' : 'CONTACT'}</span>
+          <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: '#00E5FF' }}>◈ اتصل_بنا</span>
           <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(0,229,255,0.3), transparent)' }} />
         </div>
 
-        {/* Contact entries */}
+        {/* معلومات التواصل */}
         <div className="space-y-3 mb-12">
           {contacts.map(item => (
             <div key={item.code} className="group flex items-center justify-between p-5 transition-all duration-300 cursor-pointer"
@@ -1235,14 +1218,14 @@ export function Contact() {
                   <p className="text-sm font-medium group-hover:text-[#00E5FF] transition-colors" style={{ color: '#C8D8E8' }}>{item.value}</p>
                 </div>
               </div>
-              <span className="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: '#00E5FF' }}>CONNECT →</span>
+              <span className="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: '#00E5FF' }}>اتصل ←</span>
             </div>
           ))}
         </div>
 
-        {/* Socials */}
+        {/* منصات التواصل الاجتماعي */}
         <div>
-          <p className="text-[10px] tracking-widest mb-5" style={{ color: '#2A5A6A' }}>// {isRTL ? 'منصات التواصل الاجتماعي' : 'SOCIAL_NETWORK_PROTOCOLS'}</p>
+          <p className="text-[10px] tracking-widest mb-5" style={{ color: '#2A5A6A' }}>// بروتوكولات_شبكة_التواصل_الاجتماعي</p>
           <div className="grid grid-cols-3 gap-3">
             {socials.map(s => (
               <a key={s.name} href={s.href} target="_blank" rel="noreferrer"
