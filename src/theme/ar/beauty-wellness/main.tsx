@@ -195,20 +195,19 @@ export default function Main({ store, children }:any) {
 export function Navbar({ store }:{ store:Store }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const isRTL = store.language === 'ar';
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', h);
     return () => window.removeEventListener('scroll', h);
   }, []);
   const nav = [
-    { href:`/${store.subdomain}`,         label: isRTL ? 'الرئيسية' : 'Home'    },
-    { href:`/${store.subdomain}/contact`, label: isRTL ? 'اتصل بنا' : 'Contact' },
-    { href:`/${store.subdomain}/Privacy`, label: isRTL ? 'الخصوصية' : 'Privacy' },
+    { href:`/${store.subdomain}`,         label:'الرئيسية' },
+    { href:`/${store.subdomain}/contact`, label:'اتصل بنا' },
+    { href:`/${store.subdomain}/Privacy`, label:'الخصوصية' },
   ];
   const initials = store.name.split(' ').filter(Boolean).map((w:string)=>w[0]).join('').slice(0,2).toUpperCase();
   return (
-    <nav className="sticky top-0 z-50 transition-all duration-500" dir={isRTL?'rtl':'ltr'}
+    <nav className="sticky top-0 z-50 transition-all duration-500" dir="rtl"
       style={{ backgroundColor:scrolled?'rgba(255,253,248,0.93)':'var(--ivory)', backdropFilter:scrolled?'blur(20px)':'none', borderBottom:`1px solid ${scrolled?'var(--border-soft)':'transparent'}`, boxShadow:scrolled?'0 2px 32px var(--shadow-soft)':'none' }}>
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="flex items-center justify-between py-4">
@@ -222,7 +221,7 @@ export function Navbar({ store }:{ store:Store }) {
             </div>
             <div>
               <span className="block transition-colors group-hover:text-rose-500" style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:600, fontSize:'1.35rem', color:'var(--text-dark)', letterSpacing:'0.04em' }}>{store.name}</span>
-              <span className="block text-[9px] tracking-[0.25em] uppercase" style={{ color:'var(--text-soft)', marginTop:'-1px' }}>{isRTL?'جمال وعناية':'Beauty & Wellness'}</span>
+              <span className="block text-[9px] tracking-[0.25em] uppercase" style={{ color:'var(--text-soft)', marginTop:'-1px' }}>جمال وعناية</span>
             </div>
           </Link>
           <div className="hidden md:flex items-center gap-10">
@@ -231,10 +230,10 @@ export function Navbar({ store }:{ store:Store }) {
             ))}
             <Link href={`/${store.subdomain}`} className="btn-petal px-6 py-2.5 rounded-full text-xs font-medium tracking-widest uppercase"
               style={{ background:'linear-gradient(135deg,var(--blush),var(--blush-deep))', color:'var(--rose-dark)', boxShadow:'0 4px 20px var(--shadow-rose)', letterSpacing:'0.12em' }}>
-              {isRTL?'تسوقي الآن':'Shop Now'}
+              تسوقي الآن
             </Link>
           </div>
-          <button onClick={() => setMenuOpen(p=>!p)} className="md:hidden p-2" aria-label="Menu">
+          <button onClick={() => setMenuOpen(p=>!p)} className="md:hidden p-2" aria-label="القائمة">
             <div className="space-y-1.5">
               <span className="block transition-all duration-300" style={{ width:menuOpen?'20px':'24px', height:'1.5px', backgroundColor:'var(--rose)', transform:menuOpen?'rotate(45deg) translate(5px,5px)':'none' }}/>
               <span className="block transition-all duration-300" style={{ width:'20px', height:'1.5px', backgroundColor:'var(--rose)', opacity:menuOpen?0:1 }}/>
@@ -261,9 +260,8 @@ export function Navbar({ store }:{ store:Store }) {
 // FOOTER
 // ─────────────────────────────────────────────────────────────
 export function Footer({ store }:any) {
-  const isRTL = store.language === 'ar';
   return (
-    <footer className="relative grain" style={{ backgroundColor:'var(--blush-pale)', borderTop:'1px solid var(--border-soft)', fontFamily:"'DM Sans',sans-serif", overflow:'hidden' }}>
+    <footer className="relative grain" dir="rtl" style={{ backgroundColor:'var(--blush-pale)', borderTop:'1px solid var(--border-soft)', fontFamily:"'DM Sans',sans-serif", overflow:'hidden' }}>
       <div className="absolute top-0 right-0 w-64 h-64 opacity-20 pointer-events-none" style={{ background:'radial-gradient(circle,var(--blush),transparent 70%)', transform:'translate(30%,-30%)' }}/>
       <div className="absolute bottom-0 left-0 w-48 h-48 opacity-15 pointer-events-none" style={{ background:'radial-gradient(circle,var(--sage),transparent 70%)', transform:'translate(-20%,20%)' }}/>
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-16">
@@ -276,7 +274,7 @@ export function Footer({ store }:any) {
               <span style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:600, fontSize:'1.25rem', color:'var(--text-dark)' }}>{store.name}</span>
             </div>
             <p className="text-sm leading-relaxed font-light" style={{ color:'var(--text-mid)', maxWidth:'260px' }}>
-              {isRTL?'جمالك الطبيعي يستحق العناية الأفضل. منتجات مختارة بعناية لأجل إشراقتك.':'Your natural beauty deserves the finest care. Curated products for radiant skin & soul.'}
+              جمالك الطبيعي يستحق العناية الأفضل. منتجات مختارة بعناية لأجل إشراقتك.
             </p>
             <div className="flex gap-3">
               {[Instagram, Mail].map((Icon,i) => (
@@ -291,14 +289,14 @@ export function Footer({ store }:any) {
           </div>
           <div>
             <h4 className="mb-5 text-xs tracking-[0.2em] uppercase" style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:600, color:'var(--rose-dark)', fontSize:'0.8rem' }}>
-              {isRTL?'روابط':'Navigate'}
+              روابط
             </h4>
             <div className="space-y-3">
               {[
-                { href:`/${store.subdomain}/Privacy`, label:isRTL?'سياسة الخصوصية':'Privacy Policy' },
-                { href:`/${store.subdomain}/Terms`,   label:isRTL?'شروط الخدمة':'Terms of Service'  },
-                { href:`/${store.subdomain}/Cookies`, label:isRTL?'ملفات الارتباط':'Cookie Policy'   },
-                { href:`/${store.subdomain}/contact`, label:isRTL?'اتصل بنا':'Contact Us'            },
+                { href:`/${store.subdomain}/Privacy`, label:'سياسة الخصوصية' },
+                { href:`/${store.subdomain}/Terms`,   label:'شروط الخدمة'    },
+                { href:`/${store.subdomain}/Cookies`, label:'ملفات الارتباط'  },
+                { href:`/${store.subdomain}/contact`, label:'اتصل بنا'        },
               ].map(l => (
                 <a key={l.href} href={l.href} className="link-hover flex items-center gap-2 text-sm font-light" style={{ color:'var(--text-mid)' }}>
                   <span style={{ color:'var(--blush-deep)', fontSize:'10px' }}>✦</span>{l.label}
@@ -310,17 +308,17 @@ export function Footer({ store }:any) {
             <div className="p-6 rounded-2xl relative overflow-hidden" style={{ background:'linear-gradient(135deg,var(--blush-pale),var(--cream))', border:'1px solid var(--border)' }}>
               <Quote className="w-8 h-8 mb-3 opacity-25" style={{ color:'var(--rose)' }}/>
               <p className="text-base leading-relaxed italic" style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:400, color:'var(--text-dark)', fontSize:'1.05rem' }}>
-                {isRTL?'"التجميل ليس في الوجه، بل في الضوء الذي يشع من القلب."':'"Beauty is not in the face; beauty is a light in the heart."'}
+                "التجميل ليس في الوجه، بل في الضوء الذي يشع من القلب."
               </p>
-              <p className="mt-3 text-xs tracking-wider" style={{ color:'var(--text-soft)' }}>— Kahlil Gibran</p>
+              <p className="mt-3 text-xs tracking-wider" style={{ color:'var(--text-soft)' }}>— جبران خليل جبران</p>
             </div>
           </div>
         </div>
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs font-light" style={{ color:'var(--text-ghost)' }}>© {new Date().getFullYear()} {store.name} · {isRTL?'جميع الحقوق محفوظة':'All rights reserved'}</p>
+          <p className="text-xs font-light" style={{ color:'var(--text-ghost)' }}>© {new Date().getFullYear()} {store.name} · جميع الحقوق محفوظة</p>
           <div className="flex items-center gap-2 text-xs font-light" style={{ color:'var(--text-ghost)' }}>
             <Sparkles className="w-3 h-3" style={{ color:'var(--blush-deep)' }}/>
-            <span>Beauty & Wellness Theme</span>
+            <span>ثيم الجمال والعناية</span>
             <Sparkles className="w-3 h-3" style={{ color:'var(--blush-deep)' }}/>
           </div>
         </div>
@@ -332,7 +330,7 @@ export function Footer({ store }:any) {
 // ─────────────────────────────────────────────────────────────
 // CARD
 // ─────────────────────────────────────────────────────────────
-export function Card({ product, displayImage, discount, isRTL, store, viewDetails }:any) {
+export function Card({ product, displayImage, discount, store, viewDetails }:any) {
   const [hovered, setHovered] = useState(false);
   return (
     <div className="card-lift group flex flex-col overflow-hidden rounded-2xl bg-white"
@@ -366,7 +364,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
       <div className="p-4 flex flex-col flex-1">
         <div className="flex gap-0.5 mb-2">
           {[...Array(5)].map((_,i) => <Star key={i} className={`w-2.5 h-2.5 ${i<4?'fill-current':''}`} style={{ color:'var(--champagne)' }}/>)}
-          <span className="ml-1.5 text-[10px] font-light" style={{ color:'var(--text-soft)' }}>4.8</span>
+          <span className="ml-1.5 text-[10px] font-light" style={{ color:'var(--text-soft)' }}>٤.٨</span>
         </div>
         <h3 className="font-light leading-snug mb-1 transition-colors duration-200 group-hover:text-rose-400"
           style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.05rem', color:'var(--text-dark)' }}>
@@ -395,28 +393,14 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
 // HOME
 // ─────────────────────────────────────────────────────────────
 export function Home({ store }:any) {
-  const isRTL = store.language === 'ar';
-  const dir   = isRTL ? 'rtl' : 'ltr';
-  const t = {
-    heroLabel:  isRTL?'عناية فائقة بجمالك':'Radiance. Ritual. Results.',
-    heroTitle:  isRTL?'جمال يأتي من الداخل':'Your Skin Deserves\nthe Finest',
-    heroSub:    isRTL?'اكتشفي مجموعتنا من أجود منتجات العناية':'Discover our hand-picked collection of premium skincare, makeup & wellness essentials.',
-    heroBtn:    isRTL?'تسوقي الآن':'Shop the Collection',
-    heroBtnSub: isRTL?'عروضنا الخاصة':'View Offers',
-    categories: isRTL?'التصنيفات':'Collections',
-    all:        isRTL?'الكل':'All',
-    products:   isRTL?'منتجاتنا':'Our Curated Edit',
-    noProducts: isRTL?'لا توجد منتجات بعد':'No products yet',
-    viewDetails:isRTL?'اكتشفي المنتج':'Discover',
-  };
   const rituals = [
-    { icon:<Droplets className="w-5 h-5"/>, label:isRTL?'ترطيب':'Hydration', desc:isRTL?'بشرة ناضرة':'Plump & dewy' },
-    { icon:<Sparkles className="w-5 h-5"/>, label:isRTL?'إشراقة':'Radiance',  desc:isRTL?'توهج طبيعي':'Natural glow'  },
-    { icon:<Leaf className="w-5 h-5"/>,     label:isRTL?'طبيعي':'Natural',    desc:isRTL?'مكونات نقية':'Pure ingredients' },
-    { icon:<Heart className="w-5 h-5"/>,    label:isRTL?'رفاهية':'Self-care', desc:isRTL?'دلليها يومياً':'Daily ritual'   },
+    { icon:<Droplets className="w-5 h-5"/>, label:'ترطيب', desc:'بشرة ناضرة'      },
+    { icon:<Sparkles className="w-5 h-5"/>, label:'إشراقة', desc:'توهج طبيعي'     },
+    { icon:<Leaf className="w-5 h-5"/>,     label:'طبيعي',  desc:'مكونات نقية'    },
+    { icon:<Heart className="w-5 h-5"/>,    label:'رفاهية', desc:'دلليها يومياً'  },
   ];
   return (
-    <div dir={dir} style={{ backgroundColor:'var(--ivory)', fontFamily:"'DM Sans',sans-serif" }}>
+    <div dir="rtl" style={{ backgroundColor:'var(--ivory)', fontFamily:"'DM Sans',sans-serif" }}>
 
       {/* HERO */}
       <section className="relative overflow-hidden grain" style={{ minHeight:'96vh', backgroundColor:'var(--cream)', display:'flex', alignItems:'center' }}>
@@ -433,11 +417,11 @@ export function Home({ store }:any) {
             <div className="fade-up inline-flex items-center gap-2 px-4 py-2 rounded-full mb-7"
               style={{ backgroundColor:'rgba(242,196,206,0.4)', border:'1px solid var(--blush)', backdropFilter:'blur(8px)' }}>
               <Sparkles className="w-3 h-3" style={{ color:'var(--rose)' }}/>
-              <span className="text-[11px] font-medium tracking-[0.22em] uppercase" style={{ color:'var(--rose-dark)' }}>{t.heroLabel}</span>
+              <span className="text-[11px] font-medium tracking-[0.22em] uppercase" style={{ color:'var(--rose-dark)' }}>عناية فائقة بجمالك</span>
             </div>
             <h1 className="fade-up fade-up-d1 whitespace-pre-line leading-[1.05] mb-6"
               style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:300, fontSize:'clamp(3rem,7.5vw,6.5rem)', color:'var(--text-dark)', letterSpacing:'-0.01em' }}>
-              {store.hero?.title || t.heroTitle}
+              {store.hero?.title || 'جمال يأتي\nمن الداخل'}
             </h1>
             <div className="fade-up fade-up-d2 flex items-center gap-4 mb-7">
               <div className="h-px w-16" style={{ background:'linear-gradient(90deg,var(--rose),transparent)' }}/>
@@ -445,23 +429,23 @@ export function Home({ store }:any) {
               <div className="h-px flex-1" style={{ background:'linear-gradient(90deg,transparent,var(--blush))' }}/>
             </div>
             <p className="fade-up fade-up-d2 text-base font-light leading-relaxed mb-10" style={{ color:'var(--text-mid)', maxWidth:'440px' }}>
-              {store.hero?.subtitle || t.heroSub}
+              {store.hero?.subtitle || 'اكتشفي مجموعتنا من أجود منتجات العناية بالبشرة والمكياج والعافية.'}
             </p>
             <div className="fade-up fade-up-d3 flex flex-wrap gap-4">
               <a href="#products" className="btn-petal flex items-center gap-2.5 px-8 py-3.5 rounded-full text-sm font-medium tracking-wider"
                 style={{ background:'linear-gradient(135deg,var(--rose),var(--rose-dark))', color:'white', boxShadow:'0 8px 30px rgba(193,126,138,0.35)' }}>
-                <Sparkles className="w-4 h-4"/> {t.heroBtn}
+                <Sparkles className="w-4 h-4"/> تسوقي الآن
               </a>
               <a href="#categories" className="btn-petal flex items-center gap-2.5 px-8 py-3.5 rounded-full text-sm font-light tracking-wider"
                 style={{ border:'1.5px solid var(--border)', color:'var(--text-mid)', backgroundColor:'rgba(255,255,255,0.7)', backdropFilter:'blur(8px)' }}>
-                {t.heroBtnSub} <ArrowRight className="w-3.5 h-3.5"/>
+                عروضنا الخاصة <ArrowRight className="w-3.5 h-3.5"/>
               </a>
             </div>
             <div className="fade-up fade-up-d4 flex flex-wrap gap-6 mt-12 pt-8" style={{ borderTop:'1px solid var(--border-soft)' }}>
               {[
-                { icon:<Leaf className="w-3.5 h-3.5"/>,   label:isRTL?'طبيعي 100%':'100% Natural'   },
-                { icon:<Shield className="w-3.5 h-3.5"/>, label:isRTL?'ضمان الجودة':'Quality Assured' },
-                { icon:<Truck className="w-3.5 h-3.5"/>,  label:isRTL?'توصيل سريع':'Fast Delivery'   },
+                { icon:<Leaf className="w-3.5 h-3.5"/>,   label:'طبيعي ١٠٠٪'   },
+                { icon:<Shield className="w-3.5 h-3.5"/>, label:'ضمان الجودة'   },
+                { icon:<Truck className="w-3.5 h-3.5"/>,  label:'توصيل سريع'    },
               ].map((b,i) => (
                 <div key={i} className="flex items-center gap-2">
                   <span style={{ color:'var(--champagne)' }}>{b.icon}</span>
@@ -503,16 +487,16 @@ export function Home({ store }:any) {
           <div className="text-center mb-10">
             <div className="divider-rose mb-4">
               <span className="text-[10px] tracking-[0.28em] uppercase font-medium" style={{ color:'var(--rose)', whiteSpace:'nowrap' }}>
-                <Flower2 className="inline w-3 h-3 mr-1.5 mb-0.5" style={{ color:'var(--blush-deep)' }}/> {isRTL?'تسوقي حسب':'Browse by'}
+                <Flower2 className="inline w-3 h-3 mr-1.5 mb-0.5" style={{ color:'var(--blush-deep)' }}/> تسوقي حسب
               </span>
             </div>
-            <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:300, fontSize:'clamp(1.8rem,4vw,3.2rem)', color:'var(--text-dark)' }}>{t.categories}</h2>
+            <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:300, fontSize:'clamp(1.8rem,4vw,3.2rem)', color:'var(--text-dark)' }}>التصنيفات</h2>
           </div>
           {store.categories?.length > 0 ? (
             <div className="flex flex-wrap justify-center gap-3">
               <Link href={`/${store.domain}`} className="btn-petal px-6 py-2.5 rounded-full text-xs font-medium tracking-wider"
                 style={{ background:'linear-gradient(135deg,var(--blush),var(--blush-deep))', color:'var(--rose-dark)', boxShadow:'0 4px 16px var(--shadow-rose)', letterSpacing:'0.1em' }}>
-                ✦ {t.all}
+                ✦ الكل
               </Link>
               {store.categories.map((cat:any) => (
                 <Link key={cat.id} href={`/${store.domain}?category=${cat.id}`}
@@ -526,7 +510,7 @@ export function Home({ store }:any) {
             </div>
           ) : (
             <div className="py-10 text-center rounded-2xl" style={{ border:'1px dashed var(--border)', backgroundColor:'var(--blush-pale)' }}>
-              <p className="text-sm font-light" style={{ color:'var(--text-soft)' }}>{isRTL?'لا توجد تصنيفات بعد':'No collections yet'}</p>
+              <p className="text-sm font-light" style={{ color:'var(--text-soft)' }}>لا توجد تصنيفات بعد</p>
             </div>
           )}
         </div>
@@ -537,22 +521,22 @@ export function Home({ store }:any) {
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="text-center mb-12">
             <div className="divider-rose mb-4">
-              <span className="text-[10px] tracking-[0.28em] uppercase font-medium" style={{ color:'var(--rose)', whiteSpace:'nowrap' }}>{isRTL?'اختيار مميز':'Handpicked for you'}</span>
+              <span className="text-[10px] tracking-[0.28em] uppercase font-medium" style={{ color:'var(--rose)', whiteSpace:'nowrap' }}>اختيار مميز لكِ</span>
             </div>
-            <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:300, fontSize:'clamp(1.8rem,4vw,3.2rem)', color:'var(--text-dark)' }}>{t.products}</h2>
+            <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:300, fontSize:'clamp(1.8rem,4vw,3.2rem)', color:'var(--text-dark)' }}>منتجاتنا</h2>
           </div>
           {store.products?.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
               {store.products.map((product:any) => {
                 const displayImage = product.productImage||product.imagesProduct?.[0]?.imageUrl||store.design?.logoUrl;
                 const discount = product.priceOriginal?Math.round(((product.priceOriginal-product.price)/product.priceOriginal)*100):0;
-                return <Card key={product.id} product={product} displayImage={displayImage} discount={discount} isRTL={isRTL} store={store} viewDetails={t.viewDetails}/>;
+                return <Card key={product.id} product={product} displayImage={displayImage} discount={discount} store={store} viewDetails="اكتشفي المنتج"/>;
               })}
             </div>
           ) : (
             <div className="py-32 text-center rounded-3xl petal-pattern" style={{ border:'1px dashed var(--border)', backgroundColor:'var(--blush-pale)' }}>
               <Flower2 className="w-12 h-12 mx-auto mb-4" style={{ color:'var(--blush)', animation:'float-gentle 4s ease-in-out infinite' }}/>
-              <p className="font-light text-lg" style={{ fontFamily:"'Cormorant Garamond',serif", color:'var(--text-mid)' }}>{t.noProducts}</p>
+              <p className="font-light text-lg" style={{ fontFamily:"'Cormorant Garamond',serif", color:'var(--text-mid)' }}>لا توجد منتجات بعد</p>
             </div>
           )}
         </div>
@@ -564,11 +548,11 @@ export function Home({ store }:any) {
         <div className="relative z-10 max-w-3xl mx-auto px-6 text-center">
           <Flower2 className="w-8 h-8 mx-auto mb-6" style={{ color:'var(--blush-deep)', animation:'float-gentle 5s ease-in-out infinite' }}/>
           <blockquote style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:300, fontSize:'clamp(1.6rem,4vw,3rem)', color:'var(--text-dark)', lineHeight:1.35, fontStyle:'italic' }}>
-            {isRTL?'"اعتني بنفسك. أنتِ تستحقين ذلك."':'"Take care of yourself. You are worth it."'}
+            "اعتني بنفسك. أنتِ تستحقين ذلك."
           </blockquote>
           <div className="flex items-center justify-center gap-3 mt-6">
             <div className="h-px w-12" style={{ background:'var(--blush-deep)' }}/>
-            <span className="text-[10px] tracking-[0.25em] uppercase" style={{ color:'var(--rose)' }}>{isRTL?'فلسفتنا':'Our Philosophy'}</span>
+            <span className="text-[10px] tracking-[0.25em] uppercase" style={{ color:'var(--rose)' }}>فلسفتنا</span>
             <div className="h-px w-12" style={{ background:'var(--blush-deep)' }}/>
           </div>
         </div>
@@ -580,15 +564,15 @@ export function Home({ store }:any) {
 // ─────────────────────────────────────────────────────────────
 // DETAILS
 // ─────────────────────────────────────────────────────────────
-export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, isRTL }:any) {
+export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }:any) {
   const [selectedImage, setSelectedImage] = useState(0);
   return (
-    <div className="min-h-screen" dir={isRTL?'rtl':'ltr'} style={{ backgroundColor:'var(--ivory)', fontFamily:"'DM Sans',sans-serif" }}>
-      {/* Breadcrumb */}
+    <div className="min-h-screen" dir="rtl" style={{ backgroundColor:'var(--ivory)', fontFamily:"'DM Sans',sans-serif" }}>
+      {/* شريط التنقل */}
       <header className="py-4 sticky top-0 z-40" style={{ backgroundColor:'rgba(255,253,248,0.92)', backdropFilter:'blur(16px)', borderBottom:'1px solid var(--border-soft)' }}>
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
           <nav className="flex items-center gap-2 text-xs font-light" style={{ color:'var(--text-soft)' }}>
-            <span className="hover:text-rose-400 cursor-pointer">{isRTL?'الرئيسية':'Home'}</span>
+            <span className="hover:text-rose-400 cursor-pointer">الرئيسية</span>
             <ChevronRight className="w-3 h-3"/>
             <span style={{ color:'var(--text-dark)' }}>{product.name}</span>
           </nav>
@@ -603,7 +587,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium"
               style={{ backgroundColor:inStock?'rgba(181,196,177,0.25)':'rgba(242,196,206,0.35)', border:`1px solid ${inStock?'var(--sage)':'var(--blush)'}`, color:inStock?'var(--sage-dark)':'var(--rose)' }}>
               <span className={`w-1.5 h-1.5 rounded-full ${inStock?'bg-green-400 animate-pulse':'bg-rose-400'}`}/>
-              {inStock?(isRTL?'متوفر':'In Stock'):(isRTL?'غير متوفر':'Out of Stock')}
+              {inStock ? 'متوفر' : 'غير متوفر'}
             </div>
           </div>
         </div>
@@ -611,7 +595,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
 
       <main className="max-w-6xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-14">
-          {/* Gallery */}
+          {/* معرض الصور */}
           <div className="space-y-3">
             <div className="relative overflow-hidden rounded-3xl group" style={{ aspectRatio:'4/5', backgroundColor:'var(--blush-pale)', border:'1px solid var(--border-soft)' }}>
               {allImages.length > 0
@@ -627,11 +611,11 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
               </button>
               {allImages.length > 1 && (
                 <>
-                  <button onClick={() => setSelectedImage(p=>p===0?allImages.length-1:p-1)} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                  <button onClick={() => setSelectedImage((p:number)=>p===0?allImages.length-1:p-1)} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
                     style={{ backgroundColor:'rgba(255,255,255,0.85)', backdropFilter:'blur(6px)', border:'1px solid var(--border-soft)', color:'var(--text-mid)' }}>
                     <ChevronLeft className="w-4 h-4"/>
                   </button>
-                  <button onClick={() => setSelectedImage(p=>p===allImages.length-1?0:p+1)} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                  <button onClick={() => setSelectedImage((p:number)=>p===allImages.length-1?0:p+1)} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
                     style={{ backgroundColor:'rgba(255,255,255,0.85)', backdropFilter:'blur(6px)', border:'1px solid var(--border-soft)', color:'var(--text-mid)' }}>
                     <ChevronRight className="w-4 h-4"/>
                   </button>
@@ -639,7 +623,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
               )}
               {!inStock && !autoGen && (
                 <div className="absolute inset-0 flex items-center justify-center rounded-3xl" style={{ backgroundColor:'rgba(255,253,248,0.75)', backdropFilter:'blur(4px)' }}>
-                  <div className="px-6 py-3 rounded-full text-sm font-medium" style={{ border:'1.5px solid var(--rose)', color:'var(--rose)', backgroundColor:'rgba(255,255,255,0.9)' }}>{isRTL?'نفد المخزون':'Out of Stock'}</div>
+                  <div className="px-6 py-3 rounded-full text-sm font-medium" style={{ border:'1.5px solid var(--rose)', color:'var(--rose)', backgroundColor:'rgba(255,255,255,0.9)' }}>نفد المخزون</div>
                 </div>
               )}
             </div>
@@ -655,9 +639,9 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             )}
             <div className="grid grid-cols-3 gap-2 mt-2">
               {[
-                { icon:<ShieldCheck className="w-4 h-4"/>, label:isRTL?'دفع آمن':'Secure Pay'    },
-                { icon:<Truck className="w-4 h-4"/>,       label:isRTL?'توصيل سريع':'Fast Delivery' },
-                { icon:<Leaf className="w-4 h-4"/>,        label:isRTL?'طبيعي':'Authentic'       },
+                { icon:<ShieldCheck className="w-4 h-4"/>, label:'دفع آمن'    },
+                { icon:<Truck className="w-4 h-4"/>,       label:'توصيل سريع' },
+                { icon:<Leaf className="w-4 h-4"/>,        label:'طبيعي'      },
               ].map((b,i) => (
                 <div key={i} className="flex flex-col items-center gap-1.5 py-4 rounded-xl" style={{ border:'1px solid var(--border-soft)', backgroundColor:'var(--white)' }}>
                   <span style={{ color:'var(--champagne)' }}>{b.icon}</span>
@@ -667,44 +651,44 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             </div>
           </div>
 
-          {/* Info */}
+          {/* معلومات المنتج */}
           <div className="space-y-6">
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <div className="h-px w-6" style={{ background:'var(--blush-deep)' }}/>
-                <span className="text-[10px] tracking-[0.22em] uppercase font-medium" style={{ color:'var(--rose)' }}>{isRTL?'المنتج':'Product'}</span>
+                <span className="text-[10px] tracking-[0.22em] uppercase font-medium" style={{ color:'var(--rose)' }}>المنتج</span>
               </div>
               <h1 className="leading-tight mb-3" style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:400, fontSize:'clamp(1.8rem,3.5vw,3rem)', color:'var(--text-dark)' }}>{product.name}</h1>
               <div className="flex items-center gap-3">
                 <div className="flex gap-0.5">{[...Array(5)].map((_,i) => <Star key={i} className={`w-3.5 h-3.5 ${i<4?'fill-current':''}`} style={{ color:'var(--champagne)' }}/>)}</div>
-                <span className="text-xs font-light" style={{ color:'var(--text-soft)' }}>4.8 (128 {isRTL?'تقييم':'reviews'})</span>
+                <span className="text-xs font-light" style={{ color:'var(--text-soft)' }}>٤.٨ (١٢٨ تقييم)</span>
               </div>
             </div>
-            {/* Price */}
+            {/* السعر */}
             <div className="p-5 rounded-2xl relative overflow-hidden" style={{ background:'linear-gradient(135deg,var(--blush-pale),var(--cream))', border:'1px solid var(--border)' }}>
               <div className="absolute top-0 left-0 w-1 h-full rounded-full" style={{ background:'linear-gradient(180deg,var(--blush-deep),var(--rose))' }}/>
-              <p className="text-[10px] tracking-[0.2em] uppercase font-medium mb-2 pl-4" style={{ color:'var(--text-soft)' }}>{isRTL?'السعر':'Price'}</p>
+              <p className="text-[10px] tracking-[0.2em] uppercase font-medium mb-2 pl-4" style={{ color:'var(--text-soft)' }}>السعر</p>
               <div className="flex items-baseline gap-3 pl-4">
                 <span className="font-light" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'3rem', color:'var(--rose-dark)', lineHeight:1 }}>{finalPrice.toLocaleString()}</span>
                 <span className="text-sm font-light" style={{ color:'var(--text-mid)' }}>دج</span>
                 {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
                   <div>
                     <span className="text-sm line-through font-light block" style={{ color:'var(--text-ghost)' }}>{parseFloat(product.priceOriginal).toLocaleString()} دج</span>
-                    <span className="text-[10px] font-medium" style={{ color:'var(--champagne)' }}>✦ Save {(parseFloat(product.priceOriginal)-finalPrice).toLocaleString()} دج</span>
+                    <span className="text-[10px] font-medium" style={{ color:'var(--champagne)' }}>✦ وفري {(parseFloat(product.priceOriginal)-finalPrice).toLocaleString()} دج</span>
                   </div>
                 )}
               </div>
             </div>
-            {/* Stock */}
+            {/* المخزون */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium"
               style={{ backgroundColor:autoGen?'rgba(201,169,110,0.1)':inStock?'rgba(181,196,177,0.2)':'rgba(242,196,206,0.3)', border:`1px solid ${autoGen?'var(--champagne-lt)':inStock?'var(--sage)':'var(--blush)'}`, color:autoGen?'var(--champagne)':inStock?'var(--sage-dark)':'var(--rose)' }}>
               {autoGen?<Infinity className="w-3.5 h-3.5"/>:inStock?<span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"/>:<X className="w-3.5 h-3.5"/>}
-              {autoGen?(isRTL?'مخزون غير محدود':'Unlimited'):inStock?(isRTL?'متوفر':'In Stock'):(isRTL?'نفد':'Out of Stock')}
+              {autoGen ? 'مخزون غير محدود' : inStock ? 'متوفر' : 'نفد المخزون'}
             </div>
-            {/* Offers */}
+            {/* الباقات */}
             {product.offers?.length > 0 && (
               <div>
-                <p className="text-xs tracking-[0.2em] uppercase font-medium mb-3" style={{ color:'var(--rose)' }}>{isRTL?'✦ اختاري الباقة':'✦ Select Package'}</p>
+                <p className="text-xs tracking-[0.2em] uppercase font-medium mb-3" style={{ color:'var(--rose)' }}>✦ اختاري الباقة</p>
                 <div className="space-y-2">
                   {product.offers.map((offer:any) => (
                     <label key={offer.id} className="flex items-center justify-between p-4 rounded-xl cursor-pointer transition-all"
@@ -716,7 +700,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                         <input type="radio" name="offer" value={offer.id} checked={selectedOffer===offer.id} onChange={() => setSelectedOffer(offer.id)} className="sr-only"/>
                         <div>
                           <p className="text-sm font-light" style={{ color:'var(--text-dark)' }}>{offer.name}</p>
-                          <p className="text-[10px] font-light" style={{ color:'var(--text-soft)' }}>Qty: {offer.quantity}</p>
+                          <p className="text-[10px] font-light" style={{ color:'var(--text-soft)' }}>الكمية: {offer.quantity}</p>
                         </div>
                       </div>
                       <span className="font-light" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.3rem', color:'var(--rose-dark)' }}>{offer.price.toLocaleString()} <span className="text-xs">دج</span></span>
@@ -725,7 +709,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                 </div>
               </div>
             )}
-            {/* Attributes */}
+            {/* المتغيرات */}
             {allAttrs.map((attr:any) => (
               <div key={attr.id}>
                 <p className="text-xs tracking-[0.2em] uppercase font-medium mb-3" style={{ color:'var(--rose)' }}>✦ {attr.name}</p>
@@ -763,7 +747,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
           <section className="mt-20 pt-12" style={{ borderTop:'1px solid var(--border-soft)' }}>
             <div className="text-center mb-10">
               <div className="divider-rose">
-                <span className="text-[10px] tracking-[0.25em] uppercase font-medium" style={{ color:'var(--rose)', whiteSpace:'nowrap' }}>{isRTL?'تفاصيل المنتج':'Product Details'}</span>
+                <span className="text-[10px] tracking-[0.25em] uppercase font-medium" style={{ color:'var(--rose)', whiteSpace:'nowrap' }}>تفاصيل المنتج</span>
               </div>
             </div>
             <div className="max-w-3xl mx-auto p-8 rounded-3xl" style={{ background:'linear-gradient(135deg,var(--blush-pale),var(--cream))', border:'1px solid var(--border-soft)' }}>
@@ -835,18 +819,18 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     <div style={{ borderTop:'1px solid var(--border-soft)', paddingTop:'1.75rem' }}>
       <div className="flex items-center gap-3 mb-6">
         <div className="h-px w-6" style={{ background:'var(--blush-deep)' }}/>
-        <span className="text-xs tracking-[0.2em] uppercase font-medium" style={{ color:'var(--rose)' }}>Order Details</span>
+        <span className="text-xs tracking-[0.2em] uppercase font-medium" style={{ color:'var(--rose)' }}>تفاصيل الطلب</span>
         <div className="h-px flex-1" style={{ background:'linear-gradient(90deg,var(--border),transparent)' }}/>
       </div>
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-2 gap-3">
-          <FieldWrapper error={formErrors.customerName} label="Full Name">
+          <FieldWrapper error={formErrors.customerName} label="الاسم الكامل">
             <div className="relative">
               <User className="absolute right-3.5 top-3.5 w-3.5 h-3.5" style={{ color:'var(--text-ghost)' }}/>
               <input type="text" value={formData.customerName} onChange={e=>setFormData({...formData,customerName:e.target.value})} placeholder="اسمك الكامل" style={{ ...inputSt(!!formErrors.customerName), paddingRight:'2.5rem' }} onFocus={focusStyle} onBlur={e=>blurStyle(e,!!formErrors.customerName)}/>
             </div>
           </FieldWrapper>
-          <FieldWrapper error={formErrors.customerPhone} label="Phone">
+          <FieldWrapper error={formErrors.customerPhone} label="الهاتف">
             <div className="relative">
               <Phone className="absolute right-3.5 top-3.5 w-3.5 h-3.5" style={{ color:'var(--text-ghost)' }}/>
               <input type="tel" value={formData.customerPhone} onChange={e=>setFormData({...formData,customerPhone:e.target.value})} placeholder="0X XX XX XX XX" style={{ ...inputSt(!!formErrors.customerPhone), paddingRight:'2.5rem' }} onFocus={focusStyle} onBlur={e=>blurStyle(e,!!formErrors.customerPhone)}/>
@@ -854,7 +838,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </FieldWrapper>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <FieldWrapper error={formErrors.customerWelaya} label="Wilaya">
+          <FieldWrapper error={formErrors.customerWelaya} label="الولاية">
             <div className="relative">
               <MapPin className="absolute right-3.5 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-ghost)' }}/><ChevronDown className="absolute left-3.5 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-ghost)' }}/>
               <select value={formData.customerWelaya} onChange={e=>setFormData({...formData,customerWelaya:e.target.value,customerCommune:''})} style={{ ...inputSt(!!formErrors.customerWelaya), paddingRight:'2.5rem', appearance:'none' as any, cursor:'pointer' }}>
@@ -862,17 +846,17 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               </select>
             </div>
           </FieldWrapper>
-          <FieldWrapper error={formErrors.customerCommune} label="Commune">
+          <FieldWrapper error={formErrors.customerCommune} label="البلدية">
             <div className="relative">
               <MapPin className="absolute right-3.5 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-ghost)' }}/><ChevronDown className="absolute left-3.5 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-ghost)' }}/>
               <select value={formData.customerCommune} disabled={!formData.customerWelaya||loadingCommunes} onChange={e=>setFormData({...formData,customerCommune:e.target.value})} style={{ ...inputSt(!!formErrors.customerCommune), paddingRight:'2.5rem', appearance:'none' as any, cursor:'pointer', opacity:!formData.customerWelaya?0.5:1 }}>
-                <option value="">{loadingCommunes?'Loading…':'اختر البلدية'}</option>{communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                <option value="">{loadingCommunes ? 'جاري التحميل…' : 'اختر البلدية'}</option>{communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
             </div>
           </FieldWrapper>
         </div>
         <div>
-          <p className="text-[10px] tracking-[0.2em] uppercase font-medium mb-3" style={{ color:'var(--text-soft)' }}>Delivery Mode</p>
+          <p className="text-[10px] tracking-[0.2em] uppercase font-medium mb-3" style={{ color:'var(--text-soft)' }}>طريقة التوصيل</p>
           <div className="grid grid-cols-2 gap-3">
             {(['home','office'] as const).map(type => (
               <button key={type} type="button" onClick={() => setFormData(p=>({...p,typeLivraison:type}))} className="flex flex-col items-center gap-2 py-5 rounded-xl transition-all"
@@ -881,13 +865,13 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                   ? <Heart className="w-5 h-5" style={{ color:formData.typeLivraison===type?'var(--rose)':'var(--text-ghost)' }}/>
                   : <Building2 className="w-5 h-5" style={{ color:formData.typeLivraison===type?'var(--rose)':'var(--text-ghost)' }}/>
                 }
-                <p className="text-[10px] tracking-widest uppercase font-medium" style={{ color:formData.typeLivraison===type?'var(--rose)':'var(--text-soft)' }}>{type==='home'?'Home':'Office'}</p>
+                <p className="text-[10px] tracking-widest uppercase font-medium" style={{ color:formData.typeLivraison===type?'var(--rose)':'var(--text-soft)' }}>{type==='home' ? 'منزل' : 'مكتب'}</p>
                 {selectedWilayaData && <p className="text-xs font-light" style={{ color:'var(--text-mid)' }}>{(type==='home'?selectedWilayaData.livraisonHome:selectedWilayaData.livraisonOfice).toLocaleString()} دج</p>}
               </button>
             ))}
           </div>
         </div>
-        <FieldWrapper label="Quantity">
+        <FieldWrapper label="الكمية">
           <div className="flex items-center gap-4">
             <button type="button" onClick={() => setFormData(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} className="w-10 h-10 rounded-full flex items-center justify-center text-xl font-light transition-all hover:scale-110" style={{ border:'1.5px solid var(--border)', color:'var(--rose)' }}>−</button>
             <span className="w-10 text-center font-light text-xl" style={{ fontFamily:"'Cormorant Garamond',serif", color:'var(--text-dark)' }}>{formData.quantity}</span>
@@ -895,9 +879,14 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </div>
         </FieldWrapper>
         <div className="p-5 rounded-2xl relative overflow-hidden" style={{ background:'linear-gradient(135deg,var(--blush-pale),var(--cream))', border:'1px solid var(--border)' }}>
-          <p className="text-[10px] tracking-[0.2em] uppercase font-medium mb-4" style={{ color:'var(--rose)' }}>✦ Order Summary</p>
+          <p className="text-[10px] tracking-[0.2em] uppercase font-medium mb-4" style={{ color:'var(--rose)' }}>✦ ملخص الطلب</p>
           <div className="space-y-2.5">
-            {[{label:'Product',value:product.name},{label:'Unit',value:`${finalPrice.toLocaleString()} دج`},{label:'Qty',value:`× ${formData.quantity}`},{label:'Shipping',value:selectedWilayaData?`${getPriceLivraison().toLocaleString()} دج`:'TBD'}].map(row=>(
+            {[
+              { label:'المنتج',     value:product.name },
+              { label:'سعر الوحدة', value:`${finalPrice.toLocaleString()} دج` },
+              { label:'الكمية',     value:`× ${formData.quantity}` },
+              { label:'الشحن',      value:selectedWilayaData ? `${getPriceLivraison().toLocaleString()} دج` : 'سيتحدد' },
+            ].map(row=>(
               <div key={row.label} className="flex justify-between items-center">
                 <span className="text-[10px] font-medium tracking-wider uppercase" style={{ color:'var(--text-soft)' }}>{row.label}</span>
                 <span className="text-xs font-light" style={{ color:'var(--text-mid)' }}>{row.value}</span>
@@ -905,7 +894,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             ))}
             <div className="pt-3" style={{ borderTop:'1px solid var(--border)' }}>
               <div className="flex justify-between items-baseline">
-                <span className="text-xs font-medium tracking-wider" style={{ color:'var(--rose-dark)' }}>TOTAL</span>
+                <span className="text-xs font-medium tracking-wider" style={{ color:'var(--rose-dark)' }}>المجموع</span>
                 <span className="font-light" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'2rem', color:'var(--rose-dark)' }}>{getTotalPrice().toLocaleString()}<span className="text-sm ml-1">دج</span></span>
               </div>
             </div>
@@ -913,10 +902,13 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         </div>
         <button type="submit" disabled={submitting} className="btn-petal w-full py-4 rounded-full flex items-center justify-center gap-3 text-sm font-medium tracking-wider transition-all"
           style={{ background:submitting?'var(--border)':'linear-gradient(135deg,var(--rose),var(--rose-dark))', color:submitting?'var(--text-soft)':'white', boxShadow:submitting?'none':'0 8px 28px rgba(193,126,138,0.35)', cursor:submitting?'not-allowed':'pointer', animation:!submitting?'pulse-soft 3s ease-in-out infinite':'none' }}>
-          {submitting?<><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"/>Processing…</>:<><Sparkles className="w-4 h-4"/>Confirm Order</>}
+          {submitting
+            ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"/>جاري المعالجة…</>
+            : <><Sparkles className="w-4 h-4"/>تأكيد الطلب</>
+          }
         </button>
         <p className="text-[10px] text-center font-light flex items-center justify-center gap-1.5" style={{ color:'var(--text-ghost)' }}>
-          <ShieldCheck className="w-3 h-3" style={{ color:'var(--sage-dark)' }}/> Secure & encrypted checkout
+          <ShieldCheck className="w-3 h-3" style={{ color:'var(--sage-dark)' }}/> دفع آمن ومشفر
         </p>
       </form>
     </div>
@@ -932,7 +924,7 @@ export function StaticPage({ page }:{ page:string }) {
 }
 function PageWrapper({ children, icon, title, subtitle }:{ children:React.ReactNode; icon:React.ReactNode; title:string; subtitle:string }) {
   return (
-    <div className="min-h-screen" style={{ backgroundColor:'var(--ivory)', fontFamily:"'DM Sans',sans-serif" }}>
+    <div className="min-h-screen" dir="rtl" style={{ backgroundColor:'var(--ivory)', fontFamily:"'DM Sans',sans-serif" }}>
       <div className="relative overflow-hidden grain py-20" style={{ background:'linear-gradient(135deg,var(--blush-pale),var(--cream) 60%,var(--sage-pale) 100%)' }}>
         <FloatingPetals/>
         <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
@@ -947,7 +939,7 @@ function PageWrapper({ children, icon, title, subtitle }:{ children:React.ReactN
   );
 }
 function InfoCard({ icon, title, desc, status }:{ icon:React.ReactNode; title:string; desc:string; status?:string }) {
-  const isActive = status==='دائماً نشطة'||status==='Always Active';
+  const isActive = status==='دائماً نشطة';
   return (
     <div className="group flex gap-5 p-6 mb-3 rounded-2xl transition-all duration-300"
       style={{ border:'1px solid var(--border-soft)', backgroundColor:'var(--white)' }}
@@ -966,45 +958,45 @@ function InfoCard({ icon, title, desc, status }:{ icon:React.ReactNode; title:st
 }
 export function Privacy() {
   return (
-    <PageWrapper icon={<ShieldCheck size={22}/>} title="Privacy Policy" subtitle="Your personal data is treated with the utmost care and discretion.">
-      <InfoCard icon={<Database size={16}/>} title="Data We Collect"   desc="We collect only what's essential — your name, email and order details — to deliver a seamless and personalised experience."/>
-      <InfoCard icon={<Lock size={16}/>}     title="Security"          desc="Advanced encryption and security protocols protect your information from any unauthorised access at all times."/>
-      <InfoCard icon={<Globe size={16}/>}    title="Data Sharing"      desc="We never sell your data. It is shared only with trusted partners necessary to fulfil your orders."/>
+    <PageWrapper icon={<ShieldCheck size={22}/>} title="سياسة الخصوصية" subtitle="نتعامل مع بياناتك الشخصية بأعلى درجات العناية والسرية.">
+      <InfoCard icon={<Database size={16}/>} title="البيانات التي نجمعها"   desc="نجمع فقط ما هو ضروري — اسمك وبريدك الإلكتروني وتفاصيل طلباتك — لنمنحك تجربة سلسة ومخصصة."/>
+      <InfoCard icon={<Lock size={16}/>}     title="الأمان"                 desc="تحمي بياناتك بروتوكولات تشفير وأمان متقدمة تمنع أي وصول غير مصرح به في جميع الأوقات."/>
+      <InfoCard icon={<Globe size={16}/>}    title="مشاركة البيانات"        desc="لا نبيع بياناتك أبداً. يتم مشاركتها فقط مع شركاء موثوقين لإتمام طلباتك."/>
       <div className="mt-8 p-5 rounded-2xl flex items-center gap-3" style={{ border:'1px solid rgba(181,196,177,0.4)', backgroundColor:'rgba(181,196,177,0.08)' }}>
         <Bell size={14} style={{ color:'var(--sage-dark)', flexShrink:0 }}/>
-        <p className="text-xs font-light" style={{ color:'var(--text-mid)' }}>This policy is updated periodically to reflect the latest security and privacy standards.</p>
-        <span className="ml-auto text-[10px] font-light whitespace-nowrap" style={{ color:'var(--text-ghost)' }}>Updated 06.02.2026</span>
+        <p className="text-xs font-light" style={{ color:'var(--text-mid)' }}>تُحدَّث هذه السياسة دورياً لتعكس أحدث معايير الأمان والخصوصية.</p>
+        <span className="ml-auto text-[10px] font-light whitespace-nowrap" style={{ color:'var(--text-ghost)' }}>تحديث 06.02.2026</span>
       </div>
     </PageWrapper>
   );
 }
 export function Terms() {
   return (
-    <PageWrapper icon={<Scale size={22}/>} title="Terms of Service" subtitle="Transparent, fair terms for a trusted shopping experience.">
-      <InfoCard icon={<CheckCircle2 size={16}/>} title="Account Responsibility" desc="You are responsible for maintaining the confidentiality of your account and for all activities conducted under it."/>
-      <InfoCard icon={<CreditCard size={16}/>}   title="Fees & Billing"         desc="Subscription fees are transparent with no hidden charges. You will be notified of any changes in advance."/>
-      <InfoCard icon={<Ban size={16}/>}           title="Prohibited Content"     desc="The sale of counterfeit, illegal, or harmful goods is strictly prohibited. Violations may result in account suspension."/>
-      <InfoCard icon={<Scale size={16}/>}         title="Governing Law"          desc="These terms are governed by the applicable laws of Algeria. Disputes are subject to the jurisdiction of local courts."/>
+    <PageWrapper icon={<Scale size={22}/>} title="شروط الخدمة" subtitle="شروط شفافة وعادلة لتجربة تسوق موثوقة.">
+      <InfoCard icon={<CheckCircle2 size={16}/>} title="مسؤولية الحساب"   desc="أنت مسؤول عن الحفاظ على سرية حسابك وعن جميع الأنشطة التي تُجرى من خلاله."/>
+      <InfoCard icon={<CreditCard size={16}/>}   title="الرسوم والفواتير" desc="رسوم الاشتراك شفافة دون تكاليف مخفية. سيتم إعلامك مسبقاً بأي تغييرات."/>
+      <InfoCard icon={<Ban size={16}/>}           title="المحتوى المحظور"  desc="يُحظر صراحةً بيع السلع المقلدة أو غير القانونية أو الضارة. قد تؤدي المخالفات إلى تعليق الحساب."/>
+      <InfoCard icon={<Scale size={16}/>}         title="القانون الحاكم"   desc="تخضع هذه الشروط للقوانين المعمول بها في الجزائر. تختص المحاكم المحلية بالنظر في النزاعات."/>
       <div className="mt-8 p-5 rounded-2xl flex items-start gap-3" style={{ border:'1px solid rgba(201,169,110,0.3)', backgroundColor:'rgba(201,169,110,0.06)' }}>
         <AlertCircle size={14} style={{ color:'var(--champagne)', flexShrink:0, marginTop:2 }}/>
-        <p className="text-xs font-light leading-relaxed" style={{ color:'var(--text-mid)' }}>We reserve the right to modify these terms. Continued use after changes constitutes acceptance.</p>
+        <p className="text-xs font-light leading-relaxed" style={{ color:'var(--text-mid)' }}>نحتفظ بحق تعديل هذه الشروط. استمرار استخدامك للمنصة بعد أي تغيير يُعدّ قبولاً له.</p>
       </div>
     </PageWrapper>
   );
 }
 export function Cookies() {
   return (
-    <PageWrapper icon={<CookieIcon size={22}/>} title="Cookie Policy" subtitle="Small files, big transparency — here's exactly what we use and why.">
-      <InfoCard icon={<ShieldCheck size={16}/>}   title="Essential Cookies"  desc="Necessary for core functionality like login, cart, and session management. These cannot be disabled." status="Always Active"/>
-      <InfoCard icon={<Settings size={16}/>}      title="Preference Cookies" desc="Remember your language, currency, and display settings for a smoother, more personal experience." status="Optional"/>
-      <InfoCard icon={<MousePointer2 size={16}/>} title="Analytics Cookies"  desc="Help us understand how you interact with our store so we can improve your browsing experience." status="Optional"/>
+    <PageWrapper icon={<CookieIcon size={22}/>} title="سياسة ملفات الارتباط" subtitle="ملفات صغيرة وشفافية كبيرة — إليك ما نستخدمه ولماذا.">
+      <InfoCard icon={<ShieldCheck size={16}/>}   title="ملفات الارتباط الأساسية"  desc="ضرورية لعمل المتجر من تسجيل دخول وسلة تسوق وإدارة الجلسات. لا يمكن تعطيلها." status="دائماً نشطة"/>
+      <InfoCard icon={<Settings size={16}/>}      title="ملفات تفضيلات"            desc="تتذكر لغتك وعملتك وإعدادات العرض لتجربة أكثر سلاسة وتخصيصاً." status="اختياري"/>
+      <InfoCard icon={<MousePointer2 size={16}/>} title="ملفات التحليل"             desc="تساعدنا على فهم كيفية تعاملك مع المتجر حتى نتمكن من تحسين تجربتك." status="اختياري"/>
       <div className="mt-8 p-6 rounded-2xl relative overflow-hidden" style={{ background:'linear-gradient(135deg,var(--blush-pale),var(--cream))', border:'1px solid var(--border)' }}>
         <div className="absolute top-0 left-0 w-full h-1 rounded-t-2xl" style={{ background:'linear-gradient(90deg,var(--blush-deep),var(--champagne-lt))' }}/>
         <div className="flex gap-4 items-start pt-2">
           <ToggleRight size={18} style={{ color:'var(--rose)', flexShrink:0, marginTop:2 }}/>
           <div>
-            <h3 className="font-light mb-2" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.1rem', color:'var(--text-dark)' }}>Managing Your Preferences</h3>
-            <p className="text-xs font-light leading-relaxed" style={{ color:'var(--text-mid)' }}>You can manage or delete cookies through your browser settings at any time. Disabling some cookies may affect certain features of the store.</p>
+            <h3 className="font-light mb-2" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.1rem', color:'var(--text-dark)' }}>إدارة تفضيلاتك</h3>
+            <p className="text-xs font-light leading-relaxed" style={{ color:'var(--text-mid)' }}>يمكنك إدارة ملفات الارتباط أو حذفها في أي وقت من خلال إعدادات المتصفح. قد يؤثر تعطيل بعضها على ميزات معينة في المتجر.</p>
           </div>
         </div>
       </div>
@@ -1015,19 +1007,19 @@ export function Contact() {
   const [formState,setFormState] = useState({ name:'', email:'', message:'' });
   const [sent,setSent] = useState(false);
   const contacts = [
-    { icon:<Mail className="w-4 h-4"/>,   label:'Email',    value:'hello@beautystore.dz', href:'mailto:hello@beautystore.dz' },
-    { icon:<Phone className="w-4 h-4"/>,  label:'Phone',    value:'+213 550 123 456',     href:'tel:+213550123456' },
-    { icon:<MapPin className="w-4 h-4"/>, label:'Location', value:'Alger, Algérie',       href:undefined },
+    { icon:<Mail className="w-4 h-4"/>,   label:'البريد الإلكتروني', value:'hello@beautystore.dz', href:'mailto:hello@beautystore.dz' },
+    { icon:<Phone className="w-4 h-4"/>,  label:'الهاتف',            value:'+213 550 123 456',     href:'tel:+213550123456'           },
+    { icon:<MapPin className="w-4 h-4"/>, label:'الموقع',            value:'الجزائر العاصمة',      href:undefined                     },
   ];
   return (
-    <div className="min-h-screen" style={{ backgroundColor:'var(--ivory)', fontFamily:"'DM Sans',sans-serif" }}>
+    <div className="min-h-screen" dir="rtl" style={{ backgroundColor:'var(--ivory)', fontFamily:"'DM Sans',sans-serif" }}>
       <div className="relative overflow-hidden grain py-24" style={{ background:'linear-gradient(135deg,var(--blush-pale),var(--cream) 50%,var(--sage-pale) 100%)' }}>
         <FloatingPetals/>
         <div className="relative z-10 max-w-3xl mx-auto px-6 text-center">
           <Flower2 className="w-10 h-10 mx-auto mb-5" style={{ color:'var(--blush-deep)', animation:'float-gentle 4s ease-in-out infinite' }}/>
-          <h1 className="font-light mb-4" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(2.5rem,6vw,5rem)', color:'var(--text-dark)' }}>Get in Touch</h1>
+          <h1 className="font-light mb-4" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(2.5rem,6vw,5rem)', color:'var(--text-dark)' }}>تواصلي معنا</h1>
           <div className="divider-rose mx-auto" style={{ maxWidth:'280px' }}>
-            <span className="text-[10px] tracking-[0.25em] uppercase font-medium" style={{ color:'var(--rose)', whiteSpace:'nowrap' }}>We'd love to hear from you</span>
+            <span className="text-[10px] tracking-[0.25em] uppercase font-medium" style={{ color:'var(--rose)', whiteSpace:'nowrap' }}>يسعدنا سماع رأيك</span>
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0"><svg viewBox="0 0 1440 60" fill="none" preserveAspectRatio="none" style={{ display:'block', width:'100%', height:'60px' }}><path d="M0 60L1440 60L1440 20C1200 55 900 5 600 30C300 55 100 15 0 40Z" fill="var(--ivory)"/></svg></div>
@@ -1035,7 +1027,7 @@ export function Contact() {
       <div className="max-w-5xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           <div>
-            <h2 className="font-light mb-8" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.8rem', color:'var(--text-dark)' }}>Reach Out</h2>
+            <h2 className="font-light mb-8" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.8rem', color:'var(--text-dark)' }}>وسائل التواصل</h2>
             <div className="space-y-3">
               {contacts.map(item => (
                 <a key={item.label} href={item.href||'#'} className="group flex items-center gap-4 p-5 rounded-2xl transition-all" style={{ border:'1px solid var(--border-soft)', backgroundColor:'var(--white)', textDecoration:'none' }}
@@ -1052,36 +1044,39 @@ export function Contact() {
             </div>
             <div className="mt-8 p-7 rounded-2xl relative overflow-hidden" style={{ background:'linear-gradient(135deg,var(--blush-pale),var(--cream))', border:'1px solid var(--border)' }}>
               <Quote className="w-8 h-8 mb-3 opacity-40" style={{ color:'var(--rose)' }}/>
-              <p className="font-light leading-relaxed italic" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.05rem', color:'var(--text-dark)' }}>"To care for yourself is the most beautiful act of love."</p>
-              <p className="mt-3 text-xs font-light" style={{ color:'var(--text-soft)' }}>— Our Promise to You</p>
+              <p className="font-light leading-relaxed italic" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.05rem', color:'var(--text-dark)' }}>"الاعتناء بنفسك هو أجمل تعبير عن الحب."</p>
+              <p className="mt-3 text-xs font-light" style={{ color:'var(--text-soft)' }}>— وعدنا لكِ</p>
               <Flower2 className="absolute bottom-4 right-4 w-10 h-10 opacity-15" style={{ color:'var(--rose)' }}/>
             </div>
           </div>
           <div>
-            <h2 className="font-light mb-8" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.8rem', color:'var(--text-dark)' }}>Send a Message</h2>
+            <h2 className="font-light mb-8" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.8rem', color:'var(--text-dark)' }}>أرسلي رسالة</h2>
             {sent ? (
               <div className="p-10 rounded-2xl text-center" style={{ border:'1px solid var(--blush)', background:'linear-gradient(135deg,var(--blush-pale),var(--cream))' }}>
                 <Flower2 className="w-12 h-12 mx-auto mb-4" style={{ color:'var(--blush-deep)', animation:'float-gentle 4s ease-in-out infinite' }}/>
-                <p className="font-light text-lg mb-1" style={{ fontFamily:"'Cormorant Garamond',serif", color:'var(--text-dark)' }}>Message Sent ✦</p>
-                <p className="text-sm font-light" style={{ color:'var(--text-mid)' }}>We'll be in touch within 24 hours.</p>
+                <p className="font-light text-lg mb-1" style={{ fontFamily:"'Cormorant Garamond',serif", color:'var(--text-dark)' }}>تم الإرسال ✦</p>
+                <p className="text-sm font-light" style={{ color:'var(--text-mid)' }}>سنتواصل معكِ خلال ٢٤ ساعة.</p>
               </div>
             ) : (
               <form onSubmit={e=>{e.preventDefault();setSent(true);}} className="space-y-4">
-                {[{label:'Your Name',type:'text',val:formState.name,ph:'Jane Doe',key:'name'},{label:'Email Address',type:'email',val:formState.email,ph:'jane@example.com',key:'email'}].map(f => (
+                {[
+                  { label:'اسمك',              type:'text',  val:formState.name,    ph:'اسمك الكامل',        key:'name'    },
+                  { label:'البريد الإلكتروني', type:'email', val:formState.email,   ph:'example@domain.com', key:'email'   },
+                ].map(f => (
                   <FieldWrapper key={f.key} label={f.label}>
                     <input type={f.type} value={f.val} onChange={e=>setFormState({...formState,[f.key]:e.target.value})} placeholder={f.ph} style={inputSt()} required
                       onFocus={e=>{e.target.style.borderColor='var(--blush-deep)';e.target.style.boxShadow='0 0 0 3px rgba(242,196,206,0.25)';}}
                       onBlur={e=>{e.target.style.borderColor='var(--border)';e.target.style.boxShadow='none';}}/>
                   </FieldWrapper>
                 ))}
-                <FieldWrapper label="Your Message">
-                  <textarea value={formState.message} onChange={e=>setFormState({...formState,message:e.target.value})} placeholder="How can we help you?" rows={5} style={{ ...inputSt(), resize:'none' as any }} required
+                <FieldWrapper label="رسالتك">
+                  <textarea value={formState.message} onChange={e=>setFormState({...formState,message:e.target.value})} placeholder="كيف يمكننا مساعدتك؟" rows={5} style={{ ...inputSt(), resize:'none' as any }} required
                     onFocus={e=>{e.target.style.borderColor='var(--blush-deep)';e.target.style.boxShadow='0 0 0 3px rgba(242,196,206,0.25)';}}
                     onBlur={e=>{e.target.style.borderColor='var(--border)';e.target.style.boxShadow='none';}}/>
                 </FieldWrapper>
                 <button type="submit" className="btn-petal w-full py-4 rounded-full flex items-center justify-center gap-2 text-sm font-medium tracking-wider"
                   style={{ background:'linear-gradient(135deg,var(--rose),var(--rose-dark))', color:'white', boxShadow:'0 8px 28px var(--shadow-rose)' }}>
-                  <Sparkles className="w-4 h-4"/> Send Message
+                  <Sparkles className="w-4 h-4"/> إرسال
                 </button>
               </form>
             )}
