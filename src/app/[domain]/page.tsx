@@ -66,17 +66,18 @@ export default async function StorePage(props: {
 
   // 3. استخراج الـ slug بأمان بعد التأكد من وجود الـ store
   const activeTheme = store?.themeUser?.theme?.slug || 'default';
+  const language = store?.language || 'ar';
 
   // 4. تعريف المكون الديناميكي بناءً على الثيم الفعلي
   const Home = dynamic<any>(
     async () => {
       try {
-        const mod = await import(`@/theme/${activeTheme}/main`);
+        const mod = await import(`@/theme/${language}/${activeTheme}/main`);
         return mod.Home || mod.default;
       } catch (err) {
         console.error("Failed to load theme:", activeTheme, err);
         // Fallback للثيم الافتراضي في حال فشل تحميل الثيم المخصص
-        const fallback = await import(`@/theme/default/main`);
+        const fallback = await import(`@/theme/ar/default/main`);
         return fallback.Home || fallback.default;
       }
     },

@@ -347,6 +347,7 @@ export default function ProductPage({ params }: { params: Promise<{ domain: stri
   // 2. Add inside your component (with other hooks)
   const router = useRouter();
   const currentThemeSlug = product?.store?.theme?.slug || 'default';
+  const language = product?.store?.language || 'ar';
 
   // أضف هذا الجزء داخل ProductPage
   useEffect(() => {
@@ -387,14 +388,14 @@ export default function ProductPage({ params }: { params: Promise<{ domain: stri
       async () => {
         try {
           // التحميل بناءً على السلوج المستخرج
-          const mod = await import(`@/theme/${currentThemeSlug}/main`);
+          const mod = await import(`@/theme/${language}/${currentThemeSlug}/main`);
 
           // التأكد من استخراج المكون الصحيح (Details أو default)
           return mod.Details || mod.default;
         } catch (error) {
           console.error("خطأ في تحميل الثيم:", currentThemeSlug, error);
           // Fallback للثيم الافتراضي إذا فشل التحميل
-          const defaultMod = await import(`@/theme/default/main`);
+          const defaultMod = await import(`@/theme/ar/default/main`);
           return defaultMod.Details || defaultMod.default;
         }
       },
