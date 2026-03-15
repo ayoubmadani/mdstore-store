@@ -19,19 +19,20 @@ export default function PolicyPage({ params }: ParamsType) {
   // ✅ استخدام التنقيب الآمن (Optional Chaining) مع قيمة افتراضية
   const storeData = useStore();
   const selectTheme = storeData?.theme || 'default';
+  const language = storeData?.store.language || 'ar';
 
   const DynamicStaticPage = useMemo(() => {
     return dynamic<StaticPageProps>(
       async () => {
         try {
           // استخدام الـ slug الذي حددناه (المخصص أو الافتراضي)
-          const md = await import(`@/theme/${selectTheme}/main`);
+          const md = await import(`@/theme/${language}/${selectTheme}/main`);
           return md.StaticPage || md.default;
         } catch (error) {
           console.error(`Error loading theme [${selectTheme}]:`, error);
           // محاولة تحميل الثيم الافتراضي كـ Fallback أخير إذا فشل الثيم المختار
           try {
-             const defaultMd = await import(`@/theme/default/main`);
+             const defaultMd = await import(`@/theme/${language}/default/main`);
              return defaultMd.StaticPage || defaultMd.default;
           } catch {
              return () => <p className="p-10 text-center">عذراً، هذه الصفحة غير متوفرة.</p>;

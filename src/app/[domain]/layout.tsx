@@ -40,10 +40,11 @@ export default async function StoreLayout({ children, params }: LayoutProps) {
   // ✅ 1. استخراج الـ slug بأمان تام باستخدام Optional Chaining
   // إذا كان themeUser أو theme غير موجود، سيستخدم 'default'
   const currentThemeSlug = store?.themeUser?.theme?.slug || 'default';
+  const language = store?.language || 'ar';
 
   // ✅ 2. تحميل الثيم بناءً على المتغير الآمن
   const Main = dynamic<any>(
-    () => import(`@/theme/${currentThemeSlug}/main`),
+    () => import(`@/theme/${language}/${currentThemeSlug}/main`),
     {
       loading: () => <Landing />,
       ssr: true
