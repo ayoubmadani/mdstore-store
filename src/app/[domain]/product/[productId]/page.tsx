@@ -17,6 +17,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 //import Details from '@/theme/tech-innovation/page/details';
 import dynamic from 'next/dynamic';
+import AddShow from '@/components/addShow';
 
 const listTheme = ['default', 'boho-chic', 'minimalist-shop', 'tech-innovation', 'e-commerce'];
 const selectTheme = listTheme[4];
@@ -492,6 +493,8 @@ export default function ProductPage({ params }: { params: Promise<{ domain: stri
   // لن يتم إعادة إنشاء المكون إلا إذا تغير الثيم فعلياً
 
   return (
+    <>
+    <AddShow productId={product.id} />
     <Details
       product={product}
       toggleWishlist={toggleWishlist}
@@ -510,6 +513,7 @@ export default function ProductPage({ params }: { params: Promise<{ domain: stri
       resolvedParams={resolvedParams}
       handleVariantSelection={(name: any, value: any) => handleVariantSelection(name, value)}
     />
+    </>
   );
 }
 

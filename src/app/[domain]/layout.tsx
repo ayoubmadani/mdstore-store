@@ -6,6 +6,7 @@ import { StoreProvider } from '@/Hook/store-provider';
 import dynamic from 'next/dynamic';
 import CustomerTracker from '@/components/CustomerTracker';
 import Landing from '@/components/landing';
+import AddShow from '@/components/addShow';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -30,9 +31,6 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
 export default async function StoreLayout({ children, params }: LayoutProps) {
   const { domain } = await params;
   const store: any = await getStoreByDomain(domain);
-  
-  
-
   if (!store) {
     notFound();
   }
@@ -56,6 +54,7 @@ export default async function StoreLayout({ children, params }: LayoutProps) {
 
   return (
   <StoreProvider store={store} theme={currentThemeSlug}>
+    <AddShow storeId={store.id} />
     <div dir={direction}>
       {/* ✅ تمرير الـ pixels المستلمة من الـ API */}
       <CustomerTracker pixels={store.pixels} />

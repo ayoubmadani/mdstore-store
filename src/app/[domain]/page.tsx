@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { getStoreByDomain } from '@/lib/api';
+import AddShow from '@/components/addShow';
 
 // ==========================================
 // TYPES
@@ -69,25 +70,32 @@ export default async function StorePage(props: {
   const language = store?.language || 'ar';
 
   // 4. تعريف المكون الديناميكي بناءً على الثيم الفعلي
-  const Home = dynamic<any>(
+  const SelectedTheme = dynamic<any>(
     async () => {
       try {
         const mod = await import(`@/theme/${language}/${activeTheme}/main`);
         return mod.Home || mod.default;
       } catch (err) {
         console.error("Failed to load theme:", activeTheme, err);
-        // Fallback للثيم الافتراضي في حال فشل تحميل الثيم المخصص
+        // Fallback للثيم الافتراضي
         const fallback = await import(`@/theme/${language}/default/main`);
         return fallback.Home || fallback.default;
       }
     },
     {
-      loading: () => <p className="text-center py-20">جاري التحميل...</p>,
-      ssr: true, // تفعيل الـ SSR ضروري جداً هنا للـ SEO
+      loading: () => <p className="text-center py-20 text-gray-500">جاري التحميل...</p>,
+      ssr: true,
     }
   );
 
-  return <Home store={store} searchParams={searchParams} />;
+  // الـ Return النهائي للمكون الأساسي
+  return (
+    <>
+      {/* إضافة المكون هنا يضمن عمل التتبع فور تحميل الصفحة */}
+      
+      <SelectedTheme store={store} searchParams={searchParams} />
+    </>
+  );
 }
 
 // ==========================================
