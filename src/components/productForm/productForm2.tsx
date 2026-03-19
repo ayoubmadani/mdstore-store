@@ -41,6 +41,7 @@ export interface ProductFormProps {
   selectedVariants: Record<string, string>;
   platform?: string;
   priceLoss?: number;
+  lpId?:string
 }
 
 /* ─── Helper Functions ───────────────────────────────── */
@@ -74,7 +75,7 @@ const fetchCommunes = async (wilayaId: string): Promise<Commune[]> => {
 export default function ProductForm({
   product, userId, domain, redirectPath,
   selectedOffer, setSelectedOffer, selectedVariants,
-  platform, priceLoss = 0,
+  platform, priceLoss = 0,lpId
 }: ProductFormProps) {
   const router = useRouter();
 
@@ -190,6 +191,7 @@ export default function ProductForm({
         customerPhone: formData.customerPhone,
         customerWilayaId: formData.customerWelaya,
         customerCommuneId: formData.customerCommune,
+        lpId
       });
 
       if (res.status === 200 || res.status === 201) {

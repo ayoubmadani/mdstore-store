@@ -343,6 +343,7 @@ export default function LandingPageView({
           {/* ─── Order Form ─── */}
           <ProductForm
             product={product}
+            lpId={lp.id}
             userId={product.store.userId}
             domain={product.store.subdomain}
             redirectPath={`/lp/${lpDomain}/successfully`}
