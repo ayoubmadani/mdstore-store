@@ -553,7 +553,7 @@ export function Home({ store }: any) {
           {/* Brand badge */}
           <div className="fu" style={{ display:'inline-flex', alignItems:'center', gap:'10px', border:'1px solid var(--line)', borderRadius:'4px', padding:'6px 14px', marginBottom:'24px', background:'rgba(0,212,255,0.05)' }}>
             <Gamepad2 style={{ width:'14px', height:'14px', color:'var(--cyan)' }}/>
-            <span style={{ fontFamily:"'Orbitron',monospace", fontSize:'10px', fontWeight:700, letterSpacing:'0.2em', color:'var(--cyan)' }}>CHAMSOU GAME STORE</span>
+            <span style={{ fontFamily:"'Orbitron',monospace", fontSize:'10px', fontWeight:700, letterSpacing:'0.2em', color:'var(--cyan)' ,textTransform:"uppercase"}}>{store.name}</span>
             <div style={{ width:'6px', height:'6px', borderRadius:'50%', backgroundColor:'var(--pink)', animation:'pulse-pink 2s ease-in-out infinite' }}/>
           </div>
 
