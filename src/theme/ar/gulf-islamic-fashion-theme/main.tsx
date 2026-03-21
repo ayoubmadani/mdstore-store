@@ -192,6 +192,8 @@ function GoldDiamond({ size = 8 }: { size?:number }) {
 /* ── MAIN ───────────────────────────────────────────────────── */
 export default function Main({ store, children }: any) {
   if (!store) return null;
+  console.log(store);
+  
   return (
     <div style={{ minHeight:'100vh', backgroundColor:'var(--cream)' }}>
       <style>{CSS}</style>

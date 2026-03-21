@@ -41,7 +41,7 @@ function StoreInactive({ store }: { store: Store }) {
   const isRTL = store.language === 'ar';
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="text-center p-10 bg-white rounded-2xl shadow-2xl border-t-4" style={{ borderColor: store.design.primaryColor }}>
+      <div className="text-center p-10 bg-white rounded-2xl shadow-2xl border-t-4" style={{ borderColor: store.design?.primaryColor }}>
         <h1 className="text-2xl font-bold mb-3">{isRTL ? 'المتجر غير نشط' : 'Store Inactive'}</h1>
         <p className="text-gray-600 italic">"{store.name}"</p>
       </div>

@@ -266,6 +266,7 @@ const fetchCommunes = async (wid: string): Promise<Commune[]> => { try { const {
 // MAIN LAYOUT
 // ─────────────────────────────────────────────────────────────
 export default function Main({ store, children }: any) {
+  
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', fontFamily: "'Nunito', sans-serif", color: 'var(--text)' }}>
       <style>{FONT_CSS}</style>
@@ -334,7 +335,7 @@ export function Navbar({ store }: { store: Store }) {
           <Link href={`/${store.subdomain}`} className="flex items-center gap-3 group">
             <div className="relative w-12 h-12 rounded-2xl flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:rotate-6 group-hover:scale-110"
               style={{ background: 'linear-gradient(135deg, var(--coral) 0%, var(--grape) 100%)', boxShadow: '0 4px 16px rgba(168,85,247,0.3)' }}>
-              {store.design.logoUrl
+              {store.design?.logoUrl
                 ? <img src={store.design.logoUrl} alt={store.name} className="w-full h-full object-cover" />
                 : <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: 'white' }}>{initials}</span>
               }
