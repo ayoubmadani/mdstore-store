@@ -304,48 +304,96 @@ export function Navbar({ store }: { store: Store }) {
 }
 
 /* ── FOOTER ─────────────────────────────────────────────────── */
-export function Footer({ store }: any) {
+export function Footer({ store }: { store: any }) {
   const yr = new Date().getFullYear();
+  
   if (!store) return null;
-  return (
-    <footer dir="rtl" style={{ backgroundColor:'var(--walnut)', fontFamily:"'Cairo',sans-serif", position:'relative', overflow:'hidden' }}>
-      {/* Geo pattern overlay */}
-      <div style={{ position:'absolute', inset:0, pointerEvents:'none', opacity:0.06 }} className="geo-bg"/>
 
-      <div style={{ position:'relative', zIndex:2, maxWidth:'1280px', margin:'0 auto', padding:'64px 28px 40px' }}>
-        <div className="footer-g" style={{ paddingBottom:'48px', borderBottom:'1px solid rgba(250,246,238,0.1)' }}>
+  return (
+    <footer 
+      dir="rtl" 
+      style={{ 
+        backgroundColor: 'var(--walnut)', 
+        fontFamily: "'Cairo', sans-serif", 
+        position: 'relative', 
+        overflow: 'hidden' 
+      }}
+    >
+      {/* Geo pattern overlay - خلفية زخرفية */}
+      <div 
+        style={{ 
+          position: 'absolute', 
+          inset: 0, 
+          pointerEvents: 'none', 
+          opacity: 0.06,
+          backgroundImage: 'url("/path-to-your-pattern.svg")', // تأكد من وجود المسار أو الكلاس
+        }} 
+        className="geo-bg"
+      />
+
+      <div style={{ position: 'relative', zIndex: 2, maxWidth: '1280px', margin: '0 auto', padding: '64px 28px 40px' }}>
+        <div 
+          className="footer-g" 
+          style={{ 
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '40px',
+            paddingBottom: '48px', 
+            borderBottom: '1px solid rgba(250, 246, 238, 0.1)' 
+          }}
+        >
+          {/* Brand Section */}
           <div>
-            <span className="amiri" style={{ fontSize:'1.5rem', fontWeight:700, color:'var(--cream)', display:'block', marginBottom:'6px' }}>{store.name}</span>
-            <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'18px' }}>
-              <span style={{ display:'block', height:'1px', width:'28px', background:'var(--gold)', opacity:0.5 }}/>
-              <GoldDiamond size={6}/>
+            <span className="amiri" style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--cream)', display: 'block', marginBottom: '6px' }}>
+              {store.name}
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '18px' }}>
+              <span style={{ display: 'block', height: '1px', width: '28px', background: 'var(--gold)', opacity: 0.5 }} />
+              <GoldDiamond size={6} />
             </div>
-            <p style={{ fontSize:'13px', lineHeight:'1.9', color:'rgba(250,246,238,0.5)', maxWidth:'220px', fontWeight:300 }}>
-              أجود الأزياء الخليجية الإسلامية الرجالية، مختارة بعناية فائقة.
+            <p style={{ fontSize: '13px', lineHeight: '1.9', color: 'rgba(250, 246, 238, 0.5)', maxWidth: '220px', fontWeight: 300 }}>
+              أجود الأزياء الخليجية الإسلامية الرجالية، مختارة بعناية فائقة لتناسب ذوقكم الرفيع.
             </p>
           </div>
 
+          {/* Dynamic Columns */}
           {[
-            { title:'روابط', links:[
-              [`/${store.subdomain}`,          'المجموعة الكاملة'],
-              [`/${store.subdomain}/Privacy`,  'الخصوصية'],
-              [`/${store.subdomain}/Terms`,    'الشروط'],
-              [`/${store.subdomain}/contact`,  'تواصل معنا'],
-            ]},
-            { title:'التشكيلات', links:[
-              ['#','الثياب الخليجية'],['#','الجلابيات'],['#','البشوت'],['#','الإكسسوارات'],
-            ]},
-            { title:'تواصل', links:[
-              ['#','+213 550 000 000'],['#','أولاد فايت، الجزائر'],['#','info@store.dz'],
-            ]},
-          ].map(col=>(
+            { 
+              title: 'روابط هامة', 
+              links: [
+                [`/${store.subdomain}`, 'المجموعة الكاملة'],
+                [`/${store.subdomain}/Privacy`, 'سياسة الخصوصية'],
+                [`/${store.subdomain}/Terms`, 'الشروط والأحكام'],
+                [`/${store.subdomain}/contact`, 'تواصل معنا'],
+              ] 
+            },
+            { 
+              title: 'معلومات التواصل', 
+              links: [
+                ['tel:+213550000000', '+213 550 000 000'],
+                ['https://maps.google.com', 'أولاد فايت، الجزائر'],
+                ['mailto:info@store.dz', 'info@store.dz'],
+              ] 
+            },
+          ].map((col) => (
             <div key={col.title}>
-              <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--gold)', marginBottom:'16px' }}>{col.title}</p>
-              <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
-                {col.links.map(([href,label])=>(
-                  <a key={label} href={href} style={{ fontSize:'13px', color:'rgba(250,246,238,0.45)', textDecoration:'none', transition:'color 0.2s' }}
-                    onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--gold-lt)';}}
-                    onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='rgba(250,246,238,0.45)';}}>
+              <p style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', color: 'var(--gold)', marginBottom: '20px' }}>
+                {col.title}
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {col.links.map(([href, label]) => (
+                  <a 
+                    key={label} 
+                    href={href} 
+                    style={{ 
+                      fontSize: '13px', 
+                      color: 'rgba(250, 246, 238, 0.6)', 
+                      textDecoration: 'none', 
+                      transition: 'all 0.3s ease' 
+                    }}
+                    onMouseEnter={e => { (e.currentTarget.style.color = 'var(--gold-lt)'); (e.currentTarget.style.paddingRight = '5px'); }}
+                    onMouseLeave={e => { (e.currentTarget.style.color = 'rgba(250, 246, 238, 0.6)'); (e.currentTarget.style.paddingRight = '0'); }}
+                  >
                     {label}
                   </a>
                 ))}
@@ -354,9 +402,16 @@ export function Footer({ store }: any) {
           ))}
         </div>
 
-        <div style={{ paddingTop:'20px', display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:'8px' }}>
-          <p style={{ fontSize:'12px', color:'rgba(250,246,238,0.25)' }}>© {yr} {store.name}. جميع الحقوق محفوظة.</p>
-          <p style={{ fontSize:'12px', color:'rgba(250,246,238,0.25)' }}>Gulf Fashion Theme</p>
+        {/* Bottom Bar */}
+        <div style={{ paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+          <p style={{ fontSize: '11px', color: 'rgba(250, 246, 238, 0.3)', letterSpacing: '0.5px' }}>
+            © {yr} {store.name}. جميع الحقوق محفوظة.
+          </p>
+          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+             <span style={{ fontSize: '11px', color: 'rgba(250, 246, 238, 0.3)' }}>Gulf Fashion Theme</span>
+             <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'var(--gold)', opacity: 0.3 }} />
+             <span style={{ fontSize: '11px', color: 'rgba(250, 246, 238, 0.3)' }}>صنع بإتقان</span>
+          </div>
         </div>
       </div>
     </footer>
@@ -806,7 +861,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const getLiv = useCallback(():number=>{ if(!selW) return 0; return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice; },[selW,fd.typeLivraison]);
   useEffect(()=>{ if(selW) setFd(f=>({...f,priceLoss:selW.livraisonReturn})); },[selW]);
 
-  const fp=getFP(); const total=()=>fp*fd.quantity+getLiv();
+  const fp=getFP(); const total=()=>fp*fd.quantity+ +getLiv();
   const validate=()=>{
     const e:Record<string,string>={};
     if(!fd.customerName.trim())  e.customerName='الاسم مطلوب';
@@ -818,7 +873,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const handleSubmit=async(e:React.FormEvent)=>{
     e.preventDefault(); const er=validate(); if(Object.keys(er).length){setErrors(er);return;} setErrors({}); setSub(true);
     try{
-      await axios.post(`${API_URL}/orders/create`,{...fd,productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});
+      await axios.post(`${API_URL}/orders`,{...fd,productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});
       if(typeof window!=='undefined'&&fd.customerId) localStorage.setItem('customerId',fd.customerId);
       router.push(`/lp/${domain}/successfully`);
     }catch(err){console.error(err);}finally{setSub(false);}

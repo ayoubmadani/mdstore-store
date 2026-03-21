@@ -721,7 +721,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   useEffect(()=>{ if(selW) setFd(f=>({...f,priceLoss:selW.livraisonReturn})); },[selW]);
 
   const fp=getFP();
-  const total=()=>fp*fd.quantity+getLiv();
+  const total=()=>fp*fd.quantity+ +getLiv();
   const validate=()=>{
     const e:Record<string,string>={};
     if(!fd.customerName.trim())  e.customerName='الاسم مطلوب';

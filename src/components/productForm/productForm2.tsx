@@ -178,7 +178,7 @@ export default function ProductForm({
       const res = await axios.post(`${API_URL}/orders`, {
         productId: product.id,
         variantDetailId: getVariantDetailId(),
-        domain,
+        storeId: product.store.id,
         offerId: selectedOffer ?? undefined,
         platform,
         quantity: formData.quantity,

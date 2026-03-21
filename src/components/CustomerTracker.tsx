@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import Script from 'next/script';
 
 interface Pixel {
@@ -57,53 +57,17 @@ const CustomerTracker = ({ pixels }: CustomerTrackerProps) => {
             return (
               <Script key={pixel.id} id={`tt-pixel-${pixel.id}`} strategy="afterInteractive">
                 {`
-        !function (w, d, t) {
-          w.TiktokAnalyticsObject=t;
-          var ttq=w[t]=w[t]||[];
-          ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"];
-          ttq.setAndLog=function(t,e){
-            var n=function(){
-              var args=Array.prototype.slice.call(arguments);
-              args.unshift(e);
-              t.push(args);
-              return t;
-            };
-            return n;
-          };
-          for(var n=0;n<ttq.methods.length;n++){
-            ttq[ttq.methods[n]]=ttq.setAndLog(ttq,ttq.methods[n]);
-          }
-          ttq.load=function(e,n){
-            var i="https://analytics.tiktok.com/i18n/pixel/events.js";
-            ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};
-            var o=document.createElement("script");
-            o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;
-            var a=document.getElementsByTagName("script")[0];
-            a.parentNode.insertBefore(o,a)
-          };
-
-          // التأكد من وجود ID صالح قبل التشغيل
-          if ('${pixel.pixelId}' && '${pixel.pixelId}' !== 'undefined') {
-            ttq.load('${pixel.pixelId}');
-            ttq.page();
-          }
-        }(window, document, 'ttq');
-      `}
-              </Script>
-            );
-            return (
-              <Script key={pixel.id} id={`tt-pixel-${pixel.id}`} strategy="afterInteractive">
-                {`
                   !function (w, d, t) {
-                    w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndLog=function(t,e){t.addLog=e};ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndLog(e,ttq.methods[n]);return e};for(var n=0;n<ttq.methods.length;n++)ttq.setAndLog(ttq,ttq.methods[n]);ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
-                    ttq.load('${pixel.pixelId}');
-                    ttq.page();
+                    w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
+                    if ('${pixel.pixelId}' && '${pixel.pixelId}' !== 'undefined') {
+                      ttq.load('${pixel.pixelId}');
+                      ttq.page();
+                    }
                   }(window, document, 'ttq');
                 `}
               </Script>
             );
 
-          // يمكنك إضافة Google و Snapchat بنفس الطريقة هنا
           default:
             return null;
         }
