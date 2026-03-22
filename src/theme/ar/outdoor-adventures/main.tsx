@@ -174,7 +174,7 @@ const CSS = `
     .trust-bar  { grid-template-columns: repeat(2,1fr); }
     .footer-g   { grid-template-columns: 1fr 1fr; gap: 28px; }
     .details-g  { grid-template-columns: 1fr; }
-    .details-L  { position: static; width: 100%; height:auto;aspect-ratio: 1; margin-buttom: 200px ; display: flex ;flex-direction: column; gap:20px;}
+    .details-L  { position: static; width: 100%; height:auto; margin-buttom: 200px ; display: flex ;flex-direction: column; gap:20px;}
     .details-R  { padding: 24px 16px 48px; }
     .contact-g  { grid-template-columns: 1fr; gap: 28px; }
   }
@@ -183,6 +183,13 @@ const CSS = `
     .footer-g   { grid-template-columns: 1fr; gap: 24px; }
     .form-2c    { grid-template-columns: 1fr; }
     .dlv-2c     { grid-template-columns: 1fr; }
+  }
+
+  .text-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;    /* عدد الأسطر التي تريدها */
+    -webkit-box-orient: vertical;  
+    overflow: hidden;
   }
 `;
 
@@ -600,7 +607,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
           الرئيسية
         </Link>
         <span style={{ color:'var(--rust)' }}>/</span>
-        <span style={{ color:'var(--tan-lt)' }}>{product.name.slice(0,40)}</span>
+        <span className='text-clamp' style={{ color:'var(--tan-lt)' }}>{product.name.slice(0,40)}</span>
         <div style={{ marginRight:'auto', display:'flex', gap:'8px' }}>
           <button onClick={toggleWishlist} style={{ width:'32px', height:'32px', display:'flex', alignItems:'center', justifyContent:'center', border:`1px solid ${isWishlisted?'var(--rust)':'rgba(184,153,106,0.3)'}`, background:isWishlisted?'rgba(196,82,10,0.15)':'transparent', cursor:'pointer', color:isWishlisted?'var(--rust)':'rgba(232,213,176,0.5)' }}>
             <Heart style={{ width:'13px', height:'13px', fill:isWishlisted?'currentColor':'none' }}/>
