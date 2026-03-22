@@ -179,7 +179,7 @@ const CSS = `
     .contact-g  { grid-template-columns: 1fr; gap: 28px; }
   }
   @media (max-width:480px) {
-    .prod-grid  { grid-template-columns: repeat(2,1fr); gap: 8px; }
+    .prod-grid  { grid-template-columns: repeat(1,1fr); gap: 8px; }
     .footer-g   { grid-template-columns: 1fr; gap: 24px; }
     .form-2c    { grid-template-columns: 1fr; }
     .dlv-2c     { grid-template-columns: 1fr; }
@@ -276,7 +276,7 @@ export function Navbar({ store }: { store: Store }) {
         </div>
       )}
 
-      <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'0 24px', height:'66px', display:'flex', alignItems:'center', gap:'24px' }}>
+      <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'0 24px', height:'66px', display:'flex', alignItems:'center', gap:'24px' , justifyContent: "space-between" }}>
 
         {/* Logo + Name */}
         <Link href={`/${store.subdomain}`} style={{ textDecoration:'none', flexShrink:0, display:'flex', alignItems:'center', gap:'12px' }}>
@@ -293,7 +293,8 @@ export function Navbar({ store }: { store: Store }) {
           }
         </Link>
 
-        {/* Desktop nav links */}
+        <div>
+          {/* Desktop nav links */}
         <div className="nav-links" style={{ flex:1, justifyContent:'center' }}>
           {links.map(l=>(
             <Link key={`${l.href}${l.label}`} href={l.href}
@@ -307,14 +308,15 @@ export function Navbar({ store }: { store: Store }) {
 
         {/* Mobile toggle */}
         <div style={{ flexShrink:0 }}>
-          <button className="nav-toggle" onClick={()=>setOpen(p=>!p)} style={{ background:'none', border:'1px solid rgba(232,213,176,0.3)', cursor:'pointer', color:'var(--tan-lt)', padding:'7px', alignItems:'center', justifyContent:'center' }}>
+          <button className="nav-toggle" onClick={()=>setOpen(p=>!p)} style={{ background:'none', border:'1px solid rgba(232,213,176,0.3)', cursor:'pointer', color:'var(--tan-lt)', padding:'7px', alignItems:'center', justifyContent:'space-between' }}>
             {open ? <X style={{ width:'18px', height:'18px' }}/> : <Menu style={{ width:'18px', height:'18px' }}/>}
           </button>
+        </div>
         </div>
       </div>
 
       {/* Mobile menu */}
-      <div style={{ maxHeight:open?'280px':'0', overflow:'hidden', transition:'max-height 0.3s ease', backgroundColor:'var(--forest-2)' }}>
+      <div style={{ maxHeight:open?'280px':'0', overflow:'hidden', transition:'max-height 0.3s ease', backgroundColor:'var(--forest-2)' , }}>
         <div style={{ padding:'8px 24px 16px' }}>
           {links.map(l=>(
             <Link key={`m${l.href}${l.label}`} href={l.href} onClick={()=>setOpen(false)}
@@ -542,7 +544,7 @@ export function Home({ store }: any) {
               {products.map((p:any)=>{
                 const img  = p.productImage||p.imagesProduct?.[0]?.imageUrl||store.design?.logoUrl;
                 const disc = p.priceOriginal ? Math.round(((p.priceOriginal-p.price)/p.priceOriginal)*100) : 0;
-                return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="أضف للسلة"/>;
+                return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="عرض التفاصيل"/>;
               })}
             </div>
           )}
