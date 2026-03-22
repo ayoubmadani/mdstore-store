@@ -855,7 +855,7 @@ export function ProductForm({
   }, [selectedWilayaData, formData.typeLivraison]);
 
   const getTotalPrice = useCallback(
-    () => getFinalPrice() * formData.quantity + getPriceLivraison(),
+    () => getFinalPrice() * formData.quantity + +getPriceLivraison(),
     [getFinalPrice, formData.quantity, getPriceLivraison],
   );
 
@@ -886,6 +886,7 @@ export function ProductForm({
         productId:         product.id,
         variantDetailId:   getVariantDetailId(),
         domain,
+        storeId: product.store.id,
         offerId:           selectedOffer ?? undefined,
         platform,
         quantity:          formData.quantity,
@@ -902,7 +903,7 @@ export function ProductForm({
       if (res.status === 200 || res.status === 201) {
         if (typeof window !== 'undefined' && res.data?.customerId)
           localStorage.setItem('customerId', res.data.customerId);
-        router.push(`/successfully`);
+        router.push(`/${domain}/successfully`);
       }
     } catch {
       alert('حدث خطأ في الاتصال بالخادم');
