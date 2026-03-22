@@ -142,7 +142,7 @@ const CSS = `
     .trust-bar  { grid-template-columns:repeat(2,1fr); }
     .footer-g   { grid-template-columns:1fr 1fr; gap:28px; }
     .details-g  { grid-template-columns:1fr; }
-    .details-L  { position:static; height:75vw; min-height:300px; }
+    .details-L  { position: static; width: 100%; min-height: 280px;aspect-ratio: 1; margin-buttom: 200px ; display: flex ;flex-direction: column; gap:20px;}
     .details-R  { padding:24px 16px 48px; }
     .contact-g  { grid-template-columns:1fr; gap:28px; }
   }
@@ -693,9 +693,9 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
         </div>
       </div>
 
-      <div className="details-g" style={{ maxWidth:'1280px', margin:'0 auto', padding:'0 28px' }}>
+      <div className="details-g" style={{ maxWidth:'1280px', margin:'0 auto', }}>
         {/* Gallery */}
-        <div className="details-L" style={{ paddingTop:'32px' }}>
+        <div className="details-L">
           <div style={{ position:'relative', aspectRatio:'3/4', overflow:'hidden', backgroundColor:'var(--sand)', border:'1px solid var(--line)' }}>
             {allImages.length>0
               ? <img src={allImages[sel]} alt={product.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>

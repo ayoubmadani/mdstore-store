@@ -216,7 +216,7 @@ export function Navbar({ store }: { store: Store }) {
           <Link href={`/${store.subdomain}`} className="flex items-center gap-3 group">
             <div className="relative w-10 h-10 flex items-center justify-center"
               style={{ background: 'var(--fire)', clipPath: 'polygon(10% 0, 100% 0, 90% 100%, 0 100%)' }}>
-              {store.design.logoUrl
+              {store.design?.logoUrl
                 ? <img src={store.design.logoUrl} alt={store.name} className="h-6 w-auto object-contain" />
                 : <Dumbbell className="w-5 h-5 text-white" />
               }
