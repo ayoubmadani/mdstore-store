@@ -142,7 +142,7 @@ const CSS = `
     .trust-bar  { grid-template-columns:repeat(2,1fr); }
     .footer-g   { grid-template-columns:1fr 1fr; gap:28px; }
     .details-g  { grid-template-columns:1fr; }
-    .details-L  { position: static; width: 100%; min-height: 280px;aspect-ratio: 1; margin-buttom: 200px ; display: flex ;flex-direction: column; gap:20px;}
+    .details-L  { position: static; width: 100%; height:auto ;aspect-ratio: 1; margin-buttom: 200px ; display: flex ;flex-direction: column; gap:20px;}
     .details-R  { padding:24px 16px 48px; }
     .contact-g  { grid-template-columns:1fr; gap:28px; }
   }
