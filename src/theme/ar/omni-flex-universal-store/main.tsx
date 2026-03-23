@@ -272,7 +272,7 @@ export function Navbar({ store }: { store: Store }) {
                                     <span className="bc" style={{
                                         fontSize: '1.4rem',
                                         fontWeight: 900,
-                                        color: 'var(--navy)',
+                                        color: 'var(--dim)',
                                         lineHeight: 0.9,
                                         letterSpacing: '-0.02em',
                                         textTransform: 'uppercase'
@@ -605,7 +605,7 @@ export function Home({ store }: any) {
         }}>
             {[
                 { n: `${products.length}+`, l: 'منتج متاح' },
-                { n: 'FREE', l: 'توصيل سريع' },
+                { n: 'FAST', l: 'توصيل سريع' },
                 { n: '24/7', l: 'دعم فني' }
             ].map((s, i) => (
                 <div key={i}>
