@@ -861,6 +861,7 @@ export function ProductForm({
 
   const getVariantDetailId = useCallback(() => {
     if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+
     return product.variantDetails.find(v => variantMatches(v, selectedVariants))?.id;
   }, [product.variantDetails, selectedVariants]);
 
@@ -881,8 +882,7 @@ export function ProductForm({
     e.preventDefault();
     if (!validate()) return;
     setSubmitting(true);
-    try {
-      const res = await axios.post(`${API_URL}/orders`, {
+    const payload = {
         productId:         product.id,
         variantDetailId:   getVariantDetailId(),
         domain,
@@ -899,7 +899,12 @@ export function ProductForm({
         customerPhone:     formData.customerPhone,
         customerWilayaId:  formData.customerWelaya,
         customerCommuneId: formData.customerCommune,
-      });
+      }
+
+      console.log({payload});
+      
+    try {
+      const res = await axios.post(`${API_URL}/orders`, payload);
       if (res.status === 200 || res.status === 201) {
         if (typeof window !== 'undefined' && res.data?.customerId)
           localStorage.setItem('customerId', res.data.customerId);

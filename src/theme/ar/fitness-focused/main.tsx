@@ -355,71 +355,96 @@ export function Footer({ store }: any) {
 // ─────────────────────────────────────────────────────────────
 
 export function Card({ product, displayImage, discount, isRTL, store, viewDetails }: any) {
-  return (
-    <div className="card-hover group relative flex flex-col overflow-hidden"
-      style={{ backgroundColor: 'var(--dark-2)', border: '1px solid var(--border)' }}>
+  const brandColor = 'var(--fire)'; // اللون الأساسي الموحد
 
-      {/* Image */}
+  return (
+    <div className="card-hover group relative flex flex-col overflow-hidden h-full transition-all duration-300"
+      style={{ 
+        backgroundColor: 'var(--dark-2)', 
+        border: '1px solid var(--border)',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+      }}>
+
+      {/* Image Section */}
       <div className="relative h-60 overflow-hidden" style={{ backgroundColor: 'var(--dark-3)' }}>
         {displayImage ? (
-          <img src={displayImage} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 brightness-90 group-hover:brightness-100" />
+          <img 
+            src={displayImage} 
+            alt={product.name} 
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 brightness-75 group-hover:brightness-100" 
+          />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-3">
             <Dumbbell className="w-12 h-12" style={{ color: 'var(--border)' }} />
-            <span className="text-xs" style={{ color: 'var(--text-dim)' }}>No Image</span>
+            <span className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-dim)' }}>No Image</span>
           </div>
         )}
 
-        {/* Fire overlay on hover */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          style={{ background: 'linear-gradient(to top, rgba(255,69,0,0.3) 0%, transparent 60%)' }} />
-
+        {/* Discount Badge */}
         {discount > 0 && (
-          <div className="absolute top-3 left-3 px-3 py-1 text-xs font-black text-white"
-            style={{ background: 'var(--fire)', clipPath: 'polygon(0 0, 95% 0, 100% 100%, 5% 100%)' }}>
+          <div className="absolute top-0 left-0 px-4 py-2 text-sm font-black text-white z-10"
+            style={{ background: brandColor, clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0% 100%)' }}>
             -{discount}%
           </div>
         )}
+        
+        {/* Subtle overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--dark-2)] to-transparent opacity-60" />
+      </div>
 
-        {/* Quick action */}
-        <div className="absolute bottom-3 left-0 right-0 flex justify-center translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+      {/* Content Section */}
+      <div className="p-5 flex flex-col flex-1">
+        {/* Rating & Brand Line */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex gap-0.5">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} className={`w-3 h-3 ${i < 4 ? 'fill-current' : 'opacity-20'}`} style={{ color: 'var(--gold)' }} />
+            ))}
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-tighter" style={{ color: brandColor }}>Pro Series</span>
+        </div>
+
+        <h3 className="font-bold mb-2 line-clamp-2 transition-colors text-white" 
+          style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '1.25rem', letterSpacing: '0.02em', lineHeight: '1.2' }}>
+          {product.name}
+        </h3>
+
+        {product.desc && (
+          <div className="text-xs mb-6 line-clamp-2 leading-relaxed opacity-60 font-light"
+            dangerouslySetInnerHTML={{ __html: product.desc }} />
+        )}
+
+        {/* Price & Action Area */}
+        <div className="mt-auto space-y-4">
+          <div className="flex items-end justify-between border-b pb-3" style={{ borderColor: 'var(--border)' }}>
+            <div className="flex flex-col">
+              {product.priceOriginal && product.priceOriginal > product.price && (
+                <span className="text-xs line-through opacity-40 mb-[-4px]">{product.priceOriginal} {store.currency}</span>
+              )}
+              <div className="flex items-baseline gap-1">
+                <span className="font-black" style={{ color: brandColor, fontFamily: "'Bebas Neue', sans-serif", fontSize: '2rem' }}>
+                  {product.price}
+                </span>
+                <span className="text-xs font-bold uppercase" style={{ color: 'var(--text-dim)' }}>{store.currency}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Fixed Button - Always Visible */}
           <Link href={`/${store.subdomain}/product/${product.slug || product.id}`}
-            className="btn-fire px-6 py-2.5 text-xs font-black tracking-widest uppercase text-white flex items-center gap-2"
-            style={{ background: 'var(--fire)' }}>
-            <Zap className="w-3.5 h-3.5" /> {viewDetails}
+            className="flex items-center justify-center gap-2 w-full py-4 text-sm font-black tracking-[0.2em] uppercase text-white transition-all hover:brightness-110 active:scale-[0.98]"
+            style={{ 
+              background: brandColor,
+              boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
+            }}>
+            <Zap className="w-4 h-4 fill-current" /> {viewDetails}
           </Link>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-5 flex flex-col flex-1">
-        <h3 className="font-bold mb-1 line-clamp-1 group-hover:text-orange-400 transition-colors text-white" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '1.1rem', letterSpacing: '0.03em' }}>
-          {product.name}
-        </h3>
-        {product.desc && (
-          <div className="text-xs mb-4 line-clamp-2 leading-relaxed" style={{ color: 'var(--text-dim)' }}
-            dangerouslySetInnerHTML={{ __html: product.desc }} />
-        )}
-        <div className="mt-auto flex items-end justify-between">
-          <div>
-            <div className="flex items-baseline gap-2">
-              <span className="font-black" style={{ color: 'var(--fire)', fontFamily: "'Bebas Neue', sans-serif", fontSize: '1.6rem' }}>
-                {product.price}
-              </span>
-              <span className="text-xs font-bold" style={{ color: 'var(--text-dim)' }}>{store.currency}</span>
-            </div>
-            {product.priceOriginal && product.priceOriginal > product.price && (
-              <span className="text-xs line-through" style={{ color: 'var(--text-dim)' }}>{product.priceOriginal}</span>
-            )}
-          </div>
-          <div className="flex gap-0.5">
-            {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < 4 ? 'fill-current' : ''}`} style={{ color: 'var(--gold)' }} />)}
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom fire line */}
-      <div className="h-0.5 w-0 group-hover:w-full transition-all duration-500" style={{ background: 'linear-gradient(90deg, var(--fire), var(--gold))' }} />
+      {/* Animated Bottom Line */}
+      <div className="h-1 w-full scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" 
+        style={{ background: `linear-gradient(90deg, ${brandColor}, var(--gold))` }} />
     </div>
   );
 }

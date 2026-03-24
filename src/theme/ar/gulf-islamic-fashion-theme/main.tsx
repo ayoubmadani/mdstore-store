@@ -424,48 +424,117 @@ export function Footer({ store }: { store: any }) {
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
   const [hov, setHov] = useState(false);
   if (!product || !store) return null;
-  const price = typeof product.price==='string' ? parseFloat(product.price) : product.price as number;
-  const orig  = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
+
+  const price = typeof product.price === 'string' ? parseFloat(product.price) : (product.price as number) || 0;
+  const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
+  
+  // اللون الموحد للهوية (الذهبي العميق)
+  const brandGold = 'var(--gold-dk)';
+
   return (
-    <div className="t-card" onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}>
-      {/* Image */}
-      <div className="c-img" style={{ position:'relative', aspectRatio:'3/4', overflow:'hidden', backgroundColor:'var(--sand)' }}>
-        {displayImage
-          ? <img src={displayImage} alt={product.name}/>
-          : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center' }} className="geo-bg">
-              <span className="amiri" style={{ fontSize:'2.5rem', color:'var(--gold)', opacity:0.3 }}>﷽</span>
-            </div>
-        }
-        {/* Hover overlay */}
-        <div style={{ position:'absolute', inset:0, background:'rgba(26,18,8,0.35)', opacity:hov?1:0, transition:'opacity 0.35s', display:'flex', alignItems:'center', justifyContent:'center' }}>
-          <Link href={`/${store.subdomain}/product/${product.slug||product.id}`}
-            className="btn-outline" style={{ textDecoration:'none', borderColor:'rgba(250,246,238,0.7)', color:'var(--cream)', fontSize:'13px' }}>
-            {viewDetails}
-          </Link>
-        </div>
-        {/* Gold top border */}
-        <div style={{ position:'absolute', top:0, left:0, right:0, height:'3px', background:'linear-gradient(to right,transparent,var(--gold),transparent)', opacity:hov?1:0.4, transition:'opacity 0.3s' }}/>
-        {discount>0 && (
-          <div style={{ position:'absolute', top:'12px', right:'12px', backgroundColor:'var(--gold)', color:'var(--cream)', fontSize:'11px', fontWeight:600, padding:'3px 10px', letterSpacing:'0.08em' }}>
+    <div 
+      className="t-card group" 
+      onMouseEnter={() => setHov(true)} 
+      onMouseLeave={() => setHov(false)}
+      style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        height: '100%',
+        transition: 'all 0.4s ease',
+        backgroundColor: 'var(--cream)' // أو أي لون خلفية فاتح مستخدم عندك
+      }}
+    >
+      {/* منطقة الصورة */}
+      <div className="c-img" style={{ position: 'relative', aspectRatio: '3/4', overflow: 'hidden', backgroundColor: 'var(--sand)' }}>
+        {displayImage ? (
+          <img 
+            src={displayImage} 
+            alt={product.name} 
+            className="transition-transform duration-700 group-hover:scale-105"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="geo-bg">
+            <span className="amiri" style={{ fontSize: '2.5rem', color: 'var(--gold)', opacity: 0.3 }}>﷽</span>
+          </div>
+        )}
+
+        {/* خط ذهبي علوي يتفاعل مع التحويم */}
+        <div style={{ 
+          position: 'absolute', top: 0, left: 0, right: 0, height: '3px', 
+          background: `linear-gradient(to right, transparent, ${brandGold}, transparent)`, 
+          opacity: hov ? 1 : 0.4, transition: 'opacity 0.3s' 
+        }}/>
+
+        {/* ملصق الخصم */}
+        {discount > 0 && (
+          <div style={{ 
+            position: 'absolute', top: '12px', right: '12px', 
+            backgroundColor: brandGold, color: 'var(--cream)', 
+            fontSize: '11px', fontWeight: 600, padding: '4px 12px', 
+            letterSpacing: '0.08em', borderRadius: '2px' 
+          }}>
             -{discount}%
           </div>
         )}
       </div>
 
-      {/* Info */}
-      <div style={{ padding:'14px 12px', borderTop:'1px solid var(--line)' }}>
-        <div style={{ display:'flex', gap:'2px', marginBottom:'5px' }}>
-          {[...Array(5)].map((_,i)=><Star key={i} style={{ width:'10px', height:'10px', fill:i<4?'var(--gold)':'none', color:'var(--gold)' }}/>)}
+      {/* المعلومات */}
+      <div style={{ padding: '16px 14px', borderTop: '1px solid var(--line)', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        
+        {/* التقييم */}
+        <div style={{ display: 'flex', gap: '2px', marginBottom: '8px' }}>
+          {[...Array(5)].map((_, i) => (
+            <Star key={i} style={{ width: '11px', height: '11px', fill: i < 4 ? brandGold : 'none', color: brandGold }} />
+          ))}
         </div>
-        <h3 className="amiri" style={{ fontSize:'1.05rem', fontWeight:700, color:'var(--ink)', marginBottom:'6px', lineHeight:1.4, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' as any, overflow:'hidden' }}>
+
+        {/* اسم المنتج بخط أميري */}
+        <h3 className="amiri" style={{ 
+          fontSize: '1.15rem', fontWeight: 700, color: 'var(--ink)', 
+          marginBottom: '10px', lineHeight: 1.4, 
+          display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any, 
+          overflow: 'hidden', minHeight: '3.2em'
+        }}>
           {product.name}
         </h3>
-        <div style={{ display:'flex', alignItems:'baseline', gap:'8px' }}>
-          <span className="amiri" style={{ fontSize:'1.2rem', fontWeight:700, color:'var(--gold-dk)' }}>
-            {price.toLocaleString()}
-            <span style={{ fontFamily:"'Cairo',sans-serif", fontWeight:400, fontSize:'11px', color:'var(--mid)', marginRight:'3px' }}>دج</span>
-          </span>
-          {orig>price && <span style={{ fontSize:'12px', color:'var(--dim)', textDecoration:'line-through' }}>{orig.toLocaleString()}</span>}
+
+        {/* قسم السعر والزر (ثابت في الأسفل) */}
+        <div style={{ marginTop: 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+              <span className="amiri" style={{ fontSize: '1.3rem', fontWeight: 700, color: brandGold }}>
+                {price.toLocaleString()}
+                <span style={{ fontFamily: "'Cairo',sans-serif", fontWeight: 600, fontSize: '12px', color: 'var(--mid)', marginRight: '4px' }}>دج</span>
+              </span>
+              {orig > price && (
+                <span style={{ fontSize: '12px', color: 'var(--dim)', textDecoration: 'line-through', opacity: 0.6 }}>
+                  {orig.toLocaleString()}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* الزر الموحد والظاهر دوماً */}
+          <Link href={`/${store.subdomain}/product/${product.slug || product.id}`}
+            className="amiri"
+            style={{ 
+              textDecoration: 'none', 
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%', 
+              fontSize: '1.1rem', 
+              fontWeight: 700,
+              padding: '10px', 
+              backgroundColor: hov ? brandGold : 'transparent',
+              color: hov ? 'var(--cream)' : brandGold,
+              border: `1.5px solid ${brandGold}`,
+              transition: 'all 0.3s ease',
+              borderRadius: '2px'
+            }}>
+            {viewDetails}
+          </Link>
         </div>
       </div>
     </div>

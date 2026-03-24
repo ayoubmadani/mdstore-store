@@ -262,6 +262,9 @@ export default function ProductPage({ params }: { params: Promise<{ domain: stri
     });
   }, []);
 
+  useEffect(()=> {console.log(selectedVariants);
+  },[selectedVariants])
+
   const getFinalPrice = useCallback(() => {
     if (!product) return 0;
 

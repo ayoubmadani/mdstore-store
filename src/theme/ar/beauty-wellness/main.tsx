@@ -344,37 +344,126 @@ export function Footer({ store }: any) {
 /* ── CARD ───────────────────────────────────────────────────── */
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
   if (!product || !store) return null;
-  const price = typeof product.price==='string' ? parseFloat(product.price) : product.price as number;
-  const orig  = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
+
+  // معالجة الأرقام لضمان عرضها بشكل صحيح
+  const price = typeof product.price === 'string' ? parseFloat(product.price) : (product.price as number) || 0;
+  const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
+  
+  // اللون الموحد الأساسي
+  const brandColor = 'var(--plum)'; 
+  const brandSoft = 'var(--plum-lt)';
+
   return (
-    <div className="p-card">
-      <div className="c-img" style={{ position:'relative', aspectRatio:'1/1', overflow:'hidden', backgroundColor:'var(--soft)' }}>
-        {displayImage
-          ? <img src={displayImage} alt={product.name}/>
-          : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', background:'linear-gradient(135deg,var(--soft),var(--cream))' }}>
-              <Sparkles style={{ width:'36px', height:'36px', color:'var(--plum-lt)', opacity:0.4 }}/>
-            </div>
-        }
-        {discount>0 && (
-          <div style={{ position:'absolute', top:'10px', right:'10px', backgroundColor:'var(--rose)', color:'white', fontSize:'11px', fontWeight:700, padding:'3px 9px', borderRadius:'3px' }}>
+    <div className="p-card group" style={{ transition: 'transform 0.3s ease', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      
+      {/* منطقة الصورة */}
+      <div className="c-img" style={{ 
+        position: 'relative', 
+        aspectRatio: '1/1', 
+        overflow: 'hidden', 
+        backgroundColor: 'var(--soft)',
+        borderRadius: '8px 8px 0 0' 
+      }}>
+        {displayImage ? (
+          <img 
+            src={displayImage} 
+            alt={product.name} 
+            className="transition-transform duration-500 group-hover:scale-105"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, var(--soft), var(--cream))' }}>
+            <Sparkles style={{ width: '36px', height: '36px', color: brandSoft, opacity: 0.4 }} />
+          </div>
+        )}
+
+        {/* ملصق الخصم موحد اللون */}
+        {discount > 0 && (
+          <div style={{ 
+            position: 'absolute', 
+            top: '10px', 
+            right: '10px', 
+            backgroundColor: brandColor, 
+            color: 'white', 
+            fontSize: '11px', 
+            fontWeight: 700, 
+            padding: '4px 10px', 
+            borderRadius: '4px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+          }}>
             -{discount}%
           </div>
         )}
       </div>
-      <div style={{ padding:'12px' }}>
-        <h3 style={{ fontSize:'13px', fontWeight:500, color:'var(--ink)', marginBottom:'5px', lineHeight:1.4, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' as any, overflow:'hidden' }}>
+
+      {/* محتوى البطاقة */}
+      <div style={{ padding: '15px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+        
+        {/* التقييم */}
+        <div style={{ display: 'flex', gap: '2px', marginBottom: '8px' }}>
+          {[...Array(5)].map((_, i) => (
+            <Star key={i} style={{ 
+              width: '12px', 
+              height: '12px', 
+              fill: i < 4 ? 'var(--gold)' : 'none', 
+              color: 'var(--gold)' 
+            }} />
+          ))}
+        </div>
+
+        {/* اسم المنتج */}
+        <h3 style={{ 
+          fontSize: '14px', 
+          fontWeight: 600, 
+          color: 'var(--ink)', 
+          marginBottom: '10px', 
+          lineHeight: 1.5, 
+          display: '-webkit-box', 
+          WebkitLineClamp: 2, 
+          WebkitBoxOrient: 'vertical' as any, 
+          overflow: 'hidden',
+          minHeight: '3em' // لتوحيد ارتفاع العناوين
+        }}>
           {product.name}
         </h3>
-        <div style={{ display:'flex', gap:'2px', marginBottom:'6px' }}>
-          {[...Array(5)].map((_,i)=><Star key={i} style={{ width:'10px', height:'10px', fill:i<4?'var(--gold)':'none', color:'var(--gold)' }}/>)}
+
+        {/* السعر والعملة */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '8px', 
+          marginBottom: '15px', 
+          marginTop: 'auto' // يدفع السعر والزر للأسفل دائماً
+        }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+            <span style={{ fontSize: '1.2rem', fontWeight: 800, color: brandColor }}>
+              {price.toLocaleString()}
+            </span>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--dim)' }}>دج</span>
+          </div>
+          
+          {orig > price && (
+            <span style={{ fontSize: '12px', color: 'var(--dim)', textDecoration: 'line-through', opacity: 0.6 }}>
+              {orig.toLocaleString()}
+            </span>
+          )}
         </div>
-        <div style={{ display:'flex', alignItems:'baseline', gap:'6px', marginBottom:'10px' }}>
-          <span style={{ fontSize:'1rem', fontWeight:700, color:'var(--ink)' }}>{price.toLocaleString()}</span>
-          <span style={{ fontSize:'11px', color:'var(--dim)' }}>دج</span>
-          {orig>price && <span style={{ fontSize:'11px', color:'var(--dim)', textDecoration:'line-through' }}>{orig.toLocaleString()}</span>}
-        </div>
-        <Link href={`/${store.subdomain}/product/${product.slug||product.id}`}
-          className="btn-plum" style={{ textDecoration:'none', width:'100%', fontSize:'12px', padding:'9px 14px', borderRadius:'4px' }}>
+
+        {/* زر التفاصيل الموحد والبارز دوماً */}
+        <Link href={`/${store.subdomain}/product/${product.slug || product.id}`}
+          className="btn-plum" 
+          style={{ 
+            textDecoration: 'none', 
+            width: '100%', 
+            fontSize: '13px', 
+            fontWeight: 600,
+            padding: '12px', 
+            borderRadius: '6px',
+            textAlign: 'center',
+            display: 'block',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 0 rgba(0,0,0,0.05)'
+          }}>
           {viewDetails}
         </Link>
       </div>

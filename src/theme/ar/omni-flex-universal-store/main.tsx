@@ -487,135 +487,135 @@ export function Home({ store }: any) {
         <div dir="rtl">
 
             {/* ── HERO — Full Image Background ── */}
-<section className="hero-g" style={{
-    position: 'relative',
-    minHeight: '85vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-    backgroundColor: 'var(--navy)', 
-}}>
+            <section className="hero-g" style={{
+                position: 'relative',
+                minHeight: '85vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                backgroundColor: 'var(--navy)',
+            }}>
 
-    {/* 1. Background Image Wrapper */}
-    <div style={{
-        position: 'absolute',
-        top: 0, left: 0, right: 0, bottom: 0,
-        zIndex: 1
-    }}>
-        {store.hero?.imageUrl ? (
-            <>
-                <img
-                    src={store.hero.imageUrl}
-                    alt={store.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                />
-                {/* Overlay مُحسّن: تدرج داكن من اليمين (جهة النص العربي) إلى الشفافية */}
+                {/* 1. Background Image Wrapper */}
                 <div style={{
                     position: 'absolute',
                     top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'linear-gradient(to left, rgba(13,27,42,0.95) 20%, rgba(13,27,42,0.6) 50%, rgba(13,27,42,0.2) 100%)'
-                }} />
-            </>
-        ) : (
-            <div style={{ width: '100%', height: '100%', backgroundColor: 'var(--navy-2)' }} className="dot-bg" />
-        )}
-    </div>
-
-    {/* 2. Content Container */}
-    <div style={{
-        position: 'relative',
-        zIndex: 2,
-        width: '100%',
-        maxWidth: '1280px',
-        padding: '0 6vw',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start' 
-    }}>
-        {/* اسم المتجر كـ Badge علوي */}
-        <div className="fu" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-            <span style={{ width: '30px', height: '2px', backgroundColor: 'var(--blue)' }}></span>
-            <span className="bc" style={{ 
-                fontSize: '14px', 
-                fontWeight: 800, 
-                color: 'var(--white)', 
-                letterSpacing: '0.15em',
-                textTransform: 'uppercase'
-            }}>
-                {store.name}
-            </span>
-        </div>
-
-        <p className="fu fu-1 bc" style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--blue)', marginBottom: '12px', textTransform: 'uppercase' }}>
-            ✦ تجربة تقنية متكاملة
-        </p>
-
-        <h1 className="fu fu-2 bc" style={{
-            fontSize: 'clamp(2.5rem, 6vw, 4.8rem)',
-            fontWeight: 900,
-            color: 'var(--white)',
-            lineHeight: 1.05,
-            marginBottom: '24px',
-            maxWidth: '800px',
-            textShadow: '0 10px 30px rgba(0,0,0,0.3)'
-        }}>
-            {store.hero?.title || <>مُصمَّم للتميز.<br />أداء شامل.</>}
-        </h1>
-
-        <p className="fu fu-3" style={{
-            fontSize: '18px',
-            lineHeight: '1.7',
-            color: 'rgba(255,255,255,0.7)',
-            marginBottom: '40px',
-            maxWidth: '550px',
-            fontWeight: 300
-        }}>
-            {store.hero?.subtitle || `اكتشف مجموعتنا المختارة في ${store.name} من أحدث المنتجات التقنية المصممة بعناية.`}
-        </p>
-
-        <div className="fu fu-3" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-            <a href="#products" className="btn-orange" style={{ padding: '18px 44px', borderRadius: '50px' }}>
-                تسوق الآن
-            </a>
-            <a href="#about" style={{
-                border: '1px solid rgba(255,255,255,0.2)',
-                color: 'var(--white)',
-                padding: '18px 44px',
-                borderRadius: '50px',
-                fontWeight: 600,
-                textDecoration: 'none',
-                transition: '0.3s',
-                backdropFilter: 'blur(10px)',
-                fontSize: '15px'
-            }}
-            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
-                تعرف علينا
-            </a>
-        </div>
-
-        {/* 3. Stats Section */}
-        <div className="fu fu-3" style={{
-            marginTop: '64px',
-            display: 'flex',
-            gap: '48px',
-            paddingTop: '32px',
-            borderTop: '1px solid rgba(255,255,255,0.1)'
-        }}>
-            {[
-                { n: `${products.length}+`, l: 'منتج متاح' },
-                { n: 'FAST', l: 'توصيل سريع' },
-                { n: '24/7', l: 'دعم فني' }
-            ].map((s, i) => (
-                <div key={i}>
-                    <p className="bc" style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--white)', margin: 0 }}>{s.n}</p>
-                    <p style={{ fontSize: '10px', color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: '0.15em', marginTop: '4px' }}>{s.l}</p>
+                    zIndex: 1
+                }}>
+                    {store.hero?.imageUrl ? (
+                        <>
+                            <img
+                                src={store.hero.imageUrl}
+                                alt={store.name}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                            />
+                            {/* Overlay مُحسّن: تدرج داكن من اليمين (جهة النص العربي) إلى الشفافية */}
+                            <div style={{
+                                position: 'absolute',
+                                top: 0, left: 0, right: 0, bottom: 0,
+                                background: 'linear-gradient(to left, rgba(13,27,42,0.95) 20%, rgba(13,27,42,0.6) 50%, rgba(13,27,42,0.2) 100%)'
+                            }} />
+                        </>
+                    ) : (
+                        <div style={{ width: '100%', height: '100%', backgroundColor: 'var(--navy-2)' }} className="dot-bg" />
+                    )}
                 </div>
-            ))}
-        </div>
-    </div>
-</section>
+
+                {/* 2. Content Container */}
+                <div style={{
+                    position: 'relative',
+                    zIndex: 2,
+                    width: '100%',
+                    maxWidth: '1280px',
+                    padding: '0 6vw',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start'
+                }}>
+                    {/* اسم المتجر كـ Badge علوي */}
+                    <div className="fu" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                        <span style={{ width: '30px', height: '2px', backgroundColor: 'var(--blue)' }}></span>
+                        <span className="bc" style={{
+                            fontSize: '14px',
+                            fontWeight: 800,
+                            color: 'var(--white)',
+                            letterSpacing: '0.15em',
+                            textTransform: 'uppercase'
+                        }}>
+                            {store.name}
+                        </span>
+                    </div>
+
+                    <p className="fu fu-1 bc" style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--blue)', marginBottom: '12px', textTransform: 'uppercase' }}>
+                        ✦ تجربة تقنية متكاملة
+                    </p>
+
+                    <h1 className="fu fu-2 bc" style={{
+                        fontSize: 'clamp(2.5rem, 6vw, 4.8rem)',
+                        fontWeight: 900,
+                        color: 'var(--white)',
+                        lineHeight: 1.05,
+                        marginBottom: '24px',
+                        maxWidth: '800px',
+                        textShadow: '0 10px 30px rgba(0,0,0,0.3)'
+                    }}>
+                        {store.hero?.title || <>مُصمَّم للتميز.<br />أداء شامل.</>}
+                    </h1>
+
+                    <p className="fu fu-3" style={{
+                        fontSize: '18px',
+                        lineHeight: '1.7',
+                        color: 'rgba(255,255,255,0.7)',
+                        marginBottom: '40px',
+                        maxWidth: '550px',
+                        fontWeight: 300
+                    }}>
+                        {store.hero?.subtitle || `اكتشف مجموعتنا المختارة في ${store.name} من أحدث المنتجات التقنية المصممة بعناية.`}
+                    </p>
+
+                    <div className="fu fu-3" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                        <a href="#products" className="btn-orange" style={{ padding: '18px 44px', borderRadius: '50px' }}>
+                            تسوق الآن
+                        </a>
+                        <a href="#about" style={{
+                            border: '1px solid rgba(255,255,255,0.2)',
+                            color: 'var(--white)',
+                            padding: '18px 44px',
+                            borderRadius: '50px',
+                            fontWeight: 600,
+                            textDecoration: 'none',
+                            transition: '0.3s',
+                            backdropFilter: 'blur(10px)',
+                            fontSize: '15px'
+                        }}
+                            onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+                            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                            تعرف علينا
+                        </a>
+                    </div>
+
+                    {/* 3. Stats Section */}
+                    <div className="fu fu-3" style={{
+                        marginTop: '64px',
+                        display: 'flex',
+                        gap: '48px',
+                        paddingTop: '32px',
+                        borderTop: '1px solid rgba(255,255,255,0.1)'
+                    }}>
+                        {[
+                            { n: `${products.length}+`, l: 'منتج متاح' },
+                            { n: 'FAST', l: 'توصيل سريع' },
+                            { n: '24/7', l: 'دعم فني' }
+                        ].map((s, i) => (
+                            <div key={i}>
+                                <p className="bc" style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--white)', margin: 0 }}>{s.n}</p>
+                                <p style={{ fontSize: '10px', color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: '0.15em', marginTop: '4px' }}>{s.l}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
 
             {/* ── TRUST BAR ── */}
             <div style={{ backgroundColor: 'var(--navy)', borderBottom: '3px solid var(--blue)' }}>
@@ -836,7 +836,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                 </div>
             </div>
 
-            <div className="details-g" style={{ maxWidth: '1280px', margin: '0 auto'}}>
+            <div className="details-g" style={{ maxWidth: '1280px', margin: '0 auto' }}>
                 {/* Gallery */}
                 <div className="details-L">
                     <div style={{ position: 'relative', aspectRatio: '1/1', overflow: 'hidden', backgroundColor: 'var(--white)', border: '1px solid var(--line)' }}>
@@ -1001,6 +1001,11 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         }
         return base;
     }, [product, selectedOffer, selectedVariants]);
+    const getVariantDetailId = useCallback(() => {
+        if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+
+        return product.variantDetails.find(v => variantMatches(v, selectedVariants))?.id;
+    }, [product.variantDetails, selectedVariants]);
     const getLiv = useCallback((): number => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; }, [selW, fd.typeLivraison]);
     useEffect(() => { if (selW) setFd(f => ({ ...f, priceLoss: selW.livraisonReturn })); }, [selW]);
 
@@ -1015,8 +1020,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     };
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); const er = validate(); if (Object.keys(er).length) { setErrors(er); return; } setErrors({}); setSub(true);
+        const payload = { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId:   getVariantDetailId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() }
+        console.log(payload);
+        
+
         try {
-            await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+            await axios.post(`${API_URL}/orders/create`, payload);
             if (typeof window !== 'undefined' && fd.customerId) localStorage.setItem('customerId', fd.customerId);
             router.push(`/lp/${domain}/successfully`);
         } catch (err) { console.error(err); } finally { setSub(false); }

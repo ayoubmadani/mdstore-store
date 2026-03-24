@@ -500,89 +500,107 @@ export function Footer({ store }: any) {
 // ─────────────────────────────────────────────────────────────
 export function Card({ product, displayImage, discount, isRTL, store, viewDetails }: any) {
   const [hovered, setHovered] = useState(false);
-  const tiltDir = parseInt(product.id) % 2 === 0 ? 1 : -1;
-  const accentColor = ['var(--coral)', 'var(--sky)', 'var(--grape)', 'var(--orange)', 'var(--mint-dk)'][parseInt(product.id) % 5];
+  
+  // لون موحد للعلامة التجارية - يمكنك استبداله بأي لون تريده
+  const brandColor = 'var(--coral)'; 
+  const brandLight = `${brandColor}15`; // لون خلفية خفيف (شفافية 15%)
 
   return (
     <div
-      className="card-tilt group flex flex-col overflow-hidden rounded-3xl bg-white"
-      style={{ border: `3px solid ${hovered ? accentColor : 'var(--border)'}`, position: 'relative', transition: 'border-color 0.3s' }}
+      className="card-tilt group flex flex-col overflow-hidden rounded-3xl bg-white h-full"
+      style={{ 
+        border: `3px solid ${hovered ? brandColor : 'var(--border)'}`, 
+        position: 'relative', 
+        transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)' 
+      }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Colorful top stripe */}
-      <div className="h-1.5 w-full" style={{ background: `linear-gradient(90deg, ${accentColor}, var(--sun))` }} />
+      {/* خط علوي موحد */}
+      <div className="h-1.5 w-full" style={{ backgroundColor: brandColor }} />
 
-      {/* Image zone */}
-      <div className="relative overflow-hidden" style={{ aspectRatio: '1', backgroundColor: `${accentColor}15` }}>
+      {/* منطقة الصورة */}
+      <div className="relative overflow-hidden" style={{ aspectRatio: '1', backgroundColor: brandLight }}>
         {displayImage
-          ? <img src={displayImage} alt={product.name} className="w-full h-full object-cover transition-transform duration-500" style={{ transform: hovered ? 'scale(1.08)' : 'scale(1)' }} />
+          ? <img 
+              src={displayImage} 
+              alt={product.name} 
+              className="w-full h-full object-cover transition-transform duration-700" 
+              style={{ transform: hovered ? 'scale(1.1)' : 'scale(1)' }} 
+            />
           : (
-            <div className="w-full h-full flex flex-col items-center justify-center polka-dots gap-3">
-              <span className="text-5xl" style={{ animation: 'float-up 3s ease-in-out infinite' }}>🧸</span>
-              <span className="text-xs font-bold" style={{ color: accentColor }}>No image</span>
+            <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+              <span className="text-5xl opacity-50">🧸</span>
+              <span className="text-xs font-bold" style={{ color: brandColor }}>لا توجد صورة</span>
             </div>
           )
         }
 
-        {/* Discount sticker */}
+        {/* ملصق الخصم */}
         {discount > 0 && (
           <div className="absolute top-3 right-3 w-12 h-12 rounded-full flex items-center justify-center sticker"
-            style={{ backgroundColor: 'var(--coral)', color: 'white', fontFamily: "'Fredoka One', cursive", fontSize: '0.85rem', boxShadow: '0 4px 12px rgba(255,107,107,0.4)', transform: 'rotate(12deg)' }}>
+            style={{ 
+              backgroundColor: brandColor, 
+              color: 'white', 
+              fontFamily: "'Fredoka One', cursive", 
+              fontSize: '0.85rem', 
+              boxShadow: `0 4px 12px ${brandColor}60`, 
+              transform: 'rotate(12deg)' 
+            }}>
             -{discount}%
           </div>
         )}
-
-        {/* Wishlist */}
-        <button className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 btn-bouncy"
-          style={{ backgroundColor: 'rgba(255,255,255,0.9)', color: 'var(--coral)', opacity: hovered ? 1 : 0, transform: hovered ? 'scale(1)' : 'scale(0.7)' }}>
-          <Heart className="w-4 h-4" />
-        </button>
-
-        {/* CTA on hover */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 transition-all duration-300" style={{ transform: hovered ? 'translateY(0)' : 'translateY(100%)', opacity: hovered ? 1 : 0 }}>
-          <Link href={`/${store.subdomain}/product/${product.slug || product.id}`}
-            className="btn-bouncy flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-bold text-white"
-            style={{ background: `linear-gradient(135deg, ${accentColor}, var(--sun))`, boxShadow: `0 4px 16px ${accentColor}50` }}>
-            <Sparkles className="w-4 h-4" /> {viewDetails} 🎉
-          </Link>
-        </div>
       </div>
 
-      {/* Content */}
+      {/* محتوى البطاقة */}
       <div className="p-4 flex flex-col flex-1">
-        {/* Stars rating */}
+        {/* التقييم */}
         <div className="flex gap-0.5 mb-2">
-          {[...Array(5)].map((_,i) => (
-            <Star key={i} className={`w-3 h-3 ${i<4?'fill-current':''}`} style={{ color: 'var(--sun-dark)' }} />
+          {[...Array(5)].map((_, i) => (
+            <Star key={i} className={`w-3 h-3 ${i < 4 ? 'fill-current' : 'opacity-30'}`} style={{ color: brandColor }} />
           ))}
-          <span className="ml-1 text-[10px] font-bold" style={{ color: 'var(--text-soft)' }}>4.8</span>
+          <span className="ml-1 text-[10px] font-bold opacity-60">4.8</span>
         </div>
 
-        <h3 className="font-bold leading-snug mb-1 line-clamp-2 transition-colors group-hover:text-coral-500"
-          style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--text)', letterSpacing: '0.02em' }}>
+        <h3 className="font-bold leading-snug mb-2 line-clamp-2"
+          style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--text)' }}>
           {product.name}
         </h3>
 
         {product.desc && (
-          <div className="text-xs font-medium mb-3 line-clamp-2 leading-relaxed" style={{ color: 'var(--text-soft)' }}
+          <div className="text-xs font-medium mb-4 line-clamp-2 opacity-70 leading-relaxed"
             dangerouslySetInnerHTML={{ __html: product.desc }} />
         )}
 
-        <div className="mt-auto flex items-end justify-between pt-3" style={{ borderTop: `2px dashed ${accentColor}40` }}>
-          <div>
-            <span className="font-black" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.4rem', color: accentColor }}>
-              {product.price}
-            </span>
-            <span className="ml-1 text-xs font-bold" style={{ color: 'var(--text-soft)' }}>{store.currency}</span>
-            {product.priceOriginal && product.priceOriginal > product.price && (
-              <span className="ml-2 text-xs line-through font-medium" style={{ color: 'var(--text-soft)' }}>{product.priceOriginal}</span>
-            )}
+        {/* قسم السعر والزر في الأسفل دائماً */}
+        <div className="mt-auto space-y-3">
+          <div className="flex items-center justify-between pt-3" style={{ borderTop: `1px solid var(--border)` }}>
+             <div className="flex flex-col">
+                <span className="text-[10px] font-bold uppercase opacity-50">السعر</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="font-black" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.3rem', color: brandColor }}>
+                    {product.price}
+                  </span>
+                  <span className="text-[10px] font-bold opacity-60">{store.currency}</span>
+                </div>
+             </div>
+             
+             {product.priceOriginal && product.priceOriginal > product.price && (
+                <span className="text-xs line-through opacity-40 font-medium">{product.priceOriginal}</span>
+             )}
           </div>
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center transition-all group-hover:rotate-12"
-            style={{ backgroundColor: `${accentColor}15`, color: accentColor }}>
-            <ArrowRight className="w-4 h-4" />
-          </div>
+
+          {/* الزر الأساسي - ظاهر دوماً */}
+          <Link href={`/${store.subdomain}/product/${product.slug || product.id}`}
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-bold text-white transition-all active:scale-95"
+            style={{ 
+              backgroundColor: brandColor,
+              boxShadow: hovered ? `0 8px 20px ${brandColor}40` : 'none',
+              transform: hovered ? 'translateY(-2px)' : 'translateY(0)'
+            }}>
+            {viewDetails} 
+            <ArrowRight className={`w-4 h-4 transition-transform ${hovered ? 'translate-x-1' : ''}`} />
+          </Link>
         </div>
       </div>
     </div>
@@ -789,7 +807,7 @@ export function Home({ store }: any) {
           </div>
 
           {store.products?.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-5">
               {store.products.map((product: any) => {
                 const displayImage = product.productImage || product.imagesProduct?.[0]?.imageUrl || store.design?.logoUrl;
                 const discount = product.priceOriginal ? Math.round(((product.priceOriginal - product.price) / product.priceOriginal) * 100) : 0;
