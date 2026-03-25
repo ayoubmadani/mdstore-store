@@ -1,27 +1,31 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
-  const url = request.nextUrl;
-  const hostname = request.headers.get('host');
-  const path = url.pathname;
+export function middleware(req: NextRequest) {
+  const hostname = req.headers.get('host') || '';
+  const path = req.nextUrl.pathname;
 
-  // استثناء الملفات الثابتة والـ API من التوجيه
-  if (path.startsWith('/_next') || path.startsWith('/api') || path.includes('.')) {
+  // 1. استثناءات الملفات
+  if (path.startsWith('/_next') || path.includes('.') || path.startsWith('/api')) {
     return NextResponse.next();
   }
 
-  // إذا كنت تستخدم localhost:3000/aystore
-  // سنقوم بعمل rewrite للمسار ليكون /[domain]/path
-  if (hostname?.includes('localhost:3000')) {
-    const parts = path.split('/');
-    const domain = parts[1]; // هنا ستكون "aystore"
-    const remainingPath = parts.slice(2).join('/') || '';
+  // 2. استخراج الـ Subdomain بشكل ديناميكي
+  // سيقوم بحذف الدومين الأساسي أياً كان (localhost:3000 أو myplatform.com)
+  const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'localhost:3000';
+  const subdomain = hostname.replace(`.${rootDomain}`, '');
 
-    if (domain && domain !== 'favicon.ico') {
-      return NextResponse.rewrite(new URL(`/${domain}/${remainingPath}`, request.url));
-    }
+  // 3. التحقق والتوجيه
+  // إذا كان الـ hostname هو نفسه الـ rootDomain (يعني المستخدم على الموقع الرئيسي)
+  if (hostname === rootDomain || subdomain === 'www') {
+    return NextResponse.next();
   }
 
-  return NextResponse.next();
+  // منع التكرار (Loop protection)
+  if (path.startsWith(`/${subdomain}`)) {
+    return NextResponse.next();
+  }
+
+  // إعادة التوجيه للمجلد الديناميكي [domain]
+  return NextResponse.rewrite(new URL(`/${subdomain}${path}`, req.url));
 }
