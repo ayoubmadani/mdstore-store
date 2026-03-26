@@ -305,9 +305,9 @@ export function Navbar({ store }: { store: Store }) {
   }, []);
 
   const links = [
-    { href: `/${store.subdomain}`, label: 'المتجر' },
-    { href: `/${store.subdomain}/contact`, label: 'تواصل معنا' },
-    { href: `/${store.subdomain}/Privacy`, label: 'الخصوصية' },
+    { href: `/`, label: 'المتجر' },
+    { href: `/contact`, label: 'تواصل معنا' },
+    { href: `/Privacy`, label: 'الخصوصية' },
   ];
 
   return (
@@ -340,7 +340,7 @@ export function Navbar({ store }: { store: Store }) {
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
 
         {/* Logo */}
-        <Link href={`/${store.subdomain}`} style={{ textDecoration: 'none', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <Link href={`/`} style={{ textDecoration: 'none', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
           {store.design?.logoUrl
             ? <img src={store.design.logoUrl} alt={store.name} style={{ height: '36px', width: 'auto' }} />
             : (
@@ -804,7 +804,7 @@ export function Home({ store }: any) {
                 </h2>
               </div>
 
-              <Link href={`/${store.subdomain}`}
+              <Link href={`/`}
                 className="group"
                 style={{
                   fontSize: '14px',
@@ -830,7 +830,7 @@ export function Home({ store }: any) {
               gap: '20px'
             }}>
               {cats.slice(0, 8).map((cat: any, i: number) => (
-                <Link key={cat.id} href={`/${store.subdomain}?category=${cat.id}`}
+                <Link key={cat.id} href={`?category=${cat.id}`}
                   className="group"
                   style={{
                     position: 'relative',
@@ -978,7 +978,7 @@ export function Home({ store }: any) {
             <a href="#products" className="btn-cyan" style={{ fontSize: '14px', padding: '13px 30px' }}>
               <Gamepad2 style={{ width: '15px', height: '15px' }} /> تسوق الآن
             </a>
-            <Link href={`/${store.subdomain}/contact`} className="btn-pink" style={{ fontSize: '14px', padding: '13px 30px', textDecoration: 'none' }}>
+            <Link href={`/contact`} className="btn-pink" style={{ fontSize: '14px', padding: '13px 30px', textDecoration: 'none' }}>
               <Phone style={{ width: '15px', height: '15px' }} /> تواصل معنا
             </Link>
           </div>
