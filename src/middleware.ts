@@ -35,6 +35,9 @@ export function middleware(req: NextRequest) {
     currentHost = hostname; 
   }
 
+  console.log(currentHost);
+  
+
   // 3. حماية من الحلقات التكرارية (Loop Protection)
   // نتحقق من المسار الفعلي (pathname) والمسار الموجه (destination)
   if (path.startsWith(`/${currentHost}/`) || path === `/${currentHost}`) {
