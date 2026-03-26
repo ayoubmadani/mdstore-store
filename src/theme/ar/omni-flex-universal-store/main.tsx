@@ -668,7 +668,7 @@ export function Home({ store }: any) {
                             {cats.slice(0, 8).map((cat: any) => (
                                 <Link
                                     key={cat.id}
-                                    href={`/?category=${cat.id}`}
+                                    href={`?category=${cat.id}`}
                                     className="cat-card"
                                     style={{
                                         display: 'block',
