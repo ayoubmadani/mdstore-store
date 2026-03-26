@@ -5,27 +5,33 @@ export function middleware(req: NextRequest) {
   const hostname = req.headers.get('host') || '';
   const path = req.nextUrl.pathname;
 
-  // 1. استثناءات الملفات
+  // 1. استثناء الملفات والـ API
   if (path.startsWith('/_next') || path.includes('.') || path.startsWith('/api')) {
     return NextResponse.next();
   }
 
-  // 2. استخراج الـ Subdomain بشكل ديناميكي
-  // سيقوم بحذف الدومين الأساسي أياً كان (localhost:3000 أو myplatform.com)
-  const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'localhost:3000';
-  const subdomain = hostname.replace(`.${rootDomain}`, '');
+  const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'mdstore.top';
 
-  // 3. التحقق والتوجيه
-  // إذا كان الـ hostname هو نفسه الـ rootDomain (يعني المستخدم على الموقع الرئيسي)
-  if (hostname === rootDomain || subdomain === 'www') {
+  // 2. تحديد الهوية (Subdomain أو Custom Domain)
+  let currentHost: string;
+  if (hostname.endsWith(`.${rootDomain}`)) {
+    currentHost = hostname.replace(`.${rootDomain}`, '');
+  } else if (hostname === rootDomain || hostname === `www.${rootDomain}`) {
+    return NextResponse.next();
+  } else {
+    // هنا يتم التعامل مع الدومينات المخصصة مثل (client-shop.com)
+    currentHost = hostname;
+  }
+
+  // 3. منع التكرار (Loop Protection)
+  if (path.startsWith(`/${currentHost}`)) {
     return NextResponse.next();
   }
 
-  // منع التكرار (Loop protection)
-  if (path.startsWith(`/${subdomain}`)) {
-    return NextResponse.next();
-  }
+  // 4. البناء الديناميكي للرابط مع الحفاظ على البروتوكول (HTTP أو HTTPS)
+  // نحن نستخدم req.nextUrl لضمان أن البروتوكول يبقى كما هو
+  const url = req.nextUrl.clone();
+  url.pathname = `/${currentHost}${path}`;
 
-  // إعادة التوجيه للمجلد الديناميكي [domain]
-  return NextResponse.rewrite(new URL(`/${subdomain}${path}`, req.url));
+  return NextResponse.rewrite(url);
 }
