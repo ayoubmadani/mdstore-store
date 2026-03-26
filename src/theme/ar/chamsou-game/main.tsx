@@ -951,8 +951,8 @@ export function Home({ store }: any) {
           ) : (
             <div className="prod-grid">
               {products.map((p: any) => {
-                const img = p.productImage || p.imagesProduct?.[0]?.imageUrl || store.design?.logoUrl;
-                const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
+                // أضف علامة الاستفهام بعد store وبعد design
+                const img = p.productImage || p.imagesProduct?.[0]?.imageUrl || store?.design?.logoUrl || '/fallback-image.png'; const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
                 return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="عرض المنتج" />;
               })}
             </div>
