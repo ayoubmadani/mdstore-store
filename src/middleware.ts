@@ -35,15 +35,17 @@ export function middleware(req: NextRequest) {
     currentHost = hostname; 
   }
 
-  /// 3. حماية من الحلقات التكرارية (Loop Protection)
-  // نتحقق مما إذا كان المسار يبدأ بالفعل بـ currentHost لمنع التكرار
-  if (path.startsWith(`/${currentHost}`) || path === `/${currentHost}`) {
+  // 3. حماية من الحلقات التكرارية (Loop Protection)
+  // نتحقق من المسار الفعلي (pathname) والمسار الموجه (destination)
+  if (path.startsWith(`/${currentHost}/`) || path === `/${currentHost}`) {
     return NextResponse.next();
   }
 
-  // 4. الـ Rewrite النهائي مع التأكد من بناء المسار بشكل صحيح
-  const finalPath = path === '/' ? `/${currentHost}` : `/${currentHost}${path}`;
-  
-  // استخدام URL جديد تماماً يضمن عدم تداخل البروتوكولات
-  return NextResponse.rewrite(new URL(finalPath, req.url));
+  // 4. الـ Rewrite النهائي
+  // نقوم ببناء المسار الداخلي مع ضمان عدم وجود "Double Slashes"
+  const cleanPath = path === '/' ? '' : path;
+  const targetPath = `/${currentHost}${cleanPath}`;
+
+  // Rewrite داخلي دون تغيير الرابط في المتصفح
+  return NextResponse.rewrite(new URL(targetPath, req.url));
 }
