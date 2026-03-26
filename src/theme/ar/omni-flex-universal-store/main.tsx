@@ -215,8 +215,8 @@ export function Navbar({ store }: { store: Store }) {
 
     const links = [
         { href: `/${store.subdomain}`, label: 'الرئيسية' },
-        { href: `/${store.subdomain}/contact`, label: 'تواصل' },
-        { href: `/${store.subdomain}/Privacy`, label: 'الخصوصية' },
+        { href: `/contact`, label: 'تواصل' },
+        { href: `/Privacy`, label: 'الخصوصية' },
     ];
 
     return (
@@ -375,9 +375,9 @@ export function Footer({ store }: any) {
                         <p className="bc" style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '0.1em', color: 'var(--blue)', marginBottom: '24px', textTransform: 'uppercase' }}>روابط سريعة</p>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
                             {[
-                                { href: `/${store.subdomain}/Privacy`, label: 'سياسة الخصوصية' },
-                                { href: `/${store.subdomain}/Terms`, label: 'شروط الخدمة' },
-                                { href: `/${store.subdomain}/contact`, label: 'اتصل بنا' },
+                                { href: `/Privacy`, label: 'سياسة الخصوصية' },
+                                { href: `/Terms`, label: 'شروط الخدمة' },
+                                { href: `/contact`, label: 'اتصل بنا' },
                                 { href: `#categories`, label: 'تصفح الفئات' },
                             ].map(l => (
                                 <a key={l.href} href={l.href} style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', textDecoration: 'none', transition: 'all 0.2s' }}
