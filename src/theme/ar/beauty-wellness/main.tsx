@@ -450,7 +450,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         </div>
 
         {/* زر التفاصيل الموحد والبارز دوماً */}
-        <Link href={`/${store.subdomain}/product/${product.slug || product.id}`}
+        <Link href={`/product/${product.slug || product.id}`}
           className="btn-plum" 
           style={{ 
             textDecoration: 'none', 

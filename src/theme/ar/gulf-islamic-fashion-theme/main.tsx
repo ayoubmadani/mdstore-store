@@ -516,7 +516,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
           </div>
 
           {/* الزر الموحد والظاهر دوماً */}
-          <Link href={`/${store.subdomain}/product/${product.slug || product.id}`}
+          <Link href={`/product/${product.slug || product.id}`}
             className="amiri"
             style={{ 
               textDecoration: 'none', 

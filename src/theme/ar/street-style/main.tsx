@@ -312,7 +312,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price as number;
   return (
     <div className="zc" onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}>
-      <Link href={`/${store.subdomain}/product/${product.slug || product.id}`} style={{ display:'block', width:'100%', height:'100%', textDecoration:'none' }}>
+      <Link href={`/product/${product.slug || product.id}`} style={{ display:'block', width:'100%', height:'100%', textDecoration:'none' }}>
         <div style={{ position:'relative', width:'100%', height:'100%', minHeight:'inherit', backgroundColor:'var(--paper-dk)' }}>
           {displayImage
             ? <img src={displayImage} alt={product.name} style={{ width:'100%', height:'100%', minHeight:'inherit', objectFit:'cover', display:'block', transition:'transform 0.6s cubic-bezier(0.22,1,0.36,1)', transform:hov?'scale(1.05)':'scale(1)' }}/>

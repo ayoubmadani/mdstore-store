@@ -436,7 +436,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
         </button>
         <div className="absolute bottom-0 left-0 right-0 p-3 transition-all duration-400"
           style={{ transform:hovered?'translateY(0)':'translateY(100%)', opacity:hovered?1:0 }}>
-          <Link href={`/${store.subdomain}/product/${product.slug||product.id}`}
+          <Link href={`/product/${product.slug||product.id}`}
             className="btn-paw flex items-center justify-center gap-2 w-full py-3 rounded-xl text-xs font-bold tracking-wider text-white"
             style={{ background:`linear-gradient(135deg, ${accent}, var(--honey-dk))`, boxShadow:`0 4px 16px ${accent}50` }}>
             <PawPrint size={12} color="rgba(255,255,255,0.8)"/> {viewDetails}

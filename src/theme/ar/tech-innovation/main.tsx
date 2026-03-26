@@ -346,7 +346,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
             )}
           </div>
           <Link
-            href={`/${store.subdomain}/product/${product.slug || product.id}`}
+            href={`/product/${product.slug || product.id}`}
             className="flex items-center justify-center gap-2 w-full py-3 text-[10px] tracking-widest uppercase font-bold transition-all duration-300"
             style={{ border: '1px solid rgba(0,229,255,0.3)', color: '#00E5FF', backgroundColor: 'transparent' }}
             onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.backgroundColor = '#00E5FF'; el.style.color = '#020810'; }}

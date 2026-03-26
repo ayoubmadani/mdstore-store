@@ -629,7 +629,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
           </div>
 
           {/* التعديل هنا: زر واضح دوماً */}
-          <Link href={`/${store.subdomain}/product/${product.slug || product.id}`}
+          <Link href={`/product/${product.slug || product.id}`}
             className="gaming-btn"
             style={{
               textDecoration: 'none',

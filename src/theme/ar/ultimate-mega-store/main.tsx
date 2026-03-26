@@ -455,7 +455,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
         </button>
         {/* Quick view */}
         <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'8px', opacity:hov?1:0, transform:hov?'translateY(0)':'translateY(6px)', transition:'all 0.25s' }}>
-          <Link href={`/${store.subdomain}/product/${product.slug||product.id}`}
+          <Link href={`/product/${product.slug||product.id}`}
             className="btn btn-blue" style={{ width:'100%', justifyContent:'center', fontSize:'12px', padding:'9px', borderRadius:'6px', textDecoration:'none' }}>
             {viewDetails} <ArrowRight style={{ width:'12px', height:'12px' }}/>
           </Link>

@@ -591,7 +591,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
           </div>
 
           {/* الزر الأساسي - ظاهر دوماً */}
-          <Link href={`/${store.subdomain}/product/${product.slug || product.id}`}
+          <Link href={`/product/${product.slug || product.id}`}
             className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-bold text-white transition-all active:scale-95"
             style={{ 
               backgroundColor: brandColor,

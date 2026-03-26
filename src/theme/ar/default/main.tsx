@@ -312,7 +312,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
           </div>
 
           <Link
-            href={`/${store.subdomain}/product/${product.slug || product.id}`}
+            href={`/product/${product.slug || product.id}`}
             className="block w-full py-3 text-center text-xs tracking-[0.18em] uppercase font-medium border border-[#1C1C1C] text-[#1C1C1C] hover:bg-[#1C1C1C] hover:text-[#FAFAF8] transition-all duration-300"
           >
             {viewDetails}

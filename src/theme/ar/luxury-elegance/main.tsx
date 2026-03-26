@@ -365,7 +365,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(10,10,8,0.95) 0%, rgba(10,10,8,0.3) 50%, transparent 75%)', pointerEvents:'none' }}/>
 
         <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', opacity:hov?1:0, transition:'opacity 0.4s', background:'rgba(10,10,8,0.55)', backdropFilter:hov?'blur(2px)':'none' }}>
-          <Link href={`/${store.subdomain}/product/${product.slug||product.id}`}
+          <Link href={`/product/${product.slug||product.id}`}
             className="btn-ghost-gold" style={{ padding:'11px 26px', fontSize:'10px', textDecoration:'none' }}>
             {viewDetails} <ArrowRight style={{ width:'12px', height:'12px' }}/>
           </Link>

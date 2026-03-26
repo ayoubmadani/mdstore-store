@@ -431,7 +431,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
           </div>
 
           {/* Fixed Button - Always Visible */}
-          <Link href={`/${store.subdomain}/product/${product.slug || product.id}`}
+          <Link href={`/product/${product.slug || product.id}`}
             className="flex items-center justify-center gap-2 w-full py-4 text-sm font-black tracking-[0.2em] uppercase text-white transition-all hover:brightness-110 active:scale-[0.98]"
             style={{ 
               background: brandColor,

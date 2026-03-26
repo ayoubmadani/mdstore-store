@@ -367,7 +367,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
             {orig>price && <span style={{ fontSize:'11px', color:'var(--dim)', textDecoration:'line-through' }}>{orig.toLocaleString()}</span>}
           </div>
         </div>
-        <Link href={`/${store.subdomain}/product/${product.slug||product.id}`}
+        <Link href={`/product/${product.slug||product.id}`}
           className="btn-rust" style={{ textDecoration:'none', width:'100%', fontSize:'13px', padding:'9px 16px', borderRadius:'8px' }}>
           {viewDetails}
         </Link>
