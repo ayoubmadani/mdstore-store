@@ -84,9 +84,9 @@ function variantMatches(
 /* ─── API functions ─────────────────────────────────── */
 async function getProductData(domain: string, productId: string): Promise<Product | null> {
   try {
-    const response = await axios.get(`${API_URL}/products/public/${domain}/${productId}`, {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const response = await axios.get(
+      `${API_URL}/products/public/${encodeURIComponent(domain)}/${productId}`
+    );
     console.log(response.data);
 
     return response.data;
@@ -262,8 +262,9 @@ export default function ProductPage({ params }: { params: Promise<{ domain: stri
     });
   }, []);
 
-  useEffect(()=> {console.log(selectedVariants);
-  },[selectedVariants])
+  useEffect(() => {
+    console.log(selectedVariants);
+  }, [selectedVariants])
 
   const getFinalPrice = useCallback(() => {
     if (!product) return 0;
@@ -497,25 +498,25 @@ export default function ProductPage({ params }: { params: Promise<{ domain: stri
 
   return (
     <>
-    <AddShow productId={product.id} />
-    <Details
-      product={product}
-      toggleWishlist={toggleWishlist}
-      isWishlisted={isWishlisted}
-      handleShare={handleShare}
-      discount={discount}
-      allImages={allImages}
-      domain={resolvedParams?.domain}
-      allAttrs={allAttrs}
-      finalPrice={finalPrice}
-      inStock={inStock}
-      autoGen={autoGen}
-      selectedVariants={selectedVariants}
-      setSelectedOffer={(id: any) => setSelectedOffer(id)}
-      selectedOffer={selectedOffer}
-      resolvedParams={resolvedParams}
-      handleVariantSelection={(name: any, value: any) => handleVariantSelection(name, value)}
-    />
+      <AddShow productId={product.id} />
+      <Details
+        product={product}
+        toggleWishlist={toggleWishlist}
+        isWishlisted={isWishlisted}
+        handleShare={handleShare}
+        discount={discount}
+        allImages={allImages}
+        domain={resolvedParams?.domain}
+        allAttrs={allAttrs}
+        finalPrice={finalPrice}
+        inStock={inStock}
+        autoGen={autoGen}
+        selectedVariants={selectedVariants}
+        setSelectedOffer={(id: any) => setSelectedOffer(id)}
+        selectedOffer={selectedOffer}
+        resolvedParams={resolvedParams}
+        handleVariantSelection={(name: any, value: any) => handleVariantSelection(name, value)}
+      />
     </>
   );
 }
