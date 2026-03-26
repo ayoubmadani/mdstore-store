@@ -214,7 +214,7 @@ export function Navbar({ store }: { store: Store }) {
     if (!store) return null;
 
     const links = [
-        { href: `/${store.subdomain}`, label: 'الرئيسية' },
+        { href: `/`, label: 'الرئيسية' },
         { href: `/contact`, label: 'تواصل' },
         { href: `/Privacy`, label: 'الخصوصية' },
     ];
@@ -247,7 +247,7 @@ export function Navbar({ store }: { store: Store }) {
             <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px', height: '62px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
 
                 {/* Logo */}
-                <Link href={`/${store.subdomain}`} style={{ textDecoration: 'none', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <Link href={`/`} style={{ textDecoration: 'none', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
                     {store.design?.logoUrl
                         ? <img src={store.design.logoUrl} alt={store.name} style={{ height: '36px', width: 'auto' }} />
                         : (
@@ -355,7 +355,7 @@ export function Footer({ store }: any) {
 
                     {/* ① Division: Brand Identity */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                        <Link href={`/${store.subdomain}`} style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '12px' }}>
+                        <Link href={`/`} style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '12px' }}>
                             {store.design?.logoUrl
                                 ? <img src={store.design.logoUrl} alt={store.name} style={{ height: '32px', width: 'auto', filter: 'brightness(0) invert(1)' }} />
                                 : <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'var(--blue)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -668,7 +668,7 @@ export function Home({ store }: any) {
                             {cats.slice(0, 8).map((cat: any) => (
                                 <Link
                                     key={cat.id}
-                                    href={`/${store.subdomain}?category=${cat.id}`}
+                                    href={`/?category=${cat.id}`}
                                     className="cat-card"
                                     style={{
                                         display: 'block',
