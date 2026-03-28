@@ -5,50 +5,46 @@ export function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const path = url.pathname;
 
-  // 1. استثناء الملفات والـ API والصور (مهم جداً للأداء)
+  // 1. استثناء الملفات التقنية، الـ API، والملفات ذات الامتدادات (صور، favicon، إلخ)
   if (
     path.startsWith('/_next') || 
     path.startsWith('/api') || 
-    path.startsWith('/static') ||
-    path.includes('.') // استثناء ملفات مثل favicon.ico أو صور المنتجات
+    path.includes('.')
   ) {
     return NextResponse.next();
   }
 
-  // جلب الـ Hostname الحقيقي (مع دعم Cloudflare Headers)
-  // Cloudflare يرسل الـ Hostname الأصلي في x-forwarded-host أحياناً
-  const hostname = req.headers.get('x-forwarded-host') || req.headers.get('host') || '';
-  const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'mdstore.top';
+  // 2. جلب الـ Hostname وتنظيفه بالكامل
+  let hostname = req.headers.get('host')?.toLowerCase() || '';
+  const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'mdstore.top').toLowerCase();
 
-  let currentHost: string;
+  // تنظيف الـ hostname من الـ www لتوحيد المعالجة
+  // هذا يضمن أن www.shamsougame.site تعامل مثل shamsougame.site
+  const searchHostname = hostname.replace('www.', '');
 
-  // 2. منطق تحديد "صاحب المتجر"
-  if (hostname.endsWith(`.${rootDomain}`)) {
-    // حالة: store1.mdstore.top
-    currentHost = hostname.replace(`.${rootDomain}`, '');
-  } else if (hostname === rootDomain || hostname === `www.${rootDomain}`) {
-    // حالة: الموقع الرئيسي mdstore.top
-    return NextResponse.next();
-  } else {
-    // حالة: الدومين المخصص shamsougame.site
-    // هنا نفترض أنك قمت بربط الدومين في قاعدة البيانات مع اسم مستخدم أو ID معين
-    currentHost = hostname; 
-  }
-
-  console.log(currentHost);
+  // 3. تحديد المسار الداخلي (Target)
   
-
-  // 3. حماية من الحلقات التكرارية (Loop Protection)
-  // نتحقق من المسار الفعلي (pathname) والمسار الموجه (destination)
-  if (path.startsWith(`/${currentHost}/`) || path === `/${currentHost}`) {
+  // الحالة أ: الموقع الرئيسي (mdstore.top أو www.mdstore.top)
+  if (searchHostname === rootDomain) {
     return NextResponse.next();
   }
 
-  // 4. الـ Rewrite النهائي
-  // نقوم ببناء المسار الداخلي مع ضمان عدم وجود "Double Slashes"
-  const cleanPath = path === '/' ? '' : path;
-  const targetPath = `/${currentHost}${cleanPath}`;
+  let storeIdentifier: string;
 
-  // Rewrite داخلي دون تغيير الرابط في المتصفح
-  return NextResponse.rewrite(new URL(targetPath, req.url));
+  // الحالة ب: الدومين الفرعي (user.mdstore.top)
+  if (searchHostname.endsWith(`.${rootDomain}`)) {
+    storeIdentifier = searchHostname.replace(`.${rootDomain}`, '');
+  } else {
+    // الحالة ج: الدومين المخصص (custom-domain.com)
+    storeIdentifier = searchHostname;
+  }
+
+  // 4. حماية من الحلقات التكرارية (Loop Protection)
+  if (path.startsWith(`/${storeIdentifier}`)) {
+    return NextResponse.next();
+  }
+
+  // 5. التوجيه الداخلي (Rewrite)
+  // سيتم توجيه الطلب إلى المجلد [domain] داخل app directory
+  return NextResponse.rewrite(new URL(`/${storeIdentifier}${path}`, req.url));
 }
