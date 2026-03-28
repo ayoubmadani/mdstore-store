@@ -33,7 +33,7 @@ export function middleware(req: NextRequest) {
 
   // الحالة ب: الدومين الفرعي (user.mdstore.top)
   if (searchHostname.endsWith(`.${rootDomain}`)) {
-    storeIdentifier = searchHostname.replace(`.${rootDomain}`, '');
+    storeIdentifier = searchHostname;
   } else {
     // الحالة ج: الدومين المخصص (custom-domain.com)
     storeIdentifier = searchHostname;
