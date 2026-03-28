@@ -26,7 +26,11 @@ export function middleware(req: NextRequest) {
   
   // الحالة أ: الموقع الرئيسي (mdstore.top أو www.mdstore.top)
   if (searchHostname === rootDomain) {
-    return NextResponse.next();
+    // جلب الرابط من متغيرات البيئة أو استخدامه مباشرة
+    const appUrl = process.env.MDSTORE_APP_URL!;
+    
+    // إعادة توجيه المستخدم إلى الموقع الرئيسي (Landing Page / App)
+    return NextResponse.redirect(new URL(appUrl, req.url));
   }
 
   let storeIdentifier: string;
