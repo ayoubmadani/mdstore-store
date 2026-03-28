@@ -62,10 +62,10 @@ export default async function StoreLayout({ children, params }: LayoutProps) {
       <div dir={direction}>
         {/* ✅ تمرير الـ pixels المستلمة من الـ API */}
         <CustomerTracker pixels={store.pixels} />
-        <div>{domain}</div>
-        {/* <Main store={store}>
+
+        <Main store={store}>
           {children}
-        </Main> */}
+        </Main>
       </div>
     </StoreProvider>
   );
