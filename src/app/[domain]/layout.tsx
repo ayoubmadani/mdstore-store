@@ -1,4 +1,5 @@
 import React from 'react';
+import { cache } from 'react'; // ✅ deduplication — نفس الـ request لن تستدعي الـ API مرتين
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getStoreByDomain } from '@/lib/api';
@@ -7,7 +8,12 @@ import dynamic from 'next/dynamic';
 import CustomerTracker from '@/components/CustomerTracker';
 import Landing from '@/components/landing';
 import AddShow from '@/components/addShow';
-import { Domine } from 'next/font/google';
+
+// ✅ cache() يضمن أن getStoreByDomain تُنفَّذ مرة واحدة فقط لنفس الـ domain
+// حتى لو استدعاها generateMetadata و StoreLayout في نفس الـ request
+const getStoreCached = cache(async (domain: string) => {
+  return getStoreByDomain(domain);
+});
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -15,15 +21,10 @@ interface LayoutProps {
 }
 
 export async function generateMetadata({ params }: LayoutProps): Promise<Metadata> {
-
   const { domain } = await params;
-  console.log(domain);
+  const store = await getStoreCached(domain); // ✅ من الـ cache إذا سبق جلبه
 
-  const store = await getStoreByDomain(domain);
-
-  if (!store) {
-    return { title: 'Store Not Found' };
-  }
+  if (!store) return { title: 'Store Not Found' };
 
   return {
     title: { default: store.name, template: `%s | ${store.name}` },
@@ -34,35 +35,32 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
 
 export default async function StoreLayout({ children, params }: LayoutProps) {
   const { domain } = await params;
-  const store: any = await getStoreByDomain(domain);
-  if (!store) {
-    notFound();
-  }
+  const store: any = await getStoreCached(domain); // ✅ لا query جديدة — من الـ cache
 
-  // ✅ 1. استخراج الـ slug بأمان تام باستخدام Optional Chaining
-  // إذا كان themeUser أو theme غير موجود، سيستخدم 'default'
+  if (!store) notFound();
+
   const currentThemeSlug = store?.themeUser?.theme?.slug || 'default';
   const language = store?.language || 'ar';
 
-  // ✅ 2. تحميل الثيم بناءً على المتغير الآمن
+  // ✅ dynamic خارج الـ conditional لتجنب re-creation في كل render
   const Main = dynamic<any>(
-    () => import(`@/theme/${language}/${currentThemeSlug}/main`),
+    () =>
+      import(`@/theme/${language}/${currentThemeSlug}/main`).catch(() =>
+        import(`@/theme/${language}/default/main`)
+      ),
     {
       loading: () => <Landing />,
-      ssr: true
+      ssr: true,
     }
   );
 
-  const isRTL = store.language === 'ar';
-  const direction = isRTL ? 'rtl' : 'ltr';
+  const direction = store.language === 'ar' ? 'rtl' : 'ltr';
 
   return (
     <StoreProvider store={store} theme={currentThemeSlug}>
       <AddShow storeId={store.id} />
       <div dir={direction}>
-        {/* ✅ تمرير الـ pixels المستلمة من الـ API */}
         <CustomerTracker pixels={store.pixels} />
-
         <Main store={store}>
           {children}
         </Main>

@@ -64,7 +64,7 @@ async function getLandingPage(domain: string): Promise<LandingPage | null> {
 export default function LandingPageView({
   params,
 }: {
-  params: Promise<{ domain: string }>;
+  params: Promise<{ lpdomain: string }>;
 }) {
   const [lp, setLp] = useState<LandingPage | null>(null);
   const [loading, setLoading] = useState(true);
@@ -79,9 +79,9 @@ export default function LandingPageView({
   useEffect(() => {
     const load = async () => {
       try {
-        const { domain } = await params;
-        setLpDomain(domain);
-        const data = await getLandingPage(domain);
+        const { lpdomain } = await params;
+        setLpDomain(lpdomain);
+        const data = await getLandingPage(lpdomain);
         if (data) {
           setLp(data);
           if (data.product.offers?.length) setSelectedOffer(data.product.offers[0].id);
