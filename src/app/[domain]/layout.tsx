@@ -22,18 +22,27 @@ interface LayoutProps {
 
 export async function generateMetadata({ params }: LayoutProps): Promise<Metadata> {
   const { domain } = await params;
-  const store = await getStoreCached(domain); // ✅ من الـ cache إذا سبق جلبه
+  const store = await getStoreCached(domain);
 
   if (!store) return { title: 'Store Not Found' };
 
+  // تأكد من جلب الرابط الصحيح
+  const favicon = store.design?.faviconUrl || store.design?.logoUrl;
+
   return {
-    title: { default: store.name, template: `%s | ${store.name}` },
+    title: {
+      default: store.name,
+      template: `%s | ${store.name}`
+    },
     description: store.hero?.subtitle || `Welcome to ${store.name}`,
-    icons: store.design?.faviconUrl
-      ? { icon: store.design.faviconUrl }
-      : store.design?.logoUrl
-        ? { icon: store.design.logoUrl }
-        : undefined,
+    // التعديل هنا:
+    icons: favicon ? {
+      icon: [
+        { url: favicon, href: favicon }, // للأيقونة العادية
+      ],
+      shortcut: favicon, // لدعم المتصفحات القديمة
+      apple: favicon,    // لأجهزة Apple
+    } : undefined,
   };
 }
 
