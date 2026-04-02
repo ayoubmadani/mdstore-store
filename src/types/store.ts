@@ -9,6 +9,7 @@ export interface Store {
     primaryColor: string;
     secondaryColor: string;
     logoUrl?: string | null;
+    faviconUrl?: string | null;
   };
   topBar: {
     enabled: boolean;

@@ -29,7 +29,11 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
   return {
     title: { default: store.name, template: `%s | ${store.name}` },
     description: store.hero?.subtitle || `Welcome to ${store.name}`,
-    icons: store.design?.logoUrl ? { icon: store.design.logoUrl } : undefined,
+    icons: store.design?.faviconUrl
+      ? { icon: store.design.faviconUrl }
+      : store.design?.logoUrl
+        ? { icon: store.design.logoUrl }
+        : undefined,
   };
 }
 
