@@ -115,9 +115,9 @@ export function Navbar({ store }: { store: Store }) {
   }, []);
 
   const navItems = [
-    { href: `/${store.subdomain}`,         label: isRTL ? 'الرئيسية'       : 'Home'    },
-    { href: `/${store.subdomain}/contact`, label: isRTL ? 'اتصل بنا'       : 'Contact' },
-    { href: `/${store.subdomain}/Privacy`, label: isRTL ? 'سياسة الخصوصية' : 'Privacy' },
+    { href: `/`,         label: isRTL ? 'الرئيسية'       : 'Home'    },
+    { href: `/contact`,  label: isRTL ? 'اتصل بنا'       : 'Contact' },
+    { href: `/Privacy`,  label: isRTL ? 'سياسة الخصوصية' : 'Privacy' },
   ];
 
   return (
@@ -130,7 +130,7 @@ export function Navbar({ store }: { store: Store }) {
         <div className="flex justify-between items-center h-16">
 
           {/* Logo */}
-          <Link href={`/${store.subdomain}`} className="flex items-center gap-3 group">
+          <Link href="/" className="flex items-center gap-3 group">
             {store.design.logoUrl ? (
               <img src={store.design.logoUrl} alt={store.name} className="h-8 w-auto object-contain opacity-90" />
             ) : (
@@ -214,11 +214,10 @@ export function Footer({ store }: any) {
           </div>
 
           <div className="flex items-center gap-8">
-            {/* FIX — 'Cookise' corrigé en 'Cookies' */}
             {[
-              { href: `/${store.subdomain}/Privacy`, label: 'Privacy' },
-              { href: `/${store.subdomain}/Terms`,   label: 'Terms'   },
-              { href: `/${store.subdomain}/Cookies`, label: 'Cookies' },
+              { href: `/Privacy`, label: 'Privacy' },
+              { href: `/Terms`,   label: 'Terms'   },
+              { href: `/Cookies`, label: 'Cookies' },
             ].map(link => (
               <a
                 key={link.href}
@@ -411,7 +410,7 @@ export const Home = ({ store }: any) => {
           {store.categories && store.categories.length > 0 ? (
             <div className="flex flex-wrap gap-3 justify-center">
               <Link
-                href={`/${store.subdomain}`}
+                href="/"
                 className="px-7 py-2.5 border border-[#1C1C1C] text-[#1C1C1C] text-xs tracking-[0.15em] uppercase hover:bg-[#1C1C1C] hover:text-[#FAFAF8] transition-all duration-300 font-medium"
               >
                 {t.all}
@@ -419,7 +418,7 @@ export const Home = ({ store }: any) => {
               {store.categories.map((cat: any) => (
                 <Link
                   key={cat.id}
-                  href={`/${store.subdomain}?category=${cat.id}`}
+                  href={`/?category=${cat.id}`}
                   className="px-7 py-2.5 border border-[#E4E0DB] text-[#5A5753] text-xs tracking-[0.15em] uppercase hover:border-[#1C1C1C] hover:text-[#1C1C1C] transition-all duration-300 font-medium"
                 >
                   {cat.name}
@@ -507,9 +506,7 @@ export function Details({
       <header className="border-b border-[#E4E0DB] bg-[#FAFAF8]/95 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between">
           <nav className="flex items-center gap-2 text-xs text-[#B0ABA5] tracking-[0.1em]">
-            <span className="hover:text-[#1C1C1C] cursor-pointer transition-colors uppercase">الرئيسية</span>
-            <ChevronLeft className="w-3 h-3" />
-            <span className="hover:text-[#1C1C1C] cursor-pointer transition-colors uppercase">المنتجات</span>
+            <Link href="/" className="hover:text-[#1C1C1C] cursor-pointer transition-colors uppercase">الرئيسية</Link>
             <ChevronLeft className="w-3 h-3" />
             <span className="text-[#1C1C1C] truncate max-w-[160px]">{product.name}</span>
           </nav>
@@ -752,11 +749,7 @@ export function Details({
         {product.desc && (
           <section className="mt-20 pt-14 border-t border-[#E4E0DB]">
             <div className="flex items-center gap-5 mb-8">
-              <h2
-                className="text-xs tracking-[0.2em] uppercase text-[#8A8580]"
-              >
-                وصف المنتج
-              </h2>
+              <h2 className="text-xs tracking-[0.2em] uppercase text-[#8A8580]">وصف المنتج</h2>
             </div>
             <div
               className="text-sm leading-relaxed text-[#5A5753] font-light"
@@ -815,7 +808,6 @@ export function ProductForm({
 
   useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
 
-  // FIX — SSR guard pour localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const id = localStorage.getItem('customerId');
@@ -852,7 +844,7 @@ export function ProductForm({
 
   useEffect(() => {
     if (selectedWilayaData) setFormData(f => ({ ...f, priceLoss: selectedWilayaData.livraisonReturn }));
-  }, [selectedWilayaData, formData.typeLivraison]);
+  }, [selectedWilayaData]);
 
   const getTotalPrice = useCallback(
     () => getFinalPrice() * formData.quantity + +getPriceLivraison(),
@@ -861,7 +853,6 @@ export function ProductForm({
 
   const getVariantDetailId = useCallback(() => {
     if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
-
     return product.variantDetails.find(v => variantMatches(v, selectedVariants))?.id;
   }, [product.variantDetails, selectedVariants]);
 
@@ -883,26 +874,24 @@ export function ProductForm({
     if (!validate()) return;
     setSubmitting(true);
     const payload = {
-        productId:         product.id,
-        variantDetailId:   getVariantDetailId(),
-        domain,
-        storeId: product.store.id,
-        offerId:           selectedOffer ?? undefined,
-        platform,
-        quantity:          formData.quantity,
-        totalPrice:        getTotalPrice(),
-        typeShip:          formData.typeLivraison,
-        priceShip:         getPriceLivraison(),
-        priceLoss:         formData.priceLoss,
-        customerId:        formData.customerId,
-        customerName:      formData.customerName,
-        customerPhone:     formData.customerPhone,
-        customerWilayaId:  formData.customerWelaya,
-        customerCommuneId: formData.customerCommune,
-      }
+      productId:         product.id,
+      variantDetailId:   getVariantDetailId(),
+      domain,
+      storeId:           product.store.id,
+      offerId:           selectedOffer ?? undefined,
+      platform,
+      quantity:          formData.quantity,
+      totalPrice:        getTotalPrice(),
+      typeShip:          formData.typeLivraison,
+      priceShip:         getPriceLivraison(),
+      priceLoss:         formData.priceLoss,
+      customerId:        formData.customerId,
+      customerName:      formData.customerName,
+      customerPhone:     formData.customerPhone,
+      customerWilayaId:  formData.customerWelaya,
+      customerCommuneId: formData.customerCommune,
+    };
 
-      console.log({payload});
-      
     try {
       const res = await axios.post(`${API_URL}/orders`, payload);
       if (res.status === 200 || res.status === 201) {
@@ -984,7 +973,7 @@ export function ProductForm({
           </FieldWrapper>
         </div>
 
-        {/* Delivery type — FIX: HomeIcon au lieu de Home */}
+        {/* Delivery type */}
         <div>
           <p className="text-[10px] tracking-[0.2em] uppercase text-[#8A8580] mb-3">نوع التوصيل</p>
           <div className="grid grid-cols-2 gap-3">
@@ -1113,7 +1102,6 @@ export function StaticPage({ page }: StaticPageProps) {
     <>
       {p === 'privacy' && <Privacy />}
       {p === 'terms'   && <Terms />}
-      {/* FIX — 'cookise' corrigé en 'cookies' */}
       {p === 'cookies' && <Cookies />}
       {p === 'contact' && <Contact />}
     </>
@@ -1299,9 +1287,9 @@ export function Contact() {
           <p className="text-xs tracking-[0.2em] uppercase text-[#8A8580] mb-8">{isRTL ? 'تواصل معنا' : 'Follow Us'}</p>
           <div className="flex gap-4 flex-wrap">
             {[
-              { name: 'Facebook', href: store.contact.facebook,              icon: <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> },
+              { name: 'Facebook', href: store.contact.facebook,                   icon: <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> },
               { name: 'WhatsApp', href: `https://wa.me/${store.contact.whatsapp}`, icon: <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.94 3.675 1.438 5.662 1.439h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> },
-              { name: 'TikTok',   href: store.contact.tiktok,               icon: <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.06-2.89-.44-4.11-1.24-.03 2.15-.02 4.31-.02 6.46 0 1.19-.21 2.4-.78 3.46-.94 1.83-2.86 2.92-4.88 3.12-1.84.23-3.83-.24-5.26-1.48-1.57-1.32-2.3-3.43-1.95-5.44.25-1.58 1.15-3.05 2.51-3.9 1.14-.73 2.51-.99 3.84-.81v4.11c-.71-.12-1.47.05-2.05.5-.66.52-.96 1.4-.78 2.21.14.73.72 1.34 1.45 1.5.88.2 1.88-.16 2.37-.93.2-.34.28-.73.28-1.12V0l-.02.02z"/></svg> },
+              { name: 'TikTok',   href: store.contact.tiktok,                    icon: <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.06-2.89-.44-4.11-1.24-.03 2.15-.02 4.31-.02 6.46 0 1.19-.21 2.4-.78 3.46-.94 1.83-2.86 2.92-4.88 3.12-1.84.23-3.83-.24-5.26-1.48-1.57-1.32-2.3-3.43-1.95-5.44.25-1.58 1.15-3.05 2.51-3.9 1.14-.73 2.51-.99 3.84-.81v4.11c-.71-.12-1.47.05-2.05.5-.66.52-.96 1.4-.78 2.21.14.73.72 1.34 1.45 1.5.88.2 1.88-.16 2.37-.93.2-.34.28-.73.28-1.12V0l-.02.02z"/></svg> },
             ].map(s => (
               <a key={s.name} href={s.href} target="_blank" rel="noreferrer"
                 className="flex items-center gap-2.5 border border-[#E4E0DB] px-5 py-3 text-xs tracking-[0.12em] uppercase text-[#5A5753] hover:border-[#1C1C1C] hover:text-[#1C1C1C] transition-all duration-300">

@@ -79,6 +79,7 @@ export default function LandingPageView({
   useEffect(() => {
     const load = async () => {
       try {
+
         const { lpdomain } = await params;
         setLpDomain(lpdomain);
         const data = await getLandingPage(lpdomain);

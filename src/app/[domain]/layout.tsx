@@ -22,7 +22,7 @@ interface LayoutProps {
 
 export async function generateMetadata({ params }: LayoutProps): Promise<Metadata> {
   const { domain } = await params;
-  const store = await getStoreCached(domain);
+  const store = await getStoreCached(domain);  
 
   if (!store) return { title: 'Store Not Found' };
 

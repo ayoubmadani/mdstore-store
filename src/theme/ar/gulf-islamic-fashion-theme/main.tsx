@@ -40,24 +40,20 @@ const CSS = `
 
   .amiri { font-family:'Amiri',serif; }
 
-  /* Gold gradient text */
   .gold-text {
     background:linear-gradient(135deg,var(--gold-dk),var(--gold-lt),var(--gold-dk));
     -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
   }
 
-  /* Subtle Islamic geometric pattern */
   .geo-bg {
     background-color:var(--sand);
     background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23B8973A' fill-opacity='0.06'%3E%3Cpath d='M30 0l8.66 5v10L30 20l-8.66-5V5L30 0zm0 40l8.66 5v10L30 60l-8.66-5V45L30 40zM0 20l8.66 5v10L0 40l-8.66-5V25L0 20zm60 0l8.66 5v10L60 40l-8.66-5V25L60 20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   }
 
-  /* Calligraphy divider */
   .cal-line { display:flex; align-items:center; gap:14px; }
   .cal-line::before,.cal-line::after { content:''; flex:1; height:1px; background:linear-gradient(to right,transparent,var(--gold)); }
   .cal-line::after { background:linear-gradient(to left,transparent,var(--gold)); }
 
-  /* Section label */
   .slabel {
     font-family:'Cairo',sans-serif; font-size:11px; font-weight:600;
     letter-spacing:0.18em; text-transform:uppercase; color:var(--gold);
@@ -65,7 +61,6 @@ const CSS = `
   }
   .slabel::before,.slabel::after { content:'◆'; font-size:6px; color:var(--gold); opacity:0.6; }
 
-  /* Animations */
   @keyframes fade-up { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
   .fu   { animation:fade-up 0.65s cubic-bezier(0.22,1,0.36,1) both; }
   .fu-1 { animation-delay:0.1s; }
@@ -74,13 +69,11 @@ const CSS = `
 
   @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
 
-  /* Card */
   .t-card { transition:transform 0.4s cubic-bezier(0.22,1,0.36,1), box-shadow 0.4s; cursor:pointer; background:var(--cream); }
   .t-card:hover { transform:translateY(-5px); box-shadow:0 20px 56px rgba(26,18,8,0.12); }
   .t-card:hover .c-img img { transform:scale(1.04); }
   .c-img img { display:block; width:100%; height:100%; object-fit:cover; transition:transform 0.5s cubic-bezier(0.22,1,0.36,1); }
 
-  /* Buttons */
   .btn-gold {
     display:inline-flex; align-items:center; gap:8px;
     background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-dk));
@@ -102,7 +95,6 @@ const CSS = `
   }
   .btn-outline:hover { background:var(--gold); color:var(--cream); }
 
-  /* Inputs */
   .inp {
     width:100%; padding:12px 14px;
     background:var(--cream); border:1.5px solid var(--line-dk);
@@ -114,7 +106,6 @@ const CSS = `
   .inp-err { border-color:#C0392B !important; }
   select.inp { appearance:none; cursor:pointer; }
 
-  /* Responsive */
   .nav-links   { display:flex; align-items:center; gap:28px; }
   .nav-toggle  { display:none; }
   .hero-split  { display:grid; grid-template-columns:1fr 1fr; min-height:90vh; }
@@ -142,7 +133,7 @@ const CSS = `
     .trust-bar  { grid-template-columns:repeat(2,1fr); }
     .footer-g   { grid-template-columns:1fr 1fr; gap:28px; }
     .details-g  { grid-template-columns:1fr; }
-    .details-L  { position: static; width: 100%; height:auto ;aspect-ratio: 1; margin-buttom: 200px ; display: flex ;flex-direction: column; gap:20px;}
+    .details-L  { position:static; width:100%; height:auto; aspect-ratio:1; display:flex; flex-direction:column; gap:20px; }
     .details-R  { padding:24px 16px 48px; }
     .contact-g  { grid-template-columns:1fr; gap:28px; }
   }
@@ -163,6 +154,7 @@ interface VariantAttributeEntry { attrId:string; attrName:string; displayMode:'c
 interface VariantDetail { id:string|number; name:VariantAttributeEntry[]; price:number; stock:number; autoGenerate:boolean; }
 interface Wilaya  { id:string; name:string; ar_name:string; livraisonHome:number; livraisonOfice:number; livraisonReturn:number; }
 interface Commune { id:string; name:string; ar_name:string; wilayaId:string; }
+
 export interface Product {
   id:string; name:string; price:string|number; priceOriginal?:string|number; desc?:string;
   productImage?:string; imagesProduct?:ProductImage[]; offers?:Offer[]; attributes?:Attribute[];
@@ -174,6 +166,8 @@ export interface ProductFormProps {
   selectedOffer:string|null; setSelectedOffer:(id:string|null)=>void;
   selectedVariants:Record<string,string>; platform?:string; priceLoss?:number;
 }
+
+/* ── HELPERS ─────────────────────────────────────────────────── */
 function variantMatches(d:VariantDetail, sel:Record<string,string>): boolean {
   return Object.entries(sel).every(([n,v])=>d.name.some(e=>e.attrName===n&&e.value===v));
 }
@@ -192,8 +186,6 @@ function GoldDiamond({ size = 8 }: { size?:number }) {
 /* ── MAIN ───────────────────────────────────────────────────── */
 export default function Main({ store, children }: any) {
   if (!store) return null;
-  console.log(store);
-  
   return (
     <div style={{ minHeight:'100vh', backgroundColor:'var(--cream)' }}>
       <style>{CSS}</style>
@@ -217,9 +209,9 @@ export function Navbar({ store }: { store: Store }) {
   if (!store) return null;
 
   const links = [
-    { href:`/${store.subdomain}`,         label:'المجموعة'  },
-    { href:`/${store.subdomain}/contact`, label:'تواصل'     },
-    { href:`/${store.subdomain}/Privacy`, label:'الخصوصية'  },
+    { href:`/`,         label:'المجموعة' },
+    { href:`/contact`,  label:'تواصل'    },
+    { href:`/Privacy`,  label:'الخصوصية' },
   ];
 
   return (
@@ -249,8 +241,7 @@ export function Navbar({ store }: { store: Store }) {
 
       <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'0 28px', height:'70px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:'16px', position:'relative' }}>
 
-        {/* Logo — left */}
-        <Link href={`/${store.subdomain}`} style={{ textDecoration:'none', flexShrink:0 }}>
+        <Link href="/" style={{ textDecoration:'none', flexShrink:0 }}>
           {store.design?.logoUrl
             ? <img src={store.design.logoUrl} alt={store.name} style={{ height:'40px', width:'auto', objectFit:'contain' }}/>
             : <div style={{ width:'40px', height:'40px', border:'1px solid var(--line-dk)', display:'flex', alignItems:'center', justifyContent:'center' }}>
@@ -259,8 +250,7 @@ export function Navbar({ store }: { store: Store }) {
           }
         </Link>
 
-        {/* Store name — center */}
-        <Link href={`/${store.subdomain}`} style={{ textDecoration:'none', position:'absolute', left:'50%', transform:'translateX(-50%)', textAlign:'center' }}>
+        <Link href="/" style={{ textDecoration:'none', position:'absolute', left:'50%', transform:'translateX(-50%)', textAlign:'center' }}>
           <span className="amiri" style={{ fontSize:'1.4rem', fontWeight:700, color:'var(--walnut)', display:'block', lineHeight:1, whiteSpace:'nowrap' }}>
             {store.name}
           </span>
@@ -271,7 +261,6 @@ export function Navbar({ store }: { store: Store }) {
           </div>
         </Link>
 
-        {/* Desktop links */}
         <div className="nav-links">
           {links.map(l=>(
             <Link key={l.href} href={l.href}
@@ -286,7 +275,7 @@ export function Navbar({ store }: { store: Store }) {
           </a>
         </div>
 
-        <button className="nav-toggle" onClick={()=>setOpen(p=>!p)} style={{ background:'none', border:'1px solid var(--line-dk)', cursor:'pointer', color:'var(--walnut)', padding:'8px', borderRadius:'0', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+        <button className="nav-toggle" onClick={()=>setOpen(p=>!p)} style={{ background:'none', border:'1px solid var(--line-dk)', cursor:'pointer', color:'var(--walnut)', padding:'8px', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
           {open ? <X style={{ width:'18px', height:'18px' }}/> : <Menu style={{ width:'18px', height:'18px' }}/>}
         </button>
       </div>
@@ -308,94 +297,52 @@ export function Navbar({ store }: { store: Store }) {
 /* ── FOOTER ─────────────────────────────────────────────────── */
 export function Footer({ store }: { store: any }) {
   const yr = new Date().getFullYear();
-  
   if (!store) return null;
 
   return (
-    <footer 
-      dir="rtl" 
-      style={{ 
-        backgroundColor: 'var(--walnut)', 
-        fontFamily: "'Cairo', sans-serif", 
-        position: 'relative', 
-        overflow: 'hidden' 
-      }}
-    >
-      {/* Geo pattern overlay - خلفية زخرفية */}
-      <div 
-        style={{ 
-          position: 'absolute', 
-          inset: 0, 
-          pointerEvents: 'none', 
-          opacity: 0.06,
-          backgroundImage: 'url("/path-to-your-pattern.svg")', // تأكد من وجود المسار أو الكلاس
-        }} 
-        className="geo-bg"
-      />
+    <footer dir="rtl" style={{ backgroundColor:'var(--walnut)', fontFamily:"'Cairo',sans-serif", position:'relative', overflow:'hidden' }}>
+      <div style={{ position:'absolute', inset:0, pointerEvents:'none', opacity:0.06 }} className="geo-bg"/>
+      <div style={{ position:'relative', zIndex:2, maxWidth:'1280px', margin:'0 auto', padding:'64px 28px 40px' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:'40px', paddingBottom:'48px', borderBottom:'1px solid rgba(250,246,238,0.1)' }}>
 
-      <div style={{ position: 'relative', zIndex: 2, maxWidth: '1280px', margin: '0 auto', padding: '64px 28px 40px' }}>
-        <div 
-          className="footer-g" 
-          style={{ 
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '40px',
-            paddingBottom: '48px', 
-            borderBottom: '1px solid rgba(250, 246, 238, 0.1)' 
-          }}
-        >
-          {/* Brand Section */}
           <div>
-            <span className="amiri" style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--cream)', display: 'block', marginBottom: '6px' }}>
-              {store.name}
-            </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '18px' }}>
-              <span style={{ display: 'block', height: '1px', width: '28px', background: 'var(--gold)', opacity: 0.5 }} />
-              <GoldDiamond size={6} />
+            <span className="amiri" style={{ fontSize:'1.5rem', fontWeight:700, color:'var(--cream)', display:'block', marginBottom:'6px' }}>{store.name}</span>
+            <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'18px' }}>
+              <span style={{ display:'block', height:'1px', width:'28px', background:'var(--gold)', opacity:0.5 }}/>
+              <GoldDiamond size={6}/>
             </div>
-            <p style={{ fontSize: '13px', lineHeight: '1.9', color: 'rgba(250, 246, 238, 0.5)', maxWidth: '220px', fontWeight: 300 }}>
+            <p style={{ fontSize:'13px', lineHeight:'1.9', color:'rgba(250,246,238,0.5)', maxWidth:'220px', fontWeight:300 }}>
               أجود الأزياء الخليجية الإسلامية الرجالية، مختارة بعناية فائقة لتناسب ذوقكم الرفيع.
             </p>
           </div>
 
-          {/* Dynamic Columns */}
           {[
-            { 
-              title: 'روابط هامة', 
-              links: [
-                [`/${store.subdomain}`, 'المجموعة الكاملة'],
-                [`/${store.subdomain}/Privacy`, 'سياسة الخصوصية'],
-                [`/${store.subdomain}/Terms`, 'الشروط والأحكام'],
-                [`/${store.subdomain}/contact`, 'تواصل معنا'],
-              ] 
+            {
+              title:'روابط هامة',
+              links:[
+                [`/`,        'المجموعة الكاملة'],
+                [`/Privacy`, 'سياسة الخصوصية'],
+                [`/Terms`,   'الشروط والأحكام'],
+                [`/contact`, 'تواصل معنا'],
+              ]
             },
-            { 
-              title: 'معلومات التواصل', 
-              links: [
-                ['tel:+213550000000', '+213 550 000 000'],
-                ['https://maps.google.com', 'أولاد فايت، الجزائر'],
-                ['mailto:info@store.dz', 'info@store.dz'],
-              ] 
+            {
+              title:'معلومات التواصل',
+              links:[
+                ['tel:+213550000000',     '+213 550 000 000'],
+                ['https://maps.google.com','أولاد فايت، الجزائر'],
+                ['mailto:info@store.dz',  'info@store.dz'],
+              ]
             },
-          ].map((col) => (
+          ].map((col)=>(
             <div key={col.title}>
-              <p style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', color: 'var(--gold)', marginBottom: '20px' }}>
-                {col.title}
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {col.links.map(([href, label]) => (
-                  <a 
-                    key={label} 
-                    href={href} 
-                    style={{ 
-                      fontSize: '13px', 
-                      color: 'rgba(250, 246, 238, 0.6)', 
-                      textDecoration: 'none', 
-                      transition: 'all 0.3s ease' 
-                    }}
-                    onMouseEnter={e => { (e.currentTarget.style.color = 'var(--gold-lt)'); (e.currentTarget.style.paddingRight = '5px'); }}
-                    onMouseLeave={e => { (e.currentTarget.style.color = 'rgba(250, 246, 238, 0.6)'); (e.currentTarget.style.paddingRight = '0'); }}
-                  >
+              <p style={{ fontSize:'12px', fontWeight:600, letterSpacing:'0.1em', color:'var(--gold)', marginBottom:'20px' }}>{col.title}</p>
+              <div style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
+                {col.links.map(([href,label])=>(
+                  <a key={label} href={href}
+                    style={{ fontSize:'13px', color:'rgba(250,246,238,0.6)', textDecoration:'none', transition:'all 0.3s ease' }}
+                    onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--gold-lt)'; (e.currentTarget as HTMLElement).style.paddingRight='5px';}}
+                    onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='rgba(250,246,238,0.6)'; (e.currentTarget as HTMLElement).style.paddingRight='0';}}>
                     {label}
                   </a>
                 ))}
@@ -404,15 +351,14 @@ export function Footer({ store }: { store: any }) {
           ))}
         </div>
 
-        {/* Bottom Bar */}
-        <div style={{ paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-          <p style={{ fontSize: '11px', color: 'rgba(250, 246, 238, 0.3)', letterSpacing: '0.5px' }}>
+        <div style={{ paddingTop:'24px', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'16px' }}>
+          <p style={{ fontSize:'11px', color:'rgba(250,246,238,0.3)', letterSpacing:'0.5px' }}>
             © {yr} {store.name}. جميع الحقوق محفوظة.
           </p>
-          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-             <span style={{ fontSize: '11px', color: 'rgba(250, 246, 238, 0.3)' }}>Gulf Fashion Theme</span>
-             <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'var(--gold)', opacity: 0.3 }} />
-             <span style={{ fontSize: '11px', color: 'rgba(250, 246, 238, 0.3)' }}>صنع بإتقان</span>
+          <div style={{ display:'flex', gap:'15px', alignItems:'center' }}>
+            <span style={{ fontSize:'11px', color:'rgba(250,246,238,0.3)' }}>Gulf Fashion Theme</span>
+            <div style={{ width:'4px', height:'4px', borderRadius:'50%', background:'var(--gold)', opacity:0.3 }}/>
+            <span style={{ fontSize:'11px', color:'rgba(250,246,238,0.3)' }}>صنع بإتقان</span>
           </div>
         </div>
       </div>
@@ -426,113 +372,50 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
   if (!product || !store) return null;
 
   const price = typeof product.price === 'string' ? parseFloat(product.price) : (product.price as number) || 0;
-  const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
-  
-  // اللون الموحد للهوية (الذهبي العميق)
+  const orig  = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
   const brandGold = 'var(--gold-dk)';
 
   return (
-    <div 
-      className="t-card group" 
-      onMouseEnter={() => setHov(true)} 
-      onMouseLeave={() => setHov(false)}
-      style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        height: '100%',
-        transition: 'all 0.4s ease',
-        backgroundColor: 'var(--cream)' // أو أي لون خلفية فاتح مستخدم عندك
-      }}
-    >
-      {/* منطقة الصورة */}
-      <div className="c-img" style={{ position: 'relative', aspectRatio: '3/4', overflow: 'hidden', backgroundColor: 'var(--sand)' }}>
-        {displayImage ? (
-          <img 
-            src={displayImage} 
-            alt={product.name} 
-            className="transition-transform duration-700 group-hover:scale-105"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        ) : (
-          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="geo-bg">
-            <span className="amiri" style={{ fontSize: '2.5rem', color: 'var(--gold)', opacity: 0.3 }}>﷽</span>
-          </div>
-        )}
+    <div className="t-card group" onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+      style={{ display:'flex', flexDirection:'column', height:'100%', backgroundColor:'var(--cream)' }}>
 
-        {/* خط ذهبي علوي يتفاعل مع التحويم */}
-        <div style={{ 
-          position: 'absolute', top: 0, left: 0, right: 0, height: '3px', 
-          background: `linear-gradient(to right, transparent, ${brandGold}, transparent)`, 
-          opacity: hov ? 1 : 0.4, transition: 'opacity 0.3s' 
-        }}/>
-
-        {/* ملصق الخصم */}
-        {discount > 0 && (
-          <div style={{ 
-            position: 'absolute', top: '12px', right: '12px', 
-            backgroundColor: brandGold, color: 'var(--cream)', 
-            fontSize: '11px', fontWeight: 600, padding: '4px 12px', 
-            letterSpacing: '0.08em', borderRadius: '2px' 
-          }}>
+      <div className="c-img" style={{ position:'relative', aspectRatio:'3/4', overflow:'hidden', backgroundColor:'var(--sand)' }}>
+        {displayImage
+          ? <img src={displayImage} alt={product.name} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+          : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center' }} className="geo-bg">
+              <span className="amiri" style={{ fontSize:'2.5rem', color:'var(--gold)', opacity:0.3 }}>﷽</span>
+            </div>
+        }
+        <div style={{ position:'absolute', top:0, left:0, right:0, height:'3px', background:`linear-gradient(to right,transparent,${brandGold},transparent)`, opacity:hov?1:0.4, transition:'opacity 0.3s' }}/>
+        {discount>0 && (
+          <div style={{ position:'absolute', top:'12px', right:'12px', backgroundColor:brandGold, color:'var(--cream)', fontSize:'11px', fontWeight:600, padding:'4px 12px', letterSpacing:'0.08em' }}>
             -{discount}%
           </div>
         )}
       </div>
 
-      {/* المعلومات */}
-      <div style={{ padding: '16px 14px', borderTop: '1px solid var(--line)', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        
-        {/* التقييم */}
-        <div style={{ display: 'flex', gap: '2px', marginBottom: '8px' }}>
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} style={{ width: '11px', height: '11px', fill: i < 4 ? brandGold : 'none', color: brandGold }} />
+      <div style={{ padding:'16px 14px', borderTop:'1px solid var(--line)', flex:1, display:'flex', flexDirection:'column' }}>
+        <div style={{ display:'flex', gap:'2px', marginBottom:'8px' }}>
+          {[...Array(5)].map((_,i)=>(
+            <Star key={i} style={{ width:'11px', height:'11px', fill:i<4?brandGold:'none', color:brandGold }}/>
           ))}
         </div>
-
-        {/* اسم المنتج بخط أميري */}
-        <h3 className="amiri" style={{ 
-          fontSize: '1.15rem', fontWeight: 700, color: 'var(--ink)', 
-          marginBottom: '10px', lineHeight: 1.4, 
-          display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any, 
-          overflow: 'hidden', minHeight: '3.2em'
-        }}>
+        <h3 className="amiri" style={{ fontSize:'1.15rem', fontWeight:700, color:'var(--ink)', marginBottom:'10px', lineHeight:1.4, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' as any, overflow:'hidden', minHeight:'3.2em' }}>
           {product.name}
         </h3>
 
-        {/* قسم السعر والزر (ثابت في الأسفل) */}
-        <div style={{ marginTop: 'auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-              <span className="amiri" style={{ fontSize: '1.3rem', fontWeight: 700, color: brandGold }}>
-                {price.toLocaleString()}
-                <span style={{ fontFamily: "'Cairo',sans-serif", fontWeight: 600, fontSize: '12px', color: 'var(--mid)', marginRight: '4px' }}>دج</span>
-              </span>
-              {orig > price && (
-                <span style={{ fontSize: '12px', color: 'var(--dim)', textDecoration: 'line-through', opacity: 0.6 }}>
-                  {orig.toLocaleString()}
-                </span>
-              )}
-            </div>
+        <div style={{ marginTop:'auto' }}>
+          <div style={{ display:'flex', alignItems:'baseline', gap:'6px', marginBottom:'14px' }}>
+            <span className="amiri" style={{ fontSize:'1.3rem', fontWeight:700, color:brandGold }}>
+              {price.toLocaleString()}
+              <span style={{ fontFamily:"'Cairo',sans-serif", fontWeight:600, fontSize:'12px', color:'var(--mid)', marginRight:'4px' }}>دج</span>
+            </span>
+            {orig>price && (
+              <span style={{ fontSize:'12px', color:'var(--dim)', textDecoration:'line-through', opacity:0.6 }}>{orig.toLocaleString()}</span>
+            )}
           </div>
-
-          {/* الزر الموحد والظاهر دوماً */}
-          <Link href={`/product/${product.slug || product.id}`}
-            className="amiri"
-            style={{ 
-              textDecoration: 'none', 
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%', 
-              fontSize: '1.1rem', 
-              fontWeight: 700,
-              padding: '10px', 
-              backgroundColor: hov ? brandGold : 'transparent',
-              color: hov ? 'var(--cream)' : brandGold,
-              border: `1.5px solid ${brandGold}`,
-              transition: 'all 0.3s ease',
-              borderRadius: '2px'
-            }}>
+          <Link href={`/product/${product.slug||product.id}`} className="amiri"
+            style={{ textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', width:'100%', fontSize:'1.1rem', fontWeight:700, padding:'10px', backgroundColor:hov?brandGold:'transparent', color:hov?'var(--cream)':brandGold, border:`1.5px solid ${brandGold}`, transition:'all 0.3s ease' }}>
             {viewDetails}
           </Link>
         </div>
@@ -552,46 +435,30 @@ export function Home({ store }: any) {
 
       {/* ── HERO ── */}
       <section className="hero-split" style={{ overflow:'hidden' }}>
-
-        {/* Right: Text */}
         <div style={{ display:'flex', flexDirection:'column', justifyContent:'center', padding:'8vw 6vw', position:'relative', backgroundColor:'var(--cream)', overflow:'hidden' }}>
           <div style={{ position:'absolute', inset:0, opacity:0.35 }} className="geo-bg"/>
-          {/* Gold corner ornament */}
           <div style={{ position:'absolute', top:0, right:0, width:'80px', height:'80px', borderTop:'2px solid var(--gold)', borderRight:'2px solid var(--gold)', opacity:0.3 }}/>
           <div style={{ position:'absolute', bottom:0, left:0, width:'80px', height:'80px', borderBottom:'2px solid var(--gold)', borderLeft:'2px solid var(--gold)', opacity:0.3 }}/>
-
           <div style={{ position:'relative', zIndex:2 }}>
             <div className="fu slabel" style={{ marginBottom:'20px', justifyContent:'flex-start' }}>مجموعة حصرية</div>
-
-            <h1 className="fu fu-1 amiri" style={{ fontSize:'clamp(2.8rem,6vw,5.5rem)', fontWeight:700, color:'var(--ink)', lineHeight:1, marginBottom:'18px', letterSpacing:'0.01em' }}>
+            <h1 className="fu fu-1 amiri" style={{ fontSize:'clamp(2.8rem,6vw,5.5rem)', fontWeight:700, color:'var(--ink)', lineHeight:1, marginBottom:'18px' }}>
               {store.hero?.title || <><span>أصالة</span><br/><span className="gold-text">الخليج</span></>}
             </h1>
-
-            <div className="fu fu-2 cal-line" style={{ marginBottom:'18px' }}>
-              <GoldDiamond size={7}/>
-            </div>
-
+            <div className="fu fu-2 cal-line" style={{ marginBottom:'18px' }}><GoldDiamond size={7}/></div>
             <p className="fu fu-2" style={{ fontFamily:"'Cairo',sans-serif", fontSize:'15px', lineHeight:'1.9', color:'var(--mid)', marginBottom:'36px', maxWidth:'400px', fontWeight:400 }}>
               {store.hero?.subtitle || 'أجود الأزياء الخليجية والإسلامية الرجالية — ثياب، جلابيات، وبشوت مُختارة بعناية فائقة.'}
             </p>
-
             <div className="fu fu-3" style={{ display:'flex', gap:'14px', flexWrap:'wrap' }}>
               <a href="#collection" className="btn-gold" style={{ fontSize:'14px', padding:'14px 32px' }}>
                 استعرض المجموعة <ArrowRight style={{ width:'14px', height:'14px' }}/>
               </a>
-              {cats.length>0 && (
-                <a href="#categories" className="btn-outline" style={{ fontSize:'14px', padding:'13px 28px' }}>
-                  الفئات
-                </a>
-              )}
+              {cats.length>0 && <a href="#categories" className="btn-outline" style={{ fontSize:'14px', padding:'13px 28px' }}>الفئات</a>}
             </div>
-
-            {/* Stats */}
             <div style={{ display:'flex', gap:'36px', marginTop:'48px', paddingTop:'32px', borderTop:'1px solid var(--line-dk)', flexWrap:'wrap' }}>
               {[
                 { n:`${products.length}+`, l:'قطعة', c:'var(--gold-dk)' },
-                { n:'48H',   l:'توصيل', c:'var(--walnut)' },
-                { n:'100%',  l:'أصيل',  c:'var(--walnut)' },
+                { n:'48H',  l:'توصيل', c:'var(--walnut)' },
+                { n:'100%', l:'أصيل',  c:'var(--walnut)' },
               ].map((s,i)=>(
                 <div key={i} style={{ textAlign:'center' }}>
                   <p className="amiri" style={{ fontSize:'2rem', fontWeight:700, color:s.c, lineHeight:1, margin:0 }}>{s.n}</p>
@@ -602,18 +469,14 @@ export function Home({ store }: any) {
           </div>
         </div>
 
-        {/* Left: Image */}
         <div style={{ position:'relative', overflow:'hidden', minHeight:'560px', backgroundColor:'var(--sand)' }}>
           {store.hero?.imageUrl
             ? <img src={store.hero.imageUrl} alt={store.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
-            : (
-              <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center' }} className="geo-bg">
-                <span className="amiri" style={{ fontSize:'8rem', color:'var(--gold)', opacity:0.12, userSelect:'none' }}>﷽</span>
+            : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center' }} className="geo-bg">
+                <span className="amiri" style={{ fontSize:'8rem', color:'var(--gold)', opacity:0.12 }}>﷽</span>
               </div>
-            )
           }
-          <div style={{ position:'absolute', inset:0, background:'linear-gradient(to right, rgba(250,246,238,0.2) 0%, transparent 30%)', pointerEvents:'none' }}/>
-          {/* Bottom tag */}
+          <div style={{ position:'absolute', inset:0, background:'linear-gradient(to right,rgba(250,246,238,0.2) 0%,transparent 30%)', pointerEvents:'none' }}/>
           <div style={{ position:'absolute', bottom:'20px', right:'20px', backgroundColor:'rgba(250,246,238,0.92)', backdropFilter:'blur(12px)', padding:'12px 18px', border:'1px solid var(--line-dk)' }}>
             <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'10px', fontWeight:600, letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--mid)', margin:0 }}>مجموعة {new Date().getFullYear()}</p>
             <p className="amiri" style={{ fontSize:'1rem', fontWeight:700, color:'var(--walnut)', margin:'3px 0 0' }}>أزياء خليجية راقية</p>
@@ -649,14 +512,12 @@ export function Home({ store }: any) {
           <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'0 28px' }}>
             <div style={{ textAlign:'center', marginBottom:'44px' }}>
               <div className="slabel" style={{ justifyContent:'center', marginBottom:'12px' }}>الفئات</div>
-              <h2 className="amiri" style={{ fontSize:'clamp(1.8rem,3.5vw,3rem)', fontWeight:700, color:'var(--ink)', margin:'0 0 14px' }}>
-                استعرض التشكيلات
-              </h2>
+              <h2 className="amiri" style={{ fontSize:'clamp(1.8rem,3.5vw,3rem)', fontWeight:700, color:'var(--ink)', margin:'0 0 14px' }}>استعرض التشكيلات</h2>
               <div className="cal-line"><GoldDiamond/></div>
             </div>
             <div className="cat-grid">
               {cats.slice(0,8).map((cat:any)=>(
-                <Link key={cat.id} href={`/${store.subdomain}?category=${cat.id}`}
+                <Link key={cat.id} href={`/?category=${cat.id}`}
                   style={{ display:'block', textDecoration:'none', border:'1px solid var(--line-dk)', position:'relative', aspectRatio:'3/4', overflow:'hidden', backgroundColor:'var(--sand)', transition:'all 0.35s' }}
                   onMouseEnter={e=>{const el=e.currentTarget as HTMLElement; el.style.borderColor='var(--gold)'; el.style.transform='translateY(-4px)'; el.style.boxShadow='0 12px 32px rgba(26,18,8,0.1)';}}
                   onMouseLeave={e=>{const el=e.currentTarget as HTMLElement; el.style.borderColor='var(--line-dk)'; el.style.transform='none'; el.style.boxShadow='none';}}>
@@ -666,10 +527,9 @@ export function Home({ store }: any) {
                         <span className="amiri" style={{ fontSize:'3rem', color:'var(--gold)', opacity:0.2 }}>﷽</span>
                       </div>
                   }
-                  <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(92,61,30,0.85) 0%, transparent 60%)', display:'flex', alignItems:'flex-end', padding:'16px' }}>
+                  <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top,rgba(92,61,30,0.85) 0%,transparent 60%)', display:'flex', alignItems:'flex-end', padding:'16px' }}>
                     <span className="amiri" style={{ fontSize:'1.2rem', fontWeight:700, color:'var(--cream)' }}>{cat.name}</span>
                   </div>
-                  {/* Gold top border accent */}
                   <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px', background:'linear-gradient(to right,transparent,var(--gold),transparent)' }}/>
                 </Link>
               ))}
@@ -680,14 +540,11 @@ export function Home({ store }: any) {
 
       {/* ── COLLECTION GRID ── */}
       <section id="collection" style={{ backgroundColor:'var(--sand)' }}>
-        {/* Header */}
         <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'56px 28px 32px' }}>
           <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', flexWrap:'wrap', gap:'16px' }}>
             <div>
               <div className="slabel" style={{ marginBottom:'10px' }}>المجموعة</div>
-              <h2 className="amiri" style={{ fontSize:'clamp(1.8rem,3vw,2.8rem)', fontWeight:700, color:'var(--ink)', margin:0 }}>
-                أحدث التشكيلات
-              </h2>
+              <h2 className="amiri" style={{ fontSize:'clamp(1.8rem,3vw,2.8rem)', fontWeight:700, color:'var(--ink)', margin:0 }}>أحدث التشكيلات</h2>
             </div>
             <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', color:'var(--dim)', fontWeight:400 }}>{products.length} قطعة</p>
           </div>
@@ -700,7 +557,7 @@ export function Home({ store }: any) {
             <p className="amiri" style={{ fontSize:'1.5rem', color:'var(--dim)' }}>المجموعة قادمة قريباً</p>
           </div>
         ) : (
-          <div className="prod-grid" style={{ maxWidth:'100%' }}>
+          <div className="prod-grid">
             {products.map((p:any)=>{
               const img  = p.productImage||p.imagesProduct?.[0]?.imageUrl||store.design?.logoUrl;
               const disc = p.priceOriginal ? Math.round(((p.priceOriginal-p.price)/p.priceOriginal)*100) : 0;
@@ -727,7 +584,7 @@ export function Home({ store }: any) {
             <a href="#collection" className="btn-gold" style={{ fontSize:'14px', padding:'14px 36px' }}>
               تسوق الآن <ArrowRight style={{ width:'14px', height:'14px' }}/>
             </a>
-            <Link href={`/${store.subdomain}/contact`} className="btn-outline" style={{ textDecoration:'none', borderColor:'rgba(250,246,238,0.4)', color:'var(--cream)', padding:'13px 28px' }}>
+            <Link href="/contact" className="btn-outline" style={{ textDecoration:'none', borderColor:'rgba(250,246,238,0.4)', color:'var(--cream)', padding:'13px 28px' }}>
               تواصل معنا
             </Link>
           </div>
@@ -738,9 +595,10 @@ export function Home({ store }: any) {
 }
 
 /* ── DETAILS ────────────────────────────────────────────────── */
-export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, isRTL }: any) {
+export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
   const [sel, setSel] = useState(0);
   if (!product) return null;
+
   return (
     <div dir="rtl" style={{ backgroundColor:'var(--cream)' }}>
       {/* Breadcrumb */}
@@ -762,7 +620,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
         </div>
       </div>
 
-      <div className="details-g" style={{ maxWidth:'1280px', margin:'0 auto', }}>
+      <div className="details-g" style={{ maxWidth:'1280px', margin:'0 auto' }}>
         {/* Gallery */}
         <div className="details-L">
           <div style={{ position:'relative', aspectRatio:'3/4', overflow:'hidden', backgroundColor:'var(--sand)', border:'1px solid var(--line)' }}>
@@ -772,7 +630,6 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                   <span className="amiri" style={{ fontSize:'6rem', color:'var(--gold)', opacity:0.15 }}>﷽</span>
                 </div>
             }
-            {/* Gold trim */}
             <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px', background:'linear-gradient(to right,transparent,var(--gold),transparent)' }}/>
             {discount>0 && <div style={{ position:'absolute', top:'12px', right:'12px', backgroundColor:'var(--gold)', color:'var(--cream)', fontSize:'11px', fontWeight:600, padding:'4px 12px', letterSpacing:'0.08em' }}>-{discount}%</div>}
             {allImages.length>1 && (
@@ -823,7 +680,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
           <div style={{ marginBottom:'22px', padding:'18px', backgroundColor:'var(--sand)', border:'1px solid var(--line)' }}>
             <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--dim)', margin:'0 0 6px' }}>السعر</p>
             <div style={{ display:'flex', alignItems:'baseline', gap:'12px', flexWrap:'wrap' }}>
-              <span className="amiri" style={{ fontSize:'3rem', fontWeight:700, color:'var(--gold-dk)', lineHeight:1, letterSpacing:'-0.01em' }}>{finalPrice.toLocaleString()}</span>
+              <span className="amiri" style={{ fontSize:'3rem', fontWeight:700, color:'var(--gold-dk)', lineHeight:1 }}>{finalPrice.toLocaleString()}</span>
               <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'15px', color:'var(--mid)' }}>دج</span>
               {product.priceOriginal && parseFloat(product.priceOriginal)>finalPrice && (
                 <>
@@ -908,50 +765,91 @@ const FR = ({ error, label, children }: { error?:string; label?:string; children
 
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss=0 }: ProductFormProps) {
   const router = useRouter();
-  const [wilayas,setWilayas]   = useState<Wilaya[]>([]);
-  const [communes,setCommunes] = useState<Commune[]>([]);
-  const [loadingC,setLC]       = useState(false);
-  const [fd,setFd] = useState({ customerId:'', customerName:'', customerPhone:'', customerWelaya:'', customerCommune:'', quantity:1, priceLoss:0, typeLivraison:'home' as 'home'|'office' });
-  const [errors,setErrors] = useState<Record<string,string>>({});
-  const [sub,setSub] = useState(false);
+  const [wilayas,  setWilayas]  = useState<Wilaya[]>([]);
+  const [communes, setCommunes] = useState<Commune[]>([]);
+  const [loadingC, setLC]       = useState(false);
+  const [fd, setFd] = useState({
+    customerId:'', customerName:'', customerPhone:'',
+    customerWelaya:'', customerCommune:'',
+    quantity:1, priceLoss:0,
+    typeLivraison:'home' as 'home'|'office',
+  });
+  const [errors, setErrors] = useState<Record<string,string>>({});
+  const [sub,    setSub]    = useState(false);
 
   useEffect(()=>{ if(userId) fetchWilayas(userId).then(setWilayas); },[userId]);
   useEffect(()=>{ if(typeof window!=='undefined'){ const id=localStorage.getItem('customerId'); if(id) setFd(p=>({...p,customerId:id})); } },[]);
   useEffect(()=>{ if(!fd.customerWelaya){setCommunes([]);return;} setLC(true); fetchCommunes(fd.customerWelaya).then(d=>{setCommunes(d);setLC(false);}); },[fd.customerWelaya]);
 
   const selW  = useMemo(()=>wilayas.find(w=>String(w.id)===String(fd.customerWelaya)),[wilayas,fd.customerWelaya]);
+
   const getFP = useCallback(():number=>{
-    const base=typeof product.price==='string'?parseFloat(product.price):product.price as number;
-    const off=product.offers?.find((o:any)=>o.id===selectedOffer); if(off) return off.price;
-    if(product.variantDetails?.length&&Object.keys(selectedVariants).length>0){
-      const m=product.variantDetails.find((v:any)=>variantMatches(v,selectedVariants));
-      if(m&&m.price!==-1) return m.price;
+    const base = typeof product.price==='string' ? parseFloat(product.price) : product.price as number;
+    const off  = product.offers?.find((o:any)=>o.id===selectedOffer);
+    if(off) return off.price;
+    if(product.variantDetails?.length && Object.keys(selectedVariants).length>0){
+      const m = product.variantDetails.find((v:any)=>variantMatches(v,selectedVariants));
+      if(m && m.price!==-1) return m.price;
     }
     return base;
   },[product,selectedOffer,selectedVariants]);
-  const getLiv = useCallback(():number=>{ if(!selW) return 0; return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice; },[selW,fd.typeLivraison]);
+
+  const getLiv = useCallback(():number=>{
+    if(!selW) return 0;
+    return fd.typeLivraison==='home' ? selW.livraisonHome : selW.livraisonOfice;
+  },[selW,fd.typeLivraison]);
+
   useEffect(()=>{ if(selW) setFd(f=>({...f,priceLoss:selW.livraisonReturn})); },[selW]);
 
-  const fp=getFP(); const total=()=>fp*fd.quantity+ +getLiv();
-  const validate=()=>{
+  const getVariantDetailId = useCallback(()=>{
+    if(!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+    return product.variantDetails.find((v:any)=>variantMatches(v,selectedVariants))?.id;
+  },[product.variantDetails,selectedVariants]);
+
+  const fp    = getFP();
+  const total = ()=> fp * fd.quantity + +getLiv();
+
+  const validate = ()=>{
     const e:Record<string,string>={};
-    if(!fd.customerName.trim())  e.customerName='الاسم مطلوب';
-    if(!fd.customerPhone.trim()) e.customerPhone='رقم الهاتف مطلوب';
-    if(!fd.customerWelaya)       e.customerWelaya='الولاية مطلوبة';
-    if(!fd.customerCommune)      e.customerCommune='البلدية مطلوبة';
+    if(!fd.customerName.trim())  e.customerName  = 'الاسم مطلوب';
+    if(!fd.customerPhone.trim()) e.customerPhone  = 'رقم الهاتف مطلوب';
+    if(!fd.customerWelaya)       e.customerWelaya = 'الولاية مطلوبة';
+    if(!fd.customerCommune)      e.customerCommune= 'البلدية مطلوبة';
     return e;
   };
-  const handleSubmit=async(e:React.FormEvent)=>{
-    e.preventDefault(); const er=validate(); if(Object.keys(er).length){setErrors(er);return;} setErrors({}); setSub(true);
-    try{
-      await axios.post(`${API_URL}/orders`,{...fd,productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});
-      if(typeof window!=='undefined'&&fd.customerId) localStorage.setItem('customerId',fd.customerId);
-      router.push(`/lp/${domain}/successfully`);
-    }catch(err){console.error(err);}finally{setSub(false);}
+
+  const handleSubmit = async (e:React.FormEvent)=>{
+    e.preventDefault();
+    const er = validate();
+    if(Object.keys(er).length){ setErrors(er); return; }
+    setErrors({}); setSub(true);
+    try {
+      await axios.post(`${API_URL}/orders`, {
+        productId:         product.id,
+        variantDetailId:   getVariantDetailId(),
+        storeId:           product.store.id,
+        userId,
+        selectedOffer,
+        platform:          platform || 'store',
+        finalPrice:        fp,
+        totalPrice:        total(),
+        priceLivraison:    getLiv(),
+        customerId:        fd.customerId,
+        customerName:      fd.customerName,
+        customerPhone:     fd.customerPhone,
+        customerWilayaId:  fd.customerWelaya,
+        customerCommuneId: fd.customerCommune,
+        quantity:          fd.quantity,
+        priceLoss:         fd.priceLoss,
+        typeLivraison:     fd.typeLivraison,
+      });
+      if(typeof window!=='undefined' && fd.customerId) localStorage.setItem('customerId',fd.customerId);
+      router.push(`/${domain}/successfully`);
+    } catch(err){ console.error(err); } finally { setSub(false); }
   };
 
   return (
-    <div style={{ marginTop:'22px', paddingTop:'20px', borderTop:'2px solid var(--gold)', borderImage:'linear-gradient(to right,var(--gold),var(--gold-lt),var(--gold)) 1' }}>
+    <div style={{ marginTop:'22px', paddingTop:'20px', borderTop:'2px solid var(--gold)' }}>
       <form onSubmit={handleSubmit}>
         <div className="form-2c">
           <FR error={errors.customerName} label="الاسم">
@@ -1016,14 +914,14 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         <FR label="الكمية">
           <div style={{ display:'inline-flex', alignItems:'center', border:'1.5px solid var(--line-dk)', backgroundColor:'var(--cream)' }}>
             <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))}
-              style={{ width:'36px', height:'36px', display:'flex', alignItems:'center', justifyContent:'center', border:'none', borderLeft:'1px solid var(--line-dk)', background:'transparent', cursor:'pointer', color:'var(--walnut)', transition:'background 0.18s' }}
+              style={{ width:'36px', height:'36px', display:'flex', alignItems:'center', justifyContent:'center', border:'none', borderLeft:'1px solid var(--line-dk)', background:'transparent', cursor:'pointer', color:'var(--walnut)' }}
               onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--sand-dk)';}}
               onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>
               <Minus style={{ width:'12px', height:'12px' }}/>
             </button>
             <span className="amiri" style={{ width:'44px', textAlign:'center', fontSize:'1.2rem', fontWeight:700, color:'var(--ink)' }}>{fd.quantity}</span>
             <button type="button" onClick={()=>setFd(p=>({...p,quantity:p.quantity+1}))}
-              style={{ width:'36px', height:'36px', display:'flex', alignItems:'center', justifyContent:'center', border:'none', borderRight:'1px solid var(--line-dk)', background:'transparent', cursor:'pointer', color:'var(--walnut)', transition:'background 0.18s' }}
+              style={{ width:'36px', height:'36px', display:'flex', alignItems:'center', justifyContent:'center', border:'none', borderRight:'1px solid var(--line-dk)', background:'transparent', cursor:'pointer', color:'var(--walnut)' }}
               onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--sand-dk)';}}
               onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>
               <Plus style={{ width:'12px', height:'12px' }}/>
@@ -1037,10 +935,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--mid)', margin:0 }}>ملخص الطلب</p>
           </div>
           {[
-            { l:'القطعة', v:product.name.slice(0,22) },
-            { l:'السعر',  v:`${fp.toLocaleString()} دج` },
-            { l:'الكمية', v:`× ${fd.quantity}` },
-            { l:'التوصيل',v:selW?`${getLiv().toLocaleString()} دج`:'—' },
+            { l:'القطعة',  v:product.name.slice(0,22) },
+            { l:'السعر',   v:`${fp.toLocaleString()} دج` },
+            { l:'الكمية',  v:`× ${fd.quantity}` },
+            { l:'التوصيل', v:selW?`${getLiv().toLocaleString()} دج`:'—' },
           ].map(row=>(
             <div key={row.l} style={{ display:'flex', justifyContent:'space-between', padding:'8px 14px', borderBottom:'1px solid var(--line)', backgroundColor:'var(--cream)' }}>
               <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', color:'var(--mid)' }}>{row.l}</span>
@@ -1049,7 +947,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           ))}
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', padding:'12px 14px', backgroundColor:'var(--sand-dk)' }}>
             <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', color:'var(--mid)' }}>المجموع</span>
-            <span className="amiri" style={{ fontSize:'1.8rem', fontWeight:700, color:'var(--gold-dk)', letterSpacing:'-0.01em' }}>
+            <span className="amiri" style={{ fontSize:'1.8rem', fontWeight:700, color:'var(--gold-dk)' }}>
               {total().toLocaleString()}
               <span style={{ fontFamily:"'Cairo',sans-serif", fontWeight:300, fontSize:'13px', marginRight:'4px', color:'var(--mid)' }}>دج</span>
             </span>
@@ -1061,7 +959,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           {sub?'جاري المعالجة...':'تأكيد الطلب'}{!sub && <ArrowRight style={{ width:'15px', height:'15px' }}/>}
         </button>
 
-        <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', color:'var(--dim)', textAlign:'center', marginTop:'10px', display:'flex', alignItems:'center', justifyContent:'center', gap:'5px', letterSpacing:'0.06em' }}>
+        <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', color:'var(--dim)', textAlign:'center', marginTop:'10px', display:'flex', alignItems:'center', justifyContent:'center', gap:'5px' }}>
           <Lock style={{ width:'10px', height:'10px', color:'var(--gold)' }}/> دفع آمن ومشفر
         </p>
       </form>
@@ -1099,17 +997,17 @@ const IB = ({ title, body, tag }: { title:string; body:string; tag?:string }) =>
       </h3>
       <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', lineHeight:'1.85', color:'var(--mid)', fontWeight:400, margin:0 }}>{body}</p>
     </div>
-    {tag && <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'10px', fontWeight:600, letterSpacing:'0.14em', textTransform:'uppercase', padding:'4px 10px', border:'1px solid var(--line-dk)', color:'var(--gold-dk)', flexShrink:0, marginTop:'2px' }}>{tag}</span>}
+    {tag && <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'10px', fontWeight:600, letterSpacing:'0.14em', textTransform:'uppercase', padding:'4px 10px', border:'1px solid var(--line-dk)', color:'var(--gold-dk)', flexShrink:0 }}>{tag}</span>}
   </div>
 );
 
 export function Privacy() {
   return (
     <Shell title="سياسة الخصوصية" sub="قانوني">
-      <IB title="البيانات التي نجمعها"  body="فقط اسمك ورقم هاتفك وعنوان التوصيل — ما هو ضروري لمعالجة طلبك."/>
-      <IB title="كيف نستخدمها"          body="حصرياً لتنفيذ وتوصيل مشترياتك."/>
-      <IB title="الأمان"                 body="بياناتك محمية بتشفير قياسي وبنية تحتية آمنة."/>
-      <IB title="مشاركة البيانات"        body="لا نبيع بياناتك. تُشارك فقط مع شركاء التوصيل الموثوقين."/>
+      <IB title="البيانات التي نجمعها" body="فقط اسمك ورقم هاتفك وعنوان التوصيل — ما هو ضروري لمعالجة طلبك."/>
+      <IB title="كيف نستخدمها"         body="حصرياً لتنفيذ وتوصيل مشترياتك."/>
+      <IB title="الأمان"                body="بياناتك محمية بتشفير قياسي وبنية تحتية آمنة."/>
+      <IB title="مشاركة البيانات"       body="لا نبيع بياناتك. تُشارك فقط مع شركاء التوصيل الموثوقين."/>
       <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'12px', letterSpacing:'0.1em', color:'var(--dim)', marginTop:'20px' }}>آخر تحديث: فبراير 2026</p>
     </Shell>
   );
@@ -1118,10 +1016,10 @@ export function Privacy() {
 export function Terms() {
   return (
     <Shell title="شروط الاستخدام" sub="قانوني">
-      <IB title="حسابك"             body="أنت مسؤول عن أمان بيانات تسجيل الدخول وكل النشاط تحت حسابك."/>
-      <IB title="المدفوعات"          body="لا رسوم مخفية. السعر المعروض هو السعر النهائي."/>
-      <IB title="الاستخدام المحظور"  body="المنتجات الأصيلة فقط. لا مجال للمنتجات المقلدة." tag="صارم"/>
-      <IB title="القانون الحاكم"    body="تخضع هذه الشروط لقوانين جمهورية الجزائر الديمقراطية الشعبية."/>
+      <IB title="حسابك"            body="أنت مسؤول عن أمان بيانات تسجيل الدخول وكل النشاط تحت حسابك."/>
+      <IB title="المدفوعات"         body="لا رسوم مخفية. السعر المعروض هو السعر النهائي."/>
+      <IB title="الاستخدام المحظور" body="المنتجات الأصيلة فقط. لا مجال للمنتجات المقلدة." tag="صارم"/>
+      <IB title="القانون الحاكم"   body="تخضع هذه الشروط لقوانين جمهورية الجزائر الديمقراطية الشعبية."/>
     </Shell>
   );
 }
@@ -1129,9 +1027,9 @@ export function Terms() {
 export function Cookies() {
   return (
     <Shell title="سياسة الكوكيز" sub="قانوني">
-      <IB title="الكوكيز الأساسية"    body="ضرورية للجلسات والسلة والدفع. لا يمكن تعطيلها." tag="مطلوب"/>
-      <IB title="كوكيز التفضيلات"     body="تحفظ إعداداتك لتجربة أفضل." tag="اختياري"/>
-      <IB title="كوكيز التحليلات"     body="بيانات مجمعة لتحسين المنصة." tag="اختياري"/>
+      <IB title="الكوكيز الأساسية"  body="ضرورية للجلسات والسلة والدفع. لا يمكن تعطيلها." tag="مطلوب"/>
+      <IB title="كوكيز التفضيلات"   body="تحفظ إعداداتك لتجربة أفضل." tag="اختياري"/>
+      <IB title="كوكيز التحليلات"   body="بيانات مجمعة لتحسين المنصة." tag="اختياري"/>
       <div style={{ marginTop:'18px', padding:'14px', border:'1px solid var(--line-dk)', display:'flex', gap:'12px', alignItems:'flex-start', backgroundColor:'var(--sand)' }}>
         <ToggleRight style={{ width:'18px', height:'18px', color:'var(--gold)', flexShrink:0, marginTop:'1px' }}/>
         <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', color:'var(--mid)', lineHeight:'1.8', margin:0, fontWeight:400 }}>
@@ -1151,23 +1049,20 @@ export function Contact() {
         <div style={{ position:'absolute', bottom:0, left:0, right:0, height:'2px', background:'linear-gradient(to right,transparent,var(--gold),transparent)' }}/>
         <div style={{ maxWidth:'960px', margin:'0 auto', position:'relative', zIndex:2 }}>
           <div className="slabel" style={{ marginBottom:'14px', justifyContent:'flex-start' }}>تواصل معنا</div>
-          <h1 className="amiri" style={{ fontSize:'clamp(2.2rem,5vw,4.5rem)', fontWeight:700, color:'var(--ink)', lineHeight:0.95, margin:'0 0 14px' }}>
-            نسعد بخدمتك
-          </h1>
+          <h1 className="amiri" style={{ fontSize:'clamp(2.2rem,5vw,4.5rem)', fontWeight:700, color:'var(--ink)', lineHeight:0.95, margin:'0 0 14px' }}>نسعد بخدمتك</h1>
           <div className="cal-line"><GoldDiamond/></div>
           <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'14px', color:'var(--mid)', marginTop:'12px', fontWeight:400 }}>نرد خلال 24 ساعة</p>
         </div>
       </div>
 
       <div className="contact-g" style={{ maxWidth:'960px', margin:'0 auto', padding:'48px 28px 80px' }}>
-        {/* Info */}
         <div>
           <div style={{ backgroundColor:'var(--cream)', border:'1px solid var(--line-dk)', padding:'24px', marginBottom:'12px' }}>
             <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--gold)', marginBottom:'18px' }}>طرق التواصل</p>
             {[
-              { icon:'📞', label:'الهاتف',          val:'+213 550 000 000', href:'tel:+213550000000' },
-              { icon:'✉️',  label:'البريد الإلكتروني',val:'info@store.dz',    href:'mailto:info@store.dz' },
-              { icon:'📍', label:'الموقع',           val:'أولاد فايت، الجزائر', href:undefined },
+              { icon:'📞', label:'الهاتف',           val:'+213 550 000 000', href:'tel:+213550000000' },
+              { icon:'✉️',  label:'البريد الإلكتروني', val:'info@store.dz',   href:'mailto:info@store.dz' },
+              { icon:'📍', label:'الموقع',            val:'أولاد فايت، الجزائر', href:undefined },
             ].map(item=>(
               <a key={item.label} href={item.href||'#'} style={{ display:'flex', alignItems:'center', gap:'14px', padding:'14px 0', borderBottom:'1px solid var(--line)', textDecoration:'none', transition:'padding-right 0.2s' }}
                 onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.paddingRight='6px';}}
@@ -1181,7 +1076,6 @@ export function Contact() {
               </a>
             ))}
           </div>
-          {/* Quote */}
           <div style={{ backgroundColor:'var(--walnut)', padding:'22px 24px', position:'relative', overflow:'hidden' }}>
             <div style={{ position:'absolute', inset:0, opacity:0.08 }} className="geo-bg"/>
             <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px', background:'linear-gradient(to right,transparent,var(--gold-lt),transparent)' }}/>
@@ -1194,7 +1088,6 @@ export function Contact() {
           </div>
         </div>
 
-        {/* Form */}
         <div style={{ backgroundColor:'var(--cream)', border:'1px solid var(--line-dk)', padding:'28px' }}>
           <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--gold)', marginBottom:'22px' }}>أرسل رسالة</p>
           {sent ? (
@@ -1206,7 +1099,7 @@ export function Contact() {
           ) : (
             <form onSubmit={e=>{e.preventDefault();setSent(true);}} style={{ display:'flex', flexDirection:'column', gap:'14px' }}>
               {[
-                { label:'اسمك', type:'text',  key:'name',  ph:'الاسم الكامل' },
+                { label:'اسمك',   type:'text',  key:'name',  ph:'الاسم الكامل' },
                 { label:'البريد', type:'email', key:'email', ph:'بريدك@الإلكتروني' },
               ].map(f=>(
                 <div key={f.key}>
