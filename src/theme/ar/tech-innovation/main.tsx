@@ -873,7 +873,7 @@ export function ProductForm({
     setFormErrors({});
     setSubmitting(true);
     try {
-      const payload = { ...formData, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceLivraison: getPriceLivraison() };
+      const payload = { ...formData, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceLivraison: getPriceLivraison() ,variantDetailId:   getVariantDetailId()};
       await axios.post(`${API_URL}/orders/create`, payload);
       if (typeof window !== 'undefined' && formData.customerId)
         localStorage.setItem('customerId', formData.customerId);

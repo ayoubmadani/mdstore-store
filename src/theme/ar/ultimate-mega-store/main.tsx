@@ -1067,7 +1067,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const handleSubmit=async(e:React.FormEvent)=>{
     e.preventDefault(); const er=validate(); if(Object.keys(er).length){setErrors(er);return;} setErrors({}); setSub(true);
     try{
-      await axios.post(`${API_URL}/orders/create`,{...fd,productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});
+      await axios.post(`${API_URL}/orders/create`,{...fd,productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv() , variantDetailId:   getVariantDetailId()});
       if(typeof window!=='undefined'&&fd.customerId) localStorage.setItem('customerId',fd.customerId);
       router.push(`/lp/${domain}/successfully`);
     }catch(err){console.error(err);}finally{setSub(false);}

@@ -939,7 +939,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   const handleSubmit = async (e:React.FormEvent)=>{
     e.preventDefault(); const errs=validate(); if(Object.keys(errs).length){setFormErrors(errs);return;} setFormErrors({}); setSubmitting(true);
-    try { await axios.post(`${API_URL}/orders/create`,{ ...formData, productId:product.id, storeId:product.store.id, userId, selectedOffer, selectedVariants, platform:platform||'store', finalPrice, totalPrice:getTotalPrice(), priceLivraison:getPriceLivraison() }); if(typeof window!=='undefined'&&formData.customerId) localStorage.setItem('customerId',formData.customerId); router.push(`/lp/${domain}/successfully`); } catch(err){console.error(err);} finally{setSubmitting(false);}
+    try { await axios.post(`${API_URL}/orders/create`,{ ...formData,variantDetailId:   getVariantDetailId() , productId:product.id, storeId:product.store.id, userId, selectedOffer, selectedVariants, platform:platform||'store', finalPrice, totalPrice:getTotalPrice(), priceLivraison:getPriceLivraison() }); if(typeof window!=='undefined'&&formData.customerId) localStorage.setItem('customerId',formData.customerId); router.push(`/lp/${domain}/successfully`); } catch(err){console.error(err);} finally{setSubmitting(false);}
   };
   const onFocus=(e:React.FocusEvent<any>)=>{ e.target.style.borderColor='var(--terra)'; e.target.style.boxShadow='0 0 0 4px rgba(224,122,95,0.12)'; };
   const onBlur =(e:React.FocusEvent<any>,err?:boolean)=>{ e.target.style.borderColor=err?'var(--terra)':'var(--border)'; e.target.style.boxShadow='none'; };

@@ -1020,7 +1020,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     };
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); const er = validate(); if (Object.keys(er).length) { setErrors(er); return; } setErrors({}); setSub(true);
-        const payload = { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId:   getVariantDetailId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() }
+        const payload = { ...fd,  productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId:   getVariantDetailId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() }
         console.log(payload);
         
 
