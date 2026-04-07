@@ -1393,9 +1393,9 @@ export function Footer({ store }: any) {
 
         <div className="flex flex-wrap justify-center gap-6 mb-8">
           {[
-            { href: `/${store.subdomain}/Privacy`, label: isRTL ? 'سياسة الخصوصية' : 'Privacy' },
-            { href: `/${store.subdomain}/Terms`,   label: isRTL ? 'الشروط'           : 'Terms'   },
-            { href: `/${store.subdomain}/Cookies`, label: isRTL ? 'ملفات الارتباط'  : 'Cookies' },
+            { href: `/Privacy`, label: isRTL ? 'سياسة الخصوصية' : 'Privacy' },
+            { href: `/Terms`,   label: isRTL ? 'الشروط'           : 'Terms'   },
+            { href: `/Cookies`, label: isRTL ? 'ملفات الارتباط'  : 'Cookies' },
           ].map(link => (
             <a
               key={link.href}
@@ -1442,9 +1442,9 @@ export function Navbar({ store }: any) {
   }, []);
 
   const navItems = [
-    { href: `/${store.subdomain}`,         label: isRTL ? 'الرئيسية'       : 'Home'    },
-    { href: `/${store.subdomain}/contact`, label: isRTL ? 'اتصل بنا'       : 'Contact' },
-    { href: `/${store.subdomain}/Privacy`, label: isRTL ? 'سياسة الخصوصية' : 'Privacy' },
+    { href: `/`,         label: isRTL ? 'الرئيسية'       : 'Home'    },
+    { href: `/contact`, label: isRTL ? 'اتصل بنا'       : 'Contact' },
+    { href: `/Privacy`, label: isRTL ? 'سياسة الخصوصية' : 'Privacy' },
   ];
 
   return (
@@ -1479,7 +1479,7 @@ export function Navbar({ store }: any) {
 
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex justify-between items-center h-16">
-            <Link href={`/${store.subdomain}`} className="flex items-center gap-2.5 group">
+            <Link href={`/`} className="flex items-center gap-2.5 group">
               <div className="feather-drift opacity-80 group-hover:opacity-100 transition-opacity">
                 <SunIcon />
               </div>
@@ -1676,6 +1676,12 @@ export function ProductForm({
     return e;
   };
 
+  
+  const getVariantDetailId = useCallback(() => {
+    if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+    return product.variantDetails.find((v: any) => variantMatches(v, selectedVariants))?.id;
+  }, [product.variantDetails, selectedVariants]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs = validate();
@@ -1683,7 +1689,8 @@ export function ProductForm({
     setFormErrors({});
     setSubmitting(true);
     try {
-      await axios.post(`${API_URL}/orders`, { ...formData, customerWilayaId: +formData.customerWelaya,customerCommuneId: +formData.customerCommune, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceShip : getPriceLivraison(), });
+      await axios.post(`${API_URL}/orders`, {
+        variantDetailId: getVariantDetailId(), ...formData, customerWilayaId: +formData.customerWelaya,customerCommuneId: +formData.customerCommune, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceShip : getPriceLivraison(), });
       if (typeof window !== 'undefined') {
         localStorage.setItem('customerId', formData.customerId || '');
       }

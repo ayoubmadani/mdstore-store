@@ -367,7 +367,7 @@ export function Footer({ store }: any) {
                         <p style={{ fontSize: '13px', lineHeight: '1.8', color: 'rgba(255,255,255,0.4)', maxWidth: '280px', fontWeight: 300, margin: 0 }}>
                             {store.description || 'ثيم متعدد الاستخدامات عالي الأداء يوفر تجربة تسوق تقنية متكاملة لجميع أنواع المنتجات.'}
                         </p>
-                        <p style={{ fontSize: '11px', color: 'var(--blue)', letterSpacing: '0.1em', fontWeight: 600 }}>{store.subdomain.toUpperCase()}</p>
+                        <p style={{ fontSize: '11px', color: 'var(--blue)', letterSpacing: '0.1em', fontWeight: 600 }}>{store.name.toUpperCase()}</p>
                     </div>
 
                     {/* ② Division: Quick Links */}

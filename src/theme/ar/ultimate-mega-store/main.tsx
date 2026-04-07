@@ -240,7 +240,7 @@ export function Navbar({ store }: { store: Store }) {
         <div style={{ maxWidth:'1400px', margin:'0 auto', padding:'0 20px', height:'64px', display:'flex', alignItems:'center', gap:'16px' }}>
 
           {/* Logo */}
-          <Link href={`/${store.subdomain}`} style={{ textDecoration:'none', flexShrink:0, display:'flex', alignItems:'center', gap:'10px' }}>
+          <Link href={`/`} style={{ textDecoration:'none', flexShrink:0, display:'flex', alignItems:'center', gap:'10px' }}>
             {store.design?.logoUrl
               ? <img src={store.design.logoUrl} alt={store.name} style={{ height:'32px', width:'auto', objectFit:'contain' }}/>
               : (
@@ -290,7 +290,7 @@ export function Navbar({ store }: { store: Store }) {
               {cats.length>0 && (
                 <div className="mega-panel">
                   {cats.slice(0,8).map((cat:any)=>(
-                    <Link key={cat.id} href={`/${store.subdomain}?category=${cat.id}`}
+                    <Link key={cat.id} href={`/?category=${cat.id}`}
                       style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'8px', padding:'12px 8px', borderRadius:'8px', textDecoration:'none', transition:'background 0.18s', textAlign:'center' }}
                       onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--off)';}}
                       onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>
@@ -323,7 +323,7 @@ export function Navbar({ store }: { store: Store }) {
 
             {/* Category quick links */}
             {cats.slice(0,6).map((cat:any)=>(
-              <Link key={cat.id} href={`/${store.subdomain}?category=${cat.id}`}
+              <Link key={cat.id} href={`/?category=${cat.id}`}
                 style={{ display:'flex', alignItems:'center', padding:'0 14px', height:'42px', color:'rgba(255,255,255,0.7)', fontSize:'13px', fontWeight:500, textDecoration:'none', whiteSpace:'nowrap', transition:'all 0.18s', flexShrink:0 }}
                 onMouseEnter={e=>{const el=e.currentTarget as HTMLElement; el.style.color='var(--white)'; el.style.background='rgba(255,255,255,0.08)';}}
                 onMouseLeave={e=>{const el=e.currentTarget as HTMLElement; el.style.color='rgba(255,255,255,0.7)'; el.style.background='transparent';}}>
@@ -338,9 +338,9 @@ export function Navbar({ store }: { store: Store }) {
       <div style={{ maxHeight:open?'320px':'0', overflow:'hidden', transition:'max-height 0.3s ease', backgroundColor:'var(--white)', borderBottom:open?'1px solid var(--line)':'none' }}>
         <div style={{ padding:'12px 20px 20px' }}>
           {[
-            { href:`/${store.subdomain}`,         label:'المتجر' },
-            { href:`/${store.subdomain}/contact`, label:'تواصل' },
-            { href:`/${store.subdomain}/Privacy`, label:'الخصوصية' },
+            { href:`/`,         label:'المتجر' },
+            { href:`/contact`, label:'تواصل' },
+            { href:`/Privacy`, label:'الخصوصية' },
           ].map(l=>(
             <Link key={l.href} href={l.href} onClick={()=>setOpen(false)}
               style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'11px 0', fontSize:'14px', fontWeight:600, color:'var(--mid)', textDecoration:'none', borderBottom:'1px solid var(--line)' }}>
@@ -348,7 +348,7 @@ export function Navbar({ store }: { store: Store }) {
             </Link>
           ))}
           {cats.slice(0,5).map((cat:any)=>(
-            <Link key={cat.id} href={`/${store.subdomain}?category=${cat.id}`} onClick={()=>setOpen(false)}
+            <Link key={cat.id} href={`/?category=${cat.id}`} onClick={()=>setOpen(false)}
               style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'11px 0', fontSize:'14px', fontWeight:500, color:'var(--mid)', textDecoration:'none', borderBottom:'1px solid var(--line)' }}>
               {cat.name} <Cr style={{ width:'13px', height:'13px', color:'var(--blue)' }}/>
             </Link>
@@ -387,16 +387,16 @@ export function Footer({ store }: any) {
 
           {[
             { title:'التسوق', links:[
-              [`/${store.subdomain}`, 'كل المنتجات'],
-              [`/${store.subdomain}`, 'العروض'],
-              [`/${store.subdomain}`, 'وصل جديد'],
-              [`/${store.subdomain}`, 'الأكثر مبيعاً'],
+              [`/`, 'كل المنتجات'],
+              [`/`, 'العروض'],
+              [`/`, 'وصل جديد'],
+              [`/`, 'الأكثر مبيعاً'],
             ]},
             { title:'الدعم', links:[
-              [`/${store.subdomain}/contact`, 'اتصل بنا'],
-              [`/${store.subdomain}/Privacy`, 'الخصوصية'],
-              [`/${store.subdomain}/Terms`,   'الشروط'],
-              [`/${store.subdomain}/Cookies`, 'الكوكيز'],
+              [`/contact`, 'اتصل بنا'],
+              [`/Privacy`, 'الخصوصية'],
+              [`/Terms`,   'الشروط'],
+              [`/Cookies`, 'الكوكيز'],
             ]},
             { title:'تواصل', links:[
               ['#', '+213 550 000 000'],
@@ -674,7 +674,7 @@ export function Home({ store }: any) {
                 const pr   = parseFloat(String(p.price));
                 const disc = p.priceOriginal ? Math.round(((p.priceOriginal-p.price)/p.priceOriginal)*100) : 0;
                 return (
-                  <Link key={p.id} href={`/${store.subdomain}/product/${p.slug||p.id}`}
+                  <Link key={p.id} href={`/product/${p.slug||p.id}`}
                     style={{ display:'block', textDecoration:'none', borderRadius:'8px', border:'1px solid var(--line)', overflow:'hidden', transition:'box-shadow 0.2s' }}
                     onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.boxShadow='0 4px 16px rgba(15,27,45,0.1)';}}
                     onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.boxShadow='none';}}>
@@ -805,7 +805,7 @@ export function Home({ store }: any) {
                   const pr   = parseFloat(String(p.price));
                   const disc = p.priceOriginal ? Math.round(((p.priceOriginal-p.price)/p.priceOriginal)*100) : 0;
                   return (
-                    <Link key={p.id} href={`/${store.subdomain}/product/${p.slug||p.id}`}
+                    <Link key={p.id} href={`/product/${p.slug||p.id}`}
                       style={{ display:'flex', gap:'16px', background:'var(--white)', border:'1px solid var(--line)', borderRadius:'10px', overflow:'hidden', textDecoration:'none', transition:'box-shadow 0.2s', alignItems:'center' }}
                       onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.boxShadow='0 4px 16px rgba(15,27,45,0.1)';}}
                       onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.boxShadow='none';}}>
@@ -1058,6 +1058,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if(!fd.customerCommune)      e.customerCommune='البلدية مطلوبة';
     return e;
   };
+  
+  const getVariantDetailId = useCallback(() => {
+    if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+    return product.variantDetails.find((v: any) => variantMatches(v, selectedVariants))?.id;
+  }, [product.variantDetails, selectedVariants]);
+
   const handleSubmit=async(e:React.FormEvent)=>{
     e.preventDefault(); const er=validate(); if(Object.keys(er).length){setErrors(er);return;} setErrors({}); setSub(true);
     try{

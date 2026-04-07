@@ -167,10 +167,10 @@ const fetchCommunes = async (wid:string): Promise<Commune[]> => { try { const {d
 function MenuOverlay({ store, onClose }: { store:any; onClose:()=>void }) {
   const isRTL = store.language === 'ar';
   const links = [
-    { href:`/${store.subdomain}`,         ar:'الرئيسية', en:'HOME'    },
-    { href:`/${store.subdomain}/contact`, ar:'اتصل بنا', en:'CONTACT' },
-    { href:`/${store.subdomain}/Privacy`, ar:'الخصوصية', en:'PRIVACY' },
-    { href:`/${store.subdomain}/Terms`,   ar:'الشروط',   en:'TERMS'   },
+    { href:`/`,         ar:'الرئيسية', en:'HOME'    },
+    { href:`/contact`, ar:'اتصل بنا', en:'CONTACT' },
+    { href:`/Privacy`, ar:'الخصوصية', en:'PRIVACY' },
+    { href:`/Terms`,   ar:'الشروط',   en:'TERMS'   },
   ];
   return (
     <div className="fixed inset-0 z-[200] flex flex-col"
@@ -218,7 +218,7 @@ export default function Main({ store, children }: any) {
 
       {/* Header — fixed minimal bar */}
       <header style={{ position:'fixed', top:0, left:0, right:0, zIndex:50, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 24px', height:'52px', backgroundColor:'var(--paper)', borderBottom:'1px solid var(--ink)', fontFamily:"'Space Mono',monospace" }}>
-        <Link href={`/${store.subdomain}`} style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'1rem', color:'var(--ink)', letterSpacing:'0.02em', textDecoration:'none' }}>
+        <Link href={`/`} style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'1rem', color:'var(--ink)', letterSpacing:'0.02em', textDecoration:'none' }}>
           {store.name.toUpperCase()}
         </Link>
 
@@ -283,14 +283,14 @@ export function Footer({ store }: any) {
       <div style={{ position:'relative', zIndex:2, padding:'32px 24px', borderBottom:'1px solid rgba(242,239,232,0.1)' }}>
         <p style={{ fontSize:'10px', lineHeight:'2.2', letterSpacing:'0.08em', color:'rgba(242,239,232,0.4)', maxWidth:'880px' }}>
           {isRTL
-            ? `${store.name.toUpperCase()} · متجر الستايل الأصيل · الجزائر · SS${year} · جميع المنتجات أصيلة · PRIVACY — ${store.subdomain}/Privacy · TERMS — ${store.subdomain}/Terms · COOKIES — ${store.subdomain}/Cookies · CONTACT — ${store.subdomain}/contact · © ${year}`
-            : `${store.name.toUpperCase()} · AUTHENTIC STREETWEAR · ALGIERS, DZ · SS${year} COLLECTION · ALL PRODUCTS VERIFIED · FAST NATIONWIDE DELIVERY · PRIVACY — ${store.subdomain}/Privacy · TERMS — ${store.subdomain}/Terms · COOKIES — ${store.subdomain}/Cookies · CONTACT — ${store.subdomain}/contact · ALL RIGHTS RESERVED © ${year} ${store.name.toUpperCase()} · ZINE DROP THEME`
+            ? `${store.name.toUpperCase()} · متجر الستايل الأصيل · الجزائر · SS${year} · جميع المنتجات أصيلة · PRIVACY — Privacy · TERMS — Terms · COOKIES — Cookies · CONTACT — contact · © ${year}`
+            : `${store.name.toUpperCase()} · AUTHENTIC STREETWEAR · ALGIERS, DZ · SS${year} COLLECTION · ALL PRODUCTS VERIFIED · FAST NATIONWIDE DELIVERY · PRIVACY — Privacy · TERMS — Terms · COOKIES — Cookies · CONTACT — contact · ALL RIGHTS RESERVED © ${year} ${store.name.toUpperCase()} · ZINE DROP THEME`
           }
         </p>
       </div>
       {/* Links row */}
       <div style={{ position:'relative', zIndex:2, padding:'14px 24px', display:'flex', flexWrap:'wrap', gap:'20px', borderBottom:'1px solid rgba(242,239,232,0.1)' }}>
-        {[['PRIVACY',`/${store.subdomain}/Privacy`],['TERMS',`/${store.subdomain}/Terms`],['COOKIES',`/${store.subdomain}/Cookies`],['CONTACT',`/${store.subdomain}/contact`]].map(([lbl,href])=>(
+        {[['PRIVACY',`/Privacy`],['TERMS',`/Terms`],['COOKIES',`/Cookies`],['CONTACT',`/contact`]].map(([lbl,href])=>(
           <a key={lbl} href={href} style={{ fontSize:'8px', letterSpacing:'0.2em', color:'rgba(242,239,232,0.35)', textDecoration:'none', transition:'color 0.2s' }}
             onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--punch)';}}
             onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='rgba(242,239,232,0.35)';}}>
@@ -730,6 +730,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if(!fd.customerCommune)      e.customerCommune='البلدية مطلوبة';
     return e;
   };
+  
+  const getVariantDetailId = useCallback(() => {
+    if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+    return product.variantDetails.find((v: any) => variantMatches(v, selectedVariants))?.id;
+  }, [product.variantDetails, selectedVariants]);
+
   const handleSubmit=async(e:React.FormEvent)=>{
     e.preventDefault(); const er=validate(); if(Object.keys(er).length){setErrors(er);return;} setErrors({}); setSub(true);
     try{ await axios.post(`${API_URL}/orders/create`,{...fd,productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()}); if(typeof window!=='undefined'&&fd.customerId) localStorage.setItem('customerId',fd.customerId); router.push(`/lp/${domain}/successfully`); }catch(err){console.error(err);}finally{setSub(false);}

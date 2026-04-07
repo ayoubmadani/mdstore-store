@@ -144,9 +144,9 @@ export function Navbar({ store }: { store: Store }) {
   }, []);
 
   const navItems = [
-    { href: `/${store.subdomain}`,         label: 'الرئيسية',        code: '٠١' },
-    { href: `/${store.subdomain}/contact`, label: 'اتصل بنا',        code: '٠٢' },
-    { href: `/${store.subdomain}/Privacy`, label: 'سياسة الخصوصية', code: '٠٣' },
+    { href: `/`,         label: 'الرئيسية',        code: '٠١' },
+    { href: `/contact`, label: 'اتصل بنا',        code: '٠٢' },
+    { href: `/Privacy`, label: 'سياسة الخصوصية', code: '٠٣' },
   ];
 
   const initials = store.name.split(' ').filter(Boolean).map((w: string) => w[0].toUpperCase()).join('');
@@ -163,7 +163,7 @@ export function Navbar({ store }: { store: Store }) {
         <div className="flex justify-between items-center h-16">
 
           {/* الشعار */}
-          <Link href={`/${store.subdomain}`} className="flex items-center gap-3 group">
+          <Link href={`/`} className="flex items-center gap-3 group">
             <div className="relative">
               <div className="w-9 h-9 flex items-center justify-center" style={{ border: '1px solid #00E5FF', boxShadow: '0 0 12px rgba(0,229,255,0.25)', background: 'rgba(0,229,255,0.05)' }}>
                 {store.design.logoUrl
@@ -263,9 +263,9 @@ export function Footer({ store }: any) {
           <div className="flex flex-col gap-3">
             <p className="text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: '#00E5FF' }}>// التنقل</p>
             {[
-              { href: `/${store.subdomain}/Privacy`, label: 'سياسة_الخصوصية'     },
-              { href: `/${store.subdomain}/Terms`,   label: 'شروط_الاستخدام'     },
-              { href: `/${store.subdomain}/Cookies`, label: 'بروتوكول_الكوكيز'  },
+              { href: `/Privacy`, label: 'سياسة_الخصوصية'     },
+              { href: `/Terms`,   label: 'شروط_الاستخدام'     },
+              { href: `/Cookies`, label: 'بروتوكول_الكوكيز'  },
             ].map(link => (
               <a key={link.href} href={link.href} className="flex items-center gap-2 text-[11px] tracking-wider hover:text-[#00E5FF] transition-colors group" style={{ color: '#3A6070' }}>
                 <span className="group-hover:text-[#39FF14] transition-colors" style={{ color: '#1A3040' }}>›</span>
@@ -859,6 +859,12 @@ export function ProductForm({
     if (!formData.customerCommune)      e.customerCommune = 'البلدية مطلوبة';
     return e;
   };
+
+  
+  const getVariantDetailId = useCallback(() => {
+    if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+    return product.variantDetails.find((v: any) => variantMatches(v, selectedVariants))?.id;
+  }, [product.variantDetails, selectedVariants]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

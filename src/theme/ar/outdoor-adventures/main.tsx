@@ -245,9 +245,9 @@ export function Navbar({ store }: { store: Store }) {
   if (!store) return null;
 
   const links = [
-    { href:`/${store.subdomain}`,         label:'الرئيسية'  },
-    { href:`/${store.subdomain}/contact`, label:'تواصل'     },
-    { href:`/${store.subdomain}/Privacy`, label:'الخصوصية'  },
+    { href:`/`,         label:'الرئيسية'  },
+    { href:`/contact`, label:'تواصل'     },
+    { href:`/Privacy`, label:'الخصوصية'  },
   ];
 
   return (
@@ -279,7 +279,7 @@ export function Navbar({ store }: { store: Store }) {
       <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'0 24px', height:'66px', display:'flex', alignItems:'center', gap:'24px' , justifyContent: "space-between" }}>
 
         {/* Logo + Name */}
-        <Link href={`/${store.subdomain}`} style={{ textDecoration:'none', flexShrink:0, display:'flex', alignItems:'center', gap:'12px' }}>
+        <Link href={`/`} style={{ textDecoration:'none', flexShrink:0, display:'flex', alignItems:'center', gap:'12px' }}>
           {store.design?.logoUrl
             ? <img src={store.design.logoUrl} alt={store.name} style={{ height:'40px', width:'auto', objectFit:'contain' }}/>
             : (
@@ -342,7 +342,7 @@ export function Footer({ store }: any) {
 
           {/* ① Logo + Name + Slug */}
           <div>
-            <Link href={`/${store.subdomain}`} style={{ textDecoration:'none', display:'inline-flex', alignItems:'center', gap:'10px', marginBottom:'10px' }}>
+            <Link href={`/`} style={{ textDecoration:'none', display:'inline-flex', alignItems:'center', gap:'10px', marginBottom:'10px' }}>
               {store.design?.logoUrl
                 ? <img src={store.design.logoUrl} alt={store.name} style={{ height:'34px', width:'auto', objectFit:'contain' }}/>
                 : <Trees style={{ width:'22px', height:'22px', color:'var(--tan-lt)' }}/>
@@ -352,7 +352,7 @@ export function Footer({ store }: any) {
               </span>
             </Link>
             <p style={{ fontSize:'11px', color:'rgba(184,153,106,0.5)', letterSpacing:'0.1em', marginBottom:'14px' }}>
-              {store.subdomain}
+              {store.name}
             </p>
             <p style={{ fontSize:'13px', lineHeight:'1.8', color:'rgba(232,213,176,0.4)', maxWidth:'240px', fontWeight:400 }}>
               معدات التخييم والرحلات الخارجية. مُختبَرة في الميدان.
@@ -364,10 +364,10 @@ export function Footer({ store }: any) {
             <p className="bb" style={{ fontSize:'14px', letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--tan-lt)', marginBottom:'16px' }}>روابط</p>
             <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
               {[
-                { href:`/${store.subdomain}/Privacy`, label:'سياسة الخصوصية' },
-                { href:`/${store.subdomain}/Terms`,   label:'شروط الخدمة'    },
-                { href:`/${store.subdomain}/Cookies`, label:'ملفات الارتباط'  },
-                { href:`/${store.subdomain}/contact`, label:'اتصل بنا'        },
+                { href:`/Privacy`, label:'سياسة الخصوصية' },
+                { href:`/Terms`,   label:'شروط الخدمة'    },
+                { href:`/Cookies`, label:'ملفات الارتباط'  },
+                { href:`/contact`, label:'اتصل بنا'        },
               ].map(l=>(
                 <a key={l.href} href={l.href} style={{ fontSize:'13px', color:'rgba(232,213,176,0.45)', textDecoration:'none', transition:'color 0.2s' }}
                   onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--tan-lt)';}}
@@ -504,7 +504,7 @@ export function Home({ store }: any) {
           <div className="cat-grid">
             {cats.length>0
               ? cats.slice(0,8).map((cat:any)=>(
-                <Link key={cat.id} href={`/${store.subdomain}?category=${cat.id}`}
+                <Link key={cat.id} href={`/?category=${cat.id}`}
                   style={{ display:'flex', alignItems:'center', justifyContent:'center', padding:'18px 12px', backgroundColor:'var(--tan-bg)', border:'2px solid var(--tan)', textDecoration:'none', transition:'all 0.25s', textAlign:'center' }}
                   onMouseEnter={e=>{const el=e.currentTarget as HTMLElement; el.style.backgroundColor='var(--forest)'; el.style.borderColor='var(--forest)'; el.style.transform='translateY(-3px)'; el.style.boxShadow='0 8px 24px rgba(26,18,8,0.18)';}}
                   onMouseLeave={e=>{const el=e.currentTarget as HTMLElement; el.style.backgroundColor='var(--tan-bg)'; el.style.borderColor='var(--tan)'; el.style.transform='none'; el.style.boxShadow='none';}}>
@@ -587,7 +587,7 @@ export function Home({ store }: any) {
           </p>
           <div style={{ display:'flex', gap:'12px', justifyContent:'center', flexWrap:'wrap' }}>
             <a href="#products" className="btn-rust" style={{ fontSize:'17px', padding:'14px 36px' }}>تسوق الآن</a>
-            <Link href={`/${store.subdomain}/contact`} className="btn-forest" style={{ fontSize:'17px', padding:'14px 32px', textDecoration:'none', border:'2px solid var(--tan)' }}>تواصل معنا</Link>
+            <Link href={`/contact`} className="btn-forest" style={{ fontSize:'17px', padding:'14px 32px', textDecoration:'none', border:'2px solid var(--tan)' }}>تواصل معنا</Link>
           </div>
         </div>
       </section>
@@ -795,6 +795,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if(!fd.customerCommune)      e.customerCommune='البلدية مطلوبة';
     return e;
   };
+  
+  const getVariantDetailId = useCallback(() => {
+    if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+    return product.variantDetails.find((v: any) => variantMatches(v, selectedVariants))?.id;
+  }, [product.variantDetails, selectedVariants]);
+
   const handleSubmit=async(e:React.FormEvent)=>{
     e.preventDefault(); const er=validate(); if(Object.keys(er).length){setErrors(er);return;} setErrors({}); setSub(true);
     try{

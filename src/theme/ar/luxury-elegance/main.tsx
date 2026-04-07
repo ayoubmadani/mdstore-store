@@ -206,9 +206,9 @@ export function Navbar({ store }: { store: Store }) {
   },[]);
 
   const links = [
-    { href:`/${store.subdomain}`,         label:'المجموعة'  },
-    { href:`/${store.subdomain}/contact`, label:'تواصل'     },
-    { href:`/${store.subdomain}/Privacy`, label:'الخصوصية'  },
+    { href:`/`,         label:'المجموعة'  },
+    { href:`/contact`, label:'تواصل'     },
+    { href:`/Privacy`, label:'الخصوصية'  },
   ];
 
   return (
@@ -237,7 +237,7 @@ export function Navbar({ store }: { store: Store }) {
       )}
 
       <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'0 32px', height:'70px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-        <Link href={`/${store.subdomain}`} style={{ textDecoration:'none', flexShrink:0 }}>
+        <Link href={`/`} style={{ textDecoration:'none', flexShrink:0 }}>
           {store.design?.logoUrl
             ? <img src={store.design.logoUrl} alt={store.name} style={{ height:'28px', width:'auto', objectFit:'contain' }}/>
             : (
@@ -312,10 +312,10 @@ export function Footer({ store }: any) {
 
           {[
             { title:'روابط', links:[
-              [`/${store.subdomain}/Privacy`, 'الخصوصية'],
-              [`/${store.subdomain}/Terms`,   'الشروط'],
-              [`/${store.subdomain}/Cookies`, 'الكوكيز'],
-              [`/${store.subdomain}/contact`, 'تواصل'],
+              [`/Privacy`, 'الخصوصية'],
+              [`/Terms`,   'الشروط'],
+              [`/Cookies`, 'الكوكيز'],
+              [`/contact`, 'تواصل'],
             ]},
             { title:'الأتيليه', links:[
               ['#', '+213 550 000 000'],
@@ -534,7 +534,7 @@ export function Home({ store }: any) {
                     {featured.desc.replace(/<[^>]*>/g, '')}
                   </p>
                 )}
-                <Link href={`/${store.subdomain}/product/${featured.slug||featured.id}`} className="btn-gold" style={{ textDecoration:'none', alignSelf:'flex-start' }}>
+                <Link href={`/product/${featured.slug||featured.id}`} className="btn-gold" style={{ textDecoration:'none', alignSelf:'flex-start' }}>
                   اكتشف القطعة <ArrowRight style={{ width:'13px', height:'13px' }}/>
                 </Link>
               </div>
@@ -793,6 +793,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if(!fd.customerCommune)      e.customerCommune='البلدية مطلوبة';
     return e;
   };
+  
+  const getVariantDetailId = useCallback(() => {
+    if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+    return product.variantDetails.find((v: any) => variantMatches(v, selectedVariants))?.id;
+  }, [product.variantDetails, selectedVariants]);
+
   const handleSubmit=async(e:React.FormEvent)=>{
     e.preventDefault(); const er=validate(); if(Object.keys(er).length){setErrors(er);return;} setErrors({}); setSub(true);
     try{
@@ -1080,4 +1086,4 @@ export function Contact() {
       </div>
     </div>
   );
-}
+}  

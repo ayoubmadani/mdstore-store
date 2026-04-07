@@ -104,9 +104,9 @@ export function Navbar({ store }: { store: Store }) {
   const isRTL = store.language === 'ar';
 
   const navItems = [
-    { href: `/${store.subdomain}`,         label: isRTL ? 'الرئيسية'       : 'Home'    },
-    { href: `/${store.subdomain}/contact`, label: isRTL ? 'اتصل بنا'       : 'Contact' },
-    { href: `/${store.subdomain}/Privacy`, label: isRTL ? 'سياسة الخصوصية' : 'Privacy' },
+    { href: `/`,         label: isRTL ? 'الرئيسية'       : 'Home'    },
+    { href: `/contact`, label: isRTL ? 'اتصل بنا'       : 'Contact' },
+    { href: `/Privacy`, label: isRTL ? 'سياسة الخصوصية' : 'Privacy' },
   ];
 
   const initials = store.name
@@ -121,7 +121,7 @@ export function Navbar({ store }: { store: Store }) {
         <div className="flex justify-between items-center h-16">
 
           {/* Logo */}
-          <Link href={`/${store.subdomain}`} className="flex items-center gap-2 flex-shrink-0">
+          <Link href={`/`} className="flex items-center gap-2 flex-shrink-0">
             {store.design.logoUrl ? (
               <img src={store.design.logoUrl} alt={store.name} className="h-10 w-auto object-contain" />
             ) : (
@@ -215,9 +215,9 @@ export function Footer({ store }: any) {
 
           <div className="flex items-center gap-6">
             {/* FIX — 'Cookise' corrigé en 'Cookies' */}
-            <a href={`/${store.subdomain}/Privacy`} className="text-gray-400 hover:text-white text-sm transition-colors">Privacy</a>
-            <a href={`/${store.subdomain}/Terms`}   className="text-gray-400 hover:text-white text-sm transition-colors">Terms</a>
-            <a href={`/${store.subdomain}/Cookies`} className="text-gray-400 hover:text-white text-sm transition-colors">Cookies</a>
+            <a href={`/Privacy`} className="text-gray-400 hover:text-white text-sm transition-colors">Privacy</a>
+            <a href={`/Terms`}   className="text-gray-400 hover:text-white text-sm transition-colors">Terms</a>
+            <a href={`/Cookies`} className="text-gray-400 hover:text-white text-sm transition-colors">Cookies</a>
           </div>
         </div>
       </div>
@@ -273,7 +273,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
             )}
           </div>
           <Link
-            href={`/${store.subdomain}/product/${product.slug || product.id}`}
+            href={`/product/${product.slug || product.id}`}
             className="block w-full py-3 px-4 rounded-xl text-white font-bold transition-all hover:opacity-90 hover:shadow-lg active:scale-95 text-center"
             style={{ backgroundColor: store.design.primaryColor }}
           >

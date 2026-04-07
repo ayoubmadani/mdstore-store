@@ -442,6 +442,7 @@ export function Footer({ store }: any) {
               {store.hero?.subtitle?.substring(0, 80) || 'وجهتك الأولى لعالم الألعاب والاحتراف في الجزائر. جودة أصلية وتوصيل سريع.'}
             </p>
 
+            {/* أيقونات التواصل الاجتماعي أو الألعاب */}
             <div style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
               {['🎮', '🕹️', '👾', '🔥'].map((e, i) => (
                 <div key={i} style={{
@@ -1184,57 +1185,29 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const getLiv = useCallback((): number => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; }, [selW, fd.typeLivraison]);
   useEffect(() => { if (selW) setFd(f => ({ ...f, priceLoss: selW.livraisonReturn })); }, [selW]);
 
-  const fp = getFP();
-  const getTotalPrice = useCallback(
-    () => getFP() * fd.quantity + +getLiv(),
-    [getFP, fd.quantity, getLiv],
-  );
-  const validate = useCallback((): boolean => {
+  const fp = getFP(); const total = () => fp * fd.quantity + +getLiv();
+  const validate = () => {
     const e: Record<string, string> = {};
-    if (!fd.customerName.trim() || fd.customerName.length < 3)
-      e.customerName = 'الاسم الكامل مطلوب (3 أحرف على الأقل)';
-    if (!/^(0|\+213)[5-7][0-9]{8}$/.test(fd.customerPhone.replace(/\s/g, '')))
-      e.customerPhone = 'رقم هاتف جزائري صحيح مطلوب';
-    if (!fd.customerWelaya)  e.customerWelaya  = 'اختر الولاية';
-    if (!fd.customerCommune) e.customerCommune = 'اختر البلدية';
-    if (fd.quantity < 1)     e.quantity        = 'الكمية يجب أن تكون 1 على الأقل';
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  }, [fd]);
+    if (!fd.customerName.trim()) e.customerName = 'الاسم مطلوب';
+    if (!fd.customerPhone.trim()) e.customerPhone = 'رقم الهاتف مطلوب';
+    if (!fd.customerWelaya) e.customerWelaya = 'الولاية مطلوبة';
+    if (!fd.customerCommune) e.customerCommune = 'البلدية مطلوبة';
+    return e;
+  };
   const getVariantDetailId = useCallback(() => {
     if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+
     return product.variantDetails.find(v => variantMatches(v, selectedVariants))?.id;
   }, [product.variantDetails, selectedVariants]);
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
-    setSub(true);
-    const payload = {
-      productId:         product.id,
-      variantDetailId:   getVariantDetailId(),
-      domain,
-      storeId:           product.store.id,
-      offerId:           selectedOffer ?? undefined,
-      platform:          platform || 'store',
-      quantity:          fd.quantity,
-      totalPrice:        getTotalPrice(),
-      typeShip:          fd.typeLivraison,
-      priceShip:         getLiv(),
-      priceLoss:         fd.priceLoss,
-      customerId:        fd.customerId,
-      customerName:      fd.customerName,
-      customerPhone:     fd.customerPhone,
-      customerWilayaId:  fd.customerWelaya,
-      customerCommuneId: fd.customerCommune,
-    };
+    e.preventDefault(); const er = validate(); if (Object.keys(er).length) { setErrors(er); return; } setErrors({}); setSub(true);
+    console.log({ ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+
     try {
-      const res = await axios.post(`${API_URL}/orders`, payload);
-      if (res.status === 200 || res.status === 201) {
-        if (typeof window !== 'undefined' && res.data?.customerId)
-          localStorage.setItem('customerId', res.data.customerId);
-        router.push(`/${domain}/successfully`);
-      }
-    } catch { alert('حدث خطأ في الاتصال بالخادم'); } finally { setSub(false); }
+      await axios.post(`${API_URL}/orders`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVariantDetailId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+      if (typeof window !== 'undefined' && fd.customerId) localStorage.setItem('customerId', fd.customerId);
+      router.push(`/lp/${domain}/successfully`);
+    } catch (err) { console.error(err); } finally { setSub(false); }
   };
 
   return (
@@ -1338,7 +1311,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '12px 14px', background: 'rgba(0,212,255,0.04)' }}>
             <span style={{ fontSize: '12px', color: 'var(--mid)' }}>المجموع</span>
             <span className="neon-cyan orb" style={{ fontSize: '1.6rem', fontWeight: 900, letterSpacing: '-0.01em', textShadow: '0 0 12px rgba(0,212,255,0.6)' }}>
-              {getTotalPrice().toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '12px', color: 'var(--mid)' }}>دج</span>
+              {total().toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '12px', color: 'var(--mid)' }}>دج</span>
             </span>
           </div>
         </div>

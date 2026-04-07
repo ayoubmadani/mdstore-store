@@ -264,9 +264,9 @@ export function Navbar({ store }: { store: Store }) {
   const isRTL = store.language === 'ar';
   useEffect(() => { const h=()=>setScrolled(window.scrollY>20); window.addEventListener('scroll',h); return ()=>window.removeEventListener('scroll',h); },[]);
   const nav = [
-    { href:`/${store.subdomain}`,         label:isRTL?'الرئيسية':'Home',    icon:'🏠' },
-    { href:`/${store.subdomain}/contact`, label:isRTL?'اتصل بنا':'Contact', icon:'📞' },
-    { href:`/${store.subdomain}/Privacy`, label:isRTL?'الخصوصية':'Privacy', icon:'🔒' },
+    { href:`/`,         label:isRTL?'الرئيسية':'Home',    icon:'🏠' },
+    { href:`/contact`, label:isRTL?'اتصل بنا':'Contact', icon:'📞' },
+    { href:`/Privacy`, label:isRTL?'الخصوصية':'Privacy', icon:'🔒' },
   ];
   const initials = store.name.split(' ').filter(Boolean).map((w:string)=>w[0]).join('').slice(0,2).toUpperCase();
   return (
@@ -274,7 +274,7 @@ export function Navbar({ store }: { store: Store }) {
       style={{ backgroundColor:scrolled?'rgba(253,246,238,0.96)':'var(--cream)', backdropFilter:scrolled?'blur(18px)':'none', borderBottom:`1px solid ${scrolled?'var(--border)':'transparent'}`, boxShadow:scrolled?'0 2px 28px var(--shadow-soft)':'none' }}>
       <div className="max-w-7xl mx-auto px-5 lg:px-10">
         <div className="flex items-center justify-between py-3.5">
-          <Link href={`/${store.subdomain}`} className="flex items-center gap-3 group">
+          <Link href={`/`} className="flex items-center gap-3 group">
             <div className="relative w-12 h-12 rounded-2xl flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-105 group-hover:rotate-3"
               style={{ background:'linear-gradient(135deg, var(--terra) 0%, var(--honey) 100%)', boxShadow:'0 4px 16px var(--shadow-warm)' }}>
               {store.design.logoUrl
@@ -306,7 +306,7 @@ export function Navbar({ store }: { store: Store }) {
                 <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 group-hover:w-full transition-all duration-300 rounded-full" style={{ background:'var(--terra)' }}/>
               </Link>
             ))}
-            <Link href={`/${store.subdomain}`}
+            <Link href={`/`}
               className="btn-paw flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold text-white"
               style={{ background:'linear-gradient(135deg, var(--terra), var(--caramel))', boxShadow:'0 4px 18px var(--shadow-warm)' }}>
               <PawPrint size={14} color="rgba(255,255,255,0.85)"/>
@@ -368,10 +368,10 @@ export function Footer({ store }: any) {
             </h4>
             <div className="space-y-3">
               {[
-                { href:`/${store.subdomain}/Privacy`, label:isRTL?'سياسة الخصوصية':'Privacy Policy'   },
-                { href:`/${store.subdomain}/Terms`,   label:isRTL?'شروط الخدمة'    :'Terms of Service' },
-                { href:`/${store.subdomain}/Cookies`, label:isRTL?'ملفات الارتباط' :'Cookie Policy'    },
-                { href:`/${store.subdomain}/contact`, label:isRTL?'اتصل بنا'        :'Contact Us'       },
+                { href:`/Privacy`, label:isRTL?'سياسة الخصوصية':'Privacy Policy'   },
+                { href:`/Terms`,   label:isRTL?'شروط الخدمة'    :'Terms of Service' },
+                { href:`/Cookies`, label:isRTL?'ملفات الارتباط' :'Cookie Policy'    },
+                { href:`/contact`, label:isRTL?'اتصل بنا'        :'Contact Us'       },
               ].map(l=>(
                 <a key={l.href} href={l.href} className="flex items-center gap-2 text-sm font-semibold transition-all"
                   style={{ color:'rgba(253,246,238,0.5)' }}
@@ -931,6 +931,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if(!formData.customerCommune)      e.customerCommune='البلدية مطلوبة';
     return e;
   };
+  
+  const getVariantDetailId = useCallback(() => {
+    if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+    return product.variantDetails.find((v: any) => variantMatches(v, selectedVariants))?.id;
+  }, [product.variantDetails, selectedVariants]);
+
   const handleSubmit = async (e:React.FormEvent)=>{
     e.preventDefault(); const errs=validate(); if(Object.keys(errs).length){setFormErrors(errs);return;} setFormErrors({}); setSubmitting(true);
     try { await axios.post(`${API_URL}/orders/create`,{ ...formData, productId:product.id, storeId:product.store.id, userId, selectedOffer, selectedVariants, platform:platform||'store', finalPrice, totalPrice:getTotalPrice(), priceLivraison:getPriceLivraison() }); if(typeof window!=='undefined'&&formData.customerId) localStorage.setItem('customerId',formData.customerId); router.push(`/lp/${domain}/successfully`); } catch(err){console.error(err);} finally{setSubmitting(false);}

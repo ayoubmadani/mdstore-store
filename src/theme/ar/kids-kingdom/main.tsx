@@ -312,9 +312,9 @@ export function Navbar({ store }: { store: Store }) {
   }, []);
 
   const nav = [
-    { href: `/${store.subdomain}`,         label: isRTL ? 'الرئيسية' : 'Home',    emoji: '🏠' },
-    { href: `/${store.subdomain}/contact`, label: isRTL ? 'اتصل بنا' : 'Contact', emoji: '📞' },
-    { href: `/${store.subdomain}/Privacy`, label: isRTL ? 'الخصوصية' : 'Privacy', emoji: '🔒' },
+    { href: `/`,         label: isRTL ? 'الرئيسية' : 'Home',    emoji: '🏠' },
+    { href: `/contact`, label: isRTL ? 'اتصل بنا' : 'Contact', emoji: '📞' },
+    { href: `/Privacy`, label: isRTL ? 'الخصوصية' : 'Privacy', emoji: '🔒' },
   ];
 
   const initials = store.name.split(' ').filter(Boolean).map((w:string)=>w[0]).join('').slice(0,2).toUpperCase();
@@ -332,7 +332,7 @@ export function Navbar({ store }: { store: Store }) {
         <div className="flex items-center justify-between h-18 py-3">
 
           {/* Logo */}
-          <Link href={`/${store.subdomain}`} className="flex items-center gap-3 group">
+          <Link href={`/`} className="flex items-center gap-3 group">
             <div className="relative w-12 h-12 rounded-2xl flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:rotate-6 group-hover:scale-110"
               style={{ background: 'linear-gradient(135deg, var(--coral) 0%, var(--grape) 100%)', boxShadow: '0 4px 16px rgba(168,85,247,0.3)' }}>
               {store.design?.logoUrl
@@ -363,7 +363,7 @@ export function Navbar({ store }: { store: Store }) {
                 <span>{item.emoji}</span>{item.label}
               </Link>
             ))}
-            <Link href={`/${store.subdomain}`}
+            <Link href={`/`}
               className="btn-bouncy flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold text-white"
               style={{ background: 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: '0 4px 20px rgba(255,107,107,0.4)', letterSpacing: '0.04em' }}>
               <ShoppingBag className="w-4 h-4" />
@@ -440,10 +440,10 @@ export function Footer({ store }: any) {
             </h4>
             <div className="space-y-3">
               {[
-                { href: `/${store.subdomain}/Privacy`, label: isRTL ? 'سياسة الخصوصية' : 'Privacy Policy',   emoji: '🔒' },
-                { href: `/${store.subdomain}/Terms`,   label: isRTL ? 'شروط الخدمة'     : 'Terms of Service', emoji: '📋' },
-                { href: `/${store.subdomain}/Cookies`, label: isRTL ? 'ملفات الارتباط'   : 'Cookie Policy',   emoji: '🍪' },
-                { href: `/${store.subdomain}/contact`, label: isRTL ? 'اتصل بنا'         : 'Contact Us',      emoji: '💌' },
+                { href: `/Privacy`, label: isRTL ? 'سياسة الخصوصية' : 'Privacy Policy',   emoji: '🔒' },
+                { href: `/Terms`,   label: isRTL ? 'شروط الخدمة'     : 'Terms of Service', emoji: '📋' },
+                { href: `/Cookies`, label: isRTL ? 'ملفات الارتباط'   : 'Cookie Policy',   emoji: '🍪' },
+                { href: `/contact`, label: isRTL ? 'اتصل بنا'         : 'Contact Us',      emoji: '💌' },
               ].map(l => (
                 <a key={l.href} href={l.href}
                   className="flex items-center gap-2 text-sm font-medium transition-all hover:translate-x-1"
@@ -1126,9 +1126,16 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     return e;
   };
 
+  
+  const getVariantDetailId = useCallback(() => {
+    if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+    return product.variantDetails.find((v: any) => variantMatches(v, selectedVariants))?.id;
+  }, [product.variantDetails, selectedVariants]);
+
   const handleSubmit = async (e:React.FormEvent) => {
     e.preventDefault(); const errs=validate(); if(Object.keys(errs).length){setFormErrors(errs);return;} setFormErrors({}); setSubmitting(true);
-    try { await axios.post(`${API_URL}/orders`,{ ...formData, customerWilayaId: +formData.customerWelaya,customerCommuneId: +formData.customerCommune, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceShip : getPriceLivraison(), }); if(typeof window!=='undefined'&&formData.customerId) localStorage.setItem('customerId',formData.customerId); router.push(`/lp/${domain}/successfully`); } catch(err){console.error(err);} finally{setSubmitting(false);}
+    try { await axios.post(`${API_URL}/orders`,{
+        variantDetailId: getVariantDetailId(), ...formData, customerWilayaId: +formData.customerWelaya,customerCommuneId: +formData.customerCommune, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceShip : getPriceLivraison(), }); if(typeof window!=='undefined'&&formData.customerId) localStorage.setItem('customerId',formData.customerId); router.push(`/lp/${domain}/successfully`); } catch(err){console.error(err);} finally{setSubmitting(false);}
   };
 
   const onFocus = (e:React.FocusEvent<any>) => { e.target.style.borderColor='var(--sky)'; e.target.style.boxShadow='0 0 0 4px rgba(78,205,196,0.15)'; };

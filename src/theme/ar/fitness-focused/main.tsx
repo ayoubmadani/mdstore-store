@@ -1,348 +1,364 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
-  Flame, Zap, Trophy, Target, Dumbbell, Heart,
-  ChevronDown, ChevronLeft, ChevronRight,
-  MapPin, Phone, User, Truck, Shield, Package,
-  Building2, AlertCircle, Check, X,
-  Infinity, Link2, Share2, ShieldCheck,
-  Eye, Lock, Database, Globe, Bell,
-  CheckCircle2, Scale, CreditCard, Ban,
-  Cookie as CookieIcon, Settings, MousePointer2, ToggleRight,
-  Star, Play, ArrowRight, Mail, Instagram,
-  Activity, Timer, Award,
+  Star, Heart, ChevronDown, ChevronLeft, ChevronRight,
+  AlertCircle, X, Share2, Phone, User, ToggleRight,
+  Shield, ArrowRight, Plus, Minus, CheckCircle2, Lock, Menu,
 } from 'lucide-react';
 import { Store } from '@/types/store';
 
-// ─────────────────────────────────────────────────────────────
-// CONSTANTS & DESIGN TOKENS
-// ─────────────────────────────────────────────────────────────
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
-const FONT_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap');
-
-  *, *::before, *::after { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+const CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;500;600;700&display=swap');
+  *, *::before, *::after { box-sizing:border-box; -webkit-font-smoothing:antialiased; }
 
   :root {
-    --fire: #FF4500;
-    --fire-bright: #FF6B2B;
-    --fire-glow: rgba(255,69,0,0.25);
-    --gold: #FFB800;
-    --gold-light: #FFD54F;
-    --dark: #0A0A0A;
-    --dark-2: #111111;
-    --dark-3: #1A1A1A;
-    --dark-4: #222222;
-    --border: #2A2A2A;
-    --text-dim: #666666;
-    --text-mid: #999999;
-    --text-bright: #EEEEEE;
-    --white: #FFFFFF;
-    --green: #39D353;
-    --red: #FF3030;
+    --cream:   #FAF6EE;
+    --sand:    #F0E8D5;
+    --sand-dk: #E2D5BC;
+    --gold:    #B8973A;
+    --gold-lt: #D4B05A;
+    --gold-dk: #8A6E28;
+    --walnut:  #5C3D1E;
+    --walnut-2:#7A5230;
+    --ink:     #1A1208;
+    --mid:     #6B5A42;
+    --dim:     #9A8870;
+    --line:    rgba(184,151,58,0.18);
+    --line-dk: rgba(184,151,58,0.32);
   }
 
-  ::-webkit-scrollbar { width: 3px; }
-  ::-webkit-scrollbar-track { background: var(--dark); }
-  ::-webkit-scrollbar-thumb { background: var(--fire); }
+  body { background:var(--cream); color:var(--ink); font-family:'Cairo',sans-serif; }
+  ::-webkit-scrollbar { width:3px; }
+  ::-webkit-scrollbar-thumb { background:var(--gold); }
 
-  @keyframes burn   { 0%,100%{opacity:0.7;transform:scaleY(1)} 50%{opacity:1;transform:scaleY(1.05)} }
-  @keyframes pulse-fire { 0%,100%{box-shadow:0 0 15px rgba(255,69,0,0.3)} 50%{box-shadow:0 0 40px rgba(255,69,0,0.7),0 0 80px rgba(255,69,0,0.2)} }
-  @keyframes slide-in  { from{opacity:0;transform:translateX(-30px)} to{opacity:1;transform:translateX(0)} }
-  @keyframes count-up  { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes marquee   { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-  @keyframes shake     { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-3px)} 75%{transform:translateX(3px)} }
-  @keyframes glow-line { 0%,100%{opacity:0.4;width:30%} 50%{opacity:1;width:80%} }
-  @keyframes swipe-up  { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
+  .amiri { font-family:'Amiri',serif; }
 
-  .fire-text {
-    background: linear-gradient(135deg, #FF4500 0%, #FF8C00 40%, #FFB800 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .gold-text {
+    background:linear-gradient(135deg,var(--gold-dk),var(--gold-lt),var(--gold-dk));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
   }
-  .slash-divider { position: relative; }
-  .slash-divider::after { content:''; position:absolute; bottom:0; left:0; right:0; height:4px; background:linear-gradient(90deg, var(--fire), var(--gold), transparent); }
-  .diagonal-bg { clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%); }
-  .card-hover { transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease; }
-  .card-hover:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 20px 60px rgba(255,69,0,0.2); }
-  .btn-fire { transition: all 0.25s ease; position: relative; overflow: hidden; }
-  .btn-fire::after { content:''; position:absolute; top:-50%; left:-60%; width:30%; height:200%; background:rgba(255,255,255,0.15); transform:skewX(-20deg); transition:left 0.4s ease; }
-  .btn-fire:hover::after { left:130%; }
-  .marquee-wrap { overflow: hidden; white-space: nowrap; }
-  .marquee-inner { display: inline-block; animation: marquee 20s linear infinite; }
-  .diagonal-stripe {
-    background-image: repeating-linear-gradient(
-      -45deg,
-      transparent, transparent 8px,
-      rgba(255,69,0,0.04) 8px, rgba(255,69,0,0.04) 16px
-    );
+
+  .geo-bg {
+    background-color:var(--sand);
+    background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23B8973A' fill-opacity='0.06'%3E%3Cpath d='M30 0l8.66 5v10L30 20l-8.66-5V5L30 0zm0 40l8.66 5v10L30 60l-8.66-5V45L30 40zM0 20l8.66 5v10L0 40l-8.66-5V25L0 20zm60 0l8.66 5v10L60 40l-8.66-5V25L60 20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   }
-  .noise-overlay::after {
-    content:''; position:absolute; inset:0; pointer-events:none;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    opacity: 0.06;
+
+  .cal-line { display:flex; align-items:center; gap:14px; }
+  .cal-line::before,.cal-line::after { content:''; flex:1; height:1px; background:linear-gradient(to right,transparent,var(--gold)); }
+  .cal-line::after { background:linear-gradient(to left,transparent,var(--gold)); }
+
+  .slabel {
+    font-family:'Cairo',sans-serif; font-size:11px; font-weight:600;
+    letter-spacing:0.18em; text-transform:uppercase; color:var(--gold);
+    display:flex; align-items:center; gap:10px;
+  }
+  .slabel::before,.slabel::after { content:'◆'; font-size:6px; color:var(--gold); opacity:0.6; }
+
+  @keyframes fade-up { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  .fu   { animation:fade-up 0.65s cubic-bezier(0.22,1,0.36,1) both; }
+  .fu-1 { animation-delay:0.1s; }
+  .fu-2 { animation-delay:0.2s; }
+  .fu-3 { animation-delay:0.32s; }
+
+  @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  .t-card { transition:transform 0.4s cubic-bezier(0.22,1,0.36,1), box-shadow 0.4s; cursor:pointer; background:var(--cream); }
+  .t-card:hover { transform:translateY(-5px); box-shadow:0 20px 56px rgba(26,18,8,0.12); }
+  .t-card:hover .c-img img { transform:scale(1.04); }
+  .c-img img { display:block; width:100%; height:100%; object-fit:cover; transition:transform 0.5s cubic-bezier(0.22,1,0.36,1); }
+
+  .btn-gold {
+    display:inline-flex; align-items:center; gap:8px;
+    background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-dk));
+    background-size:200% auto;
+    color:var(--cream); font-family:'Cairo',sans-serif; font-size:14px; font-weight:600;
+    letter-spacing:0.06em; padding:13px 30px;
+    border:none; cursor:pointer; text-decoration:none; border-radius:0;
+    transition:background-position 0.4s, transform 0.25s, box-shadow 0.25s;
+    box-shadow:0 4px 16px rgba(184,151,58,0.3);
+  }
+  .btn-gold:hover { background-position:right center; transform:translateY(-2px); box-shadow:0 8px 28px rgba(184,151,58,0.45); }
+
+  .btn-outline {
+    display:inline-flex; align-items:center; gap:8px;
+    background:transparent; color:var(--gold);
+    border:1.5px solid var(--gold); font-family:'Cairo',sans-serif;
+    font-size:13px; font-weight:600; letter-spacing:0.06em; padding:12px 26px;
+    cursor:pointer; text-decoration:none; border-radius:0; transition:all 0.25s;
+  }
+  .btn-outline:hover { background:var(--gold); color:var(--cream); }
+
+  .inp {
+    width:100%; padding:12px 14px;
+    background:var(--cream); border:1.5px solid var(--line-dk);
+    font-family:'Cairo',sans-serif; font-size:13px; color:var(--ink);
+    outline:none; border-radius:0; transition:border-color 0.2s, box-shadow 0.2s;
+  }
+  .inp:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(184,151,58,0.1); }
+  .inp::placeholder { color:var(--dim); }
+  .inp-err { border-color:#C0392B !important; }
+  select.inp { appearance:none; cursor:pointer; }
+
+  .nav-links   { display:flex; align-items:center; gap:28px; }
+  .nav-toggle  { display:none; }
+  .hero-split  { display:grid; grid-template-columns:1fr 1fr; min-height:90vh; }
+  .prod-grid   { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); }
+  .cat-grid    { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  .trust-bar   { display:grid; grid-template-columns:repeat(4,1fr); }
+  .footer-g    { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:56px; }
+  .details-g   { display:grid; grid-template-columns:1fr 1fr; }
+  .details-L   { position:sticky; top:70px; height:calc(100vh - 70px); overflow:hidden; }
+  .details-R   { padding:40px 36px 80px; }
+  .contact-g   { display:grid; grid-template-columns:1fr 1fr; gap:56px; }
+  .form-2c     { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .dlv-2c      { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+
+  @media (max-width:1100px) {
+    .prod-grid { grid-template-columns:repeat(3,1fr); }
+    .footer-g  { grid-template-columns:1fr 1fr; gap:36px; }
+  }
+  @media (max-width:768px) {
+    .nav-links  { display:none; }
+    .nav-toggle { display:flex; }
+    .hero-split { grid-template-columns:1fr; min-height:auto; }
+    .prod-grid  { grid-template-columns:repeat(2,1fr); }
+    .cat-grid   { grid-template-columns:repeat(2,1fr); }
+    .trust-bar  { grid-template-columns:repeat(2,1fr); }
+    .footer-g   { grid-template-columns:1fr 1fr; gap:28px; }
+    .details-g  { grid-template-columns:1fr; }
+    .details-L  { position:static; width:100%; height:auto; aspect-ratio:1; display:flex; flex-direction:column; gap:20px; }
+    .details-R  { padding:24px 16px 48px; }
+    .contact-g  { grid-template-columns:1fr; gap:28px; }
+  }
+  @media (max-width:480px) {
+    .prod-grid { grid-template-columns:repeat(2,1fr); }
+    .footer-g  { grid-template-columns:1fr; gap:24px; }
+    .form-2c   { grid-template-columns:1fr; }
+    .dlv-2c    { grid-template-columns:1fr; }
   }
 `;
 
-// ─────────────────────────────────────────────────────────────
-// TYPES
-// ─────────────────────────────────────────────────────────────
-
-interface Offer               { id: string; name: string; quantity: number; price: number; }
-interface Variant             { id: string; name: string; value: string; }
-interface Attribute           { id: string; type: string; name: string; displayMode?: 'color' | 'image' | 'text' | null; variants: Variant[]; }
-interface ProductImage        { id: string; imageUrl: string; }
-interface VariantAttributeEntry { attrId: string; attrName: string; displayMode: 'color' | 'image' | 'text'; value: string; }
-interface VariantDetail       { id: string | number; name: VariantAttributeEntry[]; price: number; stock: number; autoGenerate: boolean; }
-interface Wilaya              { id: string; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
-interface Commune             { id: string; name: string; ar_name: string; wilayaId: string; }
+/* ── TYPES ──────────────────────────────────────────────────── */
+interface Offer { id:string; name:string; quantity:number; price:number; }
+interface Variant { id:string; name:string; value:string; }
+interface Attribute { id:string; type:string; name:string; displayMode?:'color'|'image'|'text'|null; variants:Variant[]; }
+interface ProductImage { id:string; imageUrl:string; }
+interface VariantAttributeEntry { attrId:string; attrName:string; displayMode:'color'|'image'|'text'; value:string; }
+interface VariantDetail { id:string|number; name:VariantAttributeEntry[]; price:number; stock:number; autoGenerate:boolean; }
+interface Wilaya  { id:string; name:string; ar_name:string; livraisonHome:number; livraisonOfice:number; livraisonReturn:number; }
+interface Commune { id:string; name:string; ar_name:string; wilayaId:string; }
 
 export interface Product {
-  id: string; name: string; price: string | number;
-  priceOriginal?: string | number; desc?: string;
-  productImage?: string; imagesProduct?: ProductImage[];
-  offers?: Offer[]; attributes?: Attribute[];
-  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-  store: { id: string; name: string; subdomain: string; userId: string; };
+  id:string; name:string; price:string|number; priceOriginal?:string|number; desc?:string;
+  productImage?:string; imagesProduct?:ProductImage[]; offers?:Offer[]; attributes?:Attribute[];
+  variantDetails?:VariantDetail[]; stock?:number; isActive?:boolean;
+  store:{ id:string; name:string; subdomain:string; userId:string; };
 }
-
 export interface ProductFormProps {
-  product:          Product;
-  userId:           string;
-  domain:           string;
-  redirectPath?:    string;
-  selectedOffer:    string | null;
-  setSelectedOffer: (id: string | null) => void;
-  selectedVariants: Record<string, string>;
-  platform?:        string;
-  priceLoss?:       number;
+  product:Product; userId:string; domain:string; redirectPath?:string;
+  selectedOffer:string|null; setSelectedOffer:(id:string|null)=>void;
+  selectedVariants:Record<string,string>; platform?:string; priceLoss?:number;
 }
 
-// ─────────────────────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────────────────────
+/* ── HELPERS ─────────────────────────────────────────────────── */
+function variantMatches(d:VariantDetail, sel:Record<string,string>): boolean {
+  return Object.entries(sel).every(([n,v])=>d.name.some(e=>e.attrName===n&&e.value===v));
+}
+const fetchWilayas  = async (uid:string): Promise<Wilaya[]>  => { try { const {data}=await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}`); return data||[]; } catch { return []; }};
+const fetchCommunes = async (wid:string): Promise<Commune[]> => { try { const {data}=await axios.get(`${API_URL}/shipping/get-communes/${wid}`); return data||[]; } catch { return []; }};
 
-function variantMatches(detail: VariantDetail, sel: Record<string, string>): boolean {
-  return Object.entries(sel).every(([attrName, val]) =>
-    detail.name.some(e => e.attrName === attrName && e.value === val)
+/* ── DECORATIVE ─────────────────────────────────────────────── */
+function GoldDiamond({ size = 8 }: { size?:number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 8 8" fill="none">
+      <path d="M4 0L8 4L4 8L0 4Z" fill="var(--gold)" opacity="0.7"/>
+    </svg>
   );
 }
-const fetchWilayas  = async (userId: string): Promise<Wilaya[]>   => { try { const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${userId}`); return data || []; } catch { return []; } };
-const fetchCommunes = async (wilayaId: string): Promise<Commune[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/get-communes/${wilayaId}`); return data || []; } catch { return []; } };
 
-// ─────────────────────────────────────────────────────────────
-// MAIN LAYOUT
-// ─────────────────────────────────────────────────────────────
-
+/* ── MAIN ───────────────────────────────────────────────────── */
 export default function Main({ store, children }: any) {
+  if (!store) return null;
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--dark)', fontFamily: "'Barlow', sans-serif" }}>
-      <style>{FONT_CSS}</style>
+    <div style={{ minHeight:'100vh', backgroundColor:'var(--cream)' }}>
+      <style>{CSS}</style>
+      <Navbar store={store}/>
+      <main>{children}</main>
+      <Footer store={store}/>
+    </div>
+  );
+}
 
-      {/* Top announcement bar */}
+/* ── NAVBAR ─────────────────────────────────────────────────── */
+export function Navbar({ store }: { store: Store }) {
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen]         = useState(false);
+
+  useEffect(()=>{
+    const h=()=>setScrolled(window.scrollY>8);
+    window.addEventListener('scroll',h); return ()=>window.removeEventListener('scroll',h);
+  },[]);
+
+  if (!store) return null;
+
+  const links = [
+    { href:`/`,         label:'المجموعة' },
+    { href:`/contact`,  label:'تواصل'    },
+    { href:`/Privacy`,  label:'الخصوصية' },
+  ];
+
+  return (
+    <nav dir="rtl" style={{
+      position:'sticky', top:0, zIndex:50,
+      backgroundColor:scrolled?'rgba(250,246,238,0.96)':'var(--cream)',
+      backdropFilter:scrolled?'blur(16px)':'none',
+      borderBottom:`1px solid ${scrolled?'var(--line-dk)':'transparent'}`,
+      transition:'all 0.35s',
+    }}>
       {store.topBar?.enabled && store.topBar?.text && (
-        <div className="marquee-wrap py-2.5 text-center text-xs tracking-widest uppercase font-bold"
-          style={{ backgroundColor: 'var(--fire)', color: 'white' }}>
-          <div className="marquee-inner">
-            {Array(6).fill(null).map((_, i) => (
-              <span key={i} className="mx-8">
-                <Flame className="inline w-3 h-3 mr-2" />
-                {store.topBar.text}
+        <div style={{ backgroundColor:'var(--walnut)', overflow:'hidden', whiteSpace:'nowrap', padding:'7px 0' }}>
+          <div style={{ display:'inline-block', animation:'ticker 24s linear infinite' }}>
+            {Array(12).fill(null).map((_,i)=>(
+              <span key={i} style={{ fontFamily:"'Cairo',sans-serif", fontSize:'12px', fontWeight:500, letterSpacing:'0.1em', color:'rgba(250,246,238,0.8)', margin:'0 40px', display:'inline-flex', alignItems:'center', gap:'10px' }}>
+                <GoldDiamond size={6}/> {store.topBar.text} <GoldDiamond size={6}/>
               </span>
             ))}
-            {Array(6).fill(null).map((_, i) => (
-              <span key={`b${i}`} className="mx-8">
-                <Flame className="inline w-3 h-3 mr-2" />
-                {store.topBar.text}
+            {Array(12).fill(null).map((_,i)=>(
+              <span key={`b${i}`} style={{ fontFamily:"'Cairo',sans-serif", fontSize:'12px', fontWeight:500, letterSpacing:'0.1em', color:'rgba(250,246,238,0.8)', margin:'0 40px', display:'inline-flex', alignItems:'center', gap:'10px' }}>
+                <GoldDiamond size={6}/> {store.topBar.text} <GoldDiamond size={6}/>
               </span>
             ))}
           </div>
         </div>
       )}
 
-      <Navbar store={store} />
-      <main>{children}</main>
-      <Footer store={store} />
-    </div>
-  );
-}
+      <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'0 28px', height:'70px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:'16px', position:'relative' }}>
 
-// ─────────────────────────────────────────────────────────────
-// NAVBAR
-// ─────────────────────────────────────────────────────────────
-
-export function Navbar({ store }: { store: Store }) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrolled,   setScrolled]   = useState(false);
-  const isRTL = store.language === 'ar';
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 30);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  const navItems = [
-    { href: `/${store.subdomain}`,         label: isRTL ? 'الرئيسية' : 'HOME'    },
-    { href: `/${store.subdomain}/contact`, label: isRTL ? 'اتصل بنا' : 'CONTACT' },
-    { href: `/${store.subdomain}/Privacy`, label: isRTL ? 'الخصوصية' : 'PRIVACY' },
-  ];
-
-  return (
-    <nav
-      className="sticky top-0 z-50 transition-all duration-300"
-      style={{
-        backgroundColor: scrolled ? 'rgba(10,10,10,0.97)' : 'var(--dark-2)',
-        backdropFilter: scrolled ? 'blur(16px)' : 'none',
-        borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
-      }}
-      dir={isRTL ? 'rtl' : 'ltr'}
-    >
-      {/* Fire accent line */}
-      <div className="h-0.5 w-full" style={{ background: 'linear-gradient(90deg, var(--fire), var(--gold), var(--fire))' }} />
-
-      <div className="max-w-7xl mx-auto px-5 lg:px-10">
-        <div className="flex items-center justify-between h-16">
-
-          {/* Logo */}
-          <Link href={`/${store.subdomain}`} className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10 flex items-center justify-center"
-              style={{ background: 'var(--fire)', clipPath: 'polygon(10% 0, 100% 0, 90% 100%, 0 100%)' }}>
-              {store.design?.logoUrl
-                ? <img src={store.design.logoUrl} alt={store.name} className="h-6 w-auto object-contain" />
-                : <Dumbbell className="w-5 h-5 text-white" />
-              }
-            </div>
-            <div>
-              <span className="block font-black tracking-wider group-hover:text-orange-500 transition-colors text-white"
-                style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '1.5rem', letterSpacing: '0.08em' }}>
-                {store.name}
-              </span>
-              <div className="flex items-center gap-1.5 -mt-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-[9px] tracking-widest font-bold" style={{ color: 'var(--green)' }}>STORE OPEN</span>
+        <Link href="/" style={{ textDecoration:'none', flexShrink:0 }}>
+          {store.design?.logoUrl
+            ? <img src={store.design.logoUrl} alt={store.name} style={{ height:'40px', width:'auto', objectFit:'contain' }}/>
+            : <div style={{ width:'40px', height:'40px', border:'1px solid var(--line-dk)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <GoldDiamond size={10}/>
               </div>
-            </div>
-          </Link>
+          }
+        </Link>
 
-          {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-8">
-            {navItems.map(item => (
-              <Link key={item.href} href={item.href}
-                className="relative text-xs font-bold tracking-widest uppercase transition-colors group"
-                style={{ color: 'var(--text-mid)' }}>
-                <span className="group-hover:text-white transition-colors">{item.label}</span>
-                <span className="absolute -bottom-1 left-0 h-0.5 w-0 group-hover:w-full transition-all duration-300"
-                  style={{ background: 'var(--fire)' }} />
-              </Link>
-            ))}
-            <Link href={`/${store.subdomain}`}
-              className="btn-fire px-5 py-2.5 text-xs font-black tracking-widest uppercase text-white"
-              style={{ background: 'var(--fire)', clipPath: 'polygon(4% 0, 100% 0, 96% 100%, 0 100%)' }}>
-              {isRTL ? 'تسوق الآن' : 'SHOP NOW'}
-            </Link>
+        <Link href="/" style={{ textDecoration:'none', position:'absolute', left:'50%', transform:'translateX(-50%)', textAlign:'center' }}>
+          <span className="amiri" style={{ fontSize:'1.4rem', fontWeight:700, color:'var(--walnut)', display:'block', lineHeight:1, whiteSpace:'nowrap' }}>
+            {store.name}
+          </span>
+          <div style={{ display:'flex', justifyContent:'center', alignItems:'center', gap:'6px', marginTop:'3px' }}>
+            <span style={{ display:'block', height:'1px', width:'20px', background:'linear-gradient(to right,transparent,var(--gold))' }}/>
+            <GoldDiamond size={6}/>
+            <span style={{ display:'block', height:'1px', width:'20px', background:'linear-gradient(to left,transparent,var(--gold))' }}/>
           </div>
+        </Link>
 
-          {/* Mobile toggle */}
-          <button onClick={() => setIsMenuOpen(p => !p)} className="md:hidden p-2 text-white">
-            {isMenuOpen ? <X className="w-6 h-6" /> : <div className="space-y-1.5"><span className="block w-6 h-0.5 bg-orange-500" /><span className="block w-4 h-0.5 bg-orange-500" /><span className="block w-6 h-0.5 bg-orange-500" /></div>}
-          </button>
+        <div className="nav-links">
+          {links.map(l=>(
+            <Link key={l.href} href={l.href}
+              style={{ fontFamily:"'Cairo',sans-serif", fontSize:'14px', fontWeight:500, color:'var(--mid)', textDecoration:'none', transition:'color 0.2s' }}
+              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--gold)';}}
+              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mid)';}}>
+              {l.label}
+            </Link>
+          ))}
+          <a href="#collection" className="btn-gold" style={{ padding:'10px 22px', fontSize:'13px' }}>
+            تسوق المجموعة
+          </a>
         </div>
 
-        {/* Mobile menu */}
-        <div className={`md:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? 'max-h-56 pb-5' : 'max-h-0'}`}>
-          <div className="pt-4 space-y-4 border-t" style={{ borderColor: 'var(--border)' }}>
-            {navItems.map(item => (
-              <Link key={item.href} href={item.href} onClick={() => setIsMenuOpen(false)}
-                className="flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-white hover:text-orange-400 transition-colors">
-                <ArrowRight className="w-3 h-3 text-orange-500" />{item.label}
-              </Link>
-            ))}
-          </div>
+        <button className="nav-toggle" onClick={()=>setOpen(p=>!p)} style={{ background:'none', border:'1px solid var(--line-dk)', cursor:'pointer', color:'var(--walnut)', padding:'8px', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+          {open ? <X style={{ width:'18px', height:'18px' }}/> : <Menu style={{ width:'18px', height:'18px' }}/>}
+        </button>
+      </div>
+
+      <div style={{ maxHeight:open?'220px':'0', overflow:'hidden', transition:'max-height 0.3s ease', borderTop:open?'1px solid var(--line)':'none', backgroundColor:'var(--cream)' }}>
+        <div style={{ padding:'8px 28px 18px' }}>
+          {links.map(l=>(
+            <Link key={l.href} href={l.href} onClick={()=>setOpen(false)}
+              style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 0', fontFamily:"'Cairo',sans-serif", fontSize:'15px', fontWeight:500, color:'var(--mid)', textDecoration:'none', borderBottom:'1px solid var(--line)' }}>
+              {l.label} <ArrowRight style={{ width:'14px', height:'14px', color:'var(--gold)' }}/>
+            </Link>
+          ))}
         </div>
       </div>
     </nav>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// FOOTER
-// ─────────────────────────────────────────────────────────────
+/* ── FOOTER ─────────────────────────────────────────────────── */
+export function Footer({ store }: { store: any }) {
+  const yr = new Date().getFullYear();
+  if (!store) return null;
 
-export function Footer({ store }: any) {
-  const isRTL = store.language === 'ar';
   return (
-    <footer style={{ backgroundColor: '#080808', borderTop: '2px solid var(--fire)', fontFamily: "'Barlow', sans-serif" }}>
-      <div className="diagonal-stripe max-w-7xl mx-auto px-6 lg:px-10 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pb-12" style={{ borderBottom: '1px solid var(--border)' }}>
+    <footer dir="rtl" style={{ backgroundColor:'var(--walnut)', fontFamily:"'Cairo',sans-serif", position:'relative', overflow:'hidden' }}>
+      <div style={{ position:'absolute', inset:0, pointerEvents:'none', opacity:0.06 }} className="geo-bg"/>
+      <div style={{ position:'relative', zIndex:2, maxWidth:'1280px', margin:'0 auto', padding:'64px 28px 40px' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:'40px', paddingBottom:'48px', borderBottom:'1px solid rgba(250,246,238,0.1)' }}>
 
-          {/* Brand */}
           <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 flex items-center justify-center" style={{ background: 'var(--fire)', clipPath: 'polygon(10% 0,100% 0,90% 100%,0 100%)' }}>
-                <Dumbbell className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-black text-2xl text-white tracking-widest" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>{store.name}</span>
+            <span className="amiri" style={{ fontSize:'1.5rem', fontWeight:700, color:'var(--cream)', display:'block', marginBottom:'6px' }}>{store.name}</span>
+            <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'18px' }}>
+              <span style={{ display:'block', height:'1px', width:'28px', background:'var(--gold)', opacity:0.5 }}/>
+              <GoldDiamond size={6}/>
             </div>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-dim)' }}>
-              {isRTL ? 'قوة. أداء. نتائج. نحن هنا لنساعدك على تحقيق أهدافك الرياضية.' : 'Power. Performance. Results. We\'re here to fuel your fitness journey.'}
+            <p style={{ fontSize:'13px', lineHeight:'1.9', color:'rgba(250,246,238,0.5)', maxWidth:'220px', fontWeight:300 }}>
+              أجود الأزياء الخليجية الإسلامية الرجالية، مختارة بعناية فائقة لتناسب ذوقكم الرفيع.
             </p>
-            <div className="flex items-center gap-2 mt-5">
-              {[Flame, Zap, Trophy].map((Icon, i) => (
-                <div key={i} className="w-9 h-9 flex items-center justify-center transition-all hover:scale-110" style={{ border: '1px solid var(--border)', borderRadius: 0 }}>
-                  <Icon className="w-4 h-4" style={{ color: 'var(--fire)' }} />
-                </div>
-              ))}
-            </div>
           </div>
 
-          {/* Links */}
-          <div>
-            <h4 className="font-black text-white tracking-widest uppercase mb-5 text-sm" style={{ fontFamily: "'Barlow Condensed', sans-serif" }}>
-              {isRTL ? 'روابط سريعة' : 'QUICK ACCESS'}
-            </h4>
-            <div className="space-y-3">
-              {[
-                { href: `/${store.subdomain}/Privacy`, label: isRTL ? 'سياسة الخصوصية' : 'Privacy Policy' },
-                { href: `/${store.subdomain}/Terms`,   label: isRTL ? 'شروط الخدمة'     : 'Terms of Service' },
-                { href: `/${store.subdomain}/Cookies`, label: isRTL ? 'ملفات تعريف الارتباط' : 'Cookie Policy' },
-                { href: `/${store.subdomain}/contact`, label: isRTL ? 'اتصل بنا'        : 'Contact Us' },
-              ].map(link => (
-                <a key={link.href} href={link.href} className="flex items-center gap-2 text-sm hover:text-orange-400 transition-colors" style={{ color: 'var(--text-dim)' }}>
-                  <span style={{ color: 'var(--fire)' }}>›</span>{link.label}
-                </a>
-              ))}
+          {[
+            {
+              title:'روابط هامة',
+              links:[
+                [`/`,        'المجموعة الكاملة'],
+                [`/Privacy`, 'سياسة الخصوصية'],
+                [`/Terms`,   'الشروط والأحكام'],
+                [`/contact`, 'تواصل معنا'],
+              ]
+            },
+            {
+              title:'معلومات التواصل',
+              links:[
+                ['tel:+213550000000',     '+213 550 000 000'],
+                ['https://maps.google.com','أولاد فايت، الجزائر'],
+                ['mailto:info@store.dz',  'info@store.dz'],
+              ]
+            },
+          ].map((col)=>(
+            <div key={col.title}>
+              <p style={{ fontSize:'12px', fontWeight:600, letterSpacing:'0.1em', color:'var(--gold)', marginBottom:'20px' }}>{col.title}</p>
+              <div style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
+                {col.links.map(([href,label])=>(
+                  <a key={label} href={href}
+                    style={{ fontSize:'13px', color:'rgba(250,246,238,0.6)', textDecoration:'none', transition:'all 0.3s ease' }}
+                    onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--gold-lt)'; (e.currentTarget as HTMLElement).style.paddingRight='5px';}}
+                    onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='rgba(250,246,238,0.6)'; (e.currentTarget as HTMLElement).style.paddingRight='0';}}>
+                    {label}
+                  </a>
+                ))}
+              </div>
             </div>
-          </div>
-
-          {/* Motto */}
-          <div className="flex flex-col justify-between">
-            <div className="p-5 relative overflow-hidden" style={{ background: 'rgba(255,69,0,0.06)', border: '1px solid rgba(255,69,0,0.2)' }}>
-              <div className="absolute top-0 left-0 w-1 h-full" style={{ background: 'var(--fire)' }} />
-              <p className="font-black text-2xl text-white leading-tight pl-3" style={{ fontFamily: "'Bebas Neue', sans-serif", letterSpacing: '0.05em' }}>
-                {isRTL ? 'لا ألم، لا مكسب' : 'NO PAIN,\nNO GAIN'}
-              </p>
-              <p className="text-xs mt-2 pl-3" style={{ color: 'var(--fire)' }}>— {isRTL ? 'الفلسفة الأساسية' : 'The core philosophy'}</p>
-            </div>
-          </div>
+          ))}
         </div>
 
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs tracking-wider" style={{ color: 'var(--text-dim)' }}>
-            © {new Date().getFullYear()} {store.name.toUpperCase()} — ALL RIGHTS RESERVED
+        <div style={{ paddingTop:'24px', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'16px' }}>
+          <p style={{ fontSize:'11px', color:'rgba(250,246,238,0.3)', letterSpacing:'0.5px' }}>
+            © {yr} {store.name}. جميع الحقوق محفوظة.
           </p>
-          <div className="flex items-center gap-3 text-xs font-bold tracking-widest uppercase" style={{ color: 'var(--fire)' }}>
-            <Flame className="w-4 h-4" />
-            <span>FITNESS FOCUSED THEME</span>
-            <Flame className="w-4 h-4" />
+          <div style={{ display:'flex', gap:'15px', alignItems:'center' }}>
+            <span style={{ fontSize:'11px', color:'rgba(250,246,238,0.3)' }}>Gulf Fashion Theme</span>
+            <div style={{ width:'4px', height:'4px', borderRadius:'50%', background:'var(--gold)', opacity:0.3 }}/>
+            <span style={{ fontSize:'11px', color:'rgba(250,246,238,0.3)' }}>صنع بإتقان</span>
           </div>
         </div>
       </div>
@@ -350,1017 +366,759 @@ export function Footer({ store }: any) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// CARD
-// ─────────────────────────────────────────────────────────────
+/* ── CARD ───────────────────────────────────────────────────── */
+export function Card({ product, displayImage, discount, store, viewDetails }: any) {
+  const [hov, setHov] = useState(false);
+  if (!product || !store) return null;
 
-export function Card({ product, displayImage, discount, isRTL, store, viewDetails }: any) {
-  const brandColor = 'var(--fire)'; // اللون الأساسي الموحد
+  const price = typeof product.price === 'string' ? parseFloat(product.price) : (product.price as number) || 0;
+  const orig  = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
+  const brandGold = 'var(--gold-dk)';
 
   return (
-    <div className="card-hover group relative flex flex-col overflow-hidden h-full transition-all duration-300"
-      style={{ 
-        backgroundColor: 'var(--dark-2)', 
-        border: '1px solid var(--border)',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
-      }}>
+    <div className="t-card group" onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+      style={{ display:'flex', flexDirection:'column', height:'100%', backgroundColor:'var(--cream)' }}>
 
-      {/* Image Section */}
-      <div className="relative h-60 overflow-hidden" style={{ backgroundColor: 'var(--dark-3)' }}>
-        {displayImage ? (
-          <img 
-            src={displayImage} 
-            alt={product.name} 
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 brightness-75 group-hover:brightness-100" 
-          />
-        ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-            <Dumbbell className="w-12 h-12" style={{ color: 'var(--border)' }} />
-            <span className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-dim)' }}>No Image</span>
-          </div>
-        )}
-
-        {/* Discount Badge */}
-        {discount > 0 && (
-          <div className="absolute top-0 left-0 px-4 py-2 text-sm font-black text-white z-10"
-            style={{ background: brandColor, clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0% 100%)' }}>
+      <div className="c-img" style={{ position:'relative', aspectRatio:'3/4', overflow:'hidden', backgroundColor:'var(--sand)' }}>
+        {displayImage
+          ? <img src={displayImage} alt={product.name} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+          : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center' }} className="geo-bg">
+              <span className="amiri" style={{ fontSize:'2.5rem', color:'var(--gold)', opacity:0.3 }}>﷽</span>
+            </div>
+        }
+        <div style={{ position:'absolute', top:0, left:0, right:0, height:'3px', background:`linear-gradient(to right,transparent,${brandGold},transparent)`, opacity:hov?1:0.4, transition:'opacity 0.3s' }}/>
+        {discount>0 && (
+          <div style={{ position:'absolute', top:'12px', right:'12px', backgroundColor:brandGold, color:'var(--cream)', fontSize:'11px', fontWeight:600, padding:'4px 12px', letterSpacing:'0.08em' }}>
             -{discount}%
           </div>
         )}
-        
-        {/* Subtle overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--dark-2)] to-transparent opacity-60" />
       </div>
 
-      {/* Content Section */}
-      <div className="p-5 flex flex-col flex-1">
-        {/* Rating & Brand Line */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex gap-0.5">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className={`w-3 h-3 ${i < 4 ? 'fill-current' : 'opacity-20'}`} style={{ color: 'var(--gold)' }} />
-            ))}
-          </div>
-          <span className="text-[10px] font-bold uppercase tracking-tighter" style={{ color: brandColor }}>Pro Series</span>
+      <div style={{ padding:'16px 14px', borderTop:'1px solid var(--line)', flex:1, display:'flex', flexDirection:'column' }}>
+        <div style={{ display:'flex', gap:'2px', marginBottom:'8px' }}>
+          {[...Array(5)].map((_,i)=>(
+            <Star key={i} style={{ width:'11px', height:'11px', fill:i<4?brandGold:'none', color:brandGold }}/>
+          ))}
         </div>
-
-        <h3 className="font-bold mb-2 line-clamp-2 transition-colors text-white" 
-          style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '1.25rem', letterSpacing: '0.02em', lineHeight: '1.2' }}>
+        <h3 className="amiri" style={{ fontSize:'1.15rem', fontWeight:700, color:'var(--ink)', marginBottom:'10px', lineHeight:1.4, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' as any, overflow:'hidden', minHeight:'3.2em' }}>
           {product.name}
         </h3>
 
-        {product.desc && (
-          <div className="text-xs mb-6 line-clamp-2 leading-relaxed opacity-60 font-light"
-            dangerouslySetInnerHTML={{ __html: product.desc }} />
-        )}
-
-        {/* Price & Action Area */}
-        <div className="mt-auto space-y-4">
-          <div className="flex items-end justify-between border-b pb-3" style={{ borderColor: 'var(--border)' }}>
-            <div className="flex flex-col">
-              {product.priceOriginal && product.priceOriginal > product.price && (
-                <span className="text-xs line-through opacity-40 mb-[-4px]">{product.priceOriginal} {store.currency}</span>
-              )}
-              <div className="flex items-baseline gap-1">
-                <span className="font-black" style={{ color: brandColor, fontFamily: "'Bebas Neue', sans-serif", fontSize: '2rem' }}>
-                  {product.price}
-                </span>
-                <span className="text-xs font-bold uppercase" style={{ color: 'var(--text-dim)' }}>{store.currency}</span>
-              </div>
-            </div>
+        <div style={{ marginTop:'auto' }}>
+          <div style={{ display:'flex', alignItems:'baseline', gap:'6px', marginBottom:'14px' }}>
+            <span className="amiri" style={{ fontSize:'1.3rem', fontWeight:700, color:brandGold }}>
+              {price.toLocaleString()}
+              <span style={{ fontFamily:"'Cairo',sans-serif", fontWeight:600, fontSize:'12px', color:'var(--mid)', marginRight:'4px' }}>دج</span>
+            </span>
+            {orig>price && (
+              <span style={{ fontSize:'12px', color:'var(--dim)', textDecoration:'line-through', opacity:0.6 }}>{orig.toLocaleString()}</span>
+            )}
           </div>
-
-          {/* Fixed Button - Always Visible */}
-          <Link href={`/product/${product.slug || product.id}`}
-            className="flex items-center justify-center gap-2 w-full py-4 text-sm font-black tracking-[0.2em] uppercase text-white transition-all hover:brightness-110 active:scale-[0.98]"
-            style={{ 
-              background: brandColor,
-              boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
-            }}>
-            <Zap className="w-4 h-4 fill-current" /> {viewDetails}
+          <Link href={`/product/${product.slug||product.id}`} className="amiri"
+            style={{ textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', width:'100%', fontSize:'1.1rem', fontWeight:700, padding:'10px', backgroundColor:hov?brandGold:'transparent', color:hov?'var(--cream)':brandGold, border:`1.5px solid ${brandGold}`, transition:'all 0.3s ease' }}>
+            {viewDetails}
           </Link>
         </div>
       </div>
-
-      {/* Animated Bottom Line */}
-      <div className="h-1 w-full scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" 
-        style={{ background: `linear-gradient(90deg, ${brandColor}, var(--gold))` }} />
     </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// HOME
-// ─────────────────────────────────────────────────────────────
-
+/* ── HOME ───────────────────────────────────────────────────── */
 export function Home({ store }: any) {
-  const isRTL = store.language === 'ar';
-  const dir   = isRTL ? 'rtl' : 'ltr';
-  const heroRef = useRef<HTMLDivElement>(null);
-
-  const t = {
-    categories:       isRTL ? 'التصنيفات'             : 'CATEGORIES',
-    products:         isRTL ? 'المنتجات'              : 'ALL PRODUCTS',
-    noProducts:       isRTL ? 'لا توجد منتجات'        : 'NO PRODUCTS YET',
-    noProductsDesc:   isRTL ? 'لم تضف منتجات بعد'     : 'Add your first product to get started',
-    viewDetails:      isRTL ? 'اشتر الآن'             : 'GET IT NOW',
-    all:              isRTL ? 'الكل'                   : 'ALL',
-    heroBtn:          isRTL ? 'تسوق الآن'              : 'SHOP NOW',
-    heroBtnSub:       isRTL ? 'استكشف الكتالوج'        : 'EXPLORE CATALOG',
-    tagline:          isRTL ? 'حقق حدودك'              : 'EXCEED YOUR LIMITS',
-    subTagline:       isRTL ? 'معدات رياضية ومكملات غذائية عالية الجودة' : 'Premium sports equipment, supplements & gear for champions',
-  };
-
-  const stats = [
-    { icon: <Trophy className="w-6 h-6" />,   val: '5K+',  label: isRTL ? 'عميل راضٍ'   : 'HAPPY ATHLETES' },
-    { icon: <Package className="w-6 h-6" />,  val: store.products?.length || '100+', label: isRTL ? 'منتج' : 'PRODUCTS' },
-    { icon: <Truck className="w-6 h-6" />,    val: '24H',  label: isRTL ? 'توصيل سريع'  : 'FAST DELIVERY' },
-    { icon: <Shield className="w-6 h-6" />,   val: '100%', label: isRTL ? 'ضمان الجودة'  : 'QUALITY GUARANTEED' },
-  ];
+  if (!store) return null;
+  const products: any[] = store.products || [];
+  const cats: any[]     = store.categories || [];
 
   return (
-    <div className="min-h-screen" dir={dir} style={{ backgroundColor: 'var(--dark)', fontFamily: "'Barlow', sans-serif" }}>
+    <div dir="rtl">
 
       {/* ── HERO ── */}
-      <section ref={heroRef} className="relative overflow-hidden noise-overlay" style={{ minHeight: '95vh', backgroundColor: '#080808' }}>
-        {/* BG image */}
-        {store.hero?.imageUrl && (
-          <div className="absolute inset-0">
-            <img src={store.hero.imageUrl} alt="" className="w-full h-full object-cover" style={{ opacity: 0.2, filter: 'grayscale(30%) contrast(1.2)' }} />
-          </div>
-        )}
-
-        {/* Diagonal stripe pattern */}
-        <div className="absolute inset-0 diagonal-stripe opacity-50" />
-
-        {/* Big diagonal accent */}
-        <div className="absolute right-0 top-0 bottom-0 w-1/3 hidden lg:block"
-          style={{ background: 'linear-gradient(135deg, transparent 30%, rgba(255,69,0,0.06) 100%)' }} />
-
-        {/* Fire line left */}
-        <div className="absolute left-0 top-0 bottom-0 w-1" style={{ background: 'linear-gradient(180deg, transparent, var(--fire), transparent)' }} />
-
-        {/* Geometric accents */}
-        <div className="absolute top-20 right-20 w-32 h-32 hidden lg:block opacity-10"
-          style={{ border: '2px solid var(--fire)', transform: 'rotate(45deg)' }} />
-        <div className="absolute bottom-32 left-40 w-20 h-20 hidden lg:block opacity-10"
-          style={{ border: '2px solid var(--gold)', transform: 'rotate(22deg)' }} />
-
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 flex flex-col justify-center" style={{ minHeight: '95vh', paddingTop: '8rem', paddingBottom: '4rem' }}>
-
-          {/* Label */}
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-0.5" style={{ background: 'var(--fire)' }} />
-            <span className="text-xs font-black tracking-widest uppercase" style={{ color: 'var(--fire)' }}>
-              {isRTL ? '💪 متجر الرياضة' : '🔥 THE FITNESS STORE'}
-            </span>
-          </div>
-
-          {/* Main headline */}
-          <h1 className="leading-none font-black text-white mb-4 max-w-3xl"
-            style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(3.5rem, 10vw, 9rem)', letterSpacing: '0.02em' }}>
-            {store.hero?.title || t.tagline}
-          </h1>
-
-          {/* Fire underline */}
-          <div className="w-32 h-1 mb-6" style={{ background: 'linear-gradient(90deg, var(--fire), var(--gold))' }} />
-
-          <p className="text-base md:text-lg mb-10 max-w-xl leading-relaxed" style={{ color: 'var(--text-mid)', fontWeight: 500 }}>
-            {store.hero?.subtitle || t.subTagline}
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-wrap gap-4">
-            <a href="#products"
-              className="btn-fire flex items-center gap-3 px-8 py-4 text-sm font-black tracking-widest uppercase text-white"
-              style={{ background: 'var(--fire)', clipPath: 'polygon(4% 0, 100% 0, 96% 100%, 0 100%)', animation: 'pulse-fire 3s ease-in-out infinite' }}>
-              <Flame className="w-4 h-4" /> {t.heroBtn}
-            </a>
-            <a href="#categories"
-              className="flex items-center gap-3 px-8 py-4 text-sm font-black tracking-widest uppercase text-white transition-all hover:bg-white hover:text-black"
-              style={{ border: '2px solid var(--text-dim)' }}>
-              {t.heroBtnSub} <ArrowRight className="w-4 h-4" />
-            </a>
-          </div>
-
-          {/* Trust badges */}
-          <div className="flex flex-wrap gap-6 mt-12 pt-8" style={{ borderTop: '1px solid var(--border)' }}>
-            {[
-              { icon: <ShieldCheck className="w-4 h-4" />, label: isRTL ? 'دفع آمن ومضمون' : 'Secure Payments' },
-              { icon: <Truck className="w-4 h-4" />,       label: isRTL ? 'توصيل سريع'      : 'Fast Delivery' },
-              { icon: <Award className="w-4 h-4" />,       label: isRTL ? 'منتجات أصلية'    : 'Authentic Products' },
-            ].map((b, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <span style={{ color: 'var(--gold)' }}>{b.icon}</span>
-                <span className="text-xs font-bold tracking-wider" style={{ color: 'var(--text-mid)' }}>{b.label}</span>
-              </div>
-            ))}
+      <section className="hero-split" style={{ overflow:'hidden' }}>
+        <div style={{ display:'flex', flexDirection:'column', justifyContent:'center', padding:'8vw 6vw', position:'relative', backgroundColor:'var(--cream)', overflow:'hidden' }}>
+          <div style={{ position:'absolute', inset:0, opacity:0.35 }} className="geo-bg"/>
+          <div style={{ position:'absolute', top:0, right:0, width:'80px', height:'80px', borderTop:'2px solid var(--gold)', borderRight:'2px solid var(--gold)', opacity:0.3 }}/>
+          <div style={{ position:'absolute', bottom:0, left:0, width:'80px', height:'80px', borderBottom:'2px solid var(--gold)', borderLeft:'2px solid var(--gold)', opacity:0.3 }}/>
+          <div style={{ position:'relative', zIndex:2 }}>
+            <div className="fu slabel" style={{ marginBottom:'20px', justifyContent:'flex-start' }}>مجموعة حصرية</div>
+            <h1 className="fu fu-1 amiri" style={{ fontSize:'clamp(2.8rem,6vw,5.5rem)', fontWeight:700, color:'var(--ink)', lineHeight:1, marginBottom:'18px' }}>
+              {store.hero?.title || <><span>أصالة</span><br/><span className="gold-text">الخليج</span></>}
+            </h1>
+            <div className="fu fu-2 cal-line" style={{ marginBottom:'18px' }}><GoldDiamond size={7}/></div>
+            <p className="fu fu-2" style={{ fontFamily:"'Cairo',sans-serif", fontSize:'15px', lineHeight:'1.9', color:'var(--mid)', marginBottom:'36px', maxWidth:'400px', fontWeight:400 }}>
+              {store.hero?.subtitle || 'أجود الأزياء الخليجية والإسلامية الرجالية — ثياب، جلابيات، وبشوت مُختارة بعناية فائقة.'}
+            </p>
+            <div className="fu fu-3" style={{ display:'flex', gap:'14px', flexWrap:'wrap' }}>
+              <a href="#collection" className="btn-gold" style={{ fontSize:'14px', padding:'14px 32px' }}>
+                استعرض المجموعة <ArrowRight style={{ width:'14px', height:'14px' }}/>
+              </a>
+              {cats.length>0 && <a href="#categories" className="btn-outline" style={{ fontSize:'14px', padding:'13px 28px' }}>الفئات</a>}
+            </div>
+            <div style={{ display:'flex', gap:'36px', marginTop:'48px', paddingTop:'32px', borderTop:'1px solid var(--line-dk)', flexWrap:'wrap' }}>
+              {[
+                { n:`${products.length}+`, l:'قطعة', c:'var(--gold-dk)' },
+                { n:'48H',  l:'توصيل', c:'var(--walnut)' },
+                { n:'100%', l:'أصيل',  c:'var(--walnut)' },
+              ].map((s,i)=>(
+                <div key={i} style={{ textAlign:'center' }}>
+                  <p className="amiri" style={{ fontSize:'2rem', fontWeight:700, color:s.c, lineHeight:1, margin:0 }}>{s.n}</p>
+                  <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:500, letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--dim)', margin:'4px 0 0' }}>{s.l}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Diagonal clip bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-16"
-          style={{ background: 'linear-gradient(to bottom right, transparent 49%, var(--dark) 50%)' }} />
+        <div style={{ position:'relative', overflow:'hidden', minHeight:'560px', backgroundColor:'var(--sand)' }}>
+          {store.hero?.imageUrl
+            ? <img src={store.hero.imageUrl} alt={store.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
+            : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center' }} className="geo-bg">
+                <span className="amiri" style={{ fontSize:'8rem', color:'var(--gold)', opacity:0.12 }}>﷽</span>
+              </div>
+          }
+          <div style={{ position:'absolute', inset:0, background:'linear-gradient(to right,rgba(250,246,238,0.2) 0%,transparent 30%)', pointerEvents:'none' }}/>
+          <div style={{ position:'absolute', bottom:'20px', right:'20px', backgroundColor:'rgba(250,246,238,0.92)', backdropFilter:'blur(12px)', padding:'12px 18px', border:'1px solid var(--line-dk)' }}>
+            <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'10px', fontWeight:600, letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--mid)', margin:0 }}>مجموعة {new Date().getFullYear()}</p>
+            <p className="amiri" style={{ fontSize:'1rem', fontWeight:700, color:'var(--walnut)', margin:'3px 0 0' }}>أزياء خليجية راقية</p>
+          </div>
+        </div>
       </section>
 
-      {/* ── STATS BAR ── */}
-      <section style={{ backgroundColor: 'var(--fire)', position: 'relative', zIndex: 1 }}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="grid grid-cols-2 md:grid-cols-4">
-            {stats.map((stat, i) => (
-              <div key={i} className="flex items-center gap-4 py-5 px-6 group cursor-default transition-all hover:bg-black/10"
-                style={{ borderRight: i < 3 ? '1px solid rgba(255,255,255,0.2)' : 'none' }}>
-                <div className="text-white opacity-80 group-hover:opacity-100 transition-opacity">{stat.icon}</div>
+      {/* ── TRUST BAR ── */}
+      <div style={{ borderTop:'1px solid var(--line-dk)', borderBottom:'1px solid var(--line-dk)', backgroundColor:'var(--sand)' }}>
+        <div style={{ maxWidth:'1280px', margin:'0 auto' }}>
+          <div className="trust-bar">
+            {[
+              { icon:'🚚', title:'توصيل لكل الجزائر', desc:'48 ساعة لبابك' },
+              { icon:'✅', title:'أزياء أصيلة 100%',  desc:'جودة مُختارة بعناية' },
+              { icon:'🔄', title:'إرجاع مجاني',         desc:'30 يوم إرجاع مضمون' },
+              { icon:'📞', title:'خدمة العملاء',         desc:'دعم سريع ومتواصل' },
+            ].map((item,i)=>(
+              <div key={i} style={{ display:'flex', alignItems:'center', gap:'12px', padding:'18px 22px', borderLeft:i>0?'1px solid var(--line)':'none' }}>
+                <span style={{ fontSize:'1.4rem' }}>{item.icon}</span>
                 <div>
-                  <p className="font-black text-white text-2xl leading-none" style={{ fontFamily: "'Bebas Neue', sans-serif", letterSpacing: '0.05em' }}>{stat.val}</p>
-                  <p className="text-[10px] font-bold tracking-widest text-white opacity-70 uppercase">{stat.label}</p>
+                  <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', fontWeight:600, color:'var(--ink)', margin:0 }}>{item.title}</p>
+                  <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', color:'var(--dim)', margin:0, fontWeight:400 }}>{item.desc}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </section>
+      </div>
 
       {/* ── CATEGORIES ── */}
-      <section id="categories" className="py-20">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <p className="text-xs font-black tracking-widest uppercase mb-2" style={{ color: 'var(--fire)' }}>— {isRTL ? 'تسوق حسب' : 'BROWSE BY'}</p>
-              <h2 className="font-black text-white leading-none" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(2rem, 5vw, 3.5rem)', letterSpacing: '0.04em' }}>
-                {t.categories}
-              </h2>
+      {cats.length>0 && (
+        <section id="categories" style={{ padding:'80px 0', backgroundColor:'var(--cream)' }}>
+          <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'0 28px' }}>
+            <div style={{ textAlign:'center', marginBottom:'44px' }}>
+              <div className="slabel" style={{ justifyContent:'center', marginBottom:'12px' }}>الفئات</div>
+              <h2 className="amiri" style={{ fontSize:'clamp(1.8rem,3.5vw,3rem)', fontWeight:700, color:'var(--ink)', margin:'0 0 14px' }}>استعرض التشكيلات</h2>
+              <div className="cal-line"><GoldDiamond/></div>
             </div>
-          </div>
-
-          {store.categories && store.categories.length > 0 ? (
-            <div className="flex flex-wrap gap-3">
-              <Link href={`/${store.domain}`}
-                className="btn-fire px-6 py-3 text-xs font-black tracking-widest uppercase text-white transition-all"
-                style={{ background: 'var(--fire)', clipPath: 'polygon(4% 0, 100% 0, 96% 100%, 0 100%)' }}>
-                <Flame className="inline w-3 h-3 mr-1" /> {t.all}
-              </Link>
-              {store.categories.map((cat: any) => (
-                <Link key={cat.id} href={`/${store.domain}?category=${cat.id}`}
-                  className="px-6 py-3 text-xs font-bold tracking-widest uppercase transition-all hover:text-white group"
-                  style={{ border: '1px solid var(--border)', color: 'var(--text-mid)', clipPath: 'polygon(4% 0, 100% 0, 96% 100%, 0 100%)' }}
-                  onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--fire)'; el.style.backgroundColor = 'rgba(255,69,0,0.08)'; }}
-                  onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--border)'; el.style.backgroundColor = 'transparent'; }}>
-                  {cat.name}
+            <div className="cat-grid">
+              {cats.slice(0,8).map((cat:any)=>(
+                <Link key={cat.id} href={`/?category=${cat.id}`}
+                  style={{ display:'block', textDecoration:'none', border:'1px solid var(--line-dk)', position:'relative', aspectRatio:'3/4', overflow:'hidden', backgroundColor:'var(--sand)', transition:'all 0.35s' }}
+                  onMouseEnter={e=>{const el=e.currentTarget as HTMLElement; el.style.borderColor='var(--gold)'; el.style.transform='translateY(-4px)'; el.style.boxShadow='0 12px 32px rgba(26,18,8,0.1)';}}
+                  onMouseLeave={e=>{const el=e.currentTarget as HTMLElement; el.style.borderColor='var(--line-dk)'; el.style.transform='none'; el.style.boxShadow='none';}}>
+                  {cat.imageUrl
+                    ? <img src={cat.imageUrl} alt={cat.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block', opacity:0.7 }}/>
+                    : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center' }} className="geo-bg">
+                        <span className="amiri" style={{ fontSize:'3rem', color:'var(--gold)', opacity:0.2 }}>﷽</span>
+                      </div>
+                  }
+                  <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top,rgba(92,61,30,0.85) 0%,transparent 60%)', display:'flex', alignItems:'flex-end', padding:'16px' }}>
+                    <span className="amiri" style={{ fontSize:'1.2rem', fontWeight:700, color:'var(--cream)' }}>{cat.name}</span>
+                  </div>
+                  <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px', background:'linear-gradient(to right,transparent,var(--gold),transparent)' }}/>
                 </Link>
               ))}
             </div>
-          ) : (
-            <div className="py-10 text-center" style={{ border: '1px dashed var(--border)' }}>
-              <p className="text-sm" style={{ color: 'var(--text-dim)' }}>{isRTL ? 'لا توجد تصنيفات بعد' : 'No categories added yet'}</p>
+          </div>
+        </section>
+      )}
+
+      {/* ── COLLECTION GRID ── */}
+      <section id="collection" style={{ backgroundColor:'var(--sand)' }}>
+        <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'56px 28px 32px' }}>
+          <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', flexWrap:'wrap', gap:'16px' }}>
+            <div>
+              <div className="slabel" style={{ marginBottom:'10px' }}>المجموعة</div>
+              <h2 className="amiri" style={{ fontSize:'clamp(1.8rem,3vw,2.8rem)', fontWeight:700, color:'var(--ink)', margin:0 }}>أحدث التشكيلات</h2>
+            </div>
+            <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', color:'var(--dim)', fontWeight:400 }}>{products.length} قطعة</p>
+          </div>
+          <div className="cal-line" style={{ marginTop:'16px' }}><GoldDiamond/></div>
+        </div>
+
+        {products.length===0 ? (
+          <div style={{ padding:'80px 0', textAlign:'center', borderTop:'1px solid var(--line)' }}>
+            <span className="amiri" style={{ fontSize:'3rem', color:'var(--gold)', opacity:0.2, display:'block', marginBottom:'16px' }}>﷽</span>
+            <p className="amiri" style={{ fontSize:'1.5rem', color:'var(--dim)' }}>المجموعة قادمة قريباً</p>
+          </div>
+        ) : (
+          <div className="prod-grid">
+            {products.map((p:any)=>{
+              const img  = p.productImage||p.imagesProduct?.[0]?.imageUrl||store.design?.logoUrl;
+              const disc = p.priceOriginal ? Math.round(((p.priceOriginal-p.price)/p.priceOriginal)*100) : 0;
+              return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="عرض القطعة"/>;
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* ── CTA ── */}
+      <section style={{ position:'relative', padding:'96px 28px', textAlign:'center', overflow:'hidden', backgroundColor:'var(--walnut)' }}>
+        <div style={{ position:'absolute', inset:0, opacity:0.08 }} className="geo-bg"/>
+        {store.hero?.imageUrl && <img src={store.hero.imageUrl} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', opacity:0.07, display:'block' }}/>}
+        <div style={{ position:'relative', zIndex:2, maxWidth:'620px', margin:'0 auto' }}>
+          <div className="slabel" style={{ justifyContent:'center', marginBottom:'16px', color:'var(--gold-lt)' }}>أصالة وأناقة</div>
+          <h2 className="amiri" style={{ fontSize:'clamp(2rem,5vw,4rem)', fontWeight:700, color:'var(--cream)', lineHeight:1.05, marginBottom:'16px' }}>
+            {store.hero?.title ? 'مجموعة راقية تليق بك' : <>الأصالة<br/><span style={{ color:'var(--gold-lt)' }}>تُعرِّفك</span></>}
+          </h2>
+          <div className="cal-line" style={{ margin:'18px 0' }}><GoldDiamond/></div>
+          <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'15px', lineHeight:'1.9', color:'rgba(250,246,238,0.65)', marginBottom:'32px', fontWeight:300 }}>
+            اختر ما يعكس هويتك من أجود الأزياء الخليجية والإسلامية الرجالية.
+          </p>
+          <div style={{ display:'flex', gap:'14px', justifyContent:'center', flexWrap:'wrap' }}>
+            <a href="#collection" className="btn-gold" style={{ fontSize:'14px', padding:'14px 36px' }}>
+              تسوق الآن <ArrowRight style={{ width:'14px', height:'14px' }}/>
+            </a>
+            <Link href="/contact" className="btn-outline" style={{ textDecoration:'none', borderColor:'rgba(250,246,238,0.4)', color:'var(--cream)', padding:'13px 28px' }}>
+              تواصل معنا
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ── DETAILS ────────────────────────────────────────────────── */
+export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
+  const [sel, setSel] = useState(0);
+  if (!product) return null;
+
+  return (
+    <div dir="rtl" style={{ backgroundColor:'var(--cream)' }}>
+      {/* Breadcrumb */}
+      <div style={{ borderBottom:'1px solid var(--line-dk)', padding:'11px 28px', display:'flex', alignItems:'center', gap:'8px', fontSize:'12px', color:'var(--dim)', backgroundColor:'var(--sand)' }}>
+        <Link href="/" style={{ textDecoration:'none', color:'var(--mid)', transition:'color 0.2s' }}
+          onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--gold)';}}
+          onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mid)';}}>
+          الرئيسية
+        </Link>
+        <GoldDiamond size={5}/>
+        <span style={{ color:'var(--walnut)', fontWeight:600 }}>{product.name.slice(0,40)}</span>
+        <div style={{ marginRight:'auto', display:'flex', gap:'8px' }}>
+          <button onClick={toggleWishlist} style={{ width:'32px', height:'32px', display:'flex', alignItems:'center', justifyContent:'center', border:`1px solid ${isWishlisted?'var(--gold)':'var(--line-dk)'}`, background:isWishlisted?'rgba(184,151,58,0.1)':'transparent', cursor:'pointer', color:isWishlisted?'var(--gold)':'var(--mid)' }}>
+            <Heart style={{ width:'13px', height:'13px', fill:isWishlisted?'currentColor':'none' }}/>
+          </button>
+          <button onClick={handleShare} style={{ width:'32px', height:'32px', display:'flex', alignItems:'center', justifyContent:'center', border:'1px solid var(--line-dk)', background:'transparent', cursor:'pointer', color:'var(--mid)' }}>
+            <Share2 style={{ width:'13px', height:'13px' }}/>
+          </button>
+        </div>
+      </div>
+
+      <div className="details-g" style={{ maxWidth:'1280px', margin:'0 auto' }}>
+        {/* Gallery */}
+        <div className="details-L">
+          <div style={{ position:'relative', aspectRatio:'3/4', overflow:'hidden', backgroundColor:'var(--sand)', border:'1px solid var(--line)' }}>
+            {allImages.length>0
+              ? <img src={allImages[sel]} alt={product.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
+              : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center' }} className="geo-bg">
+                  <span className="amiri" style={{ fontSize:'6rem', color:'var(--gold)', opacity:0.15 }}>﷽</span>
+                </div>
+            }
+            <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px', background:'linear-gradient(to right,transparent,var(--gold),transparent)' }}/>
+            {discount>0 && <div style={{ position:'absolute', top:'12px', right:'12px', backgroundColor:'var(--gold)', color:'var(--cream)', fontSize:'11px', fontWeight:600, padding:'4px 12px', letterSpacing:'0.08em' }}>-{discount}%</div>}
+            {allImages.length>1 && (
+              <>
+                <button onClick={()=>setSel(p=>p===0?allImages.length-1:p-1)} style={{ position:'absolute', right:'10px', top:'50%', transform:'translateY(-50%)', width:'36px', height:'36px', border:'1px solid var(--line-dk)', borderRadius:'50%', backgroundColor:'rgba(250,246,238,0.9)', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <ChevronRight style={{ width:'14px', height:'14px', color:'var(--walnut)' }}/>
+                </button>
+                <button onClick={()=>setSel(p=>p===allImages.length-1?0:p+1)} style={{ position:'absolute', left:'10px', top:'50%', transform:'translateY(-50%)', width:'36px', height:'36px', border:'1px solid var(--line-dk)', borderRadius:'50%', backgroundColor:'rgba(250,246,238,0.9)', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <ChevronLeft style={{ width:'14px', height:'14px', color:'var(--walnut)' }}/>
+                </button>
+              </>
+            )}
+            {!inStock&&!autoGen && (
+              <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', backgroundColor:'rgba(250,246,238,0.85)', backdropFilter:'blur(4px)' }}>
+                <span className="amiri" style={{ fontSize:'2rem', fontWeight:700, color:'var(--mid)' }}>نفد المخزون</span>
+              </div>
+            )}
+          </div>
+          {allImages.length>1 && (
+            <div style={{ display:'flex', gap:'8px', marginTop:'10px', flexWrap:'wrap' }}>
+              {allImages.slice(0,5).map((img:string,idx:number)=>(
+                <button key={idx} onClick={()=>setSel(idx)} style={{ width:'54px', height:'54px', overflow:'hidden', border:`2px solid ${sel===idx?'var(--gold)':'var(--line-dk)'}`, cursor:'pointer', padding:0, background:'none', opacity:sel===idx?1:0.55 }}>
+                  <img src={img} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
+                </button>
+              ))}
             </div>
           )}
         </div>
-      </section>
 
-      {/* ── PRODUCTS ── */}
-      <section id="products" className="pb-24">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <p className="text-xs font-black tracking-widest uppercase mb-2" style={{ color: 'var(--fire)' }}>— {isRTL ? 'الأفضل لديكم' : 'OUR COLLECTION'}</p>
-              <h2 className="font-black text-white leading-none" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(2rem, 5vw, 3.5rem)', letterSpacing: '0.04em' }}>
-                {t.products}
-              </h2>
+        {/* Info */}
+        <div className="details-R">
+          <div className="slabel" style={{ marginBottom:'12px' }}>أزياء خليجية</div>
+          <h1 className="amiri" style={{ fontSize:'clamp(1.8rem,3.5vw,3.2rem)', fontWeight:700, color:'var(--ink)', lineHeight:1, marginBottom:'14px' }}>
+            {product.name}
+          </h1>
+
+          <div style={{ display:'flex', alignItems:'center', gap:'12px', marginBottom:'22px', paddingBottom:'22px', borderBottom:'1px solid var(--line-dk)', flexWrap:'wrap' }}>
+            <div style={{ display:'flex', gap:'2px' }}>
+              {[...Array(5)].map((_,i)=><Star key={i} style={{ width:'13px', height:'13px', fill:i<4?'var(--gold)':'none', color:'var(--gold)' }}/>)}
             </div>
-            <span className="text-sm font-bold hidden md:block" style={{ color: 'var(--text-dim)' }}>
-              {store.products?.length || 0} {isRTL ? 'منتج' : 'items'}
+            <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'12px', color:'var(--dim)' }}>4.8 (128 تقييم)</span>
+            <span style={{ marginRight:'auto', padding:'5px 14px', border:`1px solid ${inStock||autoGen?'var(--gold)':'var(--dim)'}`, color:inStock||autoGen?'var(--gold-dk)':'var(--dim)', fontSize:'12px', fontWeight:600, letterSpacing:'0.08em' }}>
+              {autoGen?'∞ متوفر':inStock?'متوفر':'نفد المخزون'}
             </span>
           </div>
 
-          {store.products && store.products.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {store.products.map((product: any) => {
-                const displayImage = product.productImage || product.imagesProduct?.[0]?.imageUrl || store.design?.logoUrl;
-                const discount = product.priceOriginal ? Math.round(((product.priceOriginal - product.price) / product.priceOriginal) * 100) : 0;
-                return <Card key={product.id} product={product} displayImage={displayImage} discount={discount} isRTL={isRTL} store={store} viewDetails={t.viewDetails} />;
-              })}
+          {/* Price */}
+          <div style={{ marginBottom:'22px', padding:'18px', backgroundColor:'var(--sand)', border:'1px solid var(--line)' }}>
+            <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--dim)', margin:'0 0 6px' }}>السعر</p>
+            <div style={{ display:'flex', alignItems:'baseline', gap:'12px', flexWrap:'wrap' }}>
+              <span className="amiri" style={{ fontSize:'3rem', fontWeight:700, color:'var(--gold-dk)', lineHeight:1 }}>{finalPrice.toLocaleString()}</span>
+              <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'15px', color:'var(--mid)' }}>دج</span>
+              {product.priceOriginal && parseFloat(product.priceOriginal)>finalPrice && (
+                <>
+                  <span style={{ fontSize:'14px', textDecoration:'line-through', color:'var(--dim)' }}>{parseFloat(product.priceOriginal).toLocaleString()}</span>
+                  <span style={{ fontSize:'12px', color:'var(--gold)', fontWeight:600, padding:'2px 8px', border:'1px solid var(--line-dk)', letterSpacing:'0.06em' }}>
+                    وفّر {(parseFloat(product.priceOriginal)-finalPrice).toLocaleString()} دج
+                  </span>
+                </>
+              )}
             </div>
-          ) : (
-            <div className="py-32 text-center" style={{ border: '1px dashed var(--border)' }}>
-              <Dumbbell className="w-14 h-14 mx-auto mb-4 opacity-20 text-white" />
-              <p className="font-black text-xl text-white mb-2" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>{t.noProducts}</p>
-              <p className="text-sm" style={{ color: 'var(--text-dim)' }}>{t.noProductsDesc}</p>
+          </div>
+
+          {/* Offers */}
+          {product.offers?.length>0 && (
+            <div style={{ marginBottom:'22px', paddingBottom:'22px', borderBottom:'1px solid var(--line)' }}>
+              <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--dim)', marginBottom:'12px' }}>الباقات</p>
+              {product.offers.map((offer:any)=>(
+                <label key={offer.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'13px 16px', border:`1.5px solid ${selectedOffer===offer.id?'var(--gold)':'var(--line-dk)'}`, cursor:'pointer', marginBottom:'8px', transition:'all 0.2s', backgroundColor:selectedOffer===offer.id?'rgba(184,151,58,0.05)':'transparent' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
+                    <div style={{ width:'16px', height:'16px', border:`2px solid ${selectedOffer===offer.id?'var(--gold)':'var(--dim)'}`, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                      {selectedOffer===offer.id&&<div style={{ width:'8px', height:'8px', borderRadius:'50%', background:'var(--gold)' }}/>}
+                    </div>
+                    <input type="radio" name="offer" value={offer.id} checked={selectedOffer===offer.id} onChange={()=>setSelectedOffer(offer.id)} style={{ display:'none' }}/>
+                    <div>
+                      <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', fontWeight:500, color:'var(--ink)', margin:0 }}>{offer.name}</p>
+                      <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', color:'var(--dim)', margin:0 }}>الكمية: {offer.quantity}</p>
+                    </div>
+                  </div>
+                  <span className="amiri" style={{ fontSize:'1.2rem', fontWeight:700, color:'var(--gold-dk)' }}>
+                    {offer.price.toLocaleString()} <span style={{ fontFamily:"'Cairo',sans-serif", fontWeight:300, fontSize:'12px', color:'var(--mid)' }}>دج</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+
+          {/* Attributes */}
+          {allAttrs.map((attr:any)=>(
+            <div key={attr.id} style={{ marginBottom:'18px', paddingBottom:'18px', borderBottom:'1px solid var(--line)' }}>
+              <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--dim)', marginBottom:'10px' }}>{attr.name}</p>
+              {attr.displayMode==='color' ? (
+                <div style={{ display:'flex', flexWrap:'wrap', gap:'8px' }}>
+                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} title={v.name} style={{ width:'28px', height:'28px', backgroundColor:v.value, border:'none', cursor:'pointer', borderRadius:'50%', outline:s?'2.5px solid var(--gold)':'2.5px solid transparent', outlineOffset:'3px' }}/>;})}
+                </div>
+              ):attr.displayMode==='image' ? (
+                <div style={{ display:'flex', flexWrap:'wrap', gap:'6px' }}>
+                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} style={{ width:'52px', height:'52px', overflow:'hidden', border:`2px solid ${s?'var(--gold)':'var(--line-dk)'}`, cursor:'pointer', padding:0 }}><img src={v.value} alt={v.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/></button>;})}
+                </div>
+              ):(
+                <div style={{ display:'flex', flexWrap:'wrap', gap:'6px' }}>
+                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} style={{ padding:'8px 16px', border:`1.5px solid ${s?'var(--gold)':'var(--line-dk)'}`, backgroundColor:s?'var(--gold)':'transparent', color:s?'var(--cream)':'var(--mid)', fontFamily:"'Cairo',sans-serif", fontSize:'13px', fontWeight:500, cursor:'pointer', transition:'all 0.18s' }}>{v.name}</button>;})}
+                </div>
+              )}
+            </div>
+          ))}
+
+          <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants}/>
+
+          {product.desc && (
+            <div style={{ marginTop:'28px', paddingTop:'22px', borderTop:'1px solid var(--line)' }}>
+              <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--dim)', marginBottom:'12px' }}>وصف القطعة</p>
+              <div style={{ fontFamily:"'Cairo',sans-serif", fontSize:'14px', lineHeight:'1.9', color:'var(--mid)', fontWeight:400 }}
+                dangerouslySetInnerHTML={{ __html:DOMPurify.sanitize(product.desc,{ALLOWED_TAGS:['p','br','strong','em','ul','ol','li','h1','h2','h3','span'],ALLOWED_ATTR:['class','style']})}}/>
             </div>
           )}
         </div>
-      </section>
-
-      {/* ── MOTIVATIONAL BANNER ── */}
-      <section className="py-20 relative overflow-hidden diagonal-stripe" style={{ backgroundColor: 'var(--dark-2)' }}>
-        <div className="absolute top-0 left-0 right-0 h-1" style={{ background: 'linear-gradient(90deg, var(--fire), var(--gold), var(--fire))' }} />
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <p className="font-black text-white mb-2" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(3rem, 8vw, 7rem)', lineHeight: 1 }}>
-            {isRTL ? 'لا تتوقف' : "DON'T STOP"}
-          </p>
-          <p className="fire-text font-black" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(3rem, 8vw, 7rem)', lineHeight: 1 }}>
-            {isRTL ? 'حتى تصل' : 'WHEN IT BURNS'}
-          </p>
-          <p className="mt-6 text-sm font-medium" style={{ color: 'var(--text-mid)' }}>
-            {isRTL ? 'ذلك يعني أن التمرين يعمل' : "That's when it starts working"}
-          </p>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: 'linear-gradient(90deg, var(--fire), var(--gold), var(--fire))' }} />
-      </section>
+      </div>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// DETAILS PAGE
-// ─────────────────────────────────────────────────────────────
-
-export function Details({
-  product, toggleWishlist, isWishlisted, handleShare, discount,
-  allImages, allAttrs, finalPrice, inStock, autoGen,
-  selectedVariants, setSelectedOffer, selectedOffer,
-  resolvedParams, handleVariantSelection, domain, isRTL,
-}: any) {
-  const [selectedImage,  setSelectedImage]  = useState(0);
-  const [submitSuccess,  setSubmitSuccess]  = useState(false);
-
-  return (
-    <div className="min-h-screen" dir={isRTL ? 'rtl' : 'ltr'} style={{ backgroundColor: 'var(--dark)', fontFamily: "'Barlow', sans-serif" }}>
-
-      {submitSuccess && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-6 py-4"
-          style={{ backgroundColor: 'var(--dark-2)', border: '2px solid var(--green)', boxShadow: '0 0 30px rgba(57,211,83,0.2)' }}>
-          <div className="w-6 h-6 flex items-center justify-center bg-green-500 rounded-full">
-            <Check className="w-3.5 h-3.5 text-black" />
-          </div>
-          <p className="text-sm font-bold text-white tracking-widest">{isRTL ? 'تم تأكيد طلبك بنجاح!' : 'ORDER CONFIRMED!'}</p>
-        </div>
-      )}
-
-      {/* Breadcrumb */}
-      <header className="py-4 sticky top-0 z-40" style={{ backgroundColor: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--border)' }}>
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
-          <nav className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-dim)' }}>
-            <span className="hover:text-white cursor-pointer">{isRTL ? 'الرئيسية' : 'HOME'}</span>
-            <ChevronRight className="w-3 h-3" />
-            <span className="hover:text-white cursor-pointer">{isRTL ? 'المنتجات' : 'PRODUCTS'}</span>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-white font-semibold">{product.name}</span>
-          </nav>
-          <div className="flex items-center gap-2">
-            <button onClick={toggleWishlist} className="w-8 h-8 flex items-center justify-center transition-colors" style={{ border: '1px solid var(--border)', color: isWishlisted ? '#FF3B30' : 'var(--text-dim)' }}>
-              <Heart className={`w-3.5 h-3.5 ${isWishlisted ? 'fill-current' : ''}`} />
-            </button>
-            <button onClick={handleShare} className="w-8 h-8 flex items-center justify-center" style={{ border: '1px solid var(--border)', color: 'var(--text-dim)' }}>
-              <Share2 className="w-3.5 h-3.5" />
-            </button>
-            <div className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold tracking-widest"
-              style={{ backgroundColor: inStock ? 'rgba(57,211,83,0.1)' : 'rgba(255,48,48,0.1)', border: `1px solid ${inStock ? 'var(--green)' : 'var(--red)'}`, color: inStock ? 'var(--green)' : 'var(--red)' }}>
-              <span className={`w-1.5 h-1.5 rounded-full ${inStock ? 'bg-green-400 animate-pulse' : 'bg-red-500'}`} />
-              {inStock ? (isRTL ? 'متوفر' : 'IN STOCK') : (isRTL ? 'غير متوفر' : 'OUT OF STOCK')}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-6xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-14">
-
-          {/* ── Images ── */}
-          <div className="space-y-3">
-            <div className="relative overflow-hidden group" style={{ aspectRatio: '1', backgroundColor: 'var(--dark-3)' }}>
-              {allImages.length > 0 ? (
-                <img src={allImages[selectedImage]} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                  <Dumbbell className="w-16 h-16" style={{ color: 'var(--border)' }} />
-                </div>
-              )}
-              {/* Fire gradient overlay */}
-              <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"
-                style={{ background: 'linear-gradient(to top, rgba(255,69,0,0.15) 0%, transparent 60%)' }} />
-
-              {discount > 0 && (
-                <div className="absolute top-4 left-4 px-3 py-1 text-sm font-black text-white"
-                  style={{ background: 'var(--fire)', clipPath: 'polygon(0 0, 95% 0, 100% 100%, 5% 100%)' }}>
-                  -{discount}%
-                </div>
-              )}
-              <button onClick={toggleWishlist} className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center transition-all"
-                style={{ backgroundColor: isWishlisted ? 'var(--red)' : 'rgba(10,10,10,0.8)', border: '1px solid var(--border)', color: isWishlisted ? 'white' : 'var(--text-mid)' }}>
-                <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
-              </button>
-
-              {allImages.length > 1 && (
-                <>
-                  <button onClick={() => setSelectedImage(p => p === 0 ? allImages.length - 1 : p - 1)} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" style={{ backgroundColor: 'rgba(10,10,10,0.9)', border: '1px solid var(--border)', color: 'white' }}>
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => setSelectedImage(p => p === allImages.length - 1 ? 0 : p + 1)} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" style={{ backgroundColor: 'rgba(10,10,10,0.9)', border: '1px solid var(--border)', color: 'white' }}>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </>
-              )}
-
-              {!inStock && !autoGen && (
-                <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(10,10,10,0.8)', backdropFilter: 'blur(4px)' }}>
-                  <div className="px-6 py-3 text-sm font-black text-white tracking-widest" style={{ border: '2px solid var(--red)', color: 'var(--red)', fontFamily: "'Bebas Neue', sans-serif", fontSize: '1.5rem' }}>
-                    {isRTL ? 'نفدت الكمية' : 'OUT OF STOCK'}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {allImages.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto">
-                {allImages.map((img: string, idx: number) => (
-                  <button key={idx} onClick={() => setSelectedImage(idx)} className="shrink-0 w-16 h-16 overflow-hidden transition-all"
-                    style={{ border: `2px solid ${selectedImage === idx ? 'var(--fire)' : 'var(--border)'}`, opacity: selectedImage === idx ? 1 : 0.5 }}>
-                    <img src={img} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Trust badges */}
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { icon: <ShieldCheck className="w-4 h-4" />, label: isRTL ? 'دفع آمن'      : 'SECURE PAY'  },
-                { icon: <Truck className="w-4 h-4" />,       label: isRTL ? 'توصيل سريع'   : 'FAST SHIP'   },
-                { icon: <Award className="w-4 h-4" />,       label: isRTL ? 'جودة مضمونة'  : 'AUTHENTIC'   },
-              ].map((b, i) => (
-                <div key={i} className="flex flex-col items-center gap-1.5 py-4" style={{ border: '1px solid var(--border)', backgroundColor: 'var(--dark-2)' }}>
-                  <span style={{ color: 'var(--gold)' }}>{b.icon}</span>
-                  <span className="text-[9px] font-bold tracking-widest uppercase" style={{ color: 'var(--text-dim)' }}>{b.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* ── Info + Form ── */}
-          <div className="space-y-6">
-            <div>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-6 h-0.5" style={{ background: 'var(--fire)' }} />
-                <span className="text-xs font-black tracking-widest uppercase" style={{ color: 'var(--fire)' }}>{isRTL ? 'المنتج' : 'PRODUCT'}</span>
-              </div>
-              <h1 className="font-black text-white leading-tight mb-3" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(1.8rem, 4vw, 3rem)', letterSpacing: '0.04em' }}>
-                {product.name}
-              </h1>
-              <div className="flex items-center gap-3">
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => <Star key={i} className={`w-3.5 h-3.5 ${i < 4 ? 'fill-current' : ''}`} style={{ color: 'var(--gold)' }} />)}
-                </div>
-                <span className="text-xs" style={{ color: 'var(--text-dim)' }}>4.8 (128 {isRTL ? 'تقييم' : 'reviews'})</span>
-              </div>
-            </div>
-
-            {/* Price */}
-            <div className="p-5 relative" style={{ border: '2px solid rgba(255,69,0,0.3)', backgroundColor: 'rgba(255,69,0,0.04)' }}>
-              <div className="absolute top-0 left-0 w-1 h-full" style={{ background: 'var(--fire)' }} />
-              <p className="text-[10px] font-black tracking-widest uppercase mb-2 pl-3" style={{ color: 'var(--text-dim)' }}>{isRTL ? 'السعر' : 'PRICE'}</p>
-              <div className="flex items-baseline gap-3 pl-3">
-                <span className="font-black" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '3.5rem', color: 'var(--fire)', lineHeight: 1 }}>
-                  {finalPrice.toLocaleString()}
-                </span>
-                <span className="font-bold text-sm" style={{ color: 'var(--text-mid)' }}>دج</span>
-                {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
-                  <div>
-                    <span className="text-sm line-through block" style={{ color: 'var(--text-dim)' }}>{parseFloat(product.priceOriginal).toLocaleString()} دج</span>
-                    <span className="text-xs font-black" style={{ color: 'var(--gold)' }}>SAVE {(parseFloat(product.priceOriginal) - finalPrice).toLocaleString()} دج</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Stock */}
-            <div className="flex items-center gap-3">
-              {autoGen
-                ? <div className="flex items-center gap-2 px-4 py-2 text-xs font-black tracking-widest" style={{ border: '1px solid rgba(255,184,0,0.4)', color: 'var(--gold)', backgroundColor: 'rgba(255,184,0,0.05)' }}><Infinity className="w-4 h-4" /> UNLIMITED STOCK</div>
-                : inStock
-                  ? <div className="flex items-center gap-2 px-4 py-2 text-xs font-black tracking-widest" style={{ border: '1px solid rgba(57,211,83,0.4)', color: 'var(--green)', backgroundColor: 'rgba(57,211,83,0.05)' }}><span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" /> IN STOCK</div>
-                  : <div className="flex items-center gap-2 px-4 py-2 text-xs font-black tracking-widest" style={{ border: '1px solid rgba(255,48,48,0.4)', color: 'var(--red)', backgroundColor: 'rgba(255,48,48,0.05)' }}><X className="w-4 h-4" /> SOLD OUT</div>
-              }
-            </div>
-
-            {/* Offers */}
-            {product.offers?.length > 0 && (
-              <div>
-                <p className="text-xs font-black tracking-widest uppercase mb-3" style={{ color: 'var(--fire)' }}>
-                  {isRTL ? '— اختر الباقة' : '— SELECT PACKAGE'}
-                </p>
-                <div className="space-y-2">
-                  {product.offers.map((offer: any) => (
-                    <label key={offer.id} className="flex items-center justify-between p-4 cursor-pointer transition-all"
-                      style={{ border: `2px solid ${selectedOffer === offer.id ? 'var(--fire)' : 'var(--border)'}`, backgroundColor: selectedOffer === offer.id ? 'rgba(255,69,0,0.06)' : 'var(--dark-2)' }}>
-                      <div className="flex items-center gap-3">
-                        <div className="w-4 h-4 flex items-center justify-center" style={{ border: `2px solid ${selectedOffer === offer.id ? 'var(--fire)' : 'var(--border)'}` }}>
-                          {selectedOffer === offer.id && <div className="w-2 h-2" style={{ backgroundColor: 'var(--fire)' }} />}
-                        </div>
-                        <input type="radio" name="offer" value={offer.id} checked={selectedOffer === offer.id} onChange={() => setSelectedOffer(offer.id)} className="sr-only" />
-                        <div>
-                          <p className="text-sm font-bold text-white">{offer.name}</p>
-                          <p className="text-xs" style={{ color: 'var(--text-dim)' }}>QTY: {offer.quantity}</p>
-                        </div>
-                      </div>
-                      <span className="font-black" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '1.4rem', color: 'var(--fire)' }}>
-                        {offer.price.toLocaleString()} <span className="text-sm">دج</span>
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Attributes */}
-            {allAttrs.map((attr: any) => (
-              <div key={attr.id}>
-                <p className="text-xs font-black tracking-widest uppercase mb-3" style={{ color: 'var(--fire)' }}>— {attr.name}</p>
-                {attr.displayMode === 'color' ? (
-                  <div className="flex gap-2 flex-wrap">
-                    {attr.variants.map((v: any) => {
-                      const isSel = selectedVariants[attr.name] === v.value;
-                      return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name} className="w-10 h-10 transition-transform hover:scale-110" style={{ backgroundColor: v.value, border: `3px solid ${isSel ? 'white' : 'transparent'}`, boxShadow: isSel ? '0 0 0 2px var(--fire)' : 'none' }} />;
-                    })}
-                  </div>
-                ) : attr.displayMode === 'image' ? (
-                  <div className="flex gap-2 flex-wrap">
-                    {attr.variants.map((v: any) => {
-                      const isSel = selectedVariants[attr.name] === v.value;
-                      return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} className="w-14 h-14 overflow-hidden transition-all" style={{ border: `2px solid ${isSel ? 'var(--fire)' : 'var(--border)'}` }}><img src={v.value} alt={v.name} className="w-full h-full object-cover" /></button>;
-                    })}
-                  </div>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {attr.variants.map((v: any) => {
-                      const isSel = selectedVariants[attr.name] === v.value;
-                      return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} className="px-5 py-2.5 text-xs font-bold tracking-widest uppercase transition-all" style={{ border: `2px solid ${isSel ? 'var(--fire)' : 'var(--border)'}`, backgroundColor: isSel ? 'rgba(255,69,0,0.1)' : 'var(--dark-2)', color: isSel ? 'var(--fire)' : 'var(--text-mid)' }}>{v.name}</button>;
-                    })}
-                  </div>
-                )}
-              </div>
-            ))}
-
-            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
-          </div>
-        </div>
-
-        {/* Description */}
-        {product.desc && (
-          <section className="mt-20 pt-12" style={{ borderTop: '1px solid var(--border)' }}>
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-6 h-0.5" style={{ background: 'var(--fire)' }} />
-              <h2 className="font-black text-white" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '2rem', letterSpacing: '0.04em' }}>
-                {isRTL ? 'تفاصيل المنتج' : 'PRODUCT DETAILS'}
-              </h2>
-            </div>
-            <div className="p-6" style={{ border: '1px solid var(--border)', backgroundColor: 'var(--dark-2)' }}>
-              <div className="text-sm leading-relaxed" style={{ color: 'var(--text-mid)' }}
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc, { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'span'], ALLOWED_ATTR: ['class', 'style'] }) }} />
-            </div>
-          </section>
-        )}
-      </main>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────
-// PRODUCT FORM
-// ─────────────────────────────────────────────────────────────
-
-const inputStyle = (err?: boolean) => ({
-  width: '100%', padding: '12px 16px', fontSize: '0.875rem',
-  backgroundColor: 'var(--dark-3)', border: `1px solid ${err ? 'var(--red)' : 'var(--border)'}`,
-  color: 'var(--text-bright)', outline: 'none', fontFamily: "'Barlow', sans-serif",
-  transition: 'border-color 0.2s',
-});
-
-const FieldWrapper = ({ error, label, children }: { error?: string; label?: string; children: React.ReactNode }) => (
-  <div className="space-y-1.5">
-    {label && <label className="block text-[10px] font-black tracking-widest uppercase" style={{ color: 'var(--text-dim)' }}>{label}</label>}
+/* ── PRODUCT FORM ────────────────────────────────────────────── */
+const FR = ({ error, label, children }: { error?:string; label?:string; children:React.ReactNode }) => (
+  <div style={{ marginBottom:'13px' }}>
+    {label && <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'6px' }}>{label}</p>}
     {children}
-    {error && <p className="text-xs flex items-center gap-1" style={{ color: 'var(--red)' }}><AlertCircle className="w-3 h-3" />{error}</p>}
+    {error && <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', color:'#C0392B', marginTop:'4px', display:'flex', alignItems:'center', gap:'4px' }}>
+      <AlertCircle style={{ width:'11px', height:'11px' }}/>{error}
+    </p>}
   </div>
 );
 
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0 }: ProductFormProps) {
+export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss=0 }: ProductFormProps) {
   const router = useRouter();
-  const [wilayas,         setWilayas]         = useState<Wilaya[]>([]);
-  const [communes,        setCommunes]        = useState<Commune[]>([]);
-  const [loadingCommunes, setLoadingCommunes] = useState(false);
-  const [formData, setFormData] = useState({
-    customerId: localStorage.getItem("customerId"), customerName: '', customerPhone: '',
-    customerWelaya: '', customerCommune: '',
-    quantity: 1, priceLoss: 0,
-    typeLivraison: 'home' as 'home' | 'office',
+  const [wilayas,  setWilayas]  = useState<Wilaya[]>([]);
+  const [communes, setCommunes] = useState<Commune[]>([]);
+  const [loadingC, setLC]       = useState(false);
+  const [fd, setFd] = useState({
+    customerId:'', customerName:'', customerPhone:'',
+    customerWelaya:'', customerCommune:'',
+    quantity:1, priceLoss:0,
+    typeLivraison:'home' as 'home'|'office',
   });
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string,string>>({});
+  const [sub,    setSub]    = useState(false);
 
-  useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const id = localStorage.getItem('customerId');
-      if (id) setFormData(p => ({ ...p, customerId: id }));
-    }
-  }, []);
-  useEffect(() => {
-    if (!formData.customerWelaya) { setCommunes([]); return; }
-    setLoadingCommunes(true);
-    fetchCommunes(formData.customerWelaya).then(data => { setCommunes(data); setLoadingCommunes(false); });
-  }, [formData.customerWelaya]);
+  useEffect(()=>{ if(userId) fetchWilayas(userId).then(setWilayas); },[userId]);
+  useEffect(()=>{ if(typeof window!=='undefined'){ const id=localStorage.getItem('customerId'); if(id) setFd(p=>({...p,customerId:id})); } },[]);
+  useEffect(()=>{ if(!fd.customerWelaya){setCommunes([]);return;} setLC(true); fetchCommunes(fd.customerWelaya).then(d=>{setCommunes(d);setLC(false);}); },[fd.customerWelaya]);
 
-  const selectedWilayaData = useMemo(() => wilayas.find(w => String(w.id) === String(formData.customerWelaya)), [wilayas, formData.customerWelaya]);
+  const selW  = useMemo(()=>wilayas.find(w=>String(w.id)===String(fd.customerWelaya)),[wilayas,fd.customerWelaya]);
 
-  const getFinalPrice = useCallback((): number => {
-    const base = typeof product.price === 'string' ? parseFloat(product.price) : product.price as number;
-    const offer = product.offers?.find(o => o.id === selectedOffer);
-    if (offer) return offer.price;
-    if (product.variantDetails?.length && Object.keys(selectedVariants).length > 0) {
-      const match = product.variantDetails.find(v => variantMatches(v, selectedVariants));
-      if (match && match.price !== -1) return match.price;
+  const getFP = useCallback(():number=>{
+    const base = typeof product.price==='string' ? parseFloat(product.price) : product.price as number;
+    const off  = product.offers?.find((o:any)=>o.id===selectedOffer);
+    if(off) return off.price;
+    if(product.variantDetails?.length && Object.keys(selectedVariants).length>0){
+      const m = product.variantDetails.find((v:any)=>variantMatches(v,selectedVariants));
+      if(m && m.price!==-1) return m.price;
     }
     return base;
-  }, [product, selectedOffer, selectedVariants]);
+  },[product,selectedOffer,selectedVariants]);
 
-  const getPriceLivraison = useCallback((): number => {
-    if (!selectedWilayaData) return 0;
-    return formData.typeLivraison === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice;
-  }, [selectedWilayaData, formData.typeLivraison]);
+  const getLiv = useCallback(():number=>{
+    if(!selW) return 0;
+    return fd.typeLivraison==='home' ? selW.livraisonHome : selW.livraisonOfice;
+  },[selW,fd.typeLivraison]);
 
-  useEffect(() => { if (selectedWilayaData) setFormData(f => ({ ...f, priceLoss: selectedWilayaData.livraisonReturn })); }, [selectedWilayaData]);
+  useEffect(()=>{ if(selW) setFd(f=>({...f,priceLoss:selW.livraisonReturn})); },[selW]);
 
-  const finalPrice    = getFinalPrice();
-  const getTotalPrice = () => finalPrice * formData.quantity + +getPriceLivraison();
+  const getVariantDetailId = useCallback(()=>{
+    if(!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+    return product.variantDetails.find((v:any)=>variantMatches(v,selectedVariants))?.id;
+  },[product.variantDetails,selectedVariants]);
 
-  const validate = () => {
-    const e: Record<string, string> = {};
-    if (!formData.customerName.trim())  e.customerName    = 'الاسم مطلوب';
-    if (!formData.customerPhone.trim()) e.customerPhone   = 'رقم الهاتف مطلوب';
-    if (!formData.customerWelaya)       e.customerWelaya  = 'الولاية مطلوبة';
-    if (!formData.customerCommune)      e.customerCommune = 'البلدية مطلوبة';
+  const fp    = getFP();
+  const total = ()=> fp * fd.quantity + +getLiv();
+
+  const validate = ()=>{
+    const e:Record<string,string>={};
+    if(!fd.customerName.trim())  e.customerName  = 'الاسم مطلوب';
+    if(!fd.customerPhone.trim()) e.customerPhone  = 'رقم الهاتف مطلوب';
+    if(!fd.customerWelaya)       e.customerWelaya = 'الولاية مطلوبة';
+    if(!fd.customerCommune)      e.customerCommune= 'البلدية مطلوبة';
     return e;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e:React.FormEvent)=>{
     e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length) { setFormErrors(errs); return; }
-    setFormErrors({}); setSubmitting(true);
+    const er = validate();
+    if(Object.keys(er).length){ setErrors(er); return; }
+    setErrors({}); setSub(true);
     try {
-      const payload = { ...formData, customerWilayaId: +formData.customerWelaya,customerCommuneId: +formData.customerCommune, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceShip : getPriceLivraison(), };
-      await axios.post(`${API_URL}/orders`, payload);
-      if (typeof window !== 'undefined' && formData.customerId) localStorage.setItem('customerId', formData.customerId);
-      router.push(`/lp/${domain}/successfully`);
-    } catch (err) { console.error(err); } finally { setSubmitting(false); }
+      await axios.post(`${API_URL}/orders`, {
+        productId:         product.id,
+        variantDetailId:   getVariantDetailId(),
+        storeId:           product.store.id,
+        userId,
+        selectedOffer,
+        platform:          platform || 'store',
+        finalPrice:        fp,
+        totalPrice:        total(),
+        priceLivraison:    getLiv(),
+        customerId:        fd.customerId,
+        customerName:      fd.customerName,
+        customerPhone:     fd.customerPhone,
+        customerWilayaId:  fd.customerWelaya,
+        customerCommuneId: fd.customerCommune,
+        quantity:          fd.quantity,
+        priceLoss:         fd.priceLoss,
+        typeLivraison:     fd.typeLivraison,
+      });
+      if(typeof window!=='undefined' && fd.customerId) localStorage.setItem('customerId',fd.customerId);
+      router.push(`/${domain}/successfully`);
+    } catch(err){ console.error(err); } finally { setSub(false); }
   };
 
   return (
-    <div style={{ borderTop: '2px solid var(--border)', paddingTop: '1.5rem' }}>
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-6 h-0.5" style={{ background: 'var(--fire)' }} />
-        <span className="text-xs font-black tracking-widest uppercase text-white">ORDER FORM</span>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid grid-cols-2 gap-3">
-          <FieldWrapper error={formErrors.customerName} label="FULL NAME">
-            <div className="relative">
-              <User className="absolute right-3 top-3.5 w-3.5 h-3.5" style={{ color: 'var(--text-dim)' }} />
-              <input type="text" value={formData.customerName} onChange={e => setFormData({ ...formData, customerName: e.target.value })} placeholder="اسمك الكامل" style={{ ...inputStyle(!!formErrors.customerName), paddingRight: '2.5rem' }} />
+    <div style={{ marginTop:'22px', paddingTop:'20px', borderTop:'2px solid var(--gold)' }}>
+      <form onSubmit={handleSubmit}>
+        <div className="form-2c">
+          <FR error={errors.customerName} label="الاسم">
+            <div style={{ position:'relative' }}>
+              <User style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
+              <input type="text" value={fd.customerName} onChange={e=>setFd({...fd,customerName:e.target.value})} placeholder="الاسم الكامل"
+                className={`inp${errors.customerName?' inp-err':''}`} style={{ paddingLeft:'36px' }}
+                onFocus={e=>{e.target.style.borderColor='var(--gold)';}} onBlur={e=>{e.target.style.borderColor=errors.customerName?'#C0392B':'var(--line-dk)';}}/>
             </div>
-          </FieldWrapper>
-          <FieldWrapper error={formErrors.customerPhone} label="PHONE">
-            <div className="relative">
-              <Phone className="absolute right-3 top-3.5 w-3.5 h-3.5" style={{ color: 'var(--text-dim)' }} />
-              <input type="tel" value={formData.customerPhone} onChange={e => setFormData({ ...formData, customerPhone: e.target.value })} placeholder="0X XX XX XX XX" style={{ ...inputStyle(!!formErrors.customerPhone), paddingRight: '2.5rem' }} />
+          </FR>
+          <FR error={errors.customerPhone} label="الهاتف">
+            <div style={{ position:'relative' }}>
+              <Phone style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
+              <input type="tel" value={fd.customerPhone} onChange={e=>setFd({...fd,customerPhone:e.target.value})} placeholder="0X XX XX XX XX"
+                className={`inp${errors.customerPhone?' inp-err':''}`} style={{ paddingLeft:'36px' }}
+                onFocus={e=>{e.target.style.borderColor='var(--gold)';}} onBlur={e=>{e.target.style.borderColor=errors.customerPhone?'#C0392B':'var(--line-dk)';}}/>
             </div>
-          </FieldWrapper>
+          </FR>
         </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <FieldWrapper error={formErrors.customerWelaya} label="WILAYA">
-            <div className="relative">
-              <MapPin className="absolute right-3 top-3.5 w-3.5 h-3.5" style={{ color: 'var(--text-dim)' }} />
-              <select value={formData.customerWelaya} onChange={e => setFormData({ ...formData, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...inputStyle(!!formErrors.customerWelaya), paddingRight: '2.5rem', cursor: 'pointer', appearance: 'none' as any }}>
+        <div className="form-2c">
+          <FR error={errors.customerWelaya} label="الولاية">
+            <div style={{ position:'relative' }}>
+              <ChevronDown style={{ position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
+              <select value={fd.customerWelaya} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})}
+                className={`inp${errors.customerWelaya?' inp-err':''}`} style={{ paddingRight:'34px' }}
+                onFocus={e=>{e.target.style.borderColor='var(--gold)';}} onBlur={e=>{e.target.style.borderColor=errors.customerWelaya?'#C0392B':'var(--line-dk)';}}>
                 <option value="">اختر الولاية</option>
-                {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                {wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
               </select>
-              <ChevronDown className="absolute left-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color: 'var(--text-dim)' }} />
             </div>
-          </FieldWrapper>
-          <FieldWrapper error={formErrors.customerCommune} label="COMMUNE">
-            <div className="relative">
-              <MapPin className="absolute right-3 top-3.5 w-3.5 h-3.5" style={{ color: 'var(--text-dim)' }} />
-              <select value={formData.customerCommune} disabled={!formData.customerWelaya || loadingCommunes} onChange={e => setFormData({ ...formData, customerCommune: e.target.value })} style={{ ...inputStyle(!!formErrors.customerCommune), paddingRight: '2.5rem', cursor: 'pointer', appearance: 'none' as any, opacity: !formData.customerWelaya ? 0.5 : 1 }}>
-                <option value="">{loadingCommunes ? 'Loading...' : 'اختر البلدية'}</option>
-                {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+          </FR>
+          <FR error={errors.customerCommune} label="البلدية">
+            <div style={{ position:'relative' }}>
+              <ChevronDown style={{ position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
+              <select value={fd.customerCommune} disabled={!fd.customerWelaya||loadingC} onChange={e=>setFd({...fd,customerCommune:e.target.value})}
+                className={`inp${errors.customerCommune?' inp-err':''}`} style={{ paddingRight:'34px', opacity:!fd.customerWelaya?0.4:1 }}
+                onFocus={e=>{e.target.style.borderColor='var(--gold)';}} onBlur={e=>{e.target.style.borderColor=errors.customerCommune?'#C0392B':'var(--line-dk)';}}>
+                <option value="">{loadingC?'...':'اختر البلدية'}</option>
+                {communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
-              <ChevronDown className="absolute left-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color: 'var(--text-dim)' }} />
             </div>
-          </FieldWrapper>
+          </FR>
         </div>
 
-        {/* Delivery type */}
-        <div>
-          <p className="text-[10px] font-black tracking-widest uppercase mb-3" style={{ color: 'var(--text-dim)' }}>DELIVERY MODE</p>
-          <div className="grid grid-cols-2 gap-3">
-            {(['home', 'office'] as const).map(type => (
-              <button key={type} type="button" onClick={() => setFormData(p => ({ ...p, typeLivraison: type }))}
-                className="flex flex-col items-center gap-2 py-5 transition-all"
-                style={{ border: `2px solid ${formData.typeLivraison === type ? 'var(--fire)' : 'var(--border)'}`, backgroundColor: formData.typeLivraison === type ? 'rgba(255,69,0,0.08)' : 'var(--dark-2)' }}>
-                {type === 'home'
-                  ? <Heart className="w-5 h-5" style={{ color: formData.typeLivraison === type ? 'var(--fire)' : 'var(--text-dim)' }} />
-                  : <Building2 className="w-5 h-5" style={{ color: formData.typeLivraison === type ? 'var(--fire)' : 'var(--text-dim)' }} />
-                }
-                <p className="text-[10px] font-black tracking-widest uppercase" style={{ color: formData.typeLivraison === type ? 'var(--fire)' : 'var(--text-dim)' }}>
-                  {type === 'home' ? 'HOME' : 'OFFICE'}
+        <FR label="طريقة التوصيل">
+          <div className="dlv-2c">
+            {(['home','office'] as const).map(type=>(
+              <button key={type} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:type}))}
+                style={{ padding:'13px 10px', border:`1.5px solid ${fd.typeLivraison===type?'var(--gold)':'var(--line-dk)'}`, backgroundColor:fd.typeLivraison===type?'rgba(184,151,58,0.06)':'transparent', cursor:'pointer', textAlign:'right', transition:'all 0.2s' }}>
+                <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', fontWeight:500, color:fd.typeLivraison===type?'var(--gold-dk)':'var(--mid)', margin:'0 0 4px' }}>
+                  {type==='home'?'توصيل للبيت':'توصيل للمكتب'}
                 </p>
-                {selectedWilayaData && (
-                  <p className="text-xs font-bold" style={{ color: 'var(--text-mid)' }}>
-                    {(type === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice).toLocaleString()} دج
-                  </p>
-                )}
+                {selW && <p className="amiri" style={{ fontSize:'1.1rem', fontWeight:700, color:fd.typeLivraison===type?'var(--gold-dk)':'var(--dim)', margin:0 }}>
+                  {(type==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()}
+                  <span style={{ fontFamily:"'Cairo',sans-serif", fontWeight:300, fontSize:'11px', marginRight:'3px', color:'var(--mid)' }}>دج</span>
+                </p>}
               </button>
             ))}
           </div>
-        </div>
+        </FR>
 
-        {/* Quantity */}
-        <FieldWrapper label="QUANTITY">
-          <div className="flex items-center gap-4">
-            <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
-              className="w-10 h-10 flex items-center justify-center text-xl font-black text-white transition-all hover:bg-orange-500"
-              style={{ border: '1px solid var(--border)', backgroundColor: 'var(--dark-3)' }}>−</button>
-            <span className="w-14 text-center font-black text-white text-2xl" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>{formData.quantity}</span>
-            <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: p.quantity + 1 }))}
-              className="w-10 h-10 flex items-center justify-center text-xl font-black text-white transition-all hover:bg-orange-500"
-              style={{ border: '1px solid var(--border)', backgroundColor: 'var(--dark-3)' }}>+</button>
+        <FR label="الكمية">
+          <div style={{ display:'inline-flex', alignItems:'center', border:'1.5px solid var(--line-dk)', backgroundColor:'var(--cream)' }}>
+            <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))}
+              style={{ width:'36px', height:'36px', display:'flex', alignItems:'center', justifyContent:'center', border:'none', borderLeft:'1px solid var(--line-dk)', background:'transparent', cursor:'pointer', color:'var(--walnut)' }}
+              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--sand-dk)';}}
+              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>
+              <Minus style={{ width:'12px', height:'12px' }}/>
+            </button>
+            <span className="amiri" style={{ width:'44px', textAlign:'center', fontSize:'1.2rem', fontWeight:700, color:'var(--ink)' }}>{fd.quantity}</span>
+            <button type="button" onClick={()=>setFd(p=>({...p,quantity:p.quantity+1}))}
+              style={{ width:'36px', height:'36px', display:'flex', alignItems:'center', justifyContent:'center', border:'none', borderRight:'1px solid var(--line-dk)', background:'transparent', cursor:'pointer', color:'var(--walnut)' }}
+              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--sand-dk)';}}
+              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>
+              <Plus style={{ width:'12px', height:'12px' }}/>
+            </button>
           </div>
-        </FieldWrapper>
+        </FR>
 
         {/* Summary */}
-        <div className="p-5 relative" style={{ border: '1px solid var(--border)', backgroundColor: 'var(--dark-2)' }}>
-          <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, var(--fire), var(--gold), transparent)' }} />
-          <p className="text-[10px] font-black tracking-widest uppercase mb-4 text-white">ORDER SUMMARY</p>
-          <div className="space-y-2.5">
-            {[
-              { label: 'PRODUCT',   value: product.name },
-              { label: 'UNIT',      value: `${finalPrice.toLocaleString()} دج` },
-              { label: 'QTY',       value: `× ${formData.quantity}` },
-              { label: 'SHIPPING',  value: selectedWilayaData ? `${getPriceLivraison().toLocaleString()} دج` : 'TBD' },
-            ].map(row => (
-              <div key={row.label} className="flex justify-between">
-                <span className="text-[10px] font-bold tracking-widest" style={{ color: 'var(--text-dim)' }}>{row.label}</span>
-                <span className="text-xs font-semibold" style={{ color: 'var(--text-mid)' }}>{row.value}</span>
-              </div>
-            ))}
-            <div className="pt-3 mt-1" style={{ borderTop: '1px solid var(--border)' }}>
-              <div className="flex justify-between items-baseline">
-                <span className="text-xs font-black tracking-widest" style={{ color: 'var(--fire)' }}>TOTAL</span>
-                <span className="font-black" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '2rem', color: 'var(--fire)' }}>
-                  {getTotalPrice().toLocaleString()}<span className="text-sm ml-1">دج</span>
-                </span>
-              </div>
+        <div style={{ border:'1px solid var(--line-dk)', marginBottom:'14px', overflow:'hidden' }}>
+          <div style={{ padding:'10px 14px', backgroundColor:'var(--sand)', borderBottom:'1px solid var(--line)' }}>
+            <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--mid)', margin:0 }}>ملخص الطلب</p>
+          </div>
+          {[
+            { l:'القطعة',  v:product.name.slice(0,22) },
+            { l:'السعر',   v:`${fp.toLocaleString()} دج` },
+            { l:'الكمية',  v:`× ${fd.quantity}` },
+            { l:'التوصيل', v:selW?`${getLiv().toLocaleString()} دج`:'—' },
+          ].map(row=>(
+            <div key={row.l} style={{ display:'flex', justifyContent:'space-between', padding:'8px 14px', borderBottom:'1px solid var(--line)', backgroundColor:'var(--cream)' }}>
+              <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', color:'var(--mid)' }}>{row.l}</span>
+              <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', fontWeight:500, color:'var(--ink)' }}>{row.v}</span>
             </div>
+          ))}
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', padding:'12px 14px', backgroundColor:'var(--sand-dk)' }}>
+            <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', color:'var(--mid)' }}>المجموع</span>
+            <span className="amiri" style={{ fontSize:'1.8rem', fontWeight:700, color:'var(--gold-dk)' }}>
+              {total().toLocaleString()}
+              <span style={{ fontFamily:"'Cairo',sans-serif", fontWeight:300, fontSize:'13px', marginRight:'4px', color:'var(--mid)' }}>دج</span>
+            </span>
           </div>
         </div>
 
-        {/* Submit */}
-        <button type="submit" disabled={submitting}
-          className="btn-fire w-full py-5 flex items-center justify-center gap-3 text-sm font-black tracking-widest uppercase text-white transition-all"
-          style={{ background: submitting ? '#555' : 'var(--fire)', clipPath: 'polygon(2% 0, 100% 0, 98% 100%, 0 100%)', animation: !submitting ? 'pulse-fire 3s ease-in-out infinite' : 'none', cursor: submitting ? 'not-allowed' : 'pointer' }}>
-          {submitting
-            ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> PROCESSING...</>
-            : <><Flame className="w-4 h-4" /> CONFIRM MY ORDER</>
-          }
+        <button type="submit" disabled={sub} className="btn-gold"
+          style={{ width:'100%', justifyContent:'center', padding:'14px', fontSize:'15px', cursor:sub?'not-allowed':'pointer', opacity:sub?0.7:1 }}>
+          {sub?'جاري المعالجة...':'تأكيد الطلب'}{!sub && <ArrowRight style={{ width:'15px', height:'15px' }}/>}
         </button>
 
-        <p className="text-[10px] text-center font-bold tracking-wider flex items-center justify-center gap-2" style={{ color: 'var(--text-dim)' }}>
-          <Shield className="w-3 h-3 text-green-500" /> SECURE CHECKOUT — 100% SAFE
+        <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', color:'var(--dim)', textAlign:'center', marginTop:'10px', display:'flex', alignItems:'center', justifyContent:'center', gap:'5px' }}>
+          <Lock style={{ width:'10px', height:'10px', color:'var(--gold)' }}/> دفع آمن ومشفر
         </p>
       </form>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// STATIC PAGES
-// ─────────────────────────────────────────────────────────────
-
-interface StaticPageProps { page: string; }
-
-export function StaticPage({ page }: StaticPageProps) {
+/* ── STATIC PAGES ────────────────────────────────────────────── */
+export function StaticPage({ page }: { page:string }) {
   const p = page.toLowerCase();
-  return (
-    <>
-      {p === 'privacy' && <Privacy />}
-      {p === 'terms'   && <Terms />}
-      {p === 'cookies' && <Cookies />}
-      {p === 'contact' && <Contact />}
-    </>
-  );
+  return <>{p==='privacy'&&<Privacy/>}{p==='terms'&&<Terms/>}{p==='cookies'&&<Cookies/>}{p==='contact'&&<Contact/>}</>;
 }
 
-function PageWrapper({ children, icon, title, subtitle }: { children: React.ReactNode; icon: React.ReactNode; title: string; subtitle: string }) {
-  return (
-    <div className="min-h-screen py-20" style={{ backgroundColor: 'var(--dark)', fontFamily: "'Barlow', sans-serif" }}>
-      <div className="max-w-4xl mx-auto px-6 lg:px-10">
-        {/* Header */}
-        <div className="mb-14 relative pb-8" style={{ borderBottom: '2px solid var(--fire)' }}>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 flex items-center justify-center" style={{ background: 'var(--fire)', clipPath: 'polygon(10% 0,100% 0,90% 100%,0 100%)', color: 'white' }}>
-              {icon}
-            </div>
-            <div>
-              <h1 className="font-black text-white leading-none" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(2rem, 5vw, 4rem)', letterSpacing: '0.04em' }}>{title}</h1>
-              <p className="text-sm mt-1" style={{ color: 'var(--text-dim)' }}>{subtitle}</p>
-            </div>
-          </div>
-        </div>
-        {children}
+const Shell = ({ children, title, sub }: { children:React.ReactNode; title:string; sub?:string }) => (
+  <div dir="rtl" style={{ backgroundColor:'var(--cream)', minHeight:'100vh' }}>
+    <div style={{ position:'relative', overflow:'hidden', padding:'72px 28px 48px', backgroundColor:'var(--sand)' }} className="geo-bg">
+      <div style={{ position:'absolute', bottom:0, left:0, right:0, height:'2px', background:'linear-gradient(to right,transparent,var(--gold),transparent)' }}/>
+      <div style={{ maxWidth:'720px', margin:'0 auto', position:'relative', zIndex:2 }}>
+        {sub && <div className="slabel" style={{ marginBottom:'14px', justifyContent:'flex-start' }}>{sub}</div>}
+        <h1 className="amiri" style={{ fontSize:'clamp(2.2rem,5vw,4.5rem)', fontWeight:700, color:'var(--ink)', lineHeight:0.95, margin:'0 0 14px' }}>{title}</h1>
+        <div className="cal-line"><GoldDiamond/></div>
       </div>
     </div>
-  );
-}
+    <div style={{ maxWidth:'720px', margin:'0 auto', padding:'40px 28px 80px' }}>
+      <div style={{ backgroundColor:'var(--cream)', border:'1px solid var(--line-dk)', padding:'32px' }}>{children}</div>
+    </div>
+  </div>
+);
 
-function InfoCard({ icon, title, desc, status }: { icon: React.ReactNode; title: string; desc: string; status?: string }) {
-  const isActive = status === 'دائماً نشطة' || status === 'Always Active';
-  return (
-    <div className="group flex gap-5 p-6 mb-3 transition-all duration-300"
-      style={{ border: '1px solid var(--border)', backgroundColor: 'var(--dark-2)' }}
-      onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(255,69,0,0.4)'; el.style.backgroundColor = 'rgba(255,69,0,0.04)'; }}
-      onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--border)'; el.style.backgroundColor = 'var(--dark-2)'; }}>
-      <div className="w-2 self-stretch flex-shrink-0" style={{ background: 'linear-gradient(180deg, var(--fire), transparent)' }} />
-      <div className="w-10 h-10 flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(255,69,0,0.1)', color: 'var(--fire)' }}>{icon}</div>
-      <div className="flex-1">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
-          <h3 className="font-black text-white tracking-wide" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '1.1rem', letterSpacing: '0.05em' }}>{title}</h3>
-          {status && (
-            <span className="text-[9px] font-black tracking-widest uppercase px-3 py-1"
-              style={{ backgroundColor: isActive ? 'rgba(57,211,83,0.1)' : 'rgba(255,69,0,0.08)', border: `1px solid ${isActive ? 'rgba(57,211,83,0.4)' : 'rgba(255,69,0,0.3)'}`, color: isActive ? 'var(--green)' : 'var(--fire)' }}>
-              {status}
-            </span>
-          )}
-        </div>
-        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-mid)' }}>{desc}</p>
-      </div>
+const IB = ({ title, body, tag }: { title:string; body:string; tag?:string }) => (
+  <div style={{ paddingBottom:'20px', marginBottom:'20px', borderBottom:'1px solid var(--line)', display:'flex', justifyContent:'space-between', gap:'16px', alignItems:'flex-start' }}>
+    <div style={{ flex:1 }}>
+      <h3 className="amiri" style={{ fontSize:'1.15rem', fontWeight:700, color:'var(--ink)', margin:'0 0 8px', display:'flex', alignItems:'center', gap:'8px' }}>
+        <GoldDiamond size={6}/> {title}
+      </h3>
+      <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', lineHeight:'1.85', color:'var(--mid)', fontWeight:400, margin:0 }}>{body}</p>
     </div>
-  );
-}
+    {tag && <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'10px', fontWeight:600, letterSpacing:'0.14em', textTransform:'uppercase', padding:'4px 10px', border:'1px solid var(--line-dk)', color:'var(--gold-dk)', flexShrink:0 }}>{tag}</span>}
+  </div>
+);
 
 export function Privacy() {
   return (
-    <PageWrapper icon={<ShieldCheck size={20} />} title="PRIVACY POLICY" subtitle="Your data is safe. Here's exactly how we protect it.">
-      <InfoCard icon={<Database size={16} />} title="Data We Collect"     desc="We collect only what's necessary to run your store — name, email, and payment info to ensure a smooth selling experience." />
-      <InfoCard icon={<Eye size={16} />}      title="How We Use It"       desc="Your data is used to improve our services, process orders, and provide smart reports for better business decisions." />
-      <InfoCard icon={<Lock size={16} />}     title="Security"            desc="We use advanced encryption and world-class security standards to protect your data from unauthorized access." />
-      <InfoCard icon={<Globe size={16} />}    title="Data Sharing"        desc="We never sell your data. We share it only with trusted service providers to complete your transactions." />
-      <div className="mt-8 p-4 flex items-center gap-3" style={{ border: '1px solid rgba(57,211,83,0.2)', backgroundColor: 'rgba(57,211,83,0.04)' }}>
-        <Bell size={14} style={{ color: 'var(--green)', flexShrink: 0 }} />
-        <p className="text-xs" style={{ color: 'var(--text-dim)' }}>This policy is updated periodically to ensure we meet the latest security standards.</p>
-        <span className="ml-auto text-[10px] font-bold whitespace-nowrap" style={{ color: 'var(--text-dim)' }}>Updated: 06.02.2026</span>
-      </div>
-    </PageWrapper>
+    <Shell title="سياسة الخصوصية" sub="قانوني">
+      <IB title="البيانات التي نجمعها" body="فقط اسمك ورقم هاتفك وعنوان التوصيل — ما هو ضروري لمعالجة طلبك."/>
+      <IB title="كيف نستخدمها"         body="حصرياً لتنفيذ وتوصيل مشترياتك."/>
+      <IB title="الأمان"                body="بياناتك محمية بتشفير قياسي وبنية تحتية آمنة."/>
+      <IB title="مشاركة البيانات"       body="لا نبيع بياناتك. تُشارك فقط مع شركاء التوصيل الموثوقين."/>
+      <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'12px', letterSpacing:'0.1em', color:'var(--dim)', marginTop:'20px' }}>آخر تحديث: فبراير 2026</p>
+    </Shell>
   );
 }
 
 export function Terms() {
   return (
-    <PageWrapper icon={<Scale size={20} />} title="TERMS OF SERVICE" subtitle="The rules that keep our marketplace fair and safe for everyone.">
-      <InfoCard icon={<CheckCircle2 size={16} />} title="Account Responsibility" desc="You are responsible for keeping your account credentials secure and for all activities under your account. Information provided must be accurate." />
-      <InfoCard icon={<CreditCard size={16} />}   title="Fees & Subscriptions"   desc="Our services are subject to periodic subscription fees. All fees are transparent with no hidden charges, charged per your chosen plan." />
-      <InfoCard icon={<Ban size={16} />}           title="Prohibited Content"      desc="The platform may not be used to sell illegal goods or infringe intellectual property rights. We reserve the right to close any violating store." />
-      <InfoCard icon={<Scale size={16} />}         title="Governing Law"           desc="These terms are governed by local laws in Algeria. Any disputes arising fall under the jurisdiction of local courts." />
-      <div className="mt-8 p-4 flex items-start gap-3" style={{ border: '1px solid rgba(255,184,0,0.2)', backgroundColor: 'rgba(255,184,0,0.04)' }}>
-        <AlertCircle size={14} style={{ color: 'var(--gold)', flexShrink: 0, marginTop: 2 }} />
-        <p className="text-xs leading-relaxed" style={{ color: 'var(--text-dim)' }}>We reserve the right to modify these terms at any time. Continued use of the platform after changes constitutes your acceptance.</p>
-      </div>
-    </PageWrapper>
+    <Shell title="شروط الاستخدام" sub="قانوني">
+      <IB title="حسابك"            body="أنت مسؤول عن أمان بيانات تسجيل الدخول وكل النشاط تحت حسابك."/>
+      <IB title="المدفوعات"         body="لا رسوم مخفية. السعر المعروض هو السعر النهائي."/>
+      <IB title="الاستخدام المحظور" body="المنتجات الأصيلة فقط. لا مجال للمنتجات المقلدة." tag="صارم"/>
+      <IB title="القانون الحاكم"   body="تخضع هذه الشروط لقوانين جمهورية الجزائر الديمقراطية الشعبية."/>
+    </Shell>
   );
 }
 
 export function Cookies() {
   return (
-    <PageWrapper icon={<CookieIcon size={20} />} title="COOKIE POLICY" subtitle="We use cookies to improve your experience. Here's the full breakdown.">
-      <InfoCard icon={<ShieldCheck size={16} />}   title="Essential Cookies"    desc="Required for core site functions like login and shopping cart. These cannot be disabled." status="Always Active" />
-      <InfoCard icon={<Settings size={16} />}      title="Preference Cookies"   desc="Allow the site to remember your choices like language and timezone preferences." status="Optional" />
-      <InfoCard icon={<MousePointer2 size={16} />} title="Analytics Cookies"    desc="Help us understand how merchants interact with the platform so we can build better selling tools." status="Optional" />
-      <div className="mt-8 p-5 relative" style={{ backgroundColor: 'rgba(255,69,0,0.04)', border: '1px solid rgba(255,69,0,0.2)' }}>
-        <div className="absolute top-0 left-0 w-1 h-full" style={{ background: 'var(--fire)' }} />
-        <div className="flex gap-4 items-start pl-4">
-          <ToggleRight size={18} style={{ color: 'var(--fire)', flexShrink: 0, marginTop: 2 }} />
-          <div>
-            <h3 className="font-black text-white mb-2" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '1rem', letterSpacing: '0.05em' }}>MANAGE YOUR PREFERENCES</h3>
-            <p className="text-xs leading-relaxed" style={{ color: 'var(--text-mid)' }}>
-              You can manage or delete cookies through your browser settings at any time. Note that disabling some cookies may affect your platform experience.
-            </p>
-          </div>
-        </div>
+    <Shell title="سياسة الكوكيز" sub="قانوني">
+      <IB title="الكوكيز الأساسية"  body="ضرورية للجلسات والسلة والدفع. لا يمكن تعطيلها." tag="مطلوب"/>
+      <IB title="كوكيز التفضيلات"   body="تحفظ إعداداتك لتجربة أفضل." tag="اختياري"/>
+      <IB title="كوكيز التحليلات"   body="بيانات مجمعة لتحسين المنصة." tag="اختياري"/>
+      <div style={{ marginTop:'18px', padding:'14px', border:'1px solid var(--line-dk)', display:'flex', gap:'12px', alignItems:'flex-start', backgroundColor:'var(--sand)' }}>
+        <ToggleRight style={{ width:'18px', height:'18px', color:'var(--gold)', flexShrink:0, marginTop:'1px' }}/>
+        <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', color:'var(--mid)', lineHeight:'1.8', margin:0, fontWeight:400 }}>
+          يمكنك إدارة تفضيلات الكوكيز من إعدادات المتصفح.
+        </p>
       </div>
-    </PageWrapper>
+    </Shell>
   );
 }
 
 export function Contact() {
-  const isRTL = false;
-  const [formState, setFormState] = useState({ name: '', email: '', message: '' });
+  const [form, setForm] = useState({ name:'', email:'', message:'' });
   const [sent, setSent] = useState(false);
-
-  const contacts = [
-    { icon: <Mail className="w-4 h-4" />,   label: 'EMAIL',    value: 'support@fitnessstore.dz', href: 'mailto:support@fitnessstore.dz' },
-    { icon: <Phone className="w-4 h-4" />,  label: 'PHONE',    value: '+213 550 123 456',         href: 'tel:+213550123456' },
-    { icon: <MapPin className="w-4 h-4" />, label: 'LOCATION', value: 'Alger, Algérie',           href: undefined },
-  ];
-
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--dark)', fontFamily: "'Barlow', sans-serif" }}>
-
-      {/* Hero */}
-      <div className="relative py-24 diagonal-stripe" style={{ backgroundColor: '#080808' }}>
-        <div className="absolute top-0 left-0 right-0 h-1" style={{ background: 'var(--fire)' }} />
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-10 h-0.5" style={{ background: 'var(--fire)' }} />
-            <span className="text-xs font-black tracking-widest uppercase" style={{ color: 'var(--fire)' }}>GET IN TOUCH</span>
-            <div className="w-10 h-0.5" style={{ background: 'var(--fire)' }} />
-          </div>
-          <h1 className="font-black text-white leading-none" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 'clamp(3rem, 9vw, 8rem)', letterSpacing: '0.02em' }}>
-            CONTACT US
-          </h1>
-          <p className="text-base mt-4" style={{ color: 'var(--text-mid)' }}>We're ready to help you crush your goals. Reach out anytime.</p>
+    <div dir="rtl" style={{ backgroundColor:'var(--cream)', minHeight:'100vh' }}>
+      <div style={{ position:'relative', overflow:'hidden', padding:'72px 28px 48px', backgroundColor:'var(--sand)' }} className="geo-bg">
+        <div style={{ position:'absolute', bottom:0, left:0, right:0, height:'2px', background:'linear-gradient(to right,transparent,var(--gold),transparent)' }}/>
+        <div style={{ maxWidth:'960px', margin:'0 auto', position:'relative', zIndex:2 }}>
+          <div className="slabel" style={{ marginBottom:'14px', justifyContent:'flex-start' }}>تواصل معنا</div>
+          <h1 className="amiri" style={{ fontSize:'clamp(2.2rem,5vw,4.5rem)', fontWeight:700, color:'var(--ink)', lineHeight:0.95, margin:'0 0 14px' }}>نسعد بخدمتك</h1>
+          <div className="cal-line"><GoldDiamond/></div>
+          <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'14px', color:'var(--mid)', marginTop:'12px', fontWeight:400 }}>نرد خلال 24 ساعة</p>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <div className="contact-g" style={{ maxWidth:'960px', margin:'0 auto', padding:'48px 28px 80px' }}>
+        <div>
+          <div style={{ backgroundColor:'var(--cream)', border:'1px solid var(--line-dk)', padding:'24px', marginBottom:'12px' }}>
+            <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--gold)', marginBottom:'18px' }}>طرق التواصل</p>
+            {[
+              { icon:'📞', label:'الهاتف',           val:'+213 550 000 000', href:'tel:+213550000000' },
+              { icon:'✉️',  label:'البريد الإلكتروني', val:'info@store.dz',   href:'mailto:info@store.dz' },
+              { icon:'📍', label:'الموقع',            val:'أولاد فايت، الجزائر', href:undefined },
+            ].map(item=>(
+              <a key={item.label} href={item.href||'#'} style={{ display:'flex', alignItems:'center', gap:'14px', padding:'14px 0', borderBottom:'1px solid var(--line)', textDecoration:'none', transition:'padding-right 0.2s' }}
+                onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.paddingRight='6px';}}
+                onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.paddingRight='0';}}>
+                <div style={{ width:'38px', height:'38px', backgroundColor:'var(--sand)', border:'1px solid var(--line-dk)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.1rem', flexShrink:0 }}>{item.icon}</div>
+                <div>
+                  <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--gold)', margin:'0 0 2px' }}>{item.label}</p>
+                  <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', fontWeight:500, color:'var(--ink)', margin:0 }}>{item.val}</p>
+                </div>
+                {item.href && <ArrowRight style={{ width:'13px', height:'13px', color:'var(--gold)', marginRight:'auto' }}/>}
+              </a>
+            ))}
+          </div>
+          <div style={{ backgroundColor:'var(--walnut)', padding:'22px 24px', position:'relative', overflow:'hidden' }}>
+            <div style={{ position:'absolute', inset:0, opacity:0.08 }} className="geo-bg"/>
+            <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px', background:'linear-gradient(to right,transparent,var(--gold-lt),transparent)' }}/>
+            <p className="amiri" style={{ fontSize:'1.2rem', fontWeight:700, color:'var(--cream)', lineHeight:1.6, margin:'0 0 8px', position:'relative', zIndex:2 }}>
+              "الأصالة في الزي تعكس الهوية."
+            </p>
+            <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:500, letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--gold-lt)', position:'relative', zIndex:2 }}>
+              أزياء خليجية راقية
+            </span>
+          </div>
+        </div>
 
-          {/* Contact info */}
-          <div>
-            <h2 className="font-black text-white mb-8" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '2rem', letterSpacing: '0.05em' }}>
-              DIRECT CHANNELS
-            </h2>
-            <div className="space-y-3">
-              {contacts.map(item => (
-                <a key={item.label} href={item.href || '#'}
-                  className="group flex items-center gap-4 p-5 transition-all"
-                  style={{ border: '1px solid var(--border)', backgroundColor: 'var(--dark-2)', textDecoration: 'none' }}
-                  onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--fire)'; el.style.backgroundColor = 'rgba(255,69,0,0.06)'; }}
-                  onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--border)'; el.style.backgroundColor = 'var(--dark-2)'; }}>
-                  <div className="w-10 h-10 flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(255,69,0,0.1)', color: 'var(--fire)' }}>
-                    {item.icon}
-                  </div>
-                  <div>
-                    <p className="text-[9px] font-black tracking-widest uppercase" style={{ color: 'var(--text-dim)' }}>{item.label}</p>
-                    <p className="text-sm font-bold text-white group-hover:text-orange-400 transition-colors">{item.value}</p>
-                  </div>
-                  <ArrowRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--fire)' }} />
-                </a>
+        <div style={{ backgroundColor:'var(--cream)', border:'1px solid var(--line-dk)', padding:'28px' }}>
+          <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--gold)', marginBottom:'22px' }}>أرسل رسالة</p>
+          {sent ? (
+            <div style={{ minHeight:'240px', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', border:'1px solid var(--line-dk)', textAlign:'center', padding:'32px', backgroundColor:'var(--sand)' }}>
+              <CheckCircle2 style={{ width:'32px', height:'32px', color:'var(--gold-dk)', marginBottom:'12px' }}/>
+              <h3 className="amiri" style={{ fontSize:'1.5rem', fontWeight:700, color:'var(--ink)', margin:'0 0 6px' }}>تم إرسال رسالتك!</h3>
+              <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', color:'var(--mid)', fontWeight:400 }}>سنرد عليك خلال 24 ساعة.</p>
+            </div>
+          ) : (
+            <form onSubmit={e=>{e.preventDefault();setSent(true);}} style={{ display:'flex', flexDirection:'column', gap:'14px' }}>
+              {[
+                { label:'اسمك',   type:'text',  key:'name',  ph:'الاسم الكامل' },
+                { label:'البريد', type:'email', key:'email', ph:'بريدك@الإلكتروني' },
+              ].map(f=>(
+                <div key={f.key}>
+                  <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'6px' }}>{f.label}</p>
+                  <input type={f.type} value={(form as any)[f.key]} onChange={e=>setForm({...form,[f.key]:e.target.value})} placeholder={f.ph} required className="inp"
+                    onFocus={e=>{e.target.style.borderColor='var(--gold)';}} onBlur={e=>{e.target.style.borderColor='var(--line-dk)';}}/>
+                </div>
               ))}
-            </div>
-
-            {/* Motivational card */}
-            <div className="mt-8 p-6 relative overflow-hidden" style={{ background: 'var(--fire)', clipPath: 'polygon(0 0, 100% 0, 97% 100%, 3% 100%)' }}>
-              <p className="font-black text-white text-2xl leading-tight" style={{ fontFamily: "'Bebas Neue', sans-serif", letterSpacing: '0.04em' }}>
-                YOUR NEXT<br />PR IS WAITING
-              </p>
-              <p className="text-white/80 text-xs mt-2">We'll help you get there.</p>
-              <Flame className="absolute bottom-3 right-5 w-12 h-12 text-white/20" />
-            </div>
-          </div>
-
-          {/* Message form */}
-          <div>
-            <h2 className="font-black text-white mb-8" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '2rem', letterSpacing: '0.05em' }}>
-              SEND A MESSAGE
-            </h2>
-
-            {sent ? (
-              <div className="p-8 text-center" style={{ border: '2px solid var(--green)', backgroundColor: 'rgba(57,211,83,0.05)' }}>
-                <CheckCircle2 className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--green)' }} />
-                <p className="font-black text-white text-xl" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>MESSAGE SENT!</p>
-                <p className="text-sm mt-2" style={{ color: 'var(--text-dim)' }}>We'll get back to you within 24 hours.</p>
+              <div>
+                <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'6px' }}>رسالتك</p>
+                <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="كيف يمكننا مساعدتك؟" rows={4} required className="inp"
+                  style={{ resize:'none' as any }}
+                  onFocus={e=>{e.target.style.borderColor='var(--gold)';}} onBlur={e=>{e.target.style.borderColor='var(--line-dk)';}}/>
               </div>
-            ) : (
-              <form onSubmit={e => { e.preventDefault(); setSent(true); }} className="space-y-4">
-                <FieldWrapper label="YOUR NAME">
-                  <input type="text" value={formState.name} onChange={e => setFormState({ ...formState, name: e.target.value })} placeholder="John Doe" style={inputStyle()} required />
-                </FieldWrapper>
-                <FieldWrapper label="EMAIL ADDRESS">
-                  <input type="email" value={formState.email} onChange={e => setFormState({ ...formState, email: e.target.value })} placeholder="john@example.com" style={inputStyle()} required />
-                </FieldWrapper>
-                <FieldWrapper label="MESSAGE">
-                  <textarea value={formState.message} onChange={e => setFormState({ ...formState, message: e.target.value })} placeholder="How can we help you?" rows={5} style={{ ...inputStyle(), resize: 'none' as any }} required />
-                </FieldWrapper>
-                <button type="submit"
-                  className="btn-fire w-full py-4 text-sm font-black tracking-widest uppercase text-white flex items-center justify-center gap-2"
-                  style={{ background: 'var(--fire)', clipPath: 'polygon(2% 0, 100% 0, 98% 100%, 0 100%)' }}>
-                  <Flame className="w-4 h-4" /> SEND MESSAGE
-                </button>
-              </form>
-            )}
-          </div>
+              <button type="submit" className="btn-gold" style={{ justifyContent:'center', width:'100%', padding:'13px', fontSize:'14px' }}>
+                إرسال الرسالة <ArrowRight style={{ width:'14px', height:'14px' }}/>
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>
