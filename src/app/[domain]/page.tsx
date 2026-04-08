@@ -1,12 +1,10 @@
 import { cache } from 'react';
-import { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import { getStoreByDomain } from '@/lib/api';
 
-// ✅ نفس الـ cache من layout.tsx — لو Next.js يشاركهم في نفس الـ request
-// لو لا، هذا يضمن على الأقل عدم التكرار بين generateMetadata و StorePage
-const getStoreCached = cache(async (domain: string) => {
-  return getStoreByDomain(domain);
+// ✅ التعديل: جعل الكاتيجوري اختيارية (category?: string) لتجنب الانهيار
+const getStoreCached = cache(async (domain: string, category?: string) => {
+  return getStoreByDomain(domain, category);
 });
 
 // ==========================================
@@ -16,8 +14,8 @@ function StoreNotFound({ domain }: { domain: string }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
-        <h1 className="text-5xl font-black mb-2">404</h1>
-        <h2 className="text-xl text-gray-600 mb-4">المتجر غير موجود</h2>
+        <h1 className="text-5xl font-black mb-2 text-red-500">404</h1>
+        <h2 className="text-xl text-gray-800 font-bold mb-4">المتجر غير موجود</h2>
         <p className="text-gray-400 font-mono text-sm">Domain: {domain}</p>
       </div>
     </div>
@@ -28,13 +26,8 @@ function StoreInactive({ store }: { store: any }) {
   const isRTL = store.language === 'ar';
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div
-        className="text-center p-10 bg-white rounded-2xl shadow-2xl border-t-4"
-        style={{ borderColor: store.design?.primaryColor }}
-      >
-        <h1 className="text-2xl font-bold mb-3">
-          {isRTL ? 'المتجر غير نشط' : 'Store Inactive'}
-        </h1>
+      <div className="text-center p-10 bg-white rounded-2xl shadow-2xl border-t-4" style={{ borderColor: store.design?.primaryColor }}>
+        <h1 className="text-2xl font-bold mb-3">{isRTL ? 'المتجر غير نشط' : 'Store Inactive'}</h1>
         <p className="text-gray-600 italic">"{store.name}"</p>
       </div>
     </div>
@@ -48,12 +41,12 @@ export default async function StorePage(props: {
   params: Promise<{ domain: string }>;
   searchParams: Promise<{ category?: string }>;
 }) {
-  const [{ domain }, searchParams] = await Promise.all([
-    props.params,
-    props.searchParams,
-  ]);
+  // انتظر فك تشفير الـ params والـ searchParams
+  const { domain } = await props.params;
+  const { category } = await props.searchParams;
 
-  const store: any = await getStoreCached(domain); // ✅ لا query جديدة
+  // ✅ نمرر الـ category المستخرجة من الرابط
+  const store: any = await getStoreCached(domain, category); 
 
   if (!store) return <StoreNotFound domain={domain} />;
   if (!store.isActive) return <StoreInactive store={store} />;
@@ -61,7 +54,6 @@ export default async function StorePage(props: {
   const activeTheme = store?.themeUser?.theme?.slug || 'default';
   const language = store?.language || 'ar';
 
-  // ✅ dynamic مع fallback داخلي
   const SelectedTheme = dynamic<any>(
     () =>
       import(`@/theme/${language}/${activeTheme}/main`)
@@ -77,23 +69,6 @@ export default async function StorePage(props: {
     }
   );
 
-  return <SelectedTheme store={store} searchParams={searchParams} />;
+  return <SelectedTheme store={store} searchParams={{ category }} />;
 }
 
-// ==========================================
-// METADATA
-// ==========================================
-export async function generateMetadata(props: {
-  params: Promise<{ domain: string }>;
-}): Promise<Metadata> {
-  const { domain } = await props.params;
-  const store = await getStoreCached(domain); // ✅ من الـ cache
-
-  if (!store) return { title: 'Store Not Found' };
-
-  return {
-    title: store.isActive ? store.name : `${store.name} (Inactive)`,
-    description: store.hero?.subtitle || `Welcome to ${store.name}`,
-    icons: store.design?.logoUrl ? { icon: store.design.logoUrl } : undefined,
-  };
-}

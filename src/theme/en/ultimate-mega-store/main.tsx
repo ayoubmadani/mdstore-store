@@ -257,10 +257,10 @@ export function Navbar({ store }: { store: Store }) {
           {/* Search bar */}
           <div className="search-bar" style={{ position:'relative' }}>
             <div style={{ display:'flex', width:'100%', border:'2px solid var(--blue)', borderRadius:'10px', overflow:'hidden', background:'var(--white)' }}>
-              <input type="text" placeholder={'ابحث عن أي منتج...'}
+              <input type="text" placeholder={'Search for any product...'}
                 style={{ flex:1, padding:'9px 14px', border:'none', outline:'none', fontSize:'14px', fontFamily:"'Plus Jakarta Sans',sans-serif", color:'var(--ink)', background:'transparent' }}/>
               <button style={{ padding:'9px 18px', background:'var(--blue)', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:'6px', color:'var(--white)', fontSize:'13px', fontWeight:600, fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
-                <Search style={{ width:'15px', height:'15px' }}/> {'بحث'}
+                <Search style={{ width:'15px', height:'15px' }}/> {'Search'}
               </button>
             </div>
           </div>
@@ -268,7 +268,7 @@ export function Navbar({ store }: { store: Store }) {
           {/* Actions */}
           <div style={{ display:'flex', alignItems:'center', gap:'8px', flexShrink:0 }}>
             <a href="#products" className="btn btn-blue" style={{ padding:'9px 20px', fontSize:'13px', borderRadius:'8px', flexShrink:0 }}>
-              <ShoppingCart style={{ width:'14px', height:'14px' }}/> {'تسوق'}
+              <ShoppingCart style={{ width:'14px', height:'14px' }}/> {'Shop'}
             </a>
             <button className="nav-toggle" onClick={()=>setOpen(p=>!p)} style={{ background:'none', border:'1.5px solid var(--line)', cursor:'pointer', color:'var(--ink)', padding:'8px', borderRadius:'8px', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
               {open ? <X style={{ width:'18px', height:'18px' }}/> : <Menu style={{ width:'18px', height:'18px' }}/>}
@@ -284,7 +284,7 @@ export function Navbar({ store }: { store: Store }) {
             {/* All categories mega button */}
             <div className="mega-wrap">
               <button style={{ display:'flex', alignItems:'center', gap:'6px', padding:'0 16px', height:'42px', background:'var(--blue)', border:'none', color:'var(--white)', cursor:'pointer', fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'13px', fontWeight:700, whiteSpace:'nowrap', flexShrink:0 }}>
-                <Menu style={{ width:'14px', height:'14px' }}/> {'كل الفئات'} <ChevronDown style={{ width:'13px', height:'13px' }}/>
+                <Menu style={{ width:'14px', height:'14px' }}/> {'All Categories'} <ChevronDown style={{ width:'13px', height:'13px' }}/>
               </button>
               {/* Mega panel */}
               {cats.length>0 && (
@@ -309,9 +309,9 @@ export function Navbar({ store }: { store: Store }) {
 
             {/* Quick links */}
             {[
-              { label:'العروض', icon:<Zap style={{ width:'13px', height:'13px' }}/>, color:'#FFB800' },
-              { label:'الأكثر مبيعاً', icon:<TrendingUp style={{ width:'13px', height:'13px' }}/>, color:'#FF6B35' },
-              { label:'وصل جديد', icon:<Award style={{ width:'13px', height:'13px' }}/>, color:'#22C55E' },
+              { label:'Offers', icon:<Zap style={{ width:'13px', height:'13px' }}/>, color:'#FFB800' },
+              { label:'Best Sellers', icon:<TrendingUp style={{ width:'13px', height:'13px' }}/>, color:'#FF6B35' },
+              { label:'New Arrivals', icon:<Award style={{ width:'13px', height:'13px' }}/>, color:'#22C55E' },
             ].map(item=>(
               <a key={item.label} href="#products"
                 style={{ display:'flex', alignItems:'center', gap:'5px', padding:'0 14px', height:'42px', color:item.color, fontSize:'13px', fontWeight:600, textDecoration:'none', whiteSpace:'nowrap', transition:'background 0.18s', flexShrink:0 }}
@@ -338,9 +338,9 @@ export function Navbar({ store }: { store: Store }) {
       <div style={{ maxHeight:open?'320px':'0', overflow:'hidden', transition:'max-height 0.3s ease', backgroundColor:'var(--white)', borderBottom:open?'1px solid var(--line)':'none' }}>
         <div style={{ padding:'12px 20px 20px' }}>
           {[
-            { href:`/`,         label:'المتجر' },
-            { href:`/contact`, label:'تواصل' },
-            { href:`/Privacy`, label:'الخصوصية' },
+            { href:`/`,         label:'Store' },
+            { href:`/contact`, label:'Contact' },
+            { href:`/Privacy`, label:'Privacy' },
           ].map(l=>(
             <Link key={l.href} href={l.href} onClick={()=>setOpen(false)}
               style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'11px 0', fontSize:'14px', fontWeight:600, color:'var(--mid)', textDecoration:'none', borderBottom:'1px solid var(--line)' }}>
@@ -376,7 +376,7 @@ export function Footer({ store }: any) {
               <span style={{ fontWeight:800, fontSize:'1.1rem', color:'var(--white)', letterSpacing:'-0.01em' }}>{store.name}</span>
             </div>
             <p style={{ fontSize:'13px', lineHeight:'1.8', color:'rgba(255,255,255,0.45)', maxWidth:'220px', fontWeight:400 }}>
-              {'منصتك الشاملة للتسوق الإلكتروني.'}
+              {'Your Complete E-Commerce Platform.'}
             </p>
             <div style={{ display:'flex', gap:'8px', marginTop:'20px', flexWrap:'wrap' }}>
               {['🚚','💳','🔒','🔄'].map((icon,i)=>(
@@ -386,22 +386,22 @@ export function Footer({ store }: any) {
           </div>
 
           {[
-            { title:'التسوق', links:[
-              [`/`, 'كل المنتجات'],
-              [`/`, 'العروض'],
-              [`/`, 'وصل جديد'],
-              [`/`, 'الأكثر مبيعاً'],
+            { title:'Shopping', links:[
+              [`/`, 'All Products'],
+              [`/`, 'Offers'],
+              [`/`, 'New Arrivals'],
+              [`/`, 'Best Sellers'],
             ]},
-            { title:'الدعم', links:[
-              [`/contact`, 'اتصل بنا'],
-              [`/Privacy`, 'الخصوصية'],
-              [`/Terms`,   'الشروط'],
-              [`/Cookies`, 'الكوكيز'],
+            { title:'Support', links:[
+              [`/contact`, 'Contact Us'],
+              [`/Privacy`, 'Privacy'],
+              [`/Terms`,   'Terms'],
+              [`/Cookies`, 'Cookies'],
             ]},
-            { title:'تواصل', links:[
+            { title:'Contact', links:[
               ['#', '+213 550 000 000'],
               ['#', 'support@store.dz'],
-              ['#', 'الجزائر، الجزائر'],
+              ['#', 'Algiers, Algeria'],
             ]},
           ].map(col=>(
             <div key={col.title}>
@@ -446,7 +446,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
         <div style={{ position:'absolute', top:'8px', left:'8px', display:'flex', flexDirection:'column', gap:'4px' }}>
           {discount>0 && <span className="badge badge-red">-{discount}%</span>}
           {(product.stock===0 && !product.variantDetails?.some((v:any)=>v.autoGenerate)) && (
-            <span className="badge badge-navy">{'نفد'}</span>
+            <span className="badge badge-navy">{'Out of Stock'}</span>
           )}
         </div>
         {/* Wishlist */}
@@ -473,7 +473,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
         <div style={{ display:'flex', alignItems:'center', gap:'8px', flexWrap:'wrap' }}>
           <span style={{ fontSize:'1.05rem', fontWeight:800, color:'var(--blue)', letterSpacing:'-0.01em' }}>
             {price.toLocaleString()}
-            <span style={{ fontSize:'11px', fontWeight:500, color:'var(--mid)', marginLeft:'2px' }}>دج</span>
+            <span style={{ fontSize:'11px', fontWeight:500, color:'var(--mid)', marginLeft:'2px' }}>DZD</span>
           </span>
           {orig>price && (
             <span style={{ fontSize:'12px', color:'var(--dim)', textDecoration:'line-through' }}>{orig.toLocaleString()}</span>
@@ -501,21 +501,21 @@ export function Home({ store }: any) {
   },[products, activeCat, sort]);
 
   const t = {
-    viewDetails: 'عرض المنتج',
-    allCats:     'الكل',
-    noItems:     'لا توجد منتجات',
-    sortBy:      'ترتيب حسب',
-    sortDef:     'الافتراضي',
-    sortPA:      'السعر: من الأقل',
-    sortPD:      'السعر: من الأعلى',
-    results:     'نتيجة',
+    viewDetails: 'View Product',
+    allCats:     'All',
+    noItems:     'No products',
+    sortBy:      'Sort by',
+    sortDef:     'Default',
+    sortPA:      'Price: Low to High',
+    sortPD:      'Price: High to Low',
+    results:     'Result',
   };
 
   const trust = [
-    { icon:<Truck style={{ width:'20px', height:'20px' }}/>,      title:'شحن سريع',   desc:'48 ساعة لبابك' },
-    { icon:<RefreshCw style={{ width:'20px', height:'20px' }}/>,  title:'إرجاع مجاني',  desc:'30 يوم إرجاع'     },
-    { icon:<Lock style={{ width:'20px', height:'20px' }}/>,       title:'دفع آمن',    desc:'مشفر وآمن'    },
-    { icon:<Award style={{ width:'20px', height:'20px' }}/>,      title:'منتجات أصيلة',    desc:'100% أصلي'         },
+    { icon:<Truck style={{ width:'20px', height:'20px' }}/>,      title:'Fast Shipping',   desc:'48 Hours to Your Door' },
+    { icon:<RefreshCw style={{ width:'20px', height:'20px' }}/>,  title:'Free Returns',  desc:'30-Day Returns'     },
+    { icon:<Lock style={{ width:'20px', height:'20px' }}/>,       title:'Secure Payment',    desc:'Encrypted & Secure'    },
+    { icon:<Award style={{ width:'20px', height:'20px' }}/>,      title:'Authentic Products',    desc:'100% Authentic'         },
   ];
 
   return (
@@ -535,29 +535,29 @@ export function Home({ store }: any) {
               <div className="fu" style={{ display:'inline-flex', alignItems:'center', gap:'6px', marginBottom:'16px' }}>
                 <Zap style={{ width:'14px', height:'14px', color:'#FFB800' }}/>
                 <span style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', color:'#FFB800' }}>
-                  {'العروض المميزة'}
+                  {'Special Offers'}
                 </span>
               </div>
               <h1 className="fu fu-1" style={{ fontWeight:800, fontSize:'clamp(1.8rem,4vw,3.2rem)', color:'var(--white)', lineHeight:1.05, letterSpacing:'-0.02em', marginBottom:'16px', maxWidth:'480px' }}>
-                {store.hero?.title || (<>ملايين المنتجات<br/>في متناول يدك</>)}
+                {store.hero?.title || (<>Millions of Products<br/>at Your Fingertips</>)}
               </h1>
               <p className="fu fu-2" style={{ fontSize:'15px', color:'rgba(255,255,255,0.65)', marginBottom:'28px', maxWidth:'380px', fontWeight:400, lineHeight:1.7 }}>
-                {store.hero?.subtitle || ('أفضل الأسعار والأسرع توصيل.')}
+                {store.hero?.subtitle || ('Best prices and fastest delivery.')}
               </p>
               <div className="fu fu-3" style={{ display:'flex', gap:'10px', flexWrap:'wrap' }}>
                 <a href="#products" className="btn btn-blue" style={{ padding:'12px 28px', fontSize:'14px', borderRadius:'8px' }}>
-                  <ShoppingCart style={{ width:'15px', height:'15px' }}/> {'تسوق الآن'}
+                  <ShoppingCart style={{ width:'15px', height:'15px' }}/> {'Shop Now'}
                 </a>
                 <a href="#products" className="btn" style={{ padding:'12px 24px', fontSize:'14px', borderRadius:'8px', background:'rgba(255,255,255,0.12)', color:'var(--white)', border:'1px solid rgba(255,255,255,0.2)' }}>
-                  {'عرض العروض'} <ArrowRight style={{ width:'14px', height:'14px' }}/>
+                  {'View Offers'} <ArrowRight style={{ width:'14px', height:'14px' }}/>
                 </a>
               </div>
               {/* Stats row */}
               <div style={{ display:'flex', gap:'24px', marginTop:'32px', paddingTop:'24px', borderTop:'1px solid rgba(255,255,255,0.1)', flexWrap:'wrap' }}>
                 {[
-                  { n:`${products.length}+`, l:'منتج' },
-                  { n:'48H',                 l:'توصيل' },
-                  { n:'100%',                l:'أصيل' },
+                  { n:`${products.length}+`, l:'Product' },
+                  { n:'48H',                 l:'Delivery' },
+                  { n:'100%',                l:'Authentic' },
                 ].map((s,i)=>(
                   <div key={i}>
                     <p style={{ fontSize:'1.4rem', fontWeight:800, color:'var(--white)', lineHeight:1, margin:0 }}>{s.n}</p>
@@ -576,39 +576,39 @@ export function Home({ store }: any) {
                 <Zap style={{ width:'14px', height:'14px' }}/> <span style={{ fontSize:'11px', fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase' }}>Flash Deal</span>
               </div>
               <p style={{ fontSize:'1.1rem', fontWeight:700, lineHeight:1.3, marginBottom:'8px' }}>
-                {products[0]?.name || ('عروض محدودة الوقت')}
+                {products[0]?.name || ('Limited-Time Offers')}
               </p>
               {products[0] && (
                 <p style={{ fontSize:'1.4rem', fontWeight:800, letterSpacing:'-0.01em' }}>
-                  {parseFloat(String(products[0].price)).toLocaleString()} <span style={{ fontSize:'12px', fontWeight:400, opacity:0.8 }}>دج</span>
+                  {parseFloat(String(products[0].price)).toLocaleString()} <span style={{ fontSize:'12px', fontWeight:400, opacity:0.8 }}>DZD</span>
                 </p>
               )}
               <a href="#products" style={{ display:'inline-flex', alignItems:'center', gap:'5px', marginTop:'10px', fontSize:'12px', fontWeight:600, color:'rgba(255,255,255,0.9)', textDecoration:'none' }}>
-                {'اكتشف الآن'} <ArrowRight style={{ width:'12px', height:'12px' }}/>
+                {'Explore Now'} <ArrowRight style={{ width:'12px', height:'12px' }}/>
               </a>
             </div>
 
             {/* Free shipping panel */}
             <div style={{ borderRadius:'12px', background:'linear-gradient(135deg,var(--blue) 0%,var(--blue-dk) 100%)', padding:'20px', color:'var(--white)', position:'relative' }}>
               <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'8px' }}>
-                <Truck style={{ width:'14px', height:'14px' }}/> <span style={{ fontSize:'11px', fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase' }}>{'توصيل مجاني'}</span>
+                <Truck style={{ width:'14px', height:'14px' }}/> <span style={{ fontSize:'11px', fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase' }}>{'Free Delivery'}</span>
               </div>
               <p style={{ fontSize:'1rem', fontWeight:600, lineHeight:1.4, marginBottom:'4px' }}>
-                {'توصيل سريع لجميع ولايات الجزائر'}
+                {'Fast Delivery to All Provinces'}
               </p>
-              <p style={{ fontSize:'12px', opacity:0.75, fontWeight:400 }}>مضمون خلال 48 ساعة</p>
+              <p style={{ fontSize:'12px', opacity:0.75, fontWeight:400 }}>Guaranteed within 48 hours</p>
             </div>
 
             {/* New arrivals panel */}
             <div style={{ borderRadius:'12px', border:'1.5px solid var(--line)', background:'var(--white)', padding:'20px' }}>
               <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'10px' }}>
-                <Award style={{ width:'14px', height:'14px', color:'#22C55E' }}/> <span style={{ fontSize:'11px', fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:'#22C55E' }}>{'وصل جديد'}</span>
+                <Award style={{ width:'14px', height:'14px', color:'#22C55E' }}/> <span style={{ fontSize:'11px', fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:'#22C55E' }}>{'New Arrivals'}</span>
               </div>
               <p style={{ fontSize:'14px', fontWeight:600, color:'var(--ink)', marginBottom:'10px' }}>
-                {products.length>0 ? `${products.length} ${'منتج جديد'}` : ('منتجات جديدة قريباً')}
+                {products.length>0 ? `${products.length} ${'New Product'}` : ('New products coming soon')}
               </p>
               <a href="#products" className="btn btn-outline" style={{ fontSize:'12px', padding:'8px 16px', borderRadius:'6px', textDecoration:'none' }}>
-                {'عرض الكل'} <ArrowRight style={{ width:'12px', height:'12px' }}/>
+                {'View All'} <ArrowRight style={{ width:'12px', height:'12px' }}/>
               </a>
             </div>
           </div>
@@ -634,7 +634,7 @@ export function Home({ store }: any) {
       {cats.length>0 && (
         <div style={{ maxWidth:'1400px', margin:'24px auto 0', padding:'0 20px' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'12px' }}>
-            <h2 style={{ fontSize:'1rem', fontWeight:700, color:'var(--ink)', margin:0 }}>{'تسوق حسب الفئة'}</h2>
+            <h2 style={{ fontSize:'1rem', fontWeight:700, color:'var(--ink)', margin:0 }}>{'Shop by Category'}</h2>
           </div>
           <div className="cat-scroll">
             <button onClick={()=>setActiveCat(null)} className={`cat-pill${!activeCat?' active':''}`}>
@@ -660,12 +660,12 @@ export function Home({ store }: any) {
               <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
                 <div style={{ background:'var(--red)', borderRadius:'6px', padding:'4px 10px', display:'flex', alignItems:'center', gap:'5px' }}>
                   <Zap style={{ width:'13px', height:'13px', color:'var(--white)' }}/>
-                  <span style={{ fontSize:'12px', fontWeight:700, color:'var(--white)', letterSpacing:'0.06em', textTransform:'uppercase' }}>عروض فلاش</span>
+                  <span style={{ fontSize:'12px', fontWeight:700, color:'var(--white)', letterSpacing:'0.06em', textTransform:'uppercase' }}>Flash Deals</span>
                 </div>
-                <span style={{ fontSize:'12px', color:'var(--mid)' }}>{'عروض محدودة الوقت'}</span>
+                <span style={{ fontSize:'12px', color:'var(--mid)' }}>{'Limited-Time Offers'}</span>
               </div>
               <a href="#products" style={{ fontSize:'12px', fontWeight:600, color:'var(--blue)', textDecoration:'none', display:'flex', alignItems:'center', gap:'4px' }}>
-                {'عرض الكل'} <ArrowRight style={{ width:'12px', height:'12px' }}/>
+                {'View All'} <ArrowRight style={{ width:'12px', height:'12px' }}/>
               </a>
             </div>
             <div className="flash-grid">
@@ -684,7 +684,7 @@ export function Home({ store }: any) {
                     </div>
                     <div style={{ padding:'8px 10px' }}>
                       <p style={{ fontSize:'12px', fontWeight:600, color:'var(--ink)', margin:'0 0 4px', lineHeight:1.3, display:'-webkit-box', WebkitLineClamp:1, WebkitBoxOrient:'vertical' as any, overflow:'hidden' }}>{p.name}</p>
-                      <p style={{ fontSize:'13px', fontWeight:800, color:'var(--blue)', margin:0 }}>{pr.toLocaleString()} <span style={{ fontSize:'10px', fontWeight:400 }}>دج</span></p>
+                      <p style={{ fontSize:'13px', fontWeight:800, color:'var(--blue)', margin:0 }}>{pr.toLocaleString()} <span style={{ fontSize:'10px', fontWeight:400 }}>DZD</span></p>
                     </div>
                   </Link>
                 );
@@ -703,12 +703,12 @@ export function Home({ store }: any) {
             <div style={{ background:'var(--white)', border:'1px solid var(--line)', borderRadius:'10px', padding:'20px', position:'sticky', top:'120px' }}>
               <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'20px', paddingBottom:'16px', borderBottom:'1px solid var(--line)' }}>
                 <SlidersHorizontal style={{ width:'15px', height:'15px', color:'var(--blue)' }}/>
-                <span style={{ fontSize:'14px', fontWeight:700, color:'var(--ink)' }}>{'تصفية النتائج'}</span>
+                <span style={{ fontSize:'14px', fontWeight:700, color:'var(--ink)' }}>{'Filter Results'}</span>
               </div>
 
               {/* Category filter */}
               <div className="filter-group">
-                <p className="filter-label">{'الفئة'}</p>
+                <p className="filter-label">{'Category'}</p>
                 <label className="filter-check" onClick={()=>setActiveCat(null)} style={{ color:!activeCat?'var(--blue)':'var(--mid)', fontWeight:!activeCat?600:400 }}>
                   <div style={{ width:'15px', height:'15px', borderRadius:'50%', border:`2px solid ${!activeCat?'var(--blue)':'var(--line)'}`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                     {!activeCat && <div style={{ width:'7px', height:'7px', borderRadius:'50%', background:'var(--blue)' }}/>}
@@ -748,9 +748,9 @@ export function Home({ store }: any) {
 
               {/* Quick stats */}
               <div style={{ background:'var(--off)', borderRadius:'8px', padding:'14px', marginTop:'8px' }}>
-                <p style={{ fontSize:'11px', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'10px' }}>{'إحصائيات'}</p>
+                <p style={{ fontSize:'11px', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'10px' }}>{'Statistics'}</p>
                 <p style={{ fontSize:'13px', color:'var(--ink)', margin:'0 0 4px', fontWeight:600 }}>{filtered.length} {t.results}</p>
-                <p style={{ fontSize:'12px', color:'var(--mid)', margin:0 }}>{cats.length} {'فئة'}</p>
+                <p style={{ fontSize:'12px', color:'var(--mid)', margin:0 }}>{cats.length} {'Category'}</p>
               </div>
             </div>
           </aside>
@@ -787,7 +787,7 @@ export function Home({ store }: any) {
               <div style={{ background:'var(--white)', border:'1px solid var(--line)', borderRadius:'10px', padding:'64px 24px', textAlign:'center' }}>
                 <Package style={{ width:'48px', height:'48px', color:'var(--dim)', margin:'0 auto 14px' }}/>
                 <p style={{ fontSize:'1.1rem', fontWeight:600, color:'var(--ink)', margin:'0 0 6px' }}>{t.noItems}</p>
-                <p style={{ fontSize:'13px', color:'var(--mid)', margin:0 }}>{'حاول تغيير الفلاتر'}</p>
+                <p style={{ fontSize:'13px', color:'var(--mid)', margin:0 }}>{'Try changing filters'}</p>
               </div>
             ) : viewMode==='grid' ? (
               <div className="prod-grid">
@@ -818,7 +818,7 @@ export function Home({ store }: any) {
                           {[...Array(5)].map((_,i)=><Star key={i} style={{ width:'10px', height:'10px', fill:i<4?'#F59E0B':'none', color:'#F59E0B' }}/>)}
                         </div>
                         <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
-                          <span style={{ fontSize:'1rem', fontWeight:800, color:'var(--blue)' }}>{pr.toLocaleString()} دج</span>
+                          <span style={{ fontSize:'1rem', fontWeight:800, color:'var(--blue)' }}>{pr.toLocaleString()} DZD</span>
                           {disc>0 && <span className="badge badge-red">-{disc}%</span>}
                         </div>
                       </div>
@@ -846,7 +846,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
           <Link href="/" style={{ textDecoration:'none', color:'var(--mid)', transition:'color 0.2s' }}
             onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--blue)';}}
             onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mid)';}}>
-            {'الرئيسية'}
+            {'Home'}
           </Link>
           <Cr style={{ width:'12px', height:'12px' }}/>
           <span style={{ color:'var(--ink)', fontWeight:600 }}>{product.name.slice(0,50)}</span>
@@ -885,7 +885,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                 )}
                 {!inStock&&!autoGen && (
                   <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', backgroundColor:'rgba(255,255,255,0.85)', backdropFilter:'blur(4px)' }}>
-                    <span style={{ fontSize:'1.2rem', fontWeight:700, color:'var(--mid)' }}>{'نفد المخزون'}</span>
+                    <span style={{ fontSize:'1.2rem', fontWeight:700, color:'var(--mid)' }}>{'Out of Stock'}</span>
                   </div>
                 )}
               </div>
@@ -903,9 +903,9 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             {/* Trust badges */}
             <div style={{ marginTop:'12px', background:'var(--white)', border:'1px solid var(--line)', borderRadius:'10px', padding:'14px 16px' }}>
               {[
-                { icon:<Truck style={{ width:'14px', height:'14px', color:'var(--green)' }}/>, text:'توصيل سريع خلال 48 ساعة' },
-                { icon:<Lock style={{ width:'14px', height:'14px', color:'var(--blue)' }}/>,  text:'دفع آمن ومشفر' },
-                { icon:<RefreshCw style={{ width:'14px', height:'14px', color:'#F59E0B' }}/>, text:'إرجاع مجاني خلال 30 يوم' },
+                { icon:<Truck style={{ width:'14px', height:'14px', color:'var(--green)' }}/>, text:'Fast Delivery in 48 Hours' },
+                { icon:<Lock style={{ width:'14px', height:'14px', color:'var(--blue)' }}/>,  text:'Secure & Encrypted Payment' },
+                { icon:<RefreshCw style={{ width:'14px', height:'14px', color:'#F59E0B' }}/>, text:'Free Returns within 30 Days' },
               ].map((item,i)=>(
                 <div key={i} style={{ display:'flex', alignItems:'center', gap:'10px', padding:'6px 0', borderBottom:i<2?'1px solid var(--line)':'none' }}>
                   {item.icon}
@@ -919,7 +919,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
           <div className="details-R">
             <div style={{ background:'var(--white)', border:'1px solid var(--line)', borderRadius:'12px', padding:'28px' }}>
               <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:'12px', marginBottom:'12px' }}>
-                <span className="badge badge-blue">{'منتج متاح'}</span>
+                <span className="badge badge-blue">{'Product Available'}</span>
                 <div style={{ display:'flex', gap:'2px' }}>
                   {[...Array(5)].map((_,i)=><Star key={i} style={{ width:'13px', height:'13px', fill:i<4?'#F59E0B':'none', color:'#F59E0B' }}/>)}
                   <span style={{ fontSize:'12px', color:'var(--mid)', marginLeft:'5px' }}>4.8 (128)</span>
@@ -932,14 +932,14 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
 
               {/* Price */}
               <div style={{ background:'var(--off)', borderRadius:'8px', padding:'16px', marginBottom:'20px' }}>
-                <p style={{ fontSize:'11px', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--mid)', margin:'0 0 6px' }}>{'السعر'}</p>
+                <p style={{ fontSize:'11px', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--mid)', margin:'0 0 6px' }}>{'Price'}</p>
                 <div style={{ display:'flex', alignItems:'baseline', gap:'10px', flexWrap:'wrap' }}>
                   <span style={{ fontSize:'2.2rem', fontWeight:800, color:'var(--blue)', letterSpacing:'-0.02em', lineHeight:1 }}>{finalPrice.toLocaleString()}</span>
-                  <span style={{ fontSize:'15px', color:'var(--mid)' }}>دج</span>
+                  <span style={{ fontSize:'15px', color:'var(--mid)' }}>DZD</span>
                   {product.priceOriginal && parseFloat(product.priceOriginal)>finalPrice && (
                     <>
                       <span style={{ fontSize:'15px', textDecoration:'line-through', color:'var(--dim)' }}>{parseFloat(product.priceOriginal).toLocaleString()}</span>
-                      <span className="badge badge-red">{'وفّر'} {(parseFloat(product.priceOriginal)-finalPrice).toLocaleString()} دج</span>
+                      <span className="badge badge-red">{'Save'} {(parseFloat(product.priceOriginal)-finalPrice).toLocaleString()} DZD</span>
                     </>
                   )}
                 </div>
@@ -948,13 +948,13 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
               {/* Stock */}
               <div style={{ display:'inline-flex', alignItems:'center', gap:'7px', padding:'6px 14px', marginBottom:'20px', borderRadius:'20px', backgroundColor:inStock||autoGen?'rgba(22,163,74,0.1)':'rgba(232,58,58,0.1)', color:inStock||autoGen?'var(--green)':'var(--red)' }}>
                 <div style={{ width:'7px', height:'7px', borderRadius:'50%', backgroundColor:'currentColor' }}/>
-                <span style={{ fontSize:'12px', fontWeight:600 }}>{autoGen?'∞ In Stock':inStock?('متوفر'):('نفد')}</span>
+                <span style={{ fontSize:'12px', fontWeight:600 }}>{autoGen?'∞ In Stock':inStock?('Available'):('Out of Stock')}</span>
               </div>
 
               {/* Offers */}
               {product.offers?.length>0 && (
                 <div style={{ marginBottom:'20px', paddingBottom:'20px', borderBottom:'1px solid var(--line)' }}>
-                  <p style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'10px' }}>{'الباقات'}</p>
+                  <p style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'10px' }}>{'Packages'}</p>
                   <div style={{ display:'flex', flexDirection:'column', gap:'8px' }}>
                     {product.offers.map((offer:any)=>(
                       <label key={offer.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 14px', border:`1.5px solid ${selectedOffer===offer.id?'var(--blue)':'var(--line)'}`, cursor:'pointer', borderRadius:'8px', transition:'all 0.18s', backgroundColor:selectedOffer===offer.id?'rgba(30,111,255,0.04)':'transparent' }}>
@@ -968,7 +968,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                             <p style={{ fontSize:'11px', color:'var(--mid)', margin:0 }}>×{offer.quantity}</p>
                           </div>
                         </div>
-                        <span style={{ fontSize:'1.1rem', fontWeight:800, color:'var(--blue)' }}>{offer.price.toLocaleString()} <span style={{ fontSize:'11px', fontWeight:400, color:'var(--mid)' }}>دج</span></span>
+                        <span style={{ fontSize:'1.1rem', fontWeight:800, color:'var(--blue)' }}>{offer.price.toLocaleString()} <span style={{ fontSize:'11px', fontWeight:400, color:'var(--mid)' }}>DZD</span></span>
                       </label>
                     ))}
                   </div>
@@ -999,7 +999,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
 
               {product.desc && (
                 <div style={{ marginTop:'24px', paddingTop:'20px', borderTop:'1px solid var(--line)' }}>
-                  <p style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'10px' }}>{'وصف المنتج'}</p>
+                  <p style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'10px' }}>{'Product Description'}</p>
                   <div style={{ fontSize:'13px', lineHeight:'1.8', color:'var(--mid)', fontWeight:400 }}
                     dangerouslySetInnerHTML={{ __html:DOMPurify.sanitize(product.desc,{ALLOWED_TAGS:['p','br','strong','em','ul','ol','li','h1','h2','h3','span'],ALLOWED_ATTR:['class','style']})}}/>
                 </div>
@@ -1053,10 +1053,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   total=()=>fp*fd.quantity+ +getLiv();
   const validate=()=>{
     const e:Record<string,string>={};
-    if(!fd.customerName.trim())  e.customerName='الاسم مطلوب';
-    if(!fd.customerPhone.trim()) e.customerPhone='رقم الهاتف مطلوب';
-    if(!fd.customerWelaya)       e.customerWelaya='الولاية مطلوبة';
-    if(!fd.customerCommune)      e.customerCommune='البلدية مطلوبة';
+    if(!fd.customerName.trim())  e.customerName='Name is required';
+    if(!fd.customerPhone.trim()) e.customerPhone='Phone number is required';
+    if(!fd.customerWelaya)       e.customerWelaya='Province is required';
+    if(!fd.customerCommune)      e.customerCommune='Municipality is required';
     return e;
   };
   
@@ -1078,15 +1078,15 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     <div style={{ marginTop:'20px', paddingTop:'20px', borderTop:'1px solid var(--line)' }}>
       <form onSubmit={handleSubmit}>
         <div className="form-2c">
-          <FR error={errors.customerName} label="الاسم">
+          <FR error={errors.customerName} label="Name">
             <div style={{ position:'relative' }}>
               <User style={{ position:'absolute', right:'11px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
-              <input type="text" value={fd.customerName} onChange={e=>setFd({...fd,customerName:e.target.value})} placeholder="الاسم الكامل"
+              <input type="text" value={fd.customerName} onChange={e=>setFd({...fd,customerName:e.target.value})} placeholder="Full Name"
                 className={`inp${errors.customerName?' inp-err':''}`} style={{ paddingRight:'34px' }}
                 onFocus={e=>{e.target.style.borderColor='var(--blue)';}} onBlur={e=>{e.target.style.borderColor=errors.customerName?'var(--red)':'var(--line)';}}/>
             </div>
           </FR>
-          <FR error={errors.customerPhone} label="الهاتف">
+          <FR error={errors.customerPhone} label="Phone">
             <div style={{ position:'relative' }}>
               <Phone style={{ position:'absolute', right:'11px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
               <input type="tel" value={fd.customerPhone} onChange={e=>setFd({...fd,customerPhone:e.target.value})} placeholder="0X XX XX XX XX"
@@ -1096,48 +1096,48 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </FR>
         </div>
         <div className="form-2c">
-          <FR error={errors.customerWelaya} label="الولاية">
+          <FR error={errors.customerWelaya} label="Province">
             <div style={{ position:'relative' }}>
               <ChevronDown style={{ position:'absolute', left:'11px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
               <select value={fd.customerWelaya} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})}
                 className={`inp${errors.customerWelaya?' inp-err':''}`} style={{ paddingLeft:'30px' }}
                 onFocus={e=>{e.target.style.borderColor='var(--blue)';}} onBlur={e=>{e.target.style.borderColor=errors.customerWelaya?'var(--red)':'var(--line)';}}>
-                <option value="">اختر الولاية</option>
+                <option value="">Select Province</option>
                 {wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
               </select>
             </div>
           </FR>
-          <FR error={errors.customerCommune} label="البلدية">
+          <FR error={errors.customerCommune} label="Municipality">
             <div style={{ position:'relative' }}>
               <ChevronDown style={{ position:'absolute', left:'11px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
               <select value={fd.customerCommune} disabled={!fd.customerWelaya||loadingC} onChange={e=>setFd({...fd,customerCommune:e.target.value})}
                 className={`inp${errors.customerCommune?' inp-err':''}`} style={{ paddingLeft:'30px', opacity:!fd.customerWelaya?0.4:1 }}
                 onFocus={e=>{e.target.style.borderColor='var(--blue)';}} onBlur={e=>{e.target.style.borderColor=errors.customerCommune?'var(--red)':'var(--line)';}}>
-                <option value="">{loadingC?'...':'اختر البلدية'}</option>
+                <option value="">{loadingC?'...':'Select Municipality'}</option>
                 {communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
             </div>
           </FR>
         </div>
 
-        <FR label="طريقة التوصيل">
+        <FR label="Delivery Method">
           <div className="dlv-2c">
             {(['home','office'] as const).map(type=>(
               <button key={type} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:type}))}
                 style={{ padding:'12px', border:`1.5px solid ${fd.typeLivraison===type?'var(--blue)':'var(--line)'}`, backgroundColor:fd.typeLivraison===type?'rgba(30,111,255,0.04)':'transparent', cursor:'pointer', textAlign:'left', borderRadius:'8px', transition:'all 0.18s' }}>
                 <p style={{ fontSize:'12px', fontWeight:700, color:fd.typeLivraison===type?'var(--blue)':'var(--mid)', margin:'0 0 4px' }}>
-                  {type==='home'?'توصيل للبيت':'توصيل للمكتب'}
+                  {type==='home'?'Home Delivery':'Office Delivery'}
                 </p>
                 {selW && <p style={{ fontSize:'1rem', fontWeight:800, color:fd.typeLivraison===type?'var(--blue)':'var(--dim)', margin:0 }}>
                   {(type==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()}
-                  <span style={{ fontSize:'11px', fontWeight:400, color:'var(--mid)', marginLeft:'3px' }}>دج</span>
+                  <span style={{ fontSize:'11px', fontWeight:400, color:'var(--mid)', marginLeft:'3px' }}>DZD</span>
                 </p>}
               </button>
             ))}
           </div>
         </FR>
 
-        <FR label="الكمية">
+        <FR label="Quantity">
           <div style={{ display:'inline-flex', alignItems:'center', border:'1.5px solid var(--line)', borderRadius:'8px', overflow:'hidden' }}>
             <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))}
               style={{ width:'36px', height:'36px', display:'flex', alignItems:'center', justifyContent:'center', border:'none', borderRight:'1px solid var(--line)', background:'transparent', cursor:'pointer', color:'var(--ink)', transition:'background 0.18s' }}
@@ -1158,13 +1158,13 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         {/* Summary */}
         <div style={{ border:'1.5px solid var(--line)', borderRadius:'10px', marginBottom:'14px', overflow:'hidden' }}>
           <div style={{ padding:'10px 14px', backgroundColor:'var(--off)', borderBottom:'1px solid var(--line)' }}>
-            <p style={{ fontSize:'11px', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--mid)', margin:0 }}>ملخص الطلب</p>
+            <p style={{ fontSize:'11px', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--mid)', margin:0 }}>Order Summary</p>
           </div>
           {[
-            { l:'المنتج', v:product.name.slice(0,22) },
-            { l:'السعر',  v:`${fp.toLocaleString()} دج` },
-            { l:'الكمية', v:`× ${fd.quantity}` },
-            { l:'التوصيل',v:selW?`${getLiv().toLocaleString()} دج`:'—' },
+            { l:'Product', v:product.name.slice(0,22) },
+            { l:'Price',  v:`${fp.toLocaleString()} DZD` },
+            { l:'Quantity', v:`× ${fd.quantity}` },
+            { l:'Delivery',v:selW?`${getLiv().toLocaleString()} DZD`:'—' },
           ].map(row=>(
             <div key={row.l} style={{ display:'flex', justifyContent:'space-between', padding:'8px 14px', borderBottom:'1px solid var(--line)' }}>
               <span style={{ fontSize:'12px', color:'var(--mid)' }}>{row.l}</span>
@@ -1172,20 +1172,20 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
           ))}
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', padding:'12px 14px', backgroundColor:'rgba(30,111,255,0.04)' }}>
-            <span style={{ fontSize:'12px', fontWeight:600, color:'var(--mid)' }}>المجموع</span>
+            <span style={{ fontSize:'12px', fontWeight:600, color:'var(--mid)' }}>Total</span>
             <span style={{ fontSize:'1.6rem', fontWeight:800, color:'var(--blue)', letterSpacing:'-0.01em' }}>
-              {total().toLocaleString()} <span style={{ fontSize:'12px', fontWeight:400, color:'var(--mid)' }}>دج</span>
+              {total().toLocaleString()} <span style={{ fontSize:'12px', fontWeight:400, color:'var(--mid)' }}>DZD</span>
             </span>
           </div>
         </div>
 
         <button type="submit" disabled={sub} className="btn btn-blue"
           style={{ width:'100%', justifyContent:'center', padding:'13px', fontSize:'14px', borderRadius:'8px', cursor:sub?'not-allowed':'pointer', opacity:sub?0.7:1 }}>
-          {sub?'جاري المعالجة...':'تأكيد الطلب'}{!sub && <ArrowRight style={{ width:'14px', height:'14px' }}/>}
+          {sub?'Processing...':'Place Order'}{!sub && <ArrowRight style={{ width:'14px', height:'14px' }}/>}
         </button>
 
         <p style={{ fontSize:'11px', color:'var(--dim)', textAlign:'center', marginTop:'10px', display:'flex', alignItems:'center', justifyContent:'center', gap:'5px' }}>
-          <Lock style={{ width:'10px', height:'10px', color:'var(--blue)' }}/> دفع آمن ومشفر
+          <Lock style={{ width:'10px', height:'10px', color:'var(--blue)' }}/> Secure & Encrypted Payment
         </p>
       </form>
     </div>
@@ -1224,11 +1224,11 @@ const IB = ({ title, body, tag }: { title:string; body:string; tag?:string }) =>
 
 export function Privacy() {
   return (
-    <Shell title="سياسة الخصوصية" sub="قانوني">
-      <IB title="البيانات التي نجمعها"  body="فقط اسمك ورقم هاتفك وعنوان التوصيل — ما هو ضروري فقط لمعالجة طلبك."/>
-      <IB title="كيف نستخدمها"    body="حصرياً لتنفيذ وتوصيل مشترياتك. لا تسويق لطرف ثالث دون موافقتك."/>
-      <IB title="الأمان"         body="بياناتك محمية بتشفير على مستوى المؤسسات وبنية تحتية آمنة."/>
-      <IB title="مشاركة البيانات"     body="لا نبيع البيانات الشخصية أبداً. تُشارك فقط مع شركاء التوصيل الموثوقين عند الحاجة."/>
+    <Shell title="Privacy Policy" sub="Legal">
+      <IB title="Data We Collect"  body="Only your name, phone number, and delivery address — strictly what's needed to process your order."/>
+      <IB title="How We Use It"    body="Exclusively to fulfill and deliver your purchases. No third-party marketing without your consent."/>
+      <IB title="Security"         body="Your data is protected with enterprise-grade encryption and secure infrastructure."/>
+      <IB title="Data Sharing"     body="We never sell personal data. Shared only with trusted delivery partners when needed."/>
       <p style={{ fontSize:'12px', color:'var(--dim)', marginTop:'16px' }}>Last updated: February 2026</p>
     </Shell>
   );
@@ -1236,11 +1236,11 @@ export function Privacy() {
 
 export function Terms() {
   return (
-    <Shell title="شروط الاستخدام" sub="قانوني">
-      <IB title="حسابك"   body="أنت مسؤول كلياً عن أمان بيانات تسجيل الدخول وكل النشاط الجاري تحت حسابك."/>
-      <IB title="التسعير"        body="لا رسوم مخفية. السعر المعروض عند الدفع هو السعر الإجمالي النهائي شاملاً كل الرسوم."/>
-      <IB title="الاستخدام المحظور" body="يُسمح فقط بالمنتجات الأصيلة والقانونية. المنتجات المقلدة محظورة تماماً." tag="صارم"/>
-      <IB title="القانون الحاكم"  body="تخضع هذه الشروط لقوانين جمهورية الجزائر الديمقراطية الشعبية."/>
+    <Shell title="Terms of Use" sub="Legal">
+      <IB title="Your Account"   body="You are fully responsible for the security of your login credentials and all activity under your account."/>
+      <IB title="Pricing"        body="No hidden fees. The price shown at checkout is the final total, inclusive of all charges."/>
+      <IB title="Prohibited Use" body="Only authentic and legal products are permitted. Counterfeit goods are strictly prohibited." tag="Strict"/>
+      <IB title="Governing Law"  body="These terms are governed by the laws of the People's Democratic Republic of Algeria."/>
       <div style={{ marginTop:'16px', padding:'14px 16px', backgroundColor:'var(--off)', borderRadius:'8px', fontSize:'13px', color:'var(--mid)', lineHeight:'1.8' }}>
         We reserve the right to update these terms. Continued use of the platform implies acceptance.
       </div>
@@ -1250,10 +1250,10 @@ export function Terms() {
 
 export function Cookies() {
   return (
-    <Shell title="سياسة الكوكيز" sub="قانوني">
-      <IB title="الكوكيز الأساسية"  body="مطلوبة للجلسات والسلة والدفع. لا يمكن تعطيلها." tag="مطلوب"/>
-      <IB title="كوكيز التفضيلات" body="تتذكر لغتك ومنطقتك لتجربة أفضل." tag="اختياري"/>
-      <IB title="كوكيز التحليلات"  body="بيانات مجمعة ومجهولة الهوية لمساعدتنا في تحسين المنصة." tag="اختياري"/>
+    <Shell title="Cookie Policy" sub="Legal">
+      <IB title="Essential Cookies"  body="Required for sessions, cart, and payment. Cannot be disabled." tag="Required"/>
+      <IB title="Preference Cookies" body="Remember your language and region for a better experience." tag="Optional"/>
+      <IB title="Analytics Cookies"  body="Aggregated and anonymized data to help us improve the platform." tag="Optional"/>
       <div style={{ marginTop:'16px', padding:'14px 16px', border:'1px solid var(--line)', borderRadius:'8px', display:'flex', gap:'12px', alignItems:'flex-start' }}>
         <ToggleRight style={{ width:'18px', height:'18px', color:'var(--blue)', flexShrink:0, marginTop:'1px' }}/>
         <p style={{ fontSize:'13px', color:'var(--mid)', lineHeight:'1.8', margin:0 }}>
@@ -1271,9 +1271,9 @@ export function Contact() {
     <div style={{ backgroundColor:'var(--off)', minHeight:'100vh' }}>
       <div style={{ backgroundColor:'var(--navy)', padding:'64px 20px 40px' }}>
         <div style={{ maxWidth:'960px', margin:'0 auto' }}>
-          <p style={{ fontSize:'11px', fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', color:'rgba(255,255,255,0.4)', marginBottom:'10px' }}>مركز الدعم</p>
-          <h1 style={{ fontWeight:800, fontSize:'clamp(2rem,5vw,3.5rem)', color:'var(--white)', lineHeight:1, margin:'0 0 12px', letterSpacing:'-0.02em' }}>تواصل معنا</h1>
-          <p style={{ fontSize:'14px', color:'rgba(255,255,255,0.55)', fontWeight:400 }}>متوسط وقت الرد: أقل من ساعتين</p>
+          <p style={{ fontSize:'11px', fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', color:'rgba(255,255,255,0.4)', marginBottom:'10px' }}>Support Center</p>
+          <h1 style={{ fontWeight:800, fontSize:'clamp(2rem,5vw,3.5rem)', color:'var(--white)', lineHeight:1, margin:'0 0 12px', letterSpacing:'-0.02em' }}>Contact Us</h1>
+          <p style={{ fontSize:'14px', color:'rgba(255,255,255,0.55)', fontWeight:400 }}>Average Response Time: Less Than 2 Hours</p>
         </div>
       </div>
 
@@ -1282,11 +1282,11 @@ export function Contact() {
           {/* Info */}
           <div>
             <div style={{ background:'var(--white)', border:'1px solid var(--line)', borderRadius:'12px', padding:'24px', marginBottom:'12px' }}>
-              <p style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'16px' }}>طرق التواصل</p>
+              <p style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'16px' }}>Contact Methods</p>
               {[
-                { icon:'📧', label:'البريد الإلكتروني', val:'support@store.dz', href:'mailto:support@store.dz' },
-                { icon:'📞', label:'الهاتف', val:'+213 550 000 000', href:'tel:+213550000000' },
-                { icon:'📍', label:'المكتب', val:'Algiers, Algeria', href:undefined },
+                { icon:'📧', label:'Email Address', val:'support@store.dz', href:'mailto:support@store.dz' },
+                { icon:'📞', label:'Phone', val:'+213 550 000 000', href:'tel:+213550000000' },
+                { icon:'📍', label:'Office', val:'Algiers, Algeria', href:undefined },
               ].map(item=>(
                 <a key={item.label} href={item.href||'#'} style={{ display:'flex', alignItems:'center', gap:'14px', padding:'13px 0', borderBottom:'1px solid var(--line)', textDecoration:'none' }}>
                   <div style={{ width:'38px', height:'38px', borderRadius:'8px', backgroundColor:'var(--off)', border:'1px solid var(--line)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.1rem', flexShrink:0 }}>{item.icon}</div>
@@ -1299,15 +1299,15 @@ export function Contact() {
               ))}
             </div>
 
-            {/* وقت الرد widget */}
+            {/* Response Time widget */}
             <div style={{ background:'var(--white)', border:'1px solid var(--line)', borderRadius:'12px', padding:'18px 20px' }}>
               <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'10px' }}>
                 <div style={{ width:'8px', height:'8px', borderRadius:'50%', backgroundColor:'#22C55E' }}/>
-                <span style={{ fontSize:'13px', fontWeight:600, color:'var(--ink)' }}>الدعم متاح</span>
+                <span style={{ fontSize:'13px', fontWeight:600, color:'var(--ink)' }}>Support Available</span>
               </div>
               {[
-                { label:'وقت الرد', val:'&lt; 2 hours' },
-                { label:'معدل الرضا', val:'98.7%' },
+                { label:'Response Time', val:'&lt; 2 hours' },
+                { label:'Satisfaction Rate', val:'98.7%' },
               ].map(s=>(
                 <div key={s.label} style={{ display:'flex', justifyContent:'space-between', padding:'5px 0', borderTop:'1px solid var(--line)' }}>
                   <span style={{ fontSize:'12px', color:'var(--mid)' }}>{s.label}</span>
@@ -1319,18 +1319,18 @@ export function Contact() {
 
           {/* Form */}
           <div style={{ background:'var(--white)', border:'1px solid var(--line)', borderRadius:'12px', padding:'24px' }}>
-            <p style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'20px' }}>أرسل رسالة</p>
+            <p style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'20px' }}>Send Message</p>
             {sent ? (
               <div style={{ minHeight:'240px', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', backgroundColor:'var(--off)', borderRadius:'10px', textAlign:'center', padding:'32px' }}>
                 <CheckCircle2 style={{ width:'36px', height:'36px', color:'#22C55E', marginBottom:'12px' }}/>
-                <h3 style={{ fontSize:'1.2rem', fontWeight:800, color:'var(--ink)', margin:'0 0 6px' }}>تم الإرسال!</h3>
+                <h3 style={{ fontSize:'1.2rem', fontWeight:800, color:'var(--ink)', margin:'0 0 6px' }}>Sent!</h3>
                 <p style={{ fontSize:'13px', color:'var(--mid)', fontWeight:400 }}>We will get back to you within 2 hours.</p>
               </div>
             ) : (
               <form onSubmit={e=>{e.preventDefault();setSent(true);}} style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
                 {[
-                  { label:'اسمك', type:'text',  key:'name',  ph:'الاسم الكامل' },
-                  { label:'البريد الإلكتروني',     type:'email', key:'email', ph:'your@email.com' },
+                  { label:'Your Name', type:'text',  key:'name',  ph:'Full Name' },
+                  { label:'Email Address',     type:'email', key:'email', ph:'your@email.com' },
                 ].map(f=>(
                   <div key={f.key}>
                     <p style={{ fontSize:'11px', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'6px' }}>{f.label}</p>
@@ -1340,7 +1340,7 @@ export function Contact() {
                 ))}
                 <div>
                   <p style={{ fontSize:'11px', fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'6px' }}>Message</p>
-                  <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="كيف يمكننا مساعدتك؟" rows={4} required className="inp"
+                  <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="How can we help you?" rows={4} required className="inp"
                     style={{ resize:'none' as any }}
                     onFocus={e=>{e.target.style.borderColor='var(--blue)';}} onBlur={e=>{e.target.style.borderColor='var(--line)';}}/>
                 </div>

@@ -48,6 +48,10 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  if (process.env.NODE_ENV === "development") {
+    return NextResponse.rewrite(new URL(`http://localhost:3000/${storeIdentifier}${path}`, req.url));
+  }
+
   // 5. التوجيه الداخلي (Rewrite)
   // سيتم توجيه الطلب إلى المجلد [domain] داخل app directory
   return NextResponse.rewrite(new URL(`/${storeIdentifier}${path}`, req.url));

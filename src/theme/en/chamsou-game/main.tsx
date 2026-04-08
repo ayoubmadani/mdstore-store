@@ -305,13 +305,13 @@ export function Navbar({ store }: { store: Store }) {
   }, []);
 
   const links = [
-    { href: `/`, label: 'المتجر' },
-    { href: `/contact`, label: 'تواصل معنا' },
-    { href: `/Privacy`, label: 'الخصوصية' },
+    { href: `/`, label: 'Store' },
+    { href: `/contact`, label: 'Contact Us' },
+    { href: `/Privacy`, label: 'Privacy' },
   ];
 
   return (
-    <nav dir="rtl" style={{
+    <nav dir="ltr" style={{
       position: 'sticky', top: 0, zIndex: 50,
       background: scrolled ? 'rgba(5,11,26,0.97)' : 'rgba(5,11,26,0.85)',
       backdropFilter: 'blur(20px)',
@@ -373,7 +373,7 @@ export function Navbar({ store }: { store: Store }) {
             </Link>
           ))}
           <a href="#products" className="btn-cyan" style={{ padding: '9px 22px', fontSize: '13px' }}>
-            <Gamepad2 style={{ width: '14px', height: '14px' }} /> تسوق الآن
+            <Gamepad2 style={{ width: '14px', height: '14px' }} /> Shop Now
           </a>
         </div>
 
@@ -400,20 +400,20 @@ export function Navbar({ store }: { store: Store }) {
 /* ── FOOTER ─────────────────────────────────────────────────── */
 export function Footer({ store }: any) {
   const yr = new Date().getFullYear();
-  // لون النيون الموحد
+  // unified neon color
   const cyan = 'var(--cyan)';
   const pink = 'var(--pink)';
 
   return (
-    <footer dir="rtl" style={{
-      backgroundColor: 'var(--navy-3)', // أغمق قليلاً ليعطي عمقاً
+    <footer dir="ltr" style={{
+      backgroundColor: 'var(--navy-3)', // slightly darker for depth
       borderTop: `2px solid var(--line)`,
       fontFamily: "'Tajawal',sans-serif",
       marginTop: '80px',
       position: 'relative',
       overflow: 'hidden'
     }}>
-      {/* تأثير إضاءة خفيفة في زاوية الفوتر */}
+      {/* Subtle light effect in footer corner */}
       <div style={{ position: 'absolute', bottom: 0, left: 0, width: '300px', height: '300px', background: `radial-gradient(circle, ${cyan}05 0%, transparent 70%)`, pointerEvents: 'none' }} />
 
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '60px 20px 30px' }}>
@@ -425,7 +425,7 @@ export function Footer({ store }: any) {
           borderBottom: '1px solid var(--line)'
         }}>
 
-          {/* القسم الأول: الشعار والوصف */}
+          {/* Section 1: Logo and Description */}
           <div style={{ gridColumn: 'span 2' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <div style={{ padding: '8px', border: `1px solid ${cyan}`, borderRadius: '4px', background: `${cyan}05` }}>
@@ -439,10 +439,10 @@ export function Footer({ store }: any) {
               </span>
             </div>
             <p style={{ fontSize: '15px', lineHeight: '1.8', color: 'var(--mid)', maxWidth: '300px', fontWeight: 400 }}>
-              {store.hero?.subtitle?.substring(0, 80) || 'وجهتك الأولى لعالم الألعاب والاحتراف في الجزائر. جودة أصلية وتوصيل سريع.'}
+              {store.hero?.subtitle?.substring(0, 80) || 'Your first destination for gaming and professional gear in Algeria. Authentic quality with fast delivery.'}
             </p>
 
-            {/* أيقونات التواصل الاجتماعي أو الألعاب */}
+            {/* Social / Gaming Contact Icons */}
             <div style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
               {['🎮', '🕹️', '👾', '🔥'].map((e, i) => (
                 <div key={i} style={{
@@ -461,21 +461,21 @@ export function Footer({ store }: any) {
             </div>
           </div>
 
-          {/* الأقسام الأخرى: الروابط والتواصل */}
+          {/* Other Sections: Links and Contact */}
           {[
             {
-              title: 'روابط سريعة', links: [
-                [`/`, 'المتجر'],
-                [`/contact`, 'الدعم الفني'],
-                [`/Privacy`, 'سياسة الخصوصية'],
-                [`/Terms`, 'شروط الاستخدام'],
+              title: 'Quick Links', links: [
+                [`/`, 'Store'],
+                [`/contact`, 'Technical Support'],
+                [`/Privacy`, 'Privacy Policy'],
+                [`/Terms`, 'Terms of Use'],
               ]
             },
             {
-              title: 'تواصل معنا', links: [
+              title: 'Contact Us', links: [
                 ['tel:+213550000000', '+213 550 000 000'],
-                ['#', 'الجزائر، أولاد فايت'],
-                ['#', 'مركز الأعمال قرب المسجد'],
+                ['#', 'Algiers, Oued Fayet'],
+                ['#', 'Business Center near the Mosque'],
               ]
             },
           ].map(col => (
@@ -520,7 +520,7 @@ export function Footer({ store }: any) {
           ))}
         </div>
 
-        {/* الجزء السفلي الأخير */}
+        {/* Bottom Footer Section */}
         <div style={{
           paddingTop: '30px',
           display: 'flex',
@@ -530,7 +530,7 @@ export function Footer({ store }: any) {
           gap: '15px'
         }}>
           <p style={{ fontSize: '13px', color: 'var(--dim)', fontWeight: 500 }}>
-            © {yr} <span style={{ color: cyan }}>{store.name}</span>. صُنع بكل شغف للألعاب.
+            © {yr} <span style={{ color: cyan }}>{store.name}</span>. Made with passion for gaming.
           </p>
           <div style={{ display: 'flex', gap: '20px' }}>
             <span style={{ fontSize: '11px', color: 'var(--dim)', letterSpacing: '1px', textTransform: 'uppercase' }}>Shamsou Gaming Engine 2.0</span>
@@ -549,7 +549,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
   const price = typeof product.price === 'string' ? parseFloat(product.price) : (product.price as number) || 0;
   const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
 
-  // اللون الموحد (السيان النيوني)
+  // unified color (neon cyan)
   const brandColor = 'var(--cyan)';
 
   return (
@@ -565,10 +565,10 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         border: `1px solid ${hov ? brandColor : 'var(--panel)'}`,
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         position: 'relative',
-        borderRadius: '4px' // لمسة بسيطة لتناسب النمط التقني
+        borderRadius: '4px' // subtle touch to fit the tech style
       }}
     >
-      {/* منطقة الصورة */}
+      {/* Image Area */}
       <div className="g-img" style={{ position: 'relative', aspectRatio: '1/1', overflow: 'hidden', backgroundColor: 'var(--navy-2)' }}>
         {displayImage ? (
           <img
@@ -596,7 +596,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         )}
       </div>
 
-      {/* المحتوى */}
+      {/* [Arabic] */}
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
 
         <h3 style={{
@@ -614,12 +614,12 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
           ))}
         </div>
 
-        {/* السعر والزر في الأسفل */}
+        {/* Price[Arabic] */}
         <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '15px' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
             <span style={{ fontSize: '1.4rem', fontWeight: 900, color: 'white' }}>
               {price.toLocaleString()}
-              <span style={{ fontSize: '12px', fontWeight: 600, color: brandColor, marginRight: '4px' }}>دج</span>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: brandColor, marginRight: '4px' }}>DZD</span>
             </span>
             {orig > price && (
               <span style={{ fontSize: '12px', color: 'var(--dim)', textDecoration: 'line-through' }}>
@@ -628,7 +628,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
             )}
           </div>
 
-          {/* التعديل هنا: زر واضح دوماً */}
+          {/* [Arabic]:[Arabic] */}
           <Link href={`/product/${product.slug || product.id}`}
             className="gaming-btn"
             style={{
@@ -644,7 +644,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
 
-              // الحالة العادية: نص سيان واضح مع إطار سيان
+              // normal state: clear cyan text with cyan border
               backgroundColor: hov ? brandColor : 'transparent',
               color: hov ? 'var(--navy-3)' : brandColor,
               border: `2px solid ${brandColor}`,
@@ -663,24 +663,24 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 }
 
 /* ── HOME ───────────────────────────────────────────────────── */
-export function Home({ store  }: any) {
+export function Home({ store }: any) {
   const products: any[] = store.products || [];
   const cats: any[] = store.categories || [];
 
   const trust = [
-    { icon: <Truck style={{ width: '20px', height: '20px' }} />, color: 'var(--cyan)', title: 'توصيل 58 ولاية', desc: 'توصيل سريع لكل الجزائر' },
-    { icon: <Shield style={{ width: '20px', height: '20px' }} />, color: 'var(--pink)', title: 'منتجات أصيلة 100%', desc: 'ضمان الجودة والأصالة' },
-    { icon: <Trophy style={{ width: '20px', height: '20px' }} />, color: 'var(--gold)', title: 'أفضل الأسعار', desc: 'أسعار تنافسية دائماً' },
-    { icon: <Zap style={{ width: '20px', height: '20px' }} />, color: 'var(--purple)', title: 'خدمة سريعة', desc: 'رد سريع على استفساراتك' },
+    { icon: <Truck style={{ width: '20px', height: '20px' }} />, color: 'var(--cyan)', title: 'Delivery to 58 Provinces', desc: 'Fast Delivery Across Algeria' },
+    { icon: <Shield style={{ width: '20px', height: '20px' }} />, color: 'var(--pink)', title: '100% Authentic Products', desc: 'Quality & Authenticity Guarantee' },
+    { icon: <Trophy style={{ width: '20px', height: '20px' }} />, color: 'var(--gold)', title: 'Best Prices', desc: 'Always Competitive Prices' },
+    { icon: <Zap style={{ width: '20px', height: '20px' }} />, color: 'var(--purple)', title: 'Fast Service', desc: 'Quick Response to Your Inquiries' },
   ];
 
   return (
-    <div dir="rtl">
+    <div dir="ltr">
 
       {/* ── HERO ── */}
       <section style={{ position: 'relative', minHeight: '92vh', display: 'flex', alignItems: 'center', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }} className="circuit-bg">
 
-        {/* 1. Background Image - تعديل الـ Opacity والـ Z-index */}
+        {/* 1.[Arabic]Background[Arabic]Image[Arabic]-[Arabic]Opacity[Arabic]Z-index */}
         {store.hero?.imageUrl && (
           <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
             <img
@@ -690,11 +690,11 @@ export function Home({ store  }: any) {
                 width: '100%',
                 height: '100%',
                 objectFit: 'cover',
-                opacity: 0.4, // زيادة الوضوح قليلاً من 0.15 إلى 0.4
+                opacity: 0.4, // increased clarity slightly from 0.15 to 0.4
                 display: 'block'
               }}
             />
-            {/* طبقة تدرج تضمن قراءة النص دون إخفاء الصورة بالكامل */}
+            {/* [Arabic] */}
             <div style={{
               position: 'absolute',
               inset: 0,
@@ -703,11 +703,11 @@ export function Home({ store  }: any) {
           </div>
         )}
 
-        {/* 2. Glow Effects - تأثيرات الإضاءة الجانبية */}
+        {/* 2.[Arabic]Glow[Arabic]Effects[Arabic]-[Arabic] */}
         <div style={{ position: 'absolute', top: '-20%', left: '-10%', width: '60vw', height: '60vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 1 }} />
         <div style={{ position: 'absolute', bottom: '-20%', right: '-10%', width: '50vw', height: '50vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,45,138,0.08) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 1 }} />
 
-        {/* 3. Content - المحتوى مع التأكد من رفعه فوق الخلفية */}
+        {/* 3.[Arabic]Content[Arabic]-[Arabic] */}
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '80px 20px 60px', position: 'relative', zIndex: 10, width: '100%' }}>
 
           {/* Brand badge */}
@@ -719,32 +719,32 @@ export function Home({ store  }: any) {
 
           {/* Main headline */}
           <h1 className="fu fu-1" style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(2.2rem,7vw,5.5rem)', lineHeight: 1.05, marginBottom: '16px', letterSpacing: '-0.01em', textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
-            <span className="gold-shimmer">عالم الألعاب</span><br />
-            <span style={{ color: 'var(--white)' }}>بين </span>
-            <span className="neon-cyan">يديك</span>
+            <span className="gold-shimmer">Gaming World</span><br />
+            <span style={{ color: 'var(--white)' }}>at Your </span>
+            <span className="neon-cyan">Fingertips</span>
           </h1>
 
           <NeonDivider color="cyan" />
 
           <p className="fu fu-2" style={{ fontSize: 'clamp(14px,2vw,18px)', lineHeight: '1.8', color: 'var(--white)', opacity: 0.9, marginBottom: '32px', maxWidth: '520px', fontWeight: 400, textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
-            {store.hero?.subtitle || 'كل ما تحتاجه للعب الاحترافي — PS5، Xbox، يدات التحكم، الألعاب وكل الإكسسوارات. توصيل لجميع ولايات الجزائر.'}
+            {store.hero?.subtitle || 'Everything you need for pro gaming — PS5, Xbox, controllers, games and all accessories. Delivery to all Algerian provinces.'}
           </p>
 
           <div className="fu fu-3" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
             <a href="#products" className="btn-cyan" style={{ fontSize: '15px', padding: '14px 32px', textDecoration: 'none' }}>
-              <Gamepad2 style={{ width: '16px', height: '16px' }} /> تسوق الآن
+              <Gamepad2 style={{ width: '16px', height: '16px' }} /> Shop Now
             </a>
             <a href="#categories" className="btn-ghost-c" style={{ fontSize: '14px', padding: '13px 28px', textDecoration: 'none', border: '1px solid var(--cyan)', color: 'var(--cyan)', borderRadius: '4px' }}>
-              استعرض الفئات <ArrowRight style={{ width: '14px', height: '14px' }} />
+              Browse Categories <ArrowRight style={{ width: '14px', height: '14px' }} />
             </a>
           </div>
 
           {/* Stats row */}
           <div style={{ display: 'flex', gap: '32px', marginTop: '48px', paddingTop: '32px', borderTop: '1px solid var(--line)', flexWrap: 'wrap' }}>
             {[
-              { n: `${products.length}+`, l: 'منتج متاح', c: 'var(--cyan)' },
-              { n: '58', l: 'ولاية توصيل', c: 'var(--pink)' },
-              { n: '100%', l: 'منتجات أصيلة', c: 'var(--gold)' },
+              { n: `${products.length}+`, l: 'Product Available', c: 'var(--cyan)' },
+              { n: '58', l: 'Delivery Province', c: 'var(--pink)' },
+              { n: '100%', l: 'Authentic Products', c: 'var(--gold)' },
             ].map((s, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
                 <p className="orb" style={{ fontSize: '2rem', fontWeight: 900, color: s.c, lineHeight: 1, margin: 0, textShadow: `0 0 16px ${s.c}80` }}>{s.n}</p>
@@ -776,12 +776,12 @@ export function Home({ store  }: any) {
       {cats.length > 0 && (
         <section id="categories" style={{ padding: '80px 0', backgroundColor: 'var(--navy-3)', position: 'relative' }} className="circuit-bg">
 
-          {/* تأثير إضاءة خلفية بسيط */}
+          {/* [Arabic] */}
           <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', height: '1px', background: 'linear-gradient(90deg, transparent, var(--cyan), transparent)', opacity: 0.3 }} />
 
           <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px' }}>
 
-            {/* الرأس: العنوان وزر عرض الكل */}
+            {/* [Arabic]:[Arabic]View[Arabic]All */}
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '40px' }}>
               <div>
                 <div style={{
@@ -800,7 +800,7 @@ export function Home({ store  }: any) {
                   EXPLORE
                 </div>
                 <h2 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(1.8rem,4vw,2.8rem)', color: 'var(--white)', margin: 0, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
-                  تسوق حسب <span className="neon-pink" style={{ textShadow: '0 0 15px var(--pink)40' }}>الفئة</span>
+                  Shop by <span className="neon-pink" style={{ textShadow: '0 0 15px var(--pink)40' }}>Category</span>
                 </h2>
               </div>
 
@@ -816,14 +816,14 @@ export function Home({ store  }: any) {
                   gap: '8px',
                   transition: 'all 0.3s ease'
                 }}>
-                <span style={{ borderBottom: '1px solid transparent', transition: '0.3s' }} className="group-hover:border-cyan-400">عرض كل الفئات</span>
+                <span style={{ borderBottom: '1px solid transparent', transition: '0.3s' }} className="group-hover:border-cyan-400">View All Categories</span>
                 <div style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid var(--cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.3s' }} className="group-hover:bg-cyan-500/10">
                   <ArrowRight style={{ width: '14px', height: '14px' }} />
                 </div>
               </Link>
             </div>
 
-            {/* شبكة الفئات */}
+            {/* [Arabic]Categories */}
             <div className="cat-grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
@@ -856,7 +856,7 @@ export function Home({ store  }: any) {
                     el.style.transform = 'translateY(0) scale(1)';
                   }}>
 
-                  {/* خلفية الصورة مع تأثير التكبير */}
+                  {/* [Arabic] */}
                   <div style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
                     {cat.imageUrl ? (
                       <img src={cat.imageUrl} alt={cat.name}
@@ -870,7 +870,7 @@ export function Home({ store  }: any) {
                     )}
                   </div>
 
-                  {/* تدرج لوني للنص */}
+                  {/* [Arabic] */}
                   <div style={{
                     position: 'absolute',
                     inset: 0,
@@ -901,7 +901,7 @@ export function Home({ store  }: any) {
                     }} className="group-hover:w-1/3" />
                   </div>
 
-                  {/* إضاءة الزاوية المتغيرة */}
+                  {/* [Arabic] */}
                   <div style={{
                     position: 'absolute',
                     top: 0,
@@ -912,7 +912,7 @@ export function Home({ store  }: any) {
                     zIndex: 1
                   }} />
 
-                  {/* لمسة تقنية (برواز داخلي عند الـ Hover) */}
+                  {/* [Arabic]([Arabic]Hover) */}
                   <div style={{
                     position: 'absolute',
                     inset: '10px',
@@ -935,25 +935,25 @@ export function Home({ store  }: any) {
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px' }}>
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '32px' }}>
             <div>
-              <div className="slabel" style={{ marginBottom: '10px' }}>المنتجات</div>
+              <div className="slabel" style={{ marginBottom: '10px' }}>Products</div>
               <h2 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(1.6rem,3vw,2.4rem)', color: 'var(--white)', margin: 0 }}>
-                كل <span className="neon-cyan">المنتجات</span>
+                All <span className="neon-cyan">Products</span>
               </h2>
             </div>
-            <p style={{ fontSize: '13px', color: 'var(--dim)', fontWeight: 500 }}>{products.length} منتج</p>
+            <p style={{ fontSize: '13px', color: 'var(--dim)', fontWeight: 500 }}>{products.length} Product</p>
           </div>
 
           {products.length === 0 ? (
             <div style={{ padding: '80px 0', textAlign: 'center', border: '1px solid var(--line)', borderRadius: '8px', background: 'var(--panel)' }}>
               <Gamepad2 style={{ width: '56px', height: '56px', color: 'var(--dim)', margin: '0 auto 16px' }} />
-              <p style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--mid)' }}>المنتجات قادمة قريباً...</p>
+              <p style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--mid)' }}>Products Coming Soon...</p>
             </div>
           ) : (
             <div className="prod-grid">
               {products.map((p: any) => {
-                // أضف علامة الاستفهام بعد store وبعد design
+                // add optional chaining after store and design
                 const img = p.productImage || p.imagesProduct?.[0]?.imageUrl || store?.design?.logoUrl || '/fallback-image.png'; const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
-                return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="عرض المنتج" />;
+                return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="View Product" />;
               })}
             </div>
           )}
@@ -966,20 +966,20 @@ export function Home({ store  }: any) {
         <div style={{ position: 'relative', zIndex: 2, maxWidth: '640px', margin: '0 auto' }}>
           <NeonDivider color="pink" />
           <div style={{ margin: '24px 0' }}>
-            <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '11px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--pink)', marginBottom: '14px' }}>// توصيل لكل الجزائر</p>
+            <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '11px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--pink)', marginBottom: '14px' }}>// Delivery Across Algeria</p>
             <h2 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(1.8rem,5vw,3.5rem)', color: 'var(--white)', lineHeight: 1.05, marginBottom: '16px' }}>
-              توصيل <span className="neon-cyan">58 ولاية</span>
+              Delivery <span className="neon-cyan">58 Provinces</span>
             </h2>
             <p style={{ fontSize: '15px', lineHeight: '1.8', color: 'var(--mid)', marginBottom: '28px', fontWeight: 400 }}>
-              الجزائر بلدية اولاد فايت بلاطو قرب مسجد ابوبكر الصديق
+              Oued Fayet, Algiers, near Abu Bakr Mosque
             </p>
           </div>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="#products" className="btn-cyan" style={{ fontSize: '14px', padding: '13px 30px' }}>
-              <Gamepad2 style={{ width: '15px', height: '15px' }} /> تسوق الآن
+              <Gamepad2 style={{ width: '15px', height: '15px' }} /> Shop Now
             </a>
             <Link href={`/contact`} className="btn-pink" style={{ fontSize: '14px', padding: '13px 30px', textDecoration: 'none' }}>
-              <Phone style={{ width: '15px', height: '15px' }} /> تواصل معنا
+              <Phone style={{ width: '15px', height: '15px' }} /> Contact Us
             </Link>
           </div>
           <NeonDivider color="cyan" />
@@ -993,13 +993,13 @@ export function Home({ store  }: any) {
 export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, isRTL }: any) {
   const [sel, setSel] = useState(0);
   return (
-    <div dir="rtl" style={{ backgroundColor: 'var(--navy)' }}>
+    <div dir="ltr" style={{ backgroundColor: 'var(--navy)' }}>
       {/* Breadcrumb */}
       <div style={{ borderBottom: '1px solid var(--line)', padding: '11px 20px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--dim)', backgroundColor: 'var(--navy-2)' }}>
         <Link href="/" style={{ textDecoration: 'none', color: 'var(--dim)', transition: 'color 0.2s' }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--cyan)'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--dim)'; }}>
-          الرئيسية
+          Home
         </Link>
         <ChevronLeft style={{ width: '12px', height: '12px', transform: 'rotate(180deg)' }} />
         <span style={{ color: 'var(--cyan)', fontWeight: 600 }}>{product.name.slice(0, 40)}</span>
@@ -1038,7 +1038,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             )}
             {!inStock && !autoGen && (
               <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(5,11,26,0.85)', backdropFilter: 'blur(4px)' }}>
-                <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '1.2rem', fontWeight: 900, color: 'var(--pink)' }}>نفد المخزون</span>
+                <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '1.2rem', fontWeight: 900, color: 'var(--pink)' }}>Out of Stock</span>
               </div>
             )}
           </div>
@@ -1056,7 +1056,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
         {/* Info */}
         <div className="details-R">
           <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', padding: '24px', marginTop: '24px' }}>
-            <div className="slabel" style={{ marginBottom: '10px' }}>تفاصيل المنتج</div>
+            <div className="slabel" style={{ marginBottom: '10px' }}>Product Details</div>
             <h1 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(1.4rem,3vw,2.2rem)', color: 'var(--white)', lineHeight: 1.15, marginBottom: '14px' }}>
               {product.name}
             </h1>
@@ -1065,23 +1065,23 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
               <div style={{ display: 'flex', gap: '2px' }}>
                 {[...Array(5)].map((_, i) => <Star key={i} style={{ width: '13px', height: '13px', fill: i < 4 ? 'var(--gold)' : 'none', color: 'var(--gold)' }} />)}
               </div>
-              <span style={{ fontSize: '12px', color: 'var(--mid)' }}>4.8 (128 تقييم)</span>
+              <span style={{ fontSize: '12px', color: 'var(--mid)' }}>4.8 (128 Rating)</span>
               <span style={{ marginRight: 'auto', padding: '4px 12px', borderRadius: '20px', backgroundColor: inStock || autoGen ? 'rgba(0,212,255,0.1)' : 'rgba(255,45,138,0.1)', color: inStock || autoGen ? 'var(--cyan)' : 'var(--pink)', fontSize: '12px', fontWeight: 700, border: `1px solid ${inStock || autoGen ? 'var(--cyan)' : 'var(--pink)'}` }}>
-                {autoGen ? '∞ متوفر' : inStock ? 'متوفر' : 'نفد'}
+                {autoGen ? '∞ Available' : inStock ? 'Available' : 'Out of Stock'}
               </span>
             </div>
 
             {/* Price */}
             <div style={{ marginBottom: '20px', padding: '16px', background: 'var(--navy-3)', borderRadius: '6px', border: '1px solid var(--line)' }}>
-              <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--mid)', letterSpacing: '0.16em', margin: '0 0 6px', textTransform: 'uppercase' }}>السعر</p>
+              <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--mid)', letterSpacing: '0.16em', margin: '0 0 6px', textTransform: 'uppercase' }}>Price</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
                 <span className="neon-cyan orb" style={{ fontSize: '2.4rem', fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1 }}>{finalPrice.toLocaleString()}</span>
-                <span style={{ fontSize: '15px', color: 'var(--mid)' }}>دج</span>
+                <span style={{ fontSize: '15px', color: 'var(--mid)' }}>DZD</span>
                 {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
                   <>
                     <span style={{ fontSize: '14px', textDecoration: 'line-through', color: 'var(--dim)' }}>{parseFloat(product.priceOriginal).toLocaleString()}</span>
                     <span style={{ fontSize: '11px', background: 'var(--pink)', color: 'var(--white)', padding: '2px 8px', borderRadius: '3px', fontWeight: 700 }}>
-                      وفّر {(parseFloat(product.priceOriginal) - finalPrice).toLocaleString()} دج
+                      Save {(parseFloat(product.priceOriginal) - finalPrice).toLocaleString()} DZD
                     </span>
                   </>
                 )}
@@ -1091,7 +1091,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             {/* Offers */}
             {product.offers?.length > 0 && (
               <div style={{ marginBottom: '20px', paddingBottom: '20px', borderBottom: '1px solid var(--line)' }}>
-                <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '10px', textTransform: 'uppercase' }}>الباقات</p>
+                <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '10px', textTransform: 'uppercase' }}>Packages</p>
                 {product.offers.map((offer: any) => (
                   <label key={offer.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', border: `1px solid ${selectedOffer === offer.id ? 'var(--cyan)' : 'var(--line)'}`, cursor: 'pointer', marginBottom: '8px', borderRadius: '6px', transition: 'all 0.2s', backgroundColor: selectedOffer === offer.id ? 'rgba(0,212,255,0.05)' : 'transparent', boxShadow: selectedOffer === offer.id ? 'var(--glow-c)' : 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1101,11 +1101,11 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                       <input type="radio" name="offer" value={offer.id} checked={selectedOffer === offer.id} onChange={() => setSelectedOffer(offer.id)} style={{ display: 'none' }} />
                       <div>
                         <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--white)', margin: 0 }}>{offer.name}</p>
-                        <p style={{ fontSize: '11px', color: 'var(--mid)', margin: 0 }}>الكمية: {offer.quantity}</p>
+                        <p style={{ fontSize: '11px', color: 'var(--mid)', margin: 0 }}>Quantity: {offer.quantity}</p>
                       </div>
                     </div>
                     <span className="neon-cyan orb" style={{ fontSize: '1.1rem', fontWeight: 900, textShadow: 'none' }}>
-                      {offer.price.toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '11px', color: 'var(--mid)' }}>دج</span>
+                      {offer.price.toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '11px', color: 'var(--mid)' }}>DZD</span>
                     </span>
                   </label>
                 ))}
@@ -1136,7 +1136,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
 
             {product.desc && (
               <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
-                <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '12px', textTransform: 'uppercase' }}>وصف المنتج</p>
+                <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '12px', textTransform: 'uppercase' }}>Product Description</p>
                 <div style={{ fontSize: '14px', lineHeight: '1.8', color: 'var(--mid)', fontWeight: 400 }}
                   dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc, { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'span'], ALLOWED_ATTR: ['class', 'style'] }) }} />
               </div>
@@ -1189,10 +1189,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const total = () => fp * fd.quantity + +getLiv();
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!fd.customerName.trim()) e.customerName = 'الاسم مطلوب';
-    if (!fd.customerPhone.trim()) e.customerPhone = 'رقم الهاتف مطلوب';
-    if (!fd.customerWelaya) e.customerWelaya = 'الولاية مطلوبة';
-    if (!fd.customerCommune) e.customerCommune = 'البلدية مطلوبة';
+    if (!fd.customerName.trim()) e.customerName = 'Name is required';
+    if (!fd.customerPhone.trim()) e.customerPhone = 'Phone number is required';
+    if (!fd.customerWelaya) e.customerWelaya = 'Province is required';
+    if (!fd.customerCommune) e.customerCommune = 'Municipality is required';
     return e;
   };
   const getVariantDetailId = useCallback(() => {
@@ -1215,15 +1215,15 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
       <form onSubmit={handleSubmit}>
         <div className="form-2c">
-          <FR error={errors.customerName} label="الاسم">
+          <FR error={errors.customerName} label="Name">
             <div style={{ position: 'relative' }}>
               <User style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
-              <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder="الاسم الكامل"
+              <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder="Full Name"
                 className={`inp${errors.customerName ? ' inp-err' : ''}`} style={{ paddingLeft: '36px' }}
                 onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.customerName ? 'var(--pink)' : 'var(--dim)'; }} />
             </div>
           </FR>
-          <FR error={errors.customerPhone} label="الهاتف">
+          <FR error={errors.customerPhone} label="Phone">
             <div style={{ position: 'relative' }}>
               <Phone style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
               <input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} placeholder="0X XX XX XX XX"
@@ -1233,48 +1233,48 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </FR>
         </div>
         <div className="form-2c">
-          <FR error={errors.customerWelaya} label="الولاية">
+          <FR error={errors.customerWelaya} label="Province">
             <div style={{ position: 'relative' }}>
               <ChevronDown style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
               <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}
                 className={`inp${errors.customerWelaya ? ' inp-err' : ''}`} style={{ paddingRight: '34px' }}
                 onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.customerWelaya ? 'var(--pink)' : 'var(--dim)'; }}>
-                <option value="">اختر الولاية</option>
+                <option value="">Select Province</option>
                 {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
               </select>
             </div>
           </FR>
-          <FR error={errors.customerCommune} label="البلدية">
+          <FR error={errors.customerCommune} label="Municipality">
             <div style={{ position: 'relative' }}>
               <ChevronDown style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
               <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })}
                 className={`inp${errors.customerCommune ? ' inp-err' : ''}`} style={{ paddingRight: '34px', opacity: !fd.customerWelaya ? 0.4 : 1 }}
                 onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.customerCommune ? 'var(--pink)' : 'var(--dim)'; }}>
-                <option value="">{loadingC ? '...' : 'اختر البلدية'}</option>
+                <option value="">{loadingC ? '...' : 'Select Municipality'}</option>
                 {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
             </div>
           </FR>
         </div>
 
-        <FR label="طريقة التوصيل">
+        <FR label="Delivery Method">
           <div className="dlv-2c">
             {(['home', 'office'] as const).map(type => (
               <button key={type} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: type }))}
                 style={{ padding: '12px 10px', border: `1px solid ${fd.typeLivraison === type ? 'var(--cyan)' : 'var(--line)'}`, backgroundColor: fd.typeLivraison === type ? 'rgba(0,212,255,0.06)' : 'transparent', cursor: 'pointer', textAlign: 'right', borderRadius: '6px', transition: 'all 0.2s', boxShadow: fd.typeLivraison === type ? 'var(--glow-c)' : 'none' }}>
                 <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', color: fd.typeLivraison === type ? 'var(--cyan)' : 'var(--mid)', margin: '0 0 4px', textTransform: 'uppercase' }}>
-                  {type === 'home' ? 'للبيت' : 'للمكتب'}
+                  {type === 'home' ? 'Home' : 'Office'}
                 </p>
                 {selW && <p className="orb" style={{ fontSize: '1rem', fontWeight: 900, color: fd.typeLivraison === type ? 'var(--cyan)' : 'var(--dim)', margin: 0 }}>
                   {(type === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()}
-                  <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '11px', marginRight: '3px', color: 'var(--mid)' }}>دج</span>
+                  <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '11px', marginRight: '3px', color: 'var(--mid)' }}>DZD</span>
                 </p>}
               </button>
             ))}
           </div>
         </FR>
 
-        <FR label="الكمية">
+        <FR label="Quantity">
           <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid var(--line)', borderRadius: '6px', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }}>
             <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
               style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderLeft: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.18s' }}
@@ -1296,13 +1296,13 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         <div style={{ border: '1px solid var(--line)', borderRadius: '6px', marginBottom: '14px', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }}>
           <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,212,255,0.05)' }}>
             <Package style={{ width: '13px', height: '13px', color: 'var(--cyan)' }} />
-            <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.18em', color: 'var(--cyan)', textTransform: 'uppercase' }}>ملخص الطلب</span>
+            <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.18em', color: 'var(--cyan)', textTransform: 'uppercase' }}>Order Summary</span>
           </div>
           {[
-            { l: 'المنتج', v: product.name.slice(0, 22) },
-            { l: 'السعر', v: `${fp.toLocaleString()} دج` },
-            { l: 'الكمية', v: `× ${fd.quantity}` },
-            { l: 'التوصيل', v: selW ? `${getLiv().toLocaleString()} دج` : '—' },
+            { l: 'Product', v: product.name.slice(0, 22) },
+            { l: 'Price', v: `${fp.toLocaleString()} DZD` },
+            { l: 'Quantity', v: `× ${fd.quantity}` },
+            { l: 'Delivery', v: selW ? `${getLiv().toLocaleString()} DZD` : '—' },
           ].map(row => (
             <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 14px', borderBottom: '1px solid var(--line)' }}>
               <span style={{ fontSize: '12px', color: 'var(--mid)' }}>{row.l}</span>
@@ -1310,20 +1310,20 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
           ))}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '12px 14px', background: 'rgba(0,212,255,0.04)' }}>
-            <span style={{ fontSize: '12px', color: 'var(--mid)' }}>المجموع</span>
+            <span style={{ fontSize: '12px', color: 'var(--mid)' }}>Total</span>
             <span className="neon-cyan orb" style={{ fontSize: '1.6rem', fontWeight: 900, letterSpacing: '-0.01em', textShadow: '0 0 12px rgba(0,212,255,0.6)' }}>
-              {total().toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '12px', color: 'var(--mid)' }}>دج</span>
+              {total().toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '12px', color: 'var(--mid)' }}>DZD</span>
             </span>
           </div>
         </div>
 
         <button type="submit" disabled={sub} className="btn-cyan"
           style={{ width: '100%', justifyContent: 'center', fontSize: '15px', padding: '13px', cursor: sub ? 'not-allowed' : 'pointer', opacity: sub ? 0.7 : 1, clipPath: 'none', borderRadius: '6px' }}>
-          {sub ? '⚡ جاري المعالجة...' : '✅ تأكيد الطلب'}
+          {sub ? '⚡ Processing...' : '✅ Place Order'}
         </button>
 
         <p style={{ fontSize: '11px', color: 'var(--dim)', textAlign: 'center', marginTop: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
-          <Lock style={{ width: '10px', height: '10px', color: 'var(--cyan)' }} /> دفع آمن ومشفر
+          <Lock style={{ width: '10px', height: '10px', color: 'var(--cyan)' }} /> Secure & Encrypted Payment
         </p>
       </form>
     </div>
@@ -1337,7 +1337,7 @@ export function StaticPage({ page }: { page: string }) {
 }
 
 const Shell = ({ children, title, sub }: { children: React.ReactNode; title: string; sub?: string }) => (
-  <div dir="rtl" style={{ backgroundColor: 'var(--navy)', minHeight: '100vh' }} className="hex-bg">
+  <div dir="ltr" style={{ backgroundColor: 'var(--navy)', minHeight: '100vh' }} className="hex-bg">
     <div style={{ background: 'linear-gradient(135deg,var(--navy-2),var(--navy-3))', padding: '72px 20px 48px', borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }} className="circuit-bg">
       <div style={{ maxWidth: '760px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
         {sub && <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--pink)', marginBottom: '10px', textTransform: 'uppercase' }}>{sub}</p>}
@@ -1369,37 +1369,37 @@ const IB = ({ title, body, tag }: { title: string; body: string; tag?: string })
 
 export function Privacy() {
   return (
-    <Shell title="سياسة الخصوصية" sub="// قانوني">
-      <IB title="البيانات التي نجمعها" body="فقط اسمك ورقم هاتفك وعنوان التوصيل — ما هو ضروري لمعالجة طلبك." />
-      <IB title="كيف نستخدمها" body="حصرياً لتنفيذ وتوصيل مشترياتك." />
-      <IB title="الأمان" body="بياناتك محمية بتشفير على مستوى المؤسسات." />
-      <IB title="مشاركة البيانات" body="لا نبيع البيانات أبداً. تُشارك فقط مع شركاء التوصيل الموثوقين." />
-      <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--dim)', marginTop: '16px', letterSpacing: '0.12em' }}>// آخر تحديث: فبراير 2026</p>
+    <Shell title="Privacy Policy" sub="// Legal">
+      <IB title="Data We Collect" body="Only your name, phone number, and delivery address — the minimum needed to process your order." />
+      <IB title="How We Use It" body="Exclusively to fulfill and deliver your purchases." />
+      <IB title="Security" body="Your data is protected with enterprise-grade encryption." />
+      <IB title="Data Sharing" body="We never sell data. Shared only with trusted delivery partners." />
+      <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--dim)', marginTop: '16px', letterSpacing: '0.12em' }}>// Last updated: February 2026</p>
     </Shell>
   );
 }
 
 export function Terms() {
   return (
-    <Shell title="شروط الاستخدام" sub="// قانوني">
-      <IB title="حسابك" body="أنت مسؤول عن أمان بيانات تسجيل الدخول وكل النشاط تحت حسابك." />
-      <IB title="المدفوعات" body="لا رسوم مخفية. السعر المعروض هو السعر النهائي." />
-      <IB title="الاستخدام المحظور" body="المنتجات الأصيلة فقط. لا مجال للمنتجات المقلدة." tag="صارم" />
-      <IB title="القانون الحاكم" body="تخضع هذه الشروط لقوانين جمهورية الجزائر الديمقراطية الشعبية." />
+    <Shell title="Terms of Use" sub="// Legal">
+      <IB title="Your Account" body="You are responsible for the security of your login credentials and all activity under your account." />
+      <IB title="Payments" body="No hidden fees. The displayed price is the final price." />
+      <IB title="Prohibited Use" body="Authentic products only. No counterfeit goods." tag="Strict" />
+      <IB title="Governing Law" body="These terms are governed by the laws of the People's Democratic Republic of Algeria." />
     </Shell>
   );
 }
 
 export function Cookies() {
   return (
-    <Shell title="سياسة الكوكيز" sub="// قانوني">
-      <IB title="الكوكيز الأساسية" body="ضرورية للجلسات والسلة والدفع. لا يمكن تعطيلها." tag="مطلوب" />
-      <IB title="كوكيز التفضيلات" body="تحفظ إعداداتك لتجربة أفضل." tag="اختياري" />
-      <IB title="كوكيز التحليلات" body="بيانات مجمعة ومجهولة لتحسين المنصة." tag="اختياري" />
+    <Shell title="Cookie Policy" sub="// Legal">
+      <IB title="Essential Cookies" body="Required for sessions, cart, and checkout. Cannot be disabled." tag="Required" />
+      <IB title="Preference Cookies" body="Save your settings for a better experience." tag="Optional" />
+      <IB title="Analytics Cookies" body="Aggregated and anonymized data to improve the platform." tag="Optional" />
       <div style={{ marginTop: '16px', padding: '14px', border: '1px solid var(--line)', borderRadius: '6px', display: 'flex', gap: '10px', alignItems: 'flex-start', background: 'rgba(0,212,255,0.03)' }}>
         <ToggleRight style={{ width: '18px', height: '18px', color: 'var(--cyan)', flexShrink: 0, marginTop: '1px' }} />
         <p style={{ fontSize: '13px', color: 'var(--mid)', lineHeight: '1.8', margin: 0 }}>
-          يمكنك إدارة تفضيلات الكوكيز من إعدادات المتصفح.
+          You can manage cookie preferences in your browser settings.
         </p>
       </div>
     </Shell>
@@ -1410,16 +1410,16 @@ export function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [sent, setSent] = useState(false);
   return (
-    <div dir="rtl" style={{ backgroundColor: 'var(--navy)', minHeight: '100vh' }} className="hex-bg">
+    <div dir="ltr" style={{ backgroundColor: 'var(--navy)', minHeight: '100vh' }} className="hex-bg">
       <div style={{ background: 'linear-gradient(135deg,var(--navy-2),var(--navy-3))', padding: '72px 20px 48px', borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }} className="circuit-bg">
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 30% 50%,rgba(0,212,255,0.06) 0%,transparent 60%)', pointerEvents: 'none' }} />
         <div style={{ maxWidth: '960px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
-          <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--pink)', marginBottom: '12px' }}>// تواصل</p>
+          <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--pink)', marginBottom: '12px' }}>// Contact</p>
           <h1 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(2rem,6vw,4rem)', color: 'var(--white)', lineHeight: 1, margin: '0 0 14px' }}>
-            تواصل <span className="neon-cyan">معنا</span>
+            Contact <span className="neon-cyan">Us</span>
           </h1>
           <NeonDivider color="cyan" />
-          <p style={{ fontSize: '14px', color: 'var(--mid)', marginTop: '10px' }}>نرد خلال أقل من ساعتين 🎮</p>
+          <p style={{ fontSize: '14px', color: 'var(--mid)', marginTop: '10px' }}>We reply in Less Than 2 Hours 🎮</p>
         </div>
       </div>
 
@@ -1427,11 +1427,11 @@ export function Contact() {
         {/* Info */}
         <div>
           <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', padding: '24px', boxShadow: 'var(--glow-c)', marginBottom: '12px' }}>
-            <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '16px', textTransform: 'uppercase' }}>طرق التواصل</p>
+            <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '16px', textTransform: 'uppercase' }}>Contact Methods</p>
             {[
-              { icon: '📞', label: 'الهاتف', val: '+213 550 000 000', href: 'tel:+213550000000' },
-              { icon: '📍', label: 'الموقع', val: 'الجزائر بلدية اولاد فايت بلاطو قرب مسجد ابوبكر الصديق', href: undefined },
-              { icon: '🎮', label: 'المتجر', val: 'شامسو قيم — كل ما تحتاجه للعب الاحترافي', href: undefined },
+              { icon: '📞', label: 'Phone', val: '+213 550 000 000', href: 'tel:+213550000000' },
+              { icon: '📍', label: 'Location', val: 'Oued Fayet, Algiers, near Abu Bakr Mosque', href: undefined },
+              { icon: '🎮', label: 'Store', val: 'Chamsou Game — Everything You Need for Pro Gaming', href: undefined },
             ].map(item => (
               <a key={item.label} href={item.href || '#'} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '13px 0', borderBottom: '1px solid var(--line)', textDecoration: 'none', transition: 'padding-right 0.25s' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.paddingRight = '8px'; }}
@@ -1450,9 +1450,9 @@ export function Contact() {
           <div style={{ background: 'var(--panel)', border: '1px solid var(--cyan)', borderRadius: '8px', padding: '16px 20px', boxShadow: 'var(--glow-c)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--cyan)', animation: 'pulse-cyan 2s ease-in-out infinite' }} />
-              <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, color: 'var(--cyan)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>متصل الآن</span>
+              <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, color: 'var(--cyan)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>Connected Now</span>
             </div>
-            {[{ l: 'وقت الرد', v: 'أقل من ساعتين' }, { l: 'التوصيل', v: '58 ولاية' }].map(s => (
+            {[{ l: 'Response Time', v: 'Less Than 2 Hours' }, { l: 'Delivery', v: '58 Provinces' }].map(s => (
               <div key={s.l} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderTop: '1px solid var(--line)' }}>
                 <span style={{ fontSize: '12px', color: 'var(--mid)' }}>{s.l}</span>
                 <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--white)' }}>{s.v}</span>
@@ -1463,18 +1463,18 @@ export function Contact() {
 
         {/* Form */}
         <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', padding: '24px' }}>
-          <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '20px', textTransform: 'uppercase' }}>أرسل رسالة</p>
+          <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '20px', textTransform: 'uppercase' }}>Send Message</p>
           {sent ? (
             <div style={{ minHeight: '240px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--cyan)', borderRadius: '8px', textAlign: 'center', padding: '32px', boxShadow: 'var(--glow-c)', background: 'rgba(0,212,255,0.04)' }}>
               <CheckCircle2 style={{ width: '36px', height: '36px', color: 'var(--cyan)', marginBottom: '12px' }} />
-              <h3 className="orb" style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--white)', margin: '0 0 8px' }}>تم إرسال رسالتك!</h3>
-              <p style={{ fontSize: '13px', color: 'var(--mid)' }}>سنرد عليك في أقل من ساعتين 🎮</p>
+              <h3 className="orb" style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--white)', margin: '0 0 8px' }}>Your Message Was Sent!</h3>
+              <p style={{ fontSize: '13px', color: 'var(--mid)' }}>We'll reply in Less Than 2 Hours 🎮</p>
             </div>
           ) : (
             <form onSubmit={e => { e.preventDefault(); setSent(true); }} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {[
-                { label: 'اسمك', type: 'text', key: 'name', ph: 'الاسم الكامل' },
-                { label: 'البريد الإلكتروني', type: 'email', key: 'email', ph: 'بريدك@الإلكتروني' },
+                { label: 'Your Name', type: 'text', key: 'name', ph: 'Full Name' },
+                { label: 'Email Address', type: 'email', key: 'email', ph: 'your@email.com' },
               ].map(f => (
                 <div key={f.key}>
                   <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.16em', color: 'var(--cyan)', marginBottom: '6px', textTransform: 'uppercase' }}>{f.label}</p>
@@ -1484,14 +1484,14 @@ export function Contact() {
                 </div>
               ))}
               <div>
-                <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.16em', color: 'var(--cyan)', marginBottom: '6px', textTransform: 'uppercase' }}>رسالتك</p>
-                <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder="كيف يمكننا مساعدتك؟" rows={4} required className="inp"
+                <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.16em', color: 'var(--cyan)', marginBottom: '6px', textTransform: 'uppercase' }}>Your Message</p>
+                <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder="How can we help you?" rows={4} required className="inp"
                   style={{ resize: 'none' as any }}
                   onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; e.target.style.boxShadow = '0 0 0 3px rgba(0,212,255,0.15)'; }}
                   onBlur={e => { e.target.style.borderColor = 'var(--dim)'; e.target.style.boxShadow = 'none'; }} />
               </div>
               <button type="submit" className="btn-cyan" style={{ justifyContent: 'center', width: '100%', clipPath: 'none', borderRadius: '6px', fontSize: '14px', padding: '13px' }}>
-                إرسال الرسالة <ArrowRight style={{ width: '14px', height: '14px' }} />
+                Send Message <ArrowRight style={{ width: '14px', height: '14px' }} />
               </button>
             </form>
           )}

@@ -115,9 +115,9 @@ export function Navbar({ store }: { store: Store }) {
   }, []);
 
   const navItems = [
-    { href: `/${store.subdomain}`,         label: isRTL ? 'الرئيسية'       : 'Home'    },
-    { href: `/${store.subdomain}/contact`, label: isRTL ? 'اتصل بنا'       : 'Contact' },
-    { href: `/${store.subdomain}/Privacy`, label: isRTL ? 'سياسة الخصوصية' : 'Privacy' },
+    { href: `/`,         label: isRTL ? 'Home'       : 'Home'    },
+    { href: `/contact`,  label: isRTL ? 'Contact Us'       : 'Contact' },
+    { href: `/Privacy`,  label: isRTL ? 'Privacy Policy' : 'Privacy' },
   ];
 
   return (
@@ -130,7 +130,7 @@ export function Navbar({ store }: { store: Store }) {
         <div className="flex justify-between items-center h-16">
 
           {/* Logo */}
-          <Link href={`/${store.subdomain}`} className="flex items-center gap-3 group">
+          <Link href="/" className="flex items-center gap-3 group">
             {store.design.logoUrl ? (
               <img src={store.design.logoUrl} alt={store.name} className="h-8 w-auto object-contain opacity-90" />
             ) : (
@@ -214,11 +214,10 @@ export function Footer({ store }: any) {
           </div>
 
           <div className="flex items-center gap-8">
-            {/* FIX — 'Cookise' corrigé en 'Cookies' */}
             {[
-              { href: `/${store.subdomain}/Privacy`, label: 'Privacy' },
-              { href: `/${store.subdomain}/Terms`,   label: 'Terms'   },
-              { href: `/${store.subdomain}/Cookies`, label: 'Cookies' },
+              { href: `/Privacy`, label: 'Privacy' },
+              { href: `/Terms`,   label: 'Terms'   },
+              { href: `/Cookies`, label: 'Cookies' },
             ].map(link => (
               <a
                 key={link.href}
@@ -267,7 +266,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
             <span className="text-xs tracking-[0.15em] uppercase text-[#B0ABA5]">
-              {isRTL ? 'لا توجد صورة' : 'No Image'}
+              {isRTL ? 'No image' : 'No Image'}
             </span>
           </div>
         )}
@@ -312,7 +311,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
           </div>
 
           <Link
-            href={`/${store.subdomain}/product/${product.slug || product.id}`}
+            href={`/product/${product.slug || product.id}`}
             className="block w-full py-3 text-center text-xs tracking-[0.18em] uppercase font-medium border border-[#1C1C1C] text-[#1C1C1C] hover:bg-[#1C1C1C] hover:text-[#FAFAF8] transition-all duration-300"
           >
             {viewDetails}
@@ -332,14 +331,14 @@ export const Home = ({ store }: any) => {
   const dir   = isRTL ? 'rtl' : 'ltr';
 
   const t = {
-    categories:       isRTL ? 'التصنيفات'                    : 'Collections',
-    noCategories:     isRTL ? 'لا توجد تصنيفات'              : 'No Collections',
-    noCategoriesDesc: isRTL ? 'لم يتم إضافة أي تصنيفات بعد'  : 'No collections have been added yet',
-    products:         isRTL ? 'المنتجات'                     : 'Products',
-    noProducts:       isRTL ? 'لا توجد منتجات'               : 'No Products',
-    noProductsDesc:   isRTL ? 'لم يتم إضافة أي منتجات بعد'   : 'No products have been added yet',
-    viewDetails:      isRTL ? 'عرض التفاصيل'                 : 'View Details',
-    all:              isRTL ? 'الكل'                          : 'All',
+    categories:       isRTL ? 'Categories'                    : 'Collections',
+    noCategories:     isRTL ? 'No categories'              : 'No Collections',
+    noCategoriesDesc: isRTL ? 'No categories added yet'  : 'No collections have been added yet',
+    products:         isRTL ? 'Products'                     : 'Products',
+    noProducts:       isRTL ? 'No products'               : 'No Products',
+    noProductsDesc:   isRTL ? 'No products added yet'   : 'No products have been added yet',
+    viewDetails:      isRTL ? 'View Details'                 : 'View Details',
+    all:              isRTL ? 'All'                          : 'All',
   };
 
   return (
@@ -411,7 +410,7 @@ export const Home = ({ store }: any) => {
           {store.categories && store.categories.length > 0 ? (
             <div className="flex flex-wrap gap-3 justify-center">
               <Link
-                href={`/${store.subdomain}`}
+                href="/"
                 className="px-7 py-2.5 border border-[#1C1C1C] text-[#1C1C1C] text-xs tracking-[0.15em] uppercase hover:bg-[#1C1C1C] hover:text-[#FAFAF8] transition-all duration-300 font-medium"
               >
                 {t.all}
@@ -419,7 +418,7 @@ export const Home = ({ store }: any) => {
               {store.categories.map((cat: any) => (
                 <Link
                   key={cat.id}
-                  href={`/${store.subdomain}?category=${cat.id}`}
+                  href={`/?category=${cat.id}`}
                   className="px-7 py-2.5 border border-[#E4E0DB] text-[#5A5753] text-xs tracking-[0.15em] uppercase hover:border-[#1C1C1C] hover:text-[#1C1C1C] transition-all duration-300 font-medium"
                 >
                   {cat.name}
@@ -494,12 +493,12 @@ export function Details({
   const [selectedImage,  setSelectedImage]  = useState(0);
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8]" dir="rtl" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+    <div className="min-h-screen bg-[#FAFAF8]" dir="ltr" style={{ fontFamily: "'DM Sans', sans-serif" }}>
       <style>{FONT_IMPORT}</style>
 
       {showShareToast && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[#1C1C1C] text-[#FAFAF8] px-5 py-2.5 text-xs tracking-[0.1em] flex items-center gap-2 shadow-lg">
-          <Link2 className="w-3.5 h-3.5" /> تم نسخ الرابط
+          <Link2 className="w-3.5 h-3.5" /> Link Copied
         </div>
       )}
 
@@ -507,9 +506,7 @@ export function Details({
       <header className="border-b border-[#E4E0DB] bg-[#FAFAF8]/95 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between">
           <nav className="flex items-center gap-2 text-xs text-[#B0ABA5] tracking-[0.1em]">
-            <span className="hover:text-[#1C1C1C] cursor-pointer transition-colors uppercase">الرئيسية</span>
-            <ChevronLeft className="w-3 h-3" />
-            <span className="hover:text-[#1C1C1C] cursor-pointer transition-colors uppercase">المنتجات</span>
+            <Link href="/" className="hover:text-[#1C1C1C] cursor-pointer transition-colors uppercase">Home</Link>
             <ChevronLeft className="w-3 h-3" />
             <span className="text-[#1C1C1C] truncate max-w-[160px]">{product.name}</span>
           </nav>
@@ -524,7 +521,7 @@ export function Details({
               <Share2 className="w-4 h-4" />
             </button>
             <div className={`text-[10px] tracking-[0.15em] uppercase px-3 py-1 ${inStock ? 'bg-[#1C1C1C] text-[#FAFAF8]' : 'border border-[#E4E0DB] text-[#8A8580]'}`}>
-              {inStock ? 'متوفر' : 'نفد المخزون'}
+              {inStock ? 'Available' : 'Out of Stock'}
             </div>
           </div>
         </div>
@@ -565,7 +562,7 @@ export function Details({
               {!inStock && !autoGen && (
                 <div className="absolute inset-0 bg-[#FAFAF8]/80 backdrop-blur-sm flex items-center justify-center">
                   <div className="bg-[#1C1C1C] text-[#FAFAF8] px-6 py-3 text-xs tracking-[0.15em] uppercase">
-                    نفذت الكمية
+                    Out of Stock
                   </div>
                 </div>
               )}
@@ -624,7 +621,7 @@ export function Details({
                     <Star key={i} className={`w-3.5 h-3.5 ${i < 4 ? 'fill-[#1C1C1C] text-[#1C1C1C]' : 'fill-[#E4E0DB] text-[#E4E0DB]'}`} />
                   ))}
                 </div>
-                <span className="text-xs text-[#B0ABA5] tracking-wider">١٢٨ تقييم</span>
+                <span className="text-xs text-[#B0ABA5] tracking-wider">128 Reviews</span>
               </div>
             </div>
 
@@ -637,12 +634,12 @@ export function Details({
                 >
                   {finalPrice.toLocaleString('ar-DZ')}
                 </span>
-                <span className="text-sm text-[#8A8580] tracking-wider">دج</span>
+                <span className="text-sm text-[#8A8580] tracking-wider">DZD</span>
                 {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
                   <div>
-                    <span className="text-sm text-[#B0ABA5] line-through">{parseFloat(product.priceOriginal).toLocaleString('ar-DZ')} دج</span>
+                    <span className="text-sm text-[#B0ABA5] line-through">{parseFloat(product.priceOriginal).toLocaleString('ar-DZ')} DZD</span>
                     <p className="text-xs text-[#8A8580] mt-0.5 tracking-wide">
-                      وفّر {(parseFloat(product.priceOriginal) - finalPrice).toLocaleString('ar-DZ')} دج
+                      Save {(parseFloat(product.priceOriginal) - finalPrice).toLocaleString('ar-DZ')} DZD
                     </p>
                   </div>
                 )}
@@ -652,13 +649,13 @@ export function Details({
             {/* Stock */}
             <div className={`inline-flex items-center gap-2 text-xs tracking-[0.15em] uppercase px-3 py-1.5 ${autoGen ? 'bg-[#1C1C1C] text-[#FAFAF8]' : inStock ? 'bg-[#1C1C1C] text-[#FAFAF8]' : 'border border-[#E4E0DB] text-[#8A8580]'}`}>
               {autoGen ? <Infinity className="w-3.5 h-3.5" /> : inStock ? <span className="w-1.5 h-1.5 bg-current rounded-full" /> : <X className="w-3.5 h-3.5" />}
-              {autoGen ? 'متوفر دائماً' : inStock ? 'متوفر' : 'غير متوفر'}
+              {autoGen ? 'Always Available' : inStock ? 'Available' : 'Unavailable'}
             </div>
 
             {/* Offers */}
             {product.offers?.length > 0 && (
               <div>
-                <p className="text-[10px] tracking-[0.2em] uppercase text-[#8A8580] mb-4">العروض المتاحة</p>
+                <p className="text-[10px] tracking-[0.2em] uppercase text-[#8A8580] mb-4">Available Offers</p>
                 <div className="space-y-2">
                   {product.offers.map((offer: any) => (
                     <label
@@ -672,11 +669,11 @@ export function Details({
                         <input type="radio" name="offer" value={offer.id} checked={selectedOffer === offer.id} onChange={() => setSelectedOffer(offer.id)} className="sr-only" />
                         <div>
                           <p className="text-sm font-medium">{offer.name}</p>
-                          <p className={`text-xs ${selectedOffer === offer.id ? 'text-white/60' : 'text-[#8A8580]'}`}>{offer.quantity} قطع</p>
+                          <p className={`text-xs ${selectedOffer === offer.id ? 'text-white/60' : 'text-[#8A8580]'}`}>{offer.quantity} pcs</p>
                         </div>
                       </div>
                       <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.2rem', fontWeight: 300 }}>
-                        {offer.price.toLocaleString('ar-DZ')} <span className="text-xs">دج</span>
+                        {offer.price.toLocaleString('ar-DZ')} <span className="text-xs">DZD</span>
                       </span>
                     </label>
                   ))}
@@ -752,11 +749,7 @@ export function Details({
         {product.desc && (
           <section className="mt-20 pt-14 border-t border-[#E4E0DB]">
             <div className="flex items-center gap-5 mb-8">
-              <h2
-                className="text-xs tracking-[0.2em] uppercase text-[#8A8580]"
-              >
-                وصف المنتج
-              </h2>
+              <h2 className="text-xs tracking-[0.2em] uppercase text-[#8A8580]">Product Description</h2>
             </div>
             <div
               className="text-sm leading-relaxed text-[#5A5753] font-light"
@@ -815,7 +808,6 @@ export function ProductForm({
 
   useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
 
-  // FIX — SSR guard pour localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const id = localStorage.getItem('customerId');
@@ -852,10 +844,10 @@ export function ProductForm({
 
   useEffect(() => {
     if (selectedWilayaData) setFormData(f => ({ ...f, priceLoss: selectedWilayaData.livraisonReturn }));
-  }, [selectedWilayaData, formData.typeLivraison]);
+  }, [selectedWilayaData]);
 
   const getTotalPrice = useCallback(
-    () => getFinalPrice() * formData.quantity + getPriceLivraison(),
+    () => getFinalPrice() * formData.quantity + +getPriceLivraison(),
     [getFinalPrice, formData.quantity, getPriceLivraison],
   );
 
@@ -867,12 +859,12 @@ export function ProductForm({
   const validate = useCallback((): boolean => {
     const e: Record<string, string> = {};
     if (!formData.customerName.trim() || formData.customerName.length < 3)
-      e.customerName  = 'الاسم الكامل مطلوب (3 أحرف على الأقل)';
+      e.customerName  = 'Full name required (at least 3 characters)';
     if (!/^(0|\+213)[5-7][0-9]{8}$/.test(formData.customerPhone.replace(/\s/g, '')))
-      e.customerPhone = 'رقم هاتف جزائري صحيح مطلوب';
-    if (!formData.customerWelaya)  e.customerWelaya  = 'اختر الولاية';
-    if (!formData.customerCommune) e.customerCommune = 'اختر البلدية';
-    if (formData.quantity < 1)     e.quantity        = 'الكمية يجب أن تكون 1 على الأقل';
+      e.customerPhone = 'Valid Algerian phone number required';
+    if (!formData.customerWelaya)  e.customerWelaya  = 'Select Province';
+    if (!formData.customerCommune) e.customerCommune = 'Select Municipality';
+    if (formData.quantity < 1)     e.quantity        = 'Quantity must be at least 1';
     setFormErrors(e);
     return Object.keys(e).length === 0;
   }, [formData]);
@@ -881,31 +873,34 @@ export function ProductForm({
     e.preventDefault();
     if (!validate()) return;
     setSubmitting(true);
+    const payload = {
+      productId:         product.id,
+      variantDetailId:   getVariantDetailId(),
+      domain,
+      storeId:           product.store.id,
+      offerId:           selectedOffer ?? undefined,
+      platform,
+      quantity:          formData.quantity,
+      totalPrice:        getTotalPrice(),
+      typeShip:          formData.typeLivraison,
+      priceShip:         getPriceLivraison(),
+      priceLoss:         formData.priceLoss,
+      customerId:        formData.customerId,
+      customerName:      formData.customerName,
+      customerPhone:     formData.customerPhone,
+      customerWilayaId:  formData.customerWelaya,
+      customerCommuneId: formData.customerCommune,
+    };
+
     try {
-      const res = await axios.post(`${API_URL}/orders`, {
-        productId:         product.id,
-        variantDetailId:   getVariantDetailId(),
-        domain,
-        offerId:           selectedOffer ?? undefined,
-        platform,
-        quantity:          formData.quantity,
-        totalPrice:        getTotalPrice(),
-        typeShip:          formData.typeLivraison,
-        priceShip:         getPriceLivraison(),
-        priceLoss:         formData.priceLoss,
-        customerId:        formData.customerId,
-        customerName:      formData.customerName,
-        customerPhone:     formData.customerPhone,
-        customerWilayaId:  formData.customerWelaya,
-        customerCommuneId: formData.customerCommune,
-      });
+      const res = await axios.post(`${API_URL}/orders`, payload);
       if (res.status === 200 || res.status === 201) {
         if (typeof window !== 'undefined' && res.data?.customerId)
           localStorage.setItem('customerId', res.data.customerId);
-        router.push(`/successfully`);
+        router.push(`/${domain}/successfully`);
       }
     } catch {
-      alert('حدث خطأ في الاتصال بالخادم');
+      alert('A server connection error occurred');
     } finally {
       setSubmitting(false);
     }
@@ -918,25 +913,25 @@ export function ProductForm({
       <div className="px-6 py-5 border-b border-[#E4E0DB] bg-[#F5F2EE]">
         <div className="flex items-center gap-2">
           <ShoppingCart className="w-4 h-4 text-[#5A5753]" />
-          <p className="text-xs tracking-[0.15em] uppercase text-[#1C1C1C] font-medium">تأكيد الطلب</p>
+          <p className="text-xs tracking-[0.15em] uppercase text-[#1C1C1C] font-medium">Place Order</p>
         </div>
-        <p className="text-xs text-[#8A8580] mt-1 font-light">سنتواصل معك خلال 24 ساعة لتأكيد طلبك</p>
+        <p className="text-xs text-[#8A8580] mt-1 font-light">We'll contact you within 24 hours to confirm your order</p>
       </div>
 
       <form onSubmit={handleSubmit} className="p-6 space-y-5">
 
         {/* Name + Phone */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FieldWrapper error={formErrors.customerName} label="الاسم الكامل">
+          <FieldWrapper error={formErrors.customerName} label="Full Name">
             <div className="relative">
               <User className="absolute right-3 top-3.5 w-4 h-4 text-[#B0ABA5]" />
-              <input type="text" value={formData.customerName} placeholder="محمد أحمد"
+              <input type="text" value={formData.customerName} placeholder="Mohamed Ahmed"
                 onChange={e => setFormData({ ...formData, customerName: e.target.value })}
                 className={`${inputCls(!!formErrors.customerName)} pr-10`} />
             </div>
           </FieldWrapper>
 
-          <FieldWrapper error={formErrors.customerPhone} label="رقم الهاتف">
+          <FieldWrapper error={formErrors.customerPhone} label="Phone Number">
             <div className="relative">
               <Phone className="absolute right-3 top-3.5 w-4 h-4 text-[#B0ABA5]" />
               <input type="tel" dir="ltr" value={formData.customerPhone} placeholder="0550 123 456"
@@ -948,20 +943,20 @@ export function ProductForm({
 
         {/* Wilaya + Commune */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FieldWrapper error={formErrors.customerWelaya} label="الولاية">
+          <FieldWrapper error={formErrors.customerWelaya} label="Province">
             <div className="relative">
               <MapPin className="absolute right-3 top-3.5 w-4 h-4 text-[#B0ABA5]" />
               <select value={formData.customerWelaya}
                 onChange={e => setFormData({ ...formData, customerWelaya: e.target.value, customerCommune: '' })}
                 className={`${inputCls(!!formErrors.customerWelaya)} pr-10 appearance-none cursor-pointer`}>
-                <option value="">اختر الولاية</option>
+                <option value="">Select Province</option>
                 {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
               </select>
               <ChevronDown className="absolute left-3 top-3.5 w-4 h-4 text-[#B0ABA5] pointer-events-none" />
             </div>
           </FieldWrapper>
 
-          <FieldWrapper error={formErrors.customerCommune} label="البلدية">
+          <FieldWrapper error={formErrors.customerCommune} label="Municipality">
             <div className="relative">
               <MapPin className="absolute right-3 top-3.5 w-4 h-4 text-[#B0ABA5]" />
               <select value={formData.customerCommune}
@@ -969,7 +964,7 @@ export function ProductForm({
                 onChange={e => setFormData({ ...formData, customerCommune: e.target.value })}
                 className={`${inputCls(!!formErrors.customerCommune)} pr-10 appearance-none cursor-pointer disabled:opacity-40`}>
                 <option value="">
-                  {loadingCommunes ? 'جاري التحميل...' : formData.customerWelaya ? 'اختر البلدية' : 'اختر الولاية أولاً'}
+                  {loadingCommunes ? 'Loading...' : formData.customerWelaya ? 'Select Municipality' : 'Select Province First'}
                 </option>
                 {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
@@ -978,9 +973,9 @@ export function ProductForm({
           </FieldWrapper>
         </div>
 
-        {/* Delivery type — FIX: HomeIcon au lieu de Home */}
+        {/* Delivery type */}
         <div>
-          <p className="text-[10px] tracking-[0.2em] uppercase text-[#8A8580] mb-3">نوع التوصيل</p>
+          <p className="text-[10px] tracking-[0.2em] uppercase text-[#8A8580] mb-3">Delivery Type</p>
           <div className="grid grid-cols-2 gap-3">
             {(['home', 'office'] as const).map(type => (
               <button
@@ -993,23 +988,23 @@ export function ProductForm({
                   : <Building2  className="w-5 h-5" />
                 }
                 <p className="text-[10px] tracking-[0.12em] uppercase font-medium">
-                  {type === 'home' ? 'توصيل للمنزل' : 'استلام من المكتب'}
+                  {type === 'home' ? 'Home Delivery' : 'Office Pickup'}
                 </p>
                 {selectedWilayaData && (
                   <p className={`text-xs ${formData.typeLivraison === type ? 'text-white/60' : 'text-[#B0ABA5]'}`}>
-                    {(type === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice).toLocaleString('ar-DZ')} دج
+                    {(type === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice).toLocaleString('ar-DZ')} DZD
                   </p>
                 )}
               </button>
             ))}
           </div>
           {!selectedWilayaData && (
-            <p className="text-[10px] text-[#B0ABA5] mt-2 text-center tracking-wider">اختر الولاية لعرض تكلفة التوصيل</p>
+            <p className="text-[10px] text-[#B0ABA5] mt-2 text-center tracking-wider">Select Province to see Delivery cost</p>
           )}
         </div>
 
         {/* Quantity */}
-        <FieldWrapper error={formErrors.quantity} label="الكمية">
+        <FieldWrapper error={formErrors.quantity} label="Quantity">
           <div className="flex items-center gap-4">
             <button type="button"
               onClick={() => setFormData(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
@@ -1027,14 +1022,14 @@ export function ProductForm({
               className="w-10 h-10 border border-[#E4E0DB] flex items-center justify-center text-[#5A5753] hover:border-[#1C1C1C] hover:bg-[#1C1C1C] hover:text-[#FAFAF8] transition-all font-light text-xl">
               +
             </button>
-            <span className="text-xs text-[#B0ABA5] tracking-wider uppercase">قطعة</span>
+            <span className="text-xs text-[#B0ABA5] tracking-wider uppercase">item(s)</span>
           </div>
         </FieldWrapper>
 
         {/* Summary */}
         <div className="bg-[#F5F2EE] p-5 space-y-3 text-xs border border-[#E4E0DB]">
           <div className="flex justify-between text-[#8A8580]">
-            <span className="flex items-center gap-1.5"><Package className="w-3.5 h-3.5" /> المنتج</span>
+            <span className="flex items-center gap-1.5"><Package className="w-3.5 h-3.5" /> Product</span>
             <span className="text-[#1C1C1C] font-medium truncate max-w-[50%]">{product.name}</span>
           </div>
 
@@ -1043,34 +1038,34 @@ export function ProductForm({
             if (!offer) return null;
             return (
               <div className="flex justify-between items-center text-[#8A8580]">
-                <span className="flex items-center gap-1.5"><Tag className="w-3.5 h-3.5" /> العرض</span>
+                <span className="flex items-center gap-1.5"><Tag className="w-3.5 h-3.5" /> Offer</span>
                 <span className="text-[#1C1C1C] font-medium tracking-wide">{offer.name}</span>
               </div>
             );
           })()}
 
           <div className="flex justify-between text-[#8A8580]">
-            <span className="flex items-center gap-1.5"><Truck className="w-3.5 h-3.5" /> التوصيل</span>
+            <span className="flex items-center gap-1.5"><Truck className="w-3.5 h-3.5" /> Delivery</span>
             <span className="text-[#1C1C1C]">
-              {formData.typeLivraison === 'home' ? 'المنزل' : 'المكتب'}
-              {selectedWilayaData && <span className="text-[#8A8580] mr-1">({getPriceLivraison().toLocaleString('ar-DZ')} دج)</span>}
+              {formData.typeLivraison === 'home' ? 'Home' : 'Office'}
+              {selectedWilayaData && <span className="text-[#8A8580] mr-1">({getPriceLivraison().toLocaleString('ar-DZ')} DZD)</span>}
             </span>
           </div>
 
           <div className="flex justify-between text-[#8A8580]">
-            <span>سعر القطعة</span>
-            <span className="text-[#1C1C1C] font-medium">{finalPrice.toLocaleString('ar-DZ')} دج</span>
+            <span>Unit Price</span>
+            <span className="text-[#1C1C1C] font-medium">{finalPrice.toLocaleString('ar-DZ')} DZD</span>
           </div>
           <div className="flex justify-between text-[#8A8580]">
-            <span>الكمية</span>
+            <span>Quantity</span>
             <span className="text-[#1C1C1C] font-medium">× {formData.quantity}</span>
           </div>
 
           <div className="flex justify-between items-baseline pt-4 border-t border-[#E4E0DB]">
-            <span className="text-xs tracking-[0.15em] uppercase text-[#1C1C1C] font-medium">الإجمالي</span>
+            <span className="text-xs tracking-[0.15em] uppercase text-[#1C1C1C] font-medium">Total</span>
             <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2rem', fontWeight: 300, color: '#1C1C1C' }}>
               {getTotalPrice().toLocaleString('ar-DZ')}
-              <span className="text-sm mr-1 text-[#8A8580]">دج</span>
+              <span className="text-sm mr-1 text-[#8A8580]">DZD</span>
             </span>
           </div>
         </div>
@@ -1081,13 +1076,13 @@ export function ProductForm({
           className={`w-full py-4 text-xs tracking-[0.2em] uppercase font-medium transition-all flex items-center justify-center gap-2 ${submitting ? 'bg-[#5A5753] text-[#FAFAF8] cursor-not-allowed' : 'bg-[#1C1C1C] text-[#FAFAF8] hover:bg-[#3A3A3A]'}`}
         >
           {submitting
-            ? <><div className="w-4 h-4 border border-white/40 border-t-white rounded-full animate-spin" /> جاري الإرسال...</>
-            : <><ShoppingCart className="w-4 h-4" /> تأكيد الطلب</>
+            ? <><div className="w-4 h-4 border border-white/40 border-t-white rounded-full animate-spin" /> Processing...</>
+            : <><ShoppingCart className="w-4 h-4" /> Place Order</>
           }
         </button>
 
         <p className="text-[10px] text-center text-[#B0ABA5] flex items-center justify-center gap-1.5 tracking-wider uppercase">
-          <Shield className="w-3 h-3" /> بياناتك آمنة ومشفرة
+          <Shield className="w-3 h-3" /> Your data is secure and encrypted
         </p>
       </form>
     </div>
@@ -1107,7 +1102,6 @@ export function StaticPage({ page }: StaticPageProps) {
     <>
       {p === 'privacy' && <Privacy />}
       {p === 'terms'   && <Terms />}
-      {/* FIX — 'cookise' corrigé en 'cookies' */}
       {p === 'cookies' && <Cookies />}
       {p === 'contact' && <Contact />}
     </>
@@ -1119,7 +1113,7 @@ function PageWrapper({ children, icon, title, subtitle, tag }: {
   title: string; subtitle: string; tag?: string;
 }) {
   return (
-    <div className="min-h-screen bg-[#FAFAF8] py-24" dir="rtl" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+    <div className="min-h-screen bg-[#FAFAF8] py-24" dir="ltr" style={{ fontFamily: "'DM Sans', sans-serif" }}>
       <style>{FONT_IMPORT}</style>
       <div className="max-w-3xl mx-auto px-6 lg:px-10">
         <div className="mb-16">
@@ -1142,7 +1136,7 @@ function PageWrapper({ children, icon, title, subtitle, tag }: {
 }
 
 function InfoCard({ icon, title, desc, status }: CardProps) {
-  const isActive = status === 'دائماً نشطة';
+  const isActive = status === 'Always Active';
   return (
     <div className="border-t border-[#E4E0DB] py-7 flex gap-6 group hover:bg-[#F5F2EE] transition-colors duration-200 px-1">
       <div className="text-[#8A8580] mt-0.5 shrink-0 group-hover:text-[#1C1C1C] transition-colors">{icon}</div>
@@ -1168,17 +1162,17 @@ function InfoCard({ icon, title, desc, status }: CardProps) {
 
 export function Privacy() {
   return (
-    <PageWrapper icon={<ShieldCheck size={18} />} title="سياسة الخصوصية" subtitle="في MdStore، نضع خصوصية بياناتك وأمان متجرك على رأس أولوياتنا." tag="Privacy">
+    <PageWrapper icon={<ShieldCheck size={18} />} title="Privacy Policy" subtitle="At MdStore, your data privacy and store security are our top priorities." tag="Privacy">
       <div className="mb-2">
-        <InfoCard icon={<Database size={16} />} title="البيانات التي نجمعها"   desc="نجمع فقط البيانات الضرورية لتشغيل متجرك، مثل الاسم، البريد الإلكتروني، ومعلومات الدفع." />
-        <InfoCard icon={<Eye size={16} />}      title="كيفية استخدام البيانات" desc="تُستخدم بياناتك لتحسين خدماتنا، ومعالجة الطلبات، وتوفير تقارير ذكية." />
-        <InfoCard icon={<Lock size={16} />}     title="حماية المعلومات"         desc="نستخدم تقنيات تشفير متطورة ومعايير أمان عالمية لحماية بياناتك من أي وصول غير مصرح به." />
-        <InfoCard icon={<Globe size={16} />}    title="مشاركة البيانات"          desc="نحن لا نبيع بياناتك أبداً. نشاركها فقط مع مزودي الخدمات الموثوقين لإتمام عملياتك." />
+        <InfoCard icon={<Database size={16} />} title="Data We Collect"   desc="We collect only the data necessary to run your store, such as name, email, and payment information." />
+        <InfoCard icon={<Eye size={16} />}      title="How We Use Your Data" desc="Your data is used to improve our services, process orders, and provide smart reports." />
+        <InfoCard icon={<Lock size={16} />}     title="Information Protection"         desc="We use advanced encryption technologies and international security standards to protect your data from unauthorized access." />
+        <InfoCard icon={<Globe size={16} />}    title="Data Sharing"          desc="We never sell your data. We share it only with trusted service providers to complete your transactions." />
       </div>
       <div className="mt-10 flex items-center justify-between py-5 border-t border-b border-[#E4E0DB]">
         <div className="flex items-center gap-3">
           <Bell size={14} className="text-[#B0ABA5]" />
-          <span className="text-xs text-[#8A8580] tracking-wide">يتم تحديث هذه السياسة دورياً لمواكبة أحدث معايير الأمان.</span>
+          <span className="text-xs text-[#8A8580] tracking-wide">This policy is periodically updated to keep up with the latest security standards.</span>
         </div>
         <span className="text-[10px] text-[#B0ABA5] tracking-[0.1em] shrink-0 mr-4">06/02/2026</span>
       </div>
@@ -1188,17 +1182,17 @@ export function Privacy() {
 
 export function Terms() {
   return (
-    <PageWrapper icon={<FileText size={18} />} title="شروط الاستخدام" subtitle="باستخدامك لمنصة MdStore، فإنك توافق على الالتزام بالشروط والقواعد التالية." tag="Terms">
+    <PageWrapper icon={<FileText size={18} />} title="Terms of Use" subtitle="By using MdStore, you agree to comply with the following terms and rules." tag="Terms">
       <div className="mb-2">
-        <InfoCard icon={<CheckCircle2 size={16} />} title="مسؤولية الحساب"     desc="أنت مسؤول عن الحفاظ على سرية بيانات حسابك وعن جميع الأنشطة التي تحدث تحته." />
-        <InfoCard icon={<CreditCard size={16} />}   title="الرسوم والاشتراكات" desc="تخضع خدماتنا لرسوم اشتراك دورية. جميع الرسوم واضحة ولا توجد تكاليف مخفية." />
-        <InfoCard icon={<Ban size={16} />}           title="المحتوى المحظور"    desc="يُمنع استخدام المنصة لبيع سلع غير قانونية أو انتهاك حقوق الملكية الفكرية." />
-        <InfoCard icon={<Scale size={16} />}         title="القانون المعمول به" desc="تخضع هذه الشروط وفقاً للقوانين المحلية المعمول بها في الجزائر." />
+        <InfoCard icon={<CheckCircle2 size={16} />} title="Account Responsibility"     desc="You are responsible for maintaining the confidentiality of your account credentials and all activities under your account." />
+        <InfoCard icon={<CreditCard size={16} />}   title="Fees & Subscriptions" desc="Our services are subject to periodic subscription fees. All fees are transparent with no hidden costs." />
+        <InfoCard icon={<Ban size={16} />}           title="Prohibited Content"    desc="Using the platform to sell illegal goods or infringe intellectual property rights is prohibited." />
+        <InfoCard icon={<Scale size={16} />}         title="Applicable Law" desc="These terms are governed by the applicable local laws of Algeria." />
       </div>
       <div className="mt-10 py-5 border-t border-b border-[#E4E0DB] flex items-start gap-3">
         <AlertCircle size={14} className="text-[#B0ABA5] shrink-0 mt-0.5" />
         <p className="text-xs text-[#8A8580] leading-relaxed font-light">
-          نحتفظ بالحق في تعديل هذه الشروط في أي وقت. استمرار استخدامك للمنصة يعد موافقة على الشروط الجديدة.
+          We reserve the right to modify these Terms at any time. Continued use of the platform constitutes acceptance of the updated Terms.
         </p>
       </div>
     </PageWrapper>
@@ -1207,11 +1201,11 @@ export function Terms() {
 
 export function Cookies() {
   return (
-    <PageWrapper icon={<CookieIcon size={18} />} title="سياسة ملفات تعريف الارتباط" subtitle="نستخدم ملفات تعريف الارتباط لتحسين تجربتك وتخصيص المحتوى." tag="Cookies">
+    <PageWrapper icon={<CookieIcon size={18} />} title="Cookie Policy" subtitle="We use cookies to improve your experience and personalize content." tag="Cookies">
       <div className="mb-2">
-        <InfoCard icon={<ShieldCheck size={16} />}   title="ملفات ضرورية"    desc="مطلوبة لتشغيل الوظائف الأساسية للموقع مثل تسجيل الدخول وتأمين سلة التسوق." status="دائماً نشطة" />
-        <InfoCard icon={<Settings size={16} />}      title="ملفات التفضيلات" desc="تسمح للموقع بتذكر خياراتك مثل اللغة والمنطقة الزمنية." status="اختياري" />
-        <InfoCard icon={<MousePointer2 size={16} />} title="ملفات التحليل"   desc="تساعدنا على فهم كيفية تفاعل التجار مع MdStore لتطوير أدوات أكثر كفاءة." status="اختياري" />
+        <InfoCard icon={<ShieldCheck size={16} />}   title="Essential Cookies"    desc="Required for basic site functions such as login and cart security." status="Always Active" />
+        <InfoCard icon={<Settings size={16} />}      title="Preference Cookies" desc="Allow the site to remember your preferences such as language and timezone." status="Optional" />
+        <InfoCard icon={<MousePointer2 size={16} />} title="Analytics Cookies"   desc="Help us understand how merchants interact with MdStore to develop more efficient tools." status="Optional" />
       </div>
       <div className="mt-10 bg-[#1C1C1C] p-8 flex gap-5 items-start">
         <ToggleRight size={18} className="text-white/50 shrink-0 mt-0.5" />
@@ -1220,10 +1214,10 @@ export function Cookies() {
             className="text-white mb-2 font-light"
             style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.1rem', fontWeight: 400 }}
           >
-            كيف تتحكم في خياراتك؟
+            How Do You Control Your Preferences?
           </h3>
           <p className="text-white/50 text-sm leading-relaxed font-light">
-            يمكنك إدارة أو مسح ملفات تعريف الارتباط من خلال إعدادات متصفحك في أي وقت.
+            You can manage or delete Cookies through your browser settings at any time.
           </p>
         </div>
       </div>
@@ -1238,7 +1232,7 @@ export function Contact() {
     contact: {
       email:    'support@teststore.com',
       phone:    '+213550123456',
-      wilaya:   'الجزائر العاصمة',
+      wilaya:   'Algiers',
       facebook: 'https://facebook.com',
       whatsapp: '213550123456',
       tiktok:   'https://tiktok.com',
@@ -1262,16 +1256,16 @@ export function Contact() {
             className="text-[#1C1C1C] leading-tight"
             style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, letterSpacing: '-0.01em', fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}
           >
-            {isRTL ? 'تواصل معنا' : 'Get in Touch'}
+            {isRTL ? 'Contact Us' : 'Get in Touch'}
           </h1>
         </div>
 
         {/* Contact lines */}
         <div className="border-t border-[#E4E0DB]">
           {[
-            { label: isRTL ? 'البريد الإلكتروني' : 'Email', value: store.contact.email, href: `mailto:${store.contact.email}` },
-            { label: isRTL ? 'الهاتف' : 'Phone',             value: store.contact.phone,  href: `tel:${store.contact.phone}`,  dir: 'ltr' as const },
-            { label: isRTL ? 'الموقع' : 'Location',          value: store.contact.wilaya, href: undefined },
+            { label: isRTL ? 'Email Address' : 'Email', value: store.contact.email, href: `mailto:${store.contact.email}` },
+            { label: isRTL ? 'Phone' : 'Phone',             value: store.contact.phone,  href: `tel:${store.contact.phone}`,  dir: 'ltr' as const },
+            { label: isRTL ? 'Location' : 'Location',          value: store.contact.wilaya, href: undefined },
           ].map((item, i) => (
             item.href ? (
               <a key={i} href={item.href} dir={item.dir}
@@ -1290,12 +1284,12 @@ export function Contact() {
 
         {/* Socials */}
         <div className="mt-16">
-          <p className="text-xs tracking-[0.2em] uppercase text-[#8A8580] mb-8">{isRTL ? 'تواصل معنا' : 'Follow Us'}</p>
+          <p className="text-xs tracking-[0.2em] uppercase text-[#8A8580] mb-8">{isRTL ? 'Contact Us' : 'Follow Us'}</p>
           <div className="flex gap-4 flex-wrap">
             {[
-              { name: 'Facebook', href: store.contact.facebook,              icon: <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> },
+              { name: 'Facebook', href: store.contact.facebook,                   icon: <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> },
               { name: 'WhatsApp', href: `https://wa.me/${store.contact.whatsapp}`, icon: <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.94 3.675 1.438 5.662 1.439h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> },
-              { name: 'TikTok',   href: store.contact.tiktok,               icon: <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.06-2.89-.44-4.11-1.24-.03 2.15-.02 4.31-.02 6.46 0 1.19-.21 2.4-.78 3.46-.94 1.83-2.86 2.92-4.88 3.12-1.84.23-3.83-.24-5.26-1.48-1.57-1.32-2.3-3.43-1.95-5.44.25-1.58 1.15-3.05 2.51-3.9 1.14-.73 2.51-.99 3.84-.81v4.11c-.71-.12-1.47.05-2.05.5-.66.52-.96 1.4-.78 2.21.14.73.72 1.34 1.45 1.5.88.2 1.88-.16 2.37-.93.2-.34.28-.73.28-1.12V0l-.02.02z"/></svg> },
+              { name: 'TikTok',   href: store.contact.tiktok,                    icon: <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.06-2.89-.44-4.11-1.24-.03 2.15-.02 4.31-.02 6.46 0 1.19-.21 2.4-.78 3.46-.94 1.83-2.86 2.92-4.88 3.12-1.84.23-3.83-.24-5.26-1.48-1.57-1.32-2.3-3.43-1.95-5.44.25-1.58 1.15-3.05 2.51-3.9 1.14-.73 2.51-.99 3.84-.81v4.11c-.71-.12-1.47.05-2.05.5-.66.52-.96 1.4-.78 2.21.14.73.72 1.34 1.45 1.5.88.2 1.88-.16 2.37-.93.2-.34.28-.73.28-1.12V0l-.02.02z"/></svg> },
             ].map(s => (
               <a key={s.name} href={s.href} target="_blank" rel="noreferrer"
                 className="flex items-center gap-2.5 border border-[#E4E0DB] px-5 py-3 text-xs tracking-[0.12em] uppercase text-[#5A5753] hover:border-[#1C1C1C] hover:text-[#1C1C1C] transition-all duration-300">

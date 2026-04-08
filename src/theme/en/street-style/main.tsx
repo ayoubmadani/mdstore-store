@@ -6,981 +6,1247 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
-  Star, Heart, ChevronDown, ChevronLeft, ChevronRight,
-  AlertCircle, X, Infinity, Share2, MapPin, Phone,
-  User, ShieldCheck, Lock, Database, Globe, Bell,
+  ShoppingCart, MapPin, Phone, User,
+  Home as HomeIcon, ChevronDown, Truck, Shield, Package,
+  Building2, AlertCircle, Tag, Zap,
+  Check, ChevronLeft, ChevronRight, FileText, Heart,
+  Infinity, Link2, Share2, X,
+  ShieldCheck, Eye, Lock, Database, Globe, Bell,
   CheckCircle2, Scale, CreditCard, Ban,
   Cookie as CookieIcon, Settings, MousePointer2, ToggleRight,
-  Shield, ArrowRight, Plus, Minus, ArrowUpRight,
+  Cpu, Globe2, Mail,
 } from 'lucide-react';
 import { Store } from '@/types/store';
+
+// ─────────────────────────────────────────────────────────────
+// CONSTANTS & TYPES
+// ─────────────────────────────────────────────────────────────
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
 const FONT_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
-  *, *::before, *::after { box-sizing:border-box; -webkit-font-smoothing:antialiased; }
-
-  :root {
-    --paper:    #F2EFE8;
-    --paper-dk: #E8E4DB;
-    --ink:      #0A0906;
-    --ink-2:    #1A1714;
-    --ash:      #6B6560;
-    --mist:     #B8B2A8;
-    --punch:    #FF2D00;
-  }
-
-  ::-webkit-scrollbar { width:3px; }
-  ::-webkit-scrollbar-track { background:var(--paper); }
-  ::-webkit-scrollbar-thumb { background:var(--ink); }
-
-  /* ZINE GRID */
-  .zs { display:grid; }
-  .zs-half  { grid-template-columns:1fr 1fr; }
-  .zs-main  { grid-template-columns:58% 42%; }
-  .zs-flip  { grid-template-columns:42% 58%; }
-  .zs-third { grid-template-columns:1fr 1fr 1fr; }
-  .zs-wide  { grid-template-columns:1fr; }
-
-  @media (max-width:768px) {
-    .zs-main, .zs-flip, .zs-third { grid-template-columns:1fr 1fr; }
-  }
-  @media (max-width:480px) {
-    .zs-main, .zs-flip, .zs-third { grid-template-columns:1fr; }
-  }
-
-  .zc {
-    position:relative; overflow:hidden;
-    border:1px solid var(--ink); margin:-1px 0 0 -1px;
-    min-height:340px;
-  }
-  .zc-tall { min-height:520px; }
-  .zc img  { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.6s cubic-bezier(0.22,1,0.36,1); }
-  .zc:hover img { transform:scale(1.05); }
-
-  .issue-label {
-    writing-mode:vertical-rl; text-orientation:mixed; transform:rotate(180deg);
-    font-family:'Space Mono',monospace; font-size:8px; letter-spacing:0.24em;
-    text-transform:uppercase; color:rgba(242,239,232,0.45); user-select:none;
-  }
-
-  @keyframes ticker-run { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
-  .ticker-w { overflow:hidden; white-space:nowrap; }
-  .ticker-i { display:inline-block; animation:ticker-run 22s linear infinite; }
-
-  @keyframes menu-in  { from{opacity:0; clip-path:inset(0 0 100% 0)} to{opacity:1; clip-path:inset(0 0 0% 0)} }
-
-  @keyframes rise { from{opacity:0;transform:translateY(36px)} to{opacity:1;transform:translateY(0)} }
-  .rise   { animation:rise 0.8s cubic-bezier(0.22,1,0.36,1) both; }
-  .rise-1 { animation-delay:0.08s; }
-  .rise-2 { animation-delay:0.20s; }
-  .rise-3 { animation-delay:0.34s; }
-
-  .btn-z {
-    display:inline-flex; align-items:center; gap:8px;
-    background:var(--ink); color:var(--paper);
-    font-family:'Space Mono',monospace; font-weight:700;
-    font-size:10px; letter-spacing:0.18em; text-transform:uppercase;
-    padding:14px 28px; border:none; cursor:pointer; text-decoration:none;
-    clip-path:polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%);
-    transition:background 0.22s, transform 0.22s;
-  }
-  .btn-z:hover { background:var(--punch); transform:translateY(-2px); }
-
-  .sec-bar {
-    display:flex; align-items:center; justify-content:space-between;
-    padding:10px 20px; background:var(--ink);
-  }
-
-  .inp {
-    width:100%; padding:12px 14px;
-    background:var(--paper); border:1px solid var(--ink);
-    font-family:'Space Mono',monospace; font-size:11px; color:var(--ink);
-    outline:none; transition:box-shadow 0.2s;
-  }
-  .inp:focus { box-shadow:3px 3px 0 var(--punch); }
-  .inp::placeholder { color:var(--mist); }
-  .inp-err { border-color:var(--punch) !important; box-shadow:2px 2px 0 var(--punch) !important; }
-
-  .noise-ov::after {
-    content:''; position:absolute; inset:0; pointer-events:none; z-index:3;
-    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    mix-blend-mode:multiply; opacity:0.06;
-  }
-
-  /* ── RESPONSIVE LAYOUT CLASSES ── */
-  .nav-ticker  { flex:1; margin:0 32px; overflow:hidden; border-left:1px solid var(--ink); border-right:1px solid var(--ink); padding:0 16px; height:100%; display:flex; align-items:center; }
-  .stats-4     { display:grid; grid-template-columns:repeat(4,1fr); }
-  .details-split { display:grid; grid-template-columns:1fr 1fr; }
-  .details-img   { border-right:1px solid var(--ink); position:sticky; top:52px; height:calc(100vh - 52px); overflow:hidden; }
-  .details-info  { padding:28px 26px; overflow-y:auto; }
-  .contact-grid-z { display:grid; grid-template-columns:1fr 1fr; gap:36px; }
-  .form-2col-z    { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-  .delivery-cols  { display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--ink); }
-
-  @media (max-width: 900px) {
-    .details-split  { grid-template-columns:1fr; }
-    .details-img    { position:static; height:60vw; min-height:280px; border-right:none; border-bottom:1px solid var(--ink); }
-    .details-info   { padding:20px 16px; }
-    .contact-grid-z { grid-template-columns:1fr; gap:28px; }
-  }
-
-  @media (max-width: 640px) {
-    .nav-ticker  { display:none; }
-    .stats-4     { grid-template-columns:repeat(2,1fr); }
-    .zc          { min-height:240px; }
-    .zs-half     { grid-template-columns:1fr; }
-    .form-2col-z { grid-template-columns:1fr; }
-    .delivery-cols { grid-template-columns:1fr; }
-    .delivery-cols button:first-child { border-right:none; border-bottom:1px solid var(--ink); }
-  }
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap');
+  * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: #020810; }
+  ::-webkit-scrollbar-thumb { background: #00E5FF; }
+  @keyframes pulse-glow { 0%,100%{box-shadow:0 0 10px rgba(0,229,255,0.2)} 50%{box-shadow:0 0 25px rgba(0,229,255,0.5)} }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  @keyframes glow-pulse { 0%,100%{opacity:0.3} 50%{opacity:0.8} }
+  @keyframes data-in { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes data-scroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+  .hex-grid { background-image: linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.025) 1px, transparent 1px); background-size: 50px 50px; }
+  .neon-text { text-shadow: 0 0 20px rgba(0,229,255,0.5), 0 0 60px rgba(0,229,255,0.2); }
+  .stat-card { border: 1px solid #0D2030; transition: all 0.3s; }
+  .stat-card:hover { border-color: rgba(0,229,255,0.4); box-shadow: 0 0 20px rgba(0,229,255,0.06); }
+  .tech-nav-link { position: relative; }
+  .tech-nav-link::before { content:'['; opacity:0; transition:opacity 0.2s; margin-left:4px; color:#00E5FF; }
+  .tech-nav-link::after  { content:']'; opacity:0; transition:opacity 0.2s; margin-right:4px; color:#00E5FF; }
+  .tech-nav-link:hover::before, .tech-nav-link:hover::after { opacity:1; }
+  .corner-tl { border-top:1.5px solid #00E5FF; border-right:1.5px solid #00E5FF; width:8px; height:8px; position:absolute; top:-1px; right:-1px; }
+  .corner-br { border-bottom:1.5px solid #00E5FF; border-left:1.5px solid #00E5FF; width:8px; height:8px; position:absolute; bottom:-1px; left:-1px; }
 `;
 
-/* ── TYPES ─────────────────────────────────────────────────── */
-interface Offer     { id:string; name:string; quantity:number; price:number; }
-interface Variant   { id:string; name:string; value:string; }
-interface Attribute { id:string; type:string; name:string; displayMode?:'color'|'image'|'text'|null; variants:Variant[]; }
-interface ProductImage { id:string; imageUrl:string; }
-interface VariantAttributeEntry { attrId:string; attrName:string; displayMode:'color'|'image'|'text'; value:string; }
-interface VariantDetail { id:string|number; name:VariantAttributeEntry[]; price:number; stock:number; autoGenerate:boolean; }
-interface Wilaya  { id:string; name:string; ar_name:string; livraisonHome:number; livraisonOfice:number; livraisonReturn:number; }
-interface Commune { id:string; name:string; ar_name:string; wilayaId:string; }
-export interface Product {
-  id:string; name:string; price:string|number; priceOriginal?:string|number; desc?:string;
-  productImage?:string; imagesProduct?:ProductImage[]; offers?:Offer[]; attributes?:Attribute[];
-  variantDetails?:VariantDetail[]; stock?:number; isActive?:boolean;
-  store:{ id:string; name:string; subdomain:string; userId:string; };
-}
-export interface ProductFormProps {
-  product:Product; userId:string; domain:string; redirectPath?:string;
-  selectedOffer:string|null; setSelectedOffer:(id:string|null)=>void;
-  selectedVariants:Record<string,string>; platform?:string; priceLoss?:number;
-}
-function variantMatches(d:VariantDetail, sel:Record<string,string>): boolean {
-  return Object.entries(sel).every(([n,v])=>d.name.some(e=>e.attrName===n&&e.value===v));
-}
-const fetchWilayas  = async (uid:string): Promise<Wilaya[]>  => { try { const {data}=await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}`); return data||[]; } catch { return []; }};
-const fetchCommunes = async (wid:string): Promise<Commune[]> => { try { const {data}=await axios.get(`${API_URL}/shipping/get-communes/${wid}`); return data||[]; } catch { return []; }};
+interface Offer               { id: string; name: string; quantity: number; price: number; }
+interface Variant             { id: string; name: string; value: string; }
+interface Attribute           { id: string; type: string; name: string; displayMode?: 'color' | 'image' | 'text' | null; variants: Variant[]; }
+interface ProductImage        { id: string; imageUrl: string; }
+interface VariantAttributeEntry { attrId: string; attrName: string; displayMode: 'color' | 'image' | 'text'; value: string; }
+interface VariantDetail       { id: string | number; name: VariantAttributeEntry[]; price: number; stock: number; autoGenerate: boolean; }
+interface Wilaya              { id: string; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
+interface Commune             { id: string; name: string; ar_name: string; wilayaId: string; }
 
-/* ── FULL-SCREEN MENU ─────────────────────────────────────── */
-function MenuOverlay({ store, onClose }: { store:any; onClose:()=>void }) {
-  const isRTL = store.language === 'ar';
-  const links = [
-    { href:`/${store.subdomain}`,         ar:'الرئيسية', en:'HOME'    },
-    { href:`/${store.subdomain}/contact`, ar:'اتصل بنا', en:'CONTACT' },
-    { href:`/${store.subdomain}/Privacy`, ar:'الخصوصية', en:'PRIVACY' },
-    { href:`/${store.subdomain}/Terms`,   ar:'الشروط',   en:'TERMS'   },
-  ];
+export interface Product {
+  id: string; name: string; price: string | number;
+  priceOriginal?: string | number; desc?: string;
+  productImage?: string; imagesProduct?: ProductImage[];
+  offers?: Offer[]; attributes?: Attribute[];
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
+  store: { id: string; name: string; subdomain: string; userId: string; };
+}
+
+export interface ProductFormProps {
+  product:          Product;
+  userId:           string;
+  domain:           string;
+  redirectPath?:    string;
+  selectedOffer:    string | null;
+  setSelectedOffer: (id: string | null) => void;
+  selectedVariants: Record<string, string>;
+  platform?:        string;
+  priceLoss?:       number;
+}
+
+// ─────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────
+
+function variantMatches(detail: VariantDetail, sel: Record<string, string>): boolean {
+  return Object.entries(sel).every(([attrName, val]) =>
+    detail.name.some(e => e.attrName === attrName && e.value === val)
+  );
+}
+
+const fetchWilayas  = async (userId: string): Promise<Wilaya[]>   => { try { const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${userId}`); return data || []; } catch { return []; } };
+const fetchCommunes = async (wilayaId: string): Promise<Commune[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/get-communes/${wilayaId}`); return data || []; } catch { return []; } };
+
+// ─────────────────────────────────────────────────────────────
+// MAIN LAYOUT
+// ─────────────────────────────────────────────────────────────
+
+export default function Main({ store, children }: any) {
   return (
-    <div className="fixed inset-0 z-[200] flex flex-col"
-      style={{ background:'var(--ink)', animation:'menu-in 0.45s cubic-bezier(0.22,1,0.36,1) forwards' }}>
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 32px', borderBottom:'1px solid rgba(242,239,232,0.1)' }}>
-        <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'1rem', color:'var(--punch)', letterSpacing:'0.04em' }}>
-          {store.name.toUpperCase()}
-        </span>
-        <button onClick={onClose} style={{ width:'44px', height:'44px', display:'flex', alignItems:'center', justifyContent:'center', border:'1px solid rgba(242,239,232,0.2)', background:'transparent', color:'var(--paper)', cursor:'pointer' }}>
-          <X style={{ width:'18px', height:'18px' }}/>
-        </button>
-      </div>
-      <div style={{ flex:1, display:'flex', flexDirection:'column', justifyContent:'center', padding:'0 32px' }}>
-        {links.map((l, i) => (
-          <Link key={l.href} href={l.href} onClick={onClose}
-            style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 0', borderBottom:'1px solid rgba(242,239,232,0.07)', textDecoration:'none', transition:'padding-left 0.25s' }}
-            onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.paddingLeft='16px';}}
-            onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.paddingLeft='0';}}>
-            <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(2rem,7vw,5.5rem)', color:'var(--paper)', letterSpacing:'-0.02em', lineHeight:1 }}>
-              {isRTL ? l.ar : l.en}
-            </span>
-            <ArrowUpRight style={{ width:'28px', height:'28px', color:'var(--punch)', opacity:0.7 }}/>
-          </Link>
-        ))}
-      </div>
-      <div style={{ padding:'16px 32px', borderTop:'1px solid rgba(242,239,232,0.1)', display:'flex', justifyContent:'space-between' }}>
-        <span style={{ fontFamily:"'Space Mono',monospace", fontSize:'8px', letterSpacing:'0.2em', color:'rgba(242,239,232,0.25)' }}>
-          ZINE DROP · SS{new Date().getFullYear()} · ALGIERS
-        </span>
-        <span style={{ fontFamily:"'Space Mono',monospace", fontSize:'8px', letterSpacing:'0.2em', color:'var(--punch)' }}>
-          © {new Date().getFullYear()}
-        </span>
-      </div>
+    <div className="min-h-screen" style={{ backgroundColor: '#050B14', fontFamily: "'JetBrains Mono', monospace" }}>
+      <style>{FONT_CSS}</style>
+
+      {store.topBar?.enabled && store.topBar?.text && (
+        <div className="relative overflow-hidden py-2 px-4 text-center text-xs tracking-widest uppercase"
+          style={{ backgroundColor: '#000D1A', color: '#00E5FF', borderBottom: '1px solid rgba(0,229,255,0.2)', fontFamily: "'JetBrains Mono', monospace" }}>
+          <span className="mr-2" style={{ color: '#39FF14' }}>⚡</span>
+          {store.topBar.text}
+          <span className="ml-2" style={{ color: '#39FF14' }}>⚡</span>
+        </div>
+      )}
+
+      <Navbar store={store} />
+      <main>{children}</main>
+      <Footer store={store} />
     </div>
   );
 }
 
-/* ── MAIN ─────────────────────────────────────────────────── */
-export default function Main({ store, children }: any) {
-  const [menuOpen, setMenuOpen] = useState(false);
+// ─────────────────────────────────────────────────────────────
+// NAVBAR
+// ─────────────────────────────────────────────────────────────
+
+export function Navbar({ store }: { store: Store }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled,   setScrolled]   = useState(false);
+  const [tick,       setTick]       = useState(true);
+  const [clock,      setClock]      = useState('');
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => !t), 800);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    const update = () => setClock(new Date().toLocaleTimeString('ar', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const navItems = [
+    { href: `/`,         label: 'Home',        code: '01' },
+    { href: `/contact`, label: 'Contact Us',        code: '02' },
+    { href: `/Privacy`, label: 'Privacy Policy', code: '03' },
+  ];
+
+  const initials = store.name.split(' ').filter(Boolean).map((w: string) => w[0].toUpperCase()).join('');
+
   return (
-    <div style={{ minHeight:'100vh', backgroundColor:'var(--paper)', fontFamily:"'Space Mono',monospace", color:'var(--ink)' }}>
-      <style>{FONT_CSS}</style>
-      {menuOpen && <MenuOverlay store={store} onClose={() => setMenuOpen(false)}/>}
+    <nav
+      className={`sticky top-0 z-50 transition-all duration-500 ${scrolled ? 'shadow-[0_4px_30px_rgba(0,229,255,0.08)]' : ''}`}
+      style={{ backgroundColor: scrolled ? 'rgba(5,11,20,0.97)' : '#050B14', backdropFilter: scrolled ? 'blur(12px)' : 'none', borderBottom: '1px solid #0D1F2D', fontFamily: "'JetBrains Mono', monospace" }}
+      dir="ltr"
+    >
+      <div className="h-0.5 w-full" style={{ background: 'linear-gradient(90deg, transparent, #00E5FF 40%, #39FF14 60%, transparent)' }} />
 
-      {/* Header — fixed minimal bar */}
-      <header style={{ position:'fixed', top:0, left:0, right:0, zIndex:50, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 24px', height:'52px', backgroundColor:'var(--paper)', borderBottom:'1px solid var(--ink)', fontFamily:"'Space Mono',monospace" }}>
-        <Link href={`/${store.subdomain}`} style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'1rem', color:'var(--ink)', letterSpacing:'0.02em', textDecoration:'none' }}>
-          {store.name.toUpperCase()}
-        </Link>
+      <div className="max-w-7xl mx-auto px-6 lg:px-10">
+        <div className="flex justify-between items-center h-16">
 
-        {/* Ticker strip */}
-        <div className="nav-ticker" style={{ height:'100%' }}>
-          {store.topBar?.enabled && store.topBar?.text ? (
-            <div className="ticker-w" style={{ width:'100%' }}>
-              <div className="ticker-i" style={{ fontFamily:"'Space Mono',monospace", fontSize:'8px', letterSpacing:'0.2em', color:'var(--punch)' }}>
-                {Array(8).fill(null).map((_,i)=><span key={i} style={{ margin:'0 32px' }}>★ {store.topBar.text.toUpperCase()}</span>)}
-                {Array(8).fill(null).map((_,i)=><span key={`b${i}`} style={{ margin:'0 32px' }}>★ {store.topBar.text.toUpperCase()}</span>)}
+          {/* Logo */}
+          <Link href={`/`} className="flex items-center gap-3 group">
+            <div className="relative">
+              <div className="w-9 h-9 flex items-center justify-center" style={{ border: '1px solid #00E5FF', boxShadow: '0 0 12px rgba(0,229,255,0.25)', background: 'rgba(0,229,255,0.05)' }}>
+                {store.design.logoUrl
+                  ? <img src={store.design.logoUrl} alt={store.name} className="h-6 w-auto object-contain" />
+                  : <span className="text-sm font-bold" style={{ color: '#00E5FF', fontFamily: "'Orbitron', sans-serif" }}>{initials}</span>
+                }
+                <span className="corner-tl" /><span className="corner-br" />
               </div>
             </div>
-          ) : (
-            <div className="ticker-w" style={{ width:'100%' }}>
-              <div className="ticker-i" style={{ fontFamily:"'Space Mono',monospace", fontSize:'8px', letterSpacing:'0.18em', color:'var(--ash)' }}>
-                {['NEW DROP','STREETWEAR','AUTHENTIC','LOCAL BRAND','FREE SHIP','ALGIERS','SS25','LIMITED'].map((t,i)=><span key={i} style={{ margin:'0 28px' }}>/ {t}</span>)}
-                {['NEW DROP','STREETWEAR','AUTHENTIC','LOCAL BRAND','FREE SHIP','ALGIERS','SS25','LIMITED'].map((t,i)=><span key={`b${i}`} style={{ margin:'0 28px' }}>/ {t}</span>)}
+            <div>
+              <span className="text-xs font-bold tracking-widest group-hover:text-[#00E5FF] transition-colors duration-200" style={{ color: '#C8D8E8', fontFamily: "'Orbitron', sans-serif", letterSpacing: '0.15em' }}>
+                {store.name}
+              </span>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#39FF14' }} />
+                <span className="text-[9px] tracking-widest" style={{ color: '#39FF14' }}>Connected</span>
+                <span className="text-[9px]" style={{ color: '#1A3A4A' }}>| System_Active</span>
               </div>
             </div>
-          )}
+          </Link>
+
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center gap-8">
+            {navItems.map(item => (
+              <Link key={item.href} href={item.href} className="tech-nav-link flex items-center gap-2 text-[11px] tracking-widest transition-colors duration-200 group" style={{ color: '#6A8A9A' }}>
+                <span style={{ color: '#00E5FF', opacity: 0.45 }}>{item.code}/</span>
+                <span className="group-hover:text-[#00E5FF] transition-colors duration-200">{item.label}</span>
+              </Link>
+            ))}
+            <div className="text-[10px] tracking-wider px-3 py-1.5 text-center" style={{ border: '1px solid #0D2030', color: '#2A5A6A', minWidth: '88px' }}>
+              {clock || '──:──:──'}
+              <span style={{ color: tick ? '#00E5FF' : 'transparent', marginLeft: '3px' }}>▮</span>
+            </div>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button onClick={() => setIsMenuOpen(p => !p)} className="md:hidden p-2 flex flex-col gap-1.5 items-end" aria-label="Toggle Menu">
+            {isMenuOpen
+              ? <Zap className="w-5 h-5" style={{ color: '#00E5FF' }} />
+              : (<><span className="block h-px w-5" style={{ backgroundColor: '#00E5FF' }} /><span className="block h-px w-3" style={{ backgroundColor: '#00E5FF' }} /><span className="block h-px w-5" style={{ backgroundColor: '#00E5FF' }} /></>)
+            }
+          </button>
         </div>
 
-        {/* Menu trigger */}
-        <button onClick={() => setMenuOpen(true)} style={{ display:'flex', alignItems:'center', gap:'10px', background:'none', border:'none', cursor:'pointer', fontFamily:"'Space Mono',monospace", fontSize:'8px', letterSpacing:'0.22em', color:'var(--ink)' }}>
-          MENU
-          <div style={{ display:'flex', flexDirection:'column', gap:'5px' }}>
-            <span style={{ display:'block', width:'20px', height:'1.5px', background:'var(--ink)' }}/>
-            <span style={{ display:'block', width:'14px', height:'1.5px', background:'var(--ink)' }}/>
+        {/* Mobile Menu */}
+        <div className={`md:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? 'max-h-56 pb-5' : 'max-h-0'}`}>
+          <div className="pt-4 flex flex-col gap-4" style={{ borderTop: '1px solid #0D1F2D' }}>
+            {navItems.map(item => (
+              <Link key={item.href} href={item.href} onClick={() => setIsMenuOpen(false)} className="flex items-center gap-3 text-[11px] tracking-widest hover:text-[#00E5FF] transition-colors" style={{ color: '#6A8A9A' }}>
+                <span style={{ color: '#00E5FF' }}>{item.code}_</span>{item.label}
+              </Link>
+            ))}
+            <div className="text-[10px] tracking-wider mt-2 py-2 text-center" style={{ borderTop: '1px solid #0D1F2D', color: '#2A5A6A' }}>
+              {clock || '──:──:──'}<span style={{ color: tick ? '#00E5FF' : 'transparent', marginLeft: '3px' }}>▮</span>
+            </div>
           </div>
-        </button>
-      </header>
-
-      <main style={{ paddingTop:'52px' }}>{children}</main>
-      <Footer store={store}/>
-    </div>
+        </div>
+      </div>
+    </nav>
   );
 }
 
-/* ── NAVBAR (compatibility export) ───────────────────────── */
-export function Navbar({ store }: { store: Store }) { return null; }
+// ─────────────────────────────────────────────────────────────
+// FOOTER
+// ─────────────────────────────────────────────────────────────
 
-/* ── FOOTER — ZINE COLOPHON ───────────────────────────────── */
 export function Footer({ store }: any) {
-  const year = new Date().getFullYear();
-  const isRTL = store.language === 'ar';
   return (
-    <footer className="noise-ov" style={{ backgroundColor:'var(--ink)', color:'var(--paper)', position:'relative', overflow:'hidden', fontFamily:"'Space Mono',monospace" }}>
-      {/* Ghost watermark */}
-      <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', pointerEvents:'none', overflow:'hidden' }}>
-        <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(6rem,22vw,20rem)', color:'rgba(242,239,232,0.025)', letterSpacing:'-0.05em', whiteSpace:'nowrap', lineHeight:1 }}>
-          {store.name.toUpperCase()}
-        </span>
-      </div>
-      {/* Red punch bar */}
-      <div style={{ position:'relative', zIndex:2, backgroundColor:'var(--punch)', padding:'14px 24px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-        <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(1.5rem,4vw,3.5rem)', letterSpacing:'-0.02em', color:'var(--paper)', lineHeight:1 }}>
-          {store.name.toUpperCase()}
-        </span>
-        <span style={{ fontSize:'8px', letterSpacing:'0.22em', color:'rgba(242,239,232,0.65)' }}>EST. {year}</span>
-      </div>
-      {/* Dense colophon */}
-      <div style={{ position:'relative', zIndex:2, padding:'32px 24px', borderBottom:'1px solid rgba(242,239,232,0.1)' }}>
-        <p style={{ fontSize:'10px', lineHeight:'2.2', letterSpacing:'0.08em', color:'rgba(242,239,232,0.4)', maxWidth:'880px' }}>
-          {isRTL
-            ? `${store.name.toUpperCase()} · متجر الستايل الأصيل · الجزائر · SS${year} · جميع المنتجات أصيلة · PRIVACY — ${store.subdomain}/Privacy · TERMS — ${store.subdomain}/Terms · COOKIES — ${store.subdomain}/Cookies · CONTACT — ${store.subdomain}/contact · © ${year}`
-            : `${store.name.toUpperCase()} · AUTHENTIC STREETWEAR · ALGIERS, DZ · SS${year} COLLECTION · ALL PRODUCTS VERIFIED · FAST NATIONWIDE DELIVERY · PRIVACY — ${store.subdomain}/Privacy · TERMS — ${store.subdomain}/Terms · COOKIES — ${store.subdomain}/Cookies · CONTACT — ${store.subdomain}/contact · ALL RIGHTS RESERVED © ${year} ${store.name.toUpperCase()} · ZINE DROP THEME`
-          }
-        </p>
-      </div>
-      {/* Links row */}
-      <div style={{ position:'relative', zIndex:2, padding:'14px 24px', display:'flex', flexWrap:'wrap', gap:'20px', borderBottom:'1px solid rgba(242,239,232,0.1)' }}>
-        {[['PRIVACY',`/${store.subdomain}/Privacy`],['TERMS',`/${store.subdomain}/Terms`],['COOKIES',`/${store.subdomain}/Cookies`],['CONTACT',`/${store.subdomain}/contact`]].map(([lbl,href])=>(
-          <a key={lbl} href={href} style={{ fontSize:'8px', letterSpacing:'0.2em', color:'rgba(242,239,232,0.35)', textDecoration:'none', transition:'color 0.2s' }}
-            onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--punch)';}}
-            onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='rgba(242,239,232,0.35)';}}>
-            {lbl} ↗
-          </a>
-        ))}
-      </div>
-      <div style={{ position:'relative', zIndex:2, padding:'12px 24px', display:'flex', justifyContent:'space-between' }}>
-        <span style={{ fontSize:'8px', letterSpacing:'0.16em', color:'rgba(242,239,232,0.18)' }}>ZINE DROP THEME</span>
-        <span style={{ fontSize:'8px', letterSpacing:'0.16em', color:'rgba(242,239,232,0.18)' }}>v2.0 / {year}</span>
+    <footer dir="ltr" style={{ backgroundColor: '#020810', borderTop: '1px solid #0D1F2D', fontFamily: "'JetBrains Mono', monospace", position: 'relative', overflow: 'hidden' }}>
+      <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+
+      <div className="relative max-w-7xl mx-auto px-6 lg:px-10 py-14">
+        <div className="flex flex-col md:flex-row justify-between gap-10 pb-10" style={{ borderBottom: '1px solid #0D1F2D' }}>
+
+          {/* Brand */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 flex items-center justify-center" style={{ border: '1px solid rgba(0,229,255,0.4)', boxShadow: '0 0 10px rgba(0,229,255,0.15)' }}>
+                {store.design.logoUrl
+                  ? <img src={store.design.logoUrl} alt={store.name} className="h-5 w-auto object-contain opacity-80" />
+                  : <span className="text-xs font-bold" style={{ color: '#00E5FF', fontFamily: "'Orbitron', sans-serif" }}>{store.name.charAt(0)}</span>
+                }
+              </div>
+              <span className="text-sm tracking-widest font-bold" style={{ color: '#C8D8E8', fontFamily: "'Orbitron', sans-serif", letterSpacing: '0.12em' }}>{store.name}</span>
+            </div>
+            <p className="text-[11px] leading-relaxed max-w-xs" style={{ color: '#2A5A6A' }}>
+              // next-generation commerce platform<br />
+              // powered by innovation engine v4.2
+            </p>
+            <div className="flex items-center gap-2 text-[10px]">
+              <span className="animate-pulse" style={{ color: '#39FF14' }}>●</span>
+              <span style={{ color: '#39FF14' }}>All Systems Operational</span>
+            </div>
+          </div>
+
+          {/* Links */}
+          <div className="flex flex-col gap-3">
+            <p className="text-[9px] tracking-[0.2em] uppercase mb-2" style={{ color: '#00E5FF' }}>// Navigation</p>
+            {[
+              { href: `/Privacy`, label: 'privacy_policy'     },
+              { href: `/Terms`,   label: 'terms_of_use'     },
+              { href: `/Cookies`, label: 'cookie_protocol'  },
+            ].map(link => (
+              <a key={link.href} href={link.href} className="flex items-center gap-2 text-[11px] tracking-wider hover:text-[#00E5FF] transition-colors group" style={{ color: '#3A6070' }}>
+                <span className="group-hover:text-[#39FF14] transition-colors" style={{ color: '#1A3040' }}>›</span>
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-[10px] tracking-widest" style={{ color: '#1A3A4A' }}>© {new Date().getFullYear()} {store.name.toUpperCase()} — All Rights Reserved</p>
+          <div className="flex items-center gap-2 text-[10px]" style={{ color: '#1A3040' }}>
+            <span style={{ color: '#00E5FF', opacity: 0.4 }}>◈</span>
+            <span>Tech Innovation Theme</span>
+            <span style={{ color: '#00E5FF', opacity: 0.4 }}>◈</span>
+          </div>
+        </div>
       </div>
     </footer>
   );
 }
 
-/* ── CARD (zine cell) ─────────────────────────────────────── */
-export function Card({ product, displayImage, discount, isRTL, store, viewDetails }: any) {
-  const [hov, setHov] = useState(false);
-  const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price as number;
+// ─────────────────────────────────────────────────────────────
+// CARD
+// ─────────────────────────────────────────────────────────────
+
+export function Card({ product, displayImage, discount, store, viewDetails }: any) {
   return (
-    <div className="zc" onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}>
-      <Link href={`/${store.subdomain}/product/${product.slug || product.id}`} style={{ display:'block', width:'100%', height:'100%', textDecoration:'none' }}>
-        <div style={{ position:'relative', width:'100%', height:'100%', minHeight:'inherit', backgroundColor:'var(--paper-dk)' }}>
-          {displayImage
-            ? <img src={displayImage} alt={product.name} style={{ width:'100%', height:'100%', minHeight:'inherit', objectFit:'cover', display:'block', transition:'transform 0.6s cubic-bezier(0.22,1,0.36,1)', transform:hov?'scale(1.05)':'scale(1)' }}/>
-            : <div style={{ width:'100%', minHeight:'inherit', display:'flex', alignItems:'center', justifyContent:'center', background:'var(--paper-dk)' }}>
-                <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'3rem', color:'rgba(10,9,6,0.15)' }}>?</span>
-              </div>
-          }
-          {/* Gradient overlay */}
-          <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(10,9,6,0.88) 0%, rgba(10,9,6,0.2) 45%, transparent 70%)', pointerEvents:'none' }}/>
-          {/* Discount sticker */}
-          {discount > 0 && (
-            <div style={{ position:'absolute', top:10, right:10, background:'var(--punch)', color:'var(--paper)', fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'11px', padding:'3px 10px', transform:'rotate(2.5deg)' }}>
-              -{discount}%
-            </div>
-          )}
-          {/* Left sidebar issue label */}
-          <div style={{ position:'absolute', top:0, left:0, bottom:0, width:'26px', display:'flex', alignItems:'center', justifyContent:'center', borderRight:'1px solid rgba(242,239,232,0.12)' }}>
-            <span className="issue-label">{product.name.slice(0,14)}</span>
-          </div>
-          {/* Bottom info */}
-          <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'14px 14px 14px 34px' }}>
-            <h3 style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:700, fontSize:'clamp(0.7rem,1.4vw,1rem)', color:'var(--paper)', letterSpacing:'-0.01em', lineHeight:1.2, marginBottom:'8px', textTransform:'uppercase' }}>
-              {product.name}
-            </h3>
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-              <div style={{ background:'var(--punch)', color:'var(--paper)', fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(1.2rem,2.5vw,1.8rem)', letterSpacing:'-0.03em', padding:'5px 12px', clipPath:'polygon(0 0,100% 0,calc(100% - 7px) 100%,0 100%)' }}>
-                {price.toLocaleString()}
-                <span style={{ fontFamily:"'Space Mono',monospace", fontWeight:400, fontSize:'0.5em', marginLeft:'4px', opacity:0.8 }}>دج</span>
-              </div>
-              <div style={{ display:'flex', alignItems:'center', gap:'5px', fontFamily:"'Space Mono',monospace", fontSize:'8px', letterSpacing:'0.14em', color:'var(--paper)', opacity:hov ? 1 : 0.4, transition:'opacity 0.3s' }}>
-                <span style={{ textDecoration:'underline', textDecorationColor:'var(--punch)' }}>{viewDetails}</span>
-                <ArrowUpRight style={{ width:'11px', height:'11px', color:'var(--punch)' }}/>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Link>
-    </div>
-  );
-}
+    <div
+      className="group relative flex flex-col overflow-hidden transition-all duration-300"
+      style={{ backgroundColor: '#080F1A', border: '1px solid #0D2030', fontFamily: "'JetBrains Mono', monospace" }}
+      onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(0,229,255,0.5)'; el.style.boxShadow = '0 0 25px rgba(0,229,255,0.08), inset 0 0 40px rgba(0,229,255,0.02)'; }}
+      onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = '#0D2030'; el.style.boxShadow = 'none'; }}
+    >
+      <span className="absolute top-0 left-0 w-4 h-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity" style={{ borderTop: '1.5px solid #00E5FF', borderLeft: '1.5px solid #00E5FF' }} />
+      <span className="absolute bottom-0 right-0 w-4 h-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity" style={{ borderBottom: '1.5px solid #00E5FF', borderRight: '1.5px solid #00E5FF' }} />
 
-/* ── HOME ─────────────────────────────────────────────────── */
-export function Home({ store }: any) {
-  const isRTL = store.language === 'ar';
-  const products: any[] = store.products || [];
-  const t = {
-    issue:       isRTL ? 'الإصدار الأول'    : 'ISSUE 001',
-    viewDetails: isRTL ? 'شوف القطعة'       : 'VIEW PIECE',
-    noItems:     isRTL ? 'قريباً...'          : 'DROPS INCOMING...',
-    browse:      isRTL ? 'تصفح حسب الستايل' : 'BROWSE BY STYLE',
-    allFits:     isRTL ? 'الكل'              : 'ALL FITS',
-    dropLabel:   isRTL ? 'الكولكشن الكاملة' : 'THE FULL DROP',
-  };
+      <div className="absolute top-3 left-3 z-10 text-[9px] tracking-widest px-1.5 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity" style={{ backgroundColor: 'rgba(0,229,255,0.08)', border: '1px solid rgba(0,229,255,0.2)', color: '#00E5FF' }}>
+        unit_{String(product.id).slice(-3).toUpperCase()}
+      </div>
 
-  /* Build irregular zine layout */
-  const COUNTS = [2, 3, 1, 2, 3, 1, 2]; // products per strip row
-  const CLASSES = ['zs-half','zs-third','zs-wide','zs-half','zs-third','zs-wide','zs-flip'];
-
-  return (
-    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ backgroundColor:'var(--paper)' }}>
-
-      {/* ── POSTER / HERO ── */}
-      <section className="noise-ov" style={{ position:'relative', minHeight:'100vh', display:'flex', flexDirection:'column', backgroundColor:'var(--ink)', overflow:'hidden' }}>
-        {/* Hero image — very faint */}
-        {store.hero?.imageUrl && (
-          <div style={{ position:'absolute', inset:0, pointerEvents:'none' }}>
-            <img src={store.hero.imageUrl} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', opacity:0.1, filter:'grayscale(100%) contrast(1.5)' }}/>
-          </div>
-        )}
-        {/* Issue number watermark */}
-        <div style={{ position:'absolute', right:'-4%', top:'-6%', pointerEvents:'none', userSelect:'none', zIndex:1 }}>
-          <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(14rem,42vw,40rem)', color:'rgba(242,239,232,0.022)', letterSpacing:'-0.06em', lineHeight:1, display:'block' }}>001</span>
-        </div>
-        {/* Punch left stripe */}
-        <div style={{ position:'absolute', left:0, top:0, bottom:0, width:'5px', background:'var(--punch)', zIndex:3 }}/>
-
-        {/* Main content */}
-        <div style={{ flex:1, display:'flex', flexDirection:'column', justifyContent:'flex-end', padding:'8vw 6vw 0 7vw', position:'relative', zIndex:4 }}>
-          {/* Issue tag */}
-          <div className="rise" style={{ display:'flex', alignItems:'center', gap:'14px', marginBottom:'28px' }}>
-            <div style={{ width:'36px', height:'1.5px', background:'var(--punch)' }}/>
-            <span style={{ fontFamily:"'Space Mono',monospace", fontSize:'8px', letterSpacing:'0.28em', color:'var(--punch)' }}>
-              {t.issue} · {isRTL ? 'ملابس الشارع' : 'STREETWEAR'} · {new Date().getFullYear()}
-            </span>
-          </div>
-
-          {/* Main headline */}
-          <h1 className="rise rise-1" style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(4rem,15vw,14rem)', letterSpacing:'-0.04em', lineHeight:0.86, color:'var(--paper)', margin:'0 0 0 0', textTransform:'uppercase' }}>
-            {store.hero?.title
-              ? store.hero.title.toUpperCase()
-              : (isRTL
-                  ? <><span>ارتدِ</span><br/><span style={{ color:'var(--punch)' }}>هويتك</span></>
-                  : <><span>WEAR</span><br/><span style={{ color:'var(--punch)' }}>CULTURE</span></>
-                )
-            }
-          </h1>
-
-          {/* Bottom row */}
-          <div className="rise rise-2" style={{ marginTop:'40px', paddingTop:'24px', paddingBottom:'0', borderTop:'1px solid rgba(242,239,232,0.14)', display:'flex', flexWrap:'wrap', alignItems:'flex-end', justifyContent:'space-between', gap:'20px' }}>
-            <p style={{ fontFamily:"'Space Mono',monospace", fontSize:'11px', lineHeight:'1.9', color:'rgba(242,239,232,0.5)', maxWidth:'400px', letterSpacing:'0.05em' }}>
-              {store.hero?.subtitle || (isRTL ? 'مجموعة ملابس الشارع الأصيلة. كل قطعة بقصة.' : 'Authentic streetwear. Every piece tells a story.')}
-            </p>
-            <div className="rise rise-3" style={{ display:'flex', gap:'10px', flexWrap:'wrap' }}>
-              <a href="#drops" className="btn-z" style={{ textDecoration:'none' }}>
-                {isRTL ? '↓ شوف الكولكشن' : '↓ VIEW THE DROP'}
-              </a>
-              <a href="#style-filter" style={{ display:'inline-flex', alignItems:'center', gap:'8px', fontFamily:"'Space Mono',monospace", fontSize:'9px', letterSpacing:'0.18em', color:'rgba(242,239,232,0.35)', textDecoration:'none', border:'1px solid rgba(242,239,232,0.14)', padding:'14px 22px', transition:'all 0.22s' }}
-                onMouseEnter={e=>{const el=e.currentTarget as HTMLElement; el.style.color='var(--paper)'; el.style.borderColor='rgba(242,239,232,0.4)';}}
-                onMouseLeave={e=>{const el=e.currentTarget as HTMLElement; el.style.color='rgba(242,239,232,0.35)'; el.style.borderColor='rgba(242,239,232,0.14)';}}>
-                {isRTL ? 'الفئات' : 'BROWSE FITS'} <ArrowRight style={{ width:'12px', height:'12px' }}/>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats strip at bottom of hero */}
-        <div className="stats-4" style={{ position:'relative', zIndex:4, borderTop:'1px solid rgba(242,239,232,0.1)', marginTop:'40px' }}>
-          {[
-            { n:'100%', l:isRTL?'أصيل':'AUTHENTIC' },
-            { n:`${products.length||'∞'}`, l:isRTL?'قطعة':'PIECES' },
-            { n:'48H',  l:isRTL?'توصيل':'DELIVERY' },
-            { n:'DZ',   l:isRTL?'محلي':'LOCAL' },
-          ].map((s,i) => (
-            <div key={i} style={{ padding:'16px 20px', borderRight:i<3?'1px solid rgba(242,239,232,0.08)':'none' }}>
-              <div style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(1.2rem,2.5vw,2.2rem)', color:i===0?'var(--punch)':'var(--paper)', letterSpacing:'-0.02em', lineHeight:1 }}>{s.n}</div>
-              <div style={{ fontFamily:"'Space Mono',monospace", fontSize:'8px', letterSpacing:'0.22em', color:'rgba(242,239,232,0.28)', marginTop:'4px' }}>{s.l}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── STYLE FILTER BAR ── */}
-      {store.categories?.length > 0 && (
-        <div id="style-filter" style={{ borderBottom:'1px solid var(--ink)', display:'flex', alignItems:'stretch', overflowX:'auto' }}>
-          <div style={{ flexShrink:0, padding:'10px 18px', borderRight:'1px solid var(--ink)', display:'flex', alignItems:'center' }}>
-            <span style={{ fontFamily:"'Space Mono',monospace", fontSize:'8px', letterSpacing:'0.2em', color:'var(--ash)', whiteSpace:'nowrap' }}>{t.browse}</span>
-          </div>
-          <Link href={`/${store.domain}`} style={{ display:'flex', alignItems:'center', padding:'10px 22px', borderRight:'1px solid var(--ink)', fontFamily:"'Space Mono',monospace", fontSize:'8px', letterSpacing:'0.18em', textDecoration:'none', backgroundColor:'var(--ink)', color:'var(--punch)', whiteSpace:'nowrap', flexShrink:0, textTransform:'uppercase' }}>
-            ★ {t.allFits}
-          </Link>
-          {store.categories.map((cat:any) => (
-            <Link key={cat.id} href={`/${store.domain}?category=${cat.id}`} style={{ display:'flex', alignItems:'center', padding:'10px 22px', borderRight:'1px solid var(--ink)', fontFamily:"'Space Mono',monospace", fontSize:'8px', letterSpacing:'0.18em', textDecoration:'none', color:'var(--ink)', whiteSpace:'nowrap', flexShrink:0, textTransform:'uppercase', transition:'background 0.2s, color 0.2s' }}
-              onMouseEnter={e=>{const el=e.currentTarget as HTMLElement; el.style.background='var(--ink)'; el.style.color='var(--punch)';}}
-              onMouseLeave={e=>{const el=e.currentTarget as HTMLElement; el.style.background='transparent'; el.style.color='var(--ink)';}}>
-              {cat.name}
-            </Link>
-          ))}
-        </div>
-      )}
-
-      {/* ── ZINE PRODUCT STRIPS ── */}
-      <section id="drops">
-        <div className="sec-bar">
-          <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(0.7rem,1.4vw,0.95rem)', color:'var(--paper)', letterSpacing:'0.04em', textTransform:'uppercase' }}>
-            {t.dropLabel}
-          </span>
-          <span style={{ fontFamily:"'Space Mono',monospace", fontSize:'8px', letterSpacing:'0.2em', color:'rgba(242,239,232,0.4)' }}>
-            {products.length} {isRTL ? 'قطعة' : 'PIECES'}
-          </span>
-        </div>
-
-        {products.length === 0 ? (
-          <div style={{ minHeight:'420px', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', border:'1px solid var(--ink)', margin:'1px' }}>
-            <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(4rem,12vw,10rem)', color:'rgba(10,9,6,0.05)', letterSpacing:'-0.04em' }}>SOON</span>
-            <p style={{ fontFamily:"'Space Mono',monospace", fontSize:'9px', letterSpacing:'0.2em', color:'var(--mist)', marginTop:'16px' }}>{t.noItems}</p>
-          </div>
+      <div className="relative h-56 overflow-hidden" style={{ backgroundColor: '#040C16' }}>
+        {displayImage ? (
+          <img src={displayImage} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100" />
         ) : (
-          (() => {
-            const groups: any[][] = [];
-            let i = 0;
-            while (i < products.length) {
-              const count = COUNTS[groups.length % COUNTS.length];
-              groups.push(products.slice(i, i + count));
-              i += count;
-            }
-            return groups.map((group, gi) => {
-              const cls = CLASSES[gi % CLASSES.length];
-              const featured = group.length === 1;
-              return (
-                <div key={gi} className={`zs ${cls}`} style={{ minHeight: featured ? '500px' : '340px' }}>
-                  {group.map((product: any) => {
-                    const displayImage = product.productImage || product.imagesProduct?.[0]?.imageUrl || store.design?.logoUrl;
-                    const discount = product.priceOriginal ? Math.round(((product.priceOriginal - product.price) / product.priceOriginal) * 100) : 0;
-                    return (
-                      <Card key={product.id} product={product} displayImage={displayImage} discount={discount} isRTL={isRTL} store={store} viewDetails={t.viewDetails}/>
-                    );
-                  })}
-                </div>
-              );
-            });
-          })()
-        )}
-      </section>
-
-      {/* ── MANIFESTO STRIP ── */}
-      <section style={{ backgroundColor:'var(--punch)', padding:'60px 6vw', position:'relative', overflow:'hidden', borderTop:'1px solid var(--ink)' }}>
-        <div style={{ position:'absolute', right:'-2%', bottom:'-15%', pointerEvents:'none', userSelect:'none', opacity:0.1 }}>
-          <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(10rem,30vw,28rem)', color:'var(--paper)', letterSpacing:'-0.05em', lineHeight:1 }}>RAW</span>
-        </div>
-        <div style={{ position:'relative', zIndex:2 }}>
-          <p style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(2.2rem,6vw,5.5rem)', color:'var(--paper)', letterSpacing:'-0.03em', lineHeight:0.88, marginBottom:'28px', textTransform:'uppercase' }}>
-            {isRTL ? <><span>ما تلبسه</span><br/><span>يقول من أنت.</span></> : <><span>WHAT YOU WEAR</span><br/><span>SAYS WHO YOU ARE.</span></>}
-          </p>
-          <a href="#drops" style={{ display:'inline-flex', alignItems:'center', gap:'8px', fontFamily:"'Space Mono',monospace", fontSize:'10px', letterSpacing:'0.18em', color:'var(--punch)', background:'var(--paper)', padding:'14px 28px', textDecoration:'none', textTransform:'uppercase', clipPath:'polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%)', transition:'background 0.2s' }}
-            onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--ink)'; (e.currentTarget as HTMLElement).style.color='var(--paper)';}}
-            onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='var(--paper)'; (e.currentTarget as HTMLElement).style.color='var(--punch)';}}>
-            {isRTL ? 'تسوق الآن' : 'SHOP NOW'} <ArrowUpRight style={{ width:'14px', height:'14px' }}/>
-          </a>
-        </div>
-      </section>
-    </div>
-  );
-}
-
-/* ── DETAILS ─────────────────────────────────────────────── */
-export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, isRTL }: any) {
-  const [selectedImage, setSelectedImage] = useState(0);
-
-  return (
-    <div style={{ backgroundColor:'var(--paper)', fontFamily:"'Space Mono',monospace" }} dir={isRTL ? 'rtl' : 'ltr'}>
-
-      {/* Breadcrumb bar */}
-      <div style={{ borderBottom:'1px solid var(--ink)', padding:'10px 22px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-        <div style={{ display:'flex', alignItems:'center', gap:'8px', fontSize:'8px', letterSpacing:'0.18em', color:'var(--ash)' }}>
-          <span>{isRTL ? 'الرئيسية' : 'HOME'}</span>
-          <span style={{ color:'var(--punch)' }}>/</span>
-          <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:700, fontSize:'8px', color:'var(--ink)' }}>{product.name.toUpperCase().slice(0,28)}</span>
-        </div>
-        <div style={{ display:'flex', gap:'8px', alignItems:'center' }}>
-          <button onClick={toggleWishlist} style={{ width:'32px', height:'32px', display:'flex', alignItems:'center', justifyContent:'center', border:`1px solid ${isWishlisted?'var(--punch)':'var(--ink)'}`, background:isWishlisted?'var(--punch)':'transparent', cursor:'pointer', color:isWishlisted?'var(--paper)':'var(--ink)' }}>
-            <Heart style={{ width:'12px', height:'12px', fill:isWishlisted?'currentColor':'none' }}/>
-          </button>
-          <button onClick={handleShare} style={{ width:'32px', height:'32px', display:'flex', alignItems:'center', justifyContent:'center', border:'1px solid var(--ink)', background:'transparent', cursor:'pointer', color:'var(--ink)' }}>
-            <Share2 style={{ width:'12px', height:'12px' }}/>
-          </button>
-          <div style={{ padding:'6px 12px', background:inStock||autoGen?'var(--ink)':'var(--punch)', color:'var(--paper)', fontSize:'8px', letterSpacing:'0.18em' }}>
-            {autoGen ? '∞ STOCK' : inStock ? 'IN STOCK' : 'SOLD OUT'}
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+            <div className="w-12 h-12 flex items-center justify-center" style={{ border: '1px solid #0D2030' }}>
+              <Zap className="w-6 h-6" style={{ color: '#1A4A5A' }} />
+            </div>
+            <span className="text-[10px] tracking-widest" style={{ color: '#1A3A4A' }}>no_image</span>
           </div>
+        )}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" style={{ background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,255,0.015) 2px, rgba(0,229,255,0.015) 4px)' }} />
+        {discount > 0 && (
+          <div className="absolute top-3 right-3 px-2 py-1 text-[10px] tracking-widest font-bold" style={{ backgroundColor: '#39FF14', color: '#020810' }}>
+            -{discount}%
+          </div>
+        )}
+        <div className="absolute bottom-0 left-0 right-0 py-1 px-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300" style={{ backgroundColor: 'rgba(0,229,255,0.08)', borderTop: '1px solid rgba(0,229,255,0.15)' }}>
+          <p className="text-[9px] tracking-widest" style={{ color: '#00E5FF' }}>◉ unit_scan_complete</p>
         </div>
       </div>
 
-      {/* Split layout: image left, info right */}
-      <div className="details-split">
+      <div className="p-5 flex flex-col flex-1">
+        <h3 className="font-medium mb-1 line-clamp-1 group-hover:text-[#00E5FF] transition-colors" style={{ color: '#C8D8E8', fontFamily: "'Orbitron', sans-serif", fontSize: '0.75rem', letterSpacing: '0.08em' }}>
+          {product.name}
+        </h3>
+        {product.desc && (
+          <div className="text-[11px] mb-4 line-clamp-2 leading-relaxed opacity-50" style={{ color: '#6A8A9A' }} dangerouslySetInnerHTML={{ __html: product.desc }} />
+        )}
+        <div className="my-3 h-px" style={{ background: 'linear-gradient(90deg, #00E5FF22, transparent)' }} />
+        <div className="mt-auto space-y-4">
+          <div className="flex items-baseline gap-3">
+            <span className="font-bold" style={{ color: '#00E5FF', fontFamily: "'Orbitron', sans-serif", fontSize: '1.3rem' }}>{product.price}</span>
+            <span className="text-[10px] tracking-widest" style={{ color: '#2A6A7A' }}>{store.currency}</span>
+            {product.priceOriginal && product.priceOriginal > product.price && (
+              <span className="text-xs line-through" style={{ color: '#2A4A5A' }}>{product.priceOriginal}</span>
+            )}
+          </div>
+          <Link
+            href={`/product/${product.slug || product.id}`}
+            className="flex items-center justify-center gap-2 w-full py-3 text-[10px] tracking-widest uppercase font-bold transition-all duration-300"
+            style={{ border: '1px solid rgba(0,229,255,0.3)', color: '#00E5FF', backgroundColor: 'transparent' }}
+            onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.backgroundColor = '#00E5FF'; el.style.color = '#020810'; }}
+            onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.backgroundColor = 'transparent'; el.style.color = '#00E5FF'; }}
+          >
+            <Zap className="w-3 h-3" /> {viewDetails}
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-        {/* LEFT — sticky image */}
-        <div className="details-img">
-          <div style={{ position:'relative', width:'100%', height:'100%' }}>
-            {allImages.length > 0
-              ? <img src={allImages[selectedImage]} alt={product.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
-              : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', background:'var(--paper-dk)' }}>
-                  <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'5rem', color:'rgba(10,9,6,0.1)' }}>?</span>
-                </div>
-            }
-            {/* Bottom gradient */}
-            <div style={{ position:'absolute', bottom:0, left:0, right:0, background:'linear-gradient(to top, rgba(10,9,6,0.88) 0%, transparent 50%)', padding:'24px 20px 20px', pointerEvents:'none' }}>
-              {discount > 0 && <div style={{ display:'inline-block', background:'var(--punch)', color:'var(--paper)', fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'11px', padding:'3px 12px', marginBottom:'10px', transform:'rotate(-1.5deg)' }}>-{discount}% OFF</div>}
-              <div style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(2rem,5vw,4rem)', color:'var(--paper)', letterSpacing:'-0.03em', lineHeight:1 }}>
-                {finalPrice.toLocaleString()}
-                <span style={{ fontFamily:"'Space Mono',monospace", fontWeight:400, fontSize:'1rem', marginLeft:'8px', opacity:0.65 }}>دج</span>
-              </div>
+// ─────────────────────────────────────────────────────────────
+// HOME PAGE
+// ─────────────────────────────────────────────────────────────
+
+export const Home = ({ store }: any) => {
+  const stats = [
+    { icon: <Cpu className="w-4 h-4" />,    label: 'active_units',    val: store.products?.length  || 0 },
+    { icon: <Globe2 className="w-4 h-4" />, label: 'Categories',      val: store.categories?.length || 0 },
+    { icon: <Shield className="w-4 h-4" />, label: 'full_security',      val: '100%' },
+    { icon: <Zap className="w-4 h-4" />,    label: 'fast_delivery',     val: '24 Hours' },
+  ];
+
+  return (
+    <div className="min-h-screen" dir="ltr" style={{ backgroundColor: '#050B14', fontFamily: "'JetBrains Mono', monospace" }}>
+
+      {/* ── HERO ── */}
+      <section className="relative flex items-center justify-center overflow-hidden" style={{ minHeight: '90vh' }}>
+        <div className="absolute inset-0 hex-grid" />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(0,229,255,0.06) 0%, transparent 70%)' }} />
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20">
+          <div style={{ position: 'absolute', top: '10%', left: '5%', width: '40%', height: '1px', background: 'linear-gradient(90deg, transparent, #00E5FF)', transform: 'rotate(-15deg)' }} />
+          <div style={{ position: 'absolute', top: '30%', right: '5%', width: '30%', height: '1px', background: 'linear-gradient(90deg, #00E5FF, transparent)', transform: 'rotate(10deg)' }} />
+          <div style={{ position: 'absolute', bottom: '20%', left: '10%', width: '20%', height: '1px', background: 'linear-gradient(90deg, transparent, #39FF14)' }} />
+        </div>
+
+        <div className="absolute top-12 right-12 text-[10px] tracking-widest hidden lg:block" style={{ color: '#1A4A5A' }}>
+          <div>system_version: 4.2.1</div>
+          <div>node_status: <span style={{ color: '#39FF14' }}>active</span></div>
+          <div>uptime: 99.98%</div>
+        </div>
+        <div className="absolute bottom-16 left-12 text-[10px] tracking-widest hidden lg:block" style={{ color: '#1A4A5A' }}>
+          <div>lat_Offer: 36.73°N</div><div>long: 3.09°E</div>
+          <div>signal: <span style={{ color: '#00E5FF' }}>████████░░</span></div>
+        </div>
+
+        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+          {store.hero.imageUrl && (
+            <div className="absolute inset-0 -z-10 overflow-hidden" style={{ opacity: 0.15 }}>
+              <img src={store.hero.imageUrl} alt="" className="w-full h-full object-cover" />
             </div>
-            {/* Thumbnail sidebar */}
+          )}
+          <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5" style={{ border: '1px solid rgba(0,229,255,0.3)', backgroundColor: 'rgba(0,229,255,0.04)' }}>
+            <span className="animate-pulse w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#39FF14' }} />
+            <span className="text-[10px] tracking-widest uppercase" style={{ color: '#00E5FF' }}>
+              system_Connected — ready_for_deploy
+            </span>
+          </div>
+          {store.hero.title && (
+            <h1 className="neon-text mb-5 leading-none" style={{ fontFamily: "'Orbitron', sans-serif", fontSize: 'clamp(2.2rem, 7vw, 6rem)', fontWeight: 900, color: '#FFFFFF', letterSpacing: '-0.02em' }}>
+              {store.hero.title}
+            </h1>
+          )}
+          {store.hero.subtitle && (
+            <p className="mb-10 max-w-xl mx-auto leading-relaxed" style={{ color: '#4A7A8A', fontSize: '0.85rem', letterSpacing: '0.05em' }}>
+              // {store.hero.subtitle}
+            </p>
+          )}
+          <div className="flex flex-wrap gap-4 justify-center">
+            <a href="#products" className="flex items-center gap-2 px-8 py-3.5 text-xs tracking-widest font-bold uppercase transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,229,255,0.3)]" style={{ backgroundColor: '#00E5FF', color: '#020810' }}>
+              <Zap className="w-3.5 h-3.5" /> explore_Products
+            </a>
+            <a href="#categories" className="flex items-center gap-2 px-8 py-3.5 text-xs tracking-widest uppercase transition-all duration-300"
+              style={{ border: '1px solid rgba(0,229,255,0.3)', color: '#00E5FF', backgroundColor: 'transparent' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(0,229,255,0.06)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
+            >
+              view_Categories
+            </a>
+          </div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, transparent, #00E5FF, #39FF14, transparent)' }} />
+      </section>
+
+      {/* ── STATS ── */}
+      <section style={{ borderTop: '1px solid #0D1F2D', borderBottom: '1px solid #0D1F2D', backgroundColor: '#030810' }}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 py-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {stats.map((stat, i) => (
+              <div key={i} className="stat-card flex items-center gap-4 px-5 py-4" style={{ backgroundColor: '#050B14' }}>
+                <div className="flex-shrink-0" style={{ color: '#00E5FF' }}>{stat.icon}</div>
+                <div>
+                  <p className="text-[9px] tracking-widest mb-0.5" style={{ color: '#2A5A6A' }}>{stat.label}</p>
+                  <p className="font-bold text-sm" style={{ color: '#00E5FF', fontFamily: "'Orbitron', sans-serif" }}>{stat.val}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CATEGORIES ── */}
+      <section id="categories" className="py-20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="flex items-center gap-5 mb-12">
+            <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: '#00E5FF' }}>◈ Categories</span>
+            <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(0,229,255,0.3), transparent)' }} />
+            <span className="text-[10px]" style={{ color: '#1A3A4A' }}>unit_database_02</span>
+          </div>
+          {store.categories && store.categories.length > 0 ? (
+            <div className="flex flex-wrap gap-3">
+              <Link href={`/${store.domain}`}
+                className="flex items-center gap-2 px-5 py-2.5 text-[10px] tracking-widest uppercase transition-all duration-200"
+                style={{ border: '1px solid rgba(0,229,255,0.4)', color: '#00E5FF', backgroundColor: 'rgba(0,229,255,0.04)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(0,229,255,0.12)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(0,229,255,0.04)'; }}
+              >
+                <span style={{ color: '#39FF14' }}>◉</span> All
+              </Link>
+              {store.categories.map((cat: any, i: number) => (
+                <Link key={cat.id} href={`/${store.domain}?category=${cat.id}`}
+                  className="flex items-center gap-2 px-5 py-2.5 text-[10px] tracking-widest uppercase transition-all duration-200"
+                  style={{ border: '1px solid #0D2030', color: '#4A7A8A', backgroundColor: '#080F1A' }}
+                  onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(0,229,255,0.4)'; el.style.color = '#00E5FF'; }}
+                  onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = '#0D2030'; el.style.color = '#4A7A8A'; }}
+                >
+                  <span style={{ color: '#1A3A4A' }}>{String(i + 1).padStart(2, '0')}/</span>{cat.name}
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center" style={{ border: '1px dashed #0D2030' }}>
+              <p className="text-[11px] tracking-widest" style={{ color: '#1A4A5A' }}>// no data streams available</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ── PRODUCTS ── */}
+      <section id="products" className="pb-24">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <div className="flex items-center gap-5 mb-12">
+            <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: '#00E5FF' }}>◈ product_database_datas</span>
+            <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(0,229,255,0.3), transparent)' }} />
+            <span className="text-[10px]" style={{ color: '#1A3A4A' }}>Records: {store.products?.length || 0}</span>
+          </div>
+          {store.products && store.products.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {store.products.map((product: any) => {
+                const displayImage = product.productImage || product.imagesProduct?.[0]?.imageUrl || store.design?.logoUrl;
+                const discount = product.priceOriginal
+                  ? Math.round(((product.priceOriginal - product.price) / product.priceOriginal) * 100) : 0;
+                return <Card key={product.id} product={product} displayImage={displayImage} discount={discount} store={store} viewDetails="view_details" />;
+              })}
+            </div>
+          ) : (
+            <div className="py-24 text-center" style={{ border: '1px dashed #0D2030' }}>
+              <Zap className="w-10 h-10 mx-auto mb-4 opacity-20" style={{ color: '#00E5FF' }} />
+              <p className="text-xs tracking-widest mb-2" style={{ color: '#1A4A5A', fontFamily: "'Orbitron', sans-serif" }}>database_empty</p>
+              <p className="text-[10px] tracking-widest" style={{ color: '#0D2A3A' }}>// no records found in the database</p>
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────
+// DETAILS PAGE
+// ─────────────────────────────────────────────────────────────
+
+export function Details({
+  product, toggleWishlist, isWishlisted, handleShare, discount,
+  allImages, allAttrs, finalPrice, inStock, autoGen,
+  selectedVariants, setSelectedOffer, selectedOffer,
+  resolvedParams, handleVariantSelection, domain,
+}: any) {
+  const [submitSuccess,  setSubmitSuccess]  = useState(false);
+  const [showShareToast, setShowShareToast] = useState(false);
+  const [selectedImage,  setSelectedImage]  = useState(0);
+
+  return (
+    <div className="min-h-screen" dir="ltr" style={{ backgroundColor: '#050B14', fontFamily: "'JetBrains Mono', monospace" }}>
+
+      {submitSuccess && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-6 py-4" style={{ backgroundColor: '#050B14', border: '1px solid rgba(57,255,20,0.4)', boxShadow: '0 0 30px rgba(57,255,20,0.15)', fontFamily: "'JetBrains Mono', monospace" }}>
+          <div className="w-6 h-6 flex items-center justify-center" style={{ backgroundColor: '#39FF14' }}>
+            <Check className="w-3.5 h-3.5 text-black" />
+          </div>
+          <div>
+            <p className="text-xs font-bold tracking-widest" style={{ color: '#39FF14' }}>confirm_order.success</p>
+            <p className="text-[10px] mt-0.5" style={{ color: '#2A5A6A' }}>// we'll contact you within 24h to confirm</p>
+          </div>
+        </div>
+      )}
+      {showShareToast && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2 text-[10px] tracking-widest" style={{ backgroundColor: '#050B14', border: '1px solid rgba(0,229,255,0.4)', color: '#00E5FF' }}>
+          <Link2 className="w-3.5 h-3.5" />link_copied
+        </div>
+      )}
+
+      {/* [Arabic]navigation */}
+      <header style={{ borderBottom: '1px solid #0D1F2D', backgroundColor: 'rgba(5,11,20,0.9)', backdropFilter: 'blur(10px)', position: 'sticky', top: 0, zIndex: 40 }}>
+        <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between">
+          <nav className="flex items-center gap-2 text-[10px] tracking-widest" style={{ color: '#2A5A6A' }}>
+            <span className="hover:text-[#00E5FF] cursor-pointer transition-colors">Home</span>
+            <span style={{ color: '#00E5FF' }}>/</span>
+            <span className="hover:text-[#00E5FF] cursor-pointer transition-colors">catalog</span>
+            <span style={{ color: '#00E5FF' }}>/</span>
+            <span style={{ color: '#C8D8E8' }}>{product.name}</span>
+          </nav>
+          <div className="flex items-center gap-3">
+            <button onClick={toggleWishlist} className="w-8 h-8 flex items-center justify-center transition-all" style={{ border: '1px solid #0D2030', color: isWishlisted ? '#FF3B30' : '#3A6A7A', backgroundColor: isWishlisted ? 'rgba(255,59,48,0.08)' : 'transparent' }}>
+              <Heart className={`w-3.5 h-3.5 ${isWishlisted ? 'fill-current' : ''}`} />
+            </button>
+            <button onClick={handleShare} className="w-8 h-8 flex items-center justify-center" style={{ border: '1px solid #0D2030', color: '#3A6A7A' }}>
+              <Share2 className="w-3.5 h-3.5" />
+            </button>
+            <div className="flex items-center gap-1.5 px-3 py-1 text-[9px] tracking-widest font-bold" style={{ border: `1px solid ${inStock ? 'rgba(57,255,20,0.3)' : 'rgba(255,59,48,0.3)'}`, backgroundColor: inStock ? 'rgba(57,255,20,0.06)' : 'rgba(255,59,48,0.06)', color: inStock ? '#39FF14' : '#FF3B30' }}>
+              <span className={`w-1.5 h-1.5 rounded-full ${inStock ? 'animate-pulse' : ''}`} style={{ backgroundColor: inStock ? '#39FF14' : '#FF3B30' }} />
+              {inStock ? 'in_stock' : 'out_of_stock'}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-6xl mx-auto px-6 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+
+          {/* ──[Arabic]── */}
+          <div className="space-y-3">
+            <div className="relative overflow-hidden group" style={{ aspectRatio: '1', backgroundColor: '#040C16', border: '1px solid #0D2030' }}>
+              {allImages.length > 0 ? (
+                <img src={allImages[selectedImage]} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100" loading="eager" />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+                  <Package className="w-16 h-16" style={{ color: '#0D2030' }} />
+                  <span className="text-[10px] tracking-widest" style={{ color: '#1A3A4A' }}>no_image</span>
+                </div>
+              )}
+              <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,229,255,0.012) 3px, rgba(0,229,255,0.012) 4px)' }} />
+              <span className="absolute top-3 right-3 w-5 h-5" style={{ borderTop: '1.5px solid #00E5FF', borderRight: '1.5px solid #00E5FF' }} />
+              <span className="absolute bottom-3 left-3 w-5 h-5" style={{ borderBottom: '1.5px solid #00E5FF', borderLeft: '1.5px solid #00E5FF' }} />
+              {discount > 0 && (
+                <div className="absolute top-4 left-4 px-2.5 py-1 text-[10px] tracking-widest font-bold" style={{ backgroundColor: '#39FF14', color: '#020810' }}>
+                  -{discount}%
+                </div>
+              )}
+              <button onClick={toggleWishlist} className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center transition-all" style={{ backgroundColor: isWishlisted ? '#FF3B30' : 'rgba(5,11,20,0.8)', border: '1px solid rgba(0,229,255,0.2)', color: isWishlisted ? 'white' : '#00E5FF' }}>
+                <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
+              </button>
+              {!inStock && !autoGen && (
+                <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(5,11,20,0.85)', backdropFilter: 'blur(4px)' }}>
+                  <div className="px-6 py-3 text-xs tracking-widest font-bold" style={{ border: '1px solid rgba(255,59,48,0.4)', color: '#FF3B30', fontFamily: "'Orbitron', sans-serif" }}>unit_unavailable</div>
+                </div>
+              )}
+              {allImages.length > 1 && (
+                <>
+                  <button onClick={() => setSelectedImage((p: number) => p === 0 ? allImages.length - 1 : p - 1)} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" style={{ backgroundColor: 'rgba(5,11,20,0.8)', border: '1px solid rgba(0,229,255,0.3)', color: '#00E5FF' }}>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => setSelectedImage((p: number) => p === allImages.length - 1 ? 0 : p + 1)} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" style={{ backgroundColor: 'rgba(5,11,20,0.8)', border: '1px solid rgba(0,229,255,0.3)', color: '#00E5FF' }}>
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                </>
+              )}
+            </div>
+
             {allImages.length > 1 && (
-              <div style={{ position:'absolute', right:'10px', top:'50%', transform:'translateY(-50%)', display:'flex', flexDirection:'column', gap:'5px' }}>
-                {allImages.slice(0,5).map((img:string, idx:number) => (
-                  <button key={idx} onClick={() => setSelectedImage(idx)} style={{ width:'40px', height:'40px', overflow:'hidden', border:`2px solid ${selectedImage===idx?'var(--punch)':'rgba(255,255,255,0.3)'}`, cursor:'pointer', opacity:selectedImage===idx?1:0.5, padding:0, background:'none' }}>
-                    <img src={img} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {allImages.map((img: string, idx: number) => (
+                  <button key={idx} onClick={() => setSelectedImage(idx)} className="shrink-0 w-16 h-16 overflow-hidden transition-all duration-200" style={{ border: `1px solid ${selectedImage === idx ? '#00E5FF' : '#0D2030'}`, boxShadow: selectedImage === idx ? '0 0 12px rgba(0,229,255,0.25)' : 'none', opacity: selectedImage === idx ? 1 : 0.5 }}>
+                    <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
                   </button>
                 ))}
               </div>
             )}
-            {/* Sold out overlay */}
-            {!inStock && !autoGen && (
-              <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(242,239,232,0.88)', backdropFilter:'blur(4px)' }}>
-                <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'3rem', color:'var(--punch)', letterSpacing:'-0.02em', transform:'rotate(-5deg)', display:'inline-block' }}>SOLD OUT</span>
+
+            {/* [Arabic] */}
+            <div className="grid grid-cols-3 gap-2 mt-4">
+              {[
+                { icon: <ShieldCheck className="w-3.5 h-3.5" />, label: 'secure_payment'     },
+                { icon: <Truck className="w-3.5 h-3.5" />,       label: 'fast_shipping'    },
+                { icon: <Zap className="w-3.5 h-3.5" />,         label: 'quality_guarantee' },
+              ].map((b, i) => (
+                <div key={i} className="flex flex-col items-center gap-1.5 py-3" style={{ border: '1px solid #0D2030', backgroundColor: '#080F1A' }}>
+                  <span style={{ color: '#00E5FF' }}>{b.icon}</span>
+                  <span className="text-[9px] tracking-widest" style={{ color: '#2A5A6A' }}>{b.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ──[Arabic]+[Arabic]── */}
+          <div className="space-y-7">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-[9px] tracking-[0.2em] uppercase" style={{ color: '#00E5FF' }}>◈ product_data</span>
+                <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(0,229,255,0.3), transparent)' }} />
+              </div>
+              <h1 className="leading-tight mb-3" style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: 'clamp(1.2rem, 3vw, 1.8rem)', color: '#FFFFFF', letterSpacing: '0.04em' }}>
+                {product.name}
+              </h1>
+              <div className="flex items-center gap-3">
+                <div className="flex gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className="text-sm" style={{ color: i < 4 ? '#00E5FF' : '#1A3A4A' }}>◆</span>
+                  ))}
+                </div>
+                <span className="text-[10px] tracking-widest" style={{ color: '#2A5A6A' }}>Rating: 4.8 | 128 Reviews</span>
+              </div>
+            </div>
+
+            {/* Price */}
+            <div className="p-5 relative" style={{ border: '1px solid #0D2030', backgroundColor: '#080F1A' }}>
+              <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, #00E5FF, transparent)' }} />
+              <p className="text-[9px] tracking-widest mb-2" style={{ color: '#2A5A6A' }}>unit_price</p>
+              <div className="flex items-baseline gap-4">
+                <span className="font-black" style={{ fontFamily: "'Orbitron', sans-serif", fontSize: '2.5rem', color: '#00E5FF', textShadow: '0 0 20px rgba(0,229,255,0.3)' }}>
+                  {finalPrice.toLocaleString('ar-DZ')}
+                </span>
+                <span className="text-xs tracking-widest" style={{ color: '#2A6A7A' }}>DZD</span>
+                {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
+                  <div>
+                    <span className="text-sm line-through" style={{ color: '#1A4A5A' }}>{parseFloat(product.priceOriginal).toLocaleString('ar-DZ')} DZD</span>
+                    <p className="text-[9px] tracking-widest mt-0.5" style={{ color: '#39FF14' }}>Save: {(parseFloat(product.priceOriginal) - finalPrice).toLocaleString('ar-DZ')} DZD</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* [Arabic] */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 text-[10px] tracking-widest font-bold" style={{ border: `1px solid ${autoGen ? 'rgba(0,229,255,0.3)' : inStock ? 'rgba(57,255,20,0.3)' : 'rgba(255,59,48,0.3)'}`, backgroundColor: autoGen ? 'rgba(0,229,255,0.04)' : inStock ? 'rgba(57,255,20,0.04)' : 'rgba(255,59,48,0.04)', color: autoGen ? '#00E5FF' : inStock ? '#39FF14' : '#FF3B30' }}>
+              {autoGen ? <Infinity className="w-3.5 h-3.5" /> : inStock ? <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" /> : <X className="w-3.5 h-3.5" />}
+              {autoGen ? 'unlimited_stock' : inStock ? 'stock_available' : 'out_of_stock'}
+            </div>
+
+            {/* Packages */}
+            {product.offers?.length > 0 && (
+              <div>
+                <p className="text-[9px] tracking-[0.2em] uppercase mb-3" style={{ color: '#00E5FF' }}>◈ available_Packages</p>
+                <div className="space-y-2">
+                  {product.offers.map((offer: any) => (
+                    <label key={offer.id} className="flex items-center justify-between p-4 cursor-pointer transition-all duration-200" style={{ border: `1px solid ${selectedOffer === offer.id ? 'rgba(0,229,255,0.5)' : '#0D2030'}`, backgroundColor: selectedOffer === offer.id ? 'rgba(0,229,255,0.05)' : '#080F1A', boxShadow: selectedOffer === offer.id ? '0 0 15px rgba(0,229,255,0.1)' : 'none' }}>
+                      <div className="flex items-center gap-3">
+                        <div className="w-4 h-4 flex items-center justify-center" style={{ border: `1px solid ${selectedOffer === offer.id ? '#00E5FF' : '#1A3A4A'}` }}>
+                          {selectedOffer === offer.id && <div className="w-2 h-2" style={{ backgroundColor: '#00E5FF' }} />}
+                        </div>
+                        <input type="radio" name="offer" value={offer.id} checked={selectedOffer === offer.id} onChange={() => setSelectedOffer(offer.id)} className="sr-only" />
+                        <div>
+                          <p className="text-xs font-medium" style={{ color: '#C8D8E8' }}>{offer.name}</p>
+                          <p className="text-[9px] tracking-wider mt-0.5" style={{ color: '#2A5A6A' }}>Quantity: {offer.quantity}</p>
+                        </div>
+                      </div>
+                      <span className="font-bold" style={{ color: '#00E5FF', fontFamily: "'Orbitron', sans-serif", fontSize: '1rem' }}>
+                        {offer.price.toLocaleString('ar-DZ')} <span className="text-xs">DZD</span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
               </div>
             )}
-          </div>
-        </div>
 
-        {/* RIGHT — scrollable info */}
-        <div className="details-info">
-          <h1 style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(1.5rem,3.5vw,3rem)', color:'var(--ink)', letterSpacing:'-0.02em', lineHeight:0.9, textTransform:'uppercase', marginBottom:'16px' }}>
-            {product.name}
-          </h1>
-          {/* Stars */}
-          <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'22px', paddingBottom:'22px', borderBottom:'1px solid var(--ink)' }}>
-            {[...Array(5)].map((_,i)=><Star key={i} style={{ width:'11px', height:'11px', fill:i<4?'var(--punch)':'none', color:'var(--punch)' }}/>)}
-            <span style={{ fontSize:'8px', letterSpacing:'0.16em', color:'var(--ash)' }}>4.8 · 128 REVIEWS</span>
-          </div>
-          {/* Price block */}
-          <div style={{ marginBottom:'22px', paddingBottom:'22px', borderBottom:'1px solid var(--paper-dk)' }}>
-            <p style={{ fontSize:'8px', letterSpacing:'0.2em', color:'var(--ash)', marginBottom:'4px' }}>RETAIL PRICE</p>
-            <div style={{ display:'flex', alignItems:'baseline', flexWrap:'wrap', gap:'10px' }}>
-              <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'3.2rem', color:'var(--punch)', letterSpacing:'-0.03em', lineHeight:1 }}>{finalPrice.toLocaleString()}</span>
-              <span style={{ fontFamily:"'Space Mono',monospace", fontSize:'1rem', color:'var(--ash)' }}>دج</span>
-              {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
-                <div>
-                  <span style={{ fontSize:'11px', textDecoration:'line-through', color:'var(--mist)', display:'block' }}>{parseFloat(product.priceOriginal).toLocaleString()}</span>
-                  <span style={{ fontSize:'8px', color:'var(--punch)', letterSpacing:'0.12em' }}>↓ SAVE {(parseFloat(product.priceOriginal)-finalPrice).toLocaleString()} دج</span>
-                </div>
-              )}
-            </div>
-          </div>
-          {/* Stock */}
-          <div style={{ display:'inline-flex', alignItems:'center', gap:'8px', padding:'7px 14px', marginBottom:'22px', border:`1px solid ${inStock||autoGen?'var(--ink)':'var(--punch)'}`, fontSize:'8px', letterSpacing:'0.2em', color:inStock||autoGen?'var(--ink)':'var(--punch)' }}>
-            {autoGen ? <Infinity style={{ width:'11px', height:'11px' }}/> : inStock ? <span style={{ width:'5px', height:'5px', borderRadius:'50%', background:'var(--ink)', display:'inline-block' }}/> : <X style={{ width:'11px', height:'11px' }}/>}
-            {autoGen ? 'UNLIMITED STOCK' : inStock ? 'IN STOCK' : 'SOLD OUT'}
-          </div>
-          {/* Offers */}
-          {product.offers?.length > 0 && (
-            <div style={{ marginBottom:'22px', paddingBottom:'22px', borderBottom:'1px solid var(--paper-dk)' }}>
-              <p style={{ fontSize:'8px', letterSpacing:'0.2em', color:'var(--ash)', marginBottom:'10px' }}>SELECT BUNDLE</p>
-              <div style={{ display:'flex', flexDirection:'column', gap:'5px' }}>
-                {product.offers.map((offer:any)=>(
-                  <label key={offer.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'11px 14px', border:`1px solid ${selectedOffer===offer.id?'var(--ink)':'var(--paper-dk)'}`, backgroundColor:selectedOffer===offer.id?'var(--ink)':'transparent', cursor:'pointer', transition:'all 0.18s' }}>
-                    <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
-                      <div style={{ width:'13px', height:'13px', border:`1px solid ${selectedOffer===offer.id?'var(--paper)':'var(--ink)'}`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                        {selectedOffer===offer.id && <div style={{ width:'7px', height:'7px', background:'var(--punch)' }}/>}
-                      </div>
-                      <input type="radio" name="offer" value={offer.id} checked={selectedOffer===offer.id} onChange={()=>setSelectedOffer(offer.id)} style={{ display:'none' }}/>
-                      <div>
-                        <p style={{ fontSize:'10px', fontWeight:700, color:selectedOffer===offer.id?'var(--paper)':'var(--ink)', letterSpacing:'0.08em' }}>{offer.name}</p>
-                        <p style={{ fontSize:'8px', color:selectedOffer===offer.id?'rgba(242,239,232,0.5)':'var(--ash)', letterSpacing:'0.12em' }}>QTY: {offer.quantity}</p>
-                      </div>
-                    </div>
-                    <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'1.1rem', color:selectedOffer===offer.id?'var(--punch)':'var(--ink)', letterSpacing:'-0.02em' }}>
-                      {offer.price.toLocaleString()}<span style={{ fontFamily:"'Space Mono',monospace", fontWeight:400, fontSize:'9px', marginLeft:'3px' }}>دج</span>
-                    </span>
-                  </label>
-                ))}
+            {/* [Arabic] */}
+            {allAttrs.map((attr: any) => (
+              <div key={attr.id}>
+                <p className="text-[9px] tracking-[0.2em] uppercase mb-3" style={{ color: '#00E5FF' }}>◈ {attr.name}</p>
+                {attr.displayMode === 'color' ? (
+                  <div className="flex gap-2 flex-wrap">
+                    {attr.variants.map((v: any) => {
+                      const isSel = selectedVariants[attr.name] === v.value;
+                      return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name} className="w-9 h-9 transition-all duration-200" style={{ backgroundColor: v.value, border: `2px solid ${isSel ? '#00E5FF' : 'transparent'}`, boxShadow: isSel ? '0 0 12px rgba(0,229,255,0.4)' : 'none' }} />;
+                    })}
+                  </div>
+                ) : attr.displayMode === 'image' ? (
+                  <div className="flex gap-2 flex-wrap">
+                    {attr.variants.map((v: any) => {
+                      const isSel = selectedVariants[attr.name] === v.value;
+                      return (
+                        <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} className="w-14 h-14 overflow-hidden transition-all" style={{ border: `1px solid ${isSel ? '#00E5FF' : '#0D2030'}`, boxShadow: isSel ? '0 0 12px rgba(0,229,255,0.25)' : 'none' }}>
+                          <img src={v.value} alt={v.name} className="w-full h-full object-cover" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {attr.variants.map((v: any) => {
+                      const isSel = selectedVariants[attr.name] === v.value;
+                      return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} className="px-5 py-2 text-[10px] tracking-widest uppercase transition-all duration-200" style={{ border: `1px solid ${isSel ? '#00E5FF' : '#0D2030'}`, backgroundColor: isSel ? 'rgba(0,229,255,0.08)' : '#080F1A', color: isSel ? '#00E5FF' : '#3A6A7A', boxShadow: isSel ? '0 0 12px rgba(0,229,255,0.15)' : 'none' }}>{v.name}</button>;
+                    })}
+                  </div>
+                )}
               </div>
-            </div>
-          )}
-          {/* Attributes */}
-          {allAttrs.map((attr:any)=>(
-            <div key={attr.id} style={{ marginBottom:'18px', paddingBottom:'18px', borderBottom:'1px solid var(--paper-dk)' }}>
-              <p style={{ fontSize:'8px', letterSpacing:'0.2em', color:'var(--ash)', marginBottom:'9px' }}>/ {attr.name.toUpperCase()}</p>
-              {attr.displayMode==='color' ? (
-                <div style={{ display:'flex', flexWrap:'wrap', gap:'7px' }}>
-                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} title={v.name} style={{ width:'30px', height:'30px', backgroundColor:v.value, border:`3px solid ${s?'var(--ink)':'transparent'}`, cursor:'pointer', outline:s?'2px solid var(--punch)':'none', outlineOffset:'2px' }}/>;})}
-                </div>
-              ) : attr.displayMode==='image' ? (
-                <div style={{ display:'flex', flexWrap:'wrap', gap:'5px' }}>
-                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} style={{ width:'48px', height:'48px', overflow:'hidden', border:`2px solid ${s?'var(--punch)':'var(--paper-dk)'}`, cursor:'pointer', padding:0 }}><img src={v.value} alt={v.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/></button>;})}
-                </div>
-              ) : (
-                <div style={{ display:'flex', flexWrap:'wrap', gap:'5px' }}>
-                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} style={{ padding:'7px 14px', border:`1px solid ${s?'var(--ink)':'var(--paper-dk)'}`, backgroundColor:s?'var(--ink)':'transparent', color:s?'var(--paper)':'var(--ink)', fontSize:'10px', letterSpacing:'0.12em', cursor:'pointer', fontFamily:"'Space Mono',monospace", transition:'all 0.18s' }}>{v.name}</button>;})}
-                </div>
-              )}
-            </div>
-          ))}
+            ))}
 
-          <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants}/>
-
-          {product.desc && (
-            <div style={{ marginTop:'28px', paddingTop:'22px', borderTop:'1px solid var(--ink)' }}>
-              <p style={{ fontSize:'8px', letterSpacing:'0.2em', color:'var(--ash)', marginBottom:'10px' }}>/ PIECE INFO</p>
-              <div style={{ fontSize:'11px', lineHeight:'1.9', color:'var(--ash)', fontFamily:"'Space Mono',monospace" }}
-                dangerouslySetInnerHTML={{ __html:DOMPurify.sanitize(product.desc, { ALLOWED_TAGS:['p','br','strong','em','ul','ol','li','h1','h2','h3','h4','span'],ALLOWED_ATTR:['class','style'] })}}/>
-            </div>
-          )}
+            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
+          </div>
         </div>
-      </div>
+
+        {/* [Arabic] */}
+        {product.desc && (
+          <section className="mt-20 pt-12" style={{ borderTop: '1px solid #0D1F2D' }}>
+            <div className="flex items-center gap-5 mb-8">
+              <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: '#00E5FF' }}>◈ product_desc</span>
+              <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(0,229,255,0.3), transparent)' }} />
+            </div>
+            <div className="p-6" style={{ border: '1px solid #0D2030', backgroundColor: '#080F1A' }}>
+              <div className="text-sm leading-relaxed" style={{ color: '#4A7A8A' }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc, { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'span'], ALLOWED_ATTR: ['class', 'style'] }) }}
+              />
+            </div>
+          </section>
+        )}
+      </main>
     </div>
   );
 }
 
-/* ── PRODUCT FORM ─────────────────────────────────────────── */
-const FR = ({ error, label, children }: { error?:string; label?:string; children:React.ReactNode }) => (
-  <div style={{ marginBottom:'12px' }}>
-    {label && <p style={{ fontSize:'8px', letterSpacing:'0.22em', color:'var(--ash)', marginBottom:'5px', textTransform:'uppercase', fontFamily:"'Space Mono',monospace" }}>{label}</p>}
+// ─────────────────────────────────────────────────────────────
+// PRODUCT FORM
+// ─────────────────────────────────────────────────────────────
+
+const FieldWrapper = ({ error, children, label }: { error?: string; children: React.ReactNode; label?: string }) => (
+  <div className="space-y-1.5">
+    {label && <label className="text-[9px] tracking-[0.2em] uppercase font-medium" style={{ color: '#2A6A7A', fontFamily: "'JetBrains Mono', monospace" }}>{label}</label>}
     {children}
-    {error && <p style={{ fontSize:'8px', letterSpacing:'0.12em', color:'var(--punch)', marginTop:'4px', display:'flex', alignItems:'center', gap:'4px' }}><AlertCircle style={{ width:'9px', height:'9px' }}/>{error}</p>}
+    {error && (
+      <p className="text-[10px] flex items-center gap-1 tracking-wider" style={{ color: '#FF3B30' }}>
+        <AlertCircle className="w-3 h-3" />{error}
+      </p>
+    )}
   </div>
 );
 
-const ist = (err?: boolean): React.CSSProperties => ({
-  width:'100%', padding:'11px 13px', fontFamily:"'Space Mono',monospace", fontSize:'11px',
-  background:'var(--paper)', border:`1px solid ${err?'var(--punch)':'var(--ink)'}`, color:'var(--ink)',
-  outline:'none', transition:'box-shadow 0.2s', boxShadow:err?'2px 2px 0 var(--punch)':'none',
-});
+const inputCls = (err?: boolean) =>
+  `w-full px-4 py-3 text-sm outline-none transition-all font-light bg-transparent text-[#C8D8E8] placeholder-[#1A4A5A] border`
+  + ` ${err ? 'border-[#FF3B30]' : 'border-[#0D2030]'} focus:border-[#00E5FF] focus:shadow-[0_0_12px_rgba(0,229,255,0.15)]`;
 
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss=0 }: ProductFormProps) {
+export function ProductForm({
+  product, userId, domain,
+  selectedOffer, setSelectedOffer, selectedVariants,
+  platform, priceLoss = 0,
+}: ProductFormProps) {
   const router = useRouter();
-  const [wilayas,setWilayas]   = useState<Wilaya[]>([]);
-  const [communes,setCommunes] = useState<Commune[]>([]);
-  const [loadingCommunes,setLC] = useState(false);
-  const [fd,setFd] = useState({ customerId:'', customerName:'', customerPhone:'', customerWelaya:'', customerCommune:'', quantity:1, priceLoss:0, typeLivraison:'home' as 'home'|'office' });
-  const [errors,setErrors] = useState<Record<string,string>>({});
-  const [submitting,setSub] = useState(false);
 
-  useEffect(()=>{ if(userId) fetchWilayas(userId).then(setWilayas); },[userId]);
-  useEffect(()=>{ if(typeof window!=='undefined'){ const id=localStorage.getItem('customerId'); if(id) setFd(p=>({...p,customerId:id})); } },[]);
-  useEffect(()=>{ if(!fd.customerWelaya){setCommunes([]);return;} setLC(true); fetchCommunes(fd.customerWelaya).then(d=>{setCommunes(d);setLC(false);}); },[fd.customerWelaya]);
+  const [wilayas,         setWilayas]         = useState<Wilaya[]>([]);
+  const [communes,        setCommunes]        = useState<Commune[]>([]);
+  const [loadingCommunes, setLoadingCommunes] = useState(false);
+  const [formData, setFormData] = useState({
+    customerId: '', customerName: '', customerPhone: '',
+    customerWelaya: '', customerCommune: '',
+    quantity: 1, priceLoss: 0,
+    typeLivraison: 'home' as 'home' | 'office',
+  });
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
 
-  const selW = useMemo(()=>wilayas.find(w=>String(w.id)===String(fd.customerWelaya)),[wilayas,fd.customerWelaya]);
-  const getFP = useCallback(():number=>{
-    const base=typeof product.price==='string'?parseFloat(product.price):product.price as number;
-    const off=product.offers?.find((o:any)=>o.id===selectedOffer); if(off) return off.price;
-    if(product.variantDetails?.length&&Object.keys(selectedVariants).length>0){ const m=product.variantDetails.find((v:any)=>variantMatches(v,selectedVariants)); if(m&&m.price!==-1) return m.price; }
+  useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const id = localStorage.getItem('customerId');
+      if (id) setFormData(p => ({ ...p, customerId: id }));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!formData.customerWelaya) { setCommunes([]); return; }
+    setLoadingCommunes(true);
+    fetchCommunes(formData.customerWelaya).then(data => { setCommunes(data); setLoadingCommunes(false); });
+  }, [formData.customerWelaya]);
+
+  const selectedWilayaData = useMemo(
+    () => wilayas.find(w => String(w.id) === String(formData.customerWelaya)),
+    [wilayas, formData.customerWelaya],
+  );
+
+  const getFinalPrice = useCallback((): number => {
+    const base = typeof product.price === 'string' ? parseFloat(product.price) : (product.price as number);
+    const offer = product.offers?.find(o => o.id === selectedOffer);
+    if (offer) return offer.price;
+    if (product.variantDetails?.length && Object.keys(selectedVariants).length > 0) {
+      const match = product.variantDetails.find(v => variantMatches(v, selectedVariants));
+      if (match && match.price !== -1) return match.price;
+    }
     return base;
-  },[product,selectedOffer,selectedVariants]);
-  const getLiv = useCallback(():number=>{ if(!selW) return 0; return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice; },[selW,fd.typeLivraison]);
-  useEffect(()=>{ if(selW) setFd(f=>({...f,priceLoss:selW.livraisonReturn})); },[selW]);
+  }, [product, selectedOffer, selectedVariants]);
 
-  const fp=getFP();
-  const total=()=>fp*fd.quantity+getLiv();
-  const validate=()=>{
-    const e:Record<string,string>={};
-    if(!fd.customerName.trim())  e.customerName='الاسم مطلوب';
-    if(!fd.customerPhone.trim()) e.customerPhone='رقم الهاتف مطلوب';
-    if(!fd.customerWelaya)       e.customerWelaya='الولاية مطلوبة';
-    if(!fd.customerCommune)      e.customerCommune='البلدية مطلوبة';
+  const getPriceLivraison = useCallback((): number => {
+    if (!selectedWilayaData) return 0;
+    return formData.typeLivraison === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice;
+  }, [selectedWilayaData, formData.typeLivraison]);
+
+  useEffect(() => {
+    if (selectedWilayaData) setFormData(f => ({ ...f, priceLoss: selectedWilayaData.livraisonReturn }));
+  }, [selectedWilayaData, formData.typeLivraison]);
+
+  const finalPrice    = getFinalPrice();
+  const getTotalPrice = () => finalPrice * formData.quantity + +getPriceLivraison();
+
+  const validate = () => {
+    const e: Record<string, string> = {};
+    if (!formData.customerName.trim())  e.customerName    = 'Name is required';
+    if (!formData.customerPhone.trim()) e.customerPhone   = 'Phone number is required';
+    if (!formData.customerWelaya)       e.customerWelaya  = 'Province is required';
+    if (!formData.customerCommune)      e.customerCommune = 'Municipality is required';
     return e;
   };
-  const handleSubmit=async(e:React.FormEvent)=>{
-    e.preventDefault(); const er=validate(); if(Object.keys(er).length){setErrors(er);return;} setErrors({}); setSub(true);
-    try{ await axios.post(`${API_URL}/orders/create`,{...fd,productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()}); if(typeof window!=='undefined'&&fd.customerId) localStorage.setItem('customerId',fd.customerId); router.push(`/lp/${domain}/successfully`); }catch(err){console.error(err);}finally{setSub(false);}
+
+  
+  const getVariantDetailId = useCallback(() => {
+    if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+    return product.variantDetails.find((v: any) => variantMatches(v, selectedVariants))?.id;
+  }, [product.variantDetails, selectedVariants]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const errs = validate();
+    if (Object.keys(errs).length) { setFormErrors(errs); return; }
+    setFormErrors({});
+    setSubmitting(true);
+    try {
+      const payload = { ...formData, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceLivraison: getPriceLivraison() ,variantDetailId:   getVariantDetailId()};
+      await axios.post(`${API_URL}/orders/create`, payload);
+      if (typeof window !== 'undefined' && formData.customerId)
+        localStorage.setItem('customerId', formData.customerId);
+      router.push(`/lp/${domain}/successfully`);
+    } catch (err) { console.error(err); } finally { setSubmitting(false); }
   };
-  const onF=(e:React.FocusEvent<any>)=>{e.target.style.boxShadow='3px 3px 0 var(--punch)';};
-  const onB=(e:React.FocusEvent<any>,err?:boolean)=>{e.target.style.boxShadow=err?'2px 2px 0 var(--punch)':'none';};
 
   return (
-    <div style={{ marginTop:'22px', paddingTop:'22px', borderTop:'2px solid var(--ink)' }}>
-      <p style={{ fontSize:'8px', letterSpacing:'0.2em', color:'var(--ash)', marginBottom:'14px', fontFamily:"'Space Mono',monospace" }}>/ ORDER FORM</p>
-      <form onSubmit={handleSubmit}>
-        <div className="form-2col-z" style={{ marginBottom:'0' }}>
-          <FR error={errors.customerName} label="NAME">
-            <div style={{ position:'relative' }}>
-              <User style={{ position:'absolute', right:'10px', top:'50%', transform:'translateY(-50%)', width:'11px', height:'11px', color:'var(--mist)', pointerEvents:'none' }}/>
-              <input type="text" value={fd.customerName} onChange={e=>setFd({...fd,customerName:e.target.value})} placeholder="الاسم الكامل" style={{ ...ist(!!errors.customerName), paddingRight:'32px' }} onFocus={onF} onBlur={e=>onB(e,!!errors.customerName)}/>
+    <div style={{ borderTop: '1px solid #0D1F2D', paddingTop: '1.75rem', fontFamily: "'JetBrains Mono', monospace" }}>
+      <div className="flex items-center gap-3 mb-6">
+        <span className="text-[9px] tracking-[0.25em] uppercase" style={{ color: '#00E5FF' }}>◈ order_form</span>
+        <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(0,229,255,0.3), transparent)' }} />
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+
+        {/* Name + Phone */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FieldWrapper error={formErrors.customerName} label="customer_name">
+            <div className="relative">
+              <User className="absolute right-3.5 top-3.5 w-3.5 h-3.5" style={{ color: '#1A4A5A' }} />
+              <input type="text" value={formData.customerName} onChange={e => setFormData({ ...formData, customerName: e.target.value })} placeholder="Enter Your Name" className={`${inputCls(!!formErrors.customerName)} pr-10`} />
             </div>
-          </FR>
-          <FR error={errors.customerPhone} label="PHONE">
-            <div style={{ position:'relative' }}>
-              <Phone style={{ position:'absolute', right:'10px', top:'50%', transform:'translateY(-50%)', width:'11px', height:'11px', color:'var(--mist)', pointerEvents:'none' }}/>
-              <input type="tel" value={fd.customerPhone} onChange={e=>setFd({...fd,customerPhone:e.target.value})} placeholder="0X XX XX XX XX" style={{ ...ist(!!errors.customerPhone), paddingRight:'32px' }} onFocus={onF} onBlur={e=>onB(e,!!errors.customerPhone)}/>
+          </FieldWrapper>
+          <FieldWrapper error={formErrors.customerPhone} label="phone_number">
+            <div className="relative">
+              <Phone className="absolute right-3.5 top-3.5 w-3.5 h-3.5" style={{ color: '#1A4A5A' }} />
+              <input type="tel" value={formData.customerPhone} onChange={e => setFormData({ ...formData, customerPhone: e.target.value })} placeholder="0X XX XX XX XX" className={`${inputCls(!!formErrors.customerPhone)} pr-10`} />
             </div>
-          </FR>
-        </div>
-        <div className="form-2col-z" style={{ marginBottom:'0', marginTop:'8px' }}>
-          <FR error={errors.customerWelaya} label="WILAYA">
-            <div style={{ position:'relative' }}>
-              <ChevronDown style={{ position:'absolute', left:'10px', top:'50%', transform:'translateY(-50%)', width:'11px', height:'11px', color:'var(--mist)', pointerEvents:'none' }}/>
-              <select value={fd.customerWelaya} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})} style={{ ...ist(!!errors.customerWelaya), paddingLeft:'28px', appearance:'none' as any, cursor:'pointer' }} onFocus={onF} onBlur={e=>onB(e,!!errors.customerWelaya)}>
-                <option value="">اختر الولاية</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
-              </select>
-            </div>
-          </FR>
-          <FR error={errors.customerCommune} label="COMMUNE">
-            <div style={{ position:'relative' }}>
-              <ChevronDown style={{ position:'absolute', left:'10px', top:'50%', transform:'translateY(-50%)', width:'11px', height:'11px', color:'var(--mist)', pointerEvents:'none' }}/>
-              <select value={fd.customerCommune} disabled={!fd.customerWelaya||loadingCommunes} onChange={e=>setFd({...fd,customerCommune:e.target.value})} style={{ ...ist(!!errors.customerCommune), paddingLeft:'28px', appearance:'none' as any, cursor:'pointer', opacity:!fd.customerWelaya?0.4:1 }} onFocus={onF} onBlur={e=>onB(e,!!errors.customerCommune)}>
-                <option value="">{loadingCommunes?'...':'اختر البلدية'}</option>{communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}
-              </select>
-            </div>
-          </FR>
+          </FieldWrapper>
         </div>
 
-        {/* Delivery toggle */}
-        <FR label="DELIVERY">
-          <div className="delivery-cols">
-            {(['home','office'] as const).map((type, i) => (
-              <button key={type} type="button" onClick={() => setFd(p=>({...p,typeLivraison:type}))}
-                style={{ padding:'13px 10px', border:'none', borderRight:i===0?'1px solid var(--ink)':'none', backgroundColor:fd.typeLivraison===type?'var(--ink)':'transparent', cursor:'pointer', textAlign:'left', borderTop:`3px solid ${fd.typeLivraison===type?'var(--punch)':'transparent'}`, transition:'all 0.18s' }}>
-                <p style={{ fontFamily:"'Space Mono',monospace", fontSize:'8px', letterSpacing:'0.16em', color:fd.typeLivraison===type?'var(--paper)':'var(--ash)', marginBottom:'3px' }}>
-                  {type==='home'?'HOME DROP':'OFFICE PICK'}
+        {/* Province + Municipality */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FieldWrapper error={formErrors.customerWelaya} label="select_province">
+            <div className="relative">
+              <MapPin className="absolute right-3.5 top-3.5 w-3.5 h-3.5" style={{ color: '#1A4A5A' }} />
+              <select value={formData.customerWelaya} onChange={e => setFormData({ ...formData, customerWelaya: e.target.value, customerCommune: '' })} className={`${inputCls(!!formErrors.customerWelaya)} pr-10 appearance-none cursor-pointer`} style={{ backgroundColor: '#050B14' }}>
+                <option value="">Select Province</option>
+                {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+              </select>
+              <ChevronDown className="absolute left-3.5 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color: '#1A4A5A' }} />
+            </div>
+          </FieldWrapper>
+          <FieldWrapper error={formErrors.customerCommune} label="select_municipality">
+            <div className="relative">
+              <MapPin className="absolute right-3.5 top-3.5 w-3.5 h-3.5" style={{ color: '#1A4A5A' }} />
+              <select value={formData.customerCommune} disabled={!formData.customerWelaya || loadingCommunes} onChange={e => setFormData({ ...formData, customerCommune: e.target.value })} className={`${inputCls(!!formErrors.customerCommune)} pr-10 appearance-none cursor-pointer disabled:opacity-30`} style={{ backgroundColor: '#050B14' }}>
+                <option value="">{loadingCommunes ? 'Loading...' : formData.customerWelaya ? 'Select Municipality' : 'select_province_first'}</option>
+                {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+              </select>
+              <ChevronDown className="absolute left-3.5 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color: '#1A4A5A' }} />
+            </div>
+          </FieldWrapper>
+        </div>
+
+        {/* Delivery Method */}
+        <div>
+          <p className="text-[9px] tracking-[0.2em] uppercase mb-3" style={{ color: '#2A6A7A' }}>delivery_method</p>
+          <div className="grid grid-cols-2 gap-3">
+            {(['home', 'office'] as const).map(type => (
+              <button key={type} type="button" onClick={() => setFormData(p => ({ ...p, typeLivraison: type }))}
+                className="flex flex-col items-center gap-2 py-5 transition-all duration-200"
+                style={{ border: `1px solid ${formData.typeLivraison === type ? 'rgba(0,229,255,0.5)' : '#0D2030'}`, backgroundColor: formData.typeLivraison === type ? 'rgba(0,229,255,0.06)' : '#080F1A', boxShadow: formData.typeLivraison === type ? '0 0 15px rgba(0,229,255,0.08)' : 'none' }}
+              >
+                {type === 'home'
+                  ? <HomeIcon  className="w-5 h-5" style={{ color: formData.typeLivraison === type ? '#00E5FF' : '#1A4A5A' }} />
+                  : <Building2 className="w-5 h-5" style={{ color: formData.typeLivraison === type ? '#00E5FF' : '#1A4A5A' }} />
+                }
+                <p className="text-[10px] tracking-widest" style={{ color: formData.typeLivraison === type ? '#00E5FF' : '#2A5A6A' }}>
+                  {type === 'home' ? 'home_delivery' : 'office_pickup'}
                 </p>
-                {selW && (
-                  <p style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'1rem', color:fd.typeLivraison===type?'var(--punch)':'var(--mist)', letterSpacing:'-0.02em', lineHeight:1 }}>
-                    {(type==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()}<span style={{ fontFamily:"'Space Mono',monospace", fontWeight:400, fontSize:'8px', marginLeft:'3px' }}>دج</span>
+                {selectedWilayaData && (
+                  <p className="text-[9px] font-mono" style={{ color: formData.typeLivraison === type ? 'rgba(0,229,255,0.6)' : '#1A3A4A' }}>
+                    {(type === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice).toLocaleString('ar-DZ')} DZD
                   </p>
                 )}
               </button>
             ))}
           </div>
-        </FR>
+          {!selectedWilayaData && <p className="text-[10px] mt-2 text-center tracking-widest" style={{ color: '#1A3A4A' }}>// select_province_to_see_shipping_cost</p>}
+        </div>
 
         {/* Quantity */}
-        <FR label="QUANTITY">
-          <div style={{ display:'inline-flex', alignItems:'center', border:'1px solid var(--ink)' }}>
-            {[
-              { icon:<Minus style={{ width:'11px', height:'11px' }}/>, action:()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)})) },
-              { icon:<Plus  style={{ width:'11px', height:'11px' }}/>, action:()=>setFd(p=>({...p,quantity:p.quantity+1})) },
-            ].map((btn, i) => (
-              <button key={i} type="button" onClick={btn.action} style={{ width:'38px', height:'38px', display:'flex', alignItems:'center', justifyContent:'center', border:'none', borderRight:i===0?'1px solid var(--ink)':'none', background:'transparent', cursor:'pointer', color:'var(--ink)', transition:'all 0.18s', ...(i===1?{borderLeft:'1px solid var(--ink)'}:{}) }}
-                onMouseEnter={e=>{const el=e.currentTarget as HTMLElement; el.style.background='var(--punch)'; el.style.color='var(--paper)';}}
-                onMouseLeave={e=>{const el=e.currentTarget as HTMLElement; el.style.background='transparent'; el.style.color='var(--ink)';}}>
-                {btn.icon}
-              </button>
-            )).reduce((acc, btn, i, arr) => i===0 ? [...acc, btn, <span key="qty" style={{ width:'44px', textAlign:'center', fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'1.1rem', color:'var(--ink)', letterSpacing:'-0.02em', lineHeight:'38px', display:'inline-block' }}>{fd.quantity}</span>] : [...acc, btn], [] as React.ReactNode[])}
+        <FieldWrapper label="unit_count">
+          <div className="flex items-center gap-4">
+            <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} className="w-10 h-10 flex items-center justify-center text-xl transition-all" style={{ border: '1px solid #0D2030', color: '#00E5FF', backgroundColor: '#080F1A' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(0,229,255,0.08)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#080F1A'; }}
+            >−</button>
+            <span className="w-14 text-center font-bold" style={{ color: '#00E5FF', fontFamily: "'Orbitron', sans-serif", fontSize: '1.5rem' }}>{formData.quantity}</span>
+            <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: p.quantity + 1 }))} className="w-10 h-10 flex items-center justify-center text-xl transition-all" style={{ border: '1px solid #0D2030', color: '#00E5FF', backgroundColor: '#080F1A' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(0,229,255,0.08)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#080F1A'; }}
+            >+</button>
+            <span className="text-[10px] tracking-widest" style={{ color: '#1A4A5A' }}>unit</span>
           </div>
-        </FR>
+        </FieldWrapper>
 
-        {/* Summary */}
-        <div style={{ border:'1px solid var(--ink)', marginBottom:'12px' }}>
-          <div style={{ padding:'8px 13px', background:'var(--ink)' }}>
-            <span style={{ fontSize:'8px', letterSpacing:'0.2em', color:'rgba(242,239,232,0.55)', fontFamily:"'Space Mono',monospace" }}>ORDER MANIFEST</span>
-          </div>
-          {[{l:'ITEM',v:product.name.slice(0,20)},{l:'UNIT',v:`${fp.toLocaleString()} دج`},{l:'× QTY',v:fd.quantity},{l:'SHIP',v:selW?`${getLiv().toLocaleString()} دج`:'TBD'}].map(row=>(
-            <div key={row.l} style={{ display:'flex', justifyContent:'space-between', padding:'6px 13px', borderTop:'1px solid var(--paper-dk)' }}>
-              <span style={{ fontSize:'8px', letterSpacing:'0.18em', color:'var(--ash)', fontFamily:"'Space Mono',monospace" }}>{row.l}</span>
-              <span style={{ fontSize:'9px', fontWeight:700, color:'var(--ink)', fontFamily:"'Space Mono',monospace" }}>{row.v}</span>
+        {/* [Arabic] */}
+        <div className="p-5 relative" style={{ border: '1px solid #0D2030', backgroundColor: '#080F1A' }}>
+          <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, #00E5FF44, transparent)' }} />
+          <p className="text-[9px] tracking-[0.2em] uppercase mb-4" style={{ color: '#2A5A6A' }}>order_summary</p>
+          <div className="space-y-2.5">
+            {[
+              { label: 'Product',      value: product.name },
+              { label: 'unit_price', value: `${finalPrice.toLocaleString('ar-DZ')} DZD` },
+              { label: 'Quantity',      value: `× ${formData.quantity}` },
+              { label: 'Shipping',       value: selectedWilayaData ? `${getPriceLivraison().toLocaleString('ar-DZ')} DZD` : 'To be determined' },
+            ].map(row => (
+              <div key={row.label} className="flex justify-between items-center">
+                <span className="text-[10px] tracking-widest" style={{ color: '#2A5A6A' }}>{row.label}</span>
+                <span className="text-[11px]" style={{ color: '#6A8A9A' }}>{row.value}</span>
+              </div>
+            ))}
+            <div className="pt-3 mt-1" style={{ borderTop: '1px solid #0D2030' }}>
+              <div className="flex justify-between items-baseline">
+                <span className="text-[10px] tracking-widest font-bold" style={{ color: '#00E5FF' }}>total_amount</span>
+                <span className="font-black" style={{ color: '#00E5FF', fontFamily: "'Orbitron', sans-serif", fontSize: '1.6rem', textShadow: '0 0 15px rgba(0,229,255,0.3)' }}>
+                  {getTotalPrice().toLocaleString('ar-DZ')}<span className="text-xs mr-1">DZD</span>
+                </span>
+              </div>
             </div>
-          ))}
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', padding:'10px 13px', borderTop:'2px solid var(--ink)', background:'var(--paper-dk)' }}>
-            <span style={{ fontSize:'8px', letterSpacing:'0.2em', color:'var(--ash)', fontFamily:"'Space Mono',monospace" }}>TOTAL</span>
-            <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'1.7rem', color:'var(--punch)', letterSpacing:'-0.03em', lineHeight:1 }}>
-              {total().toLocaleString()}<span style={{ fontFamily:"'Space Mono',monospace", fontWeight:400, fontSize:'10px', marginLeft:'4px' }}>دج</span>
-            </span>
           </div>
         </div>
 
-        <button type="submit" disabled={submitting} className="btn-z" style={{ width:'100%', justifyContent:'center', fontSize:'10px', background:submitting?'var(--ash)':'var(--ink)', cursor:submitting?'not-allowed':'pointer', clipPath:'polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%)' }}>
-          {submitting ? 'PROCESSING...' : <>LOCK IN ORDER <ArrowUpRight style={{ width:'13px', height:'13px' }}/></>}
+        {/* [Arabic] */}
+        <button type="submit" disabled={submitting}
+          className="w-full py-4 flex items-center justify-center gap-3 text-xs tracking-widest uppercase font-bold transition-all duration-300"
+          style={{ backgroundColor: submitting ? '#1A4A5A' : '#00E5FF', color: '#020810', cursor: submitting ? 'not-allowed' : 'pointer' }}
+          onMouseEnter={e => { if (!submitting) (e.currentTarget as HTMLElement).style.boxShadow = '0 0 30px rgba(0,229,255,0.4)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
+        >
+          {submitting
+            ? <><div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />Processing_order...</>
+            : <><Zap className="w-4 h-4" />confirm_order</>
+          }
         </button>
-        <p style={{ fontSize:'8px', letterSpacing:'0.16em', color:'var(--mist)', textAlign:'center', marginTop:'8px', display:'flex', alignItems:'center', justifyContent:'center', gap:'5px', fontFamily:"'Space Mono',monospace" }}>
-          <Shield style={{ width:'9px', height:'9px', color:'var(--ink)' }}/> SECURE · ENCRYPTED CHECKOUT
+
+        <p className="text-[10px] text-center tracking-widest flex items-center justify-center gap-1.5" style={{ color: '#1A3A4A' }}>
+          <Shield className="w-3 h-3" style={{ color: '#39FF14' }} />
+          <span style={{ color: '#39FF14' }}>encrypted</span> | secure_transaction_protocol
         </p>
       </form>
     </div>
   );
 }
 
-/* ── STATIC PAGES ─────────────────────────────────────────── */
-export function StaticPage({ page }: { page:string }) {
+// ─────────────────────────────────────────────────────────────
+// STATIC PAGES
+// ─────────────────────────────────────────────────────────────
+
+interface StaticPageProps { page: string; }
+interface CardProps       { icon: React.ReactNode; title: string; desc: string; status?: string; }
+
+export function StaticPage({ page }: StaticPageProps) {
   const p = page.toLowerCase();
-  return <>{p==='privacy'&&<Privacy/>}{p==='terms'&&<Terms/>}{p==='cookies'&&<Cookies/>}{p==='contact'&&<Contact/>}</>;
+  return (
+    <>
+      {p === 'privacy' && <Privacy />}
+      {p === 'terms'   && <Terms />}
+      {p === 'cookies' && <Cookies />}
+      {p === 'contact' && <Contact />}
+    </>
+  );
 }
 
-const PageShell = ({ children, title, code }: { children:React.ReactNode; title:string; code:string }) => (
-  <div style={{ backgroundColor:'var(--paper)', fontFamily:"'Space Mono',monospace", minHeight:'100vh' }}>
-    <div style={{ backgroundColor:'var(--ink)', padding:'80px 6vw 40px', position:'relative', overflow:'hidden' }}>
-      <div style={{ position:'absolute', right:'-3%', bottom:'-20%', pointerEvents:'none', userSelect:'none', opacity:0.04 }}>
-        <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(10rem,28vw,26rem)', color:'var(--paper)', letterSpacing:'-0.05em', lineHeight:1, whiteSpace:'nowrap' }}>{title.toUpperCase()}</span>
+function PageWrapper({ children, icon, title, subtitle, tag }: {
+  children: React.ReactNode; icon: React.ReactNode; title: string; subtitle: string; tag: string;
+}) {
+  return (
+    <div className="min-h-screen py-20" dir="ltr" style={{ backgroundColor: '#050B14', fontFamily: "'JetBrains Mono', monospace" }}>
+      <div className="max-w-4xl mx-auto px-6 lg:px-10">
+        <div className="mb-14">
+          <div className="flex items-center gap-2 mb-8 text-[10px] tracking-widest" style={{ color: '#2A5A6A' }}>
+            <span>system</span><span style={{ color: '#00E5FF' }}>/</span>
+            <span>Legal</span><span style={{ color: '#00E5FF' }}>/</span>
+            <span style={{ color: '#00E5FF' }}>{tag}</span>
+          </div>
+          <div className="flex items-start gap-5">
+            <div className="w-12 h-12 flex items-center justify-center flex-shrink-0 mt-1" style={{ border: '1px solid rgba(0,229,255,0.3)', backgroundColor: 'rgba(0,229,255,0.04)', color: '#00E5FF' }}>{icon}</div>
+            <div>
+              <h1 className="mb-3 leading-tight" style={{ fontFamily: "'Orbitron', sans-serif", fontWeight: 700, fontSize: 'clamp(1.4rem, 4vw, 2.5rem)', color: '#FFFFFF' }}>{title}</h1>
+              <p className="text-sm leading-relaxed" style={{ color: '#3A6A7A' }}>// {subtitle}</p>
+            </div>
+          </div>
+          <div className="mt-8 h-px" style={{ background: 'linear-gradient(90deg, #00E5FF44, transparent)' }} />
+        </div>
+        {children}
       </div>
-      <p style={{ fontSize:'8px', letterSpacing:'0.22em', color:'rgba(242,239,232,0.28)', marginBottom:'12px' }}>REF: {code}</p>
-      <h1 style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(2.5rem,7vw,7rem)', color:'var(--paper)', letterSpacing:'-0.03em', lineHeight:0.9, textTransform:'uppercase' }}>{title}</h1>
-      <div style={{ width:'56px', height:'4px', background:'var(--punch)', marginTop:'14px' }}/>
     </div>
-    <div style={{ maxWidth:'700px', margin:'0 auto', padding:'44px 24px 80px' }}>{children}</div>
-  </div>
-);
+  );
+}
 
-const IB = ({ title, body, tag, tagColor='var(--punch)' }: { title:string; body:string; tag?:string; tagColor?:string }) => (
-  <div style={{ borderBottom:'1px solid var(--paper-dk)', padding:'18px 0', display:'flex', gap:'18px', alignItems:'flex-start' }}>
-    <div style={{ flex:1 }}>
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'7px' }}>
-        <h3 style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:700, fontSize:'0.82rem', color:'var(--ink)', letterSpacing:'0.02em' }}>{title.toUpperCase()}</h3>
-        {tag && <span style={{ fontSize:'8px', letterSpacing:'0.2em', padding:'3px 8px', border:`1px solid ${tagColor}`, color:tagColor, fontFamily:"'Space Mono',monospace" }}>{tag}</span>}
+function InfoCard({ icon, title, desc, status }: CardProps) {
+  const isActive = status === 'Always Active';
+  return (
+    <div className="group flex gap-5 p-6 mb-3 transition-all duration-300" style={{ border: '1px solid #0D2030', backgroundColor: '#080F1A' }}
+      onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(0,229,255,0.3)'; el.style.boxShadow = '0 0 20px rgba(0,229,255,0.05)'; }}
+      onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = '#0D2030'; el.style.boxShadow = 'none'; }}
+    >
+      <div className="w-0.5 self-stretch flex-shrink-0" style={{ background: 'linear-gradient(180deg, #00E5FF, transparent)' }} />
+      <div className="w-9 h-9 flex items-center justify-center flex-shrink-0 mt-0.5" style={{ border: '1px solid #0D2030', color: '#00E5FF', backgroundColor: '#040C16' }}>{icon}</div>
+      <div className="flex-1">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+          <h3 className="text-sm font-medium" style={{ color: '#C8D8E8', fontFamily: "'Orbitron', sans-serif", letterSpacing: '0.05em' }}>{title}</h3>
+          {status && (
+            <span className="text-[9px] tracking-widest px-2.5 py-1 uppercase font-bold" style={{ backgroundColor: isActive ? 'rgba(57,255,20,0.08)' : 'rgba(0,229,255,0.04)', border: `1px solid ${isActive ? 'rgba(57,255,20,0.3)' : 'rgba(0,229,255,0.15)'}`, color: isActive ? '#39FF14' : '#00E5FF' }}>
+              {status}
+            </span>
+          )}
+        </div>
+        <p className="text-sm leading-relaxed" style={{ color: '#3A6A7A' }}>{desc}</p>
       </div>
-      <p style={{ fontSize:'10px', lineHeight:'1.9', letterSpacing:'0.05em', color:'var(--ash)' }}>{body}</p>
     </div>
-  </div>
-);
+  );
+}
 
 export function Privacy() {
   return (
-    <PageShell title="PRIVACY" code="DOC-001">
-      <IB title="Data Collected" body="Only name, phone, and delivery info. Nothing more. We keep it minimal."/>
-      <IB title="How We Use It"  body="Exclusively to process and deliver your order. That is it."/>
-      <IB title="Security"       body="Industry-standard encryption. Your data is locked tight."/>
-      <IB title="Data Sharing"   body="Never sold. Only shared with delivery partners — and only what is needed."/>
-      <div style={{ marginTop:'20px', padding:'12px 14px', border:'1px solid var(--paper-dk)', background:'var(--paper-dk)', fontSize:'8px', letterSpacing:'0.16em', color:'var(--ash)', fontFamily:"'Space Mono',monospace" }}>
-        LAST UPDATED: FEB 2026 · REVIEWED QUARTERLY
+    <PageWrapper icon={<ShieldCheck size={20} />} title="Privacy Policy" subtitle="At our store, your data privacy and information security are our top priorities. Here's how we protect your information." tag="Privacy">
+      <InfoCard icon={<Database size={16} />} title="Data We Collect"   desc="We collect only the data necessary to run your store, such as name, email, and order information, to ensure a smooth selling experience." />
+      <InfoCard icon={<Eye size={16} />}      title="How We Use Your Data" desc="Your data is used to improve our services, process orders, and provide smart reports to help you make better business decisions." />
+      <InfoCard icon={<Lock size={16} />}     title="Information Protection"         desc="We use advanced encryption technologies and international security standards to protect your data from unauthorized access." />
+      <InfoCard icon={<Globe size={16} />}    title="Data Sharing"          desc="We never sell your data. We share it only with trusted service providers to complete your transactions." />
+      <div className="mt-8 p-5 flex items-center justify-between" style={{ border: '1px solid rgba(57,255,20,0.15)', backgroundColor: 'rgba(57,255,20,0.03)' }}>
+        <div className="flex items-center gap-3">
+          <Bell size={14} style={{ color: '#39FF14' }} />
+          <p className="text-xs" style={{ color: '#3A6A7A' }}>This policy is periodically updated to keep up withith the latest security standards.</p>
+        </div>
+        <span className="text-[10px] tracking-widest flex-shrink-0 ml-6" style={{ color: '#1A4A5A' }}>Updated: 06.02.2026</span>
       </div>
-    </PageShell>
+    </PageWrapper>
   );
 }
 
 export function Terms() {
   return (
-    <PageShell title="TERMS" code="DOC-002">
-      <IB title="Your Account"   body="You own the account, you own the responsibility. Keep credentials secure."/>
-      <IB title="Payments"       body="Zero hidden charges. The price shown is exactly what you pay. Final."/>
-      <IB title="Prohibited Use" body="No counterfeit or illegal items. We run clean operations only." tag="STRICT"/>
-      <IB title="Governing Law"  body="Governed by Algerian law. Disputes through official legal channels."/>
-      <div style={{ marginTop:'20px', padding:'12px 14px', borderLeft:'4px solid var(--punch)', background:'rgba(255,45,0,0.04)', fontSize:'8px', letterSpacing:'0.14em', lineHeight:'1.9', color:'var(--ash)', fontFamily:"'Space Mono',monospace" }}>
-        TERMS MAY UPDATE. CONTINUED USE = ACCEPTANCE OF CURRENT VERSION.
+    <PageWrapper icon={<FileText size={20} />} title="Terms of Use" subtitle="By using our platform, you agree to comply with the following terms and rules to ensure a fair and safe commercial environment." tag="Terms">
+      <InfoCard icon={<CheckCircle2 size={16} />} title="Account Responsibility"     desc="You are responsible for maintaining the confidentiality of your account and all activities under it. Information provided must be accurate and up to date." />
+      <InfoCard icon={<CreditCard size={16} />}   title="Fees & Subscriptions" desc="Our services are subject to periodic subscription fees. All fees are clear with no hidden costs and are charged according to your chosen plan." />
+      <InfoCard icon={<Ban size={16} />}           title="Prohibited Content"    desc="Using the platform to sell illegal goods or infringe intellectual property rights is prohibited. We reserve the right to close any store that violates these rules." />
+      <InfoCard icon={<Scale size={16} />}         title="Applicable Law" desc="These Terms are governed and interpreted in accordance with the applicable local laws of Algeria, and any disputes are subject to the jurisdiction of local courts." />
+      <div className="mt-8 p-5 flex items-start gap-3" style={{ border: '1px solid rgba(255,150,0,0.2)', backgroundColor: 'rgba(255,150,0,0.03)' }}>
+        <AlertCircle size={16} style={{ color: '#FF9500', flexShrink: 0, marginTop: 1 }} />
+        <p className="text-xs leading-relaxed" style={{ color: '#3A6A7A' }}>
+          // We reserve the right to modify these Terms at any time. Continued use of the platform after amendments يعد موافقة منك على Terms الNewة.
+        </p>
       </div>
-    </PageShell>
+    </PageWrapper>
   );
 }
 
 export function Cookies() {
   return (
-    <PageShell title="COOKIES" code="DOC-003">
-      <IB title="Essential Cookies"  body="Core functions — login, cart, checkout. Cannot be disabled." tag="ALWAYS ON" tagColor="var(--ink)"/>
-      <IB title="Preference Cookies" body="Saves your settings so you do not have to repeat yourself." tag="OPTIONAL"/>
-      <IB title="Analytics Cookies"  body="Anonymous data to improve the experience. Nothing personal stored." tag="OPTIONAL"/>
-      <div style={{ marginTop:'20px', padding:'14px', border:'1px solid var(--ink)', display:'flex', gap:'10px', alignItems:'flex-start' }}>
-        <ToggleRight style={{ width:'16px', height:'16px', color:'var(--punch)', flexShrink:0, marginTop:'2px' }}/>
-        <div>
-          <p style={{ fontSize:'9px', fontWeight:700, letterSpacing:'0.14em', color:'var(--ink)', marginBottom:'5px', fontFamily:"'Space Mono',monospace" }}>MANAGE YOUR COOKIES</p>
-          <p style={{ fontSize:'10px', lineHeight:'1.8', color:'var(--ash)' }}>Adjust through browser settings. Disabling essential cookies breaks core functionality.</p>
+    <PageWrapper icon={<CookieIcon size={20} />} title="Cookie Policy" subtitle="We use cookies to improve your experience, personalize content, and analyze traffic on our platform." tag="Cookies">
+      <InfoCard icon={<ShieldCheck size={16} />}   title="Essential Cookies"    desc="These cookies are required for basic site functions such as login and cart security. They cannot be disabled." status="Always Active" />
+      <InfoCard icon={<Settings size={16} />}      title="Preference Cookies" desc="Allow the site to remember your preferences such as current language and timezone." status="Optional" />
+      <InfoCard icon={<MousePointer2 size={16} />} title="Analytics Cookies"   desc="Help us understand how visitors interact with the store, enabling us to develop more efficient selling tools." status="Optional" />
+      <div className="mt-8 p-6 relative overflow-hidden" style={{ backgroundColor: 'rgba(0,229,255,0.04)', border: '1px solid rgba(0,229,255,0.2)' }}>
+        <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, transparent, #00E5FF, transparent)' }} />
+        <div className="flex gap-4 items-start">
+          <ToggleRight size={18} style={{ color: '#00E5FF', flexShrink: 0, marginTop: 2 }} />
+          <div>
+            <h3 className="text-sm mb-2" style={{ color: '#00E5FF', fontFamily: "'Orbitron', sans-serif", letterSpacing: '0.08em' }}>How Do You Control Your Preferences?</h3>
+            <p className="text-xs leading-relaxed" style={{ color: '#3A6A7A' }}>
+              // You can manage or delete Cookies through your browser settings at any time. Please note that disabling بعضها قد يؤثر على تجربة استخدام المنصة.
+            </p>
+          </div>
         </div>
       </div>
-    </PageShell>
+    </PageWrapper>
   );
 }
 
 export function Contact() {
-  const [form, setForm] = useState({ name:'', email:'', message:'' });
-  const [sent, setSent] = useState(false);
+  const store = {
+    language: 'ar',
+    design: { primaryColor: '#00E5FF', secondaryColor: '#39FF14' },
+    contact: {
+      email:    'support@teststore.com',
+      phone:    '+213550123456',
+      wilaya:   'Algiers',
+      facebook: 'https://facebook.com',
+      whatsapp: '213550123456',
+      tiktok:   'https://tiktok.com',
+    },
+  };
+
+  const [typedText, setTypedText] = useState('');
+  const fullText = '> Contact_us --init';
+
+  useEffect(() => {
+    let i = 0;
+    const id = setInterval(() => {
+      setTypedText(fullText.slice(0, i + 1));
+      i++;
+      if (i >= fullText.length) clearInterval(id);
+    }, 50);
+    return () => clearInterval(id);
+  }, []);
+
+  const contacts = [
+    { icon: <Mail className="w-4 h-4" />,  label: 'email_address', value: store.contact.email,  href: `mailto:${store.contact.email}`, code: 'P01' },
+    { icon: <Phone className="w-4 h-4" />, label: 'phone_line',          value: store.contact.phone,  href: `tel:${store.contact.phone}`,    code: 'P01' },
+    { icon: <MapPin className="w-4 h-4" />,label: 'location',    value: store.contact.wilaya, href: undefined,                       code: 'P01' },
+  ];
+
+  const socials = [
+    { name: 'Facebook',  href: store.contact.facebook,                   icon: <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> },
+    { name: 'WhatsApp', href: `https://wa.me/${store.contact.whatsapp}`, icon: <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.94 3.675 1.438 5.662 1.439h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> },
+    { name: 'TikTok', href: store.contact.tiktok,                     icon: <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.06-2.89-.44-4.11-1.24-.03 2.15-.02 4.31-.02 6.46 0 1.19-.21 2.4-.78 3.46-.94 1.83-2.86 2.92-4.88 3.12-1.84.23-3.83-.24-5.26-1.48-1.57-1.32-2.3-3.43-1.95-5.44.25-1.58 1.15-3.05 2.51-3.9 1.14-.73 2.51-.99 3.84-.81v4.11c-.71-.12-1.47.05-2.05.5-.66.52-.96 1.4-.78 2.21.14.73.72 1.34 1.45 1.5.88.2 1.88-.16 2.37-.93.2-.34.28-.73.28-1.12V0l-.02.02z"/></svg> },
+  ];
+
   return (
-    <div style={{ backgroundColor:'var(--paper)', fontFamily:"'Space Mono',monospace", minHeight:'100vh' }}>
-      {/* Punch header */}
-      <div style={{ backgroundColor:'var(--punch)', padding:'80px 6vw 40px', position:'relative', overflow:'hidden' }}>
-        <div style={{ position:'absolute', right:'-3%', bottom:'-15%', pointerEvents:'none', userSelect:'none', opacity:0.1 }}>
-          <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(10rem,28vw,26rem)', color:'var(--paper)', letterSpacing:'-0.05em', lineHeight:1 }}>HIT</span>
+    <section className="min-h-screen py-20" dir="ltr" style={{ backgroundColor: '#050B14', fontFamily: "'JetBrains Mono', monospace" }}>
+      <div className="max-w-3xl mx-auto px-6">
+
+        {/* [Arabic] */}
+        <div className="mb-12 p-5" style={{ border: '1px solid #0D2030', backgroundColor: '#040C16' }}>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#FF3B30' }} />
+            <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#FF9500' }} />
+            <span className="w-3 h-3 rounded-full" style={{ backgroundColor: '#39FF14' }} />
+            <span className="ml-4 text-[10px] tracking-widest" style={{ color: '#2A5A6A' }}>contact_terminal_v2.1</span>
+          </div>
+          <p className="text-sm" style={{ color: '#00E5FF' }}>{typedText}<span className="animate-pulse">▮</span></p>
+          <p className="text-[11px] mt-2" style={{ color: '#1A4A5A' }}>// initializing Contact channels...</p>
         </div>
-        <h1 style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'clamp(3rem,9vw,9rem)', color:'var(--paper)', letterSpacing:'-0.04em', lineHeight:0.88, position:'relative', zIndex:2 }}>HIT US.</h1>
-        <p style={{ fontSize:'9px', letterSpacing:'0.2em', color:'rgba(242,239,232,0.55)', marginTop:'14px', position:'relative', zIndex:2 }}>WE REPLY WITHIN 24H · NO CAP</p>
-      </div>
-      <div className="contact-grid-z" style={{ maxWidth:'860px', margin:'0 auto', padding:'44px 24px 80px' }}>
-        {/* Channels */}
-        <div>
-          <p style={{ fontSize:'8px', letterSpacing:'0.22em', color:'var(--ash)', marginBottom:'14px' }}>/ CONTACT CHANNELS</p>
-          {[{emoji:'📡',label:'EMAIL',val:'hello@zinedrop.dz',href:'mailto:hello@zinedrop.dz'},{emoji:'📞',label:'PHONE',val:'+213 550 123 456',href:'tel:+213550123456'},{emoji:'📍',label:'BASE',val:'Alger, DZ',href:undefined}].map(item=>(
-            <a key={item.label} href={item.href||'#'} style={{ display:'flex', alignItems:'center', gap:'12px', padding:'12px 14px', borderBottom:'1px solid var(--paper-dk)', textDecoration:'none', transition:'background 0.18s' }}
-              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--paper-dk)';}}
-              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>
-              <span style={{ fontSize:'1.3rem' }}>{item.emoji}</span>
-              <div>
-                <p style={{ fontSize:'8px', letterSpacing:'0.2em', color:'var(--ash)', marginBottom:'2px' }}>{item.label}</p>
-                <p style={{ fontSize:'10px', fontWeight:700, color:'var(--ink)', letterSpacing:'0.08em' }}>{item.val}</p>
+
+        <div className="flex items-center gap-5 mb-10">
+          <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: '#00E5FF' }}>◈ contact_us</span>
+          <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(0,229,255,0.3), transparent)' }} />
+        </div>
+
+        {/* Contact Info */}
+        <div className="space-y-3 mb-12">
+          {contacts.map(item => (
+            <div key={item.code} className="group flex items-center justify-between p-5 transition-all duration-300 cursor-pointer"
+              style={{ border: '1px solid #0D2030', backgroundColor: '#080F1A' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(0,229,255,0.4)'; el.style.backgroundColor = '#0A141F'; }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = '#0D2030'; el.style.backgroundColor = '#080F1A'; }}
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-9 h-9 flex items-center justify-center" style={{ border: '1px solid rgba(0,229,255,0.2)', color: '#00E5FF' }}>{item.icon}</div>
+                <div>
+                  <p className="text-[9px] tracking-widest mb-0.5" style={{ color: '#2A5A6A' }}>{item.code}/ {item.label}</p>
+                  <p className="text-sm font-medium group-hover:text-[#00E5FF] transition-colors" style={{ color: '#C8D8E8' }}>{item.value}</p>
+                </div>
               </div>
-              <ArrowUpRight style={{ width:'13px', height:'13px', color:'var(--punch)', marginLeft:'auto' }}/>
-            </a>
-          ))}
-          <div style={{ marginTop:'20px', padding:'18px', background:'var(--ink)', position:'relative', overflow:'hidden' }}>
-            <div style={{ position:'absolute', right:'-5%', bottom:'-10%', opacity:0.07, pointerEvents:'none' }}>
-              <span style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'6rem', color:'var(--paper)', letterSpacing:'-0.04em' }}>RAW</span>
+              <span className="text-[10px] tracking-widest opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: '#00E5FF' }}>contact →</span>
             </div>
-            <p style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'1.2rem', color:'var(--punch)', letterSpacing:'-0.01em', lineHeight:1.1, position:'relative', zIndex:2 }}>STAY FRESH.<br/>STAY REAL.</p>
-            <p style={{ fontSize:'8px', letterSpacing:'0.18em', color:'rgba(242,239,232,0.35)', marginTop:'8px', position:'relative', zIndex:2 }}>DROP CULTURE · ALGIERS</p>
+          ))}
+        </div>
+
+        {/* [Arabic]Contact[Arabic] */}
+        <div>
+          <p className="text-[10px] tracking-widest mb-5" style={{ color: '#2A5A6A' }}>// social_media_protocols</p>
+          <div className="grid grid-cols-3 gap-3">
+            {socials.map(s => (
+              <a key={s.name} href={s.href} target="_blank" rel="noreferrer"
+                className="flex flex-col items-center gap-3 py-6 transition-all duration-300"
+                style={{ border: '1px solid #0D2030', backgroundColor: '#080F1A', color: '#4A7A8A' }}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(0,229,255,0.4)'; el.style.color = '#00E5FF'; el.style.boxShadow = '0 0 20px rgba(0,229,255,0.06)'; }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = '#0D2030'; el.style.color = '#4A7A8A'; el.style.boxShadow = 'none'; }}
+              >
+                {s.icon}
+                <span className="text-[9px] tracking-[0.2em] uppercase" style={{ color: '#2A5A6A' }}>{s.name}</span>
+              </a>
+            ))}
           </div>
         </div>
-        {/* Form */}
-        <div>
-          <p style={{ fontSize:'8px', letterSpacing:'0.22em', color:'var(--ash)', marginBottom:'14px' }}>/ SEND A MESSAGE</p>
-          {sent ? (
-            <div style={{ minHeight:'260px', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', border:'1px solid var(--ink)', textAlign:'center' }}>
-              <CheckCircle2 style={{ width:'32px', height:'32px', color:'var(--punch)', marginBottom:'10px' }}/>
-              <p style={{ fontFamily:"'Unbounded',sans-serif", fontWeight:900, fontSize:'1.1rem', color:'var(--ink)', letterSpacing:'-0.01em', marginBottom:'4px' }}>SENT.</p>
-              <p style={{ fontSize:'8px', letterSpacing:'0.2em', color:'var(--ash)' }}>BACK IN 24H · NO CAP</p>
-            </div>
-          ) : (
-            <form onSubmit={e=>{e.preventDefault();setSent(true);}} style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
-              {[{label:'YOUR NAME',type:'text',key:'name',ph:'Full name'},{label:'EMAIL',type:'email',key:'email',ph:'your@email.com'}].map(f=>(
-                <div key={f.key}>
-                  <p style={{ fontSize:'8px', letterSpacing:'0.22em', color:'var(--ash)', marginBottom:'5px' }}>{f.label}</p>
-                  <input type={f.type} value={(form as any)[f.key]} onChange={e=>setForm({...form,[f.key]:e.target.value})} placeholder={f.ph} required style={{ width:'100%', padding:'11px 13px', fontFamily:"'Space Mono',monospace", fontSize:'11px', background:'var(--paper)', border:'1px solid var(--ink)', color:'var(--ink)', outline:'none' }} onFocus={e=>{e.target.style.boxShadow='3px 3px 0 var(--punch)';}} onBlur={e=>{e.target.style.boxShadow='none';}}/>
-                </div>
-              ))}
-              <div>
-                <p style={{ fontSize:'8px', letterSpacing:'0.22em', color:'var(--ash)', marginBottom:'5px' }}>YOUR MESSAGE</p>
-                <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="What's good?" rows={5} required style={{ width:'100%', padding:'11px 13px', fontFamily:"'Space Mono',monospace", fontSize:'11px', background:'var(--paper)', border:'1px solid var(--ink)', color:'var(--ink)', outline:'none', resize:'none' as any }} onFocus={e=>{e.target.style.boxShadow='3px 3px 0 var(--punch)';}} onBlur={e=>{e.target.style.boxShadow='none';}}/>
-              </div>
-              <button type="submit" className="btn-z" style={{ justifyContent:'center', width:'100%', clipPath:'polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%)' }}>
-                SEND IT <ArrowUpRight style={{ width:'13px', height:'13px' }}/>
-              </button>
-            </form>
-          )}
-        </div>
       </div>
-    </div>
+    </section>
   );
 }

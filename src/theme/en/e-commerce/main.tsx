@@ -104,9 +104,9 @@ export function Navbar({ store }: { store: Store }) {
   const isRTL = store.language === 'ar';
 
   const navItems = [
-    { href: `/${store.subdomain}`,         label: isRTL ? 'الرئيسية'       : 'Home'    },
-    { href: `/${store.subdomain}/contact`, label: isRTL ? 'اتصل بنا'       : 'Contact' },
-    { href: `/${store.subdomain}/Privacy`, label: isRTL ? 'سياسة الخصوصية' : 'Privacy' },
+    { href: `/`,         label: isRTL ? 'Home'       : 'Home'    },
+    { href: `/contact`, label: isRTL ? 'Contact Us'       : 'Contact' },
+    { href: `/Privacy`, label: isRTL ? 'Privacy Policy' : 'Privacy' },
   ];
 
   const initials = store.name
@@ -121,7 +121,7 @@ export function Navbar({ store }: { store: Store }) {
         <div className="flex justify-between items-center h-16">
 
           {/* Logo */}
-          <Link href={`/${store.subdomain}`} className="flex items-center gap-2 flex-shrink-0">
+          <Link href={`/`} className="flex items-center gap-2 flex-shrink-0">
             {store.design.logoUrl ? (
               <img src={store.design.logoUrl} alt={store.name} className="h-10 w-auto object-contain" />
             ) : (
@@ -215,9 +215,9 @@ export function Footer({ store }: any) {
 
           <div className="flex items-center gap-6">
             {/* FIX — 'Cookise' corrigé en 'Cookies' */}
-            <a href={`/${store.subdomain}/Privacy`} className="text-gray-400 hover:text-white text-sm transition-colors">Privacy</a>
-            <a href={`/${store.subdomain}/Terms`}   className="text-gray-400 hover:text-white text-sm transition-colors">Terms</a>
-            <a href={`/${store.subdomain}/Cookies`} className="text-gray-400 hover:text-white text-sm transition-colors">Cookies</a>
+            <a href={`/Privacy`} className="text-gray-400 hover:text-white text-sm transition-colors">Privacy</a>
+            <a href={`/Terms`}   className="text-gray-400 hover:text-white text-sm transition-colors">Terms</a>
+            <a href={`/Cookies`} className="text-gray-400 hover:text-white text-sm transition-colors">Cookies</a>
           </div>
         </div>
       </div>
@@ -242,7 +242,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-gray-400 bg-gray-50">
-            <span className="text-sm font-medium">{isRTL ? 'لا توجد صورة' : 'No Image'}</span>
+            <span className="text-sm font-medium">{isRTL ? 'No image' : 'No Image'}</span>
           </div>
         )}
         {discount > 0 && (
@@ -273,7 +273,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
             )}
           </div>
           <Link
-            href={`/${store.subdomain}/product/${product.slug || product.id}`}
+            href={`/product/${product.slug || product.id}`}
             className="block w-full py-3 px-4 rounded-xl text-white font-bold transition-all hover:opacity-90 hover:shadow-lg active:scale-95 text-center"
             style={{ backgroundColor: store.design.primaryColor }}
           >
@@ -293,13 +293,13 @@ export const Home = ({ store }: any) => {
   const isRTL = store.language === 'ar';
 
   const t = {
-    categories:       isRTL ? 'التصنيفات'                    : 'Categories',
-    noCategories:     isRTL ? 'لا توجد تصنيفات'              : 'No Categories',
-    noCategoriesDesc: isRTL ? 'لم يتم إضافة أي تصنيفات بعد'  : 'No categories have been added yet',
-    products:         isRTL ? 'المنتجات'                     : 'Products',
-    noProducts:       isRTL ? 'لا توجد منتجات'               : 'No Products',
-    noProductsDesc:   isRTL ? 'لم يتم إضافة أي منتجات بعد'   : 'No products have been added yet',
-    viewDetails:      isRTL ? 'عرض التفاصيل'                 : 'View Details',
+    categories:       isRTL ? 'Categories'                    : 'Categories',
+    noCategories:     isRTL ? 'No categories'              : 'No Categories',
+    noCategoriesDesc: isRTL ? 'No categories added yet'  : 'No categories have been added yet',
+    products:         isRTL ? 'Products'                     : 'Products',
+    noProducts:       isRTL ? 'No products'               : 'No Products',
+    noProductsDesc:   isRTL ? 'No products added yet'   : 'No products have been added yet',
+    viewDetails:      isRTL ? 'View Details'                 : 'View Details',
   };
 
   return (
@@ -439,11 +439,11 @@ export function Details({
   const [selectedImage,  setSelectedImage]  = useState(0);
 
   return (
-    <div className="min-h-screen bg-white" dir="rtl">
+    <div className="min-h-screen bg-white" dir="ltr">
 
       {showShareToast && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm">
-          <Link2 className="w-4 h-4" /> تم نسخ الرابط!
+          <Link2 className="w-4 h-4" /> Link Copied!
         </div>
       )}
 
@@ -451,9 +451,9 @@ export function Details({
       <header className="border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <nav className="flex items-center gap-1.5 text-xs text-gray-400">
-            <span className="hover:text-gray-700 cursor-pointer transition-colors">الرئيسية</span>
+            <span className="hover:text-gray-700 cursor-pointer transition-colors">Home</span>
             <ChevronLeft className="w-3 h-3" />
-            <span className="hover:text-gray-700 cursor-pointer transition-colors">المنتجات</span>
+            <span className="hover:text-gray-700 cursor-pointer transition-colors">Products</span>
             <ChevronLeft className="w-3 h-3" />
             <span className="text-gray-800 font-medium truncate max-w-[160px]">{product.name}</span>
           </nav>
@@ -469,7 +469,7 @@ export function Details({
             </button>
             <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${inStock ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
               <div className={`w-1.5 h-1.5 rounded-full ${inStock ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-              {inStock ? 'متوفر' : 'نفد المخزون'}
+              {inStock ? 'Available' : 'Out of Stock'}
             </div>
           </div>
         </div>
@@ -496,7 +496,7 @@ export function Details({
 
               {discount > 0 && (
                 <div className="absolute top-4 right-4 bg-gray-900 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                  خصم {discount}%
+                  Discount {discount}%
                 </div>
               )}
 
@@ -510,7 +510,7 @@ export function Details({
               {!inStock && !autoGen && (
                 <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center">
                   <div className="bg-gray-900 text-white px-6 py-3 rounded-2xl font-bold text-sm flex items-center gap-2">
-                    <Package className="w-5 h-5" /> نفذت الكمية
+                    <Package className="w-5 h-5" /> Out of Stock
                   </div>
                 </div>
               )}
@@ -549,9 +549,9 @@ export function Details({
 
             <div className="grid grid-cols-3 gap-3 pt-2">
               {[
-                { icon: <Truck className="w-5 h-5" />,    label: 'توصيل سريع',  sub: '24-48 ساعة' },
-                { icon: <Shield className="w-5 h-5" />,   label: 'جودة مضمونة', sub: '100% أصلي'  },
-                { icon: <RefreshCw className="w-5 h-5" />, label: 'استبدال سهل', sub: '7 أيام'     },
+                { icon: <Truck className="w-5 h-5" />,    label: 'Fast Delivery',  sub: '24-48 Hours' },
+                { icon: <Shield className="w-5 h-5" />,   label: 'Guaranteed Quality', sub: '100% Authentic'  },
+                { icon: <RefreshCw className="w-5 h-5" />, label: 'Easy Exchange', sub: '7 Days'     },
               ].map((b, i) => (
                 <div key={i} className="flex flex-col items-center gap-2 py-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-gray-200 transition-colors">
                   <span className="text-gray-700">{b.icon}</span>
@@ -572,34 +572,34 @@ export function Details({
                     <Star key={i} className={`w-4 h-4 ${i < 4 ? 'fill-amber-400 text-amber-400' : 'fill-gray-200 text-gray-200'}`} />
                   ))}
                 </div>
-                <span className="text-xs text-gray-500 font-medium">(4.8) · ١٢٨ تقييم</span>
-                <span className="text-xs text-green-600 font-medium">٨٦ تم شراؤه اليوم</span>
+                <span className="text-xs text-gray-500 font-medium">(4.8) · 128 Reviews</span>
+                <span className="text-xs text-green-600 font-medium">86 bought today</span>
               </div>
             </div>
 
             <div className="flex items-baseline gap-4 bg-gray-50 p-4 rounded-2xl">
               <span className="text-4xl font-black text-gray-900 tracking-tight">
                 {finalPrice.toLocaleString('ar-DZ')}
-                <span className="text-lg font-semibold text-gray-400 mr-1">د.ج</span>
+                <span className="text-lg font-semibold text-gray-400 mr-1">DZD</span>
               </span>
               {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
                 <div className="flex flex-col">
-                  <span className="text-lg text-gray-400 line-through">{parseFloat(product.priceOriginal).toLocaleString('ar-DZ')} د.ج</span>
-                  <span className="text-xs text-red-500 font-bold">وفّر {(parseFloat(product.priceOriginal) - finalPrice).toLocaleString('ar-DZ')} د.ج</span>
+                  <span className="text-lg text-gray-400 line-through">{parseFloat(product.priceOriginal).toLocaleString('ar-DZ')} DZD</span>
+                  <span className="text-xs text-red-500 font-bold">Save {(parseFloat(product.priceOriginal) - finalPrice).toLocaleString('ar-DZ')} DZD</span>
                 </div>
               )}
             </div>
 
             <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold border ${autoGen ? 'bg-blue-50 text-blue-700 border-blue-200' : inStock ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-600 border-red-200'}`}>
               {autoGen ? <Infinity className="w-4 h-4" /> : inStock ? <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /> : <X className="w-4 h-4" />}
-              {autoGen ? 'متوفر دائماً' : inStock ? 'متوفر في المخزون' : 'غير متوفر حالياً'}
+              {autoGen ? 'Always Available' : inStock ? 'In Stock' : 'Currently Unavailable'}
             </div>
 
             {/* Offers */}
             {product.offers?.length > 0 && (
               <div className="bg-amber-50/50 p-4 rounded-2xl border border-amber-100">
                 <p className="text-xs font-bold text-amber-800 uppercase tracking-wider mb-3 flex items-center gap-1">
-                  <Star className="w-3 h-3 fill-amber-800" /> العروض المتاحة
+                  <Star className="w-3 h-3 fill-amber-800" /> Available Offers
                 </p>
                 <div className="space-y-2">
                   {product.offers.map((offer: any) => (
@@ -614,12 +614,12 @@ export function Details({
                         <input type="radio" name="offer" value={offer.id} checked={selectedOffer === offer.id} onChange={() => setSelectedOffer(offer.id)} className="sr-only" />
                         <div>
                           <p className="text-sm font-bold text-gray-900">{offer.name}</p>
-                          <p className="text-xs text-gray-500">{offer.quantity} قطع في العرض</p>
+                          <p className="text-xs text-gray-500">{offer.quantity} pcs in offer</p>
                         </div>
                       </div>
                       <div>
                         <span className="text-lg font-black text-gray-900">{offer.price.toLocaleString('ar-DZ')}</span>
-                        <span className="text-xs text-gray-500 mr-1">د.ج</span>
+                        <span className="text-xs text-gray-500 mr-1">DZD</span>
                       </div>
                     </label>
                   ))}
@@ -696,7 +696,7 @@ export function Details({
           <section className="mt-16 pt-12 border-t border-gray-100">
             <div className="">
               <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <FileText className="w-5 h-5" /> وصف المنتج
+                <FileText className="w-5 h-5" /> Product Description
               </h2>
               <div
                 className="prose prose-lg prose-gray max-w-none text-gray-600 leading-relaxed"
@@ -798,7 +798,7 @@ export function ProductForm({
   }, [selectedWilayaData, formData.typeLivraison]);
 
   const getTotalPrice = useCallback(
-    () => getFinalPrice() * formData.quantity + getPriceLivraison(),
+    () => getFinalPrice() * formData.quantity + +getPriceLivraison(),
     [getFinalPrice, formData.quantity, getPriceLivraison],
   );
 
@@ -810,12 +810,12 @@ export function ProductForm({
   const validate = useCallback((): boolean => {
     const e: Record<string, string> = {};
     if (!formData.customerName.trim() || formData.customerName.length < 3)
-      e.customerName  = 'الاسم الكامل مطلوب (3 أحرف على الأقل)';
+      e.customerName  = 'Full name required (at least 3 characters)';
     if (!/^(0|\+213)[5-7][0-9]{8}$/.test(formData.customerPhone.replace(/\s/g, '')))
-      e.customerPhone = 'رقم هاتف جزائري صحيح مطلوب (مثال: 0550123456)';
-    if (!formData.customerWelaya)  e.customerWelaya  = 'اختر الولاية';
-    if (!formData.customerCommune) e.customerCommune = 'اختر البلدية';
-    if (formData.quantity < 1)     e.quantity        = 'الكمية يجب أن تكون 1 على الأقل';
+      e.customerPhone = 'Valid Algerian phone number required (e.g. 0550123456)';
+    if (!formData.customerWelaya)  e.customerWelaya  = 'Select Province';
+    if (!formData.customerCommune) e.customerCommune = 'Select Municipality';
+    if (formData.quantity < 1)     e.quantity        = 'Quantity must be at least 1';
     setFormErrors(e);
     return Object.keys(e).length === 0;
   }, [formData]);
@@ -848,7 +848,7 @@ export function ProductForm({
         router.push(`/successfully`);
       }
     } catch {
-      alert('حدث خطأ في الاتصال بالخادم');
+      alert('A server connection error occurred');
     } finally {
       setSubmitting(false);
     }
@@ -861,25 +861,25 @@ export function ProductForm({
       <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
         <div className="flex items-center gap-2">
           <ShoppingCart className="w-5 h-5 text-gray-700" />
-          <p className="font-bold text-gray-900">أدخل بيانات التسليم</p>
+          <p className="font-bold text-gray-900">Enter Delivery Details</p>
         </div>
-        <p className="text-xs text-gray-500 mt-1">سنتواصل معك خلال 24 ساعة لتأكيد طلبك</p>
+        <p className="text-xs text-gray-500 mt-1">We'll contact you within 24 hours to confirm your order</p>
       </div>
 
       <form onSubmit={handleSubmit} className="p-6 space-y-4">
 
         {/* Name + Phone */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FieldWrapper error={formErrors.customerName} label="الاسم الكامل">
+          <FieldWrapper error={formErrors.customerName} label="Full Name">
             <div className="relative">
               <User className="absolute right-3 top-3.5 w-4 h-4 text-gray-400" />
-              <input type="text" value={formData.customerName} placeholder="محمد أحمد"
+              <input type="text" value={formData.customerName} placeholder="Mohamed Ahmed"
                 onChange={e => setFormData({ ...formData, customerName: e.target.value })}
                 className={`${inputCls(!!formErrors.customerName)} pr-10`} />
             </div>
           </FieldWrapper>
 
-          <FieldWrapper error={formErrors.customerPhone} label="رقم الهاتف">
+          <FieldWrapper error={formErrors.customerPhone} label="Phone Number">
             <div className="relative">
               <Phone className="absolute right-3 top-3.5 w-4 h-4 text-gray-400" />
               <input type="tel" dir="ltr" value={formData.customerPhone} placeholder="0550 123 456"
@@ -891,20 +891,20 @@ export function ProductForm({
 
         {/* Wilaya + Commune */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FieldWrapper error={formErrors.customerWelaya} label="الولاية">
+          <FieldWrapper error={formErrors.customerWelaya} label="Province">
             <div className="relative">
               <MapPin className="absolute right-3 top-3.5 w-4 h-4 text-gray-400" />
               <select value={formData.customerWelaya}
                 onChange={e => setFormData({ ...formData, customerWelaya: e.target.value, customerCommune: '' })}
                 className={`${inputCls(!!formErrors.customerWelaya)} pr-10 appearance-none cursor-pointer`}>
-                <option value="">اختر الولاية</option>
+                <option value="">Select Province</option>
                 {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
               </select>
               <ChevronDown className="absolute left-3 top-3.5 w-4 h-4 text-gray-400 pointer-events-none" />
             </div>
           </FieldWrapper>
 
-          <FieldWrapper error={formErrors.customerCommune} label="البلدية">
+          <FieldWrapper error={formErrors.customerCommune} label="Municipality">
             <div className="relative">
               <MapPin className="absolute right-3 top-3.5 w-4 h-4 text-gray-400" />
               <select value={formData.customerCommune}
@@ -912,7 +912,7 @@ export function ProductForm({
                 onChange={e => setFormData({ ...formData, customerCommune: e.target.value })}
                 className={`${inputCls(!!formErrors.customerCommune)} pr-10 appearance-none cursor-pointer disabled:opacity-50`}>
                 <option value="">
-                  {loadingCommunes ? 'جاري التحميل...' : formData.customerWelaya ? 'اختر البلدية' : 'اختر الولاية أولاً'}
+                  {loadingCommunes ? 'Loading...' : formData.customerWelaya ? 'Select Municipality' : 'Select Province First'}
                 </option>
                 {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
@@ -923,7 +923,7 @@ export function ProductForm({
 
         {/* Delivery type — FIX: HomeIcon utilisé au lieu de Home */}
         <div>
-          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">نوع التوصيل</p>
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Delivery Type</p>
           <div className="grid grid-cols-2 gap-3">
             {(['home', 'office'] as const).map(type => (
               <button
@@ -936,10 +936,10 @@ export function ProductForm({
                   : <Building2  className={`w-6 h-6 ${formData.typeLivraison === type ? 'text-white' : 'text-gray-400'}`} />
                 }
                 <div className="text-center">
-                  <p className="text-sm font-bold">{type === 'home' ? 'توصيل للمنزل' : 'استلام من المكتب'}</p>
+                  <p className="text-sm font-bold">{type === 'home' ? 'Home Delivery' : 'Office Pickup'}</p>
                   {selectedWilayaData && (
                     <p className={`text-xs mt-0.5 ${formData.typeLivraison === type ? 'text-gray-300' : 'text-gray-400'}`}>
-                      {(type === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice).toLocaleString('ar-DZ')} د.ج
+                      {(type === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice).toLocaleString('ar-DZ')} DZD
                     </p>
                   )}
                 </div>
@@ -947,26 +947,26 @@ export function ProductForm({
             ))}
           </div>
           {!selectedWilayaData && (
-            <p className="text-xs text-gray-400 mt-2 text-center">اختر الولاية لعرض تكلفة التوصيل</p>
+            <p className="text-xs text-gray-400 mt-2 text-center">Select Province to see Delivery cost</p>
           )}
         </div>
 
         {/* Quantity */}
-        <FieldWrapper error={formErrors.quantity} label="الكمية">
+        <FieldWrapper error={formErrors.quantity} label="Quantity">
           <div className="flex items-center gap-4">
             <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
               className="w-12 h-12 rounded-xl border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-gray-900 hover:bg-gray-900 hover:text-white transition-all font-bold text-xl active:scale-95">−</button>
             <span className="w-16 text-center text-2xl font-black text-gray-900">{formData.quantity}</span>
             <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: p.quantity + 1 }))}
               className="w-12 h-12 rounded-xl border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-gray-900 hover:bg-gray-900 hover:text-white transition-all font-bold text-xl active:scale-95">+</button>
-            <span className="text-sm text-gray-400 font-medium">قطعة</span>
+            <span className="text-sm text-gray-400 font-medium">item(s)</span>
           </div>
         </FieldWrapper>
 
         {/* Summary */}
         <div className="bg-gray-50 rounded-2xl p-5 space-y-3 text-sm border border-gray-100">
           <div className="flex justify-between text-gray-600">
-            <span className="flex items-center gap-1"><Package className="w-4 h-4" /> المنتج</span>
+            <span className="flex items-center gap-1"><Package className="w-4 h-4" /> Product</span>
             <span className="text-gray-900 font-bold truncate max-w-[50%]">{product.name}</span>
           </div>
 
@@ -975,34 +975,34 @@ export function ProductForm({
             if (!offer) return null;
             return (
               <div className="flex justify-between items-center text-gray-600">
-                <span className="flex items-center gap-1"><Tag className="w-3.5 h-3.5 text-amber-500" /> العرض</span>
+                <span className="flex items-center gap-1"><Tag className="w-3.5 h-3.5 text-amber-500" /> Offer</span>
                 <span className="text-amber-600 font-bold bg-amber-50 px-2.5 py-1 rounded-lg text-xs border border-amber-100">{offer.name}</span>
               </div>
             );
           })()}
 
           <div className="flex justify-between text-gray-600">
-            <span className="flex items-center gap-1"><Truck className="w-4 h-4" /> التوصيل</span>
+            <span className="flex items-center gap-1"><Truck className="w-4 h-4" /> Delivery</span>
             <span className="text-gray-900 font-medium">
-              {formData.typeLivraison === 'home' ? 'المنزل' : 'المكتب'}
-              {selectedWilayaData && <span className="text-gray-500 mr-1">({getPriceLivraison().toLocaleString('ar-DZ')} د.ج)</span>}
+              {formData.typeLivraison === 'home' ? 'Home' : 'Office'}
+              {selectedWilayaData && <span className="text-gray-500 mr-1">({getPriceLivraison().toLocaleString('ar-DZ')} DZD)</span>}
             </span>
           </div>
 
           <div className="flex justify-between text-gray-600">
-            <span>سعر القطعة</span>
-            <span className="text-gray-900 font-bold">{finalPrice.toLocaleString('ar-DZ')} د.ج</span>
+            <span>Unit Price</span>
+            <span className="text-gray-900 font-bold">{finalPrice.toLocaleString('ar-DZ')} DZD</span>
           </div>
           <div className="flex justify-between text-gray-600">
-            <span>الكمية</span>
+            <span>Quantity</span>
             <span className="text-gray-900 font-bold">× {formData.quantity}</span>
           </div>
 
           <div className="flex justify-between items-center pt-3 border-t-2 border-dashed border-gray-200">
-            <span className="font-bold text-gray-900 text-base">الإجمالي الكلي</span>
+            <span className="font-bold text-gray-900 text-base">Grand Total</span>
             <span className="text-2xl font-black text-gray-900">
               {getTotalPrice().toLocaleString('ar-DZ')}
-              <span className="text-sm font-bold text-gray-500 mr-1">د.ج</span>
+              <span className="text-sm font-bold text-gray-500 mr-1">DZD</span>
             </span>
           </div>
         </div>
@@ -1013,13 +1013,13 @@ export function ProductForm({
           className={`w-full py-4 rounded-2xl font-bold text-base transition-all flex items-center justify-center gap-2 shadow-lg ${submitting ? 'bg-gray-900 text-white opacity-90 cursor-not-allowed' : 'bg-gray-900 text-white hover:bg-gray-800 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0'}`}
         >
           {submitting
-            ? <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />جاري إرسال الطلب...</>
-            : <><ShoppingCart className="w-5 h-5" />تأكيد الطلب الآن</>
+            ? <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />Processing Order...</>
+            : <><ShoppingCart className="w-5 h-5" />Place Order Now</>
           }
         </button>
 
         <p className="text-xs text-center text-gray-400 flex items-center justify-center gap-1">
-          <Shield className="w-3 h-3" /> بياناتك آمنة ومشفرة 100%
+          <Shield className="w-3 h-3" /> Your data is 100% secure and encrypted
         </p>
       </form>
     </div>
@@ -1051,7 +1051,7 @@ export function PageWrapper({ children, icon, title, subtitle, accentColor = '#6
   title: string; subtitle: string; accentColor?: string;
 }) {
   return (
-    <div className="min-h-screen bg-[#f8f8f6] transition-colors duration-300" dir="rtl">
+    <div className="min-h-screen bg-[#f8f8f6] transition-colors duration-300" dir="ltr">
       <div className="max-w-5xl mx-auto px-6 lg:px-10 py-20">
         <div className="mb-16">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-6 shadow-sm" style={{ backgroundColor: `${accentColor}15`, color: accentColor }}>
@@ -1068,7 +1068,7 @@ export function PageWrapper({ children, icon, title, subtitle, accentColor = '#6
 }
 
 function InfoCard({ icon, title, desc, status }: CardProps) {
-  const isActive = status === 'دائماً نشطة';
+  const isActive = status === 'Always Active';
   return (
     <div className="bg-white border border-gray-100 rounded-[1.75rem] p-6 md:p-8 flex flex-col sm:flex-row gap-5 items-start hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group">
       <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
@@ -1091,21 +1091,21 @@ function InfoCard({ icon, title, desc, status }: CardProps) {
 
 export function Privacy() {
   return (
-    <PageWrapper icon={<ShieldCheck size={28} />} title="سياسة الخصوصية" subtitle="في MdStore، نضع خصوصية بياناتك وأمان متجرك على رأس أولوياتنا.">
+    <PageWrapper icon={<ShieldCheck size={28} />} title="Privacy Policy" subtitle="At MdStore, your data privacy and store security are our top priorities.">
       <div className="grid gap-5">
-        <InfoCard icon={<Database size={22} className="text-blue-500" />}   title="البيانات التي نجمعها"   desc="نجمع فقط البيانات الضرورية لتشغيل متجرك، مثل الاسم، البريد الإلكتروني، ومعلومات الدفع لضمان تجربة بيع سلسة." />
-        <InfoCard icon={<Eye size={22} className="text-purple-500" />}       title="كيفية استخدام البيانات" desc="تُستخدم بياناتك لتحسين خدماتنا، ومعالجة الطلبات، وتوفير تقارير ذكية تساعدك في اتخاذ قرارات تجارية أفضل." />
-        <InfoCard icon={<Lock size={22} className="text-emerald-500" />}     title="حماية المعلومات"         desc="نستخدم تقنيات تشفير متطورة ومعايير أمان عالمية لحماية بياناتك من أي وصول غير مصرح به." />
-        <InfoCard icon={<Globe size={22} className="text-indigo-500" />}     title="مشاركة البيانات"          desc="نحن لا نبيع بياناتك أبداً. نشاركها فقط مع مزودي الخدمات الموثوقين لإتمام عملياتك التجارية." />
+        <InfoCard icon={<Database size={22} className="text-blue-500" />}   title="Data We Collect"   desc="We collect only the data necessary to run your store, such as name, email, and payment information, to ensure a smooth selling experience." />
+        <InfoCard icon={<Eye size={22} className="text-purple-500" />}       title="How We Use Your Data" desc="Your data is used to improve our services, process orders, and provide smart reports to help you make better business decisions." />
+        <InfoCard icon={<Lock size={22} className="text-emerald-500" />}     title="Information Protection"         desc="We use advanced encryption technologies and international security standards to protect your data from unauthorized access." />
+        <InfoCard icon={<Globe size={22} className="text-indigo-500" />}     title="Data Sharing"          desc="We never sell your data. We share it only with trusted service providers to complete your transactions." />
       </div>
       <div className="mt-10 p-6 bg-white rounded-[1.75rem] border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="w-11 h-11 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0">
             <Bell size={18} className="text-gray-400" />
           </div>
-          <p className="text-xs text-gray-400 leading-relaxed">نقوم بتحديث هذه السياسة دورياً لضمان مواكبة أحدث معايير الأمان.</p>
+          <p className="text-xs text-gray-400 leading-relaxed">We periodically update this policy to keep up with the latest security standards.</p>
         </div>
-        <span className="text-xs text-gray-400 font-medium shrink-0">آخر تحديث: 06/02/2026</span>
+        <span className="text-xs text-gray-400 font-medium shrink-0">Last updated: 06/02/2026</span>
       </div>
     </PageWrapper>
   );
@@ -1113,16 +1113,16 @@ export function Privacy() {
 
 export function Terms() {
   return (
-    <PageWrapper icon={<FileText size={28} />} title="شروط الاستخدام" subtitle="باستخدامك لمنصة MdStore، فإنك توافق على الالتزام بالشروط والقواعد التالية." accentColor="#8b5cf6">
+    <PageWrapper icon={<FileText size={28} />} title="Terms of Use" subtitle="By using MdStore, you agree to comply with the following terms and rules." accentColor="#8b5cf6">
       <div className="grid gap-5">
-        <InfoCard icon={<CheckCircle2 size={22} className="text-emerald-500" />} title="مسؤولية الحساب"     desc="أنت مسؤول عن الحفاظ على سرية بيانات حسابك وعن جميع الأنشطة التي تحدث تحته." />
-        <InfoCard icon={<CreditCard size={22} className="text-blue-500" />}      title="الرسوم والاشتراكات" desc="تخضع خدماتنا لرسوم اشتراك دورية. جميع الرسوم واضحة ولا توجد تكاليف مخفية." />
-        <InfoCard icon={<Ban size={22} className="text-rose-500" />}             title="المحتوى المحظور"    desc="يُمنع استخدام المنصة لبيع سلع غير قانونية أو انتهاك حقوق الملكية الفكرية." />
-        <InfoCard icon={<Scale size={22} className="text-violet-500" />}         title="القانون المعمول به" desc="تخضع هذه الشروط وفقاً للقوانين المحلية المعمول بها في الجزائر." />
+        <InfoCard icon={<CheckCircle2 size={22} className="text-emerald-500" />} title="Account Responsibility"     desc="You are responsible for maintaining the confidentiality of your account credentials and all activities under your account." />
+        <InfoCard icon={<CreditCard size={22} className="text-blue-500" />}      title="Fees & Subscriptions" desc="Our services are subject to periodic subscription fees. All fees are transparent with no hidden costs." />
+        <InfoCard icon={<Ban size={22} className="text-rose-500" />}             title="Prohibited Content"    desc="Using the platform to sell illegal goods or infringe intellectual property rights is prohibited." />
+        <InfoCard icon={<Scale size={22} className="text-violet-500" />}         title="Applicable Law" desc="These terms are governed by the applicable local laws of Algeria." />
       </div>
       <div className="mt-10 p-5 bg-amber-50 rounded-[1.75rem] border border-amber-100 flex gap-4 items-start">
         <AlertCircle size={20} className="text-amber-500 shrink-0 mt-0.5" />
-        <p className="text-sm text-amber-800 leading-relaxed">نحتفظ بالحق في تعديل هذه الشروط في أي وقت. استمرار استخدامك للمنصة يعد موافقة على الشروط الجديدة.</p>
+        <p className="text-sm text-amber-800 leading-relaxed">We reserve the right to modify these Terms at any time. Continued use of the platform constitutes acceptance of the updated Terms.</p>
       </div>
     </PageWrapper>
   );
@@ -1130,11 +1130,11 @@ export function Terms() {
 
 export function Cookies() {
   return (
-    <PageWrapper icon={<CookieIcon size={28} />} title="سياسة ملفات تعريف الارتباط" subtitle="نستخدم ملفات تعريف الارتباط لتحسين تجربتك وتخصيص المحتوى." accentColor="#f59e0b">
+    <PageWrapper icon={<CookieIcon size={28} />} title="Cookie Policy" subtitle="We use cookies to improve your experience and personalize content." accentColor="#f59e0b">
       <div className="grid gap-5">
-        <InfoCard icon={<ShieldCheck size={22} className="text-indigo-500" />}   title="ملفات ضرورية"    desc="مطلوبة لتشغيل الوظائف الأساسية للموقع مثل تسجيل الدخول وتأمين سلة التسوق." status="دائماً نشطة" />
-        <InfoCard icon={<Settings size={22} className="text-purple-500" />}      title="ملفات التفضيلات" desc="تسمح للموقع بتذكر خياراتك مثل اللغة والمنطقة الزمنية." status="اختياري" />
-        <InfoCard icon={<MousePointer2 size={22} className="text-blue-500" />}   title="ملفات التحليل"   desc="تساعدنا على فهم كيفية تفاعل التجار مع MdStore لتطوير أدوات أكثر كفاءة." status="اختياري" />
+        <InfoCard icon={<ShieldCheck size={22} className="text-indigo-500" />}   title="Essential Cookies"    desc="Required for basic site functions such as login and cart security." status="Always Active" />
+        <InfoCard icon={<Settings size={22} className="text-purple-500" />}      title="Preference Cookies" desc="Allow the site to remember your preferences such as language and timezone." status="Optional" />
+        <InfoCard icon={<MousePointer2 size={22} className="text-blue-500" />}   title="Analytics Cookies"   desc="Help us understand how merchants interact with MdStore to develop more efficient tools." status="Optional" />
       </div>
       <div className="mt-10 p-7 bg-amber-500 rounded-[1.75rem] text-white relative overflow-hidden shadow-lg shadow-amber-500/20">
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-5">
@@ -1142,8 +1142,8 @@ export function Cookies() {
             <ToggleRight size={24} />
           </div>
           <div>
-            <h3 className="text-base font-black mb-1">كيف تتحكم في خياراتك؟</h3>
-            <p className="text-amber-50/90 text-sm leading-relaxed">يمكنك إدارة أو مسح ملفات تعريف الارتباط من خلال إعدادات متصفحك في أي وقت.</p>
+            <h3 className="text-base font-black mb-1">How Do You Control Your Preferences?</h3>
+            <p className="text-amber-50/90 text-sm leading-relaxed">You can manage or delete Cookies through your browser settings at any time.</p>
           </div>
         </div>
         <div className="absolute -top-10 -left-10 w-48 h-48 bg-white/10 rounded-full blur-3xl pointer-events-none" />
@@ -1159,7 +1159,7 @@ export function Contact() {
     contact: {
       email:    'support@teststore.com',
       phone:    '+213550123456',
-      wilaya:   'الجزائر العاصمة',
+      wilaya:   'Algiers',
       facebook: 'https://facebook.com',
       whatsapp: '213550123456',
       tiktok:   'https://tiktok.com',
@@ -1172,7 +1172,7 @@ export function Contact() {
     <section className="py-20 bg-gray-50 min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-3xl mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">{isRTL ? 'اتصل بنا' : 'Contact Us'}</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">{isRTL ? 'Contact Us' : 'Contact Us'}</h2>
           <div className="w-20 h-1.5 mx-auto rounded-full" style={{ backgroundColor: store.design.primaryColor }} />
         </div>
 
@@ -1180,13 +1180,13 @@ export function Contact() {
           {[
             {
               icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>,
-              label: isRTL ? 'البريد الإلكتروني' : 'Email',
+              label: isRTL ? 'Email Address' : 'Email',
               value: store.contact.email,
               href: `mailto:${store.contact.email}`,
             },
             {
               icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>,
-              label: isRTL ? 'الهاتف' : 'Phone',
+              label: isRTL ? 'Phone' : 'Phone',
               value: store.contact.phone,
               href: `tel:${store.contact.phone}`,
             },

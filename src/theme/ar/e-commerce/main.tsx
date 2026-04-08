@@ -798,7 +798,7 @@ export function ProductForm({
   }, [selectedWilayaData, formData.typeLivraison]);
 
   const getTotalPrice = useCallback(
-    () => getFinalPrice() * formData.quantity + getPriceLivraison(),
+    () => getFinalPrice() * formData.quantity + +getPriceLivraison(),
     [getFinalPrice, formData.quantity, getPriceLivraison],
   );
 

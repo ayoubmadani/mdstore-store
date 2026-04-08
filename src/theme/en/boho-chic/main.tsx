@@ -100,7 +100,7 @@ function PageWrapper({
   return (
     <div
       className="min-h-screen py-24"
-      dir="rtl"
+      dir="ltr"
       style={{ backgroundColor: '#F7F0E6', fontFamily: "'Karla', sans-serif" }}
     >
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300;1,9..144,400&family=Karla:wght@300;400;500&display=swap');`}</style>
@@ -152,7 +152,7 @@ function PageWrapper({
 function InfoCard({ icon, title, desc, status }: {
   icon: React.ReactNode; title: string; desc: string; status?: string;
 }) {
-  const isActive = status === 'دائماً نشطة';
+  const isActive = status === 'Always Active';
 
   return (
     <div
@@ -210,11 +210,11 @@ function InfoCard({ icon, title, desc, status }: {
 
 export function Privacy() {
   return (
-    <PageWrapper icon={<ShieldCheck size={22}/>} title="سياسة الخصوصية" subtitle="في MdStore، نضع خصوصية بياناتك وأمان متجرك على رأس أولوياتنا." tag="Privacy">
-      <InfoCard icon={<Database size={18}/>}  title="البيانات التي نجمعها"   desc="نجمع فقط البيانات الضرورية لتشغيل متجرك، مثل الاسم والبريد الإلكتروني ومعلومات الدفع لضمان تجربة بيع سلسة." />
-      <InfoCard icon={<Eye size={18}/>}       title="كيفية استخدام البيانات" desc="تُستخدم بياناتك لتحسين خدماتنا ومعالجة الطلبات وتوفير تقارير ذكية تساعدك في اتخاذ قرارات تجارية أفضل." />
-      <InfoCard icon={<Lock size={18}/>}      title="حماية المعلومات"         desc="نستخدم تقنيات تشفير متطورة ومعايير أمان عالمية لحماية بياناتك من أي وصول غير مصرح به." />
-      <InfoCard icon={<Globe size={18}/>}     title="مشاركة البيانات"          desc="نحن لا نبيع بياناتك أبداً. نشاركها فقط مع مزودي الخدمات الموثوقين لإتمام عملياتك التجارية." />
+    <PageWrapper icon={<ShieldCheck size={22}/>} title="Privacy Policy" subtitle="At MdStore, your data privacy and store security are our top priorities." tag="Privacy">
+      <InfoCard icon={<Database size={18}/>}  title="Data We Collect"   desc="We collect only the data necessary to run your store, such as name, email, and payment information, to ensure a smooth selling experience." />
+      <InfoCard icon={<Eye size={18}/>}       title="How We Use Your Data" desc="Your data is used to improve our services, process orders, and provide smart reports to help you make better business decisions." />
+      <InfoCard icon={<Lock size={18}/>}      title="Information Protection"         desc="We use advanced encryption technologies and international security standards to protect your data from unauthorized access." />
+      <InfoCard icon={<Globe size={18}/>}     title="Data Sharing"          desc="We never sell your data. We share it only with trusted service providers to complete your transactions." />
 
       <div
         className="mt-8 p-5 flex items-center justify-between"
@@ -223,7 +223,7 @@ export function Privacy() {
         <div className="flex items-center gap-3">
           <Bell size={15} style={{ color: '#C4714A' }} />
           <p className="text-xs leading-relaxed" style={{ color: '#9E8060' }}>
-            نقوم بتحديث هذه السياسة دورياً لضمان مواكبة أحدث معايير الأمان.
+            We periodically update this policy to keep up with the latest security standards.
           </p>
         </div>
         <span className="text-xs flex-shrink-0 mr-4 font-medium" style={{ color: '#C4714A' }}>
@@ -236,11 +236,11 @@ export function Privacy() {
 
 export function Terms() {
   return (
-    <PageWrapper icon={<FileText size={22}/>} title="شروط الاستخدام" subtitle="باستخدامك لمنصة MdStore، فإنك توافق على الالتزام بالشروط والقواعد التالية." tag="Terms">
-      <InfoCard icon={<CheckCircle2 size={18}/>} title="مسؤولية الحساب"     desc="أنت مسؤول عن الحفاظ على سرية بيانات حسابك وعن جميع الأنشطة التي تحدث تحته. يجب أن تكون المعلومات المقدمة دقيقة ومحدثة." />
-      <InfoCard icon={<CreditCard size={18}/>}   title="الرسوم والاشتراكات" desc="تخضع خدماتنا لرسوم اشتراك دورية. جميع الرسوم واضحة ولا توجد تكاليف مخفية، ويتم تحصيلها وفقاً للخطة التي تختارها." />
-      <InfoCard icon={<Ban size={18}/>}           title="المحتوى المحظور"    desc="يُمنع استخدام المنصة لبيع سلع غير قانونية أو انتهاك حقوق الملكية الفكرية. نحتفظ بالحق في إغلاق أي متجر يخالف هذه القوانين." />
-      <InfoCard icon={<Scale size={18}/>}         title="القانون المعمول به" desc="تخضع هذه الشروط وتفسر وفقاً للقوانين المحلية المعمول بها في الجزائر، وأي نزاع ينشأ يخضع للاختصاص القضائي." />
+    <PageWrapper icon={<FileText size={22}/>} title="Terms of Use" subtitle="By using MdStore, you agree to comply with the following terms and rules." tag="Terms">
+      <InfoCard icon={<CheckCircle2 size={18}/>} title="Account Responsibility"     desc="You are responsible for maintaining the confidentiality of your account and all activities under it. Information provided must be accurate and up to date." />
+      <InfoCard icon={<CreditCard size={18}/>}   title="Fees & Subscriptions" desc="Our services are subject to periodic subscription fees. All fees are clear with no hidden costs and are charged according to your chosen plan." />
+      <InfoCard icon={<Ban size={18}/>}           title="Prohibited Content"    desc="Using the platform to sell illegal goods or infringe intellectual property rights is prohibited. We reserve the right to close any store that violates these rules." />
+      <InfoCard icon={<Scale size={18}/>}         title="Applicable Law" desc="These terms are governed by and interpreted in accordance with applicable local laws in Algeria, and any disputes are subject to the jurisdiction of Algerian courts." />
 
       <div
         className="mt-8 p-5 flex items-start gap-3"
@@ -248,7 +248,7 @@ export function Terms() {
       >
         <AlertCircle size={16} style={{ color: '#C4714A', flexShrink: 0, marginTop: '2px' }} />
         <p className="text-xs leading-relaxed" style={{ color: '#9E8060' }}>
-          نحتفظ بالحق في تعديل هذه الشروط في أي وقت. استمرار استخدامك للمنصة بعد التعديلات يعد موافقة منك على الشروط الجديدة.
+          We reserve the right to modify these Terms at any time. Continued use of the platform after amendments constitutes your acceptance of the updated Terms.
         </p>
       </div>
     </PageWrapper>
@@ -257,10 +257,10 @@ export function Terms() {
 
 export function Cookies() {
   return (
-    <PageWrapper icon={<CookieIcon size={22}/>} title="سياسة ملفات تعريف الارتباط" subtitle="نستخدم ملفات تعريف الارتباط لتحسين تجربتك وتخصيص المحتوى وتحليل حركة المرور على منصتنا." tag="Cookies">
-      <InfoCard icon={<ShieldCheck size={18}/>}   title="ملفات ضرورية"      desc="هذه الملفات مطلوبة لتشغيل الوظائف الأساسية للموقع مثل تسجيل الدخول وتأمين سلة التسوق. لا يمكن إيقافها." status="دائماً نشطة" />
-      <InfoCard icon={<Settings size={18}/>}      title="ملفات التفضيلات"   desc="تسمح للموقع بتذكر خياراتك مثل اللغة التي تستخدمها حالياً ومنطقتك الزمنية." status="اختياري" />
-      <InfoCard icon={<MousePointer2 size={18}/>} title="ملفات التحليل"     desc="تساعدنا على فهم كيفية تفاعل التجار مع MdStore مما يسمح لنا بتطوير أدوات بيع أكثر كفاءة." status="اختياري" />
+    <PageWrapper icon={<CookieIcon size={22}/>} title="Cookie Policy" subtitle="We use cookies to improve your experience, personalize content, and analyze traffic on our platform." tag="Cookies">
+      <InfoCard icon={<ShieldCheck size={18}/>}   title="Essential Cookies"      desc="These cookies are required for basic site functions such as login and cart security. They cannot be disabled." status="Always Active" />
+      <InfoCard icon={<Settings size={18}/>}      title="Preference Cookies"   desc="Allow the site to remember your preferences such as current language and timezone." status="Optional" />
+      <InfoCard icon={<MousePointer2 size={18}/>} title="Analytics Cookies"     desc="Help us understand how merchants interact with MdStore, enabling us to develop more efficient selling tools." status="Optional" />
 
       <div
         className="mt-8 p-7 relative overflow-hidden"
@@ -283,10 +283,10 @@ export function Cookies() {
                 fontWeight: 400,
               }}
             >
-              كيف تتحكم في خياراتك؟
+              How Do You Control Your Preferences?
             </h3>
             <p className="text-sm leading-relaxed" style={{ color: 'rgba(247,240,230,0.6)' }}>
-              يمكنك إدارة أو مسح ملفات تعريف الارتباط من خلال إعدادات متصفحك في أي وقت. يرجى العلم أن تعطيل بعضها قد يؤثر على تجربة استخدام المنصة.
+              You can manage or delete Cookies through your browser settings at any time. Please note that disabling some of them may affect your platform experience.
             </p>
           </div>
         </div>
@@ -302,7 +302,7 @@ export function ContactStaticTest() {
     contact: {
       email:    'support@teststore.com',
       phone:    '+213550123456',
-      wilaya:   'الجزائر العاصمة',
+      wilaya:   'Algiers',
       facebook: 'https://facebook.com',
       whatsapp: '213550123456',
       tiktok:   'https://tiktok.com',
@@ -312,13 +312,14 @@ export function ContactStaticTest() {
   const isRTL = store.language === 'ar';
 
   const t = {
+    // تم إصلاح الأخطاء وإضافة نصوص عربية مقابلة
     title:    isRTL ? 'تواصل معنا'          : 'Get in Touch',
-    subtitle: isRTL ? 'يسعدنا سماع أفكارك' : "We'd love to hear from you",
-    email:    isRTL ? 'البريد الإلكتروني'   : 'Email',
-    phone:    isRTL ? 'الهاتف'              : 'Phone',
-    location: isRTL ? 'الموقع'              : 'Location',
+    subtitle: isRTL ? 'نسعد دائماً بسماع آرائكم' : "We'd love to hear from you", // استخدمنا " " هنا لتجنب الخطأ
+    email:    isRTL ? 'البريد الإلكتروني'   : 'Email Address',
+    phone:    isRTL ? 'رقم الهاتف'         : 'Phone',
+    location: isRTL ? 'الموقع'             : 'Location',
     follow:   isRTL ? 'تابعنا على'          : 'Follow Along',
-  };
+};
 
   const contactItems = [
     {
@@ -505,15 +506,15 @@ export const Home = ({ store }: any) => {
   const dir   = isRTL ? 'rtl' : 'ltr';
 
   const t = {
-    categories:       isRTL ? 'تصفّح التصنيفات'              : 'Collections',
-    noCategories:     isRTL ? 'لا توجد تصنيفات'              : 'No Collections Yet',
-    noCategoriesDesc: isRTL ? 'لم يتم إضافة أي تصنيفات بعد'  : 'Check back soon for new arrivals',
-    products:         isRTL ? 'أحدث المنتجات'                 : 'Latest Arrivals',
-    noProducts:       isRTL ? 'لا توجد منتجات'                : 'No Products Yet',
-    noProductsDesc:   isRTL ? 'لم يتم إضافة أي منتجات بعد'   : 'New pieces arriving soon…',
-    viewDetails:      isRTL ? 'اكتشف المنتج'                  : 'Discover',
-    all:              isRTL ? 'الكل'                           : 'All',
-    scrollDown:       isRTL ? 'تمرير للأسفل'                  : 'Scroll',
+    categories:       isRTL ? 'Browse Categories'              : 'Collections',
+    noCategories:     isRTL ? 'No categories'              : 'No Collections Yet',
+    noCategoriesDesc: isRTL ? 'No categories added yet'  : 'Check back soon for new arrivals',
+    products:         isRTL ? 'Latest Products'                 : 'Latest Arrivals',
+    noProducts:       isRTL ? 'No products'                : 'No Products Yet',
+    noProductsDesc:   isRTL ? 'No products added yet'   : 'New pieces arriving soon…',
+    viewDetails:      isRTL ? 'View Product'                  : 'Discover',
+    all:              isRTL ? 'All'                           : 'All',
+    scrollDown:       isRTL ? 'Scroll Down'                  : 'Scroll',
   };
 
   return (
@@ -597,7 +598,7 @@ export const Home = ({ store }: any) => {
                     letterSpacing:   '0.06em',
                   }}
                 >
-                  {isRTL ? 'اكتشف المجموعة' : 'Explore Collection'}
+                  {isRTL ? 'Explore Collection' : 'Explore Collection'}
                 </a>
                 <a
                   href="#categories"
@@ -653,7 +654,7 @@ export const Home = ({ store }: any) => {
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="text-center mb-12 boho-in">
             <p className="text-xs tracking-widest mb-3 uppercase" style={{ color: '#C4714A', letterSpacing: '0.22em' }}>
-              ✦ &nbsp; {isRTL ? 'تصفّح' : 'Browse'} &nbsp; ✦
+              ✦ &nbsp; {isRTL ? 'Browse' : 'Browse'} &nbsp; ✦
             </p>
             <h2
               style={{
@@ -721,7 +722,7 @@ export const Home = ({ store }: any) => {
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="text-center mb-14">
             <p className="text-xs tracking-widest mb-3 uppercase" style={{ color: '#C4714A', letterSpacing: '0.22em' }}>
-              ✦ &nbsp; {isRTL ? 'جديد' : 'New In'} &nbsp; ✦
+              ✦ &nbsp; {isRTL ? 'New' : 'New In'} &nbsp; ✦
             </p>
             <h2
               style={{
@@ -803,7 +804,7 @@ export function Details({
   return (
     <div
       className="min-h-screen"
-      dir="rtl"
+      dir="ltr"
       style={{ backgroundColor: '#F7F0E6', fontFamily: "'Karla', sans-serif" }}
     >
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Karla:wght@300;400;500;600&display=swap');`}</style>
@@ -814,7 +815,7 @@ export function Details({
           className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-5 py-2.5 text-sm shadow-lg"
           style={{ backgroundColor: '#3D2314', color: '#F7F0E6', borderRadius: '30px' }}
         >
-          <Link2 className="w-3.5 h-3.5" /> تم نسخ الرابط
+          <Link2 className="w-3.5 h-3.5" /> Link Copied
         </div>
       )}
 
@@ -825,9 +826,9 @@ export function Details({
       >
         <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between">
           <nav className="flex items-center gap-2 text-xs" style={{ color: '#B89A7A' }}>
-            <span className="hover:text-[#3D2314] cursor-pointer transition-colors">الرئيسية</span>
+            <span className="hover:text-[#3D2314] cursor-pointer transition-colors">Home</span>
             <ChevronLeft className="w-3 h-3" />
-            <span className="hover:text-[#3D2314] cursor-pointer transition-colors">المنتجات</span>
+            <span className="hover:text-[#3D2314] cursor-pointer transition-colors">Products</span>
             <ChevronLeft className="w-3 h-3" />
             <span style={{ color: '#3D2314' }}>{product.name}</span>
           </nav>
@@ -863,7 +864,7 @@ export function Details({
                 className="w-1.5 h-1.5 rounded-full"
                 style={{ backgroundColor: inStock ? '#7A9068' : '#C4714A' }}
               />
-              {inStock ? 'متوفر' : 'غير متوفر'}
+              {inStock ? 'Available' : 'Unavailable'}
             </div>
           </div>
         </div>
@@ -920,7 +921,7 @@ export function Details({
                     className="px-6 py-3 text-sm font-semibold"
                     style={{ backgroundColor: '#FDF8F2', color: '#C4714A', borderRadius: '30px', border: '1px solid #EDE0CE' }}
                   >
-                    نفذت الكمية
+                    Out of Stock
                   </div>
                 </div>
               )}
@@ -991,7 +992,7 @@ export function Details({
                     </svg>
                   ))}
                 </div>
-                <span className="text-xs" style={{ color: '#B89A7A' }}>٤.٨ · ١٢٨ تقييم</span>
+                <span className="text-xs" style={{ color: '#B89A7A' }}>4.8 · 128 Reviews</span>
               </div>
             </div>
 
@@ -1010,14 +1011,14 @@ export function Details({
                 >
                   {finalPrice.toLocaleString('ar-DZ')}
                 </span>
-                <span className="text-sm" style={{ color: '#B89A7A' }}>دج</span>
+                <span className="text-sm" style={{ color: '#B89A7A' }}>DZD</span>
                 {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
                   <div>
                     <span className="text-sm line-through" style={{ color: '#C8B09A' }}>
-                      {parseFloat(product.priceOriginal).toLocaleString('ar-DZ')} دج
+                      {parseFloat(product.priceOriginal).toLocaleString('ar-DZ')} DZD
                     </span>
                     <p className="text-xs mt-0.5 font-medium" style={{ color: '#7A9068' }}>
-                      وفّر {(parseFloat(product.priceOriginal) - finalPrice).toLocaleString('ar-DZ')} دج
+                      Save {(parseFloat(product.priceOriginal) - finalPrice).toLocaleString('ar-DZ')} DZD
                     </p>
                   </div>
                 )}
@@ -1033,12 +1034,12 @@ export function Details({
               }}
             >
               {autoGen ? <Infinity className="w-3.5 h-3.5" /> : inStock ? <span className="w-2 h-2 rounded-full bg-current" /> : <X className="w-3.5 h-3.5" />}
-              {autoGen ? 'متوفر دائماً' : inStock ? 'متوفر في المخزون' : 'غير متوفر حالياً'}
+              {autoGen ? 'Always Available' : inStock ? 'In Stock' : 'Currently Unavailable'}
             </div>
 
             {product.offers?.length > 0 && (
               <div>
-                <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: '#B89A7A', letterSpacing: '0.12em' }}>العروض المتاحة</p>
+                <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: '#B89A7A', letterSpacing: '0.12em' }}>Available Offers</p>
                 <div className="space-y-2">
                   {product.offers.map((offer: any) => (
                     <label
@@ -1064,11 +1065,11 @@ export function Details({
                         <input type="radio" name="offer" value={offer.id} checked={selectedOffer === offer.id} onChange={() => setSelectedOffer(offer.id)} className="sr-only" />
                         <div>
                           <p className="text-sm font-medium" style={{ color: '#3D2314' }}>{offer.name}</p>
-                          <p className="text-xs" style={{ color: '#9E8060' }}>{offer.quantity} قطع</p>
+                          <p className="text-xs" style={{ color: '#9E8060' }}>{offer.quantity} pcs</p>
                         </div>
                       </div>
                       <span style={{ fontFamily: "'Fraunces', serif", fontSize: '1.2rem', color: '#C4714A' }}>
-                        {offer.price.toLocaleString('ar-DZ')} <span className="text-xs">دج</span>
+                        {offer.price.toLocaleString('ar-DZ')} <span className="text-xs">DZD</span>
                       </span>
                     </label>
                   ))}
@@ -1171,7 +1172,7 @@ export function Details({
                   fontWeight: 300,
                 }}
               >
-                وصف المنتج
+                Product Description
               </h2>
             </div>
             <div
@@ -1192,85 +1193,70 @@ export function Details({
 }
 
 export function Card({ product, displayImage, discount, isRTL, store, viewDetails }: any) {
+  const brandColor = '#C4714A'; // unified color (warm terracotta)
+  const textColor = '#3D2314';  // primary text color
+
   return (
     <div
-      className="boho-card group flex flex-col overflow-hidden"
+      className="boho-card group flex flex-col overflow-hidden h-full"
       style={{
-        backgroundColor:  '#FDF8F2',
-        borderRadius:     '20px',
-        border:           '1px solid #EDE0CE',
-        fontFamily:       "'Karla', sans-serif",
+        backgroundColor: '#FDF8F2',
+        borderRadius:    '24px',
+        border:          '1px solid #EDE0CE',
+        fontFamily:      "'Karla', sans-serif",
+        transition:      'all 0.4s ease',
       }}
     >
+      {/* Image Area */}
       <div
         className="relative overflow-hidden"
-        style={{ aspectRatio: '3/4', backgroundColor: '#EDE0CE', borderRadius: '20px 20px 0 0' }}
+        style={{ aspectRatio: '1/1', backgroundColor: '#EDE0CE', borderRadius: '24px 24px 0 0' }}
       >
         {displayImage ? (
-          // FIX #4 — scale-108 remplacé par scale-105 (classe Tailwind valide)
           <img
             src={displayImage}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
           />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-              <circle cx="24" cy="24" r="20" stroke="#C4714A" strokeWidth="1" strokeDasharray="4 3" opacity="0.4"/>
-              <circle cx="24" cy="24" r="10" stroke="#7A9068" strokeWidth="1" opacity="0.3"/>
-              <circle cx="24" cy="24" r="3" fill="#C4714A" opacity="0.3"/>
+            <svg width="40" height="40" viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="24" r="20" stroke={brandColor} strokeWidth="1" strokeDasharray="4 3" opacity="0.3"/>
+              <path d="M16 24L24 16L32 24" stroke={brandColor} strokeWidth="1.5" opacity="0.5"/>
             </svg>
-            <span className="text-xs tracking-wider" style={{ color: '#B89A7A' }}>
-              {isRTL ? 'لا توجد صورة' : 'No Image'}
+            <span className="text-[10px] tracking-widest uppercase" style={{ color: '#B89A7A' }}>
+              {isRTL ? 'No image' : 'No Image'}
             </span>
           </div>
         )}
 
-        <div
-          className="absolute bottom-0 left-0 right-0 h-20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          style={{ background: 'linear-gradient(to top, rgba(61,35,20,0.35), transparent)' }}
-        />
-
+        {/* Discount[Arabic]Badge[Arabic]Boho */}
         {discount > 0 && (
           <div
-            className="absolute top-3 right-3 text-[10px] font-semibold tracking-wider px-2.5 py-1"
+            className="absolute top-4 right-4 text-[10px] font-bold px-3 py-1.5 z-10"
             style={{
-              backgroundColor: '#C4714A',
+              backgroundColor: brandColor,
               color:           '#FDF8F2',
-              borderRadius:    '20px',
-              letterSpacing:   '0.08em',
+              borderRadius:    '12px',
+              boxShadow:       '0 4px 12px rgba(196,113,74,0.2)',
             }}
           >
             -{discount}%
           </div>
         )}
-
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center opacity-0 group-hover:opacity-100 transition-all duration-400 translate-y-2 group-hover:translate-y-0">
-          <Link
-            href={`/${store.subdomain}/product/${product.slug || product.id}`}
-            className="text-[11px] tracking-widest font-semibold px-5 py-2 transition-all duration-200 hover:scale-105"
-            style={{
-              backgroundColor: '#FDF8F2',
-              color:           '#3D2314',
-              borderRadius:    '30px',
-              letterSpacing:   '0.1em',
-            }}
-          >
-            {viewDetails}
-          </Link>
-        </div>
       </div>
 
+      {/* Card Content */}
       <div className="p-5 flex flex-col flex-1">
         <h3
-          className="mb-1 line-clamp-1 group-hover:text-[#C4714A] transition-colors duration-300"
+          className="mb-2 line-clamp-2 transition-colors duration-300"
           style={{
             fontFamily:    "'Fraunces', serif",
             fontStyle:     'italic',
-            fontSize:      '1rem',
+            fontSize:      '1.1rem',
             fontWeight:    400,
-            color:         '#3D2314',
-            letterSpacing: '-0.01em',
+            color:         textColor,
+            lineHeight:    '1.3',
           }}
         >
           {product.name}
@@ -1278,62 +1264,60 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
 
         {product.desc && (
           <div
-            className="text-xs mb-3 line-clamp-2 leading-relaxed"
-            style={{ color: '#9E8060' }}
+            className="text-xs mb-4 line-clamp-2 opacity-70 leading-relaxed"
+            style={{ color: textColor }}
             dangerouslySetInnerHTML={{ __html: product.desc }}
           />
         )}
 
-        <div className="my-3 flex items-center gap-2">
-          <div className="flex-1 h-px" style={{ backgroundColor: '#EDE0CE' }} />
-          <span style={{ color: '#D4A28C', fontSize: '8px' }}>✦</span>
-          <div className="flex-1 h-px" style={{ backgroundColor: '#EDE0CE' }} />
+        {/* Decorative Divider */}
+        <div className="mb-4 flex items-center gap-3 opacity-30">
+          <div className="flex-1 h-[1px]" style={{ backgroundColor: brandColor }} />
+          <span style={{ color: brandColor, fontSize: '10px' }}>✦</span>
+          <div className="flex-1 h-[1px]" style={{ backgroundColor: brandColor }} />
         </div>
 
-        <div className="mt-auto flex items-center justify-between">
-          <div>
+        {/* Price[Arabic] */}
+        <div className="mt-auto space-y-4">
+          <div className="flex items-baseline justify-center gap-2">
             <span
               style={{
                 fontFamily: "'Fraunces', serif",
-                fontSize:   '1.25rem',
-                fontWeight: 400,
-                color:      '#C4714A',
+                fontSize:   '1.5rem',
+                fontWeight: 500,
+                color:      brandColor,
               }}
             >
               {product.price}
             </span>
-            <span className="text-xs ml-1" style={{ color: '#B89A7A' }}>{store.currency}</span>
+            <span className="text-[10px] uppercase font-bold tracking-wider" style={{ color: '#B89A7A' }}>
+              {store.currency}
+            </span>
             {product.priceOriginal && product.priceOriginal > product.price && (
-              <p className="text-xs line-through mt-0.5" style={{ color: '#C8B09A' }}>
+              <span className="text-xs line-through opacity-40" style={{ color: textColor }}>
                 {product.priceOriginal}
-              </p>
+              </span>
             )}
           </div>
 
+          {/* [Arabic] */}
           <Link
-            href={`/${store.subdomain}/product/${product.slug || product.id}`}
-            className="flex items-center justify-center w-9 h-9 transition-all duration-300 hover:scale-110 group/btn"
+            href={`/product/${product.slug || product.id}`}
+            className="flex items-center justify-center w-full py-3.5 text-[11px] tracking-[0.15em] font-bold uppercase transition-all duration-300 group-hover:shadow-lg"
             style={{
-              backgroundColor: '#F0E6D8',
-              borderRadius:    '50%',
-              border:          '1px solid #E0CEBC',
+              backgroundColor: brandColor,
+              color:           '#FDF8F2',
+              borderRadius:    '15px',
+              border:          `1px solid ${brandColor}`,
             }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#C4714A')}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#F0E6D8')}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-colors group-hover/btn:stroke-white" style={{ color: '#8E7860' }}>
-              {isRTL
-                ? <><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></>
-                : <><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></>
-              }
-            </svg>
+            {viewDetails}
           </Link>
         </div>
       </div>
     </div>
   );
 }
-
 const BotanicalLeft = () => (
   <svg width="80" height="100" viewBox="0 0 80 100" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity: 0.18 }}>
     <path d="M40 90 Q20 70 25 45 Q30 20 40 10" stroke="#C4714A" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
@@ -1410,9 +1394,9 @@ export function Footer({ store }: any) {
 
         <div className="flex flex-wrap justify-center gap-6 mb-8">
           {[
-            { href: `/${store.subdomain}/Privacy`, label: isRTL ? 'سياسة الخصوصية' : 'Privacy' },
-            { href: `/${store.subdomain}/Terms`,   label: isRTL ? 'الشروط'           : 'Terms'   },
-            { href: `/${store.subdomain}/Cookies`, label: isRTL ? 'ملفات الارتباط'  : 'Cookies' },
+            { href: `/Privacy`, label: isRTL ? 'Privacy Policy' : 'Privacy' },
+            { href: `/Terms`,   label: isRTL ? 'Terms'           : 'Terms'   },
+            { href: `/Cookies`, label: isRTL ? 'Cookies'  : 'Cookies' },
           ].map(link => (
             <a
               key={link.href}
@@ -1459,9 +1443,9 @@ export function Navbar({ store }: any) {
   }, []);
 
   const navItems = [
-    { href: `/${store.subdomain}`,         label: isRTL ? 'الرئيسية'       : 'Home'    },
-    { href: `/${store.subdomain}/contact`, label: isRTL ? 'اتصل بنا'       : 'Contact' },
-    { href: `/${store.subdomain}/Privacy`, label: isRTL ? 'سياسة الخصوصية' : 'Privacy' },
+    { href: `/`,         label: isRTL ? 'Home'       : 'Home'    },
+    { href: `/contact`, label: isRTL ? 'Contact Us'       : 'Contact' },
+    { href: `/Privacy`, label: isRTL ? 'Privacy Policy' : 'Privacy' },
   ];
 
   return (
@@ -1496,7 +1480,7 @@ export function Navbar({ store }: any) {
 
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex justify-between items-center h-16">
-            <Link href={`/${store.subdomain}`} className="flex items-center gap-2.5 group">
+            <Link href={`/`} className="flex items-center gap-2.5 group">
               <div className="feather-drift opacity-80 group-hover:opacity-100 transition-opacity">
                 <SunIcon />
               </div>
@@ -1686,12 +1670,18 @@ export function ProductForm({
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!formData.customerName.trim())  e.customerName    = 'الاسم مطلوب';
-    if (!formData.customerPhone.trim()) e.customerPhone   = 'رقم الهاتف مطلوب';
-    if (!formData.customerWelaya)       e.customerWelaya  = 'الولاية مطلوبة';
-    if (!formData.customerCommune)      e.customerCommune = 'البلدية مطلوبة';
+    if (!formData.customerName.trim())  e.customerName    = 'Name is required';
+    if (!formData.customerPhone.trim()) e.customerPhone   = 'Phone number is required';
+    if (!formData.customerWelaya)       e.customerWelaya  = 'Province is required';
+    if (!formData.customerCommune)      e.customerCommune = 'Municipality is required';
     return e;
   };
+
+  
+  const getVariantDetailId = useCallback(() => {
+    if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+    return product.variantDetails.find((v: any) => variantMatches(v, selectedVariants))?.id;
+  }, [product.variantDetails, selectedVariants]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1700,7 +1690,8 @@ export function ProductForm({
     setFormErrors({});
     setSubmitting(true);
     try {
-      await axios.post(`${API_URL}/orders`, { ...formData, customerWilayaId: +formData.customerWelaya,customerCommuneId: +formData.customerCommune, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceShip : getPriceLivraison(), });
+      await axios.post(`${API_URL}/orders`, {
+        variantDetailId: getVariantDetailId(), ...formData, customerWilayaId: +formData.customerWelaya,customerCommuneId: +formData.customerCommune, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceShip : getPriceLivraison(), });
       if (typeof window !== 'undefined') {
         localStorage.setItem('customerId', formData.customerId || '');
       }
@@ -1711,20 +1702,20 @@ export function ProductForm({
   return (
     <div style={{ borderTop: '1px solid #E8D9C5', paddingTop: '1.75rem', fontFamily: "'Karla', sans-serif" }}>
       <p className="text-xs font-semibold tracking-widest uppercase mb-6" style={{ color: '#B89A7A', letterSpacing: '0.15em' }}>
-        ✦ تأكيد الطلب
+        ✦ Place Order
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FieldWrapper error={formErrors.customerName} label="الاسم الكامل">
+          <FieldWrapper error={formErrors.customerName} label="Full Name">
             <div className="relative">
               <User className="absolute right-3.5 top-3.5 w-3.5 h-3.5" style={{ color: '#C8B09A' }} />
               <input type="text" value={formData.customerName} onChange={e => setFormData({ ...formData, customerName: e.target.value })}
-                placeholder="أدخل اسمك" className={`${inputCls(!!formErrors.customerName)} pr-10`} style={{ color: '#3D2314' }} />
+                placeholder="Enter Your Name" className={`${inputCls(!!formErrors.customerName)} pr-10`} style={{ color: '#3D2314' }} />
             </div>
           </FieldWrapper>
 
-          <FieldWrapper error={formErrors.customerPhone} label="رقم الهاتف">
+          <FieldWrapper error={formErrors.customerPhone} label="Phone Number">
             <div className="relative">
               <Phone className="absolute right-3.5 top-3.5 w-3.5 h-3.5" style={{ color: '#C8B09A' }} />
               <input type="tel" value={formData.customerPhone} onChange={e => setFormData({ ...formData, customerPhone: e.target.value })}
@@ -1734,25 +1725,25 @@ export function ProductForm({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FieldWrapper error={formErrors.customerWelaya} label="الولاية">
+          <FieldWrapper error={formErrors.customerWelaya} label="Province">
             <div className="relative">
               <MapPin className="absolute right-3.5 top-3.5 w-3.5 h-3.5" style={{ color: '#C8B09A' }} />
               <select value={formData.customerWelaya} onChange={e => setFormData({ ...formData, customerWelaya: e.target.value, customerCommune: '' })}
                 className={`${inputCls(!!formErrors.customerWelaya)} pr-10 appearance-none cursor-pointer`} style={{ color: '#3D2314', backgroundColor: '#FDF8F2' }}>
-                <option value="">اختر الولاية</option>
+                <option value="">Select Province</option>
                 {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
               </select>
               <ChevronDown className="absolute left-3.5 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color: '#C8B09A' }} />
             </div>
           </FieldWrapper>
 
-          <FieldWrapper error={formErrors.customerCommune} label="البلدية">
+          <FieldWrapper error={formErrors.customerCommune} label="Municipality">
             <div className="relative">
               <MapPin className="absolute right-3.5 top-3.5 w-3.5 h-3.5" style={{ color: '#C8B09A' }} />
               <select value={formData.customerCommune} disabled={!formData.customerWelaya || loadingCommunes}
                 onChange={e => setFormData({ ...formData, customerCommune: e.target.value })}
                 className={`${inputCls(!!formErrors.customerCommune)} pr-10 appearance-none cursor-pointer disabled:opacity-40`} style={{ color: '#3D2314', backgroundColor: '#FDF8F2' }}>
-                <option value="">{loadingCommunes ? 'جاري التحميل...' : formData.customerWelaya ? 'اختر البلدية' : 'اختر الولاية أولاً'}</option>
+                <option value="">{loadingCommunes ? 'Loading...' : formData.customerWelaya ? 'Select Municipality' : 'Select Province First'}</option>
                 {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
               <ChevronDown className="absolute left-3.5 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color: '#C8B09A' }} />
@@ -1762,7 +1753,7 @@ export function ProductForm({
 
         {/* Delivery type */}
         <div>
-          <p className="text-xs font-semibold tracking-wider uppercase mb-3" style={{ color: '#B89A7A', letterSpacing: '0.1em' }}>نوع التوصيل</p>
+          <p className="text-xs font-semibold tracking-wider uppercase mb-3" style={{ color: '#B89A7A', letterSpacing: '0.1em' }}>Delivery Type</p>
           <div className="grid grid-cols-2 gap-3">
             {(['home', 'office'] as const).map(type => (
               <button
@@ -1782,22 +1773,22 @@ export function ProductForm({
                   : <Building2 className="w-5 h-5" style={{ color: formData.typeLivraison === type ? '#C4714A' : '#C8B09A' }} />
                 }
                 <p className="text-xs font-medium" style={{ color: formData.typeLivraison === type ? '#3D2314' : '#9E8060' }}>
-                  {type === 'home' ? 'توصيل للمنزل' : 'استلام من المكتب'}
+                  {type === 'home' ? 'Home Delivery' : 'Office Pickup'}
                 </p>
                 {selectedWilayaData && (
                   <p className="text-xs font-semibold" style={{ color: formData.typeLivraison === type ? '#C4714A' : '#B89A7A' }}>
-                    {(type === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice).toLocaleString('ar-DZ')} دج
+                    {(type === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice).toLocaleString('ar-DZ')} DZD
                   </p>
                 )}
               </button>
             ))}
           </div>
           {!selectedWilayaData && (
-            <p className="text-xs text-center mt-2" style={{ color: '#C8B09A' }}>اختر الولاية لعرض تكلفة التوصيل</p>
+            <p className="text-xs text-center mt-2" style={{ color: '#C8B09A' }}>Select Province to see Delivery cost</p>
           )}
         </div>
 
-        <FieldWrapper error={formErrors.quantity} label="الكمية">
+        <FieldWrapper error={formErrors.quantity} label="Quantity">
           <div className="flex items-center gap-4">
             <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
               className="w-10 h-10 flex items-center justify-center rounded-full text-lg font-light transition-all hover:scale-110"
@@ -1812,14 +1803,14 @@ export function ProductForm({
               style={{ border: '1px solid #E0CEBC', backgroundColor: '#FDF8F2', color: '#8E7860' }}>
               +
             </button>
-            <span className="text-sm" style={{ color: '#C8B09A' }}>قطعة</span>
+            <span className="text-sm" style={{ color: '#C8B09A' }}>item(s)</span>
           </div>
         </FieldWrapper>
 
         <div className="p-5 space-y-3" style={{ backgroundColor: '#F0E6D8', borderRadius: '16px' }}>
           <div className="flex items-center justify-between text-xs">
             <span className="flex items-center gap-1.5" style={{ color: '#9E8060' }}>
-              <Package className="w-3.5 h-3.5" /> المنتج
+              <Package className="w-3.5 h-3.5" /> Product
             </span>
             <span className="font-medium truncate max-w-[50%]" style={{ color: '#3D2314' }}>{product.name}</span>
           </div>
@@ -1829,34 +1820,34 @@ export function ProductForm({
             if (!offer) return null;
             return (
               <div className="flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1.5" style={{ color: '#9E8060' }}><Tag className="w-3.5 h-3.5" /> العرض</span>
+                <span className="flex items-center gap-1.5" style={{ color: '#9E8060' }}><Tag className="w-3.5 h-3.5" /> Offer</span>
                 <span className="font-medium px-2.5 py-0.5" style={{ color: '#C4714A', backgroundColor: 'rgba(196,113,74,0.1)', borderRadius: '20px' }}>{offer.name}</span>
               </div>
             );
           })()}
 
           <div className="flex justify-between text-xs">
-            <span className="flex items-center gap-1.5" style={{ color: '#9E8060' }}><Truck className="w-3.5 h-3.5" /> التوصيل</span>
+            <span className="flex items-center gap-1.5" style={{ color: '#9E8060' }}><Truck className="w-3.5 h-3.5" /> Delivery</span>
             <span style={{ color: '#3D2314' }}>
-              {formData.typeLivraison === 'home' ? 'المنزل' : 'المكتب'}
-              {selectedWilayaData && <span style={{ color: '#9E8060' }}> ({getPriceLivraison().toLocaleString('ar-DZ')} دج)</span>}
+              {formData.typeLivraison === 'home' ? 'Home' : 'Office'}
+              {selectedWilayaData && <span style={{ color: '#9E8060' }}> ({getPriceLivraison().toLocaleString('ar-DZ')} DZD)</span>}
             </span>
           </div>
 
           <div className="flex justify-between text-xs">
-            <span style={{ color: '#9E8060' }}>سعر القطعة</span>
-            <span style={{ color: '#3D2314' }}>{finalPrice.toLocaleString('ar-DZ')} دج</span>
+            <span style={{ color: '#9E8060' }}>Unit Price</span>
+            <span style={{ color: '#3D2314' }}>{finalPrice.toLocaleString('ar-DZ')} DZD</span>
           </div>
           <div className="flex justify-between text-xs">
-            <span style={{ color: '#9E8060' }}>الكمية</span>
+            <span style={{ color: '#9E8060' }}>Quantity</span>
             <span style={{ color: '#3D2314' }}>× {formData.quantity}</span>
           </div>
 
           <div className="flex justify-between items-baseline pt-3" style={{ borderTop: '1px dashed #D4A28C' }}>
-            <span className="text-sm font-semibold" style={{ color: '#3D2314' }}>الإجمالي</span>
+            <span className="text-sm font-semibold" style={{ color: '#3D2314' }}>Total</span>
             <span style={{ fontFamily: "'Fraunces', serif", fontSize: '1.8rem', color: '#C4714A', fontWeight: 400 }}>
               {getTotalPrice().toLocaleString('ar-DZ')}
-              <span className="text-sm mr-1" style={{ color: '#B89A7A' }}>دج</span>
+              <span className="text-sm mr-1" style={{ color: '#B89A7A' }}>DZD</span>
             </span>
           </div>
         </div>
@@ -1875,15 +1866,15 @@ export function ProductForm({
           }}
         >
           {submitting ? (
-            <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />جاري إرسال الطلب...</>
+            <><div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />Processing Order...</>
           ) : (
-            <><ShoppingCart className="w-4 h-4" />تأكيد الطلب ✦</>
+            <><ShoppingCart className="w-4 h-4" />Place Order ✦</>
           )}
         </button>
 
         <p className="text-xs text-center flex items-center justify-center gap-1.5" style={{ color: '#C8B09A' }}>
           <Shield className="w-3.5 h-3.5" style={{ color: '#7A9068' }} />
-          بياناتك آمنة ومحمية بالكامل
+          Your data is fully secure and protected
         </p>
       </form>
     </div>

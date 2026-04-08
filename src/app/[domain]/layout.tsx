@@ -1,5 +1,5 @@
 import React from 'react';
-import { cache } from 'react'; // ✅ deduplication — نفس الـ request لن تستدعي الـ API مرتين
+import { cache } from 'react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getStoreByDomain } from '@/lib/api';
@@ -9,8 +9,7 @@ import CustomerTracker from '@/components/CustomerTracker';
 import Landing from '@/components/landing';
 import AddShow from '@/components/addShow';
 
-// ✅ cache() يضمن أن getStoreByDomain تُنفَّذ مرة واحدة فقط لنفس الـ domain
-// حتى لو استدعاها generateMetadata و StoreLayout في نفس الـ request
+// ✅ كاش لبيانات المتجر الأساسية (بدون تصنيفات)
 const getStoreCached = cache(async (domain: string) => {
   return getStoreByDomain(domain);
 });
@@ -20,42 +19,52 @@ interface LayoutProps {
   params: Promise<{ domain: string }>;
 }
 
+// ==========================================
+// METADATA (تعمل على مستوى المتجر بالكامل)
+// ==========================================
 export async function generateMetadata({ params }: LayoutProps): Promise<Metadata> {
   const { domain } = await params;
-  const store = await getStoreCached(domain);  
+  const store = await getStoreCached(domain);
 
   if (!store) return { title: 'Store Not Found' };
 
-  // تأكد من جلب الرابط الصحيح
-  const favicon = store.design?.faviconUrl || store.design?.logoUrl;
+  // تأكد من مسار الأيقونة (استخدم رابط كامل إذا كانت الصورة خارجية)
+  const iconUrl = store.design?.faviconUrl || store.design?.logoUrl || '/default-logo.png';
 
   return {
     title: {
       default: store.name,
-      template: `%s | ${store.name}`
+      template: `%s | ${store.name}`, // يسمح للصفحات الفرعية بإضافة عنوانها قبل اسم المتجر
     },
     description: store.hero?.subtitle || `Welcome to ${store.name}`,
-    // التعديل هنا:
-    icons: favicon ? {
+    icons: {
       icon: [
-        { url: favicon, href: favicon }, // للأيقونة العادية
+        { url: iconUrl, href: iconUrl },
       ],
-      shortcut: favicon, // لدعم المتصفحات القديمة
-      apple: favicon,    // لأجهزة Apple
-    } : undefined,
+      shortcut: iconUrl,
+      apple: iconUrl,
+    },
+    // لدعم ظهور الشعار عند مشاركة الرابط في واتساب وفيسبوك
+    openGraph: {
+      title: store.name,
+      description: store.hero?.subtitle,
+      images: [{ url: store.design?.logoUrl || '' }],
+    },
   };
 }
 
+// ==========================================
+// LAYOUT COMPONENT
+// ==========================================
 export default async function StoreLayout({ children, params }: LayoutProps) {
   const { domain } = await params;
-  const store: any = await getStoreCached(domain); // ✅ لا query جديدة — من الـ cache
+  const store: any = await getStoreCached(domain);
 
   if (!store) notFound();
 
   const currentThemeSlug = store?.themeUser?.theme?.slug || 'default';
   const language = store?.language || 'ar';
 
-  // ✅ dynamic خارج الـ conditional لتجنب re-creation في كل render
   const Main = dynamic<any>(
     () =>
       import(`@/theme/${language}/${currentThemeSlug}/main`).catch(() =>
@@ -67,7 +76,7 @@ export default async function StoreLayout({ children, params }: LayoutProps) {
     }
   );
 
-  const direction = store.language === 'ar' ? 'rtl' : 'ltr';
+  const direction = language === 'ar' ? 'rtl' : 'ltr';
 
   return (
     <StoreProvider store={store} theme={currentThemeSlug}>

@@ -922,7 +922,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   useEffect(()=>{ if(selectedWilayaData) setFormData(f=>({...f,priceLoss:selectedWilayaData.livraisonReturn})); },[selectedWilayaData]);
 
   const finalPrice = getFinalPrice();
-  const getTotalPrice = () => finalPrice*formData.quantity+getPriceLivraison();
+  const getTotalPrice = () => finalPrice*formData.quantity+ +getPriceLivraison();
   const validate = ()=>{
     const e:Record<string,string>={};
     if(!formData.customerName.trim())  e.customerName='الاسم مطلوب';

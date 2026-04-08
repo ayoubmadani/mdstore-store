@@ -682,7 +682,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const getLiv = useCallback(():number=>{ if(!selW) return 0; return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice; },[selW,fd.typeLivraison]);
   useEffect(()=>{ if(selW) setFd(f=>({...f,priceLoss:selW.livraisonReturn})); },[selW]);
 
-  const fp=getFP(); const total=()=>fp*fd.quantity+getLiv();
+  const fp=getFP(); const total=()=>fp*fd.quantity+ +getLiv();
   const validate=()=>{
     const e:Record<string,string>={};
     if(!fd.customerName.trim())  e.customerName='الاسم مطلوب';

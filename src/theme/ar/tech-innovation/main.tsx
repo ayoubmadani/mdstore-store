@@ -849,7 +849,7 @@ export function ProductForm({
   }, [selectedWilayaData, formData.typeLivraison]);
 
   const finalPrice    = getFinalPrice();
-  const getTotalPrice = () => finalPrice * formData.quantity + getPriceLivraison();
+  const getTotalPrice = () => finalPrice * formData.quantity + +getPriceLivraison();
 
   const validate = () => {
     const e: Record<string, string> = {};

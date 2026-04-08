@@ -7,164 +7,154 @@ import { useRouter } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, Heart, ChevronDown, ChevronLeft, ChevronRight,
-  AlertCircle, X, Infinity, Share2, MapPin, Phone,
-  User, ShieldCheck, Lock, Database, Globe, Bell,
-  CheckCircle2, Scale, CreditCard, Ban,
-  Cookie as CookieIcon, Settings, MousePointer2, ToggleRight,
-  Shield, ArrowRight, Sofa, Leaf, Sparkles, Package, Truck,
+  AlertCircle, X, Share2, Phone, User, ToggleRight,
+  Shield, ArrowRight, Plus, Minus, CheckCircle2, Lock, Menu,
 } from 'lucide-react';
 import { Store } from '@/types/store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
-// ─── DESIGN TOKENS ────────────────────────────────────────────
-const FONT_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap');
+const CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;500;600;700&display=swap');
   *, *::before, *::after { box-sizing:border-box; -webkit-font-smoothing:antialiased; }
 
   :root {
-    --linen:      #F7F3ED;
-    --linen-dk:   #EDE7DC;
-    --linen-dkk:  #E0D8CC;
-    --warm-white: #FDFAF6;
-    --walnut:     #6B4F3A;
-    --walnut-lt:  #8B6B52;
-    --walnut-dk:  #4E3929;
-    --clay:       #C4795A;
-    --clay-lt:    #D9957A;
-    --clay-dk:    #A55E42;
-    --sage:       #7A9270;
-    --sage-lt:    #9DB391;
-    --sage-dk:    #5C7252;
-    --rose:       #C9A09A;
-    --rose-lt:    #DDB9B4;
-    --dusty:      #B8A89E;
-    --text-h:     #2C1F17;
-    --text-b:     #4A3728;
-    --text-mid:   #7A6255;
-    --text-dim:   #A89080;
-    --border:     #E0D4CA;
-    --border-lt:  #EDE4DC;
-    --shadow:     rgba(107,79,58,0.10);
-    --shadow-md:  rgba(107,79,58,0.18);
+    --cream:   #FAF6EE;
+    --sand:    #F0E8D5;
+    --sand-dk: #E2D5BC;
+    --gold:    #B8973A;
+    --gold-lt: #D4B05A;
+    --gold-dk: #8A6E28;
+    --walnut:  #5C3D1E;
+    --walnut-2:#7A5230;
+    --ink:     #1A1208;
+    --mid:     #6B5A42;
+    --dim:     #9A8870;
+    --line:    rgba(184,151,58,0.18);
+    --line-dk: rgba(184,151,58,0.32);
   }
 
-  ::-webkit-scrollbar { width:6px; }
-  ::-webkit-scrollbar-track { background:var(--linen); }
-  ::-webkit-scrollbar-thumb { background:linear-gradient(180deg,var(--clay),var(--rose)); border-radius:99px; }
+  body { background:var(--cream); color:var(--ink); font-family:'Cairo',sans-serif; }
+  ::-webkit-scrollbar { width:3px; }
+  ::-webkit-scrollbar-thumb { background:var(--gold); }
 
-  @keyframes dust-float { 0%{opacity:0;transform:translateY(0) scale(0.6);} 30%{opacity:0.5;} 100%{opacity:0;transform:translateY(-90px) translateX(20px) scale(1.1);} }
-  @keyframes fade-up    { from{opacity:0;transform:translateY(22px);} to{opacity:1;transform:translateY(0);} }
-  @keyframes sway       { 0%,100%{transform:rotate(-2deg);} 50%{transform:rotate(2deg);} }
-  @keyframes shimmer    { 0%{background-position:-200% center;} 100%{background-position:200% center;} }
-  @keyframes marquee-hc { 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
-  @keyframes float-soft { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
+  .amiri { font-family:'Amiri',serif; }
 
-  .fade-up    { animation: fade-up 0.75s cubic-bezier(0.22,1,0.36,1) both; }
-  .fade-up-d1 { animation-delay:0.12s; }
-  .fade-up-d2 { animation-delay:0.26s; }
-  .fade-up-d3 { animation-delay:0.44s; }
-  .fade-up-d4 { animation-delay:0.62s; }
-
-  .grain::after {
-    content:''; position:absolute; inset:0; pointer-events:none; z-index:1;
-    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.04'/%3E%3C/svg%3E");
-    opacity:0.06; mix-blend-mode:multiply;
+  .gold-text {
+    background:linear-gradient(135deg,var(--gold-dk),var(--gold-lt),var(--gold-dk));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
   }
 
-  .linen-tex {
-    background-image:
-      repeating-linear-gradient(0deg, rgba(107,79,58,0.03) 0px, rgba(107,79,58,0.03) 1px, transparent 1px, transparent 8px),
-      repeating-linear-gradient(90deg, rgba(107,79,58,0.03) 0px, rgba(107,79,58,0.03) 1px, transparent 1px, transparent 8px);
+  .geo-bg {
+    background-color:var(--sand);
+    background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23B8973A' fill-opacity='0.06'%3E%3Cpath d='M30 0l8.66 5v10L30 20l-8.66-5V5L30 0zm0 40l8.66 5v10L30 60l-8.66-5V45L30 40zM0 20l8.66 5v10L0 40l-8.66-5V25L0 20zm60 0l8.66 5v10L60 40l-8.66-5V25L60 20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   }
 
-  .card-home {
-    transition: transform 0.5s cubic-bezier(0.22,1,0.36,1), box-shadow 0.5s ease;
-  }
-  .card-home:hover { transform:translateY(-8px); box-shadow:0 24px 64px var(--shadow-md); }
+  .cal-line { display:flex; align-items:center; gap:14px; }
+  .cal-line::before,.cal-line::after { content:''; flex:1; height:1px; background:linear-gradient(to right,transparent,var(--gold)); }
+  .cal-line::after { background:linear-gradient(to left,transparent,var(--gold)); }
 
-  .btn-cozy {
-    position:relative; overflow:hidden;
-    transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
+  .slabel {
+    font-family:'Cairo',sans-serif; font-size:11px; font-weight:600;
+    letter-spacing:0.18em; text-transform:uppercase; color:var(--gold);
+    display:flex; align-items:center; gap:10px;
   }
-  .btn-cozy::before {
-    content:''; position:absolute; inset:0;
-    background:linear-gradient(120deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.22) 50%, rgba(255,255,255,0) 70%);
-    background-size:200% auto; opacity:0; transition:opacity 0.4s;
+  .slabel::before,.slabel::after { content:'◆'; font-size:6px; color:var(--gold); opacity:0.6; }
+
+  @keyframes fade-up { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  .fu   { animation:fade-up 0.65s cubic-bezier(0.22,1,0.36,1) both; }
+  .fu-1 { animation-delay:0.1s; }
+  .fu-2 { animation-delay:0.2s; }
+  .fu-3 { animation-delay:0.32s; }
+
+  @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  .t-card { transition:transform 0.4s cubic-bezier(0.22,1,0.36,1), box-shadow 0.4s; cursor:pointer; background:var(--cream); }
+  .t-card:hover { transform:translateY(-5px); box-shadow:0 20px 56px rgba(26,18,8,0.12); }
+  .t-card:hover .c-img img { transform:scale(1.04); }
+  .c-img img { display:block; width:100%; height:100%; object-fit:cover; transition:transform 0.5s cubic-bezier(0.22,1,0.36,1); }
+
+  .btn-gold {
+    display:inline-flex; align-items:center; gap:8px;
+    background:linear-gradient(135deg,var(--gold-dk),var(--gold),var(--gold-dk));
+    background-size:200% auto;
+    color:var(--cream); font-family:'Cairo',sans-serif; font-size:14px; font-weight:600;
+    letter-spacing:0.06em; padding:13px 30px;
+    border:none; cursor:pointer; text-decoration:none; border-radius:0;
+    transition:background-position 0.4s, transform 0.25s, box-shadow 0.25s;
+    box-shadow:0 4px 16px rgba(184,151,58,0.3);
   }
-  .btn-cozy:hover { transform:translateY(-2px); box-shadow:0 10px 32px var(--shadow-md); }
-  .btn-cozy:hover::before { opacity:1; animation:shimmer 0.8s ease forwards; }
-  .btn-cozy:active { transform:scale(0.98); }
+  .btn-gold:hover { background-position:right center; transform:translateY(-2px); box-shadow:0 8px 28px rgba(184,151,58,0.45); }
 
-  .serif { font-family:'Cormorant Garamond',serif; }
+  .btn-outline {
+    display:inline-flex; align-items:center; gap:8px;
+    background:transparent; color:var(--gold);
+    border:1.5px solid var(--gold); font-family:'Cairo',sans-serif;
+    font-size:13px; font-weight:600; letter-spacing:0.06em; padding:12px 26px;
+    cursor:pointer; text-decoration:none; border-radius:0; transition:all 0.25s;
+  }
+  .btn-outline:hover { background:var(--gold); color:var(--cream); }
 
-  .marquee-wrap  { overflow:hidden; white-space:nowrap; }
-  .marquee-inner { display:inline-block; animation:marquee-hc 24s linear infinite; }
+  .inp {
+    width:100%; padding:12px 14px;
+    background:var(--cream); border:1.5px solid var(--line-dk);
+    font-family:'Cairo',sans-serif; font-size:13px; color:var(--ink);
+    outline:none; border-radius:0; transition:border-color 0.2s, box-shadow 0.2s;
+  }
+  .inp:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(184,151,58,0.1); }
+  .inp::placeholder { color:var(--dim); }
+  .inp-err { border-color:#C0392B !important; }
+  select.inp { appearance:none; cursor:pointer; }
+
+  .nav-links   { display:flex; align-items:center; gap:28px; }
+  .nav-toggle  { display:none; }
+  .hero-split  { display:grid; grid-template-columns:1fr 1fr; min-height:90vh; }
+  .prod-grid   { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); }
+  .cat-grid    { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  .trust-bar   { display:grid; grid-template-columns:repeat(4,1fr); }
+  .footer-g    { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:56px; }
+  .details-g   { display:grid; grid-template-columns:1fr 1fr; }
+  .details-L   { position:sticky; top:70px; height:calc(100vh - 70px); overflow:hidden; }
+  .details-R   { padding:40px 36px 80px; }
+  .contact-g   { display:grid; grid-template-columns:1fr 1fr; gap:56px; }
+  .form-2c     { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .dlv-2c      { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+
+  @media (max-width:1100px) {
+    .prod-grid { grid-template-columns:repeat(3,1fr); }
+    .footer-g  { grid-template-columns:1fr 1fr; gap:36px; }
+  }
+  @media (max-width:768px) {
+    .nav-links  { display:none; }
+    .nav-toggle { display:flex; }
+    .hero-split { grid-template-columns:1fr; min-height:auto; }
+    .prod-grid  { grid-template-columns:repeat(2,1fr); }
+    .cat-grid   { grid-template-columns:repeat(2,1fr); }
+    .trust-bar  { grid-template-columns:repeat(2,1fr); }
+    .footer-g   { grid-template-columns:1fr 1fr; gap:28px; }
+    .details-g  { grid-template-columns:1fr; }
+    .details-L  { position:static; width:100%; height:auto; aspect-ratio:1; display:flex; flex-direction:column; gap:20px; }
+    .details-R  { padding:24px 16px 48px; }
+    .contact-g  { grid-template-columns:1fr; gap:28px; }
+  }
+  @media (max-width:480px) {
+    .prod-grid { grid-template-columns:repeat(2,1fr); }
+    .footer-g  { grid-template-columns:1fr; gap:24px; }
+    .form-2c   { grid-template-columns:1fr; }
+    .dlv-2c    { grid-template-columns:1fr; }
+  }
 `;
 
-// ─── SVG DECORATIONS ──────────────────────────────────────────
-function LeafSprig({ size=60, color='var(--sage)', style={} }: any) {
-  return (
-    <svg width={size} height={size*1.3} viewBox="0 0 60 78" fill="none" style={style}>
-      <path d="M30 75 Q30 40 30 10" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
-      <path d="M30 55 Q20 44 10 46 Q14 34 30 38" fill={color} opacity="0.7"/>
-      <path d="M30 55 Q40 44 50 46 Q46 34 30 38" fill={color} opacity="0.7"/>
-      <path d="M30 38 Q22 28 14 30 Q17 18 30 22" fill={color} opacity="0.5"/>
-      <path d="M30 38 Q38 28 46 30 Q43 18 30 22" fill={color} opacity="0.5"/>
-      <path d="M30 22 Q24 14 19 16 Q21 7 30 10" fill={color} opacity="0.35"/>
-      <path d="M30 22 Q36 14 41 16 Q39 7 30 10" fill={color} opacity="0.35"/>
-    </svg>
-  );
-}
-
-function OrnamentDiamond({ color='var(--clay)', size=10 }: any) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 12 12" fill="none">
-      <rect x="1" y="1" width="10" height="10" transform="rotate(45 6 6)" fill={color} opacity="0.55"/>
-      <rect x="3" y="3" width="6" height="6" transform="rotate(45 6 6)" fill="none" stroke={color} strokeWidth="0.8" opacity="0.35"/>
-    </svg>
-  );
-}
-
-function SectionDivider() {
-  return (
-    <div className="flex items-center gap-4 my-3">
-      <div className="flex-1 h-px" style={{ background:'linear-gradient(90deg, transparent, var(--border))' }}/>
-      <OrnamentDiamond size={8}/>
-      <LeafSprig size={16} color="var(--sage)" style={{ transform:'rotate(90deg)' }}/>
-      <OrnamentDiamond size={8}/>
-      <div className="flex-1 h-px" style={{ background:'linear-gradient(90deg, var(--border), transparent)' }}/>
-    </div>
-  );
-}
-
-function FloatingDust() {
-  const motes = useMemo(() => Array.from({ length:14 }, (_,i) => ({
-    id:i, left:`${(i*7.1)%100}%`, bottom:`${10+(i*5.3)%60}%`,
-    delay:`${(i*0.9)%10}s`, dur:`${6+(i*0.65)%6}s`, size:2+(i*0.5)%4,
-    color:['rgba(196,121,90,0.4)','rgba(122,146,112,0.35)','rgba(201,160,154,0.45)','rgba(184,168,158,0.4)'][i%4],
-  })), []);
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex:0 }}>
-      {motes.map(m=>(
-        <div key={m.id} style={{ position:'absolute', left:m.left, bottom:m.bottom, opacity:0,
-          animation:`dust-float ${m.dur} ${m.delay} ease-in-out infinite` }}>
-          <div style={{ width:m.size, height:m.size, borderRadius:'50%', backgroundColor:m.color }}/>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ─── TYPES ────────────────────────────────────────────────────
-interface Offer     { id:string; name:string; quantity:number; price:number; }
-interface Variant   { id:string; name:string; value:string; }
+/* ── TYPES ──────────────────────────────────────────────────── */
+interface Offer { id:string; name:string; quantity:number; price:number; }
+interface Variant { id:string; name:string; value:string; }
 interface Attribute { id:string; type:string; name:string; displayMode?:'color'|'image'|'text'|null; variants:Variant[]; }
 interface ProductImage { id:string; imageUrl:string; }
 interface VariantAttributeEntry { attrId:string; attrName:string; displayMode:'color'|'image'|'text'; value:string; }
 interface VariantDetail { id:string|number; name:VariantAttributeEntry[]; price:number; stock:number; autoGenerate:boolean; }
 interface Wilaya  { id:string; name:string; ar_name:string; livraisonHome:number; livraisonOfice:number; livraisonReturn:number; }
 interface Commune { id:string; name:string; ar_name:string; wilayaId:string; }
+
 export interface Product {
   id:string; name:string; price:string|number; priceOriginal?:string|number; desc?:string;
   productImage?:string; imagesProduct?:ProductImage[]; offers?:Offer[]; attributes?:Attribute[];
@@ -176,33 +166,29 @@ export interface ProductFormProps {
   selectedOffer:string|null; setSelectedOffer:(id:string|null)=>void;
   selectedVariants:Record<string,string>; platform?:string; priceLoss?:number;
 }
+
+/* ── HELPERS ─────────────────────────────────────────────────── */
 function variantMatches(d:VariantDetail, sel:Record<string,string>): boolean {
   return Object.entries(sel).every(([n,v])=>d.name.some(e=>e.attrName===n&&e.value===v));
 }
 const fetchWilayas  = async (uid:string): Promise<Wilaya[]>  => { try { const {data}=await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}`); return data||[]; } catch { return []; }};
 const fetchCommunes = async (wid:string): Promise<Commune[]> => { try { const {data}=await axios.get(`${API_URL}/shipping/get-communes/${wid}`); return data||[]; } catch { return []; }};
 
-// ─── MAIN ─────────────────────────────────────────────────────
-export default function Main({ store, children }: any) {
+/* ── DECORATIVE ─────────────────────────────────────────────── */
+function GoldDiamond({ size = 8 }: { size?:number }) {
   return (
-    <div style={{ minHeight:'100vh', backgroundColor:'var(--warm-white)', fontFamily:"'Jost',sans-serif", color:'var(--text-b)' }}>
-      <style>{FONT_CSS}</style>
-      {store.topBar?.enabled && store.topBar?.text && (
-        <div className="marquee-wrap py-2.5" style={{ backgroundColor:'var(--walnut)', color:'var(--linen)' }}>
-          <div className="marquee-inner">
-            {Array(12).fill(null).map((_,i)=>(
-              <span key={i} className="mx-10 text-xs tracking-[0.22em] font-light inline-flex items-center gap-3">
-                <OrnamentDiamond color="var(--clay-lt)" size={7}/>{store.topBar.text}
-              </span>
-            ))}
-            {Array(12).fill(null).map((_,i)=>(
-              <span key={`b${i}`} className="mx-10 text-xs tracking-[0.22em] font-light inline-flex items-center gap-3">
-                <OrnamentDiamond color="var(--clay-lt)" size={7}/>{store.topBar.text}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+    <svg width={size} height={size} viewBox="0 0 8 8" fill="none">
+      <path d="M4 0L8 4L4 8L0 4Z" fill="var(--gold)" opacity="0.7"/>
+    </svg>
+  );
+}
+
+/* ── MAIN ───────────────────────────────────────────────────── */
+export default function Main({ store, children }: any) {
+  if (!store) return null;
+  return (
+    <div style={{ minHeight:'100vh', backgroundColor:'var(--cream)' }}>
+      <style>{CSS}</style>
       <Navbar store={store}/>
       <main>{children}</main>
       <Footer store={store}/>
@@ -210,449 +196,397 @@ export default function Main({ store, children }: any) {
   );
 }
 
-// ─── NAVBAR ───────────────────────────────────────────────────
+/* ── NAVBAR ─────────────────────────────────────────────────── */
 export function Navbar({ store }: { store: Store }) {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const isRTL = store.language === 'ar';
-  useEffect(()=>{ const h=()=>setScrolled(window.scrollY>30); window.addEventListener('scroll',h); return ()=>window.removeEventListener('scroll',h); },[]);
-  const nav = [
-    { href:`/${store.subdomain}`,         label:isRTL?'الرئيسية':'Home'    },
-    { href:`/${store.subdomain}/contact`, label:isRTL?'اتصل بنا':'Contact' },
-    { href:`/${store.subdomain}/Privacy`, label:isRTL?'الخصوصية':'Privacy' },
+  const [open, setOpen]         = useState(false);
+
+  useEffect(()=>{
+    const h=()=>setScrolled(window.scrollY>8);
+    window.addEventListener('scroll',h); return ()=>window.removeEventListener('scroll',h);
+  },[]);
+
+  if (!store) return null;
+
+  const links = [
+    { href:`/`,         label:'Collection' },
+    { href:`/contact`,  label:'Contact'    },
+    { href:`/Privacy`,  label:'Privacy' },
   ];
-  const initials = store.name.split(' ').filter(Boolean).map((w:string)=>w[0]).join('').slice(0,2).toUpperCase();
+
   return (
-    <nav className="sticky top-0 z-50 transition-all duration-500" dir={isRTL?'rtl':'ltr'}
-      style={{ backgroundColor:scrolled?'rgba(253,250,246,0.96)':'var(--warm-white)', backdropFilter:scrolled?'blur(20px)':'none', borderBottom:`1px solid ${scrolled?'var(--border)':'transparent'}`, boxShadow:scrolled?'0 4px 40px var(--shadow)':'none' }}>
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
-        <div className="flex items-center justify-between py-5">
-          <Link href={`/${store.subdomain}`} className="flex items-center gap-3.5 group">
-            <div className="relative w-11 h-11 rounded-full flex items-center justify-center overflow-hidden transition-all duration-400 group-hover:scale-105"
-              style={{ background:'linear-gradient(135deg, var(--walnut), var(--clay))', boxShadow:'0 4px 16px var(--shadow)' }}>
-              {store.design.logoUrl
-                ? <img src={store.design.logoUrl} alt={store.name} className="w-full h-full object-cover"/>
-                : <span className="serif font-semibold text-white" style={{ fontSize:'1.1rem' }}>{initials}</span>
-              }
-            </div>
-            <div>
-              <span className="block serif font-medium transition-colors" style={{ fontSize:'1.35rem', color:'var(--text-h)', letterSpacing:'0.02em', lineHeight:1.1 }}>{store.name}</span>
-              <span className="block text-[9px] font-light tracking-[0.24em] uppercase" style={{ color:'var(--clay)', marginTop:'2px' }}>{isRTL?'🏡 ديكور المنزل':'🏡 Home & Living'}</span>
-            </div>
-          </Link>
-
-          <div className="hidden md:flex items-center gap-8">
-            {nav.map(item=>(
-              <Link key={item.href} href={item.href}
-                className="relative text-xs font-medium tracking-[0.14em] uppercase transition-colors group"
-                style={{ color:'var(--text-mid)' }}
-                onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--walnut)';}}
-                onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--text-mid)';}}>
-                {item.label}
-                <span className="absolute -bottom-0.5 left-0 h-px w-0 group-hover:w-full transition-all duration-400 rounded-full" style={{ background:'var(--clay)' }}/>
-              </Link>
+    <nav dir="ltr" style={{
+      position:'sticky', top:0, zIndex:50,
+      backgroundColor:scrolled?'rgba(250,246,238,0.96)':'var(--cream)',
+      backdropFilter:scrolled?'blur(16px)':'none',
+      borderBottom:`1px solid ${scrolled?'var(--line-dk)':'transparent'}`,
+      transition:'all 0.35s',
+    }}>
+      {store.topBar?.enabled && store.topBar?.text && (
+        <div style={{ backgroundColor:'var(--walnut)', overflow:'hidden', whiteSpace:'nowrap', padding:'7px 0' }}>
+          <div style={{ display:'inline-block', animation:'ticker 24s linear infinite' }}>
+            {Array(12).fill(null).map((_,i)=>(
+              <span key={i} style={{ fontFamily:"'Cairo',sans-serif", fontSize:'12px', fontWeight:500, letterSpacing:'0.1em', color:'rgba(250,246,238,0.8)', margin:'0 40px', display:'inline-flex', alignItems:'center', gap:'10px' }}>
+                <GoldDiamond size={6}/> {store.topBar.text} <GoldDiamond size={6}/>
+              </span>
             ))}
-            <Link href={`/${store.subdomain}`}
-              className="btn-cozy flex items-center gap-2 px-7 py-3 rounded-full text-xs font-medium tracking-[0.12em] uppercase text-white"
-              style={{ background:'linear-gradient(135deg, var(--walnut), var(--clay))', boxShadow:'0 4px 20px var(--shadow)' }}>
-              <Sofa className="w-3.5 h-3.5"/> {isRTL?'تسوق':'Shop Now'}
-            </Link>
+            {Array(12).fill(null).map((_,i)=>(
+              <span key={`b${i}`} style={{ fontFamily:"'Cairo',sans-serif", fontSize:'12px', fontWeight:500, letterSpacing:'0.1em', color:'rgba(250,246,238,0.8)', margin:'0 40px', display:'inline-flex', alignItems:'center', gap:'10px' }}>
+                <GoldDiamond size={6}/> {store.topBar.text} <GoldDiamond size={6}/>
+              </span>
+            ))}
           </div>
+        </div>
+      )}
 
-          <button onClick={()=>setMenuOpen(p=>!p)} className="md:hidden w-10 h-10 rounded-full flex items-center justify-center"
-            style={{ border:'1px solid var(--border)', color:'var(--walnut)', backgroundColor:'var(--linen)' }}>
-            {menuOpen?<X className="w-4 h-4"/>:<Sofa className="w-4 h-4"/>}
-          </button>
+      <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'0 28px', height:'70px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:'16px', position:'relative' }}>
+
+        <Link href="/" style={{ textDecoration:'none', flexShrink:0 }}>
+          {store.design?.logoUrl
+            ? <img src={store.design.logoUrl} alt={store.name} style={{ height:'40px', width:'auto', objectFit:'contain' }}/>
+            : <div style={{ width:'40px', height:'40px', border:'1px solid var(--line-dk)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <GoldDiamond size={10}/>
+              </div>
+          }
+        </Link>
+
+        <Link href="/" style={{ textDecoration:'none', position:'absolute', left:'50%', transform:'translateX(-50%)', textAlign:'center' }}>
+          <span className="amiri" style={{ fontSize:'1.4rem', fontWeight:700, color:'var(--walnut)', display:'block', lineHeight:1, whiteSpace:'nowrap' }}>
+            {store.name}
+          </span>
+          <div style={{ display:'flex', justifyContent:'center', alignItems:'center', gap:'6px', marginTop:'3px' }}>
+            <span style={{ display:'block', height:'1px', width:'20px', background:'linear-gradient(to right,transparent,var(--gold))' }}/>
+            <GoldDiamond size={6}/>
+            <span style={{ display:'block', height:'1px', width:'20px', background:'linear-gradient(to left,transparent,var(--gold))' }}/>
+          </div>
+        </Link>
+
+        <div className="nav-links">
+          {links.map(l=>(
+            <Link key={l.href} href={l.href}
+              style={{ fontFamily:"'Cairo',sans-serif", fontSize:'14px', fontWeight:500, color:'var(--mid)', textDecoration:'none', transition:'color 0.2s' }}
+              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--gold)';}}
+              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mid)';}}>
+              {l.label}
+            </Link>
+          ))}
+          <a href="#collection" className="btn-gold" style={{ padding:'10px 22px', fontSize:'13px' }}>
+            Shop Collection
+          </a>
         </div>
 
-        <div className={`md:hidden overflow-hidden transition-all duration-400 ${menuOpen?'max-h-52 pb-6':'max-h-0'}`}>
-          <div className="pt-4 space-y-1" style={{ borderTop:'1px solid var(--border-lt)' }}>
-            {nav.map(item=>(
-              <Link key={item.href} href={item.href} onClick={()=>setMenuOpen(false)}
-                className="flex items-center justify-between px-3 py-3 rounded-xl text-xs font-medium tracking-[0.14em] uppercase transition-all"
-                style={{ color:'var(--text-mid)' }}
-                onMouseEnter={e=>{const el=e.currentTarget as HTMLElement; el.style.backgroundColor='var(--linen)'; el.style.color='var(--walnut)';}}
-                onMouseLeave={e=>{const el=e.currentTarget as HTMLElement; el.style.backgroundColor='transparent'; el.style.color='var(--text-mid)';}}>
-                {item.label}<ArrowRight className="w-3 h-3 opacity-40"/>
-              </Link>
-            ))}
-          </div>
+        <button className="nav-toggle" onClick={()=>setOpen(p=>!p)} style={{ background:'none', border:'1px solid var(--line-dk)', cursor:'pointer', color:'var(--walnut)', padding:'8px', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+          {open ? <X style={{ width:'18px', height:'18px' }}/> : <Menu style={{ width:'18px', height:'18px' }}/>}
+        </button>
+      </div>
+
+      <div style={{ maxHeight:open?'220px':'0', overflow:'hidden', transition:'max-height 0.3s ease', borderTop:open?'1px solid var(--line)':'none', backgroundColor:'var(--cream)' }}>
+        <div style={{ padding:'8px 28px 18px' }}>
+          {links.map(l=>(
+            <Link key={l.href} href={l.href} onClick={()=>setOpen(false)}
+              style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 0', fontFamily:"'Cairo',sans-serif", fontSize:'15px', fontWeight:500, color:'var(--mid)', textDecoration:'none', borderBottom:'1px solid var(--line)' }}>
+              {l.label} <ArrowRight style={{ width:'14px', height:'14px', color:'var(--gold)' }}/>
+            </Link>
+          ))}
         </div>
       </div>
-      <div className="h-px w-full" style={{ background:'linear-gradient(90deg, transparent, var(--clay-lt) 30%, var(--rose-lt) 50%, var(--clay-lt) 70%, transparent)', opacity:0.5 }}/>
     </nav>
   );
 }
 
-// ─── FOOTER ───────────────────────────────────────────────────
-export function Footer({ store }: any) {
-  const isRTL = store.language === 'ar';
+/* ── FOOTER ─────────────────────────────────────────────────── */
+export function Footer({ store }: { store: any }) {
+  const yr = new Date().getFullYear();
+  if (!store) return null;
+
   return (
-    <footer className="relative grain linen-tex" style={{ backgroundColor:'var(--walnut-dk)', overflow:'hidden', fontFamily:"'Jost',sans-serif" }}>
-      <div className="absolute top-0 right-4 opacity-15 pointer-events-none" style={{ animation:'sway 8s ease-in-out infinite' }}>
-        <LeafSprig size={120} color="var(--sage-lt)"/>
-      </div>
-      <div className="absolute bottom-0 left-4 opacity-10 pointer-events-none" style={{ transform:'rotate(180deg)', animation:'sway 10s ease-in-out infinite', animationDelay:'2s' }}>
-        <LeafSprig size={90} color="var(--clay-lt)"/>
-      </div>
-      <div className="h-px" style={{ background:'linear-gradient(90deg, var(--walnut), var(--clay), var(--rose), var(--sage), var(--walnut))' }}/>
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pb-12" style={{ borderBottom:'1px solid rgba(255,255,255,0.08)' }}>
-          <div className="space-y-5">
-            <div>
-              <p className="serif font-medium mb-0.5" style={{ fontSize:'1.6rem', color:'var(--linen)', letterSpacing:'0.02em', lineHeight:1 }}>{store.name}</p>
-              <p className="text-[9px] font-light tracking-[0.24em] uppercase" style={{ color:'var(--clay-lt)' }}>🏡 Home & Living</p>
+    <footer dir="ltr" style={{ backgroundColor:'var(--walnut)', fontFamily:"'Cairo',sans-serif", position:'relative', overflow:'hidden' }}>
+      <div style={{ position:'absolute', inset:0, pointerEvents:'none', opacity:0.06 }} className="geo-bg"/>
+      <div style={{ position:'relative', zIndex:2, maxWidth:'1280px', margin:'0 auto', padding:'64px 28px 40px' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:'40px', paddingBottom:'48px', borderBottom:'1px solid rgba(250,246,238,0.1)' }}>
+
+          <div>
+            <span className="amiri" style={{ fontSize:'1.5rem', fontWeight:700, color:'var(--cream)', display:'block', marginBottom:'6px' }}>{store.name}</span>
+            <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'18px' }}>
+              <span style={{ display:'block', height:'1px', width:'28px', background:'var(--gold)', opacity:0.5 }}/>
+              <GoldDiamond size={6}/>
             </div>
-            <p className="text-sm font-light leading-relaxed" style={{ color:'rgba(240,234,224,0.55)' }}>
-              {isRTL?'نحوّل منزلك إلى ملاذ دافئ. أثاث وديكور مختار بعناية لكل زاوية في بيتك.':'Turning houses into homes — curated furniture and décor for every corner of your sanctuary.'}
+            <p style={{ fontSize:'13px', lineHeight:'1.9', color:'rgba(250,246,238,0.5)', maxWidth:'220px', fontWeight:300 }}>
+              The finest Gulf Islamic menswear, curated with exceptional care to match your refined taste.
             </p>
-            <div className="flex items-end gap-3">
-              <LeafSprig size={40} color="rgba(240,234,224,0.12)"/>
-              <LeafSprig size={28} color="rgba(196,121,90,0.18)"/>
-              <LeafSprig size={50} color="rgba(122,146,112,0.16)"/>
-            </div>
           </div>
 
-          <div>
-            <p className="serif italic text-xs mb-5" style={{ color:'var(--clay-lt)', letterSpacing:'0.1em' }}>— Quick Links</p>
-            <div className="space-y-3">
-              {[
-                { href:`/${store.subdomain}/Privacy`, label:isRTL?'سياسة الخصوصية':'Privacy Policy'   },
-                { href:`/${store.subdomain}/Terms`,   label:isRTL?'شروط الخدمة'    :'Terms of Service' },
-                { href:`/${store.subdomain}/Cookies`, label:isRTL?'ملفات الارتباط' :'Cookie Policy'    },
-                { href:`/${store.subdomain}/contact`, label:isRTL?'اتصل بنا'        :'Contact Us'       },
-              ].map(l=>(
-                <a key={l.href} href={l.href}
-                  className="flex items-center gap-2 text-xs font-light transition-all"
-                  style={{ color:'rgba(240,234,224,0.45)', letterSpacing:'0.08em' }}
-                  onMouseEnter={e=>{const el=e.currentTarget as HTMLElement; el.style.color='var(--clay-lt)'; el.style.paddingLeft='8px';}}
-                  onMouseLeave={e=>{const el=e.currentTarget as HTMLElement; el.style.color='rgba(240,234,224,0.45)'; el.style.paddingLeft='0';}}>
-                  <OrnamentDiamond color="var(--clay)" size={6}/>{l.label}
-                </a>
-              ))}
+          {[
+            {
+              title:'Important Links',
+              links:[
+                [`/`,        'Full Collection'],
+                [`/Privacy`, 'Privacy Policy'],
+                [`/Terms`,   'Terms & Conditions'],
+                [`/contact`, 'Contact Us'],
+              ]
+            },
+            {
+              title:'Contact Info',
+              links:[
+                ['tel:+213550000000',     '+213 550 000 000'],
+                ['https://maps.google.com','Oued Fayet, Algiers'],
+                ['mailto:info@store.dz',  'info@store.dz'],
+              ]
+            },
+          ].map((col)=>(
+            <div key={col.title}>
+              <p style={{ fontSize:'12px', fontWeight:600, letterSpacing:'0.1em', color:'var(--gold)', marginBottom:'20px' }}>{col.title}</p>
+              <div style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
+                {col.links.map(([href,label])=>(
+                  <a key={label} href={href}
+                    style={{ fontSize:'13px', color:'rgba(250,246,238,0.6)', textDecoration:'none', transition:'all 0.3s ease' }}
+                    onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--gold-lt)'; (e.currentTarget as HTMLElement).style.paddingRight='5px';}}
+                    onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='rgba(250,246,238,0.6)'; (e.currentTarget as HTMLElement).style.paddingRight='0';}}>
+                    {label}
+                  </a>
+                ))}
+              </div>
             </div>
-          </div>
-
-          <div>
-            <div className="p-6 rounded-2xl relative overflow-hidden" style={{ background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.08)' }}>
-              <div className="serif italic mb-2" style={{ fontSize:'3rem', color:'rgba(196,121,90,0.35)', lineHeight:0.8 }}>"</div>
-              <p className="serif italic font-light leading-relaxed" style={{ fontSize:'1.05rem', color:'rgba(240,234,224,0.72)', letterSpacing:'0.02em' }}>
-                {isRTL ? '"المنزل حيث تبدأ قصتك."' : '"Home is where your story begins."'}
-              </p>
-              <p className="text-xs font-light mt-3" style={{ color:'rgba(240,234,224,0.28)', letterSpacing:'0.12em' }}>— Anonymous</p>
-              <div className="absolute -bottom-4 -right-4 opacity-10"><LeafSprig size={70} color="var(--sage-lt)"/></div>
-            </div>
-          </div>
+          ))}
         </div>
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs font-light tracking-[0.12em]" style={{ color:'rgba(240,234,224,0.22)' }}>© {new Date().getFullYear()} {store.name} · {isRTL?'جميع الحقوق محفوظة':'All rights reserved'}</p>
-          <p className="text-xs font-light flex items-center gap-2 tracking-[0.1em]" style={{ color:'rgba(240,234,224,0.22)' }}>
-            <OrnamentDiamond color="var(--clay-lt)" size={7}/> Home Comforts Theme <OrnamentDiamond color="var(--clay-lt)" size={7}/>
+
+        <div style={{ paddingTop:'24px', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:'16px' }}>
+          <p style={{ fontSize:'11px', color:'rgba(250,246,238,0.3)', letterSpacing:'0.5px' }}>
+            © {yr} {store.name}. All Rights Reserved.
           </p>
+          <div style={{ display:'flex', gap:'15px', alignItems:'center' }}>
+            <span style={{ fontSize:'11px', color:'rgba(250,246,238,0.3)' }}>Gulf Fashion Theme</span>
+            <div style={{ width:'4px', height:'4px', borderRadius:'50%', background:'var(--gold)', opacity:0.3 }}/>
+            <span style={{ fontSize:'11px', color:'rgba(250,246,238,0.3)' }}>Crafted to Perfection</span>
+          </div>
         </div>
       </div>
     </footer>
   );
 }
 
-// ─── CARD ─────────────────────────────────────────────────────
-export function Card({ product, displayImage, discount, isRTL, store, viewDetails }: any) {
-  const [hovered, setHovered] = useState(false);
-  const accents = ['var(--clay)','var(--sage)','var(--rose)','var(--dusty)','var(--walnut-lt)'];
-  const accent  = accents[parseInt(product.id, 10) % accents.length] || accents[0];
+/* ── CARD ───────────────────────────────────────────────────── */
+export function Card({ product, displayImage, discount, store, viewDetails }: any) {
+  const [hov, setHov] = useState(false);
+  if (!product || !store) return null;
+
+  const price = typeof product.price === 'string' ? parseFloat(product.price) : (product.price as number) || 0;
+  const orig  = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
+  const brandGold = 'var(--gold-dk)';
+
   return (
-    <div className="card-home group flex flex-col overflow-hidden rounded-2xl"
-      style={{ backgroundColor:'var(--warm-white)', border:'1px solid var(--border-lt)', boxShadow:'0 4px 24px var(--shadow)' }}
-      onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)}>
-      {/* Image */}
-      <div className="relative overflow-hidden" style={{ aspectRatio:'4/3', backgroundColor:'var(--linen)' }}>
+    <div className="t-card group" onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+      style={{ display:'flex', flexDirection:'column', height:'100%', backgroundColor:'var(--cream)' }}>
+
+      <div className="c-img" style={{ position:'relative', aspectRatio:'3/4', overflow:'hidden', backgroundColor:'var(--sand)' }}>
         {displayImage
-          ? <img src={displayImage} alt={product.name} className="w-full h-full object-cover transition-transform duration-700" style={{ transform:hovered?'scale(1.08)':'scale(1)' }}/>
-          : <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-              <Sofa className="w-14 h-14" style={{ color:'var(--linen-dkk)' }}/>
-              <span className="text-xs font-light tracking-widest uppercase" style={{ color:'var(--text-dim)' }}>No Image</span>
+          ? <img src={displayImage} alt={product.name} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+          : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center' }} className="geo-bg">
+              <span className="amiri" style={{ fontSize:'2.5rem', color:'var(--gold)', opacity:0.3 }}>﷽</span>
             </div>
         }
-        <div className="absolute inset-0 pointer-events-none" style={{ background:'linear-gradient(to bottom, rgba(253,250,246,0.1) 0%, transparent 40%, rgba(253,250,246,0.4) 100%)' }}/>
-        {discount > 0 && (
-          <div className="absolute top-3.5 left-3.5 flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-medium tracking-widest text-white"
-            style={{ backgroundColor:'var(--clay)', boxShadow:'0 4px 12px rgba(196,121,90,0.35)' }}>
+        <div style={{ position:'absolute', top:0, left:0, right:0, height:'3px', background:`linear-gradient(to right,transparent,${brandGold},transparent)`, opacity:hov?1:0.4, transition:'opacity 0.3s' }}/>
+        {discount>0 && (
+          <div style={{ position:'absolute', top:'12px', right:'12px', backgroundColor:brandGold, color:'var(--cream)', fontSize:'11px', fontWeight:600, padding:'4px 12px', letterSpacing:'0.08em' }}>
             -{discount}%
           </div>
         )}
-        <button className="absolute top-3.5 right-3.5 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300"
-          style={{ backgroundColor:'var(--warm-white)', boxShadow:'0 2px 10px var(--shadow)', color:'var(--rose)', transform:hovered?'scale(1)':'scale(0.75)', opacity:hovered?1:0 }}>
-          <Heart className="w-4 h-4"/>
-        </button>
-        {/* CTA hover */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 transition-all duration-400"
-          style={{ transform:hovered?'translateY(0)':'translateY(110%)', opacity:hovered?1:0 }}>
-          <Link href={`/${store.subdomain}/product/${product.slug||product.id}`}
-            className="btn-cozy flex items-center justify-center gap-2 w-full py-3 rounded-xl text-xs font-medium tracking-[0.12em] uppercase text-white"
-            style={{ background:`linear-gradient(135deg, var(--walnut), ${accent})`, boxShadow:'0 8px 24px var(--shadow-md)' }}>
-            {viewDetails} <ArrowRight className="w-3.5 h-3.5"/>
+      </div>
+
+      <div style={{ padding:'16px 14px', borderTop:'1px solid var(--line)', flex:1, display:'flex', flexDirection:'column' }}>
+        <div style={{ display:'flex', gap:'2px', marginBottom:'8px' }}>
+          {[...Array(5)].map((_,i)=>(
+            <Star key={i} style={{ width:'11px', height:'11px', fill:i<4?brandGold:'none', color:brandGold }}/>
+          ))}
+        </div>
+        <h3 className="amiri" style={{ fontSize:'1.15rem', fontWeight:700, color:'var(--ink)', marginBottom:'10px', lineHeight:1.4, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' as any, overflow:'hidden', minHeight:'3.2em' }}>
+          {product.name}
+        </h3>
+
+        <div style={{ marginTop:'auto' }}>
+          <div style={{ display:'flex', alignItems:'baseline', gap:'6px', marginBottom:'14px' }}>
+            <span className="amiri" style={{ fontSize:'1.3rem', fontWeight:700, color:brandGold }}>
+              {price.toLocaleString()}
+              <span style={{ fontFamily:"'Cairo',sans-serif", fontWeight:600, fontSize:'12px', color:'var(--mid)', marginRight:'4px' }}>DZD</span>
+            </span>
+            {orig>price && (
+              <span style={{ fontSize:'12px', color:'var(--dim)', textDecoration:'line-through', opacity:0.6 }}>{orig.toLocaleString()}</span>
+            )}
+          </div>
+          <Link href={`/product/${product.slug||product.id}`} className="amiri"
+            style={{ textDecoration:'none', display:'flex', alignItems:'center', justifyContent:'center', width:'100%', fontSize:'1.1rem', fontWeight:700, padding:'10px', backgroundColor:hov?brandGold:'transparent', color:hov?'var(--cream)':brandGold, border:`1.5px solid ${brandGold}`, transition:'all 0.3s ease' }}>
+            {viewDetails}
           </Link>
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Content */}
-      <div className="p-5 flex flex-col flex-1">
-        <div className="flex gap-0.5 mb-2">
-          {[...Array(5)].map((_,i)=><Star key={i} className={`w-3 h-3 ${i<4?'fill-current':''}`} style={{ color:'var(--clay-lt)' }}/>)}
-        </div>
-        <h3 className="serif font-medium mb-2 line-clamp-2 leading-snug"
-          style={{ fontSize:'1.1rem', color:'var(--text-h)', letterSpacing:'0.01em' }}>
-          {product.name}
-        </h3>
-        {product.desc && (
-          <div className="text-xs mb-3 line-clamp-2 leading-relaxed font-light" style={{ color:'var(--text-dim)' }}
-            dangerouslySetInnerHTML={{ __html:product.desc }}/>
-        )}
-        <div className="mt-auto pt-3 flex items-end justify-between" style={{ borderTop:'1px solid var(--border-lt)' }}>
-          <div>
-            <p className="text-[9px] font-medium tracking-[0.14em] uppercase mb-0.5" style={{ color:'var(--text-dim)' }}>Price</p>
-            <span className="serif font-semibold" style={{ fontSize:'1.5rem', color:accent, letterSpacing:'0.01em', lineHeight:1 }}>
-              {product.price}
-            </span>
-            <span className="ml-1 text-xs font-light" style={{ color:'var(--text-dim)' }}>{store.currency}</span>
-            {product.priceOriginal && product.priceOriginal > product.price && (
-              <span className="ml-2 text-xs line-through font-light" style={{ color:'var(--text-dim)' }}>{product.priceOriginal}</span>
-            )}
+/* ── HOME ───────────────────────────────────────────────────── */
+export function Home({ store }: any) {
+  if (!store) return null;
+  const products: any[] = store.products || [];
+  const cats: any[]     = store.categories || [];
+
+  return (
+    <div dir="ltr">
+
+      {/* ── HERO ── */}
+      <section className="hero-split" style={{ overflow:'hidden' }}>
+        <div style={{ display:'flex', flexDirection:'column', justifyContent:'center', padding:'8vw 6vw', position:'relative', backgroundColor:'var(--cream)', overflow:'hidden' }}>
+          <div style={{ position:'absolute', inset:0, opacity:0.35 }} className="geo-bg"/>
+          <div style={{ position:'absolute', top:0, right:0, width:'80px', height:'80px', borderTop:'2px solid var(--gold)', borderRight:'2px solid var(--gold)', opacity:0.3 }}/>
+          <div style={{ position:'absolute', bottom:0, left:0, width:'80px', height:'80px', borderBottom:'2px solid var(--gold)', borderLeft:'2px solid var(--gold)', opacity:0.3 }}/>
+          <div style={{ position:'relative', zIndex:2 }}>
+            <div className="fu slabel" style={{ marginBottom:'20px', justifyContent:'flex-start' }}>Exclusive Collection</div>
+            <h1 className="fu fu-1 amiri" style={{ fontSize:'clamp(2.8rem,6vw,5.5rem)', fontWeight:700, color:'var(--ink)', lineHeight:1, marginBottom:'18px' }}>
+              {store.hero?.title || <><span>Gulf</span><br/><span className="gold-text">Heritage</span></>}
+            </h1>
+            <div className="fu fu-2 cal-line" style={{ marginBottom:'18px' }}><GoldDiamond size={7}/></div>
+            <p className="fu fu-2" style={{ fontFamily:"'Cairo',sans-serif", fontSize:'15px', lineHeight:'1.9', color:'var(--mid)', marginBottom:'36px', maxWidth:'400px', fontWeight:400 }}>
+              {store.hero?.subtitle || 'The finest Gulf and Islamic menswear — thobes, djellabas, and bisht robes, each curated with exceptional care.'}
+            </p>
+            <div className="fu fu-3" style={{ display:'flex', gap:'14px', flexWrap:'wrap' }}>
+              <a href="#collection" className="btn-gold" style={{ fontSize:'14px', padding:'14px 32px' }}>
+                Browse Collection <ArrowRight style={{ width:'14px', height:'14px' }}/>
+              </a>
+              {cats.length>0 && <a href="#categories" className="btn-outline" style={{ fontSize:'14px', padding:'13px 28px' }}>Categories</a>}
+            </div>
+            <div style={{ display:'flex', gap:'36px', marginTop:'48px', paddingTop:'32px', borderTop:'1px solid var(--line-dk)', flexWrap:'wrap' }}>
+              {[
+                { n:`${products.length}+`, l:'item(s)', c:'var(--gold-dk)' },
+                { n:'48H',  l:'Delivery', c:'var(--walnut)' },
+                { n:'100%', l:'Authentic',  c:'var(--walnut)' },
+              ].map((s,i)=>(
+                <div key={i} style={{ textAlign:'center' }}>
+                  <p className="amiri" style={{ fontSize:'2rem', fontWeight:700, color:s.c, lineHeight:1, margin:0 }}>{s.n}</p>
+                  <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:500, letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--dim)', margin:'4px 0 0' }}>{s.l}</p>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="w-8 h-8 rounded-full flex items-center justify-center transition-all"
-            style={{ backgroundColor:'var(--linen)', border:'1px solid var(--border)', color:accent }}>
-            <ArrowRight className="w-3.5 h-3.5"/>
+        </div>
+
+        <div style={{ position:'relative', overflow:'hidden', minHeight:'560px', backgroundColor:'var(--sand)' }}>
+          {store.hero?.imageUrl
+            ? <img src={store.hero.imageUrl} alt={store.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
+            : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center' }} className="geo-bg">
+                <span className="amiri" style={{ fontSize:'8rem', color:'var(--gold)', opacity:0.12 }}>﷽</span>
+              </div>
+          }
+          <div style={{ position:'absolute', inset:0, background:'linear-gradient(to right,rgba(250,246,238,0.2) 0%,transparent 30%)', pointerEvents:'none' }}/>
+          <div style={{ position:'absolute', bottom:'20px', right:'20px', backgroundColor:'rgba(250,246,238,0.92)', backdropFilter:'blur(12px)', padding:'12px 18px', border:'1px solid var(--line-dk)' }}>
+            <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'10px', fontWeight:600, letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--mid)', margin:0 }}>Collection {new Date().getFullYear()}</p>
+            <p className="amiri" style={{ fontSize:'1rem', fontWeight:700, color:'var(--walnut)', margin:'3px 0 0' }}>Premium Gulf Fashion</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── TRUST BAR ── */}
+      <div style={{ borderTop:'1px solid var(--line-dk)', borderBottom:'1px solid var(--line-dk)', backgroundColor:'var(--sand)' }}>
+        <div style={{ maxWidth:'1280px', margin:'0 auto' }}>
+          <div className="trust-bar">
+            {[
+              { icon:'🚚', title:'Delivery Across Algeria', desc:'48 Hours to Your Door' },
+              { icon:'✅', title:'100% Authentic Fashion',  desc:'Carefully Selected Quality' },
+              { icon:'🔄', title:'Free Returns',         desc:'30-Day Guaranteed Returns' },
+              { icon:'📞', title:'Customer Service',         desc:'Fast & Ongoing Support' },
+            ].map((item,i)=>(
+              <div key={i} style={{ display:'flex', alignItems:'center', gap:'12px', padding:'18px 22px', borderLeft:i>0?'1px solid var(--line)':'none' }}>
+                <span style={{ fontSize:'1.4rem' }}>{item.icon}</span>
+                <div>
+                  <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', fontWeight:600, color:'var(--ink)', margin:0 }}>{item.title}</p>
+                  <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', color:'var(--dim)', margin:0, fontWeight:400 }}>{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
-      {/* Color accent bottom line */}
-      <div className="h-0.5 w-0 group-hover:w-full transition-all duration-500 rounded-b-2xl" style={{ background:`linear-gradient(90deg, var(--walnut), ${accent})` }}/>
-    </div>
-  );
-}
 
-// ─── HOME ─────────────────────────────────────────────────────
-export function Home({ store }: any) {
-  const isRTL = store.language === 'ar';
-  const dir   = isRTL ? 'rtl' : 'ltr';
-  const t = {
-    badge:        isRTL ? '🏡 أثاث وديكور فاخر'         : '🏡 Curated Home Décor',
-    heroTitle:    isRTL ? 'أضفِ الدفء\nلمنزلك'           : 'Bring Warmth\nHome',
-    heroSub:      isRTL ? 'مجموعة مختارة من الأثاث والديكور الذي يجعل منزلك ملاذاً حقيقياً.' : 'A carefully curated collection of furniture and décor that transforms any house into a sanctuary.',
-    heroBtn:      isRTL ? 'تصفح المجموعة'                : 'Explore Collection',
-    heroBtn2:     isRTL ? 'اكتشف التصنيفات'              : 'Browse Rooms',
-    viewDetails:  isRTL ? 'عرض التفاصيل'                  : 'View Details',
-    categories:   isRTL ? 'غرفة لكل مزاج'                : 'A Room for Every Mood',
-    all:          isRTL ? 'الكل'                           : 'All Rooms',
-    products:     isRTL ? 'مجموعتنا المختارة'              : 'Our Curated Selection',
-    noProducts:   isRTL ? 'لا توجد منتجات حالياً'          : 'Collection Coming Soon',
-  };
+      {/* ── CATEGORIES ── */}
+      {cats.length>0 && (
+        <section id="categories" style={{ padding:'80px 0', backgroundColor:'var(--cream)' }}>
+          <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'0 28px' }}>
+            <div style={{ textAlign:'center', marginBottom:'44px' }}>
+              <div className="slabel" style={{ justifyContent:'center', marginBottom:'12px' }}>Categories</div>
+              <h2 className="amiri" style={{ fontSize:'clamp(1.8rem,3.5vw,3rem)', fontWeight:700, color:'var(--ink)', margin:'0 0 14px' }}>Browse Collections</h2>
+              <div className="cal-line"><GoldDiamond/></div>
+            </div>
+            <div className="cat-grid">
+              {cats.slice(0,8).map((cat:any)=>(
+                <Link key={cat.id} href={`/?category=${cat.id}`}
+                  style={{ display:'block', textDecoration:'none', border:'1px solid var(--line-dk)', position:'relative', aspectRatio:'3/4', overflow:'hidden', backgroundColor:'var(--sand)', transition:'all 0.35s' }}
+                  onMouseEnter={e=>{const el=e.currentTarget as HTMLElement; el.style.borderColor='var(--gold)'; el.style.transform='translateY(-4px)'; el.style.boxShadow='0 12px 32px rgba(26,18,8,0.1)';}}
+                  onMouseLeave={e=>{const el=e.currentTarget as HTMLElement; el.style.borderColor='var(--line-dk)'; el.style.transform='none'; el.style.boxShadow='none';}}>
+                  {cat.imageUrl
+                    ? <img src={cat.imageUrl} alt={cat.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block', opacity:0.7 }}/>
+                    : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center' }} className="geo-bg">
+                        <span className="amiri" style={{ fontSize:'3rem', color:'var(--gold)', opacity:0.2 }}>﷽</span>
+                      </div>
+                  }
+                  <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top,rgba(92,61,30,0.85) 0%,transparent 60%)', display:'flex', alignItems:'flex-end', padding:'16px' }}>
+                    <span className="amiri" style={{ fontSize:'1.2rem', fontWeight:700, color:'var(--cream)' }}>{cat.name}</span>
+                  </div>
+                  <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px', background:'linear-gradient(to right,transparent,var(--gold),transparent)' }}/>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
-  const pillars = [
-    { icon:'🛋️', label:isRTL?'أثاث الصالون':'Living Room',  desc:isRTL?'راحة واسترخاء':'Comfort & relaxation', color:'var(--clay)' },
-    { icon:'🛏️', label:isRTL?'غرفة النوم':'Bedroom',        desc:isRTL?'هدوء وسكينة':'Calm & serenity',       color:'var(--sage)' },
-    { icon:'🍽️', label:isRTL?'غرفة الطعام':'Dining',        desc:isRTL?'تجمّع ودفء':'Gather & warm',          color:'var(--rose)' },
-    { icon:'🌿', label:isRTL?'ديكور طبيعي':'Natural Décor',  desc:isRTL?'طبيعة وحياة':'Nature & life',         color:'var(--walnut-lt)' },
-  ];
-
-  return (
-    <div dir={dir} style={{ backgroundColor:'var(--warm-white)', fontFamily:"'Jost',sans-serif" }}>
-
-      {/* ── HERO ── */}
-      <section className="relative overflow-hidden grain" style={{ minHeight:'100vh', display:'flex', alignItems:'center', backgroundColor:'var(--linen)' }}>
-        <FloatingDust/>
-        <div className="absolute inset-0 linen-tex pointer-events-none opacity-60"/>
-        {/* Soft warm gradient */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background:'radial-gradient(ellipse 80% 70% at 60% 50%, rgba(196,121,90,0.07) 0%, transparent 70%)' }}/>
-        {/* Decorative leaves */}
-        <div className="absolute top-16 right-8 opacity-30 pointer-events-none" style={{ animation:'sway 9s ease-in-out infinite' }}>
-          <LeafSprig size={160} color="var(--sage)"/>
-        </div>
-        <div className="absolute bottom-0 right-32 opacity-20 pointer-events-none" style={{ transform:'rotate(20deg)', animation:'sway 7s ease-in-out infinite', animationDelay:'1.5s' }}>
-          <LeafSprig size={100} color="var(--clay-lt)"/>
-        </div>
-        <div className="absolute top-1/3 left-4 opacity-15 pointer-events-none" style={{ transform:'rotate(-15deg) scaleX(-1)', animation:'sway 11s ease-in-out infinite' }}>
-          <LeafSprig size={80} color="var(--walnut-lt)"/>
+      {/* ── COLLECTION GRID ── */}
+      <section id="collection" style={{ backgroundColor:'var(--sand)' }}>
+        <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'56px 28px 32px' }}>
+          <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', flexWrap:'wrap', gap:'16px' }}>
+            <div>
+              <div className="slabel" style={{ marginBottom:'10px' }}>Collection</div>
+              <h2 className="amiri" style={{ fontSize:'clamp(1.8rem,3vw,2.8rem)', fontWeight:700, color:'var(--ink)', margin:0 }}>Latest Collections</h2>
+            </div>
+            <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', color:'var(--dim)', fontWeight:400 }}>{products.length} item(s)</p>
+          </div>
+          <div className="cal-line" style={{ marginTop:'16px' }}><GoldDiamond/></div>
         </div>
 
-        {store.hero?.imageUrl && (
-          <div className="absolute inset-0 pointer-events-none">
-            <img src={store.hero.imageUrl} alt="" className="w-full h-full object-cover" style={{ opacity:0.12 }}/>
+        {products.length===0 ? (
+          <div style={{ padding:'80px 0', textAlign:'center', borderTop:'1px solid var(--line)' }}>
+            <span className="amiri" style={{ fontSize:'3rem', color:'var(--gold)', opacity:0.2, display:'block', marginBottom:'16px' }}>﷽</span>
+            <p className="amiri" style={{ fontSize:'1.5rem', color:'var(--dim)' }}>Collection Coming Soon</p>
+          </div>
+        ) : (
+          <div className="prod-grid">
+            {products.map((p:any)=>{
+              const img  = p.productImage||p.imagesProduct?.[0]?.imageUrl||store.design?.logoUrl;
+              const disc = p.priceOriginal ? Math.round(((p.priceOriginal-p.price)/p.priceOriginal)*100) : 0;
+              return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="View Item"/>;
+            })}
           </div>
         )}
-
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-16 w-full pt-12">
-          <div className="max-w-2xl">
-            {/* Badge */}
-            <div className="fade-up inline-flex items-center gap-2 mb-7 px-5 py-2.5 rounded-full text-xs font-medium tracking-[0.16em] uppercase"
-              style={{ backgroundColor:'var(--warm-white)', border:'1px solid var(--border)', color:'var(--walnut)', boxShadow:'0 4px 16px var(--shadow)' }}>
-              <Sparkles className="w-3 h-3" style={{ color:'var(--clay)' }}/> {t.badge}
-            </div>
-
-            {/* Title */}
-            <h1 className="fade-up fade-up-d1 serif whitespace-pre-line mb-6"
-              style={{ fontWeight:400, fontSize:'clamp(3.5rem,9vw,8rem)', color:'var(--text-h)', letterSpacing:'-0.01em', lineHeight:0.95 }}>
-              {store.hero?.title || t.heroTitle}
-            </h1>
-
-            {/* Ornament */}
-            <div className="fade-up fade-up-d1 flex items-center gap-4 mb-7">
-              <div className="h-px w-12" style={{ background:'linear-gradient(90deg, var(--clay), transparent)' }}/>
-              <OrnamentDiamond size={9}/>
-              <div className="h-px w-12" style={{ background:'linear-gradient(90deg, transparent, var(--sage))' }}/>
-            </div>
-
-            <p className="fade-up fade-up-d2 text-base leading-relaxed mb-10 font-light" style={{ color:'var(--text-mid)', maxWidth:'30rem' }}>
-              {store.hero?.subtitle || t.heroSub}
-            </p>
-
-            {/* CTAs */}
-            <div className="fade-up fade-up-d3 flex flex-wrap gap-4 mb-14">
-              <a href="#products"
-                className="btn-cozy flex items-center gap-2.5 px-9 py-4 rounded-full text-sm font-medium tracking-[0.10em] uppercase text-white"
-                style={{ background:'linear-gradient(135deg, var(--walnut), var(--clay))', boxShadow:'0 8px 32px var(--shadow-md)' }}>
-                <Sofa className="w-4 h-4"/> {t.heroBtn}
-              </a>
-              <a href="#categories"
-                className="btn-cozy flex items-center gap-2.5 px-9 py-4 rounded-full text-sm font-medium tracking-[0.10em] uppercase"
-                style={{ border:'1.5px solid var(--border)', color:'var(--walnut)', backgroundColor:'var(--warm-white)', boxShadow:'0 4px 16px var(--shadow)' }}>
-                {t.heroBtn2} <ArrowRight className="w-4 h-4"/>
-              </a>
-            </div>
-
-            {/* Trust row */}
-            <div className="fade-up fade-up-d4 flex flex-wrap gap-6 pt-8" style={{ borderTop:'1px solid var(--border)' }}>
-              {[
-                { icon:<ShieldCheck className="w-4 h-4"/>, label:isRTL?'دفع آمن':'Secure Payment' },
-                { icon:<Truck className="w-4 h-4"/>,      label:isRTL?'توصيل سريع':'Fast Delivery' },
-                { icon:<Leaf className="w-4 h-4"/>,       label:isRTL?'جودة طبيعية':'Natural Quality' },
-              ].map((b,i)=>(
-                <div key={i} className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor:'var(--linen-dk)', color:'var(--clay)' }}>{b.icon}</div>
-                  <span className="text-xs font-light tracking-[0.1em]" style={{ color:'var(--text-mid)' }}>{b.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom soft fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none" style={{ background:'linear-gradient(to bottom, transparent, var(--warm-white))' }}/>
       </section>
 
-      {/* ── PILLARS ── */}
-      <section id="categories" className="py-20" style={{ backgroundColor:'var(--warm-white)' }}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="text-center mb-14">
-            <p className="serif italic text-sm mb-3" style={{ color:'var(--clay)', letterSpacing:'0.12em' }}>— {isRTL?'حسب الغرفة':'Shop by Room'}</p>
-            <h2 className="serif font-light" style={{ fontSize:'clamp(2rem,5vw,3.5rem)', color:'var(--text-h)', letterSpacing:'-0.01em' }}>
-              {t.categories}
-            </h2>
-            <SectionDivider/>
-          </div>
-          {store.categories?.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <Link href={`/${store.domain}`}
-                className="btn-cozy flex flex-col items-center gap-3 py-8 px-4 rounded-2xl text-center transition-all"
-                style={{ backgroundColor:'var(--linen)', border:'1.5px solid var(--border)', color:'var(--walnut)' }}>
-                <span className="text-2xl">🏠</span>
-                <span className="text-xs font-medium tracking-[0.1em] uppercase">{t.all}</span>
-              </Link>
-              {store.categories.map((cat:any, idx:number) => {
-                const emojis = ['🛋️','🛏️','🍽️','🌿','🪴','🕯️','🖼️','🪞'];
-                return (
-                  <Link key={cat.id} href={`/${store.domain}?category=${cat.id}`}
-                    className="btn-cozy flex flex-col items-center gap-3 py-8 px-4 rounded-2xl text-center transition-all"
-                    style={{ backgroundColor:'var(--linen)', border:'1.5px solid var(--border)', color:'var(--walnut)' }}
-                    onMouseEnter={e=>{const el=e.currentTarget as HTMLElement; el.style.borderColor='var(--clay)'; el.style.backgroundColor='var(--linen-dk)';}}
-                    onMouseLeave={e=>{const el=e.currentTarget as HTMLElement; el.style.borderColor='var(--border)'; el.style.backgroundColor='var(--linen)';}}>
-                    <span className="text-2xl">{emojis[idx%emojis.length]}</span>
-                    <span className="text-xs font-medium tracking-[0.1em] uppercase">{cat.name}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {pillars.map((p,i)=>(
-                <div key={i} className="flex flex-col items-center gap-3 py-10 px-4 rounded-2xl text-center"
-                  style={{ backgroundColor:'var(--linen)', border:'1px solid var(--border-lt)' }}>
-                  <span className="text-3xl">{p.icon}</span>
-                  <div>
-                    <p className="text-xs font-medium tracking-[0.1em] uppercase mb-1" style={{ color:'var(--text-h)' }}>{p.label}</p>
-                    <p className="text-[10px] font-light" style={{ color:'var(--text-dim)' }}>{p.desc}</p>
-                  </div>
-                  <div className="w-8 h-0.5 rounded-full" style={{ backgroundColor:p.color }}/>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ── PRODUCTS ── */}
-      <section id="products" className="py-20 linen-tex" style={{ backgroundColor:'var(--linen)' }}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="text-center mb-14">
-            <p className="serif italic text-sm mb-3" style={{ color:'var(--clay)', letterSpacing:'0.12em' }}>— {isRTL?'اكتشف':'Discover'}</p>
-            <h2 className="serif font-light" style={{ fontSize:'clamp(2rem,5vw,3.5rem)', color:'var(--text-h)', letterSpacing:'-0.01em' }}>
-              {t.products}
-            </h2>
-            <p className="text-xs font-light mt-2 tracking-[0.1em]" style={{ color:'var(--text-dim)' }}>
-              {store.products?.length || 0} {isRTL?'قطعة':'pieces in collection'}
-            </p>
-            <SectionDivider/>
-          </div>
-
-          {store.products?.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {store.products.map((product:any) => {
-                const displayImage = product.productImage || product.imagesProduct?.[0]?.imageUrl || store.design?.logoUrl;
-                const discount = product.priceOriginal ? Math.round(((product.priceOriginal-product.price)/product.priceOriginal)*100) : 0;
-                return <Card key={product.id} product={product} displayImage={displayImage} discount={discount} isRTL={isRTL} store={store} viewDetails={t.viewDetails}/>;
-              })}
-            </div>
-          ) : (
-            <div className="py-40 text-center rounded-3xl" style={{ backgroundColor:'var(--warm-white)', border:'1px solid var(--border-lt)' }}>
-              <div style={{ animation:'float-soft 4s ease-in-out infinite' }}>
-                <Sofa className="w-16 h-16 mx-auto mb-5" style={{ color:'var(--linen-dkk)' }}/>
-              </div>
-              <h3 className="serif font-light mb-2" style={{ fontSize:'1.8rem', color:'var(--text-mid)' }}>{t.noProducts}</h3>
-              <p className="text-sm font-light" style={{ color:'var(--text-dim)' }}>{isRTL?'المنتجات قادمة قريباً.':'Your beautiful pieces are on their way.'}</p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ── COZY BANNER ── */}
-      <section className="relative overflow-hidden py-28 grain" style={{ backgroundColor:'var(--walnut-dk)' }}>
-        <div className="absolute inset-0 linen-tex pointer-events-none opacity-30"/>
-        <div className="absolute top-0 right-0 opacity-20 pointer-events-none" style={{ animation:'sway 10s ease-in-out infinite' }}>
-          <LeafSprig size={200} color="var(--sage-lt)"/>
-        </div>
-        <div className="absolute bottom-0 left-8 opacity-15 pointer-events-none" style={{ transform:'rotate(180deg) scaleX(-1)', animation:'sway 8s ease-in-out infinite', animationDelay:'3s' }}>
-          <LeafSprig size={140} color="var(--clay-lt)"/>
-        </div>
-        <div className="relative z-10 max-w-3xl mx-auto px-6 text-center">
-          <OrnamentDiamond color="var(--clay-lt)" size={12}/>
-          <h2 className="serif font-light my-6" style={{ fontSize:'clamp(2.5rem,7vw,6rem)', color:'var(--linen)', letterSpacing:'-0.01em', lineHeight:1.05 }}>
-            {isRTL?'منزلك يستحق\nالأفضل':'Your Home\nDeserves the Best'}
+      {/* ── CTA ── */}
+      <section style={{ position:'relative', padding:'96px 28px', textAlign:'center', overflow:'hidden', backgroundColor:'var(--walnut)' }}>
+        <div style={{ position:'absolute', inset:0, opacity:0.08 }} className="geo-bg"/>
+        {store.hero?.imageUrl && <img src={store.hero.imageUrl} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', opacity:0.07, display:'block' }}/>}
+        <div style={{ position:'relative', zIndex:2, maxWidth:'620px', margin:'0 auto' }}>
+          <div className="slabel" style={{ justifyContent:'center', marginBottom:'16px', color:'var(--gold-lt)' }}>Heritage & Elegance</div>
+          <h2 className="amiri" style={{ fontSize:'clamp(2rem,5vw,4rem)', fontWeight:700, color:'var(--cream)', lineHeight:1.05, marginBottom:'16px' }}>
+            {store.hero?.title ? 'A Refined Collection Worthy of You' : <>Heritage<br/><span style={{ color:'var(--gold-lt)' }}>Defines You</span></>}
           </h2>
-          <SectionDivider/>
-          <p className="text-base font-light leading-relaxed mb-10" style={{ color:'rgba(240,234,224,0.65)' }}>
-            {isRTL?'كل قطعة في مجموعتنا مختارة بعناية لتضيف دفئاً وجمالاً لمنزلك.':'Every piece in our collection is handpicked to bring warmth, character, and beauty into your home.'}
+          <div className="cal-line" style={{ margin:'18px 0' }}><GoldDiamond/></div>
+          <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'15px', lineHeight:'1.9', color:'rgba(250,246,238,0.65)', marginBottom:'32px', fontWeight:300 }}>
+            Choose what reflects your identity from the finest Gulf and Islamic menswear.
           </p>
-          <div className="flex justify-center gap-4 flex-wrap">
-            <a href="#products"
-              className="btn-cozy flex items-center gap-2.5 px-10 py-4 rounded-full text-sm font-medium tracking-[0.10em] uppercase text-white"
-              style={{ background:'linear-gradient(135deg, var(--clay), var(--clay-dk))', boxShadow:'0 8px 32px rgba(196,121,90,0.4)' }}>
-              <Sofa className="w-4 h-4"/> {isRTL?'تسوق الآن':'Shop Collection'}
+          <div style={{ display:'flex', gap:'14px', justifyContent:'center', flexWrap:'wrap' }}>
+            <a href="#collection" className="btn-gold" style={{ fontSize:'14px', padding:'14px 36px' }}>
+              Shop Now <ArrowRight style={{ width:'14px', height:'14px' }}/>
             </a>
-            <a href="#categories"
-              className="btn-cozy flex items-center gap-2.5 px-10 py-4 rounded-full text-sm font-medium tracking-[0.10em] uppercase"
-              style={{ border:'1.5px solid rgba(240,234,224,0.25)', color:'var(--linen)', backgroundColor:'rgba(253,250,246,0.07)' }}>
-              <Leaf className="w-4 h-4"/> {isRTL?'استكشف':'Explore Rooms'}
-            </a>
+            <Link href="/contact" className="btn-outline" style={{ textDecoration:'none', borderColor:'rgba(250,246,238,0.4)', color:'var(--cream)', padding:'13px 28px' }}>
+              Contact Us
+            </Link>
           </div>
         </div>
       </section>
@@ -660,564 +594,531 @@ export function Home({ store }: any) {
   );
 }
 
-// ─── DETAILS ──────────────────────────────────────────────────
-export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, isRTL }: any) {
-  const [selectedImage, setSelectedImage] = useState(0);
-  const accents = ['var(--clay)','var(--sage)','var(--rose)','var(--dusty)','var(--walnut-lt)'];
-  const accent  = accents[parseInt(product.id, 10) % accents.length] || accents[0];
+/* ── DETAILS ────────────────────────────────────────────────── */
+export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
+  const [sel, setSel] = useState(0);
+  if (!product) return null;
+
   return (
-    <div className="min-h-screen" dir={isRTL?'rtl':'ltr'} style={{ backgroundColor:'var(--warm-white)', fontFamily:"'Jost',sans-serif" }}>
+    <div dir="ltr" style={{ backgroundColor:'var(--cream)' }}>
       {/* Breadcrumb */}
-      <header className="py-4 sticky top-0 z-40" style={{ backgroundColor:'rgba(253,250,246,0.96)', backdropFilter:'blur(20px)', borderBottom:'1px solid var(--border)' }}>
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
-          <nav className="flex items-center gap-2 text-xs font-light tracking-[0.12em]" style={{ color:'var(--text-dim)' }}>
-            <span className="hover:text-walnut cursor-pointer">{isRTL?'الرئيسية':'Home'}</span>
-            <OrnamentDiamond size={5}/>
-            <span style={{ color:'var(--text-h)' }}>{product.name}</span>
-          </nav>
-          <div className="flex items-center gap-2">
-            <button onClick={toggleWishlist} className="w-9 h-9 rounded-full flex items-center justify-center transition-all"
-              style={{ border:'1px solid var(--border)', backgroundColor:isWishlisted?'var(--rose-lt)':'transparent', color:isWishlisted?'var(--walnut)':'var(--rose)' }}>
-              <Heart className={`w-4 h-4 ${isWishlisted?'fill-current':''}`}/>
-            </button>
-            <button onClick={handleShare} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ border:'1px solid var(--border)', color:'var(--text-dim)' }}>
-              <Share2 className="w-4 h-4"/>
-            </button>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-medium tracking-widest uppercase"
-              style={{ backgroundColor:inStock?'rgba(122,146,112,0.1)':'rgba(196,121,90,0.1)', border:`1px solid ${inStock?'var(--sage)':'var(--clay)'}`, color:inStock?'var(--sage-dk)':'var(--clay-dk)' }}>
-              <span className={`w-1.5 h-1.5 rounded-full ${inStock?'bg-green-400 animate-pulse':'bg-orange-400'}`}/>
-              {inStock ? (isRTL?'متوفر':'In Stock') : (isRTL?'غير متوفر':'Out of Stock')}
-            </div>
-          </div>
+      <div style={{ borderBottom:'1px solid var(--line-dk)', padding:'11px 28px', display:'flex', alignItems:'center', gap:'8px', fontSize:'12px', color:'var(--dim)', backgroundColor:'var(--sand)' }}>
+        <Link href="/" style={{ textDecoration:'none', color:'var(--mid)', transition:'color 0.2s' }}
+          onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--gold)';}}
+          onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mid)';}}>
+          Home
+        </Link>
+        <GoldDiamond size={5}/>
+        <span style={{ color:'var(--walnut)', fontWeight:600 }}>{product.name.slice(0,40)}</span>
+        <div style={{ marginRight:'auto', display:'flex', gap:'8px' }}>
+          <button onClick={toggleWishlist} style={{ width:'32px', height:'32px', display:'flex', alignItems:'center', justifyContent:'center', border:`1px solid ${isWishlisted?'var(--gold)':'var(--line-dk)'}`, background:isWishlisted?'rgba(184,151,58,0.1)':'transparent', cursor:'pointer', color:isWishlisted?'var(--gold)':'var(--mid)' }}>
+            <Heart style={{ width:'13px', height:'13px', fill:isWishlisted?'currentColor':'none' }}/>
+          </button>
+          <button onClick={handleShare} style={{ width:'32px', height:'32px', display:'flex', alignItems:'center', justifyContent:'center', border:'1px solid var(--line-dk)', background:'transparent', cursor:'pointer', color:'var(--mid)' }}>
+            <Share2 style={{ width:'13px', height:'13px' }}/>
+          </button>
         </div>
-      </header>
+      </div>
 
-      <main className="max-w-6xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-
-          {/* Gallery */}
-          <div className="space-y-3">
-            <div className="relative overflow-hidden rounded-3xl group" style={{ aspectRatio:'1', backgroundColor:'var(--linen)', border:'1px solid var(--border-lt)' }}>
-              {allImages.length > 0
-                ? <img src={allImages[selectedImage]} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
-                : <div className="w-full h-full flex items-center justify-center"><Sofa className="w-20 h-20" style={{ color:'var(--linen-dkk)' }}/></div>
-              }
-              {discount > 0 && (
-                <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[10px] font-medium text-white"
-                  style={{ backgroundColor:'var(--clay)', boxShadow:'0 4px 16px rgba(196,121,90,0.35)' }}>
-                  -{discount}% off
+      <div className="details-g" style={{ maxWidth:'1280px', margin:'0 auto' }}>
+        {/* Gallery */}
+        <div className="details-L">
+          <div style={{ position:'relative', aspectRatio:'3/4', overflow:'hidden', backgroundColor:'var(--sand)', border:'1px solid var(--line)' }}>
+            {allImages.length>0
+              ? <img src={allImages[sel]} alt={product.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
+              : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center' }} className="geo-bg">
+                  <span className="amiri" style={{ fontSize:'6rem', color:'var(--gold)', opacity:0.15 }}>﷽</span>
                 </div>
-              )}
-              <button onClick={toggleWishlist} className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-all"
-                style={{ backgroundColor:'var(--warm-white)', boxShadow:'0 4px 16px var(--shadow)', color:isWishlisted?'var(--rose)':'var(--dusty)' }}>
-                <Heart className={`w-4 h-4 ${isWishlisted?'fill-current':''}`}/>
-              </button>
-              {allImages.length > 1 && (
+            }
+            <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px', background:'linear-gradient(to right,transparent,var(--gold),transparent)' }}/>
+            {discount>0 && <div style={{ position:'absolute', top:'12px', right:'12px', backgroundColor:'var(--gold)', color:'var(--cream)', fontSize:'11px', fontWeight:600, padding:'4px 12px', letterSpacing:'0.08em' }}>-{discount}%</div>}
+            {allImages.length>1 && (
+              <>
+                <button onClick={()=>setSel(p=>p===0?allImages.length-1:p-1)} style={{ position:'absolute', right:'10px', top:'50%', transform:'translateY(-50%)', width:'36px', height:'36px', border:'1px solid var(--line-dk)', borderRadius:'50%', backgroundColor:'rgba(250,246,238,0.9)', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <ChevronRight style={{ width:'14px', height:'14px', color:'var(--walnut)' }}/>
+                </button>
+                <button onClick={()=>setSel(p=>p===allImages.length-1?0:p+1)} style={{ position:'absolute', left:'10px', top:'50%', transform:'translateY(-50%)', width:'36px', height:'36px', border:'1px solid var(--line-dk)', borderRadius:'50%', backgroundColor:'rgba(250,246,238,0.9)', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <ChevronLeft style={{ width:'14px', height:'14px', color:'var(--walnut)' }}/>
+                </button>
+              </>
+            )}
+            {!inStock&&!autoGen && (
+              <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', backgroundColor:'rgba(250,246,238,0.85)', backdropFilter:'blur(4px)' }}>
+                <span className="amiri" style={{ fontSize:'2rem', fontWeight:700, color:'var(--mid)' }}>Out of Stock</span>
+              </div>
+            )}
+          </div>
+          {allImages.length>1 && (
+            <div style={{ display:'flex', gap:'8px', marginTop:'10px', flexWrap:'wrap' }}>
+              {allImages.slice(0,5).map((img:string,idx:number)=>(
+                <button key={idx} onClick={()=>setSel(idx)} style={{ width:'54px', height:'54px', overflow:'hidden', border:`2px solid ${sel===idx?'var(--gold)':'var(--line-dk)'}`, cursor:'pointer', padding:0, background:'none', opacity:sel===idx?1:0.55 }}>
+                  <img src={img} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Info */}
+        <div className="details-R">
+          <div className="slabel" style={{ marginBottom:'12px' }}>Gulf Fashion</div>
+          <h1 className="amiri" style={{ fontSize:'clamp(1.8rem,3.5vw,3.2rem)', fontWeight:700, color:'var(--ink)', lineHeight:1, marginBottom:'14px' }}>
+            {product.name}
+          </h1>
+
+          <div style={{ display:'flex', alignItems:'center', gap:'12px', marginBottom:'22px', paddingBottom:'22px', borderBottom:'1px solid var(--line-dk)', flexWrap:'wrap' }}>
+            <div style={{ display:'flex', gap:'2px' }}>
+              {[...Array(5)].map((_,i)=><Star key={i} style={{ width:'13px', height:'13px', fill:i<4?'var(--gold)':'none', color:'var(--gold)' }}/>)}
+            </div>
+            <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'12px', color:'var(--dim)' }}>4.8 (128 Rating)</span>
+            <span style={{ marginRight:'auto', padding:'5px 14px', border:`1px solid ${inStock||autoGen?'var(--gold)':'var(--dim)'}`, color:inStock||autoGen?'var(--gold-dk)':'var(--dim)', fontSize:'12px', fontWeight:600, letterSpacing:'0.08em' }}>
+              {autoGen?'∞ Available':inStock?'Available':'Out of Stock'}
+            </span>
+          </div>
+
+          {/* Price */}
+          <div style={{ marginBottom:'22px', padding:'18px', backgroundColor:'var(--sand)', border:'1px solid var(--line)' }}>
+            <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--dim)', margin:'0 0 6px' }}>Price</p>
+            <div style={{ display:'flex', alignItems:'baseline', gap:'12px', flexWrap:'wrap' }}>
+              <span className="amiri" style={{ fontSize:'3rem', fontWeight:700, color:'var(--gold-dk)', lineHeight:1 }}>{finalPrice.toLocaleString()}</span>
+              <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'15px', color:'var(--mid)' }}>DZD</span>
+              {product.priceOriginal && parseFloat(product.priceOriginal)>finalPrice && (
                 <>
-                  <button onClick={()=>setSelectedImage(p=>p===0?allImages.length-1:p-1)} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
-                    style={{ backgroundColor:'var(--warm-white)', boxShadow:'0 4px 16px var(--shadow)', color:'var(--walnut)' }}>
-                    <ChevronLeft className="w-4 h-4"/>
-                  </button>
-                  <button onClick={()=>setSelectedImage(p=>p===allImages.length-1?0:p+1)} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
-                    style={{ backgroundColor:'var(--warm-white)', boxShadow:'0 4px 16px var(--shadow)', color:'var(--walnut)' }}>
-                    <ChevronRight className="w-4 h-4"/>
-                  </button>
+                  <span style={{ fontSize:'14px', textDecoration:'line-through', color:'var(--dim)' }}>{parseFloat(product.priceOriginal).toLocaleString()}</span>
+                  <span style={{ fontSize:'12px', color:'var(--gold)', fontWeight:600, padding:'2px 8px', border:'1px solid var(--line-dk)', letterSpacing:'0.06em' }}>
+                    Save {(parseFloat(product.priceOriginal)-finalPrice).toLocaleString()} DZD
+                  </span>
                 </>
               )}
-              {!inStock && !autoGen && (
-                <div className="absolute inset-0 rounded-3xl flex items-center justify-center" style={{ backgroundColor:'rgba(253,250,246,0.85)', backdropFilter:'blur(6px)' }}>
-                  <div className="px-8 py-4 rounded-full serif italic" style={{ backgroundColor:'var(--warm-white)', border:'1px solid var(--border)', color:'var(--text-mid)', fontSize:'1.1rem' }}>
-                    {isRTL?'نفدت الكمية':'Out of Stock'}
+            </div>
+          </div>
+
+          {/* Offers */}
+          {product.offers?.length>0 && (
+            <div style={{ marginBottom:'22px', paddingBottom:'22px', borderBottom:'1px solid var(--line)' }}>
+              <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--dim)', marginBottom:'12px' }}>Packages</p>
+              {product.offers.map((offer:any)=>(
+                <label key={offer.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'13px 16px', border:`1.5px solid ${selectedOffer===offer.id?'var(--gold)':'var(--line-dk)'}`, cursor:'pointer', marginBottom:'8px', transition:'all 0.2s', backgroundColor:selectedOffer===offer.id?'rgba(184,151,58,0.05)':'transparent' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
+                    <div style={{ width:'16px', height:'16px', border:`2px solid ${selectedOffer===offer.id?'var(--gold)':'var(--dim)'}`, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                      {selectedOffer===offer.id&&<div style={{ width:'8px', height:'8px', borderRadius:'50%', background:'var(--gold)' }}/>}
+                    </div>
+                    <input type="radio" name="offer" value={offer.id} checked={selectedOffer===offer.id} onChange={()=>setSelectedOffer(offer.id)} style={{ display:'none' }}/>
+                    <div>
+                      <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', fontWeight:500, color:'var(--ink)', margin:0 }}>{offer.name}</p>
+                      <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', color:'var(--dim)', margin:0 }}>Quantity: {offer.quantity}</p>
+                    </div>
                   </div>
+                  <span className="amiri" style={{ fontSize:'1.2rem', fontWeight:700, color:'var(--gold-dk)' }}>
+                    {offer.price.toLocaleString()} <span style={{ fontFamily:"'Cairo',sans-serif", fontWeight:300, fontSize:'12px', color:'var(--mid)' }}>DZD</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          )}
+
+          {/* Attributes */}
+          {allAttrs.map((attr:any)=>(
+            <div key={attr.id} style={{ marginBottom:'18px', paddingBottom:'18px', borderBottom:'1px solid var(--line)' }}>
+              <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--dim)', marginBottom:'10px' }}>{attr.name}</p>
+              {attr.displayMode==='color' ? (
+                <div style={{ display:'flex', flexWrap:'wrap', gap:'8px' }}>
+                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} title={v.name} style={{ width:'28px', height:'28px', backgroundColor:v.value, border:'none', cursor:'pointer', borderRadius:'50%', outline:s?'2.5px solid var(--gold)':'2.5px solid transparent', outlineOffset:'3px' }}/>;})}
+                </div>
+              ):attr.displayMode==='image' ? (
+                <div style={{ display:'flex', flexWrap:'wrap', gap:'6px' }}>
+                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} style={{ width:'52px', height:'52px', overflow:'hidden', border:`2px solid ${s?'var(--gold)':'var(--line-dk)'}`, cursor:'pointer', padding:0 }}><img src={v.value} alt={v.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}/></button>;})}
+                </div>
+              ):(
+                <div style={{ display:'flex', flexWrap:'wrap', gap:'6px' }}>
+                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} style={{ padding:'8px 16px', border:`1.5px solid ${s?'var(--gold)':'var(--line-dk)'}`, backgroundColor:s?'var(--gold)':'transparent', color:s?'var(--cream)':'var(--mid)', fontFamily:"'Cairo',sans-serif", fontSize:'13px', fontWeight:500, cursor:'pointer', transition:'all 0.18s' }}>{v.name}</button>;})}
                 </div>
               )}
             </div>
+          ))}
 
-            {allImages.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {allImages.map((img:string,idx:number)=>(
-                  <button key={idx} onClick={()=>setSelectedImage(idx)} className="shrink-0 w-16 h-16 rounded-xl overflow-hidden transition-all"
-                    style={{ border:`2px solid ${selectedImage===idx?accent:'transparent'}`, opacity:selectedImage===idx?1:0.55 }}>
-                    <img src={img} alt="" className="w-full h-full object-cover"/>
-                  </button>
-                ))}
-              </div>
-            )}
+          <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants}/>
 
-            <div className="grid grid-cols-3 gap-3">
-              {[{e:'🛡️',l:isRTL?'جودة مضمونة':'Quality Assured'},{e:'🚚',l:isRTL?'توصيل سريع':'Fast Delivery'},{e:'🌿',l:isRTL?'مواد طبيعية':'Natural Materials'}].map((b,i)=>(
-                <div key={i} className="flex flex-col items-center gap-2 py-4 rounded-2xl" style={{ backgroundColor:'var(--linen)', border:'1px solid var(--border-lt)' }}>
-                  <span className="text-xl">{b.e}</span>
-                  <span className="text-[9px] font-light tracking-[0.1em] uppercase text-center" style={{ color:'var(--text-dim)' }}>{b.l}</span>
-                </div>
-              ))}
+          {product.desc && (
+            <div style={{ marginTop:'28px', paddingTop:'22px', borderTop:'1px solid var(--line)' }}>
+              <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--dim)', marginBottom:'12px' }}>Item Description</p>
+              <div style={{ fontFamily:"'Cairo',sans-serif", fontSize:'14px', lineHeight:'1.9', color:'var(--mid)', fontWeight:400 }}
+                dangerouslySetInnerHTML={{ __html:DOMPurify.sanitize(product.desc,{ALLOWED_TAGS:['p','br','strong','em','ul','ol','li','h1','h2','h3','span'],ALLOWED_ATTR:['class','style']})}}/>
             </div>
-          </div>
-
-          {/* Info */}
-          <div className="space-y-6">
-            <div>
-              <p className="serif italic text-xs mb-3" style={{ color:'var(--clay)', letterSpacing:'0.12em' }}>— {isRTL?'منتج':'Piece'}</p>
-              <h1 className="serif font-light mb-3 leading-tight"
-                style={{ fontSize:'clamp(1.8rem,4vw,3rem)', color:'var(--text-h)', letterSpacing:'-0.01em' }}>
-                {product.name}
-              </h1>
-              <div className="flex items-center gap-3">
-                <div className="flex gap-0.5">{[...Array(5)].map((_,i)=><Star key={i} className={`w-3.5 h-3.5 ${i<4?'fill-current':''}`} style={{ color:'var(--clay-lt)' }}/>)}</div>
-                <span className="text-xs font-light" style={{ color:'var(--text-dim)' }}>4.8 · 128 {isRTL?'تقييم':'reviews'}</span>
-              </div>
-            </div>
-
-            {/* Price card */}
-            <div className="p-5 rounded-2xl" style={{ backgroundColor:'var(--linen)', border:'1px solid var(--border-lt)' }}>
-              <p className="text-[9px] font-medium tracking-[0.18em] uppercase mb-2" style={{ color:'var(--text-dim)' }}>{isRTL?'السعر':'Price'}</p>
-              <div className="flex items-baseline gap-3">
-                <span className="serif font-medium" style={{ fontSize:'3.5rem', color:accent, lineHeight:1, letterSpacing:'-0.02em' }}>
-                  {finalPrice.toLocaleString()}
-                </span>
-                <span className="text-sm font-light" style={{ color:'var(--text-mid)' }}>دج</span>
-                {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
-                  <div>
-                    <span className="text-sm line-through block font-light" style={{ color:'var(--text-dim)' }}>{parseFloat(product.priceOriginal).toLocaleString()} دج</span>
-                    <span className="text-xs font-medium" style={{ color:'var(--clay)' }}>Save {(parseFloat(product.priceOriginal)-finalPrice).toLocaleString()} دج</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Stock */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-light tracking-[0.1em]"
-              style={{ backgroundColor:autoGen?'rgba(184,168,158,0.12)':inStock?'rgba(122,146,112,0.1)':'rgba(196,121,90,0.1)', border:`1px solid ${autoGen?'var(--dusty)':inStock?'var(--sage)':'var(--clay)'}`, color:autoGen?'var(--dusty)':inStock?'var(--sage-dk)':'var(--clay-dk)' }}>
-              {autoGen?<Infinity className="w-3.5 h-3.5"/>:inStock?<span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"/>:<X className="w-3.5 h-3.5"/>}
-              {autoGen?'Unlimited Stock':inStock?'In Stock — Ready to ship':'Out of Stock'}
-            </div>
-
-            {/* Offers */}
-            {product.offers?.length > 0 && (
-              <div>
-                <SectionDivider/>
-                <p className="text-[9px] font-medium tracking-[0.18em] uppercase mb-3" style={{ color:'var(--text-dim)' }}>{isRTL?'اختر الباقة':'Select Package'}</p>
-                <div className="space-y-2">
-                  {product.offers.map((offer:any)=>(
-                    <label key={offer.id} className="flex items-center justify-between p-4 rounded-xl cursor-pointer transition-all"
-                      style={{ border:`1.5px solid ${selectedOffer===offer.id?accent:'var(--border)'}`, backgroundColor:selectedOffer===offer.id?'var(--linen)':'transparent' }}>
-                      <div className="flex items-center gap-3">
-                        <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ border:`1.5px solid ${selectedOffer===offer.id?accent:'var(--border)'}` }}>
-                          {selectedOffer===offer.id&&<div className="w-2 h-2 rounded-full" style={{ backgroundColor:accent }}/>}
-                        </div>
-                        <input type="radio" name="offer" value={offer.id} checked={selectedOffer===offer.id} onChange={()=>setSelectedOffer(offer.id)} className="sr-only"/>
-                        <div>
-                          <p className="text-sm font-medium" style={{ color:'var(--text-h)' }}>{offer.name}</p>
-                          <p className="text-xs font-light" style={{ color:'var(--text-dim)' }}>Qty: {offer.quantity}</p>
-                        </div>
-                      </div>
-                      <span className="serif font-medium" style={{ fontSize:'1.3rem', color:accent }}>
-                        {offer.price.toLocaleString()} <span className="text-xs font-light">دج</span>
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Attributes */}
-            {allAttrs.map((attr:any)=>(
-              <div key={attr.id}>
-                <SectionDivider/>
-                <p className="text-[9px] font-medium tracking-[0.18em] uppercase mb-3" style={{ color:'var(--text-dim)' }}>{attr.name}</p>
-                {attr.displayMode==='color'?(
-                  <div className="flex gap-2 flex-wrap">
-                    {attr.variants.map((v:any)=>{ const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} title={v.name} className="w-9 h-9 rounded-full transition-all" style={{ backgroundColor:v.value, boxShadow:s?`0 0 0 2px var(--warm-white), 0 0 0 4px ${accent}`:'0 2px 8px var(--shadow)', transform:s?'scale(1.15)':'scale(1)' }}/>; })}
-                  </div>
-                ):attr.displayMode==='image'?(
-                  <div className="flex gap-2 flex-wrap">
-                    {attr.variants.map((v:any)=>{ const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} className="w-14 h-14 rounded-xl overflow-hidden transition-all" style={{ border:`2px solid ${s?accent:'var(--border)'}`, opacity:s?1:0.6 }}><img src={v.value} alt={v.name} className="w-full h-full object-cover"/></button>; })}
-                  </div>
-                ):(
-                  <div className="flex flex-wrap gap-2">
-                    {attr.variants.map((v:any)=>{ const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} className="px-5 py-2.5 rounded-full text-xs font-medium tracking-[0.1em] transition-all" style={{ border:`1.5px solid ${s?accent:'var(--border)'}`, backgroundColor:s?'var(--linen)':'transparent', color:s?accent:'var(--text-mid)' }}>{v.name}</button>; })}
-                  </div>
-                )}
-              </div>
-            ))}
-
-            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants}/>
-          </div>
+          )}
         </div>
-
-        {product.desc && (
-          <section className="mt-20 pt-12" style={{ borderTop:'1px solid var(--border-lt)' }}>
-            <SectionDivider/>
-            <h2 className="serif font-light mb-8 text-center" style={{ fontSize:'2rem', color:'var(--text-h)' }}>
-              {isRTL?'تفاصيل القطعة':'Piece Details'}
-            </h2>
-            <div className="p-8 rounded-3xl linen-tex" style={{ backgroundColor:'var(--linen)', border:'1px solid var(--border-lt)' }}>
-              <div className="text-sm font-light leading-relaxed" style={{ color:'var(--text-mid)' }}
-                dangerouslySetInnerHTML={{ __html:DOMPurify.sanitize(product.desc, { ALLOWED_TAGS:['p','br','strong','em','ul','ol','li','h1','h2','h3','h4','span'],ALLOWED_ATTR:['class','style'] }) }}/>
-            </div>
-          </section>
-        )}
-      </main>
+      </div>
     </div>
   );
 }
 
-// ─── PRODUCT FORM ─────────────────────────────────────────────
-const inputSt = (err?:boolean): React.CSSProperties => ({
-  width:'100%', padding:'12px 16px', fontSize:'0.875rem', fontWeight:300,
-  backgroundColor:'var(--warm-white)', border:`1.5px solid ${err?'var(--clay)':'var(--border)'}`,
-  borderRadius:'12px', color:'var(--text-h)', outline:'none',
-  fontFamily:"'Jost',sans-serif", transition:'border-color 0.3s, box-shadow 0.3s',
-});
-
-const FieldWrapper = ({ error, label, children }: { error?:string; label?:string; children:React.ReactNode }) => (
-  <div className="space-y-1.5">
-    {label && <label className="block text-[9px] font-medium tracking-[0.18em] uppercase" style={{ color:'var(--text-dim)' }}>{label}</label>}
+/* ── PRODUCT FORM ────────────────────────────────────────────── */
+const FR = ({ error, label, children }: { error?:string; label?:string; children:React.ReactNode }) => (
+  <div style={{ marginBottom:'13px' }}>
+    {label && <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'6px' }}>{label}</p>}
     {children}
-    {error && <p className="text-xs font-light flex items-center gap-1" style={{ color:'var(--clay)' }}><AlertCircle className="w-3 h-3"/>{error}</p>}
+    {error && <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', color:'#C0392B', marginTop:'4px', display:'flex', alignItems:'center', gap:'4px' }}>
+      <AlertCircle style={{ width:'11px', height:'11px' }}/>{error}
+    </p>}
   </div>
 );
 
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss=0 }: ProductFormProps) {
   const router = useRouter();
-  const [wilayas,setWilayas]   = useState<Wilaya[]>([]);
-  const [communes,setCommunes] = useState<Commune[]>([]);
-  const [loadingCommunes,setLoadingCommunes] = useState(false);
-  const [formData,setFormData] = useState({ customerId:'', customerName:'', customerPhone:'', customerWelaya:'', customerCommune:'', quantity:1, priceLoss:0, typeLivraison:'home' as 'home'|'office' });
-  const [formErrors,setFormErrors] = useState<Record<string,string>>({});
-  const [submitting,setSubmitting] = useState(false);
+  const [wilayas,  setWilayas]  = useState<Wilaya[]>([]);
+  const [communes, setCommunes] = useState<Commune[]>([]);
+  const [loadingC, setLC]       = useState(false);
+  const [fd, setFd] = useState({
+    customerId:'', customerName:'', customerPhone:'',
+    customerWelaya:'', customerCommune:'',
+    quantity:1, priceLoss:0,
+    typeLivraison:'home' as 'home'|'office',
+  });
+  const [errors, setErrors] = useState<Record<string,string>>({});
+  const [sub,    setSub]    = useState(false);
 
   useEffect(()=>{ if(userId) fetchWilayas(userId).then(setWilayas); },[userId]);
-  useEffect(()=>{ if(typeof window!=='undefined'){ const id=localStorage.getItem('customerId'); if(id) setFormData(p=>({...p,customerId:id})); } },[]);
-  useEffect(()=>{ if(!formData.customerWelaya){setCommunes([]);return;} setLoadingCommunes(true); fetchCommunes(formData.customerWelaya).then(d=>{setCommunes(d);setLoadingCommunes(false);}); },[formData.customerWelaya]);
+  useEffect(()=>{ if(typeof window!=='undefined'){ const id=localStorage.getItem('customerId'); if(id) setFd(p=>({...p,customerId:id})); } },[]);
+  useEffect(()=>{ if(!fd.customerWelaya){setCommunes([]);return;} setLC(true); fetchCommunes(fd.customerWelaya).then(d=>{setCommunes(d);setLC(false);}); },[fd.customerWelaya]);
 
-  const selectedWilayaData = useMemo(()=>wilayas.find(w=>String(w.id)===String(formData.customerWelaya)),[wilayas,formData.customerWelaya]);
-  const getFinalPrice = useCallback(():number=>{
-    const base = typeof product.price==='string'?parseFloat(product.price):product.price as number;
-    const offer = product.offers?.find(o=>o.id===selectedOffer); if(offer) return offer.price;
-    if(product.variantDetails?.length&&Object.keys(selectedVariants).length>0){ const m=product.variantDetails.find(v=>variantMatches(v,selectedVariants)); if(m&&m.price!==-1) return m.price; }
+  const selW  = useMemo(()=>wilayas.find(w=>String(w.id)===String(fd.customerWelaya)),[wilayas,fd.customerWelaya]);
+
+  const getFP = useCallback(():number=>{
+    const base = typeof product.price==='string' ? parseFloat(product.price) : product.price as number;
+    const off  = product.offers?.find((o:any)=>o.id===selectedOffer);
+    if(off) return off.price;
+    if(product.variantDetails?.length && Object.keys(selectedVariants).length>0){
+      const m = product.variantDetails.find((v:any)=>variantMatches(v,selectedVariants));
+      if(m && m.price!==-1) return m.price;
+    }
     return base;
   },[product,selectedOffer,selectedVariants]);
-  const getPriceLivraison = useCallback(():number=>{ if(!selectedWilayaData) return 0; return formData.typeLivraison==='home'?selectedWilayaData.livraisonHome:selectedWilayaData.livraisonOfice; },[selectedWilayaData,formData.typeLivraison]);
-  useEffect(()=>{ if(selectedWilayaData) setFormData(f=>({...f,priceLoss:selectedWilayaData.livraisonReturn})); },[selectedWilayaData]);
 
-  const finalPrice    = getFinalPrice();
-  const getTotalPrice = ()=>finalPrice*formData.quantity+getPriceLivraison();
+  const getLiv = useCallback(():number=>{
+    if(!selW) return 0;
+    return fd.typeLivraison==='home' ? selW.livraisonHome : selW.livraisonOfice;
+  },[selW,fd.typeLivraison]);
+
+  useEffect(()=>{ if(selW) setFd(f=>({...f,priceLoss:selW.livraisonReturn})); },[selW]);
+
+  const getVariantDetailId = useCallback(()=>{
+    if(!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+    return product.variantDetails.find((v:any)=>variantMatches(v,selectedVariants))?.id;
+  },[product.variantDetails,selectedVariants]);
+
+  const fp    = getFP();
+  const total = ()=> fp * fd.quantity + +getLiv();
+
   const validate = ()=>{
     const e:Record<string,string>={};
-    if(!formData.customerName.trim())  e.customerName='الاسم مطلوب';
-    if(!formData.customerPhone.trim()) e.customerPhone='رقم الهاتف مطلوب';
-    if(!formData.customerWelaya)       e.customerWelaya='الولاية مطلوبة';
-    if(!formData.customerCommune)      e.customerCommune='البلدية مطلوبة';
+    if(!fd.customerName.trim())  e.customerName  = 'Name is required';
+    if(!fd.customerPhone.trim()) e.customerPhone  = 'Phone number is required';
+    if(!fd.customerWelaya)       e.customerWelaya = 'Province is required';
+    if(!fd.customerCommune)      e.customerCommune= 'Municipality is required';
     return e;
   };
-  const handleSubmit = async(e:React.FormEvent)=>{
-    e.preventDefault(); const errs=validate(); if(Object.keys(errs).length){setFormErrors(errs);return;} setFormErrors({}); setSubmitting(true);
-    try { await axios.post(`${API_URL}/orders/create`,{ ...formData, productId:product.id, storeId:product.store.id, userId, selectedOffer, selectedVariants, platform:platform||'store', finalPrice, totalPrice:getTotalPrice(), priceLivraison:getPriceLivraison() }); if(typeof window!=='undefined'&&formData.customerId) localStorage.setItem('customerId',formData.customerId); router.push(`/lp/${domain}/successfully`); } catch(err){console.error(err);} finally{setSubmitting(false);}
+
+  const handleSubmit = async (e:React.FormEvent)=>{
+    e.preventDefault();
+    const er = validate();
+    if(Object.keys(er).length){ setErrors(er); return; }
+    setErrors({}); setSub(true);
+    try {
+      await axios.post(`${API_URL}/orders`, {
+        productId:         product.id,
+        variantDetailId:   getVariantDetailId(),
+        storeId:           product.store.id,
+        userId,
+        selectedOffer,
+        platform:          platform || 'store',
+        finalPrice:        fp,
+        totalPrice:        total(),
+        priceLivraison:    getLiv(),
+        customerId:        fd.customerId,
+        customerName:      fd.customerName,
+        customerPhone:     fd.customerPhone,
+        customerWilayaId:  fd.customerWelaya,
+        customerCommuneId: fd.customerCommune,
+        quantity:          fd.quantity,
+        priceLoss:         fd.priceLoss,
+        typeLivraison:     fd.typeLivraison,
+      });
+      if(typeof window!=='undefined' && fd.customerId) localStorage.setItem('customerId',fd.customerId);
+      router.push(`/${domain}/successfully`);
+    } catch(err){ console.error(err); } finally { setSub(false); }
   };
-  const onFocus = (e:React.FocusEvent<any>)=>{ e.target.style.borderColor='var(--walnut)'; e.target.style.boxShadow='0 0 0 3px rgba(107,79,58,0.10)'; };
-  const onBlur  = (e:React.FocusEvent<any>,err?:boolean)=>{ e.target.style.borderColor=err?'var(--clay)':'var(--border)'; e.target.style.boxShadow='none'; };
 
   return (
-    <div style={{ borderTop:'1px solid var(--border-lt)', paddingTop:'1.5rem' }}>
-      <SectionDivider/>
-      <h3 className="serif font-light mb-6" style={{ fontSize:'1.6rem', color:'var(--text-h)', letterSpacing:'-0.01em' }}>
-        {' '}{' '}{' '}{' '} Complete Your Order
-      </h3>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <FieldWrapper error={formErrors.customerName} label="Full Name">
-            <div className="relative">
-              <User className="absolute right-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-dim)' }}/>
-              <input type="text" value={formData.customerName} onChange={e=>setFormData({...formData,customerName:e.target.value})} placeholder="اسمك الكامل" style={{ ...inputSt(!!formErrors.customerName), paddingRight:'2.5rem' }} onFocus={onFocus} onBlur={e=>onBlur(e,!!formErrors.customerName)}/>
+    <div style={{ marginTop:'22px', paddingTop:'20px', borderTop:'2px solid var(--gold)' }}>
+      <form onSubmit={handleSubmit}>
+        <div className="form-2c">
+          <FR error={errors.customerName} label="Name">
+            <div style={{ position:'relative' }}>
+              <User style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
+              <input type="text" value={fd.customerName} onChange={e=>setFd({...fd,customerName:e.target.value})} placeholder="Full Name"
+                className={`inp${errors.customerName?' inp-err':''}`} style={{ paddingLeft:'36px' }}
+                onFocus={e=>{e.target.style.borderColor='var(--gold)';}} onBlur={e=>{e.target.style.borderColor=errors.customerName?'#C0392B':'var(--line-dk)';}}/>
             </div>
-          </FieldWrapper>
-          <FieldWrapper error={formErrors.customerPhone} label="Phone">
-            <div className="relative">
-              <Phone className="absolute right-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-dim)' }}/>
-              <input type="tel" value={formData.customerPhone} onChange={e=>setFormData({...formData,customerPhone:e.target.value})} placeholder="0X XX XX XX XX" style={{ ...inputSt(!!formErrors.customerPhone), paddingRight:'2.5rem' }} onFocus={onFocus} onBlur={e=>onBlur(e,!!formErrors.customerPhone)}/>
+          </FR>
+          <FR error={errors.customerPhone} label="Phone">
+            <div style={{ position:'relative' }}>
+              <Phone style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
+              <input type="tel" value={fd.customerPhone} onChange={e=>setFd({...fd,customerPhone:e.target.value})} placeholder="0X XX XX XX XX"
+                className={`inp${errors.customerPhone?' inp-err':''}`} style={{ paddingLeft:'36px' }}
+                onFocus={e=>{e.target.style.borderColor='var(--gold)';}} onBlur={e=>{e.target.style.borderColor=errors.customerPhone?'#C0392B':'var(--line-dk)';}}/>
             </div>
-          </FieldWrapper>
+          </FR>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <FieldWrapper error={formErrors.customerWelaya} label="Wilaya">
-            <div className="relative">
-              <MapPin className="absolute right-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-dim)' }}/>
-              <ChevronDown className="absolute left-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-dim)' }}/>
-              <select value={formData.customerWelaya} onChange={e=>setFormData({...formData,customerWelaya:e.target.value,customerCommune:''})} style={{ ...inputSt(!!formErrors.customerWelaya), paddingRight:'2.5rem', appearance:'none' as any, cursor:'pointer' }} onFocus={onFocus} onBlur={e=>onBlur(e,!!formErrors.customerWelaya)}>
-                <option value="">اختر الولاية</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+        <div className="form-2c">
+          <FR error={errors.customerWelaya} label="Province">
+            <div style={{ position:'relative' }}>
+              <ChevronDown style={{ position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
+              <select value={fd.customerWelaya} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})}
+                className={`inp${errors.customerWelaya?' inp-err':''}`} style={{ paddingRight:'34px' }}
+                onFocus={e=>{e.target.style.borderColor='var(--gold)';}} onBlur={e=>{e.target.style.borderColor=errors.customerWelaya?'#C0392B':'var(--line-dk)';}}>
+                <option value="">Select Province</option>
+                {wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
               </select>
             </div>
-          </FieldWrapper>
-          <FieldWrapper error={formErrors.customerCommune} label="Commune">
-            <div className="relative">
-              <MapPin className="absolute right-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-dim)' }}/>
-              <ChevronDown className="absolute left-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-dim)' }}/>
-              <select value={formData.customerCommune} disabled={!formData.customerWelaya||loadingCommunes} onChange={e=>setFormData({...formData,customerCommune:e.target.value})} style={{ ...inputSt(!!formErrors.customerCommune), paddingRight:'2.5rem', appearance:'none' as any, cursor:'pointer', opacity:!formData.customerWelaya?0.45:1 }} onFocus={onFocus} onBlur={e=>onBlur(e,!!formErrors.customerCommune)}>
-                <option value="">{loadingCommunes?'Loading...':'اختر البلدية'}</option>{communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}
+          </FR>
+          <FR error={errors.customerCommune} label="Municipality">
+            <div style={{ position:'relative' }}>
+              <ChevronDown style={{ position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
+              <select value={fd.customerCommune} disabled={!fd.customerWelaya||loadingC} onChange={e=>setFd({...fd,customerCommune:e.target.value})}
+                className={`inp${errors.customerCommune?' inp-err':''}`} style={{ paddingRight:'34px', opacity:!fd.customerWelaya?0.4:1 }}
+                onFocus={e=>{e.target.style.borderColor='var(--gold)';}} onBlur={e=>{e.target.style.borderColor=errors.customerCommune?'#C0392B':'var(--line-dk)';}}>
+                <option value="">{loadingC?'...':'Select Municipality'}</option>
+                {communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
             </div>
-          </FieldWrapper>
+          </FR>
         </div>
 
-        {/* Delivery */}
-        <div>
-          <p className="text-[9px] font-medium tracking-[0.18em] uppercase mb-3" style={{ color:'var(--text-dim)' }}>Delivery Method</p>
-          <div className="grid grid-cols-2 gap-3">
+        <FR label="Delivery Method">
+          <div className="dlv-2c">
             {(['home','office'] as const).map(type=>(
-              <button key={type} type="button" onClick={()=>setFormData(p=>({...p,typeLivraison:type}))}
-                className="flex flex-col items-center gap-2 py-6 rounded-2xl transition-all"
-                style={{ border:`1.5px solid ${formData.typeLivraison===type?'var(--walnut)':'var(--border)'}`, backgroundColor:formData.typeLivraison===type?'var(--linen)':'transparent' }}>
-                <span className="text-2xl">{type==='home'?'🏡':'🏢'}</span>
-                <p className="text-xs font-medium tracking-[0.1em] uppercase" style={{ color:formData.typeLivraison===type?'var(--walnut)':'var(--text-dim)' }}>
-                  {type==='home'?'Home Delivery':'Office Pickup'}
+              <button key={type} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:type}))}
+                style={{ padding:'13px 10px', border:`1.5px solid ${fd.typeLivraison===type?'var(--gold)':'var(--line-dk)'}`, backgroundColor:fd.typeLivraison===type?'rgba(184,151,58,0.06)':'transparent', cursor:'pointer', textAlign:'right', transition:'all 0.2s' }}>
+                <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', fontWeight:500, color:fd.typeLivraison===type?'var(--gold-dk)':'var(--mid)', margin:'0 0 4px' }}>
+                  {type==='home'?'Home Delivery':'Office Delivery'}
                 </p>
-                {selectedWilayaData && (
-                  <p className="serif text-lg" style={{ color:'var(--clay)', lineHeight:1 }}>
-                    {(type==='home'?selectedWilayaData.livraisonHome:selectedWilayaData.livraisonOfice).toLocaleString()} <span className="text-xs font-light">دج</span>
-                  </p>
-                )}
+                {selW && <p className="amiri" style={{ fontSize:'1.1rem', fontWeight:700, color:fd.typeLivraison===type?'var(--gold-dk)':'var(--dim)', margin:0 }}>
+                  {(type==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()}
+                  <span style={{ fontFamily:"'Cairo',sans-serif", fontWeight:300, fontSize:'11px', marginRight:'3px', color:'var(--mid)' }}>DZD</span>
+                </p>}
               </button>
             ))}
           </div>
-        </div>
+        </FR>
 
-        {/* Quantity */}
-        <FieldWrapper label="Quantity">
-          <div className="flex items-center gap-4">
-            <button type="button" onClick={()=>setFormData(p=>({...p,quantity:Math.max(1,p.quantity-1)}))}
-              className="w-10 h-10 rounded-full flex items-center justify-center text-xl font-light transition-all"
-              style={{ border:'1.5px solid var(--border)', color:'var(--walnut)', backgroundColor:'var(--linen)' }}
-              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.backgroundColor='var(--linen-dk)';}}
-              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.backgroundColor='var(--linen)';}}>−</button>
-            <span className="w-10 text-center serif font-medium" style={{ fontSize:'1.8rem', color:'var(--text-h)', lineHeight:1 }}>{formData.quantity}</span>
-            <button type="button" onClick={()=>setFormData(p=>({...p,quantity:p.quantity+1}))}
-              className="w-10 h-10 rounded-full flex items-center justify-center text-xl font-light transition-all"
-              style={{ border:'1.5px solid var(--border)', color:'var(--walnut)', backgroundColor:'var(--linen)' }}
-              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.backgroundColor='var(--linen-dk)';}}
-              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.backgroundColor='var(--linen)';}}>+</button>
+        <FR label="Quantity">
+          <div style={{ display:'inline-flex', alignItems:'center', border:'1.5px solid var(--line-dk)', backgroundColor:'var(--cream)' }}>
+            <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))}
+              style={{ width:'36px', height:'36px', display:'flex', alignItems:'center', justifyContent:'center', border:'none', borderLeft:'1px solid var(--line-dk)', background:'transparent', cursor:'pointer', color:'var(--walnut)' }}
+              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--sand-dk)';}}
+              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>
+              <Minus style={{ width:'12px', height:'12px' }}/>
+            </button>
+            <span className="amiri" style={{ width:'44px', textAlign:'center', fontSize:'1.2rem', fontWeight:700, color:'var(--ink)' }}>{fd.quantity}</span>
+            <button type="button" onClick={()=>setFd(p=>({...p,quantity:p.quantity+1}))}
+              style={{ width:'36px', height:'36px', display:'flex', alignItems:'center', justifyContent:'center', border:'none', borderRight:'1px solid var(--line-dk)', background:'transparent', cursor:'pointer', color:'var(--walnut)' }}
+              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--sand-dk)';}}
+              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>
+              <Plus style={{ width:'12px', height:'12px' }}/>
+            </button>
           </div>
-        </FieldWrapper>
+        </FR>
 
         {/* Summary */}
-        <div className="p-6 rounded-2xl linen-tex" style={{ backgroundColor:'var(--linen)', border:'1px solid var(--border-lt)' }}>
-          <p className="text-[9px] font-medium tracking-[0.18em] uppercase mb-4" style={{ color:'var(--text-dim)' }}>Order Summary</p>
-          <div className="space-y-2.5">
-            {[{l:'Item',v:product.name},{l:'Unit price',v:`${finalPrice.toLocaleString()} دج`},{l:'Quantity',v:`× ${formData.quantity}`},{l:'Shipping',v:selectedWilayaData?`${getPriceLivraison().toLocaleString()} دج`:'TBD'}].map(row=>(
-              <div key={row.l} className="flex justify-between items-center">
-                <span className="text-[9px] font-light tracking-[0.12em] uppercase" style={{ color:'var(--text-dim)' }}>{row.l}</span>
-                <span className="text-xs font-light" style={{ color:'var(--text-mid)' }}>{row.v}</span>
-              </div>
-            ))}
-            <div className="pt-3" style={{ borderTop:'1px solid var(--border)' }}>
-              <div className="flex justify-between items-baseline">
-                <span className="text-xs font-medium tracking-[0.1em] uppercase" style={{ color:'var(--text-mid)' }}>Total</span>
-                <span className="serif font-medium" style={{ fontSize:'2rem', color:'var(--walnut)', letterSpacing:'-0.01em', lineHeight:1 }}>
-                  {getTotalPrice().toLocaleString()} <span className="text-sm font-light">دج</span>
-                </span>
-              </div>
+        <div style={{ border:'1px solid var(--line-dk)', marginBottom:'14px', overflow:'hidden' }}>
+          <div style={{ padding:'10px 14px', backgroundColor:'var(--sand)', borderBottom:'1px solid var(--line)' }}>
+            <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--mid)', margin:0 }}>Order Summary</p>
+          </div>
+          {[
+            { l:'Item',  v:product.name.slice(0,22) },
+            { l:'Price',   v:`${fp.toLocaleString()} DZD` },
+            { l:'Quantity',  v:`× ${fd.quantity}` },
+            { l:'Delivery', v:selW?`${getLiv().toLocaleString()} DZD`:'—' },
+          ].map(row=>(
+            <div key={row.l} style={{ display:'flex', justifyContent:'space-between', padding:'8px 14px', borderBottom:'1px solid var(--line)', backgroundColor:'var(--cream)' }}>
+              <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', color:'var(--mid)' }}>{row.l}</span>
+              <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', fontWeight:500, color:'var(--ink)' }}>{row.v}</span>
             </div>
+          ))}
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', padding:'12px 14px', backgroundColor:'var(--sand-dk)' }}>
+            <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', color:'var(--mid)' }}>Total</span>
+            <span className="amiri" style={{ fontSize:'1.8rem', fontWeight:700, color:'var(--gold-dk)' }}>
+              {total().toLocaleString()}
+              <span style={{ fontFamily:"'Cairo',sans-serif", fontWeight:300, fontSize:'13px', marginRight:'4px', color:'var(--mid)' }}>DZD</span>
+            </span>
           </div>
         </div>
 
-        <button type="submit" disabled={submitting}
-          className="btn-cozy w-full py-4 rounded-full flex items-center justify-center gap-3 text-sm font-medium tracking-[0.10em] uppercase text-white"
-          style={{ background:submitting?'var(--dusty)':'linear-gradient(135deg, var(--walnut), var(--clay))', boxShadow:submitting?'none':'0 8px 32px var(--shadow-md)', cursor:submitting?'not-allowed':'pointer' }}>
-          {submitting
-            ?<><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"/> Processing…</>
-            :<><Sparkles className="w-4 h-4"/> Place My Order</>
-          }
+        <button type="submit" disabled={sub} className="btn-gold"
+          style={{ width:'100%', justifyContent:'center', padding:'14px', fontSize:'15px', cursor:sub?'not-allowed':'pointer', opacity:sub?0.7:1 }}>
+          {sub?'Processing...':'Place Order'}{!sub && <ArrowRight style={{ width:'15px', height:'15px' }}/>}
         </button>
-        <p className="text-[9px] text-center font-light flex items-center justify-center gap-2 tracking-[0.14em]" style={{ color:'var(--text-dim)' }}>
-          <Shield className="w-3 h-3" style={{ color:'var(--sage)' }}/> Secure &amp; encrypted checkout
+
+        <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', color:'var(--dim)', textAlign:'center', marginTop:'10px', display:'flex', alignItems:'center', justifyContent:'center', gap:'5px' }}>
+          <Lock style={{ width:'10px', height:'10px', color:'var(--gold)' }}/> Secure & Encrypted Payment
         </p>
       </form>
     </div>
   );
 }
 
-// ─── STATIC PAGES ─────────────────────────────────────────────
+/* ── STATIC PAGES ────────────────────────────────────────────── */
 export function StaticPage({ page }: { page:string }) {
   const p = page.toLowerCase();
   return <>{p==='privacy'&&<Privacy/>}{p==='terms'&&<Terms/>}{p==='cookies'&&<Cookies/>}{p==='contact'&&<Contact/>}</>;
 }
 
-function PageWrapper({ children, icon, title, subtitle }: { children:React.ReactNode; icon:React.ReactNode; title:string; subtitle:string }) {
-  return (
-    <div className="min-h-screen" style={{ backgroundColor:'var(--warm-white)', fontFamily:"'Jost',sans-serif" }}>
-      <div className="relative grain linen-tex overflow-hidden py-24" style={{ backgroundColor:'var(--linen)' }}>
-        <div className="absolute top-4 right-8 opacity-20 pointer-events-none" style={{ animation:'sway 9s ease-in-out infinite' }}>
-          <LeafSprig size={130} color="var(--sage)"/>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none" style={{ background:'linear-gradient(to bottom, transparent, var(--warm-white))' }}/>
-        <div className="relative z-10 max-w-3xl mx-auto px-6">
-          <div className="w-14 h-14 rounded-full flex items-center justify-center mb-5" style={{ backgroundColor:'var(--warm-white)', border:'1px solid var(--border)', color:'var(--clay)', boxShadow:'0 4px 16px var(--shadow)' }}>
-            {icon}
-          </div>
-          <h1 className="serif font-light mb-3" style={{ fontSize:'clamp(2.5rem,7vw,5.5rem)', color:'var(--text-h)', letterSpacing:'-0.02em', lineHeight:0.95 }}>{title}</h1>
-          <SectionDivider/>
-          <p className="text-sm font-light" style={{ color:'var(--text-mid)' }}>{subtitle}</p>
-        </div>
+const Shell = ({ children, title, sub }: { children:React.ReactNode; title:string; sub?:string }) => (
+  <div dir="ltr" style={{ backgroundColor:'var(--cream)', minHeight:'100vh' }}>
+    <div style={{ position:'relative', overflow:'hidden', padding:'72px 28px 48px', backgroundColor:'var(--sand)' }} className="geo-bg">
+      <div style={{ position:'absolute', bottom:0, left:0, right:0, height:'2px', background:'linear-gradient(to right,transparent,var(--gold),transparent)' }}/>
+      <div style={{ maxWidth:'720px', margin:'0 auto', position:'relative', zIndex:2 }}>
+        {sub && <div className="slabel" style={{ marginBottom:'14px', justifyContent:'flex-start' }}>{sub}</div>}
+        <h1 className="amiri" style={{ fontSize:'clamp(2.2rem,5vw,4.5rem)', fontWeight:700, color:'var(--ink)', lineHeight:0.95, margin:'0 0 14px' }}>{title}</h1>
+        <div className="cal-line"><GoldDiamond/></div>
       </div>
-      <div className="max-w-3xl mx-auto px-6 pt-12 pb-24">{children}</div>
     </div>
-  );
-}
+    <div style={{ maxWidth:'720px', margin:'0 auto', padding:'40px 28px 80px' }}>
+      <div style={{ backgroundColor:'var(--cream)', border:'1px solid var(--line-dk)', padding:'32px' }}>{children}</div>
+    </div>
+  </div>
+);
 
-function InfoCard({ icon, title, desc, badge, badgeColor='var(--clay)' }: { icon:React.ReactNode; title:string; desc:string; badge?:string; badgeColor?:string }) {
-  return (
-    <div className="card-home flex gap-5 p-6 mb-3 rounded-2xl cursor-default"
-      style={{ border:'1px solid var(--border-lt)', backgroundColor:'var(--warm-white)', boxShadow:'0 4px 16px var(--shadow)' }}>
-      <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor:`${badgeColor}14`, color:badgeColor, border:`1px solid ${badgeColor}30` }}>{icon}</div>
-      <div className="flex-1">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
-          <h3 className="serif font-medium" style={{ fontSize:'1.1rem', color:'var(--text-h)', letterSpacing:'0.01em' }}>{title}</h3>
-          {badge && <span className="text-[8px] font-medium tracking-[0.18em] uppercase px-2.5 py-1 rounded-full" style={{ backgroundColor:`${badgeColor}12`, border:`1px solid ${badgeColor}30`, color:badgeColor }}>{badge}</span>}
-        </div>
-        <p className="text-sm font-light leading-relaxed" style={{ color:'var(--text-mid)' }}>{desc}</p>
-      </div>
+const IB = ({ title, body, tag }: { title:string; body:string; tag?:string }) => (
+  <div style={{ paddingBottom:'20px', marginBottom:'20px', borderBottom:'1px solid var(--line)', display:'flex', justifyContent:'space-between', gap:'16px', alignItems:'flex-start' }}>
+    <div style={{ flex:1 }}>
+      <h3 className="amiri" style={{ fontSize:'1.15rem', fontWeight:700, color:'var(--ink)', margin:'0 0 8px', display:'flex', alignItems:'center', gap:'8px' }}>
+        <GoldDiamond size={6}/> {title}
+      </h3>
+      <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', lineHeight:'1.85', color:'var(--mid)', fontWeight:400, margin:0 }}>{body}</p>
     </div>
-  );
-}
+    {tag && <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'10px', fontWeight:600, letterSpacing:'0.14em', textTransform:'uppercase', padding:'4px 10px', border:'1px solid var(--line-dk)', color:'var(--gold-dk)', flexShrink:0 }}>{tag}</span>}
+  </div>
+);
 
 export function Privacy() {
   return (
-    <PageWrapper icon={<Lock size={20}/>} title="Privacy Policy" subtitle="How we handle and protect your personal information.">
-      <InfoCard icon={<Database size={16}/>}    title="Information We Collect"  desc="We collect only what we need: your name, contact details, and delivery information to fulfill your order beautifully." badgeColor="var(--clay)"/>
-      <InfoCard icon={<Shield size={16}/>}      title="How We Use It"           desc="Your data helps us deliver your furniture, communicate updates, and improve your shopping experience." badgeColor="var(--sage)"/>
-      <InfoCard icon={<Lock size={16}/>}        title="Data Security"           desc="We use industry-standard encryption to keep your personal information safe and secure at all times." badgeColor="var(--rose)"/>
-      <InfoCard icon={<Globe size={16}/>}       title="Data Sharing"            desc="We never sell your data. We only share necessary delivery information with our trusted logistics partners." badgeColor="var(--walnut-lt)"/>
-      <div className="mt-8 p-4 rounded-2xl flex items-center gap-3" style={{ backgroundColor:'rgba(122,146,112,0.08)', border:'1px solid rgba(122,146,112,0.2)' }}>
-        <Bell size={14} style={{ color:'var(--sage)', flexShrink:0 }}/>
-        <p className="text-xs font-light" style={{ color:'var(--text-mid)' }}>This policy is reviewed periodically to ensure your privacy is always protected. Last updated: February 2026.</p>
-      </div>
-    </PageWrapper>
+    <Shell title="Privacy Policy" sub="Legal">
+      <IB title="Data We Collect" body="Only your name, phone number, and delivery address — the minimum needed to process your order."/>
+      <IB title="How We Use It"         body="Exclusively to fulfill and deliver your purchases."/>
+      <IB title="Security"                body="Your data is protected with standard encryption and secure infrastructure."/>
+      <IB title="Data Sharing"       body="We never sell your data. It's shared only with trusted delivery partners."/>
+      <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'12px', letterSpacing:'0.1em', color:'var(--dim)', marginTop:'20px' }}>Last updated: February 2026</p>
+    </Shell>
   );
 }
 
 export function Terms() {
   return (
-    <PageWrapper icon={<Scale size={20}/>} title="Terms of Service" subtitle="The guidelines that make our home community fair and trustworthy.">
-      <InfoCard icon={<User size={16}/>}        title="Account Responsibility"  desc="You are responsible for maintaining the security of your account credentials and all activity that occurs under your account." badgeColor="var(--clay)"/>
-      <InfoCard icon={<CreditCard size={16}/>}  title="Payments & Fees"         desc="All prices are clearly displayed with no hidden fees. What you see is exactly what you pay — full transparency." badgeColor="var(--sage)"/>
-      <InfoCard icon={<Ban size={16}/>}         title="Prohibited Use"          desc="Our platform may not be used for unlawful purposes or to infringe on intellectual property rights." badgeColor="var(--rose)"/>
-      <InfoCard icon={<Scale size={16}/>}       title="Governing Law"           desc="These terms are governed by Algerian law. Any disputes will be resolved through established legal channels." badgeColor="var(--walnut-lt)"/>
-      <div className="mt-8 p-4 rounded-2xl flex items-start gap-3" style={{ backgroundColor:'rgba(196,121,90,0.06)', border:'1px solid rgba(196,121,90,0.2)' }}>
-        <AlertCircle size={14} style={{ color:'var(--clay)', flexShrink:0, marginTop:2 }}/>
-        <p className="text-xs font-light leading-relaxed" style={{ color:'var(--text-mid)' }}>We reserve the right to update these terms. Continued use of our platform constitutes acceptance of any changes made.</p>
-      </div>
-    </PageWrapper>
+    <Shell title="Terms of Use" sub="Legal">
+      <IB title="Your Account"            body="You are responsible for the security of your login credentials and all activity under your account."/>
+      <IB title="Payments"         body="No hidden fees. The displayed price is the final price."/>
+      <IB title="Prohibited Use" body="Authentic products only. No counterfeit goods." tag="Strict"/>
+      <IB title="Governing Law"   body="These terms are governed by the laws of the People's Democratic Republic of Algeria."/>
+    </Shell>
   );
 }
 
 export function Cookies() {
   return (
-    <PageWrapper icon={<CookieIcon size={20}/>} title="Cookie Policy" subtitle="Small files that help create a smoother, more personal experience.">
-      <InfoCard icon={<ShieldCheck size={16}/>}   title="Essential Cookies"    desc="Required for core functionality such as keeping you signed in and maintaining your shopping session." badge="Always Active" badgeColor="var(--sage)"/>
-      <InfoCard icon={<Settings size={16}/>}      title="Preference Cookies"   desc="Remember your settings like language preference and region so we can tailor your experience." badge="Optional" badgeColor="var(--clay)"/>
-      <InfoCard icon={<MousePointer2 size={16}/>} title="Analytics Cookies"    desc="Help us understand how you browse so we can continuously improve our product selection and service." badge="Optional" badgeColor="var(--walnut-lt)"/>
-      <div className="mt-8 p-5 rounded-2xl" style={{ backgroundColor:'var(--linen)', border:'1px solid var(--border-lt)' }}>
-        <div className="flex gap-4 items-start">
-          <ToggleRight size={18} style={{ color:'var(--clay)', flexShrink:0, marginTop:2 }}/>
-          <div>
-            <p className="serif font-medium mb-1.5" style={{ fontSize:'1.05rem', color:'var(--text-h)' }}>Manage Your Preferences</p>
-            <p className="text-sm font-light leading-relaxed" style={{ color:'var(--text-mid)' }}>You can adjust or disable optional cookies through your browser settings at any time. Disabling essential cookies may affect core functionality.</p>
-          </div>
-        </div>
+    <Shell title="Cookie Policy" sub="Legal">
+      <IB title="Essential Cookies"  body="Required for sessions, cart, and checkout. Cannot be disabled." tag="Required"/>
+      <IB title="Preference Cookies"   body="Save your settings for a better experience." tag="Optional"/>
+      <IB title="Analytics Cookies"   body="Aggregated data to improve the platform." tag="Optional"/>
+      <div style={{ marginTop:'18px', padding:'14px', border:'1px solid var(--line-dk)', display:'flex', gap:'12px', alignItems:'flex-start', backgroundColor:'var(--sand)' }}>
+        <ToggleRight style={{ width:'18px', height:'18px', color:'var(--gold)', flexShrink:0, marginTop:'1px' }}/>
+        <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', color:'var(--mid)', lineHeight:'1.8', margin:0, fontWeight:400 }}>
+          You can manage cookie preferences in your browser settings.
+        </p>
       </div>
-    </PageWrapper>
+    </Shell>
   );
 }
 
 export function Contact() {
-  const [formState, setFormState] = useState({ name:'', email:'', message:'' });
+  const [form, setForm] = useState({ name:'', email:'', message:'' });
   const [sent, setSent] = useState(false);
-  const channels = [
-    { emoji:'✉️', label:'Email Us',    val:'hello@homecomforts.dz',  href:'mailto:hello@homecomforts.dz' },
-    { emoji:'📞', label:'Call Us',     val:'+213 550 123 456',        href:'tel:+213550123456'             },
-    { emoji:'📍', label:'Visit Us',    val:'Alger, Algérie',          href:undefined                       },
-  ];
   return (
-    <div className="min-h-screen" style={{ backgroundColor:'var(--warm-white)', fontFamily:"'Jost',sans-serif" }}>
-      {/* Hero */}
-      <div className="relative grain linen-tex overflow-hidden py-28" style={{ backgroundColor:'var(--linen)' }}>
-        <FloatingDust/>
-        <div className="absolute top-4 right-8 opacity-25 pointer-events-none" style={{ animation:'sway 9s ease-in-out infinite' }}>
-          <LeafSprig size={150} color="var(--sage)"/>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none" style={{ background:'linear-gradient(to bottom, transparent, var(--warm-white))' }}/>
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <p className="serif italic text-sm mb-4" style={{ color:'var(--clay)', letterSpacing:'0.12em' }}>— Say Hello</p>
-          <h1 className="serif font-light mb-4" style={{ fontSize:'clamp(3.5rem,10vw,9rem)', color:'var(--text-h)', letterSpacing:'-0.02em', lineHeight:0.9 }}>
-            Let's Talk
-          </h1>
-          <SectionDivider/>
-          <p className="text-base font-light" style={{ color:'var(--text-mid)' }}>We love hearing from our community. Reach out and we will get back to you within 24 hours.</p>
+    <div dir="ltr" style={{ backgroundColor:'var(--cream)', minHeight:'100vh' }}>
+      <div style={{ position:'relative', overflow:'hidden', padding:'72px 28px 48px', backgroundColor:'var(--sand)' }} className="geo-bg">
+        <div style={{ position:'absolute', bottom:0, left:0, right:0, height:'2px', background:'linear-gradient(to right,transparent,var(--gold),transparent)' }}/>
+        <div style={{ maxWidth:'960px', margin:'0 auto', position:'relative', zIndex:2 }}>
+          <div className="slabel" style={{ marginBottom:'14px', justifyContent:'flex-start' }}>Contact Us</div>
+          <h1 className="amiri" style={{ fontSize:'clamp(2.2rem,5vw,4.5rem)', fontWeight:700, color:'var(--ink)', lineHeight:0.95, margin:'0 0 14px' }}>We're Happy to Serve You</h1>
+          <div className="cal-line"><GoldDiamond/></div>
+          <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'14px', color:'var(--mid)', marginTop:'12px', fontWeight:400 }}>We Reply within 24 Hours</p>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 pt-12 pb-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Channels */}
-          <div>
-            <p className="serif italic text-xs mb-6" style={{ color:'var(--clay)', letterSpacing:'0.12em' }}>— Contact Channels</p>
-            <div className="space-y-3">
-              {channels.map(item=>(
-                <a key={item.label} href={item.href||'#'}
-                  className="card-home flex items-center gap-4 p-5 rounded-2xl"
-                  style={{ border:'1px solid var(--border-lt)', backgroundColor:'var(--warm-white)', boxShadow:'0 4px 16px var(--shadow)', textDecoration:'none' }}>
-                  <span className="text-2xl">{item.emoji}</span>
-                  <div>
-                    <p className="text-[9px] font-medium tracking-[0.18em] uppercase mb-0.5" style={{ color:'var(--text-dim)' }}>{item.label}</p>
-                    <p className="text-sm font-light" style={{ color:'var(--text-h)' }}>{item.val}</p>
-                  </div>
-                  <ArrowRight className="w-4 h-4 ml-auto" style={{ color:'var(--clay)' }}/>
-                </a>
-              ))}
-            </div>
-            {/* Quote card */}
-            <div className="mt-6 p-6 rounded-2xl relative overflow-hidden" style={{ background:'linear-gradient(135deg, var(--walnut), var(--clay))', boxShadow:'0 8px 32px var(--shadow-md)' }}>
-              <div className="absolute -top-3 -right-3 opacity-15"><LeafSprig size={80} color="white"/></div>
-              <p className="serif italic font-light leading-relaxed mb-3" style={{ fontSize:'1.05rem', color:'rgba(253,250,246,0.85)' }}>
-                "Good design is making something beautiful that also works."
-              </p>
-              <p className="text-xs font-light" style={{ color:'rgba(253,250,246,0.45)', letterSpacing:'0.12em' }}>— Saul Bass</p>
-            </div>
-          </div>
-
-          {/* Form */}
-          <div>
-            <p className="serif italic text-xs mb-6" style={{ color:'var(--clay)', letterSpacing:'0.12em' }}>— Send a Message</p>
-            {sent ? (
-              <div className="py-24 text-center rounded-3xl" style={{ backgroundColor:'var(--linen)', border:'1px solid var(--border-lt)' }}>
-                <div style={{ animation:'float-soft 3s ease-in-out infinite' }}>
-                  <CheckCircle2 className="w-14 h-14 mx-auto mb-5" style={{ color:'var(--sage)' }}/>
+      <div className="contact-g" style={{ maxWidth:'960px', margin:'0 auto', padding:'48px 28px 80px' }}>
+        <div>
+          <div style={{ backgroundColor:'var(--cream)', border:'1px solid var(--line-dk)', padding:'24px', marginBottom:'12px' }}>
+            <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--gold)', marginBottom:'18px' }}>Contact Methods</p>
+            {[
+              { icon:'📞', label:'Phone',           val:'+213 550 000 000', href:'tel:+213550000000' },
+              { icon:'✉️',  label:'Email Address', val:'info@store.dz',   href:'mailto:info@store.dz' },
+              { icon:'📍', label:'Location',            val:'Oued Fayet, Algiers', href:undefined },
+            ].map(item=>(
+              <a key={item.label} href={item.href||'#'} style={{ display:'flex', alignItems:'center', gap:'14px', padding:'14px 0', borderBottom:'1px solid var(--line)', textDecoration:'none', transition:'padding-right 0.2s' }}
+                onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.paddingRight='6px';}}
+                onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.paddingRight='0';}}>
+                <div style={{ width:'38px', height:'38px', backgroundColor:'var(--sand)', border:'1px solid var(--line-dk)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.1rem', flexShrink:0 }}>{item.icon}</div>
+                <div>
+                  <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--gold)', margin:'0 0 2px' }}>{item.label}</p>
+                  <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', fontWeight:500, color:'var(--ink)', margin:0 }}>{item.val}</p>
                 </div>
-                <p className="serif font-light mb-2" style={{ fontSize:'1.8rem', color:'var(--text-h)' }}>Message Sent!</p>
-                <p className="text-sm font-light" style={{ color:'var(--text-dim)' }}>We will reply within 24 hours.</p>
-              </div>
-            ) : (
-              <form onSubmit={e=>{e.preventDefault();setSent(true);}} className="space-y-4">
-                {[{label:'Your Name',type:'text',val:formState.name,ph:'Full name',key:'name'},{label:'Email Address',type:'email',val:formState.email,ph:'your@email.com',key:'email'}].map(f=>(
-                  <FieldWrapper key={f.key} label={f.label}>
-                    <input type={f.type} value={f.val} onChange={e=>setFormState({...formState,[f.key]:e.target.value})} placeholder={f.ph} style={inputSt()} required
-                      onFocus={e=>{e.target.style.borderColor='var(--walnut)'; e.target.style.boxShadow='0 0 0 3px rgba(107,79,58,0.10)';}}
-                      onBlur={e=>{e.target.style.borderColor='var(--border)'; e.target.style.boxShadow='none';}}/>
-                  </FieldWrapper>
-                ))}
-                <FieldWrapper label="Your Message">
-                  <textarea value={formState.message} onChange={e=>setFormState({...formState,message:e.target.value})} placeholder="How can we help you?" rows={5}
-                    style={{ ...inputSt(), resize:'none' as any }} required
-                    onFocus={e=>{e.target.style.borderColor='var(--walnut)'; e.target.style.boxShadow='0 0 0 3px rgba(107,79,58,0.10)';}}
-                    onBlur={e=>{e.target.style.borderColor='var(--border)'; e.target.style.boxShadow='none';}}/>
-                </FieldWrapper>
-                <button type="submit" className="btn-cozy w-full py-4 rounded-full flex items-center justify-center gap-2.5 text-sm font-medium tracking-[0.10em] uppercase text-white"
-                  style={{ background:'linear-gradient(135deg, var(--walnut), var(--clay))', boxShadow:'0 8px 32px var(--shadow-md)' }}>
-                  <Sparkles className="w-4 h-4"/> Send Message
-                </button>
-              </form>
-            )}
+                {item.href && <ArrowRight style={{ width:'13px', height:'13px', color:'var(--gold)', marginRight:'auto' }}/>}
+              </a>
+            ))}
           </div>
+          <div style={{ backgroundColor:'var(--walnut)', padding:'22px 24px', position:'relative', overflow:'hidden' }}>
+            <div style={{ position:'absolute', inset:0, opacity:0.08 }} className="geo-bg"/>
+            <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px', background:'linear-gradient(to right,transparent,var(--gold-lt),transparent)' }}/>
+            <p className="amiri" style={{ fontSize:'1.2rem', fontWeight:700, color:'var(--cream)', lineHeight:1.6, margin:'0 0 8px', position:'relative', zIndex:2 }}>
+              ""Authentic attire reflects identity.""
+            </p>
+            <span style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:500, letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--gold-lt)', position:'relative', zIndex:2 }}>
+              Premium Gulf Fashion
+            </span>
+          </div>
+        </div>
+
+        <div style={{ backgroundColor:'var(--cream)', border:'1px solid var(--line-dk)', padding:'28px' }}>
+          <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--gold)', marginBottom:'22px' }}>Send Message</p>
+          {sent ? (
+            <div style={{ minHeight:'240px', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', border:'1px solid var(--line-dk)', textAlign:'center', padding:'32px', backgroundColor:'var(--sand)' }}>
+              <CheckCircle2 style={{ width:'32px', height:'32px', color:'var(--gold-dk)', marginBottom:'12px' }}/>
+              <h3 className="amiri" style={{ fontSize:'1.5rem', fontWeight:700, color:'var(--ink)', margin:'0 0 6px' }}>Your Message Was Sent!</h3>
+              <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'13px', color:'var(--mid)', fontWeight:400 }}>We'll reply within 24 hours.</p>
+            </div>
+          ) : (
+            <form onSubmit={e=>{e.preventDefault();setSent(true);}} style={{ display:'flex', flexDirection:'column', gap:'14px' }}>
+              {[
+                { label:'Your Name',   type:'text',  key:'name',  ph:'Full Name' },
+                { label:'Email', type:'email', key:'email', ph:'your@email.com' },
+              ].map(f=>(
+                <div key={f.key}>
+                  <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'6px' }}>{f.label}</p>
+                  <input type={f.type} value={(form as any)[f.key]} onChange={e=>setForm({...form,[f.key]:e.target.value})} placeholder={f.ph} required className="inp"
+                    onFocus={e=>{e.target.style.borderColor='var(--gold)';}} onBlur={e=>{e.target.style.borderColor='var(--line-dk)';}}/>
+                </div>
+              ))}
+              <div>
+                <p style={{ fontFamily:"'Cairo',sans-serif", fontSize:'11px', fontWeight:600, letterSpacing:'0.14em', textTransform:'uppercase', color:'var(--mid)', marginBottom:'6px' }}>Your Message</p>
+                <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="How can we help you?" rows={4} required className="inp"
+                  style={{ resize:'none' as any }}
+                  onFocus={e=>{e.target.style.borderColor='var(--gold)';}} onBlur={e=>{e.target.style.borderColor='var(--line-dk)';}}/>
+              </div>
+              <button type="submit" className="btn-gold" style={{ justifyContent:'center', width:'100%', padding:'13px', fontSize:'14px' }}>
+                Send Message <ArrowRight style={{ width:'14px', height:'14px' }}/>
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>

@@ -206,13 +206,13 @@ export function Navbar({ store }: { store: Store }) {
   },[]);
 
   const links = [
-    { href:`/`,         label:'المجموعة'  },
-    { href:`/contact`, label:'تواصل'     },
-    { href:`/Privacy`, label:'الخصوصية'  },
+    { href:`/`,         label:'Collection'  },
+    { href:`/contact`, label:'Contact'     },
+    { href:`/Privacy`, label:'Privacy'  },
   ];
 
   return (
-    <nav dir="rtl" style={{
+    <nav dir="ltr" style={{
       position:'fixed', top:0, left:0, right:0, zIndex:50,
       backgroundColor:scrolled?'rgba(10,10,8,0.97)':'transparent',
       backdropFilter:scrolled?'blur(20px)':'none',
@@ -264,7 +264,7 @@ export function Navbar({ store }: { store: Store }) {
               {l.label}
             </Link>
           ))}
-          <a href="#collection" className="btn-ghost-gold" style={{ padding:'10px 24px' }}>اكتشف</a>
+          <a href="#collection" className="btn-ghost-gold" style={{ padding:'10px 24px' }}>Discover</a>
         </div>
 
         <button className="nav-toggle" onClick={()=>setOpen(p=>!p)} style={{ background:'none', border:'1px solid var(--line)', cursor:'pointer', color:'var(--gold)', padding:'8px', alignItems:'center', justifyContent:'center' }}>
@@ -290,7 +290,7 @@ export function Navbar({ store }: { store: Store }) {
 export function Footer({ store }: any) {
   const yr = new Date().getFullYear();
   return (
-    <footer dir="rtl" style={{ backgroundColor:'var(--black)', borderTop:'1px solid var(--line)', fontFamily:"'Montserrat',sans-serif" }}>
+    <footer dir="ltr" style={{ backgroundColor:'var(--black)', borderTop:'1px solid var(--line)', fontFamily:"'Montserrat',sans-serif" }}>
       <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'72px 32px 48px' }}>
         <div className="footer-grid" style={{ paddingBottom:'48px', borderBottom:'1px solid var(--line)' }}>
           <div>
@@ -301,7 +301,7 @@ export function Footer({ store }: any) {
               }
             </div>
             <p style={{ fontSize:'12px', lineHeight:'2', color:'var(--dim)', maxWidth:'240px', fontWeight:300, letterSpacing:'0.04em' }}>
-              منتجات فاخرة مختارة بعناية فائقة لأرقى الأذواق.
+              Luxury products curated with exceptional care for the finest tastes.
             </p>
             <div style={{ marginTop:'24px', display:'flex', alignItems:'center', gap:'10px' }}>
               <span style={{ display:'block', width:'24px', height:'1px', background:'var(--gold)', opacity:0.4 }}/>
@@ -311,15 +311,15 @@ export function Footer({ store }: any) {
           </div>
 
           {[
-            { title:'روابط', links:[
-              [`/Privacy`, 'الخصوصية'],
-              [`/Terms`,   'الشروط'],
-              [`/Cookies`, 'الكوكيز'],
-              [`/contact`, 'تواصل'],
+            { title:'Links', links:[
+              [`/Privacy`, 'Privacy'],
+              [`/Terms`,   'Terms'],
+              [`/Cookies`, 'Cookies'],
+              [`/contact`, 'Contact'],
             ]},
-            { title:'الأتيليه', links:[
+            { title:'The Atelier', links:[
               ['#', '+213 550 000 000'],
-              ['#', 'الجزائر، الجزائر'],
+              ['#', 'Algiers, Algeria'],
               ['#', 'luxury@store.dz'],
             ]},
           ].map(col=>(
@@ -339,8 +339,8 @@ export function Footer({ store }: any) {
         </div>
 
         <div style={{ paddingTop:'24px', display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:'8px' }}>
-          <p style={{ fontSize:'11px', color:'var(--dim)', letterSpacing:'0.08em' }}>© {yr} {store.name.toUpperCase()}. جميع الحقوق محفوظة.</p>
-          <p style={{ fontSize:'11px', color:'var(--dim)', letterSpacing:'0.08em' }}>ثيم الأناقة الفاخرة</p>
+          <p style={{ fontSize:'11px', color:'var(--dim)', letterSpacing:'0.08em' }}>© {yr} {store.name.toUpperCase()}. All Rights Reserved.</p>
+          <p style={{ fontSize:'11px', color:'var(--dim)', letterSpacing:'0.08em' }}>Luxury Elegance Theme</p>
         </div>
       </div>
     </footer>
@@ -391,7 +391,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
             <span className="serif" style={{ fontSize:'1.6rem', fontWeight:600, color:'var(--gold)', letterSpacing:'-0.01em', lineHeight:1 }}>
               {price.toLocaleString()}
             </span>
-            <span style={{ fontSize:'11px', color:'var(--gold)', opacity:0.7, fontWeight:300 }}>دج</span>
+            <span style={{ fontSize:'11px', color:'var(--gold)', opacity:0.7, fontWeight:300 }}>DZD</span>
             {product.priceOriginal && parseFloat(String(product.priceOriginal))>price && (
               <span style={{ fontSize:'11px', color:'var(--dim)', textDecoration:'line-through' }}>
                 {parseFloat(String(product.priceOriginal)).toLocaleString()}
@@ -419,7 +419,7 @@ export function Home({ store }: any) {
   const featured = products[0];
 
   return (
-    <div dir="rtl" style={{ paddingTop:'70px' }}>
+    <div dir="ltr" style={{ paddingTop:'70px' }}>
 
       {/* HERO */}
       <section className="hero-grid" style={{ backgroundColor:'var(--black)', overflow:'hidden', position:'relative' }}>
@@ -442,12 +442,12 @@ export function Home({ store }: any) {
           <div style={{ position:'relative', zIndex:2 }}>
             <div className="fu" style={{ display:'flex', alignItems:'center', gap:'12px', marginBottom:'24px' }}>
               <GoldDiamond/>
-              <span className="slabel">المجموعة الحصرية</span>
+              <span className="slabel">Exclusive Collection</span>
               <GoldDiamond/>
             </div>
 
             <h1 className="fu fu-1 serif" style={{ fontSize:'clamp(2.8rem,7vw,6.5rem)', fontWeight:300, fontStyle:'italic', color:'var(--white)', lineHeight:0.9, letterSpacing:'-0.02em', marginBottom:'24px' }}>
-              {store.hero?.title || <><span>فخامة</span><br/><span style={{ color:'var(--gold)' }}>لا مثيل لها</span></>}
+              {store.hero?.title || <><span>Luxury</span><br/><span style={{ color:'var(--gold)' }}>Unmatched</span></>}
             </h1>
 
             <div className="fu fu-2" style={{ display:'flex', alignItems:'center', gap:'16px', marginBottom:'16px' }}>
@@ -455,18 +455,18 @@ export function Home({ store }: any) {
             </div>
 
             <p className="fu fu-2" style={{ fontSize:'14px', lineHeight:'1.9', color:'var(--dim)', marginBottom:'40px', maxWidth:'380px', fontWeight:300, letterSpacing:'0.05em' }}>
-              {store.hero?.subtitle || 'أرقى المنتجات الفاخرة، مختارة لك بعناية فائقة.'}
+              {store.hero?.subtitle || 'The most exquisite luxury products, curated for you with exceptional care.'}
             </p>
 
             <div className="fu fu-3" style={{ display:'flex', gap:'16px', flexWrap:'wrap' }}>
-              <a href="#collection" className="btn-gold">اكتشف المجموعة <ArrowRight style={{ width:'14px', height:'14px' }}/></a>
+              <a href="#collection" className="btn-gold">Explore Collection <ArrowRight style={{ width:'14px', height:'14px' }}/></a>
             </div>
 
             <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'1px', marginTop:'56px', border:'1px solid var(--line)', backgroundColor:'var(--line)' }}>
               {[
-                { n:`${products.length||'∞'}`, l:'قطعة' },
-                { n:'100%', l:'فاخر' },
-                { n:'48H',  l:'توصيل' },
+                { n:`${products.length||'∞'}`, l:'item(s)' },
+                { n:'100%', l:'Luxury' },
+                { n:'48H',  l:'Delivery' },
               ].map((s,i)=>(
                 <div key={i} style={{ padding:'18px 12px', backgroundColor:'var(--black)', textAlign:'center' }}>
                   <p className="serif" style={{ fontSize:'2rem', fontWeight:600, color:'var(--gold)', lineHeight:1, margin:0, letterSpacing:'-0.01em' }}>{s.n}</p>
@@ -483,9 +483,9 @@ export function Home({ store }: any) {
         <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'0 32px' }}>
           <div style={{ display:'flex', justifyContent:'center', gap:'0', flexWrap:'wrap' }}>
             {[
-              { icon:'◆', text:'جودة استثنائية' },
-              { icon:'◆', text:'توصيل موثوق' },
-              { icon:'◆', text:'أصالة مضمونة' },
+              { icon:'◆', text:'Exceptional Quality' },
+              { icon:'◆', text:'Reliable Delivery' },
+              { icon:'◆', text:'Guaranteed Authenticity' },
             ].map((item,i)=>(
               <div key={i} style={{ display:'flex', alignItems:'center', gap:'12px', padding:'20px 40px', borderLeft:i>0?'1px solid var(--line)':'none', flexWrap:'wrap', justifyContent:'center' }}>
                 <span style={{ color:'var(--gold)', fontSize:'8px' }}>{item.icon}</span>
@@ -501,7 +501,7 @@ export function Home({ store }: any) {
         <section style={{ backgroundColor:'var(--black)' }}>
           <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'80px 32px' }}>
             <div style={{ textAlign:'center', marginBottom:'48px' }}>
-              <span className="slabel">القطعة المميزة</span>
+              <span className="slabel">Featured Items</span>
               <div style={{ display:'flex', justifyContent:'center', alignItems:'center', gap:'16px', marginTop:'10px' }}>
                 <span style={{ display:'block', height:'1px', width:'48px', background:'linear-gradient(to right,transparent,var(--gold))' }}/>
                 <GoldDiamond/>
@@ -518,7 +518,7 @@ export function Home({ store }: any) {
                 <div style={{ position:'absolute', inset:0, background:'linear-gradient(to left, transparent 60%, var(--black) 100%)', pointerEvents:'none' }}/>
               </div>
               <div style={{ display:'flex', flexDirection:'column', justifyContent:'center', padding:'56px 48px', backgroundColor:'var(--black)' }}>
-                <span className="slabel" style={{ marginBottom:'16px' }}>قطعة مختارة</span>
+                <span className="slabel" style={{ marginBottom:'16px' }}>Curated Items</span>
                 <h2 className="serif" style={{ fontSize:'clamp(2rem,4vw,3.5rem)', fontWeight:300, fontStyle:'italic', color:'var(--white)', lineHeight:0.95, marginBottom:'16px', letterSpacing:'-0.01em' }}>
                   {featured.name}
                 </h2>
@@ -526,7 +526,7 @@ export function Home({ store }: any) {
                   <span style={{ display:'block', width:'40px', height:'1px', background:'linear-gradient(to right,var(--gold),transparent)' }}/>
                   <span className="serif" style={{ fontSize:'2rem', fontWeight:600, color:'var(--gold)', letterSpacing:'-0.01em' }}>
                     {(typeof featured.price==='string'?parseFloat(featured.price):featured.price as number).toLocaleString()}
-                    <span style={{ fontFamily:"'Montserrat',sans-serif", fontWeight:300, fontSize:'13px', marginRight:'5px', opacity:0.7 }}>دج</span>
+                    <span style={{ fontFamily:"'Montserrat',sans-serif", fontWeight:300, fontSize:'13px', marginRight:'5px', opacity:0.7 }}>DZD</span>
                   </span>
                 </div>
                 {featured.desc && (
@@ -535,7 +535,7 @@ export function Home({ store }: any) {
                   </p>
                 )}
                 <Link href={`/product/${featured.slug||featured.id}`} className="btn-gold" style={{ textDecoration:'none', alignSelf:'flex-start' }}>
-                  اكتشف القطعة <ArrowRight style={{ width:'13px', height:'13px' }}/>
+                  Discover Item <ArrowRight style={{ width:'13px', height:'13px' }}/>
                 </Link>
               </div>
             </div>
@@ -547,9 +547,9 @@ export function Home({ store }: any) {
       <section id="collection" style={{ backgroundColor:'var(--black-2)', padding:'80px 0' }}>
         <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'0 32px' }}>
           <div style={{ textAlign:'center', marginBottom:'48px' }}>
-            <span className="slabel">المجموعة</span>
+            <span className="slabel">Collection</span>
             <h2 className="serif" style={{ fontSize:'clamp(2rem,4vw,3.5rem)', fontWeight:300, fontStyle:'italic', color:'var(--white)', margin:'10px 0 0', letterSpacing:'-0.01em' }}>
-              المجموعة الكاملة
+              Full Collection
             </h2>
             <div style={{ display:'flex', justifyContent:'center', alignItems:'center', gap:'16px', marginTop:'16px' }}>
               <span style={{ display:'block', height:'1px', width:'48px', background:'linear-gradient(to right,transparent,var(--gold))' }}/>
@@ -560,14 +560,14 @@ export function Home({ store }: any) {
 
           {products.length===0 ? (
             <GoldBorderCorners style={{ maxWidth:'480px', margin:'0 auto', padding:'80px 40px', textAlign:'center' }}>
-              <span className="serif" style={{ fontSize:'1.6rem', fontStyle:'italic', color:'var(--dim)' }}>المجموعة قادمة قريباً</span>
+              <span className="serif" style={{ fontSize:'1.6rem', fontStyle:'italic', color:'var(--dim)' }}>Collection Coming Soon</span>
             </GoldBorderCorners>
           ) : (
             <div className="prod-grid">
               {products.map((p:any)=>{
                 const img  = p.productImage||p.imagesProduct?.[0]?.imageUrl||store.design?.logoUrl;
                 const disc = p.priceOriginal ? Math.round(((p.priceOriginal-p.price)/p.priceOriginal)*100) : 0;
-                return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="اكتشف"/>;
+                return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="Discover"/>;
               })}
             </div>
           )}
@@ -584,12 +584,12 @@ export function Home({ store }: any) {
             <span style={{ display:'block', height:'1px', width:'56px', background:'linear-gradient(to left,transparent,var(--gold))' }}/>
           </div>
           <h2 className="serif" style={{ fontSize:'clamp(2rem,5vw,4rem)', fontWeight:300, fontStyle:'italic', color:'var(--white)', lineHeight:1.05, marginBottom:'20px' }}>
-            صُنع بإتقان
+            Crafted to Perfection
           </h2>
           <p style={{ fontSize:'13px', lineHeight:'2', color:'var(--dim)', fontWeight:300, letterSpacing:'0.06em', marginBottom:'36px' }}>
-            كل قطعة مختارة بعناية فائقة لتعكس معايير الجودة والفخامة التي تستحقها.
+            Every item is curated with exceptional care to reflect the quality and luxury you deserve.
           </p>
-          <a href="#collection" className="btn-ghost-gold">استكشف المجموعة</a>
+          <a href="#collection" className="btn-ghost-gold">Explore Collection</a>
         </div>
       </section>
     </div>
@@ -601,12 +601,12 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
   const [sel, setSel] = useState(0);
 
   return (
-    <div dir="rtl" style={{ backgroundColor:'var(--black)', paddingTop:'70px' }}>
+    <div dir="ltr" style={{ backgroundColor:'var(--black)', paddingTop:'70px' }}>
       <div style={{ borderBottom:'1px solid var(--line)', padding:'13px 32px', display:'flex', alignItems:'center', gap:'10px', fontSize:'10px', letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--dim)' }}>
         <Link href="/" style={{ textDecoration:'none', color:'var(--dim)', transition:'color 0.3s' }}
           onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--gold)';}}
           onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--dim)';}}>
-          الرئيسية
+          Home
         </Link>
         <GoldDiamond/>
         <span style={{ color:'var(--gold)' }}>{product.name.slice(0,40)}</span>
@@ -645,7 +645,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             {!inStock&&!autoGen && (
               <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', backgroundColor:'rgba(10,10,8,0.75)', backdropFilter:'blur(4px)' }}>
                 <GoldBorderCorners style={{ padding:'24px 40px' }}>
-                  <span className="serif" style={{ fontSize:'2rem', fontStyle:'italic', color:'var(--gold)' }}>نفد المخزون</span>
+                  <span className="serif" style={{ fontSize:'2rem', fontStyle:'italic', color:'var(--gold)' }}>Out of Stock</span>
                 </GoldBorderCorners>
               </div>
             )}
@@ -660,7 +660,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
         </div>
 
         <div className="details-R">
-          <span className="slabel" style={{ display:'block', marginBottom:'14px' }}>قطعة فاخرة</span>
+          <span className="slabel" style={{ display:'block', marginBottom:'14px' }}>Luxury Items</span>
           <h1 className="serif" style={{ fontSize:'clamp(1.8rem,4vw,3.2rem)', fontWeight:300, fontStyle:'italic', color:'var(--white)', lineHeight:0.95, marginBottom:'16px', letterSpacing:'-0.01em' }}>
             {product.name}
           </h1>
@@ -672,17 +672,17 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             </div>
             <span style={{ fontSize:'11px', color:'var(--dim)', letterSpacing:'0.08em' }}>4.8</span>
             <span style={{ marginRight:'auto', padding:'5px 14px', border:`1px solid ${inStock||autoGen?'var(--gold)':'var(--dim)'}`, color:inStock||autoGen?'var(--gold)':'var(--dim)', fontSize:'10px', letterSpacing:'0.14em', textTransform:'uppercase' }}>
-              {autoGen?'∞':inStock?'متوفر':'نفد'}
+              {autoGen?'∞':inStock?'Available':'Out of Stock'}
             </span>
           </div>
 
           <div style={{ marginBottom:'28px' }}>
-            <span style={{ fontSize:'10px', letterSpacing:'0.18em', color:'var(--dim)', textTransform:'uppercase', display:'block', marginBottom:'8px' }}>السعر</span>
+            <span style={{ fontSize:'10px', letterSpacing:'0.18em', color:'var(--dim)', textTransform:'uppercase', display:'block', marginBottom:'8px' }}>Price</span>
             <div style={{ display:'flex', alignItems:'baseline', gap:'12px', flexWrap:'wrap' }}>
               <span className="serif gold-shimmer" style={{ fontSize:'3rem', fontWeight:600, lineHeight:1, letterSpacing:'-0.02em' }}>
                 {finalPrice.toLocaleString()}
               </span>
-              <span style={{ fontSize:'14px', color:'var(--gold)', opacity:0.7 }}>دج</span>
+              <span style={{ fontSize:'14px', color:'var(--gold)', opacity:0.7 }}>DZD</span>
               {product.priceOriginal && parseFloat(product.priceOriginal)>finalPrice && (
                 <span style={{ fontSize:'14px', textDecoration:'line-through', color:'var(--dim)' }}>{parseFloat(product.priceOriginal).toLocaleString()}</span>
               )}
@@ -691,7 +691,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
 
           {product.offers?.length>0 && (
             <div style={{ marginBottom:'24px', paddingBottom:'24px', borderBottom:'1px solid var(--line)' }}>
-              <span className="slabel" style={{ display:'block', marginBottom:'12px' }}>الباقات</span>
+              <span className="slabel" style={{ display:'block', marginBottom:'12px' }}>Packages</span>
               {product.offers.map((offer:any)=>(
                 <label key={offer.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px', border:`1px solid ${selectedOffer===offer.id?'var(--gold)':'var(--line)'}`, cursor:'pointer', marginBottom:'8px', transition:'all 0.3s', backgroundColor:selectedOffer===offer.id?'rgba(201,168,76,0.05)':'transparent' }}>
                   <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
@@ -701,12 +701,12 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                     <input type="radio" name="offer" value={offer.id} checked={selectedOffer===offer.id} onChange={()=>setSelectedOffer(offer.id)} style={{ display:'none' }}/>
                     <div>
                       <p style={{ fontSize:'12px', fontWeight:500, color:'var(--white)', margin:0 }}>{offer.name}</p>
-                      <p style={{ fontSize:'10px', color:'var(--dim)', margin:0, letterSpacing:'0.1em' }}>الكمية: {offer.quantity}</p>
+                      <p style={{ fontSize:'10px', color:'var(--dim)', margin:0, letterSpacing:'0.1em' }}>Quantity: {offer.quantity}</p>
                     </div>
                   </div>
                   <span className="serif" style={{ fontSize:'1.3rem', fontWeight:600, color:'var(--gold)' }}>
                     {offer.price.toLocaleString()}
-                    <span style={{ fontFamily:"'Montserrat',sans-serif", fontWeight:300, fontSize:'11px', marginRight:'4px', opacity:0.7 }}>دج</span>
+                    <span style={{ fontFamily:"'Montserrat',sans-serif", fontWeight:300, fontSize:'11px', marginRight:'4px', opacity:0.7 }}>DZD</span>
                   </span>
                 </label>
               ))}
@@ -736,7 +736,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
 
           {product.desc && (
             <div style={{ marginTop:'32px', paddingTop:'28px', borderTop:'1px solid var(--line)' }}>
-              <span className="slabel" style={{ display:'block', marginBottom:'14px' }}>تفاصيل القطعة</span>
+              <span className="slabel" style={{ display:'block', marginBottom:'14px' }}>Item Details</span>
               <div style={{ fontSize:'13px', lineHeight:'2', color:'var(--dim)', fontWeight:300, letterSpacing:'0.04em' }}
                 dangerouslySetInnerHTML={{ __html:DOMPurify.sanitize(product.desc,{ALLOWED_TAGS:['p','br','strong','em','ul','ol','li','h1','h2','h3','span'],ALLOWED_ATTR:['class','style']})}}/>
             </div>
@@ -787,10 +787,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const fp=getFP(); const total=()=>fp*fd.quantity+ +getLiv();
   const validate=()=>{
     const e:Record<string,string>={};
-    if(!fd.customerName.trim())  e.customerName='الاسم مطلوب';
-    if(!fd.customerPhone.trim()) e.customerPhone='رقم الهاتف مطلوب';
-    if(!fd.customerWelaya)       e.customerWelaya='الولاية مطلوبة';
-    if(!fd.customerCommune)      e.customerCommune='البلدية مطلوبة';
+    if(!fd.customerName.trim())  e.customerName='Name is required';
+    if(!fd.customerPhone.trim()) e.customerPhone='Phone number is required';
+    if(!fd.customerWelaya)       e.customerWelaya='Province is required';
+    if(!fd.customerCommune)      e.customerCommune='Municipality is required';
     return e;
   };
   
@@ -812,15 +812,15 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     <div style={{ marginTop:'28px', paddingTop:'24px', borderTop:'1px solid var(--line)' }}>
       <form onSubmit={handleSubmit}>
         <div className="form-2c">
-          <FR error={errors.customerName} label="الاسم">
+          <FR error={errors.customerName} label="Name">
             <div style={{ position:'relative' }}>
               <User style={{ position:'absolute', left:'13px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
-              <input type="text" value={fd.customerName} onChange={e=>setFd({...fd,customerName:e.target.value})} placeholder="الاسم الكامل"
+              <input type="text" value={fd.customerName} onChange={e=>setFd({...fd,customerName:e.target.value})} placeholder="Full Name"
                 className={`inp${errors.customerName?' inp-err':''}`} style={{ paddingLeft:'36px' }}
                 onFocus={e=>{e.target.style.borderColor='var(--gold)';}} onBlur={e=>{e.target.style.borderColor=errors.customerName?'#C0392B':'var(--line)';}}/>
             </div>
           </FR>
-          <FR error={errors.customerPhone} label="الهاتف">
+          <FR error={errors.customerPhone} label="Phone">
             <div style={{ position:'relative' }}>
               <Phone style={{ position:'absolute', left:'13px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
               <input type="tel" value={fd.customerPhone} onChange={e=>setFd({...fd,customerPhone:e.target.value})} placeholder="0X XX XX XX XX"
@@ -830,48 +830,48 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </FR>
         </div>
         <div className="form-2c">
-          <FR error={errors.customerWelaya} label="الولاية">
+          <FR error={errors.customerWelaya} label="Province">
             <div style={{ position:'relative' }}>
               <ChevronDown style={{ position:'absolute', right:'13px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
               <select value={fd.customerWelaya} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})}
                 className={`inp${errors.customerWelaya?' inp-err':''}`} style={{ paddingRight:'34px' }}
                 onFocus={e=>{e.target.style.borderColor='var(--gold)';}} onBlur={e=>{e.target.style.borderColor=errors.customerWelaya?'#C0392B':'var(--line)';}}>
-                <option value="">اختر الولاية</option>
+                <option value="">Select Province</option>
                 {wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
               </select>
             </div>
           </FR>
-          <FR error={errors.customerCommune} label="البلدية">
+          <FR error={errors.customerCommune} label="Municipality">
             <div style={{ position:'relative' }}>
               <ChevronDown style={{ position:'absolute', right:'13px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }}/>
               <select value={fd.customerCommune} disabled={!fd.customerWelaya||loadingC} onChange={e=>setFd({...fd,customerCommune:e.target.value})}
                 className={`inp${errors.customerCommune?' inp-err':''}`} style={{ paddingRight:'34px', opacity:!fd.customerWelaya?0.4:1 }}
                 onFocus={e=>{e.target.style.borderColor='var(--gold)';}} onBlur={e=>{e.target.style.borderColor=errors.customerCommune?'#C0392B':'var(--line)';}}>
-                <option value="">{loadingC?'...':'اختر البلدية'}</option>
+                <option value="">{loadingC?'...':'Select Municipality'}</option>
                 {communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
             </div>
           </FR>
         </div>
 
-        <FR label="طريقة التوصيل">
+        <FR label="Delivery Method">
           <div className="dlv-2c">
             {(['home','office'] as const).map(type=>(
               <button key={type} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:type}))}
                 style={{ padding:'14px 12px', border:`1px solid ${fd.typeLivraison===type?'var(--gold)':'var(--line)'}`, backgroundColor:fd.typeLivraison===type?'rgba(201,168,76,0.05)':'transparent', cursor:'pointer', textAlign:'right', transition:'all 0.3s' }}>
                 <p style={{ fontSize:'10px', fontWeight:600, letterSpacing:'0.16em', textTransform:'uppercase', color:fd.typeLivraison===type?'var(--gold)':'var(--dim)', margin:'0 0 5px' }}>
-                  {type==='home'?'توصيل للبيت':'توصيل للمكتب'}
+                  {type==='home'?'Home Delivery':'Office Delivery'}
                 </p>
                 {selW && <p className="serif" style={{ fontSize:'1.15rem', fontWeight:600, color:fd.typeLivraison===type?'var(--gold)':'var(--dim)', margin:0 }}>
                   {(type==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()}
-                  <span style={{ fontFamily:"'Montserrat',sans-serif", fontWeight:300, fontSize:'11px', marginRight:'4px', opacity:0.7 }}>دج</span>
+                  <span style={{ fontFamily:"'Montserrat',sans-serif", fontWeight:300, fontSize:'11px', marginRight:'4px', opacity:0.7 }}>DZD</span>
                 </p>}
               </button>
             ))}
           </div>
         </FR>
 
-        <FR label="الكمية">
+        <FR label="Quantity">
           <div style={{ display:'inline-flex', alignItems:'center', border:'1px solid var(--line)' }}>
             <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))}
               style={{ width:'38px', height:'38px', display:'flex', alignItems:'center', justifyContent:'center', border:'none', borderLeft:'1px solid var(--line)', background:'transparent', cursor:'pointer', color:'var(--gold)', transition:'background 0.2s' }}
@@ -892,13 +892,13 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         <div style={{ border:'1px solid var(--line)', marginBottom:'16px' }}>
           <div style={{ padding:'10px 16px', borderBottom:'1px solid var(--line)', display:'flex', alignItems:'center', gap:'10px' }}>
             <GoldDiamond/>
-            <span style={{ fontSize:'9px', fontWeight:600, letterSpacing:'0.22em', textTransform:'uppercase', color:'var(--gold)', fontFamily:"'Montserrat',sans-serif" }}>ملخص الطلب</span>
+            <span style={{ fontSize:'9px', fontWeight:600, letterSpacing:'0.22em', textTransform:'uppercase', color:'var(--gold)', fontFamily:"'Montserrat',sans-serif" }}>Order Summary</span>
           </div>
           {[
-            { l:'المنتج', v:product.name.slice(0,22) },
-            { l:'السعر',  v:`${fp.toLocaleString()} دج` },
-            { l:'الكمية', v:`× ${fd.quantity}` },
-            { l:'التوصيل',v:selW?`${getLiv().toLocaleString()} دج`:'—' },
+            { l:'Product', v:product.name.slice(0,22) },
+            { l:'Price',  v:`${fp.toLocaleString()} DZD` },
+            { l:'Quantity', v:`× ${fd.quantity}` },
+            { l:'Delivery',v:selW?`${getLiv().toLocaleString()} DZD`:'—' },
           ].map(row=>(
             <div key={row.l} style={{ display:'flex', justifyContent:'space-between', padding:'8px 16px', borderBottom:'1px solid var(--line)' }}>
               <span style={{ fontSize:'11px', letterSpacing:'0.1em', color:'var(--dim)', textTransform:'uppercase' }}>{row.l}</span>
@@ -906,20 +906,20 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
           ))}
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', padding:'14px 16px', background:'rgba(201,168,76,0.04)' }}>
-            <span style={{ fontSize:'11px', letterSpacing:'0.1em', color:'var(--dim)', textTransform:'uppercase' }}>المجموع</span>
+            <span style={{ fontSize:'11px', letterSpacing:'0.1em', color:'var(--dim)', textTransform:'uppercase' }}>Total</span>
             <span className="serif gold-shimmer" style={{ fontSize:'1.8rem', fontWeight:600, letterSpacing:'-0.01em' }}>
-              {total().toLocaleString()} <span style={{ fontFamily:"'Montserrat',sans-serif", fontWeight:300, fontSize:'12px' }}>دج</span>
+              {total().toLocaleString()} <span style={{ fontFamily:"'Montserrat',sans-serif", fontWeight:300, fontSize:'12px' }}>DZD</span>
             </span>
           </div>
         </div>
 
         <button type="submit" disabled={sub} className="btn-gold"
           style={{ width:'100%', justifyContent:'center', fontSize:'11px', cursor:sub?'not-allowed':'pointer', opacity:sub?0.7:1 }}>
-          {sub?'جاري المعالجة...':'تأكيد الطلب'} {!sub && <ArrowRight style={{ width:'13px', height:'13px' }}/>}
+          {sub?'Processing...':'Place Order'} {!sub && <ArrowRight style={{ width:'13px', height:'13px' }}/>}
         </button>
 
         <p style={{ fontSize:'10px', letterSpacing:'0.12em', color:'var(--dim)', textAlign:'center', marginTop:'12px', display:'flex', alignItems:'center', justifyContent:'center', gap:'6px', textTransform:'uppercase' }}>
-          <Lock style={{ width:'10px', height:'10px', color:'var(--gold)' }}/> دفع آمن ومشفر
+          <Lock style={{ width:'10px', height:'10px', color:'var(--gold)' }}/> Secure & Encrypted Payment
         </p>
       </form>
     </div>
@@ -933,7 +933,7 @@ export function StaticPage({ page }: { page:string }) {
 }
 
 const Shell = ({ children, title, sub }: { children:React.ReactNode; title:string; sub?:string }) => (
-  <div dir="rtl" style={{ backgroundColor:'var(--black)', minHeight:'100vh', paddingTop:'70px' }}>
+  <div dir="ltr" style={{ backgroundColor:'var(--black)', minHeight:'100vh', paddingTop:'70px' }}>
     <div style={{ padding:'72px 32px 56px', borderBottom:'1px solid var(--line)', position:'relative', overflow:'hidden' }}>
       <div style={{ position:'absolute', inset:0, opacity:0.03, backgroundImage:'repeating-linear-gradient(45deg,var(--gold) 0,var(--gold) 1px,transparent 0,transparent 60px),repeating-linear-gradient(-45deg,var(--gold) 0,var(--gold) 1px,transparent 0,transparent 60px)', pointerEvents:'none' }}/>
       <div style={{ maxWidth:'720px', margin:'0 auto', position:'relative', zIndex:2 }}>
@@ -961,25 +961,25 @@ const IB = ({ title, body, tag }: { title:string; body:string; tag?:string }) =>
 
 export function Privacy() {
   return (
-    <Shell title="سياسة الخصوصية" sub="قانوني">
-      <IB title="البيانات التي نجمعها"  body="فقط اسمك ورقم هاتفك وعنوان التوصيل — ما هو ضروري فقط لمعالجة طلبك."/>
-      <IB title="كيف نستخدمها"          body="حصرياً لتنفيذ وتوصيل مشترياتك. لا نستخدم بياناتك للتواصل غير المرغوب فيه."/>
-      <IB title="الأمان"                 body="بياناتك محمية بتشفير على مستوى المؤسسات وبنية تحتية آمنة."/>
-      <IB title="مشاركة البيانات"        body="لا نبيع البيانات الشخصية أبداً. تُشارك فقط مع شركاء التوصيل الموثوقين عند الحاجة."/>
-      <p style={{ fontSize:'11px', letterSpacing:'0.1em', color:'var(--dim)', marginTop:'28px', textTransform:'uppercase' }}>آخر تحديث — فبراير 2026</p>
+    <Shell title="Privacy Policy" sub="Legal">
+      <IB title="Data We Collect"  body="Only your name, phone number, and delivery address — strictly what's needed to process your order."/>
+      <IB title="How We Use It"          body="Exclusively to fulfill and deliver your purchases. We don't use your data for unsolicited communication."/>
+      <IB title="Security"                 body="Your data is protected with enterprise-grade encryption and secure infrastructure."/>
+      <IB title="Data Sharing"        body="We never sell personal data. Shared only with trusted delivery partners when needed."/>
+      <p style={{ fontSize:'11px', letterSpacing:'0.1em', color:'var(--dim)', marginTop:'28px', textTransform:'uppercase' }}>Last Updated — February 2026</p>
     </Shell>
   );
 }
 
 export function Terms() {
   return (
-    <Shell title="شروط الاستخدام" sub="قانوني">
-      <IB title="حسابك"            body="أنت مسؤول كلياً عن أمان بيانات تسجيل الدخول وكل النشاط الجاري تحت حسابك."/>
-      <IB title="المدفوعات"        body="لا رسوم مخفية. السعر المعروض عند الدفع هو السعر الإجمالي النهائي."/>
-      <IB title="الاستخدام المحظور" body="يُسمح فقط بالمنتجات الأصيلة والقانونية. المنتجات المقلدة محظورة تماماً." tag="صارم"/>
-      <IB title="القانون الحاكم"   body="تخضع هذه الشروط لقوانين جمهورية الجزائر الديمقراطية الشعبية."/>
+    <Shell title="Terms of Use" sub="Legal">
+      <IB title="Your Account"            body="You are fully responsible for the security of your login credentials and all activity under your account."/>
+      <IB title="Payments"        body="No hidden fees. The price shown at checkout is the final total."/>
+      <IB title="Prohibited Use" body="Only authentic and legal products are permitted. Counterfeit goods are strictly prohibited." tag="Strict"/>
+      <IB title="Governing Law"   body="These terms are governed by the laws of the People's Democratic Republic of Algeria."/>
       <div style={{ marginTop:'24px', padding:'16px 20px', border:'1px solid var(--line)', background:'rgba(201,168,76,0.03)', fontSize:'12px', color:'var(--dim)', lineHeight:'1.9', fontWeight:300, letterSpacing:'0.04em' }}>
-        قد تُحدَّث هذه الشروط بصفة دورية. استمرارك في استخدام الخدمة يعني موافقتك على الشروط المحدَّثة.
+        These Terms may be updated periodically. Your continued use of the service implies your acceptance of updated Terms.
       </div>
     </Shell>
   );
@@ -987,14 +987,14 @@ export function Terms() {
 
 export function Cookies() {
   return (
-    <Shell title="سياسة الكوكيز" sub="قانوني">
-      <IB title="الكوكيز الأساسية"    body="ضرورية لجلسات تسجيل الدخول والسلة وعملية الدفع. لا يمكن تعطيلها." tag="مطلوب"/>
-      <IB title="كوكيز التفضيلات"     body="تحفظ إعدادات اللغة والمنطقة لتخصيص تجربتك." tag="اختياري"/>
-      <IB title="كوكيز التحليلات"     body="بيانات مجمعة ومجهولة الهوية لمساعدتنا في تحسين المنصة." tag="اختياري"/>
+    <Shell title="Cookie Policy" sub="Legal">
+      <IB title="Essential Cookies"    body="Required for login sessions, cart, and checkout. Cannot be disabled." tag="Required"/>
+      <IB title="Preference Cookies"     body="Save language and region settings to personalize your experience." tag="Optional"/>
+      <IB title="Analytics Cookies"     body="Aggregated and anonymized data to help us improve the platform." tag="Optional"/>
       <div style={{ marginTop:'24px', padding:'16px 20px', border:'1px solid var(--line)', display:'flex', gap:'14px', alignItems:'flex-start' }}>
         <ToggleRight style={{ width:'18px', height:'18px', color:'var(--gold)', flexShrink:0, marginTop:'2px' }}/>
         <p style={{ fontSize:'13px', color:'var(--dim)', lineHeight:'1.9', fontWeight:300, letterSpacing:'0.04em', margin:0 }}>
-          يمكنك إدارة تفضيلات الكوكيز من إعدادات المتصفح. يُرجى العلم أن تعطيل الكوكيز الأساسية قد يؤثر على وظائف الموقع الأساسية.
+          You can manage cookie preferences in your browser settings. Note that disabling Essential Cookies may affect core site functions.
         </p>
       </div>
     </Shell>
@@ -1005,27 +1005,27 @@ export function Contact() {
   const [form, setForm] = useState({ name:'', email:'', message:'' });
   const [sent, setSent] = useState(false);
   return (
-    <div dir="rtl" style={{ backgroundColor:'var(--black)', minHeight:'100vh', paddingTop:'70px' }}>
+    <div dir="ltr" style={{ backgroundColor:'var(--black)', minHeight:'100vh', paddingTop:'70px' }}>
       <div style={{ padding:'72px 32px 56px', borderBottom:'1px solid var(--line)', position:'relative', overflow:'hidden' }}>
         <div style={{ position:'absolute', inset:0, opacity:0.03, backgroundImage:'repeating-linear-gradient(45deg,var(--gold) 0,var(--gold) 1px,transparent 0,transparent 60px),repeating-linear-gradient(-45deg,var(--gold) 0,var(--gold) 1px,transparent 0,transparent 60px)', pointerEvents:'none' }}/>
         <div style={{ maxWidth:'960px', margin:'0 auto', position:'relative', zIndex:2 }}>
-          <span className="slabel" style={{ display:'block', marginBottom:'14px' }}>الأتيليه</span>
+          <span className="slabel" style={{ display:'block', marginBottom:'14px' }}>The Atelier</span>
           <h1 className="serif" style={{ fontSize:'clamp(2.4rem,6vw,5rem)', fontWeight:300, fontStyle:'italic', color:'var(--white)', lineHeight:0.95, margin:'0 0 14px' }}>
-            تواصل معنا.
+            Contact Us.
           </h1>
           <p style={{ fontSize:'13px', letterSpacing:'0.1em', color:'var(--dim)', fontWeight:300, textTransform:'uppercase' }}>
-            نرد خلال 24 ساعة.
+            We Reply within 24 Hours.
           </p>
         </div>
       </div>
 
       <div className="contact-g" style={{ maxWidth:'960px', margin:'0 auto', padding:'56px 32px 96px' }}>
         <div>
-          <span className="slabel" style={{ display:'block', marginBottom:'24px' }}>طرق التواصل</span>
+          <span className="slabel" style={{ display:'block', marginBottom:'24px' }}>Contact Methods</span>
           {[
-            { icon:'◈', label:'البريد الإلكتروني', val:'luxury@store.dz',  href:'mailto:luxury@store.dz' },
-            { icon:'◈', label:'الهاتف',            val:'+213 550 000 000', href:'tel:+213550000000'      },
-            { icon:'◈', label:'الأتيليه',          val:'الجزائر، الجزائر', href:undefined                },
+            { icon:'◈', label:'Email Address', val:'luxury@store.dz',  href:'mailto:luxury@store.dz' },
+            { icon:'◈', label:'Phone',            val:'+213 550 000 000', href:'tel:+213550000000'      },
+            { icon:'◈', label:'The Atelier',          val:'Algiers, Algeria', href:undefined                },
           ].map(item=>(
             <a key={item.label} href={item.href||'#'} style={{ display:'flex', alignItems:'center', gap:'16px', padding:'18px 0', borderBottom:'1px solid var(--line)', textDecoration:'none', transition:'padding-right 0.3s' }}
               onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.paddingRight='8px';}}
@@ -1043,27 +1043,27 @@ export function Contact() {
             <span style={{ position:'absolute', top:0, right:0, width:'16px', height:'16px', borderTop:'1px solid var(--gold)', borderRight:'1px solid var(--gold)' }}/>
             <span style={{ position:'absolute', bottom:0, left:0, width:'16px', height:'16px', borderBottom:'1px solid var(--gold)', borderLeft:'1px solid var(--gold)' }}/>
             <p className="serif" style={{ fontSize:'1.3rem', fontWeight:300, fontStyle:'italic', color:'var(--white)', lineHeight:1.5, margin:'0 0 8px' }}>
-              الفخامة في كل تفصيل.
+              Luxury in every detail.
             </p>
-            <span className="slabel" style={{ fontSize:'9px', color:'var(--gold)' }}>الأتيليه الفاخر · الجزائر</span>
+            <span className="slabel" style={{ fontSize:'9px', color:'var(--gold)' }}>The Atelier · Luxury · Algeria</span>
           </div>
         </div>
 
         <div>
-          <span className="slabel" style={{ display:'block', marginBottom:'24px' }}>أرسل رسالة</span>
+          <span className="slabel" style={{ display:'block', marginBottom:'24px' }}>Send Message</span>
           {sent ? (
             <div style={{ minHeight:'280px', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', border:'1px solid var(--line)', textAlign:'center', padding:'40px', position:'relative' }}>
               <span style={{ position:'absolute', top:'12px', right:'12px', width:'14px', height:'14px', borderTop:'1px solid var(--gold)', borderRight:'1px solid var(--gold)' }}/>
               <span style={{ position:'absolute', bottom:'12px', left:'12px', width:'14px', height:'14px', borderBottom:'1px solid var(--gold)', borderLeft:'1px solid var(--gold)' }}/>
               <GoldDiamond/>
-              <h3 className="serif" style={{ fontSize:'1.6rem', fontStyle:'italic', fontWeight:300, color:'var(--white)', margin:'16px 0 8px' }}>تم إرسال رسالتك.</h3>
-              <p style={{ fontSize:'12px', letterSpacing:'0.1em', color:'var(--dim)', textTransform:'uppercase', fontWeight:300 }}>سنرد عليك خلال 24 ساعة.</p>
+              <h3 className="serif" style={{ fontSize:'1.6rem', fontStyle:'italic', fontWeight:300, color:'var(--white)', margin:'16px 0 8px' }}>Message Sent Successfully.</h3>
+              <p style={{ fontSize:'12px', letterSpacing:'0.1em', color:'var(--dim)', textTransform:'uppercase', fontWeight:300 }}>We'll reply within 24 hours.</p>
             </div>
           ) : (
             <form onSubmit={e=>{e.preventDefault();setSent(true);}} style={{ display:'flex', flexDirection:'column', gap:'14px' }}>
               {[
-                { label:'اسمك', type:'text',  key:'name',  ph:'الاسم الكامل' },
-                { label:'البريد الإلكتروني', type:'email', key:'email', ph:'بريدك@الإلكتروني.com' },
+                { label:'Your Name', type:'text',  key:'name',  ph:'Full Name' },
+                { label:'Email Address', type:'email', key:'email', ph:'your@email.com' },
               ].map(f=>(
                 <div key={f.key}>
                   <span className="slabel" style={{ display:'block', fontSize:'9px', marginBottom:'7px' }}>{f.label}</span>
@@ -1072,13 +1072,13 @@ export function Contact() {
                 </div>
               ))}
               <div>
-                <span className="slabel" style={{ display:'block', fontSize:'9px', marginBottom:'7px' }}>رسالتك</span>
-                <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="كيف يمكننا مساعدتك؟" rows={5} required className="inp"
+                <span className="slabel" style={{ display:'block', fontSize:'9px', marginBottom:'7px' }}>Your Message</span>
+                <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="How can we help you?" rows={5} required className="inp"
                   style={{ resize:'none' as any }}
                   onFocus={e=>{e.target.style.borderColor='var(--gold)';}} onBlur={e=>{e.target.style.borderColor='var(--line)';}}/>
               </div>
               <button type="submit" className="btn-gold" style={{ justifyContent:'center', width:'100%' }}>
-                إرسال الرسالة <ArrowRight style={{ width:'13px', height:'13px' }}/>
+                Send Message <ArrowRight style={{ width:'13px', height:'13px' }}/>
               </button>
             </form>
           )}
@@ -1086,4 +1086,4 @@ export function Contact() {
       </div>
     </div>
   );
-}  
+}

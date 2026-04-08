@@ -2,33 +2,52 @@ import { Store } from '@/types/store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function getStoreByDomain(domain: string): Promise<Store | null> {
+export async function getStoreByDomain(domain: string, categoryId?: string): Promise<Store | null> {
   if (!API_URL) {
-    console.error('API_URL is not defined');
+    console.error('❌ API_URL is not defined in environment variables');
     return null;
   }
 
-  // طباعة المعرف للتأكد في السيرفر (Terminal) ما الذي يتم إرساله للـ API
-  console.log('🔍 Fetching store for identifier:', domain);
+  // منع محاولات جلب بيانات لملفات تقنية أو صور (سبب خطأ الـ Digest السابق)
+  if (!domain || domain.includes('.') && !domain.includes('mdstore.top')) {
+     return null;
+  }
+
+  console.log('🔍 Fetching store for:', domain, categoryId ? `| Category: ${categoryId}` : '');
 
   try {
-    const response = await fetch(`${API_URL}/stores/domain/${domain}`, {
-      next: { revalidate: 60 } // استخدام التخزين المؤقت لمدة دقيقة للأداء
+    // بناء الرابط باستخدام URLSearchParams لضمان سلامة الـ Query Strings
+    const url = new URL(`${API_URL}/stores/domain/${domain}`);
+    if (categoryId) {
+      url.searchParams.append('categoryId', categoryId);
+    }
+
+    const response = await fetch(url.toString(), {
+      next: { revalidate: 60 } 
     });
 
-    if (!response.ok) return null;
+    if (!response.ok) {
+      console.warn(`⚠️ Store not found for domain: ${domain} (Status: ${response.status})`);
+      return null;
+    }
 
     const result = await response.json();
     const store = result.data || result;
 
-    // حماية إضافية: إذا نجح الطلب ولكن بيانات التصميم مفقودة
-    if (store && !store.design) {
-      store.design = { logoUrl: '/default-logo.png' }; // قيمة افتراضية تمنع الانهيار
-    }
+    if (!store) return null;
 
-    return store;
+    // تأمين كائن التصميم (Design Object) لمنع انهيار الـ Layout
+    return {
+      ...store,
+      design: {
+        logoUrl: '/default-logo.png',
+        faviconUrl: '/default-logo.png',
+        ...store.design
+      }
+    };
+
   } catch (error) {
-    console.error('Fetch Error:', error);
+    console.error('🚨 Fetch Error in getStoreByDomain:', error);
     return null;
   }
 }

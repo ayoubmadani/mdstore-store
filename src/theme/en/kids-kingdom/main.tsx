@@ -266,6 +266,7 @@ const fetchCommunes = async (wid: string): Promise<Commune[]> => { try { const {
 // MAIN LAYOUT
 // ─────────────────────────────────────────────────────────────
 export default function Main({ store, children }: any) {
+  
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', fontFamily: "'Nunito', sans-serif", color: 'var(--text)' }}>
       <style>{FONT_CSS}</style>
@@ -311,9 +312,9 @@ export function Navbar({ store }: { store: Store }) {
   }, []);
 
   const nav = [
-    { href: `/${store.subdomain}`,         label: isRTL ? 'الرئيسية' : 'Home',    emoji: '🏠' },
-    { href: `/${store.subdomain}/contact`, label: isRTL ? 'اتصل بنا' : 'Contact', emoji: '📞' },
-    { href: `/${store.subdomain}/Privacy`, label: isRTL ? 'الخصوصية' : 'Privacy', emoji: '🔒' },
+    { href: `/`,         label: isRTL ? 'Home' : 'Home',    emoji: '🏠' },
+    { href: `/contact`, label: isRTL ? 'Contact Us' : 'Contact', emoji: '📞' },
+    { href: `/Privacy`, label: isRTL ? 'Privacy' : 'Privacy', emoji: '🔒' },
   ];
 
   const initials = store.name.split(' ').filter(Boolean).map((w:string)=>w[0]).join('').slice(0,2).toUpperCase();
@@ -331,10 +332,10 @@ export function Navbar({ store }: { store: Store }) {
         <div className="flex items-center justify-between h-18 py-3">
 
           {/* Logo */}
-          <Link href={`/${store.subdomain}`} className="flex items-center gap-3 group">
+          <Link href={`/`} className="flex items-center gap-3 group">
             <div className="relative w-12 h-12 rounded-2xl flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:rotate-6 group-hover:scale-110"
               style={{ background: 'linear-gradient(135deg, var(--coral) 0%, var(--grape) 100%)', boxShadow: '0 4px 16px rgba(168,85,247,0.3)' }}>
-              {store.design.logoUrl
+              {store.design?.logoUrl
                 ? <img src={store.design.logoUrl} alt={store.name} className="w-full h-full object-cover" />
                 : <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: 'white' }}>{initials}</span>
               }
@@ -346,7 +347,7 @@ export function Navbar({ store }: { store: Store }) {
                 {store.name}
               </span>
               <span className="block text-[10px] font-bold tracking-widest uppercase" style={{ color: 'var(--coral)' }}>
-                {isRTL ? '🎮 متجر الأطفال' : '🎮 Kids\' Store'}
+                {isRTL ? '🎮 Kids Store' : '🎮 Kids\' Store'}
               </span>
             </div>
           </Link>
@@ -362,11 +363,11 @@ export function Navbar({ store }: { store: Store }) {
                 <span>{item.emoji}</span>{item.label}
               </Link>
             ))}
-            <Link href={`/${store.subdomain}`}
+            <Link href={`/`}
               className="btn-bouncy flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold text-white"
               style={{ background: 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: '0 4px 20px rgba(255,107,107,0.4)', letterSpacing: '0.04em' }}>
               <ShoppingBag className="w-4 h-4" />
-              {isRTL ? 'تسوق الآن' : 'Shop Now!'}
+              {isRTL ? 'Shop Now' : 'Shop Now!'}
             </Link>
           </div>
 
@@ -419,7 +420,7 @@ export function Footer({ store }: any) {
               <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.4rem', color: 'white' }}>{store.name}</span>
             </div>
             <p className="text-sm font-medium leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
-              {isRTL ? '🎁 ألعاب وملابس أطفال بجودة عالية وأسعار مناسبة!' : '🎁 Quality toys & kids clothing for every little adventurer!'}
+              {isRTL ? '🎁 High-quality kids toys and clothing at great prices!' : '🎁 Quality toys & kids clothing for every little adventurer!'}
             </p>
             {/* Fun emoji row */}
             <div className="flex gap-2 mt-5 text-2xl" style={{ animation: 'none' }}>
@@ -435,14 +436,14 @@ export function Footer({ store }: any) {
           {/* Links */}
           <div>
             <h4 className="mb-5 font-bold text-sm uppercase tracking-wider" style={{ color: 'var(--sun)', fontFamily: "'Fredoka One', cursive", fontSize: '1rem' }}>
-              🗺️ {isRTL ? 'روابط مهمة' : 'Quick Links'}
+              🗺️ {isRTL ? 'Important Links' : 'Quick Links'}
             </h4>
             <div className="space-y-3">
               {[
-                { href: `/${store.subdomain}/Privacy`, label: isRTL ? 'سياسة الخصوصية' : 'Privacy Policy',   emoji: '🔒' },
-                { href: `/${store.subdomain}/Terms`,   label: isRTL ? 'شروط الخدمة'     : 'Terms of Service', emoji: '📋' },
-                { href: `/${store.subdomain}/Cookies`, label: isRTL ? 'ملفات الارتباط'   : 'Cookie Policy',   emoji: '🍪' },
-                { href: `/${store.subdomain}/contact`, label: isRTL ? 'اتصل بنا'         : 'Contact Us',      emoji: '💌' },
+                { href: `/Privacy`, label: isRTL ? 'Privacy Policy' : 'Privacy Policy',   emoji: '🔒' },
+                { href: `/Terms`,   label: isRTL ? 'Terms of Service'     : 'Terms of Service', emoji: '📋' },
+                { href: `/Cookies`, label: isRTL ? 'Cookies'   : 'Cookie Policy',   emoji: '🍪' },
+                { href: `/contact`, label: isRTL ? 'Contact Us'         : 'Contact Us',      emoji: '💌' },
               ].map(l => (
                 <a key={l.href} href={l.href}
                   className="flex items-center gap-2 text-sm font-medium transition-all hover:translate-x-1"
@@ -460,17 +461,17 @@ export function Footer({ store }: any) {
             <div className="p-5 rounded-2xl" style={{ background: 'linear-gradient(135deg, rgba(255,107,107,0.15), rgba(168,85,247,0.15))', border: '1px solid rgba(255,255,255,0.1)' }}>
               <p className="text-3xl mb-2"></p>
               <p className="font-bold text-base text-white leading-snug" style={{ fontFamily: "'Fredoka One', cursive" }}>
-                {isRTL ? 'لأن كل طفل يستحق الأفضل!' : "Because every kid deserves the best!"}
+                {isRTL ? 'Because every child deserves the best!' : "Because every kid deserves the best!"}
               </p>
               <p className="text-xs font-medium mt-2" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                {isRTL ? 'منتجات آمنة وممتعة لأطفالك' : 'Safe, fun & approved for little ones'}
+                {isRTL ? 'Safe & fun products for your kids' : 'Safe, fun & approved for little ones'}
               </p>
             </div>
             {/* Safety badges */}
             <div className="flex gap-2 flex-wrap">
               {[
-                { e: '✅', label: isRTL ? 'آمن للأطفال' : 'Child Safe' },
-                { e: '🏅', label: isRTL ? 'جودة عالية' : 'Top Quality' },
+                { e: '✅', label: isRTL ? 'Child-Safe' : 'Child Safe' },
+                { e: '🏅', label: isRTL ? 'High Quality' : 'Top Quality' },
               ].map((b,i) => (
                 <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold"
                   style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)' }}>
@@ -483,7 +484,7 @@ export function Footer({ store }: any) {
 
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.3)' }}>
-            © {new Date().getFullYear()} {store.name} · {isRTL ? 'جميع الحقوق محفوظة' : 'All rights reserved'} 🎉
+            © {new Date().getFullYear()} {store.name} · {isRTL ? 'All Rights Reserved' : 'All rights reserved'} 🎉
           </p>
           <p className="text-xs font-bold" style={{ color: 'rgba(255,255,255,0.3)' }}>
             Kids' Kingdom Theme 👑
@@ -499,89 +500,107 @@ export function Footer({ store }: any) {
 // ─────────────────────────────────────────────────────────────
 export function Card({ product, displayImage, discount, isRTL, store, viewDetails }: any) {
   const [hovered, setHovered] = useState(false);
-  const tiltDir = parseInt(product.id) % 2 === 0 ? 1 : -1;
-  const accentColor = ['var(--coral)', 'var(--sky)', 'var(--grape)', 'var(--orange)', 'var(--mint-dk)'][parseInt(product.id) % 5];
+  
+  // unified brand color — you can replace it with any color
+  const brandColor = 'var(--coral)'; 
+  const brandLight = `${brandColor}15`; // Light background (15% opacity)
 
   return (
     <div
-      className="card-tilt group flex flex-col overflow-hidden rounded-3xl bg-white"
-      style={{ border: `3px solid ${hovered ? accentColor : 'var(--border)'}`, position: 'relative', transition: 'border-color 0.3s' }}
+      className="card-tilt group flex flex-col overflow-hidden rounded-3xl bg-white h-full"
+      style={{ 
+        border: `3px solid ${hovered ? brandColor : 'var(--border)'}`, 
+        position: 'relative', 
+        transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)' 
+      }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Colorful top stripe */}
-      <div className="h-1.5 w-full" style={{ background: `linear-gradient(90deg, ${accentColor}, var(--sun))` }} />
+      {/* Unified Top Border */}
+      <div className="h-1.5 w-full" style={{ backgroundColor: brandColor }} />
 
-      {/* Image zone */}
-      <div className="relative overflow-hidden" style={{ aspectRatio: '1', backgroundColor: `${accentColor}15` }}>
+      {/* Image Area */}
+      <div className="relative overflow-hidden" style={{ aspectRatio: '1', backgroundColor: brandLight }}>
         {displayImage
-          ? <img src={displayImage} alt={product.name} className="w-full h-full object-cover transition-transform duration-500" style={{ transform: hovered ? 'scale(1.08)' : 'scale(1)' }} />
+          ? <img 
+              src={displayImage} 
+              alt={product.name} 
+              className="w-full h-full object-cover transition-transform duration-700" 
+              style={{ transform: hovered ? 'scale(1.1)' : 'scale(1)' }} 
+            />
           : (
-            <div className="w-full h-full flex flex-col items-center justify-center polka-dots gap-3">
-              <span className="text-5xl" style={{ animation: 'float-up 3s ease-in-out infinite' }}>🧸</span>
-              <span className="text-xs font-bold" style={{ color: accentColor }}>No image</span>
+            <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+              <span className="text-5xl opacity-50">🧸</span>
+              <span className="text-xs font-bold" style={{ color: brandColor }}>No image</span>
             </div>
           )
         }
 
-        {/* Discount sticker */}
+        {/* Discount Badge */}
         {discount > 0 && (
           <div className="absolute top-3 right-3 w-12 h-12 rounded-full flex items-center justify-center sticker"
-            style={{ backgroundColor: 'var(--coral)', color: 'white', fontFamily: "'Fredoka One', cursive", fontSize: '0.85rem', boxShadow: '0 4px 12px rgba(255,107,107,0.4)', transform: 'rotate(12deg)' }}>
+            style={{ 
+              backgroundColor: brandColor, 
+              color: 'white', 
+              fontFamily: "'Fredoka One', cursive", 
+              fontSize: '0.85rem', 
+              boxShadow: `0 4px 12px ${brandColor}60`, 
+              transform: 'rotate(12deg)' 
+            }}>
             -{discount}%
           </div>
         )}
-
-        {/* Wishlist */}
-        <button className="absolute top-3 left-3 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 btn-bouncy"
-          style={{ backgroundColor: 'rgba(255,255,255,0.9)', color: 'var(--coral)', opacity: hovered ? 1 : 0, transform: hovered ? 'scale(1)' : 'scale(0.7)' }}>
-          <Heart className="w-4 h-4" />
-        </button>
-
-        {/* CTA on hover */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 transition-all duration-300" style={{ transform: hovered ? 'translateY(0)' : 'translateY(100%)', opacity: hovered ? 1 : 0 }}>
-          <Link href={`/${store.subdomain}/product/${product.slug || product.id}`}
-            className="btn-bouncy flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-bold text-white"
-            style={{ background: `linear-gradient(135deg, ${accentColor}, var(--sun))`, boxShadow: `0 4px 16px ${accentColor}50` }}>
-            <Sparkles className="w-4 h-4" /> {viewDetails} 🎉
-          </Link>
-        </div>
       </div>
 
-      {/* Content */}
+      {/* Card Content */}
       <div className="p-4 flex flex-col flex-1">
-        {/* Stars rating */}
+        {/* Rating */}
         <div className="flex gap-0.5 mb-2">
-          {[...Array(5)].map((_,i) => (
-            <Star key={i} className={`w-3 h-3 ${i<4?'fill-current':''}`} style={{ color: 'var(--sun-dark)' }} />
+          {[...Array(5)].map((_, i) => (
+            <Star key={i} className={`w-3 h-3 ${i < 4 ? 'fill-current' : 'opacity-30'}`} style={{ color: brandColor }} />
           ))}
-          <span className="ml-1 text-[10px] font-bold" style={{ color: 'var(--text-soft)' }}>4.8</span>
+          <span className="ml-1 text-[10px] font-bold opacity-60">4.8</span>
         </div>
 
-        <h3 className="font-bold leading-snug mb-1 line-clamp-2 transition-colors group-hover:text-coral-500"
-          style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--text)', letterSpacing: '0.02em' }}>
+        <h3 className="font-bold leading-snug mb-2 line-clamp-2"
+          style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--text)' }}>
           {product.name}
         </h3>
 
         {product.desc && (
-          <div className="text-xs font-medium mb-3 line-clamp-2 leading-relaxed" style={{ color: 'var(--text-soft)' }}
+          <div className="text-xs font-medium mb-4 line-clamp-2 opacity-70 leading-relaxed"
             dangerouslySetInnerHTML={{ __html: product.desc }} />
         )}
 
-        <div className="mt-auto flex items-end justify-between pt-3" style={{ borderTop: `2px dashed ${accentColor}40` }}>
-          <div>
-            <span className="font-black" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.4rem', color: accentColor }}>
-              {product.price}
-            </span>
-            <span className="ml-1 text-xs font-bold" style={{ color: 'var(--text-soft)' }}>{store.currency}</span>
-            {product.priceOriginal && product.priceOriginal > product.price && (
-              <span className="ml-2 text-xs line-through font-medium" style={{ color: 'var(--text-soft)' }}>{product.priceOriginal}</span>
-            )}
+        {/* Price and Button Always at Bottom */}
+        <div className="mt-auto space-y-3">
+          <div className="flex items-center justify-between pt-3" style={{ borderTop: `1px solid var(--border)` }}>
+             <div className="flex flex-col">
+                <span className="text-[10px] font-bold uppercase opacity-50">Price</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="font-black" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.3rem', color: brandColor }}>
+                    {product.price}
+                  </span>
+                  <span className="text-[10px] font-bold opacity-60">{store.currency}</span>
+                </div>
+             </div>
+             
+             {product.priceOriginal && product.priceOriginal > product.price && (
+                <span className="text-xs line-through opacity-40 font-medium">{product.priceOriginal}</span>
+             )}
           </div>
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center transition-all group-hover:rotate-12"
-            style={{ backgroundColor: `${accentColor}15`, color: accentColor }}>
-            <ArrowRight className="w-4 h-4" />
-          </div>
+
+          {/* Primary Button — Always Visible */}
+          <Link href={`/product/${product.slug || product.id}`}
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-bold text-white transition-all active:scale-95"
+            style={{ 
+              backgroundColor: brandColor,
+              boxShadow: hovered ? `0 8px 20px ${brandColor}40` : 'none',
+              transform: hovered ? 'translateY(-2px)' : 'translateY(0)'
+            }}>
+            {viewDetails} 
+            <ArrowRight className={`w-4 h-4 transition-transform ${hovered ? 'translate-x-1' : ''}`} />
+          </Link>
         </div>
       </div>
     </div>
@@ -596,23 +615,23 @@ export function Home({ store }: any) {
   const dir   = isRTL ? 'rtl' : 'ltr';
 
   const t = {
-    heroLabel:   isRTL ? '🎪 عالم الأطفال الساحر'        : '🎪 The Magical Kids World',
-    heroTitle:   isRTL ? 'كل شيء\nيحبه أطفالك!'          : 'Everything\nKids Love!',
-    heroSub:     isRTL ? 'ألعاب وملابس وأدوات ترفيه آمنة وممتعة لأطفالك السعداء' : 'Safe, fun toys, clothing & accessories for your little adventurers!',
-    heroBtn:     isRTL ? '🛍️ تسوق الآن'                  : '🛍️ Start Shopping!',
-    heroBtn2:    isRTL ? '🎁 العروض الخاصة'               : '🎁 Special Offers',
-    categories:  isRTL ? 'تسوق حسب الفئة'                : 'Shop by Category',
-    all:         isRTL ? 'الكل'                            : 'All',
-    products:    isRTL ? 'منتجاتنا المميزة'               : 'Our Awesome Products',
-    noProducts:  isRTL ? 'لا توجد منتجات بعد 🧸'          : 'No products yet 🧸',
-    viewDetails: isRTL ? 'اعرف المزيد'                    : 'Get It!',
+    heroLabel:   isRTL ? '🎪 The Magical World of Kids'        : '🎪 The Magical Kids World',
+    heroTitle:   'Everything\nKids Love!',
+    heroSub:     isRTL ? 'Safe and fun toys, clothing and entertainment for your happy kids' : 'Safe, fun toys, clothing & accessories for your little adventurers!',
+    heroBtn:     isRTL ? '🛍️ Shop Now'                  : '🛍️ Start Shopping!',
+    heroBtn2:    isRTL ? '🎁 Special Offers'               : '🎁 Special Offers',
+    categories:  isRTL ? 'Shop by Category'                : 'Shop by Category',
+    all:         isRTL ? 'All'                            : 'All',
+    products:    isRTL ? 'Featured Products'               : 'Our Awesome Products',
+    noProducts:  isRTL ? 'No products yet 🧸'          : 'No products yet 🧸',
+    viewDetails: isRTL ? 'Learn More'                    : 'Get It!',
   };
 
   const features = [
-    { emoji: '🛡️', title: isRTL ? 'آمن للأطفال' : 'Child Safe',    sub: isRTL ? 'جميع المنتجات تجتاز معايير السلامة' : 'All products pass safety standards' },
-    { emoji: '🚀', title: isRTL ? 'توصيل سريع'  : 'Fast Delivery', sub: isRTL ? 'يصل لبيتك في وقت قياسي'           : 'Delivered right to your door'       },
-    { emoji: '⭐', title: isRTL ? 'جودة عالية'  : 'Top Quality',   sub: isRTL ? 'منتجات مختارة بعناية'             : 'Handpicked for durability & fun'    },
-    { emoji: '💝', title: isRTL ? 'ضمان الرضا'  : 'Happy Guarantee', sub: isRTL ? 'رضاك يهمنا دائماً'             : 'We ensure every child smiles'       },
+    { emoji: '🛡️', title: isRTL ? 'Child-Safe' : 'Child Safe',    sub: isRTL ? 'All Products Meet Safety Standards' : 'All products pass safety standards' },
+    { emoji: '🚀', title: isRTL ? 'Fast Delivery'  : 'Fast Delivery', sub: isRTL ? 'Arrives at Your Door in Record Time'           : 'Delivered right to your door'       },
+    { emoji: '⭐', title: isRTL ? 'High Quality'  : 'Top Quality',   sub: isRTL ? 'Carefully Selected Products'             : 'Handpicked for durability & fun'    },
+    { emoji: '💝', title: isRTL ? 'Satisfaction Guarantee'  : 'Happy Guarantee', sub: isRTL ? 'Your Satisfaction Is Our Priority'             : 'We ensure every child smiles'       },
   ];
 
   return (
@@ -696,9 +715,9 @@ export function Home({ store }: any) {
             {/* Trust line */}
             <div className="pop-in pop-in-d4 flex flex-wrap gap-6 mt-12 pt-8" style={{ borderTop: '2px dashed var(--border)' }}>
               {[
-                { e: '🛡️', t: isRTL ? 'آمن' : 'Safe'     },
-                { e: '🚀', t: isRTL ? 'سريع' : 'Fast'    },
-                { e: '⭐', t: isRTL ? 'مميز' : 'Quality' },
+                { e: '🛡️', t: isRTL ? 'Secure' : 'Safe'     },
+                { e: '🚀', t: isRTL ? 'Fast' : 'Fast'    },
+                { e: '⭐', t: isRTL ? 'Featured' : 'Quality' },
               ].map((b,i) => (
                 <div key={i} className="flex items-center gap-2">
                   <span className="text-xl">{b.e}</span>
@@ -769,7 +788,7 @@ export function Home({ store }: any) {
           ) : (
             <div className="py-12 text-center rounded-3xl polka-dots" style={{ border: '3px dashed var(--border)' }}>
               <span className="text-4xl block mb-3">🎪</span>
-              <p className="font-bold" style={{ color: 'var(--text-soft)' }}>{isRTL ? 'لا توجد تصنيفات بعد' : 'No categories yet'}</p>
+              <p className="font-bold" style={{ color: 'var(--text-soft)' }}>{isRTL ? 'No categories yet' : 'No categories yet'}</p>
             </div>
           )}
         </div>
@@ -783,12 +802,12 @@ export function Home({ store }: any) {
               🎁 {t.products}
             </h2>
             <p className="mt-2 font-medium text-sm" style={{ color: 'var(--text-soft)' }}>
-              {store.products?.length || 0} {isRTL ? 'منتج رائع' : 'awesome items'} 🌟
+              {store.products?.length || 0} {isRTL ? 'Great Product' : 'awesome items'} 🌟
             </p>
           </div>
 
           {store.products?.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-5">
               {store.products.map((product: any) => {
                 const displayImage = product.productImage || product.imagesProduct?.[0]?.imageUrl || store.design?.logoUrl;
                 const discount = product.priceOriginal ? Math.round(((product.priceOriginal - product.price) / product.priceOriginal) * 100) : 0;
@@ -815,15 +834,15 @@ export function Home({ store }: any) {
           </div>
           <h2 className="font-black text-white leading-tight"
             style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(2rem,6vw,5rem)', lineHeight: 1.15 }}>
-            {isRTL ? 'الفرح لا يتوقف هنا!' : 'The Fun Never Stops!'}
+            {isRTL ? 'The fun never stops here!' : 'The Fun Never Stops!'}
           </h2>
           <p className="mt-4 text-base font-semibold" style={{ color: 'rgba(255,255,255,0.6)' }}>
-            {isRTL ? 'آلاف المنتجات الممتعة والآمنة في انتظار أطفالك' : 'Thousands of fun & safe products waiting for your kids'}
+            {isRTL ? 'Thousands of fun and safe products waiting for your kids' : 'Thousands of fun & safe products waiting for your kids'}
           </p>
           <a href="#products"
             className="btn-bouncy inline-flex items-center gap-3 mt-8 px-10 py-4 rounded-2xl text-base font-black text-white"
             style={{ background: 'linear-gradient(135deg, var(--coral), var(--orange), var(--sun))', boxShadow: '0 8px 30px rgba(255,107,107,0.5)' }}>
-            🎪 {isRTL ? 'استكشف الآن!' : 'Explore Now!'}
+            🎪 {isRTL ? 'Explore Now!' : 'Explore Now!'}
           </a>
         </div>
       </section>
@@ -846,9 +865,9 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
         style={{ backgroundColor: 'rgba(255,251,240,0.95)', backdropFilter: 'blur(12px)', borderBottom: '2px dashed var(--border)' }}>
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
           <nav className="flex items-center gap-2 text-xs font-bold" style={{ color: 'var(--text-soft)' }}>
-            <span className="hover:text-coral-500 cursor-pointer">🏠 {isRTL?'الرئيسية':'Home'}</span>
+            <span className="hover:text-coral-500 cursor-pointer">🏠 {isRTL?'Home':'Home'}</span>
             <span>›</span>
-            <span className="hover:text-coral-500 cursor-pointer">🎁 {isRTL?'المنتجات':'Products'}</span>
+            <span className="hover:text-coral-500 cursor-pointer">🎁 {isRTL?'Products':'Products'}</span>
             <span>›</span>
             <span style={{ color: 'var(--text)' }}>{product.name}</span>
           </nav>
@@ -863,7 +882,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             </button>
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold"
               style={{ backgroundColor: inStock ? 'rgba(110,231,183,0.15)' : 'rgba(255,107,107,0.1)', border: `2px solid ${inStock ? 'var(--mint-dk)' : 'var(--coral)'}`, color: inStock ? 'var(--mint-dk)' : 'var(--coral)' }}>
-              {inStock ? '✅' : '❌'} {inStock ? (isRTL?'متوفر':'In Stock') : (isRTL?'نفد':'Out of Stock')}
+              {inStock ? '✅' : '❌'} {inStock ? (isRTL?'Available':'In Stock') : (isRTL?'Out of Stock':'Out of Stock')}
             </div>
           </div>
         </div>
@@ -905,7 +924,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
               {!inStock && !autoGen && (
                 <div className="absolute inset-0 flex items-center justify-center rounded-3xl" style={{ backgroundColor: 'rgba(255,251,240,0.85)', backdropFilter: 'blur(4px)' }}>
                   <div className="px-6 py-4 rounded-2xl text-base font-black" style={{ border: '3px solid var(--coral)', color: 'var(--coral)', backgroundColor: 'white' }}>
-                    😢 {isRTL?'نفد المخزون':'Out of Stock'}
+                    😢 {isRTL?'Out of Stock':'Out of Stock'}
                   </div>
                 </div>
               )}
@@ -923,9 +942,9 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             {/* Trust badges */}
             <div className="grid grid-cols-3 gap-2">
               {[
-                { e:'🛡️', l:isRTL?'دفع آمن':'Secure Pay'   },
-                { e:'🚀', l:isRTL?'توصيل سريع':'Fast Ship' },
-                { e:'⭐', l:isRTL?'جودة عالية':'Quality'   },
+                { e:'🛡️', l:isRTL?'Secure Payment':'Secure Pay'   },
+                { e:'🚀', l:isRTL?'Fast Delivery':'Fast Ship' },
+                { e:'⭐', l:isRTL?'High Quality':'Quality'   },
               ].map((b,i) => (
                 <div key={i} className="flex flex-col items-center gap-1 py-3 rounded-2xl" style={{ border: '2px solid var(--border)', backgroundColor: 'white' }}>
                   <span className="text-xl">{b.e}</span>
@@ -940,30 +959,30 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <div className="h-1.5 w-8 rounded-full" style={{ background: accentColor }} />
-                <span className="text-xs font-black uppercase tracking-wider" style={{ color: accentColor }}>🎁 {isRTL?'المنتج':'Product'}</span>
+                <span className="text-xs font-black uppercase tracking-wider" style={{ color: accentColor }}>🎁 {isRTL?'Product':'Product'}</span>
               </div>
               <h1 className="leading-tight mb-3" style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.6rem,3.5vw,2.5rem)', color: 'var(--text)', letterSpacing: '0.01em' }}>
                 {product.name}
               </h1>
               <div className="flex items-center gap-3">
                 <div className="flex gap-0.5">{[...Array(5)].map((_,i)=><Star key={i} className={`w-4 h-4 ${i<4?'fill-current':''}`} style={{ color:'var(--sun-dark)' }}/>)}</div>
-                <span className="text-xs font-bold" style={{ color:'var(--text-soft)' }}>4.8 (128 {isRTL?'تقييم':'reviews'}) 🌟</span>
+                <span className="text-xs font-bold" style={{ color:'var(--text-soft)' }}>4.8 (128 {isRTL?'Rating':'reviews'}) 🌟</span>
               </div>
             </div>
 
             {/* Price */}
             <div className="p-5 rounded-3xl relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${accentColor}10, ${accentColor}05)`, border: `3px solid ${accentColor}30` }}>
               <div className="absolute top-0 left-0 w-1.5 h-full rounded-full" style={{ background: accentColor }} />
-              <p className="text-[10px] font-black uppercase tracking-wider mb-2 pl-4" style={{ color: 'var(--text-soft)' }}>{isRTL?'💰 السعر':'💰 Price'}</p>
+              <p className="text-[10px] font-black uppercase tracking-wider mb-2 pl-4" style={{ color: 'var(--text-soft)' }}>{isRTL?'💰 Price':'💰 Price'}</p>
               <div className="flex items-baseline gap-3 pl-4">
                 <span className="font-black" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '3rem', color: accentColor, lineHeight: 1 }}>
                   {finalPrice.toLocaleString()}
                 </span>
-                <span className="text-base font-bold" style={{ color: 'var(--text-mid)' }}>دج</span>
+                <span className="text-base font-bold" style={{ color: 'var(--text-mid)' }}>DZD</span>
                 {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
                   <div>
-                    <span className="text-sm line-through font-bold block" style={{ color: 'var(--text-soft)' }}>{parseFloat(product.priceOriginal).toLocaleString()} دج</span>
-                    <span className="text-xs font-black" style={{ color: 'var(--coral)' }}>🎉 توفر {(parseFloat(product.priceOriginal)-finalPrice).toLocaleString()} دج!</span>
+                    <span className="text-sm line-through font-bold block" style={{ color: 'var(--text-soft)' }}>{parseFloat(product.priceOriginal).toLocaleString()} DZD</span>
+                    <span className="text-xs font-black" style={{ color: 'var(--coral)' }}>🎉 Save {(parseFloat(product.priceOriginal)-finalPrice).toLocaleString()} DZD!</span>
                   </div>
                 )}
               </div>
@@ -973,13 +992,13 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-black"
               style={{ backgroundColor: autoGen?'rgba(255,217,61,0.15)':inStock?'rgba(110,231,183,0.15)':'rgba(255,107,107,0.1)', border: `2px solid ${autoGen?'var(--sun-dark)':inStock?'var(--mint-dk)':'var(--coral)'}`, color: autoGen?'var(--sun-dark)':inStock?'var(--mint-dk)':'var(--coral)' }}>
               {autoGen?'♾️ ':inStock?'✅ ':'❌ '}
-              {autoGen?(isRTL?'مخزون غير محدود':'Unlimited Stock'):inStock?(isRTL?'متوفر في المخزون':'In Stock'):(isRTL?'نفد المخزون':'Out of Stock')}
+              {autoGen?(isRTL?'Unlimited Stock':'Unlimited Stock'):inStock?(isRTL?'In Stock':'In Stock'):(isRTL?'Out of Stock':'Out of Stock')}
             </div>
 
             {/* Offers */}
             {product.offers?.length > 0 && (
               <div>
-                <p className="text-xs font-black uppercase tracking-wider mb-3" style={{ color: accentColor }}>🎁 {isRTL?'اختر الباقة':'Select Package'}</p>
+                <p className="text-xs font-black uppercase tracking-wider mb-3" style={{ color: accentColor }}>🎁 {isRTL?'Select Package':'Select Package'}</p>
                 <div className="space-y-2">
                   {product.offers.map((offer:any) => (
                     <label key={offer.id} className="flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all btn-bouncy"
@@ -994,7 +1013,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                           <p className="text-[10px] font-medium" style={{ color:'var(--text-soft)' }}>Qty: {offer.quantity}</p>
                         </div>
                       </div>
-                      <span className="font-black" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.3rem', color: accentColor }}>{offer.price.toLocaleString()} <span className="text-xs">دج</span></span>
+                      <span className="font-black" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.3rem', color: accentColor }}>{offer.price.toLocaleString()} <span className="text-xs">DZD</span></span>
                     </label>
                   ))}
                 </div>
@@ -1040,7 +1059,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
         {product.desc && (
           <section className="mt-16 pt-10" style={{ borderTop: '3px dashed var(--border)' }}>
             <h2 className="flex items-center gap-3 mb-8" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.8rem', color: 'var(--text)' }}>
-              <span className="text-3xl">📖</span> {isRTL?'تفاصيل المنتج':'Product Details'}
+              <span className="text-3xl">📖</span> {isRTL?'Product Details':'Product Details'}
             </h2>
             <div className="p-8 rounded-3xl polka-dots" style={{ border: '2px solid var(--border)', backgroundColor: 'white' }}>
               <div className="text-sm font-medium leading-relaxed" style={{ color: 'var(--text-mid)' }}
@@ -1100,16 +1119,23 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   const validate = () => {
     const e:Record<string,string>={};
-    if(!formData.customerName.trim())  e.customerName='الاسم مطلوب';
-    if(!formData.customerPhone.trim()) e.customerPhone='رقم الهاتف مطلوب';
-    if(!formData.customerWelaya)       e.customerWelaya='الولاية مطلوبة';
-    if(!formData.customerCommune)      e.customerCommune='البلدية مطلوبة';
+    if(!formData.customerName.trim())  e.customerName='Name is required';
+    if(!formData.customerPhone.trim()) e.customerPhone='Phone number is required';
+    if(!formData.customerWelaya)       e.customerWelaya='Province is required';
+    if(!formData.customerCommune)      e.customerCommune='Municipality is required';
     return e;
   };
 
+  
+  const getVariantDetailId = useCallback(() => {
+    if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+    return product.variantDetails.find((v: any) => variantMatches(v, selectedVariants))?.id;
+  }, [product.variantDetails, selectedVariants]);
+
   const handleSubmit = async (e:React.FormEvent) => {
     e.preventDefault(); const errs=validate(); if(Object.keys(errs).length){setFormErrors(errs);return;} setFormErrors({}); setSubmitting(true);
-    try { await axios.post(`${API_URL}/orders`,{ ...formData, customerWilayaId: +formData.customerWelaya,customerCommuneId: +formData.customerCommune, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceShip : getPriceLivraison(), }); if(typeof window!=='undefined'&&formData.customerId) localStorage.setItem('customerId',formData.customerId); router.push(`/lp/${domain}/successfully`); } catch(err){console.error(err);} finally{setSubmitting(false);}
+    try { await axios.post(`${API_URL}/orders`,{
+        variantDetailId: getVariantDetailId(), ...formData, customerWilayaId: +formData.customerWelaya,customerCommuneId: +formData.customerCommune, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceShip : getPriceLivraison(), }); if(typeof window!=='undefined'&&formData.customerId) localStorage.setItem('customerId',formData.customerId); router.push(`/lp/${domain}/successfully`); } catch(err){console.error(err);} finally{setSubmitting(false);}
   };
 
   const onFocus = (e:React.FocusEvent<any>) => { e.target.style.borderColor='var(--sky)'; e.target.style.boxShadow='0 0 0 4px rgba(78,205,196,0.15)'; };
@@ -1125,7 +1151,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           <FieldWrapper error={formErrors.customerName} label="👤 Your Name">
             <div className="relative">
               <User className="absolute right-3 top-3.5 w-3.5 h-3.5" style={{ color:'var(--text-soft)' }} />
-              <input type="text" value={formData.customerName} onChange={e=>setFormData({...formData,customerName:e.target.value})} placeholder="اسمك الكامل" style={{ ...inputSt(!!formErrors.customerName), paddingRight:'2.5rem' }} onFocus={onFocus} onBlur={e=>onBlur(e,!!formErrors.customerName)} />
+              <input type="text" value={formData.customerName} onChange={e=>setFormData({...formData,customerName:e.target.value})} placeholder="Full Name" style={{ ...inputSt(!!formErrors.customerName), paddingRight:'2.5rem' }} onFocus={onFocus} onBlur={e=>onBlur(e,!!formErrors.customerName)} />
             </div>
           </FieldWrapper>
           <FieldWrapper error={formErrors.customerPhone} label="📞 Phone">
@@ -1141,7 +1167,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <MapPin className="absolute right-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-soft)' }} />
               <ChevronDown className="absolute left-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-soft)' }} />
               <select value={formData.customerWelaya} onChange={e=>setFormData({...formData,customerWelaya:e.target.value,customerCommune:''})} style={{ ...inputSt(!!formErrors.customerWelaya), paddingRight:'2.5rem', appearance:'none' as any, cursor:'pointer' }}>
-                <option value="">اختر الولاية</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                <option value="">Select Province</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
               </select>
             </div>
           </FieldWrapper>
@@ -1150,7 +1176,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <MapPin className="absolute right-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-soft)' }} />
               <ChevronDown className="absolute left-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-soft)' }} />
               <select value={formData.customerCommune} disabled={!formData.customerWelaya||loadingCommunes} onChange={e=>setFormData({...formData,customerCommune:e.target.value})} style={{ ...inputSt(!!formErrors.customerCommune), paddingRight:'2.5rem', appearance:'none' as any, cursor:'pointer', opacity:!formData.customerWelaya?0.5:1 }}>
-                <option value="">{loadingCommunes?'⏳ Loading…':'اختر البلدية'}</option>{communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                <option value="">{loadingCommunes?'⏳ Loading…':'Select Municipality'}</option>{communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
             </div>
           </FieldWrapper>
@@ -1165,7 +1191,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 style={{ border:`3px solid ${formData.typeLivraison===type?'var(--sky)':'var(--border)'}`, backgroundColor:formData.typeLivraison===type?'rgba(78,205,196,0.08)':'white' }}>
                 <span className="text-2xl">{type==='home'?'🏠':'🏢'}</span>
                 <p className="text-xs font-black uppercase" style={{ color:formData.typeLivraison===type?'var(--sky-dk)':'var(--text-soft)' }}>{type==='home'?'Home':'Office'}</p>
-                {selectedWilayaData && <p className="text-xs font-bold" style={{ color:'var(--text-mid)' }}>{(type==='home'?selectedWilayaData.livraisonHome:selectedWilayaData.livraisonOfice).toLocaleString()} دج</p>}
+                {selectedWilayaData && <p className="text-xs font-bold" style={{ color:'var(--text-mid)' }}>{(type==='home'?selectedWilayaData.livraisonHome:selectedWilayaData.livraisonOfice).toLocaleString()} DZD</p>}
               </button>
             ))}
           </div>
@@ -1184,7 +1210,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         <div className="p-5 rounded-3xl relative overflow-hidden polka-dots" style={{ border:'2px solid var(--border)', backgroundColor:'white' }}>
           <p className="text-xs font-black uppercase tracking-wider mb-4" style={{ color:'var(--coral)' }}>🧾 Order Summary</p>
           <div className="space-y-2.5">
-            {[{l:'Product',v:product.name},{l:'Unit',v:`${finalPrice.toLocaleString()} دج`},{l:'Qty',v:`× ${formData.quantity}`},{l:'Shipping',v:selectedWilayaData?`${getPriceLivraison().toLocaleString()} دج`:'TBD'}].map(row=>(
+            {[{l:'Product',v:product.name},{l:'Unit',v:`${finalPrice.toLocaleString()} DZD`},{l:'Qty',v:`× ${formData.quantity}`},{l:'Shipping',v:selectedWilayaData?`${getPriceLivraison().toLocaleString()} DZD`:'TBD'}].map(row=>(
               <div key={row.l} className="flex justify-between items-center">
                 <span className="text-[10px] font-black uppercase tracking-wider" style={{ color:'var(--text-soft)' }}>{row.l}</span>
                 <span className="text-sm font-bold" style={{ color:'var(--text)' }}>{row.v}</span>
@@ -1193,7 +1219,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <div className="pt-3" style={{ borderTop:'2px dashed var(--border)' }}>
               <div className="flex justify-between items-baseline">
                 <span className="text-sm font-black uppercase" style={{ color:'var(--coral)' }}>💰 TOTAL</span>
-                <span className="font-black" style={{ fontFamily:"'Fredoka One',cursive", fontSize:'2rem', color:'var(--coral)' }}>{getTotalPrice().toLocaleString()}<span className="text-sm ml-1">دج</span></span>
+                <span className="font-black" style={{ fontFamily:"'Fredoka One',cursive", fontSize:'2rem', color:'var(--coral)' }}>{getTotalPrice().toLocaleString()}<span className="text-sm ml-1">DZD</span></span>
               </div>
             </div>
           </div>
@@ -1239,7 +1265,7 @@ function PageWrapper({ children, emoji, title, subtitle }: { children:React.Reac
 }
 
 function InfoCard({ icon, title, desc, status }: { icon:React.ReactNode; title:string; desc:string; status?:string }) {
-  const isActive = status==='دائماً نشطة'||status==='Always Active';
+  const isActive = status==='Always Active'||status==='Always Active';
   return (
     <div className="group flex gap-5 p-6 mb-3 rounded-3xl transition-all duration-300 cursor-default"
       style={{ border:'2px solid var(--border)', backgroundColor:'white' }}
