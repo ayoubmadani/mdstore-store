@@ -45,10 +45,19 @@ export default async function StorePage(props: {
   searchParams: Promise<{ category?: string }>;
 }) {
   const { domain } = await props.params;
-  const { category } = await props.searchParams;
+  const searchParams = await props.searchParams;
+  const category = searchParams.category;
 
-  // ✅ نمرر الـ category المستخرجة من الرابط
+  // 🔴 تنبيه: هذه السطور ستظهر في Vercel Dashboard > Logs
+  console.log("--- DEBUG START ---");
+  console.log("1. Domain from Params:", domain);
+  console.log("2. Category from SearchParams:", category);
+  
   const store: any = await getStoreCached(domain, category);
+
+  console.log("3. API URL called with Category:", category ? "YES" : "NO");
+  console.log("4. Products received from API:", store?.products?.length || 0);
+  console.log("--- DEBUG END ---");
 
   if (!store) return <StoreNotFound domain={domain} />;
   if (!store.isActive) return <StoreInactive store={store} />;
