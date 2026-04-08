@@ -48,11 +48,14 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // 5. التوجيه الداخلي (Rewrite)
+  // إضافة url.search لضمان انتقال الـ Query Params مثل ?category=...
+  
+  const targetUrl = new URL(`/${storeIdentifier}${path}${url.search}`, req.url);
+
   if (process.env.NODE_ENV === "development") {
-    return NextResponse.rewrite(new URL(`http://localhost:3000/${storeIdentifier}${path}`, req.url));
+    return NextResponse.rewrite(new URL(`http://localhost:3000/${storeIdentifier}${path}${url.search}`, req.url));
   }
 
-  // 5. التوجيه الداخلي (Rewrite)
-  // سيتم توجيه الطلب إلى المجلد [domain] داخل app directory
-  return NextResponse.rewrite(new URL(`/${storeIdentifier}${path}`, req.url));
+  return NextResponse.rewrite(targetUrl);
 }
