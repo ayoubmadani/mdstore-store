@@ -1,6 +1,5 @@
 import React from 'react';
 import { cache } from 'react';
-import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getStoreByDomain } from '@/lib/api';
 import { StoreProvider } from '@/Hook/store-provider';
@@ -8,8 +7,9 @@ import dynamic from 'next/dynamic';
 import CustomerTracker from '@/components/CustomerTracker';
 import Landing from '@/components/landing';
 import AddShow from '@/components/addShow';
+import { Metadata } from 'next';
 
-// ✅ كاش لبيانات المتجر الأساسية (بدون تصنيفات)
+// ✅ كاش يعتمد على الـ domain فقط لضمان استقرار الـ Layout
 const getStoreCached = cache(async (domain: string) => {
   return getStoreByDomain(domain);
 });
@@ -20,7 +20,7 @@ interface LayoutProps {
 }
 
 // ==========================================
-// METADATA (تعمل على مستوى المتجر بالكامل)
+// METADATA
 // ==========================================
 export async function generateMetadata({ params }: LayoutProps): Promise<Metadata> {
   const { domain } = await params;
@@ -28,26 +28,24 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
 
   if (!store) return { title: 'Store Not Found' };
 
-  // تأكد من مسار الأيقونة (استخدم رابط كامل إذا كانت الصورة خارجية)
-  const iconUrl = store.design?.faviconUrl || store.design?.logoUrl || '/default-logo.png';
+  // ✅ حل مشكلة الـ TypeScript: تحويل الـ null إلى undefined أو string
+  const description = store.name;
+  const favicon = store.design?.faviconUrl || store.design?.logoUrl || '/default-logo.png';
 
   return {
     title: {
-      default: store.name,
-      template: `%s | ${store.name}`, // يسمح للصفحات الفرعية بإضافة عنوانها قبل اسم المتجر
+      default: store.isActive ? store.name : `${store.name} (Inactive)`,
+      template: `%s | ${store.name}`
     },
-    description: store.hero?.subtitle || `Welcome to ${store.name}`,
+    description: description,
     icons: {
-      icon: [
-        { url: iconUrl, href: iconUrl },
-      ],
-      shortcut: iconUrl,
-      apple: iconUrl,
+      icon: favicon,
+      shortcut: favicon,
+      apple: favicon,
     },
-    // لدعم ظهور الشعار عند مشاركة الرابط في واتساب وفيسبوك
     openGraph: {
       title: store.name,
-      description: store.hero?.subtitle,
+      description: description,
       images: [{ url: store.design?.logoUrl || '' }],
     },
   };
@@ -58,6 +56,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
 // ==========================================
 export default async function StoreLayout({ children, params }: LayoutProps) {
   const { domain } = await params;
+  
   const store: any = await getStoreCached(domain);
 
   if (!store) notFound();
