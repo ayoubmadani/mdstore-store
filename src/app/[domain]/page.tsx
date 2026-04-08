@@ -1,14 +1,17 @@
 import { cache } from 'react';
-import dynamic from 'next/dynamic';
+import { default as nextDynamic } from 'next/dynamic';
 import { getStoreByDomain } from '@/lib/api';
 
-// ✅ التعديل: جعل الكاتيجوري اختيارية (category?: string) لتجنب الانهيار
+// ✅ 1. إجبار الصفحة على التحقق من البيانات في كل طلب (حل مشكلة Production)
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const getStoreCached = cache(async (domain: string, category?: string) => {
   return getStoreByDomain(domain, category);
 });
 
 // ==========================================
-// SUB-COMPONENTS
+// SUB-COMPONENTS (نفس كودك دون تغيير)
 // ==========================================
 function StoreNotFound({ domain }: { domain: string }) {
   return (
@@ -41,12 +44,11 @@ export default async function StorePage(props: {
   params: Promise<{ domain: string }>;
   searchParams: Promise<{ category?: string }>;
 }) {
-  // انتظر فك تشفير الـ params والـ searchParams
   const { domain } = await props.params;
   const { category } = await props.searchParams;
 
   // ✅ نمرر الـ category المستخرجة من الرابط
-  const store: any = await getStoreCached(domain, category); 
+  const store: any = await getStoreCached(domain, category);
 
   if (!store) return <StoreNotFound domain={domain} />;
   if (!store.isActive) return <StoreInactive store={store} />;
@@ -54,7 +56,7 @@ export default async function StorePage(props: {
   const activeTheme = store?.themeUser?.theme?.slug || 'default';
   const language = store?.language || 'ar';
 
-  const SelectedTheme = dynamic<any>(
+  const SelectedTheme = nextDynamic<any>(
     () =>
       import(`@/theme/${language}/${activeTheme}/main`)
         .then((mod) => mod.Home || mod.default)
@@ -71,4 +73,3 @@ export default async function StorePage(props: {
 
   return <SelectedTheme store={store} searchParams={{ category }} />;
 }
-
