@@ -6,8 +6,8 @@ import { getStoreByDomain } from '@/lib/api';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-const getStoreCached = cache(async (domain: string, category?: string) => {
-  return getStoreByDomain(domain, category);
+const getStoreCached = cache(async (domain: string, category?: string , search? :string) => {
+  return getStoreByDomain(domain, category , search);
 });
 
 // ==========================================
@@ -42,22 +42,17 @@ function StoreInactive({ store }: { store: any }) {
 // ==========================================
 export default async function StorePage(props: {
   params: Promise<{ domain: string }>;
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string ,search:string}>;
 }) {
   const { domain } = await props.params;
   const searchParams = await props.searchParams;
   const category = searchParams.category;
-
-  // 🔴 تنبيه: هذه السطور ستظهر في Vercel Dashboard > Logs
-  console.log("--- DEBUG START ---");
-  console.log("1. Domain from Params:", domain);
-  console.log("2. Category from SearchParams:", category);
+  const search = searchParams.search;
+  console.log('-----------------------------------');
   
-  const store: any = await getStoreCached(domain, category);
+  console.log({search});
 
-  console.log("3. API URL called with Category:", category ? "YES" : "NO");
-  console.log("4. Products received from API:", store?.products?.length || 0);
-  console.log("--- DEBUG END ---");
+  const store: any = await getStoreCached(domain, category,search);
 
   if (!store) return <StoreNotFound domain={domain} />;
   if (!store.isActive) return <StoreInactive store={store} />;
@@ -80,5 +75,5 @@ export default async function StorePage(props: {
     }
   );
 
-  return <SelectedTheme store={store} searchParams={{ category }} />;
+  return <SelectedTheme store={store} domain={domain} />;
 }

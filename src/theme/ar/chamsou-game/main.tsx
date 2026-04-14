@@ -10,8 +10,11 @@ import {
   AlertCircle, X, Share2, Phone, User, ToggleRight,
   Shield, ArrowRight, Plus, Minus, CheckCircle2, Lock,
   Menu, Gamepad2, Zap, Trophy, Package, Truck,
+  Search, ShoppingCart, ShoppingBag, Trash2, Loader2,
+  BadgeCheck, ShieldCheck,
 } from 'lucide-react';
 import { Store } from '@/types/store';
+import { useCartStore } from '@/store/useCartStore';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -31,6 +34,8 @@ const CSS = `
     --gold:    #FFD700;
     --gold-dk: #E6B800;
     --purple:  #9B59FF;
+    --green:   #00FF88;
+    --red:     #FF4444;
     --white:   #F0F8FF;
     --mid:     #7A9BB5;
     --dim:     #3D5A78;
@@ -45,13 +50,11 @@ const CSS = `
   ::-webkit-scrollbar { width:3px; }
   ::-webkit-scrollbar-thumb { background:linear-gradient(var(--cyan),var(--pink)); border-radius:2px; }
 
-  /* Hexagon BG */
   .hex-bg {
     background-color:var(--navy);
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Crect width='56' height='100' fill='%23050B1A'/%3E%3Cpath d='M28 66L0 50V17L28 1l28 16v33z' fill='none' stroke='%230D1A38' stroke-width='1'/%3E%3Cpath d='M28 100L0 83V50l28-16 28 16v33z' fill='none' stroke='%230D1A38' stroke-width='1'/%3E%3C/svg%3E");
   }
 
-  /* Circuit lines */
   .circuit-bg {
     background-image:
       linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
@@ -59,21 +62,10 @@ const CSS = `
     background-size:40px 40px;
   }
 
-  /* Neon text */
-  .neon-cyan {
-    color:var(--cyan);
-    text-shadow:0 0 10px rgba(0,212,255,0.8), 0 0 30px rgba(0,212,255,0.4);
-  }
-  .neon-pink {
-    color:var(--pink);
-    text-shadow:0 0 10px rgba(255,45,138,0.8), 0 0 30px rgba(255,45,138,0.4);
-  }
-  .neon-gold {
-    color:var(--gold);
-    text-shadow:0 0 10px rgba(255,215,0,0.8), 0 0 30px rgba(255,215,0,0.4);
-  }
+  .neon-cyan { color:var(--cyan); text-shadow:0 0 10px rgba(0,212,255,0.8), 0 0 30px rgba(0,212,255,0.4); }
+  .neon-pink { color:var(--pink); text-shadow:0 0 10px rgba(255,45,138,0.8), 0 0 30px rgba(255,45,138,0.4); }
+  .neon-gold { color:var(--gold); text-shadow:0 0 10px rgba(255,215,0,0.8), 0 0 30px rgba(255,215,0,0.4); }
 
-  /* Orbitron font */
   .orb { font-family:'Orbitron',monospace; }
 
   @keyframes shimmer-gold {
@@ -108,16 +100,25 @@ const CSS = `
   @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
   @keyframes float  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
   @keyframes spin-slow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  @keyframes cartBounce {
+    0%   { transform:scale(1); }
+    50%  { transform:scale(1.06); }
+    100% { transform:scale(1); }
+  }
+  @keyframes checkAppear {
+    0%   { transform:scale(0) rotate(-45deg); opacity:0; }
+    100% { transform:scale(1) rotate(0); opacity:1; }
+  }
+  .animate-cart  { animation:cartBounce 0.4s ease-in-out; }
+  .animate-check { animation:checkAppear 0.3s cubic-bezier(0.175,0.885,0.32,1.275); }
 
   /* CARD */
   .g-card {
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:8px;
-    overflow:hidden;
-    transition:transform 0.3s, box-shadow 0.3s, border-color 0.3s;
-    cursor:pointer;
-    position:relative;
+    background:var(--panel); border:1px solid var(--line); border-radius:8px;
+    overflow:hidden; transition:transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+    cursor:pointer; position:relative;
   }
   .g-card::before {
     content:''; position:absolute; inset:0; border-radius:8px;
@@ -174,27 +175,11 @@ const CSS = `
   .inp::placeholder { color:var(--dim); }
   .inp-err { border-color:var(--pink) !important; box-shadow:0 0 0 3px rgba(255,45,138,0.1) !important; }
   select.inp { appearance:none; cursor:pointer; }
+  select.inp option { background:var(--navy-2); color:var(--white); }
 
-  /* NEON BORDER BOX */
-  .neon-box {
-    border:1px solid var(--line);
-    box-shadow:var(--glow-c), inset 0 0 30px rgba(0,212,255,0.03);
-    animation:pulse-cyan 3s ease-in-out infinite;
-  }
-  .neon-box-pk {
-    border:1px solid var(--line-pk);
-    box-shadow:var(--glow-p), inset 0 0 30px rgba(255,45,138,0.03);
-    animation:pulse-pink 3s ease-in-out infinite;
-  }
-
-  /* Corner ornaments */
-  .corners { position:relative; }
-  .corners::before, .corners::after,
-  .corners > .c1, .corners > .c2 {
-    content:''; position:absolute; width:12px; height:12px;
-  }
-  .corners::before { top:0; right:0; border-top:2px solid var(--cyan); border-right:2px solid var(--cyan); }
-  .corners::after  { bottom:0; left:0; border-bottom:2px solid var(--pink); border-left:2px solid var(--pink); }
+  /* NEON BORDER */
+  .neon-box { border:1px solid var(--line); box-shadow:var(--glow-c), inset 0 0 30px rgba(0,212,255,0.03); animation:pulse-cyan 3s ease-in-out infinite; }
+  .neon-box-pk { border:1px solid var(--line-pk); box-shadow:var(--glow-p), inset 0 0 30px rgba(255,45,138,0.03); animation:pulse-pink 3s ease-in-out infinite; }
 
   /* Section label */
   .slabel {
@@ -204,6 +189,16 @@ const CSS = `
   }
   .slabel::before { content:'//'; color:var(--pink); }
 
+  /* Cart badge */
+  .cart-badge {
+    position:absolute; top:-6px; left:-6px;
+    min-width:18px; height:18px; border-radius:9px;
+    background:var(--pink); color:white;
+    font-size:10px; font-weight:900; font-family:'Orbitron',monospace;
+    display:flex; align-items:center; justify-content:center; padding:0 4px;
+    box-shadow:0 0 8px rgba(255,45,138,0.7);
+  }
+
   /* Responsive */
   .nav-links  { display:flex; align-items:center; gap:24px; }
   .nav-toggle { display:none; }
@@ -212,11 +207,12 @@ const CSS = `
   .trust-bar  { display:grid; grid-template-columns:repeat(4,1fr); }
   .footer-g   { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; }
   .details-g  { display:grid; grid-template-columns:1fr 1fr; }
-  .details-L  { padding:20px 0;position:sticky; top:70px; height:calc(100vh - 70px); overflow:hidden; }
+  .details-L  { padding:20px 0; position:sticky; top:70px; height:calc(100vh - 70px); overflow:hidden; }
   .details-R  { padding:20px 32px; overflow-y:auto; }
   .contact-g  { display:grid; grid-template-columns:1fr 1fr; gap:48px; }
   .form-2c    { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .dlv-2c     { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .cart-g     { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
 
   @media (max-width:1100px) {
     .prod-grid { grid-template-columns:repeat(3,1fr); }
@@ -230,9 +226,10 @@ const CSS = `
     .trust-bar  { grid-template-columns:repeat(2,1fr); }
     .footer-g   { grid-template-columns:1fr 1fr; gap:24px; }
     .details-g  { grid-template-columns:1fr; }
-    .details-L  { padding: 0; position: static; width: 100%; height:auto;aspect-ratio: 1; margin-buttom: 200px ; display: flex ;flex-direction: column; gap:20px;}
-    .details-R  { padding:20px 0px; }
+    .details-L  { padding:0; position:static; width:100%; height:auto; aspect-ratio:1; margin-bottom:20px; display:flex; flex-direction:column; gap:20px; }
+    .details-R  { padding:20px 0; }
     .contact-g  { grid-template-columns:1fr; gap:28px; }
+    .cart-g     { grid-template-columns:1fr; }
   }
   @media (max-width:480px) {
     .prod-grid  { grid-template-columns:repeat(2,1fr); gap:8px; }
@@ -255,7 +252,7 @@ export interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
   variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-  store: { id: string; name: string; subdomain: string; userId: string; };
+  store: { id: string; name: string; subdomain: string; userId: string; cart: boolean; };
 }
 export interface ProductFormProps {
   product: Product; userId: string; domain: string; redirectPath?: string;
@@ -281,13 +278,12 @@ function NeonDivider({ color = 'cyan' }: { color?: 'cyan' | 'pink' }) {
 }
 
 /* ── MAIN ───────────────────────────────────────────────────── */
-export default function Main({ store, children }: any) {
+export default function Main({ store, children, domain }: any) {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--navy)' }} className="hex-bg">
       <style>{CSS}</style>
-      {/* Scan line effect */}
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(to right,transparent,var(--cyan),transparent)', opacity: 0.4, pointerEvents: 'none', zIndex: 9999, animation: 'scan-line 8s linear infinite' }} />
-      <Navbar store={store} />
+      <Navbar store={store} domain={domain} />
       <main>{children}</main>
       <Footer store={store} />
     </div>
@@ -295,104 +291,159 @@ export default function Main({ store, children }: any) {
 }
 
 /* ── NAVBAR ─────────────────────────────────────────────────── */
-export function Navbar({ store }: { store: Store }) {
+export function Navbar({ store, domain }: { store: any, domain: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [listSearch, setListSearch] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const itemsCartCount = useCartStore((state) => state.count);
+  const initCount = useCartStore((state) => state.initCount);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && domain) {
+      try {
+        const stored = localStorage.getItem(domain);
+        const items = JSON.parse(stored || '[]');
+        initCount(Array.isArray(items) ? items.length : 0);
+      } catch { initCount(0); }
+    }
+  }, [domain, initCount]);
+
+  useEffect(() => {
+    if (searchQuery.length < 2) { setListSearch([]); return; }
+    const t = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const { data } = await axios.get(`${API_URL}/products/public/${domain}`, { params: { search: searchQuery } });
+        setListSearch(data.products || []);
+      } catch { } finally { setLoading(false); }
+    }, 400);
+    return () => clearTimeout(t);
+  }, [searchQuery, domain]);
+
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`https://${domain}/?search=${encodeURIComponent(searchQuery)}`);
+      setListSearch([]); setShowSearch(false);
+    }
+  };
 
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 8);
-    window.addEventListener('scroll', h); return () => window.removeEventListener('scroll', h);
+    window.addEventListener('scroll', h);
+    return () => window.removeEventListener('scroll', h);
   }, []);
 
-  const links = [
-    { href: `/`, label: 'المتجر' },
-    { href: `/contact`, label: 'تواصل معنا' },
-    { href: `/Privacy`, label: 'الخصوصية' },
-  ];
+  const DropdownResults = () => (
+    <div style={{ position: 'absolute', top: '100%', right: 0, left: 0, background: 'rgba(10,22,40,0.98)', border: '1px solid var(--line)', borderRadius: '0 0 8px 8px', zIndex: 100, boxShadow: '0 10px 30px rgba(0,0,0,0.5)', marginTop: '4px', overflow: 'hidden' }}>
+      {loading
+        ? <div style={{ padding: '15px', color: 'var(--cyan)', textAlign: 'center', fontSize: '12px' }}>جاري البحث...</div>
+        : listSearch.length > 0 ? listSearch.map((p: any) => (
+          <Link href={`/product/${p.id}`} key={p.id} onClick={() => setSearchQuery('')}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px', borderBottom: '1px solid rgba(255,255,255,0.05)', textDecoration: 'none' }}>
+            <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} style={{ width: '40px', height: '40px', borderRadius: '4px', objectFit: 'cover', border: '1px solid var(--line)' }} alt="" />
+            <div style={{ flex: 1 }}>
+              <div style={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}>{p.name}</div>
+              <div style={{ color: 'var(--cyan)', fontSize: '11px' }}>{p.price} دج</div>
+            </div>
+          </Link>
+        )) : searchQuery.length >= 2 && (
+          <div style={{ padding: '15px', color: 'var(--mid)', textAlign: 'center', fontSize: '12px' }}>لا توجد نتائج</div>
+        )
+      }
+    </div>
+  );
 
   return (
-    <nav dir="rtl" style={{
-      position: 'sticky', top: 0, zIndex: 50,
-      background: scrolled ? 'rgba(5,11,26,0.97)' : 'rgba(5,11,26,0.85)',
-      backdropFilter: 'blur(20px)',
-      borderBottom: '1px solid var(--line)',
-      boxShadow: scrolled ? '0 4px 24px rgba(0,212,255,0.1)' : 'none',
-      transition: 'all 0.3s',
-    }}>
-      {/* Ticker */}
-      {store.topBar?.enabled && store.topBar?.text && (
-        <div style={{ overflow: 'hidden', whiteSpace: 'nowrap', padding: '6px 0', background: 'linear-gradient(90deg,var(--navy-2),var(--navy-3),var(--navy-2))', borderBottom: '1px solid var(--line)' }}>
-          <div style={{ display: 'inline-block', animation: 'ticker 20s linear infinite' }}>
-            {Array(10).fill(null).map((_, i) => (
-              <span key={i} style={{ fontFamily: "'Tajawal',sans-serif", fontSize: '12px', fontWeight: 700, color: 'var(--cyan)', margin: '0 32px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                <Zap style={{ width: '11px', height: '11px' }} /> {store.topBar.text} <Zap style={{ width: '11px', height: '11px' }} />
-              </span>
-            ))}
-            {Array(10).fill(null).map((_, i) => (
-              <span key={`b${i}`} style={{ fontFamily: "'Tajawal',sans-serif", fontSize: '12px', fontWeight: 700, color: 'var(--cyan)', margin: '0 32px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                <Zap style={{ width: '11px', height: '11px' }} /> {store.topBar.text} <Zap style={{ width: '11px', height: '11px' }} />
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
+    <nav dir="rtl" style={{ position: 'sticky', top: 0, zIndex: 50, background: scrolled ? 'rgba(5,11,26,0.97)' : 'rgba(5,11,26,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--line)', transition: 'all 0.3s' }}>
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '15px' }}>
 
         {/* Logo */}
-        <Link href={`/`} style={{ textDecoration: 'none', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {store.design?.logoUrl
-            ? <img src={store.design.logoUrl} alt={store.name} style={{ height: '36px', width: 'auto' }} />
-            : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ width: '36px', height: '36px', border: '1px solid var(--cyan)', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--glow-c)', position: 'relative' }}>
-                  <Gamepad2 style={{ width: '18px', height: '18px', color: 'var(--cyan)' }} />
-                  <div style={{ position: 'absolute', top: '-4px', right: '-4px', width: '8px', height: '8px', backgroundColor: 'var(--pink)', borderRadius: '50%', boxShadow: 'var(--glow-p)' }} />
-                </div>
-                <div>
-                  <span className="orb" style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--white)', letterSpacing: '0.05em', display: 'block', lineHeight: 1 }}>
-                    <span className="neon-cyan">{store.name.split(' ')[0]}</span>
-                    {store.name.split(' ').slice(1).length > 0 && (
-                      <span className="neon-pink"> {store.name.split(' ').slice(1).join(' ')}</span>
-                    )}
-                  </span>
-                </div>
-              </div>
-            )
+        <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
+          {store?.design?.logoUrl
+            ? <img src={store.design.logoUrl} style={{ height: '32px' }} alt={store.name} />
+            : <span className="neon-cyan orb" style={{ fontWeight: 900, fontSize: '1.1rem' }}>{store?.name}</span>
           }
         </Link>
 
-        {/* Desktop links */}
-        <div className="nav-links">
-          {links.map(l => (
-            <Link key={l.href} href={l.href}
-              style={{ fontFamily: "'Tajawal',sans-serif", fontSize: '14px', fontWeight: 600, color: 'var(--mid)', textDecoration: 'none', transition: 'color 0.2s, text-shadow 0.2s', letterSpacing: '0.02em' }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--cyan)'; el.style.textShadow = '0 0 8px rgba(0,212,255,0.6)'; }}
-              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--mid)'; el.style.textShadow = 'none'; }}>
-              {l.label}
-            </Link>
-          ))}
-          <a href="#products" className="btn-cyan" style={{ padding: '9px 22px', fontSize: '13px' }}>
-            <Gamepad2 style={{ width: '14px', height: '14px' }} /> تسوق الآن
-          </a>
+        {/* Desktop Search */}
+        <div className="nav-links" style={{ flex: 1, maxWidth: '400px', position: 'relative' }}>
+          <form onSubmit={handleSearchSubmit} style={{ width: '100%', position: 'relative' }}>
+            <input type="text" placeholder="ابحث عن منتج..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+              style={{ width: '100%', padding: '8px 35px 8px 15px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--line)', color: '#fff', outline: 'none', fontFamily: "'Tajawal',sans-serif" }} />
+            <Search size={14} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--cyan)' }} />
+          </form>
+          {searchQuery.length >= 2 && <DropdownResults />}
         </div>
 
-        <button className="nav-toggle" onClick={() => setOpen(p => !p)} style={{ background: 'transparent', border: '1px solid var(--line)', cursor: 'pointer', color: 'var(--cyan)', padding: '8px', borderRadius: '4px', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          {open ? <X style={{ width: '18px', height: '18px' }} /> : <Menu style={{ width: '18px', height: '18px' }} />}
-        </button>
-      </div>
+        {/* Desktop Links */}
+        <div className="nav-links" style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <Link href="/" style={{ color: 'var(--mid)', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>المتجر</Link>
+          <Link href="/contact" style={{ color: 'var(--mid)', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>تواصل معنا</Link>
+          {/* Cart Icon */}
+          <Link href="/cart" style={{ position: 'relative', color: 'var(--mid)', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '38px', height: '38px', border: '1px solid var(--line)', borderRadius: '6px', transition: 'all 0.2s' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--cyan)'; (e.currentTarget as HTMLElement).style.color = 'var(--cyan)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--line)'; (e.currentTarget as HTMLElement).style.color = 'var(--mid)'; }}>
+            <ShoppingCart size={18} />
+            {itemsCartCount > 0 && <span className="cart-badge">{itemsCartCount}</span>}
+          </Link>
+          <a href="#products" className="btn-cyan" style={{ padding: '8px 18px', fontSize: '12px' }}>تسوق الآن</a>
+        </div>
 
-      {/* Mobile menu */}
-      <div style={{ maxHeight: open ? '260px' : '0', overflow: 'hidden', transition: 'max-height 0.3s ease', borderTop: open ? '1px solid var(--line)' : 'none', background: 'rgba(5,11,26,0.98)' }}>
-        <div style={{ padding: '10px 20px 18px' }}>
-          {links.map(l => (
-            <Link key={l.href} href={l.href} onClick={() => setOpen(false)}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', fontSize: '15px', fontWeight: 700, color: 'var(--mid)', textDecoration: 'none', borderBottom: '1px solid var(--line)' }}>
-              {l.label} <ArrowRight style={{ width: '14px', height: '14px', color: 'var(--cyan)' }} />
-            </Link>
-          ))}
+        {/* Mobile Toggle */}
+        <div style={{ display: 'none', gap: '10px' }} className="mobile-only-flex">
+          {/* Mobile Cart */}
+          <Link href="/cart" style={{ position: 'relative', background: 'none', border: '1px solid var(--line)', borderRadius: '6px', color: 'var(--cyan)', width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
+            <ShoppingCart size={20} />
+            {itemsCartCount > 0 && <span className="cart-badge">{itemsCartCount}</span>}
+          </Link>
+          <button onClick={() => setShowSearch(!showSearch)} style={{ background: 'none', border: 'none', color: 'var(--cyan)', cursor: 'pointer' }}><Search size={22} /></button>
+          <button onClick={() => setOpen(!open)} style={{ background: 'none', border: 'none', color: 'var(--cyan)', cursor: 'pointer' }}>{open ? <X size={24} /> : <Menu size={24} />}</button>
         </div>
       </div>
+
+      {/* Mobile Search */}
+      {showSearch && (
+        <div style={{ padding: '10px 20px', background: 'var(--navy-2)', borderTop: '1px solid var(--line)', position: 'relative' }}>
+          <form onSubmit={handleSearchSubmit}>
+            <input autoFocus type="text" placeholder="ابحث هنا..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+              style={{ width: '100%', padding: '12px 40px', borderRadius: '8px', background: '#000', border: '1px solid var(--cyan)', color: '#fff', fontFamily: "'Tajawal',sans-serif" }} />
+            <Search size={18} style={{ position: 'absolute', right: '30px', top: '50%', transform: 'translateY(-50%)', color: 'var(--cyan)' }} />
+          </form>
+          {searchQuery.length >= 2 && <DropdownResults />}
+        </div>
+      )}
+
+      {/* Mobile Menu */}
+      <div style={{ maxHeight: open ? '240px' : '0', overflow: 'hidden', transition: 'all 0.3s', background: 'var(--navy-2)' }}>
+        <div style={{ padding: '10px 20px' }}>
+          <Link href="/" onClick={() => setOpen(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', color: '#fff', textDecoration: 'none', borderBottom: '1px solid var(--line)', fontSize: '15px' }}>
+            المتجر <ArrowRight size={14} style={{ color: 'var(--cyan)' }} />
+          </Link>
+          <Link href="/cart" onClick={() => setOpen(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', color: '#fff', textDecoration: 'none', borderBottom: '1px solid var(--line)', fontSize: '15px' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <ShoppingCart size={16} style={{ color: 'var(--cyan)' }} /> السلة
+              {itemsCartCount > 0 && <span style={{ background: 'var(--pink)', color: 'white', fontSize: '10px', fontWeight: 900, padding: '1px 7px', borderRadius: '10px' }}>{itemsCartCount}</span>}
+            </span>
+            <ArrowRight size={14} style={{ color: 'var(--cyan)' }} />
+          </Link>
+          <Link href="/contact" onClick={() => setOpen(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', color: '#fff', textDecoration: 'none', fontSize: '15px' }}>
+            تواصل معنا <ArrowRight size={14} style={{ color: 'var(--cyan)' }} />
+          </Link>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @media (max-width: 991px) {
+          .nav-links { display: none !important; }
+          .mobile-only-flex { display: flex !important; }
+        }
+      `}</style>
     </nav>
   );
 }
@@ -400,118 +451,52 @@ export function Navbar({ store }: { store: Store }) {
 /* ── FOOTER ─────────────────────────────────────────────────── */
 export function Footer({ store }: any) {
   const yr = new Date().getFullYear();
-  // لون النيون الموحد
   const cyan = 'var(--cyan)';
   const pink = 'var(--pink)';
-
   return (
-    <footer dir="rtl" style={{
-      backgroundColor: 'var(--navy-3)', // أغمق قليلاً ليعطي عمقاً
-      borderTop: `2px solid var(--line)`,
-      fontFamily: "'Tajawal',sans-serif",
-      marginTop: '80px',
-      position: 'relative',
-      overflow: 'hidden'
-    }}>
-      {/* تأثير إضاءة خفيفة في زاوية الفوتر */}
+    <footer dir="rtl" style={{ backgroundColor: 'var(--navy-3)', borderTop: '2px solid var(--line)', fontFamily: "'Tajawal',sans-serif", marginTop: '80px', position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', bottom: 0, left: 0, width: '300px', height: '300px', background: `radial-gradient(circle, ${cyan}05 0%, transparent 70%)`, pointerEvents: 'none' }} />
-
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '60px 20px 30px' }}>
-        <div className="footer-grid" style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '40px',
-          paddingBottom: '40px',
-          borderBottom: '1px solid var(--line)'
-        }}>
-
-          {/* القسم الأول: الشعار والوصف */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '40px', paddingBottom: '40px', borderBottom: '1px solid var(--line)' }}>
           <div style={{ gridColumn: 'span 2' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <div style={{ padding: '8px', border: `1px solid ${cyan}`, borderRadius: '4px', background: `${cyan}05` }}>
                 <Gamepad2 style={{ width: '24px', height: '24px', color: cyan }} />
               </div>
               <span className="orb" style={{ fontSize: '1.4rem', fontWeight: 900, letterSpacing: '0.05em' }}>
-                <span style={{ color: cyan, textShadow: `0 0 10px ${cyan}40` }}>{store.name.split(' ')[0]}</span>
-                {store.name.split(' ').slice(1).length > 0 && (
-                  <span style={{ color: pink, textShadow: `0 0 10px ${pink}40` }}> {store.name.split(' ').slice(1).join(' ')}</span>
+                <span style={{ color: cyan, textShadow: `0 0 10px ${cyan}40` }}>{store?.name?.split(' ')[0]}</span>
+                {store?.name?.split(' ').slice(1).length > 0 && (
+                  <span style={{ color: pink, textShadow: `0 0 10px ${pink}40` }}> {store?.name?.split(' ').slice(1).join(' ')}</span>
                 )}
               </span>
             </div>
-            <p style={{ fontSize: '15px', lineHeight: '1.8', color: 'var(--mid)', maxWidth: '300px', fontWeight: 400 }}>
-              {store.hero?.subtitle?.substring(0, 80) || 'وجهتك الأولى لعالم الألعاب والاحتراف في الجزائر. جودة أصلية وتوصيل سريع.'}
+            <p style={{ fontSize: '15px', lineHeight: '1.8', color: 'var(--mid)', maxWidth: '300px' }}>
+              {store?.hero?.subtitle?.substring(0, 80) || 'وجهتك الأولى لعالم الألعاب والاحتراف في الجزائر. جودة أصلية وتوصيل سريع.'}
             </p>
-
-            {/* أيقونات التواصل الاجتماعي أو الألعاب */}
             <div style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
               {['🎮', '🕹️', '👾', '🔥'].map((e, i) => (
-                <div key={i} style={{
-                  width: '36px', height: '36px',
-                  border: '1px solid var(--line)',
-                  borderRadius: '6px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '16px',
-                  background: 'rgba(255,255,255,0.02)',
-                  transition: '0.3s'
-                }}
-                  onMouseEnter={e => e.currentTarget.style.borderColor = cyan}
-                  onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--line)'}
-                >{e}</div>
+                <div key={i} style={{ width: '36px', height: '36px', border: '1px solid var(--line)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', background: 'rgba(255,255,255,0.02)', transition: '0.3s', cursor: 'default' }}
+                  onMouseEnter={el => (el.currentTarget as HTMLElement).style.borderColor = cyan}
+                  onMouseLeave={el => (el.currentTarget as HTMLElement).style.borderColor = 'var(--line)'}>
+                  {e}
+                </div>
               ))}
             </div>
           </div>
-
-          {/* الأقسام الأخرى: الروابط والتواصل */}
           {[
-            {
-              title: 'روابط سريعة', links: [
-                [`/`, 'المتجر'],
-                [`/contact`, 'الدعم الفني'],
-                [`/Privacy`, 'سياسة الخصوصية'],
-                [`/Terms`, 'شروط الاستخدام'],
-              ]
-            },
-            {
-              title: 'تواصل معنا', links: [
-                ['tel:+213550000000', '+213 550 000 000'],
-                ['#', 'الجزائر، أولاد فايت'],
-                ['#', 'مركز الأعمال قرب المسجد'],
-              ]
-            },
+            { title: 'روابط سريعة', links: [['/', 'المتجر'], ['/cart', 'السلة'], ['/contact', 'الدعم الفني'], ['/Privacy', 'سياسة الخصوصية'], ['/Terms', 'شروط الاستخدام']] },
+            { title: 'تواصل معنا', links: [['tel:+213550000000', '+213 550 000 000'], ['#', 'الجزائر، أولاد فايت'], ['#', 'مركز الأعمال قرب المسجد']] },
           ].map(col => (
             <div key={col.title}>
-              <p style={{
-                fontFamily: "'Orbitron',monospace",
-                fontSize: '11px',
-                fontWeight: 800,
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                color: cyan,
-                marginBottom: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <span style={{ width: '4px', height: '4px', backgroundColor: pink, borderRadius: '50%' }} />
+              <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '11px', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase', color: cyan, marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ width: '4px', height: '4px', backgroundColor: pink, borderRadius: '50%', display: 'inline-block' }} />
                 {col.title}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {col.links.map(([href, label]) => (
-                  <a key={label} href={href} style={{
-                    fontSize: '14px',
-                    color: 'var(--mid)',
-                    textDecoration: 'none',
-                    transition: 'all 0.3s ease',
-                    display: 'inline-block'
-                  }}
-                    onMouseEnter={e => {
-                      (e.currentTarget as HTMLElement).style.color = 'white';
-                      (e.currentTarget as HTMLElement).style.transform = 'translateX(-5px)';
-                    }}
-                    onMouseLeave={e => {
-                      (e.currentTarget as HTMLElement).style.color = 'var(--mid)';
-                      (e.currentTarget as HTMLElement).style.transform = 'translateX(0)';
-                    }}>
+                  <a key={label} href={href} style={{ fontSize: '14px', color: 'var(--mid)', textDecoration: 'none', transition: 'all 0.3s', display: 'inline-block' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'white'; (e.currentTarget as HTMLElement).style.transform = 'translateX(-5px)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--mid)'; (e.currentTarget as HTMLElement).style.transform = 'translateX(0)'; }}>
                     {label}
                   </a>
                 ))}
@@ -519,22 +504,9 @@ export function Footer({ store }: any) {
             </div>
           ))}
         </div>
-
-        {/* الجزء السفلي الأخير */}
-        <div style={{
-          paddingTop: '30px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '15px'
-        }}>
-          <p style={{ fontSize: '13px', color: 'var(--dim)', fontWeight: 500 }}>
-            © {yr} <span style={{ color: cyan }}>{store.name}</span>. صُنع بكل شغف للألعاب.
-          </p>
-          <div style={{ display: 'flex', gap: '20px' }}>
-            <span style={{ fontSize: '11px', color: 'var(--dim)', letterSpacing: '1px', textTransform: 'uppercase' }}>Shamsou Gaming Engine 2.0</span>
-          </div>
+        <div style={{ paddingTop: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
+          <p style={{ fontSize: '13px', color: 'var(--dim)' }}>© {yr} <span style={{ color: cyan }}>{store?.name}</span>. صُنع بكل شغف للألعاب.</p>
+          <span style={{ fontSize: '11px', color: 'var(--dim)', letterSpacing: '1px', textTransform: 'uppercase' }}>Gaming Engine 2.0</span>
         </div>
       </div>
     </footer>
@@ -545,114 +517,42 @@ export function Footer({ store }: any) {
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
   const [hov, setHov] = useState(false);
   if (!product || !store) return null;
-
   const price = typeof product.price === 'string' ? parseFloat(product.price) : (product.price as number) || 0;
   const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
-
-  // اللون الموحد (السيان النيوني)
   const brandColor = 'var(--cyan)';
-
   return (
-    <div
-      className="g-card group"
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        backgroundColor: 'var(--navy-3)',
-        border: `1px solid ${hov ? brandColor : 'var(--panel)'}`,
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        position: 'relative',
-        borderRadius: '4px' // لمسة بسيطة لتناسب النمط التقني
-      }}
-    >
-      {/* منطقة الصورة */}
+    <div className="g-card group" onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: 'var(--navy-3)', border: `1px solid ${hov ? brandColor : 'var(--panel)'}`, transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)', position: 'relative', borderRadius: '4px' }}>
       <div className="g-img" style={{ position: 'relative', aspectRatio: '1/1', overflow: 'hidden', backgroundColor: 'var(--navy-2)' }}>
-        {displayImage ? (
-          <img
-            src={displayImage}
-            alt={product.name}
-            className="transition-transform duration-700 group-hover:scale-110"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        ) : (
-          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--navy-3)' }}>
+        {displayImage
+          ? <img src={displayImage} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--navy-3)' }}>
             <Gamepad2 style={{ width: '40px', height: '40px', color: 'var(--dim)' }} />
           </div>
-        )}
-
+        }
         {discount > 0 && (
-          <div style={{
-            position: 'absolute', top: '10px', right: '10px',
-            background: 'var(--pink)', color: 'var(--white)',
-            fontSize: '11px', fontWeight: 900, padding: '3px 10px',
-            borderRadius: '2px', boxShadow: '0 0 10px rgba(255, 0, 128, 0.4)',
-            zIndex: 10
-          }}>
+          <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'var(--pink)', color: 'var(--white)', fontSize: '11px', fontWeight: 900, padding: '3px 10px', borderRadius: '2px', boxShadow: '0 0 10px rgba(255,0,128,0.4)', zIndex: 10 }}>
             -{discount}%
           </div>
         )}
       </div>
-
-      {/* المحتوى */}
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-
-        <h3 style={{
-          fontSize: '14px', fontWeight: 700, color: 'var(--white)',
-          marginBottom: '10px', lineHeight: 1.4,
-          display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any,
-          overflow: 'hidden', minHeight: '2.8em'
-        }}>
+        <h3 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--white)', marginBottom: '10px', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any, overflow: 'hidden', minHeight: '2.8em' }}>
           {product.name}
         </h3>
-
         <div style={{ display: 'flex', gap: '3px', marginBottom: '15px' }}>
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} style={{ width: '11px', height: '11px', fill: i < 4 ? brandColor : 'none', color: brandColor }} />
-          ))}
+          {[...Array(5)].map((_, i) => <Star key={i} style={{ width: '11px', height: '11px', fill: i < 4 ? brandColor : 'none', color: brandColor }} />)}
         </div>
-
-        {/* السعر والزر في الأسفل */}
         <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '15px' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
             <span style={{ fontSize: '1.4rem', fontWeight: 900, color: 'white' }}>
               {price.toLocaleString()}
               <span style={{ fontSize: '12px', fontWeight: 600, color: brandColor, marginRight: '4px' }}>دج</span>
             </span>
-            {orig > price && (
-              <span style={{ fontSize: '12px', color: 'var(--dim)', textDecoration: 'line-through' }}>
-                {orig.toLocaleString()}
-              </span>
-            )}
+            {orig > price && <span style={{ fontSize: '12px', color: 'var(--dim)', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
           </div>
-
-          {/* التعديل هنا: زر واضح دوماً */}
           <Link href={`/product/${product.slug || product.id}`}
-            className="gaming-btn"
-            style={{
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '10px',
-              width: '100%',
-              fontSize: '13px',
-              fontWeight: 800,
-              padding: '14px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-
-              // الحالة العادية: نص سيان واضح مع إطار سيان
-              backgroundColor: hov ? brandColor : 'transparent',
-              color: hov ? 'var(--navy-3)' : brandColor,
-              border: `2px solid ${brandColor}`,
-
-              boxShadow: hov ? `0 0 20px ${brandColor}80` : 'none',
-              transition: 'all 0.25s ease',
-              clipPath: 'polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%)'
-            }}>
+            style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', fontSize: '13px', fontWeight: 800, padding: '14px', textTransform: 'uppercase', letterSpacing: '0.1em', backgroundColor: hov ? brandColor : 'transparent', color: hov ? 'var(--navy-3)' : brandColor, border: `2px solid ${brandColor}`, boxShadow: hov ? `0 0 20px ${brandColor}80` : 'none', transition: 'all 0.25s ease', clipPath: 'polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%)' }}>
             <span style={{ position: 'relative', top: '1px' }}>{viewDetails}</span>
             <ArrowRight style={{ width: '16px', height: '16px' }} />
           </Link>
@@ -663,7 +563,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 }
 
 /* ── HOME ───────────────────────────────────────────────────── */
-export function Home({ store  }: any) {
+export function Home({ store }: any) {
   const products: any[] = store.products || [];
   const cats: any[] = store.categories || [];
 
@@ -676,76 +576,41 @@ export function Home({ store  }: any) {
 
   return (
     <div dir="rtl">
-
       {/* ── HERO ── */}
       <section style={{ position: 'relative', minHeight: '92vh', display: 'flex', alignItems: 'center', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }} className="circuit-bg">
-
-        {/* 1. Background Image - تعديل الـ Opacity والـ Z-index */}
         {store.hero?.imageUrl && (
           <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-            <img
-              src={store.hero.imageUrl}
-              alt=""
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                opacity: 0.4, // زيادة الوضوح قليلاً من 0.15 إلى 0.4
-                display: 'block'
-              }}
-            />
-            {/* طبقة تدرج تضمن قراءة النص دون إخفاء الصورة بالكامل */}
-            <div style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'linear-gradient(to left, rgba(5,11,26,0.95) 30%, rgba(5,11,26,0.4) 100%)'
-            }} />
+            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.4, display: 'block' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to left, rgba(5,11,26,0.95) 30%, rgba(5,11,26,0.4) 100%)' }} />
           </div>
         )}
-
-        {/* 2. Glow Effects - تأثيرات الإضاءة الجانبية */}
         <div style={{ position: 'absolute', top: '-20%', left: '-10%', width: '60vw', height: '60vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 1 }} />
         <div style={{ position: 'absolute', bottom: '-20%', right: '-10%', width: '50vw', height: '50vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,45,138,0.08) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 1 }} />
-
-        {/* 3. Content - المحتوى مع التأكد من رفعه فوق الخلفية */}
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '80px 20px 60px', position: 'relative', zIndex: 10, width: '100%' }}>
-
-          {/* Brand badge */}
           <div className="fu" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', border: '1px solid var(--line)', borderRadius: '4px', padding: '6px 14px', marginBottom: '24px', background: 'rgba(5,11,26,0.8)', backdropFilter: 'blur(4px)' }}>
             <Gamepad2 style={{ width: '14px', height: '14px', color: 'var(--cyan)' }} />
-            <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--cyan)', textTransform: "uppercase" }}>{store.name}</span>
+            <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--cyan)', textTransform: 'uppercase' }}>{store.name}</span>
             <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--pink)', animation: 'pulse-pink 2s ease-in-out infinite' }} />
           </div>
-
-          {/* Main headline */}
           <h1 className="fu fu-1" style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(2.2rem,7vw,5.5rem)', lineHeight: 1.05, marginBottom: '16px', letterSpacing: '-0.01em', textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
             <span className="gold-shimmer">عالم الألعاب</span><br />
             <span style={{ color: 'var(--white)' }}>بين </span>
             <span className="neon-cyan">يديك</span>
           </h1>
-
           <NeonDivider color="cyan" />
-
           <p className="fu fu-2" style={{ fontSize: 'clamp(14px,2vw,18px)', lineHeight: '1.8', color: 'var(--white)', opacity: 0.9, marginBottom: '32px', maxWidth: '520px', fontWeight: 400, textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
             {store.hero?.subtitle || 'كل ما تحتاجه للعب الاحترافي — PS5، Xbox، يدات التحكم، الألعاب وكل الإكسسوارات. توصيل لجميع ولايات الجزائر.'}
           </p>
-
           <div className="fu fu-3" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
             <a href="#products" className="btn-cyan" style={{ fontSize: '15px', padding: '14px 32px', textDecoration: 'none' }}>
               <Gamepad2 style={{ width: '16px', height: '16px' }} /> تسوق الآن
             </a>
-            <a href="#categories" className="btn-ghost-c" style={{ fontSize: '14px', padding: '13px 28px', textDecoration: 'none', border: '1px solid var(--cyan)', color: 'var(--cyan)', borderRadius: '4px' }}>
-              استعرض الفئات <ArrowRight style={{ width: '14px', height: '14px' }} />
-            </a>
+            <Link href="/cart" className="btn-ghost-c" style={{ fontSize: '14px', padding: '13px 28px', textDecoration: 'none' }}>
+              <ShoppingCart style={{ width: '15px', height: '15px' }} /> السلة
+            </Link>
           </div>
-
-          {/* Stats row */}
           <div style={{ display: 'flex', gap: '32px', marginTop: '48px', paddingTop: '32px', borderTop: '1px solid var(--line)', flexWrap: 'wrap' }}>
-            {[
-              { n: `${products.length}+`, l: 'منتج متاح', c: 'var(--cyan)' },
-              { n: '58', l: 'ولاية توصيل', c: 'var(--pink)' },
-              { n: '100%', l: 'منتجات أصيلة', c: 'var(--gold)' },
-            ].map((s, i) => (
+            {[{ n: `${products.length}+`, l: 'منتج متاح', c: 'var(--cyan)' }, { n: '58', l: 'ولاية توصيل', c: 'var(--pink)' }, { n: '100%', l: 'منتجات أصيلة', c: 'var(--gold)' }].map((s, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
                 <p className="orb" style={{ fontSize: '2rem', fontWeight: 900, color: s.c, lineHeight: 1, margin: 0, textShadow: `0 0 16px ${s.c}80` }}>{s.n}</p>
                 <p style={{ fontSize: '12px', color: 'var(--white)', opacity: 0.7, margin: '4px 0 0', fontWeight: 500 }}>{s.l}</p>
@@ -764,7 +629,7 @@ export function Home({ store  }: any) {
                 <div style={{ color: item.color, flexShrink: 0 }}>{item.icon}</div>
                 <div>
                   <p style={{ fontSize: '13px', fontWeight: 700, color: item.color, margin: 0 }}>{item.title}</p>
-                  <p style={{ fontSize: '11px', color: 'var(--mid)', margin: 0, fontWeight: 400 }}>{item.desc}</p>
+                  <p style={{ fontSize: '11px', color: 'var(--mid)', margin: 0 }}>{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -775,154 +640,40 @@ export function Home({ store  }: any) {
       {/* ── CATEGORIES ── */}
       {cats.length > 0 && (
         <section id="categories" style={{ padding: '80px 0', backgroundColor: 'var(--navy-3)', position: 'relative' }} className="circuit-bg">
-
-          {/* تأثير إضاءة خلفية بسيط */}
           <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', height: '1px', background: 'linear-gradient(90deg, transparent, var(--cyan), transparent)', opacity: 0.3 }} />
-
           <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px' }}>
-
-            {/* الرأس: العنوان وزر عرض الكل */}
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '40px' }}>
               <div>
-                <div style={{
-                  display: 'inline-block',
-                  padding: '4px 12px',
-                  backgroundColor: 'rgba(0,212,255,0.1)',
-                  border: '1px solid var(--cyan)',
-                  borderRadius: '4px',
-                  fontSize: '10px',
-                  fontWeight: 800,
-                  color: 'var(--cyan)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.2em',
-                  marginBottom: '12px'
-                }}>
-                  EXPLORE
-                </div>
-                <h2 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(1.8rem,4vw,2.8rem)', color: 'var(--white)', margin: 0, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
-                  تسوق حسب <span className="neon-pink" style={{ textShadow: '0 0 15px var(--pink)40' }}>الفئة</span>
+                <div style={{ display: 'inline-block', padding: '4px 12px', backgroundColor: 'rgba(0,212,255,0.1)', border: '1px solid var(--cyan)', borderRadius: '4px', fontSize: '10px', fontWeight: 800, color: 'var(--cyan)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '12px' }}>EXPLORE</div>
+                <h2 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(1.8rem,4vw,2.8rem)', color: 'var(--white)', margin: 0 }}>
+                  تسوق حسب <span className="neon-pink">الفئة</span>
                 </h2>
               </div>
-
-              <Link href={`/`}
-                className="group"
-                style={{
-                  fontSize: '14px',
-                  fontWeight: 700,
-                  color: 'var(--cyan)',
-                  textDecoration: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  transition: 'all 0.3s ease'
-                }}>
-                <span style={{ borderBottom: '1px solid transparent', transition: '0.3s' }} className="group-hover:border-cyan-400">عرض كل الفئات</span>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid var(--cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.3s' }} className="group-hover:bg-cyan-500/10">
+              <Link href="/" style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cyan)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                عرض كل الفئات
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid var(--cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <ArrowRight style={{ width: '14px', height: '14px' }} />
                 </div>
               </Link>
             </div>
-
-            {/* شبكة الفئات */}
-            <div className="cat-grid" style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-              gap: '20px'
-            }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
               {cats.slice(0, 8).map((cat: any, i: number) => (
                 <Link key={cat.id} href={`?category=${cat.id}`}
-                  className="group"
-                  style={{
-                    position: 'relative',
-                    display: 'block',
-                    textDecoration: 'none',
-                    borderRadius: '12px',
-                    overflow: 'hidden',
-                    border: '1px solid var(--line)',
-                    aspectRatio: '16/10',
-                    backgroundColor: 'var(--panel)',
-                    transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-                  }}
-                  onMouseEnter={e => {
-                    const el = e.currentTarget as HTMLElement;
-                    el.style.borderColor = 'var(--cyan)';
-                    el.style.boxShadow = '0 10px 30px rgba(0,212,255,0.2)';
-                    el.style.transform = 'translateY(-8px) scale(1.02)';
-                  }}
-                  onMouseLeave={e => {
-                    const el = e.currentTarget as HTMLElement;
-                    el.style.borderColor = 'var(--line)';
-                    el.style.boxShadow = 'none';
-                    el.style.transform = 'translateY(0) scale(1)';
-                  }}>
-
-                  {/* خلفية الصورة مع تأثير التكبير */}
+                  style={{ position: 'relative', display: 'block', textDecoration: 'none', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--line)', aspectRatio: '16/10', backgroundColor: 'var(--panel)', transition: 'all 0.4s' }}
+                  onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--cyan)'; el.style.boxShadow = '0 10px 30px rgba(0,212,255,0.2)'; el.style.transform = 'translateY(-8px) scale(1.02)'; }}
+                  onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--line)'; el.style.boxShadow = 'none'; el.style.transform = 'translateY(0) scale(1)'; }}>
                   <div style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
-                    {cat.imageUrl ? (
-                      <img src={cat.imageUrl} alt={cat.name}
-                        className="transition-transform duration-700 group-hover:scale-110 group-hover:rotate-1"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: 0.6 }}
-                      />
-                    ) : (
-                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, var(--navy-3), var(--panel))' }}>
+                    {cat.imageUrl
+                      ? <img src={cat.imageUrl} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: 0.6 }} />
+                      : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, var(--navy-3), var(--panel))' }}>
                         <Gamepad2 style={{ width: '40px', height: '40px', color: 'var(--cyan)', opacity: 0.2 }} />
                       </div>
-                    )}
+                    }
                   </div>
-
-                  {/* تدرج لوني للنص */}
-                  <div style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'linear-gradient(to top, rgba(5,11,26,0.9) 0%, rgba(5,11,26,0.2) 50%, transparent 100%)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-end',
-                    padding: '20px',
-                    zIndex: 2
-                  }}>
-                    <span style={{
-                      fontSize: '18px',
-                      fontWeight: 900,
-                      color: 'var(--white)',
-                      fontFamily: "'Tajawal', sans-serif",
-                      letterSpacing: '0.02em',
-                      textShadow: '0 2px 10px rgba(0,0,0,0.8)'
-                    }}>
-                      {cat.name}
-                    </span>
-                    <div style={{
-                      width: '0%',
-                      height: '2px',
-                      backgroundColor: 'var(--cyan)',
-                      marginTop: '4px',
-                      transition: '0.4s ease',
-                      boxShadow: '0 0 10px var(--cyan)'
-                    }} className="group-hover:w-1/3" />
+                  <div style={{ position: 'absolute', top: 0, right: 0, width: '60px', height: '60px', background: `radial-gradient(circle at top right, ${i % 2 === 0 ? 'var(--cyan)' : 'var(--pink)'}40, transparent 70%)`, zIndex: 1 }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(5,11,26,0.9) 0%, rgba(5,11,26,0.2) 50%, transparent 100%)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '20px', zIndex: 2 }}>
+                    <span style={{ fontSize: '18px', fontWeight: 900, color: 'var(--white)', fontFamily: "'Tajawal',sans-serif" }}>{cat.name}</span>
                   </div>
-
-                  {/* إضاءة الزاوية المتغيرة */}
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    width: '60px',
-                    height: '60px',
-                    background: `radial-gradient(circle at top right, ${i % 2 === 0 ? 'var(--cyan)' : 'var(--pink)'}40, transparent 70%)`,
-                    zIndex: 1
-                  }} />
-
-                  {/* لمسة تقنية (برواز داخلي عند الـ Hover) */}
-                  <div style={{
-                    position: 'absolute',
-                    inset: '10px',
-                    border: `1px solid ${i % 2 === 0 ? 'var(--cyan)' : 'var(--pink)'}`,
-                    opacity: 0,
-                    transition: '0.3s',
-                    pointerEvents: 'none',
-                    borderRadius: '8px'
-                  }} className="group-hover:opacity-20" />
-
                 </Link>
               ))}
             </div>
@@ -940,23 +691,21 @@ export function Home({ store  }: any) {
                 كل <span className="neon-cyan">المنتجات</span>
               </h2>
             </div>
-            <p style={{ fontSize: '13px', color: 'var(--dim)', fontWeight: 500 }}>{products.length} منتج</p>
+            <p style={{ fontSize: '13px', color: 'var(--dim)' }}>{products.length} منتج</p>
           </div>
-
-          {products.length === 0 ? (
-            <div style={{ padding: '80px 0', textAlign: 'center', border: '1px solid var(--line)', borderRadius: '8px', background: 'var(--panel)' }}>
+          {products.length === 0
+            ? <div style={{ padding: '80px 0', textAlign: 'center', border: '1px solid var(--line)', borderRadius: '8px', background: 'var(--panel)' }}>
               <Gamepad2 style={{ width: '56px', height: '56px', color: 'var(--dim)', margin: '0 auto 16px' }} />
               <p style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--mid)' }}>المنتجات قادمة قريباً...</p>
             </div>
-          ) : (
-            <div className="prod-grid">
+            : <div className="prod-grid">
               {products.map((p: any) => {
-                // أضف علامة الاستفهام بعد store وبعد design
-                const img = p.productImage || p.imagesProduct?.[0]?.imageUrl || store?.design?.logoUrl || '/fallback-image.png'; const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
+                const img = p.productImage || p.imagesProduct?.[0]?.imageUrl || store?.design?.logoUrl || '/fallback-image.png';
+                const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
                 return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="عرض المنتج" />;
               })}
             </div>
-          )}
+          }
         </div>
       </section>
 
@@ -970,7 +719,7 @@ export function Home({ store  }: any) {
             <h2 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(1.8rem,5vw,3.5rem)', color: 'var(--white)', lineHeight: 1.05, marginBottom: '16px' }}>
               توصيل <span className="neon-cyan">58 ولاية</span>
             </h2>
-            <p style={{ fontSize: '15px', lineHeight: '1.8', color: 'var(--mid)', marginBottom: '28px', fontWeight: 400 }}>
+            <p style={{ fontSize: '15px', lineHeight: '1.8', color: 'var(--mid)', marginBottom: '28px' }}>
               الجزائر بلدية اولاد فايت بلاطو قرب مسجد ابوبكر الصديق
             </p>
           </div>
@@ -978,7 +727,7 @@ export function Home({ store  }: any) {
             <a href="#products" className="btn-cyan" style={{ fontSize: '14px', padding: '13px 30px' }}>
               <Gamepad2 style={{ width: '15px', height: '15px' }} /> تسوق الآن
             </a>
-            <Link href={`/contact`} className="btn-pink" style={{ fontSize: '14px', padding: '13px 30px', textDecoration: 'none' }}>
+            <Link href="/contact" className="btn-pink" style={{ fontSize: '14px', padding: '13px 30px', textDecoration: 'none' }}>
               <Phone style={{ width: '15px', height: '15px' }} /> تواصل معنا
             </Link>
           </div>
@@ -994,7 +743,6 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
   const [sel, setSel] = useState(0);
   return (
     <div dir="rtl" style={{ backgroundColor: 'var(--navy)' }}>
-      {/* Breadcrumb */}
       <div style={{ borderBottom: '1px solid var(--line)', padding: '11px 20px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--dim)', backgroundColor: 'var(--navy-2)' }}>
         <Link href="/" style={{ textDecoration: 'none', color: 'var(--dim)', transition: 'color 0.2s' }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--cyan)'; }}
@@ -1023,7 +771,6 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             }
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(5,11,26,0.7) 0%, transparent 50%)', pointerEvents: 'none' }} />
             {discount > 0 && <div style={{ position: 'absolute', top: '12px', right: '12px', background: 'var(--pink)', color: 'var(--white)', fontSize: '12px', fontWeight: 800, padding: '4px 12px', borderRadius: '4px', boxShadow: 'var(--glow-p)' }}>-{discount}%</div>}
-            {/* Corner decorations */}
             <span style={{ position: 'absolute', top: '8px', left: '8px', width: '14px', height: '14px', borderTop: '2px solid var(--cyan)', borderLeft: '2px solid var(--cyan)' }} />
             <span style={{ position: 'absolute', bottom: '8px', right: '8px', width: '14px', height: '14px', borderBottom: '2px solid var(--pink)', borderRight: '2px solid var(--pink)' }} />
             {allImages.length > 1 && (
@@ -1057,10 +804,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
         <div className="details-R">
           <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', padding: '24px', marginTop: '24px' }}>
             <div className="slabel" style={{ marginBottom: '10px' }}>تفاصيل المنتج</div>
-            <h1 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(1.4rem,3vw,2.2rem)', color: 'var(--white)', lineHeight: 1.15, marginBottom: '14px' }}>
-              {product.name}
-            </h1>
-
+            <h1 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(1.4rem,3vw,2.2rem)', color: 'var(--white)', lineHeight: 1.15, marginBottom: '14px' }}>{product.name}</h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', paddingBottom: '20px', borderBottom: '1px solid var(--line)', flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', gap: '2px' }}>
                 {[...Array(5)].map((_, i) => <Star key={i} style={{ width: '13px', height: '13px', fill: i < 4 ? 'var(--gold)' : 'none', color: 'var(--gold)' }} />)}
@@ -1137,7 +881,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             {product.desc && (
               <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
                 <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '12px', textTransform: 'uppercase' }}>وصف المنتج</p>
-                <div style={{ fontSize: '14px', lineHeight: '1.8', color: 'var(--mid)', fontWeight: 400 }}
+                <div style={{ fontSize: '14px', lineHeight: '1.8', color: 'var(--mid)' }}
                   dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc, { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'span'], ALLOWED_ATTR: ['class', 'style'] }) }} />
               </div>
             )}
@@ -1167,6 +911,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [fd, setFd] = useState({ customerId: '', customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '', quantity: 1, priceLoss: 0, typeLivraison: 'home' as 'home' | 'office' });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sub, setSub] = useState(false);
+  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
+
+  const initCount = useCartStore((state) => state.initCount);
 
   useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
   useEffect(() => { if (typeof window !== 'undefined') { const id = localStorage.getItem('customerId'); if (id) setFd(p => ({ ...p, customerId: id })); } }, []);
@@ -1185,7 +933,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const getLiv = useCallback((): number => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; }, [selW, fd.typeLivraison]);
   useEffect(() => { if (selW) setFd(f => ({ ...f, priceLoss: selW.livraisonReturn })); }, [selW]);
 
-  const fp = getFP(); 
+  const fp = getFP();
   const total = () => fp * fd.quantity + +getLiv();
   const validate = () => {
     const e: Record<string, string> = {};
@@ -1197,135 +945,513 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   };
   const getVariantDetailId = useCallback(() => {
     if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
-
     return product.variantDetails.find(v => variantMatches(v, selectedVariants))?.id;
   }, [product.variantDetails, selectedVariants]);
+
+  const addToCart = () => {
+    setIsOrderNow(false);
+    setIsAdded(true);
+    const existing = localStorage.getItem(domain);
+    const cart = existing ? JSON.parse(existing) : [];
+    cart.push({
+      ...fd, product, variantDetailId: getVariantDetailId(),
+      productId: product.id, storeId: product.store.id, userId,
+      selectedOffer, selectedVariants,
+      platform: platform || 'store',
+      finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(),
+      addedAt: new Date().getTime(),
+    });
+    localStorage.setItem(domain, JSON.stringify(cart));
+    initCount(cart.length);
+    setTimeout(() => setIsAdded(false), 2000);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); const er = validate(); if (Object.keys(er).length) { setErrors(er); return; } setErrors({}); setSub(true);
-    console.log({ ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
-
     try {
-      await axios.post(`${API_URL}/orders`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVariantDetailId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+      await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVariantDetailId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (typeof window !== 'undefined' && fd.customerId) localStorage.setItem('customerId', fd.customerId);
       router.push(`/lp/${domain}/successfully`);
     } catch (err) { console.error(err); } finally { setSub(false); }
   };
 
   return (
-    <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
-      <form onSubmit={handleSubmit}>
-        <div className="form-2c">
-          <FR error={errors.customerName} label="الاسم">
-            <div style={{ position: 'relative' }}>
-              <User style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
-              <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder="الاسم الكامل"
-                className={`inp${errors.customerName ? ' inp-err' : ''}`} style={{ paddingLeft: '36px' }}
-                onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.customerName ? 'var(--pink)' : 'var(--dim)'; }} />
-            </div>
-          </FR>
-          <FR error={errors.customerPhone} label="الهاتف">
-            <div style={{ position: 'relative' }}>
-              <Phone style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
-              <input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} placeholder="0X XX XX XX XX"
-                className={`inp${errors.customerPhone ? ' inp-err' : ''}`} style={{ paddingLeft: '36px' }}
-                onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.customerPhone ? 'var(--pink)' : 'var(--dim)'; }} />
-            </div>
-          </FR>
-        </div>
-        <div className="form-2c">
-          <FR error={errors.customerWelaya} label="الولاية">
-            <div style={{ position: 'relative' }}>
-              <ChevronDown style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
-              <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}
-                className={`inp${errors.customerWelaya ? ' inp-err' : ''}`} style={{ paddingRight: '34px' }}
-                onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.customerWelaya ? 'var(--pink)' : 'var(--dim)'; }}>
-                <option value="">اختر الولاية</option>
-                {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
-              </select>
-            </div>
-          </FR>
-          <FR error={errors.customerCommune} label="البلدية">
-            <div style={{ position: 'relative' }}>
-              <ChevronDown style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
-              <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })}
-                className={`inp${errors.customerCommune ? ' inp-err' : ''}`} style={{ paddingRight: '34px', opacity: !fd.customerWelaya ? 0.4 : 1 }}
-                onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.customerCommune ? 'var(--pink)' : 'var(--dim)'; }}>
-                <option value="">{loadingC ? '...' : 'اختر البلدية'}</option>
-                {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
-              </select>
-            </div>
-          </FR>
-        </div>
+    <div style={{ direction: 'rtl', marginTop: '20px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
 
-        <FR label="طريقة التوصيل">
-          <div className="dlv-2c">
-            {(['home', 'office'] as const).map(type => (
-              <button key={type} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: type }))}
-                style={{ padding: '12px 10px', border: `1px solid ${fd.typeLivraison === type ? 'var(--cyan)' : 'var(--line)'}`, backgroundColor: fd.typeLivraison === type ? 'rgba(0,212,255,0.06)' : 'transparent', cursor: 'pointer', textAlign: 'right', borderRadius: '6px', transition: 'all 0.2s', boxShadow: fd.typeLivraison === type ? 'var(--glow-c)' : 'none' }}>
-                <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', color: fd.typeLivraison === type ? 'var(--cyan)' : 'var(--mid)', margin: '0 0 4px', textTransform: 'uppercase' }}>
-                  {type === 'home' ? 'للبيت' : 'للمكتب'}
-                </p>
-                {selW && <p className="orb" style={{ fontSize: '1rem', fontWeight: 900, color: fd.typeLivraison === type ? 'var(--cyan)' : 'var(--dim)', margin: 0 }}>
-                  {(type === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()}
-                  <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '11px', marginRight: '3px', color: 'var(--mid)' }}>دج</span>
-                </p>}
+      {/* ── أزرار السلة / الطلب المباشر ── */}
+      {product.store.cart && (
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+          {/* زر إضافة للسلة */}
+          <button onClick={addToCart} disabled={isAdded}
+            className={isAdded ? 'animate-cart' : ''}
+            style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+              padding: '13px', borderRadius: '4px', cursor: isAdded ? 'default' : 'pointer',
+              fontFamily: "'Tajawal',sans-serif", fontSize: '14px', fontWeight: 800,
+              transition: 'all 0.3s ease',
+              border: isAdded ? '1px solid var(--green)' : '1px solid var(--cyan)',
+              backgroundColor: isAdded ? 'rgba(0,255,136,0.08)' : 'transparent',
+              color: isAdded ? 'var(--green)' : 'var(--cyan)',
+              boxShadow: isAdded ? '0 0 16px rgba(0,255,136,0.3)' : 'none',
+            }}>
+            {isAdded ? (
+              <>
+                <CheckCircle2 size={17} className="animate-check" />
+                <span className="animate-check">تمت الإضافة!</span>
+              </>
+            ) : (
+              <>
+                <ShoppingCart size={17} />
+                <span>أضف للسلة</span>
+              </>
+            )}
+          </button>
+
+          {/* زر طلب الآن */}
+          <button onClick={() => setIsOrderNow(true)}
+            style={{
+              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+              padding: '13px', borderRadius: '4px', border: 'none', cursor: 'pointer',
+              fontFamily: "'Tajawal',sans-serif", fontSize: '14px', fontWeight: 800,
+              background: 'linear-gradient(135deg, var(--pink-dk), var(--pink))',
+              color: 'var(--white)', boxShadow: '0 4px 16px rgba(255,45,138,0.3)',
+              transition: 'all 0.25s',
+              clipPath: 'polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)',
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 24px rgba(255,45,138,0.6)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 16px rgba(255,45,138,0.3)'; }}>
+            <Zap size={17} />
+            طلب الآن
+          </button>
+        </div>
+      )}
+
+      {/* ── نموذج الطلب ── */}
+      {(isOrderNow || !product.store.cart) && (
+        <div style={{ animation: 'fadeIn 0.3s ease-in-out' }}>
+          {product.store.cart && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', margin: 0 }}>// بيانات التوصيل</p>
+              <button onClick={() => setIsOrderNow(false)} style={{ background: 'none', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--mid)', cursor: 'pointer', padding: '4px 10px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <X size={12} /> إلغاء
               </button>
-            ))}
-          </div>
-        </FR>
-
-        <FR label="الكمية">
-          <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid var(--line)', borderRadius: '6px', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }}>
-            <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
-              style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderLeft: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.18s' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
-              <Minus style={{ width: '12px', height: '12px' }} />
-            </button>
-            <span className="orb" style={{ width: '44px', textAlign: 'center', fontSize: '1.1rem', fontWeight: 900, color: 'var(--white)' }}>{fd.quantity}</span>
-            <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))}
-              style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderRight: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.18s' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
-              <Plus style={{ width: '12px', height: '12px' }} />
-            </button>
-          </div>
-        </FR>
-
-        {/* Summary */}
-        <div style={{ border: '1px solid var(--line)', borderRadius: '6px', marginBottom: '14px', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }}>
-          <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,212,255,0.05)' }}>
-            <Package style={{ width: '13px', height: '13px', color: 'var(--cyan)' }} />
-            <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.18em', color: 'var(--cyan)', textTransform: 'uppercase' }}>ملخص الطلب</span>
-          </div>
-          {[
-            { l: 'المنتج', v: product.name.slice(0, 22) },
-            { l: 'السعر', v: `${fp.toLocaleString()} دج` },
-            { l: 'الكمية', v: `× ${fd.quantity}` },
-            { l: 'التوصيل', v: selW ? `${getLiv().toLocaleString()} دج` : '—' },
-          ].map(row => (
-            <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 14px', borderBottom: '1px solid var(--line)' }}>
-              <span style={{ fontSize: '12px', color: 'var(--mid)' }}>{row.l}</span>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--white)' }}>{row.v}</span>
             </div>
-          ))}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '12px 14px', background: 'rgba(0,212,255,0.04)' }}>
-            <span style={{ fontSize: '12px', color: 'var(--mid)' }}>المجموع</span>
-            <span className="neon-cyan orb" style={{ fontSize: '1.6rem', fontWeight: 900, letterSpacing: '-0.01em', textShadow: '0 0 12px rgba(0,212,255,0.6)' }}>
-              {total().toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '12px', color: 'var(--mid)' }}>دج</span>
-            </span>
+          )}
+          <form onSubmit={handleSubmit}>
+            <div className="form-2c">
+              <FR error={errors.customerName} label="الاسم">
+                <div style={{ position: 'relative' }}>
+                  <User style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
+                  <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder="الاسم الكامل"
+                    className={`inp${errors.customerName ? ' inp-err' : ''}`} style={{ paddingLeft: '36px' }}
+                    onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.customerName ? 'var(--pink)' : 'var(--dim)'; }} />
+                </div>
+              </FR>
+              <FR error={errors.customerPhone} label="الهاتف">
+                <div style={{ position: 'relative' }}>
+                  <Phone style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
+                  <input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} placeholder="0X XX XX XX XX"
+                    className={`inp${errors.customerPhone ? ' inp-err' : ''}`} style={{ paddingLeft: '36px' }}
+                    onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.customerPhone ? 'var(--pink)' : 'var(--dim)'; }} />
+                </div>
+              </FR>
+            </div>
+            <div className="form-2c">
+              <FR error={errors.customerWelaya} label="الولاية">
+                <div style={{ position: 'relative' }}>
+                  <ChevronDown style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
+                  <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}
+                    className={`inp${errors.customerWelaya ? ' inp-err' : ''}`} style={{ paddingRight: '34px' }}
+                    onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.customerWelaya ? 'var(--pink)' : 'var(--dim)'; }}>
+                    <option value="">اختر الولاية</option>
+                    {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                  </select>
+                </div>
+              </FR>
+              <FR error={errors.customerCommune} label="البلدية">
+                <div style={{ position: 'relative' }}>
+                  <ChevronDown style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
+                  <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })}
+                    className={`inp${errors.customerCommune ? ' inp-err' : ''}`} style={{ paddingRight: '34px', opacity: !fd.customerWelaya ? 0.4 : 1 }}
+                    onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.customerCommune ? 'var(--pink)' : 'var(--dim)'; }}>
+                    <option value="">{loadingC ? '...' : 'اختر البلدية'}</option>
+                    {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                  </select>
+                </div>
+              </FR>
+            </div>
+
+            <FR label="طريقة التوصيل">
+              <div className="dlv-2c">
+                {(['home', 'office'] as const).map(type => (
+                  <button key={type} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: type }))}
+                    style={{ padding: '12px 10px', border: `1px solid ${fd.typeLivraison === type ? 'var(--cyan)' : 'var(--line)'}`, backgroundColor: fd.typeLivraison === type ? 'rgba(0,212,255,0.06)' : 'transparent', cursor: 'pointer', textAlign: 'right', borderRadius: '6px', transition: 'all 0.2s', boxShadow: fd.typeLivraison === type ? 'var(--glow-c)' : 'none' }}>
+                    <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', color: fd.typeLivraison === type ? 'var(--cyan)' : 'var(--mid)', margin: '0 0 4px', textTransform: 'uppercase' }}>
+                      {type === 'home' ? 'للبيت' : 'للمكتب'}
+                    </p>
+                    {selW && <p className="orb" style={{ fontSize: '1rem', fontWeight: 900, color: fd.typeLivraison === type ? 'var(--cyan)' : 'var(--dim)', margin: 0 }}>
+                      {(type === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()}
+                      <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '11px', marginRight: '3px', color: 'var(--mid)' }}>دج</span>
+                    </p>}
+                  </button>
+                ))}
+              </div>
+            </FR>
+
+            <FR label="الكمية">
+              <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid var(--line)', borderRadius: '6px', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }}>
+                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
+                  style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderLeft: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.18s' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                  <Minus style={{ width: '12px', height: '12px' }} />
+                </button>
+                <span className="orb" style={{ width: '44px', textAlign: 'center', fontSize: '1.1rem', fontWeight: 900, color: 'var(--white)' }}>{fd.quantity}</span>
+                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))}
+                  style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderRight: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.18s' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                  <Plus style={{ width: '12px', height: '12px' }} />
+                </button>
+              </div>
+            </FR>
+
+            {/* Summary */}
+            <div style={{ border: '1px solid var(--line)', borderRadius: '6px', marginBottom: '14px', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }}>
+              <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,212,255,0.05)' }}>
+                <Package style={{ width: '13px', height: '13px', color: 'var(--cyan)' }} />
+                <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.18em', color: 'var(--cyan)', textTransform: 'uppercase' }}>ملخص الطلب</span>
+              </div>
+              {[
+                { l: 'المنتج', v: product.name.slice(0, 22) },
+                { l: 'السعر', v: `${fp.toLocaleString()} دج` },
+                { l: 'الكمية', v: `× ${fd.quantity}` },
+                { l: 'التوصيل', v: selW ? `${getLiv().toLocaleString()} دج` : '—' },
+              ].map(row => (
+                <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 14px', borderBottom: '1px solid var(--line)' }}>
+                  <span style={{ fontSize: '12px', color: 'var(--mid)' }}>{row.l}</span>
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--white)' }}>{row.v}</span>
+                </div>
+              ))}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '12px 14px', background: 'rgba(0,212,255,0.04)' }}>
+                <span style={{ fontSize: '12px', color: 'var(--mid)' }}>المجموع</span>
+                <span className="neon-cyan orb" style={{ fontSize: '1.6rem', fontWeight: 900, letterSpacing: '-0.01em' }}>
+                  {total().toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '12px', color: 'var(--mid)' }}>دج</span>
+                </span>
+              </div>
+            </div>
+
+            <button type="submit" disabled={sub} className="btn-cyan"
+              style={{ width: '100%', justifyContent: 'center', fontSize: '15px', padding: '13px', cursor: sub ? 'not-allowed' : 'pointer', opacity: sub ? 0.7 : 1, clipPath: 'none', borderRadius: '6px' }}>
+              {sub ? '⚡ جاري المعالجة...' : '✅ تأكيد الطلب'}
+            </button>
+            <p style={{ fontSize: '11px', color: 'var(--dim)', textAlign: 'center', marginTop: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+              <Lock style={{ width: '10px', height: '10px', color: 'var(--cyan)' }} /> دفع آمن ومشفر
+            </p>
+          </form>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── CART PAGE ───────────────────────────────────────────────── */
+export function Cart({ domain, store }: { domain: string; store: any }) {
+  const [cartItems, setCartItems] = useState<any[]>([]);
+  const [wilayas, setWilayas] = useState<Wilaya[]>([]);
+  const [communes, setCommunes] = useState<Commune[]>([]);
+  const [loadingC, setLC] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [fd, setFd] = useState({ customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '', typeLivraison: 'home' as 'home' | 'office' });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const initCount = useCartStore((state) => state.initCount);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(domain);
+    if (saved) setCartItems(JSON.parse(saved));
+    if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas);
+  }, [domain, store]);
+
+  useEffect(() => {
+    if (!fd.customerWelaya) { setCommunes([]); return; }
+    setLC(true);
+    fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLC(false); });
+  }, [fd.customerWelaya]);
+
+  const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
+  const getLivPrice = useCallback(() => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; }, [selW, fd.typeLivraison]);
+  const cartTotal = cartItems.reduce((acc, item) => acc + (item.finalPrice * item.quantity), 0);
+  const finalTotal = cartTotal + +getLivPrice();
+
+  const updateCart = (newItems: any[]) => { setCartItems(newItems); localStorage.setItem(domain, JSON.stringify(newItems)); initCount(newItems.length); };
+  const removeItem = (i: number) => updateCart(cartItems.filter((_, idx) => idx !== i));
+  const changeQty = (i: number, delta: number) => { const n = [...cartItems]; n[i].quantity = Math.max(1, n[i].quantity + delta); updateCart(n); };
+
+  const validate = () => {
+    const e: Record<string, string> = {};
+    if (!fd.customerName.trim()) e.name = 'الاسم مطلوب';
+    if (!fd.customerPhone.trim()) e.phone = 'الهاتف مطلوب';
+    if (!fd.customerWelaya) e.welaya = 'الولاية مطلوبة';
+    if (!fd.customerCommune) e.commune = 'البلدية مطلوبة';
+    setErrors(e); return Object.keys(e).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); if (!validate()) return; setSubmitting(true);
+    try {
+      const payload = cartItems.map(item => ({
+        customerName: fd.customerName, customerPhone: fd.customerPhone,
+        customerWelaya: fd.customerWelaya, customerCommune: fd.customerCommune,
+        typeLivraison: fd.typeLivraison, quantity: item.quantity,
+        priceLoss: selW?.livraisonReturn ?? 0, customerId: item.customerId || '',
+        variantDetailId: item.variantDetailId, productId: item.productId,
+        storeId: item.storeId, userId: item.userId,
+        selectedOffer: item.selectedOffer, selectedVariants: item.selectedVariants,
+        platform: item.platform || 'store', finalPrice: item.finalPrice,
+        totalPrice: finalTotal, priceLivraison: +getLivPrice(),
+      }));
+      await axios.post(`${API_URL}/orders/create`, payload);
+      setSuccess(true); localStorage.removeItem(domain); setCartItems([]); initCount(0);
+    } catch (err) { console.error(err); } finally { setSubmitting(false); }
+  };
+
+  /* ── Success ── */
+  if (success) {
+    return (
+      <div dir="rtl" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
+        <div style={{ textAlign: 'center', background: 'var(--panel)', border: '1px solid var(--cyan)', borderRadius: '12px', padding: '60px 40px', boxShadow: 'var(--glow-c)', maxWidth: '480px', width: '100%' }}>
+          <div style={{ width: '80px', height: '80px', borderRadius: '50%', border: '2px solid var(--cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: 'var(--glow-c)', background: 'rgba(0,212,255,0.06)' }}>
+            <CheckCircle2 size={40} style={{ color: 'var(--cyan)' }} />
+          </div>
+          <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--pink)', letterSpacing: '0.2em', marginBottom: '12px', textTransform: 'uppercase' }}>// ORDER CONFIRMED</p>
+          <h2 className="orb" style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--white)', marginBottom: '10px' }}>تم استلام طلبك!</h2>
+          <p style={{ color: 'var(--mid)', fontSize: '14px', lineHeight: '1.7', marginBottom: '28px' }}>شكراً لثقتك. سنتصل بك قريباً لتأكيد الطلب وترتيب التوصيل 🎮</p>
+          <Link href="/" className="btn-cyan" style={{ textDecoration: 'none', justifyContent: 'center' }}>
+            <Gamepad2 size={16} /> العودة للمتجر
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Empty ── */
+  if (cartItems.length === 0) {
+    return (
+      <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
+        <div style={{ textAlign: 'center', background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '12px', padding: '60px 40px', maxWidth: '420px', width: '100%' }}>
+          <ShoppingBag size={56} style={{ color: 'var(--dim)', margin: '0 auto 20px', display: 'block', opacity: 0.5 }} />
+          <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.2em', marginBottom: '10px' }}>// EMPTY CART</p>
+          <h3 className="orb" style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--white)', marginBottom: '16px' }}>السلة فارغة</h3>
+          <p style={{ color: 'var(--mid)', fontSize: '14px', marginBottom: '24px' }}>أضف بعض المنتجات للبدء بالتسوق</p>
+          <Link href="/" className="btn-cyan" style={{ textDecoration: 'none', justifyContent: 'center' }}>
+            <Gamepad2 size={16} /> تسوق الآن
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div dir="rtl" style={{ padding: '32px 20px 80px', maxWidth: '1280px', margin: '0 auto' }}>
+      {/* Header */}
+      <div style={{ marginBottom: '32px' }}>
+        <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--pink)', letterSpacing: '0.2em', marginBottom: '8px', textTransform: 'uppercase' }}>// SHOPPING CART</p>
+        <h1 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(1.8rem,4vw,2.8rem)', color: 'var(--white)', margin: 0 }}>
+          سلة <span className="neon-cyan">التسوق</span>
+        </h1>
+        <NeonDivider color="cyan" />
+      </div>
+
+      <div className="cart-g">
+        {/* ── عمود المنتجات ── */}
+        <div>
+          <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', overflow: 'hidden' }}>
+            {/* Header */}
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--line)', background: 'rgba(0,212,255,0.04)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Package size={18} style={{ color: 'var(--cyan)' }} />
+              <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.16em', color: 'var(--cyan)', textTransform: 'uppercase' }}>منتجاتك ({cartItems.length})</span>
+            </div>
+
+            {/* Items */}
+            {cartItems.map((item, index) => (
+              <div key={index} style={{ display: 'flex', gap: '16px', padding: '18px 20px', borderBottom: '1px solid var(--line)', transition: 'background 0.2s' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.02)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                {/* صورة المنتج */}
+                <div style={{ width: '80px', height: '80px', flexShrink: 0, borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--line)', background: 'var(--navy-2)' }}>
+                  <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage || '/fallback-image.png'} alt={item.product?.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                </div>
+                {/* تفاصيل */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: 'var(--white)', lineHeight: 1.4 }}>{item.product?.name}</h4>
+                  {item.selectedOffer && <p style={{ margin: 0, fontSize: '11px', color: 'var(--mid)' }}>الباقة: {item.selectedOffer}</p>}
+                  <p className="neon-cyan orb" style={{ fontSize: '1.1rem', fontWeight: 900, margin: 0 }}>
+                    {item.finalPrice?.toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '12px', color: 'var(--mid)' }}>دج</span>
+                  </p>
+                  {/* Qty + Delete */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: 'auto' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid var(--line)', borderRadius: '4px', overflow: 'hidden', background: 'var(--navy-3)' }}>
+                      <button onClick={() => changeQty(index, -1)} style={{ width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderLeft: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.15s' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                        <Minus size={12} />
+                      </button>
+                      <span className="orb" style={{ width: '38px', textAlign: 'center', fontSize: '14px', fontWeight: 900, color: 'var(--white)' }}>{item.quantity}</span>
+                      <button onClick={() => changeQty(index, 1)} style={{ width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderRight: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.15s' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                        <Plus size={12} />
+                      </button>
+                    </div>
+                    <button onClick={() => removeItem(index)} style={{ marginRight: 'auto', background: 'transparent', border: '1px solid rgba(255,68,68,0.3)', borderRadius: '4px', color: 'var(--red)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', fontWeight: 600, padding: '5px 10px', transition: 'all 0.2s' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,68,68,0.1)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--red)'; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,68,68,0.3)'; }}>
+                      <Trash2 size={13} /> حذف
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* Subtotal */}
+            <div style={{ padding: '16px 20px', background: 'rgba(0,212,255,0.04)', borderTop: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--mid)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>المجموع الفرعي</span>
+              <span className="neon-cyan orb" style={{ fontSize: '1.3rem', fontWeight: 900 }}>{cartTotal.toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontSize: '12px', fontWeight: 400, color: 'var(--mid)' }}>دج</span></span>
+            </div>
           </div>
         </div>
 
-        <button type="submit" disabled={sub} className="btn-cyan"
-          style={{ width: '100%', justifyContent: 'center', fontSize: '15px', padding: '13px', cursor: sub ? 'not-allowed' : 'pointer', opacity: sub ? 0.7 : 1, clipPath: 'none', borderRadius: '6px' }}>
-          {sub ? '⚡ جاري المعالجة...' : '✅ تأكيد الطلب'}
-        </button>
+        {/* ── عمود التوصيل ── */}
+        <div>
+          <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', overflow: 'hidden' }}>
+            {/* Header */}
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--line)', background: 'rgba(0,212,255,0.04)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Truck size={18} style={{ color: 'var(--cyan)' }} />
+              <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.16em', color: 'var(--cyan)', textTransform: 'uppercase' }}>معلومات التوصيل</span>
+            </div>
 
-        <p style={{ fontSize: '11px', color: 'var(--dim)', textAlign: 'center', marginTop: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
-          <Lock style={{ width: '10px', height: '10px', color: 'var(--cyan)' }} /> دفع آمن ومشفر
-        </p>
-      </form>
+            <form onSubmit={handleSubmit} style={{ padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* الاسم */}
+              <div>
+                <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '6px' }}>الاسم الكامل *</p>
+                <div style={{ position: 'relative' }}>
+                  <User size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
+                  <input type="text" value={fd.customerName} onChange={e => { setFd({ ...fd, customerName: e.target.value }); if (errors.name) setErrors({ ...errors, name: '' }); }}
+                    placeholder="الاسم الكامل" className={`inp${errors.name ? ' inp-err' : ''}`} style={{ paddingLeft: '36px' }}
+                    onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.name ? 'var(--pink)' : 'var(--dim)'; }} />
+                </div>
+                {errors.name && <p style={{ fontSize: '11px', color: 'var(--pink)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}><AlertCircle size={11} /> {errors.name}</p>}
+              </div>
+
+              {/* الهاتف */}
+              <div>
+                <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '6px' }}>رقم الهاتف *</p>
+                <div style={{ position: 'relative' }}>
+                  <Phone size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
+                  <input type="tel" value={fd.customerPhone} onChange={e => { setFd({ ...fd, customerPhone: e.target.value }); if (errors.phone) setErrors({ ...errors, phone: '' }); }}
+                    placeholder="0XXXXXXXXX" className={`inp${errors.phone ? ' inp-err' : ''}`} style={{ paddingLeft: '36px' }}
+                    onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.phone ? 'var(--pink)' : 'var(--dim)'; }} />
+                </div>
+                {errors.phone && <p style={{ fontSize: '11px', color: 'var(--pink)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}><AlertCircle size={11} /> {errors.phone}</p>}
+              </div>
+
+              {/* الولاية + البلدية */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '6px' }}>الولاية *</p>
+                  <div style={{ position: 'relative' }}>
+                    <ChevronDown size={13} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
+                    <select value={fd.customerWelaya} onChange={e => { setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' }); if (errors.welaya) setErrors({ ...errors, welaya: '' }); }}
+                      className={`inp${errors.welaya ? ' inp-err' : ''}`} style={{ paddingRight: '34px' }}
+                      onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.welaya ? 'var(--pink)' : 'var(--dim)'; }}>
+                      <option value="">الولاية</option>
+                      {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                    </select>
+                  </div>
+                  {errors.welaya && <p style={{ fontSize: '11px', color: 'var(--pink)', marginTop: '4px' }}>{errors.welaya}</p>}
+                </div>
+                <div>
+                  <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '6px' }}>البلدية *</p>
+                  <div style={{ position: 'relative' }}>
+                    <ChevronDown size={13} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
+                    <select value={fd.customerCommune} disabled={loadingC || !fd.customerWelaya} onChange={e => { setFd({ ...fd, customerCommune: e.target.value }); if (errors.commune) setErrors({ ...errors, commune: '' }); }}
+                      className={`inp${errors.commune ? ' inp-err' : ''}`} style={{ paddingRight: '34px', opacity: !fd.customerWelaya ? 0.4 : 1 }}
+                      onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.commune ? 'var(--pink)' : 'var(--dim)'; }}>
+                      <option value="">{loadingC ? '...' : !fd.customerWelaya ? 'الولاية أولاً' : 'البلدية'}</option>
+                      {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                    </select>
+                  </div>
+                  {errors.commune && <p style={{ fontSize: '11px', color: 'var(--pink)', marginTop: '4px' }}>{errors.commune}</p>}
+                </div>
+              </div>
+
+              {/* نوع التوصيل */}
+              <div>
+                <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '8px' }}>نوع التوصيل</p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  {(['home', 'office'] as const).map(type => (
+                    <button key={type} type="button" onClick={() => setFd({ ...fd, typeLivraison: type })}
+                      style={{ padding: '13px', borderRadius: '4px', border: `1px solid ${fd.typeLivraison === type ? 'var(--cyan)' : 'var(--line)'}`, background: fd.typeLivraison === type ? 'rgba(0,212,255,0.07)' : 'transparent', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s', boxShadow: fd.typeLivraison === type ? 'var(--glow-c)' : 'none' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 700, color: fd.typeLivraison === type ? 'var(--cyan)' : 'var(--mid)', marginBottom: '4px' }}>
+                        {type === 'home' ? '🏠 للبيت' : '🏢 للمكتب'}
+                      </div>
+                      <div className="orb" style={{ fontSize: '1rem', fontWeight: 900, color: fd.typeLivraison === type ? 'var(--cyan)' : 'var(--dim)' }}>
+                        {selW ? `${(type === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج` : '---'}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* ملخص الحساب */}
+              <div style={{ border: '1px solid var(--line)', borderRadius: '6px', overflow: 'hidden', background: 'var(--navy-3)' }}>
+                <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--line)', background: 'rgba(0,212,255,0.04)' }}>
+                  <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase' }}>// الملخص المالي</span>
+                </div>
+                {[
+                  { l: 'المجموع الفرعي', v: `${cartTotal.toLocaleString()} دج` },
+                  { l: 'رسوم التوصيل', v: getLivPrice() ? `${getLivPrice().toLocaleString()} دج` : '---' },
+                ].map(row => (
+                  <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 14px', borderBottom: '1px solid var(--line)' }}>
+                    <span style={{ fontSize: '12px', color: 'var(--mid)' }}>{row.l}</span>
+                    <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--white)' }}>{row.v}</span>
+                  </div>
+                ))}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '14px', background: 'rgba(0,212,255,0.05)' }}>
+                  <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--mid)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>الإجمالي</span>
+                  <span className="neon-cyan orb" style={{ fontSize: '2rem', fontWeight: 900 }}>
+                    {finalTotal.toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '13px', color: 'var(--mid)' }}>دج</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* زر التأكيد */}
+              <button type="submit" disabled={submitting} className="btn-cyan"
+                style={{ width: '100%', justifyContent: 'center', fontSize: '15px', padding: '14px', cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1, clipPath: 'none', borderRadius: '6px' }}>
+                {submitting
+                  ? <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Loader2 size={18} style={{ animation: 'spin-slow 1s linear infinite' }} /> جاري المعالجة...</span>
+                  : <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={18} /> تأكيد الطلب</span>
+                }
+              </button>
+
+              {/* ضمانات */}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                {[
+                  { icon: <Lock size={11} />, label: 'دفع آمن' },
+                  { icon: <ShieldCheck size={11} />, label: 'بيانات مشفّرة' },
+                  { icon: <BadgeCheck size={11} />, label: 'موثّق ومعتمد' },
+                ].map((b, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: 'var(--dim)' }}>
+                    <span style={{ color: 'var(--cyan)' }}>{b.icon}</span> {b.label}
+                  </div>
+                ))}
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1398,9 +1524,7 @@ export function Cookies() {
       <IB title="كوكيز التحليلات" body="بيانات مجمعة ومجهولة لتحسين المنصة." tag="اختياري" />
       <div style={{ marginTop: '16px', padding: '14px', border: '1px solid var(--line)', borderRadius: '6px', display: 'flex', gap: '10px', alignItems: 'flex-start', background: 'rgba(0,212,255,0.03)' }}>
         <ToggleRight style={{ width: '18px', height: '18px', color: 'var(--cyan)', flexShrink: 0, marginTop: '1px' }} />
-        <p style={{ fontSize: '13px', color: 'var(--mid)', lineHeight: '1.8', margin: 0 }}>
-          يمكنك إدارة تفضيلات الكوكيز من إعدادات المتصفح.
-        </p>
+        <p style={{ fontSize: '13px', color: 'var(--mid)', lineHeight: '1.8', margin: 0 }}>يمكنك إدارة تفضيلات الكوكيز من إعدادات المتصفح.</p>
       </div>
     </Shell>
   );
@@ -1424,14 +1548,13 @@ export function Contact() {
       </div>
 
       <div className="contact-g" style={{ maxWidth: '960px', margin: '0 auto', padding: '40px 20px 80px' }}>
-        {/* Info */}
         <div>
           <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', padding: '24px', boxShadow: 'var(--glow-c)', marginBottom: '12px' }}>
             <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '16px', textTransform: 'uppercase' }}>طرق التواصل</p>
             {[
               { icon: '📞', label: 'الهاتف', val: '+213 550 000 000', href: 'tel:+213550000000' },
               { icon: '📍', label: 'الموقع', val: 'الجزائر بلدية اولاد فايت بلاطو قرب مسجد ابوبكر الصديق', href: undefined },
-              { icon: '🎮', label: 'المتجر', val: 'شامسو قيم — كل ما تحتاجه للعب الاحترافي', href: undefined },
+              { icon: '🎮', label: 'المتجر', val: 'كل ما تحتاجه للعب الاحترافي', href: undefined },
             ].map(item => (
               <a key={item.label} href={item.href || '#'} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '13px 0', borderBottom: '1px solid var(--line)', textDecoration: 'none', transition: 'padding-right 0.25s' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.paddingRight = '8px'; }}
@@ -1445,8 +1568,6 @@ export function Contact() {
               </a>
             ))}
           </div>
-
-          {/* Status widget */}
           <div style={{ background: 'var(--panel)', border: '1px solid var(--cyan)', borderRadius: '8px', padding: '16px 20px', boxShadow: 'var(--glow-c)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--cyan)', animation: 'pulse-cyan 2s ease-in-out infinite' }} />
@@ -1461,7 +1582,6 @@ export function Contact() {
           </div>
         </div>
 
-        {/* Form */}
         <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', padding: '24px' }}>
           <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '20px', textTransform: 'uppercase' }}>أرسل رسالة</p>
           {sent ? (
@@ -1472,10 +1592,7 @@ export function Contact() {
             </div>
           ) : (
             <form onSubmit={e => { e.preventDefault(); setSent(true); }} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {[
-                { label: 'اسمك', type: 'text', key: 'name', ph: 'الاسم الكامل' },
-                { label: 'البريد الإلكتروني', type: 'email', key: 'email', ph: 'بريدك@الإلكتروني' },
-              ].map(f => (
+              {[{ label: 'اسمك', type: 'text', key: 'name', ph: 'الاسم الكامل' }, { label: 'البريد الإلكتروني', type: 'email', key: 'email', ph: 'بريدك@الإلكتروني' }].map(f => (
                 <div key={f.key}>
                   <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.16em', color: 'var(--cyan)', marginBottom: '6px', textTransform: 'uppercase' }}>{f.label}</p>
                   <input type={f.type} value={(form as any)[f.key]} onChange={e => setForm({ ...form, [f.key]: e.target.value })} placeholder={f.ph} required className="inp"

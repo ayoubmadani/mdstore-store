@@ -26,6 +26,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
   const { domain } = await params;
   const store = await getStoreCached(domain);
 
+
   if (!store) return { title: 'Store Not Found' };
 
   // ✅ حل مشكلة الـ TypeScript: تحويل الـ null إلى undefined أو string
@@ -82,7 +83,7 @@ export default async function StoreLayout({ children, params }: LayoutProps) {
       <AddShow storeId={store.id} />
       <div dir={direction}>
         <CustomerTracker pixels={store.pixels} />
-        <Main store={store}>
+        <Main store={store} domain={domain} >
           {children}
         </Main>
       </div>

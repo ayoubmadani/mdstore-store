@@ -2,7 +2,7 @@ import { Store } from '@/types/store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function getStoreByDomain(domain: string, categoryId?: string): Promise<Store | null> {
+export async function getStoreByDomain(domain: string, categoryId?: string , search?:string): Promise<Store | null> {
   if (!API_URL) {
     console.error('❌ API_URL is not defined in environment variables');
     return null;
@@ -14,12 +14,18 @@ export async function getStoreByDomain(domain: string, categoryId?: string): Pro
   }
 
   console.log('🔍 Fetching store for:', domain, categoryId ? `| Category: ${categoryId}` : '');
-
+  console.log({'fetch by search': search});
+  
+  
   try {
     // بناء الرابط باستخدام URLSearchParams لضمان سلامة الـ Query Strings
     const url = new URL(`${API_URL}/stores/domain/${domain}`);
     if (categoryId) {
       url.searchParams.append('categoryId', categoryId);
+    }
+
+    if (search) {
+      url.searchParams.append('search', search);
     }
 
     const response = await fetch(url.toString(), {

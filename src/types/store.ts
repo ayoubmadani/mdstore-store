@@ -5,6 +5,7 @@ export interface Store {
   currency: string;
   language: 'ar' | 'en' | string;
   isActive: boolean;
+  cart:boolean,
   design: {
     primaryColor: string;
     secondaryColor: string;
