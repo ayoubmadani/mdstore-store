@@ -1,48 +1,53 @@
+import axios from 'axios';
 import { Store } from '@/types/store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function getStoreByDomain(domain: string, categoryId?: string , search?:string): Promise<Store | null> {
+export async function getStoreByDomain(
+  domain: string,
+  categoryId?: string,
+  search?: string,
+  page?: string,
+): Promise<Store | null> {
+  
   if (!API_URL) {
-    console.error('❌ API_URL is not defined in environment variables');
+    console.error('❌ API_URL is not defined');
     return null;
   }
 
-  // منع محاولات جلب بيانات لملفات تقنية أو صور (سبب خطأ الـ Digest السابق)
-  if (!domain || domain.includes('.') && !domain.includes('mdstore.top')) {
-     return null;
+  // التحقق من صحة النطاق
+  if (!domain || (domain.includes('.') && !domain.includes('mdstore.top'))) {
+    return null;
   }
 
-  console.log('🔍 Fetching store for:', domain, categoryId ? `| Category: ${categoryId}` : '');
-  console.log({'fetch by search': search});
-  
-  
   try {
-    // بناء الرابط باستخدام URLSearchParams لضمان سلامة الـ Query Strings
-    const url = new URL(`${API_URL}/stores/domain/${domain}`);
-    if (categoryId) {
-      url.searchParams.append('categoryId', categoryId);
-    }
-
-    if (search) {
-      url.searchParams.append('search', search);
-    }
-
-    const response = await fetch(url.toString(), {
-      next: { revalidate: 60 } 
+    const response = await axios.get(`${API_URL}/stores/domain/${domain}`, {
+      params: {
+        categoryId,
+        search,
+        page,
+      },
+      // Axios لا يدعم revalidate الخاص بـ Next.js بشكل افتراضي 
+      // لذا نستخدم headers إذا كنت تعتمد على ISR/SSR من جهة الخادم
+      headers: {
+        'Cache-Control': 'no-cache',
+      },
     });
 
-    if (!response.ok) {
-      console.warn(`⚠️ Store not found for domain: ${domain} (Status: ${response.status})`);
-      return null;
-    }
+    console.log({response});
+    
 
-    const result = await response.json();
+    // Axios يضع البيانات تلقائياً داخل كائن data
+    const result = response.data;
+    
+    // التعامل مع هيكلية الرد (Data Wrapper) حسب الـ JSON الأخير
     const store = result.data || result;
 
     if (!store) return null;
 
-    // تأمين كائن التصميم (Design Object) لمنع انهيار الـ Layout
+    // طباعة البيانات للتأكد من وصول كائن الـ theme
+
+    // دمج الإعدادات الافتراضية للتصميم مع الحفاظ على كائن المتجر كاملاً
     return {
       ...store,
       design: {
@@ -53,7 +58,11 @@ export async function getStoreByDomain(domain: string, categoryId?: string , sea
     };
 
   } catch (error) {
-    console.error('🚨 Fetch Error in getStoreByDomain:', error);
+    if (axios.isAxiosError(error)) {
+      console.warn(`⚠️ Fetch failed: ${error.response?.status} ${error.message}`);
+    } else {
+      console.error('🚨 Unexpected Error:', error);
+    }
     return null;
   }
 }

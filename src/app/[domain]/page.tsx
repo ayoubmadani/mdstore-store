@@ -6,8 +6,8 @@ import { getStoreByDomain } from '@/lib/api';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-const getStoreCached = cache(async (domain: string, category?: string , search? :string) => {
-  return getStoreByDomain(domain, category , search);
+const getStoreCached = cache(async (domain: string, category?: string , search? :string , page?:string ) => {
+  return getStoreByDomain(domain, category , search , page);
 });
 
 // ==========================================
@@ -42,22 +42,23 @@ function StoreInactive({ store }: { store: any }) {
 // ==========================================
 export default async function StorePage(props: {
   params: Promise<{ domain: string }>;
-  searchParams: Promise<{ category?: string ,search:string}>;
+  searchParams: Promise<{ category?: string ,search:string , page:string}>;
 }) {
   const { domain } = await props.params;
   const searchParams = await props.searchParams;
   const category = searchParams.category;
   const search = searchParams.search;
+  const page = searchParams.page
   console.log('-----------------------------------');
   
   console.log({search});
 
-  const store: any = await getStoreCached(domain, category,search);
+  const store: any = await getStoreCached(domain, category,search , page);
 
   if (!store) return <StoreNotFound domain={domain} />;
   if (!store.isActive) return <StoreInactive store={store} />;
 
-  const activeTheme = store?.themeUser?.theme?.slug || 'default';
+  const activeTheme = store?.theme?.slug || 'default';
   const language = store?.language || 'ar';
 
   const SelectedTheme = nextDynamic<any>(
@@ -75,5 +76,5 @@ export default async function StorePage(props: {
     }
   );
 
-  return <SelectedTheme store={store} domain={domain} />;
+  return <SelectedTheme store={store} page={+page} domain={domain} />;
 }

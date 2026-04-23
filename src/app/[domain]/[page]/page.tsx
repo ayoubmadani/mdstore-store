@@ -4,9 +4,11 @@ import dynamic from "next/dynamic";
 import { notFound } from "next/navigation";
 import { use, useMemo } from "react";
 import { useStore } from "@/Hook/store-provider"; 
+import { Store } from "@/types/store";
 
 interface StaticPageProps {
-  page: string;
+  staticPage: string;
+  store:Store
 }
 
 interface ParamsType {
@@ -16,10 +18,14 @@ interface ParamsType {
 export default function PolicyPage({ params }: ParamsType) {
   const { page } = use(params);
   
+  
+  
   // ✅ استخدام التنقيب الآمن (Optional Chaining) مع قيمة افتراضية
   const storeData = useStore();
   const selectTheme = storeData?.theme || 'default';
   const language = storeData?.store.language || 'ar';
+
+  console.log(storeData);
 
   const DynamicStaticPage = useMemo(() => {
     return dynamic<StaticPageProps>(
@@ -55,7 +61,7 @@ export default function PolicyPage({ params }: ParamsType) {
 
   return (
     <main>
-      <DynamicStaticPage page={currentPage} />
+      <DynamicStaticPage staticPage={currentPage}  store={storeData.store} />
     </main>
   );
 }

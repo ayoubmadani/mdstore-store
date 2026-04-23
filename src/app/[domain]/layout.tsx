@@ -62,7 +62,9 @@ export default async function StoreLayout({ children, params }: LayoutProps) {
 
   if (!store) notFound();
 
-  const currentThemeSlug = store?.themeUser?.theme?.slug || 'default';
+  const currentThemeSlug = store?.theme?.slug || 'default';
+  console.log(store.theme);
+  
   const language = store?.language || 'ar';
 
   const Main = dynamic<any>(

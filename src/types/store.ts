@@ -1,4 +1,4 @@
-export interface Store {
+export interface  Store {
   id: string;
   name: string;
   subdomain: string;
