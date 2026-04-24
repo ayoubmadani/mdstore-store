@@ -15,51 +15,47 @@ export async function getStoreByDomain(
     return null;
   }
 
-  // التحقق من صحة النطاق
-  if (!domain || (domain.includes('.') && !domain.includes('mdstore.top'))) {
-    return null;
-  }
+  // التحقق من وجود القيمة فقط، ونترك للـ API قرار التحقق من صحة الدومين
+  if (!domain) return null;
 
   try {
+    // نصيحة: إذا كنت تستدعي هذا من Server Component، يفضل استخدام fetch 
+    // للحصول على ميزات التخزين المؤقت (Caching) الخاصة بـ Next.js.
+    // أما إذا كنت تفضل Axios:
     const response = await axios.get(`${API_URL}/stores/domain/${domain}`, {
       params: {
         categoryId,
         search,
         page,
       },
-      // Axios لا يدعم revalidate الخاص بـ Next.js بشكل افتراضي 
-      // لذا نستخدم headers إذا كنت تعتمد على ISR/SSR من جهة الخادم
-      headers: {
-        'Cache-Control': 'no-cache',
-      },
+      // في Next.js 15/16، الـ Fetching الافتراضي هو dynamic
+      timeout: 10000, // إضافة مهلة زمنية للطلب
     });
 
-    console.log({response});
-    
-
-    // Axios يضع البيانات تلقائياً داخل كائن data
     const result = response.data;
-    
-    // التعامل مع هيكلية الرد (Data Wrapper) حسب الـ JSON الأخير
     const store = result.data || result;
 
     if (!store) return null;
 
-    // طباعة البيانات للتأكد من وصول كائن الـ theme
-
-    // دمج الإعدادات الافتراضية للتصميم مع الحفاظ على كائن المتجر كاملاً
+    // دمج الإعدادات مع معالجة الصور الافتراضية
     return {
       ...store,
       design: {
-        logoUrl: '/default-logo.png',
-        faviconUrl: '/default-logo.png',
-        ...store.design
+        // تأكد من أن الـ Default values لا تظهر إلا إذا كانت القيمة الأصلية null أو undefined
+        ...store.design,
+        logoUrl: store.design?.logoUrl || '/default-logo.png',
+        faviconUrl: store.design?.faviconUrl || '/default-favicon.png',
       }
     };
 
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.warn(`⚠️ Fetch failed: ${error.response?.status} ${error.message}`);
+      // تجنب إظهار 404 كخطأ فادح لأنه طبيعي عند بحث المتصفحات عن ملفات غير موجودة
+      if (error.response?.status === 404) {
+        console.warn(`🏪 Store not found for domain: ${domain}`);
+      } else {
+        console.error(`⚠️ API Error: ${error.response?.status} - ${error.message}`);
+      }
     } else {
       console.error('🚨 Unexpected Error:', error);
     }

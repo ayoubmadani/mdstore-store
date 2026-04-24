@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(req: NextRequest) {
-  const url = req.nextUrl.clone();
+  const url = req.nextUrl; // لا حاجة لـ clone() هنا في البداية
   const path = url.pathname;
 
-  // 1. استثناء الملفات التقنية، الـ API، والملفات ذات الامتدادات (صور، favicon، إلخ)
+  // 1. استثناء الملفات التقنية والملفات الثابتة
   if (
     path.startsWith('/_next') || 
     path.startsWith('/api') || 
@@ -14,48 +14,34 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2. جلب الـ Hostname وتنظيفه بالكامل
-  let hostname = req.headers.get('host')?.toLowerCase() || '';
+  // 2. جلب وتجهيز الـ Hostname
+  const hostname = req.headers.get('host')?.toLowerCase() || '';
   const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'mdstore.top').toLowerCase();
-
-  // تنظيف الـ hostname من الـ www لتوحيد المعالجة
-  // هذا يضمن أن www.shamsougame.site تعامل مثل shamsougame.site
   const searchHostname = hostname.replace('www.', '');
 
-  // 3. تحديد المسار الداخلي (Target)
-  
-  // الحالة أ: الموقع الرئيسي (mdstore.top أو www.mdstore.top)
+  // 3. معالجة الموقع الرئيسي
   if (searchHostname === rootDomain) {
-    // جلب الرابط من متغيرات البيئة أو استخدامه مباشرة
-    const appUrl = process.env.MDSTORE_APP_URL!;
-    
-    // إعادة توجيه المستخدم إلى الموقع الرئيسي (Landing Page / App)
-    return NextResponse.redirect(new URL(appUrl, req.url));
+    const appUrl = process.env.MDSTORE_APP_URL;
+    if (appUrl) {
+      return NextResponse.redirect(new URL(appUrl, req.url));
+    }
+    // إذا لم يتوفر رابط التطبيق، يمكن توجيهه لمسار افتراضي أو تركه يمر
+    return NextResponse.next();
   }
 
-  let storeIdentifier: string;
+  // 4. تحديد هوية المتجر (المعرف)
+  // نستخدم الـ hostname بالكامل (بدون www) كمعرف للمتجر سواء كان فرعياً أو مخصصاً
+  const storeIdentifier = searchHostname;
 
-  // الحالة ب: الدومين الفرعي (user.mdstore.top)
-  if (searchHostname.endsWith(`.${rootDomain}`)) {
-    storeIdentifier = searchHostname;
-  } else {
-    // الحالة ج: الدومين المخصص (custom-domain.com)
-    storeIdentifier = searchHostname;
-  }
-
-  // 4. حماية من الحلقات التكرارية (Loop Protection)
+  // 5. حماية من الحلقات التكرارية (Loop Protection)
   if (path.startsWith(`/${storeIdentifier}`)) {
     return NextResponse.next();
   }
 
-  // 5. التوجيه الداخلي (Rewrite)
-  // إضافة url.search لضمان انتقال الـ Query Params مثل ?category=...
+  // 6. التوجيه الداخلي (Rewrite)
+  // ملاحظة: Next.js يتعامل مع الـ Rewrite داخلياً بشكل أفضل عند تمرير المسار النسبي
+  url.pathname = `/${storeIdentifier}${path}`;
   
-  const targetUrl = new URL(`/${storeIdentifier}${path}${url.search}`, req.url);
-
-  if (process.env.NODE_ENV === "development") {
-    return NextResponse.rewrite(new URL(`http://localhost:3000/${storeIdentifier}${path}${url.search}`, req.url));
-  }
-
-  return NextResponse.rewrite(targetUrl);
+  // الـ search params ستنتقل تلقائياً لأننا عدلنا على كائن url نفسه
+  return NextResponse.rewrite(url);
 }
