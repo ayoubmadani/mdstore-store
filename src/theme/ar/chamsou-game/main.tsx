@@ -531,7 +531,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
       </div>
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <h3 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--white)', marginBottom: '10px', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any, overflow: 'hidden', minHeight: '2.8em' }}>
-          {product.id}
+          {product.name}
         </h3>
         <div style={{ display: 'flex', gap: '3px', marginBottom: '15px' }}>
           {[...Array(5)].map((_, i) => <Star key={i} style={{ width: '11px', height: '11px', fill: i < 4 ? brandColor : 'none', color: brandColor }} />)}
@@ -591,11 +591,33 @@ export function Home({ store, page }: any) {
             <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--cyan)', textTransform: 'uppercase' }}>{store.name}</span>
             <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--pink)', animation: 'pulse-pink 2s ease-in-out infinite' }} />
           </div>
-          <h1 className="fu fu-1" style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(2.2rem,7vw,5.5rem)', lineHeight: 1.05, marginBottom: '16px', letterSpacing: '-0.01em', textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
-            <span className="gold-shimmer">عالم الألعاب</span><br />
-            <span style={{ color: 'var(--white)' }}>بين </span>
-            <span className="neon-cyan">يديك</span>
-          </h1>
+          {
+            store?.hero?.title ? (() => {
+              // تقسيم النص إلى كلمات
+              const words = store.hero.title.split(' ');
+              const third = Math.ceil(words.length / 3);
+
+              // تقسيم الكلمات إلى ثلاث مجموعات
+              const part1 = words.slice(0, third).join(' ');
+              const part2 = words.slice(third, third * 2).join(' ');
+              const part3 = words.slice(third * 2).join(' ');
+
+              return (
+                <h1 className="fu fu-1" style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(2.2rem,7vw,5.5rem)', lineHeight: 1.05, marginBottom: '16px', letterSpacing: '-0.01em', textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
+                  <span className="gold-shimmer">{part1}</span>
+                  {part2 && <><br /><span style={{ color: 'var(--white)' }}>{part2}</span></>}
+                  {part3 && <><br /><span className="neon-cyan">{part3}</span></>}
+                </h1>
+              );
+            })() : (
+              /* العنوان الافتراضي في حال عدم وجود عنوان في المتجر */
+              <h1 className="fu fu-1" style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(2.2rem,7vw,5.5rem)', lineHeight: 1.05, marginBottom: '16px', letterSpacing: '-0.01em', textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
+                <span className="gold-shimmer">عالم الألعاب</span><br />
+                <span style={{ color: 'var(--white)' }}>بين </span>
+                <span className="neon-cyan">يديك</span>
+              </h1>
+            )
+          }
           <NeonDivider color="cyan" />
           <p className="fu fu-2" style={{ fontSize: 'clamp(14px,2vw,18px)', lineHeight: '1.8', color: 'var(--white)', opacity: 0.9, marginBottom: '32px', maxWidth: '520px', fontWeight: 400, textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
             {store.hero?.subtitle || 'كل ما تحتاجه للعب الاحترافي — PS5، Xbox، يدات التحكم، الألعاب وكل الإكسسوارات. توصيل لجميع ولايات الجزائر.'}
@@ -1527,7 +1549,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 }
 /* ── STATIC PAGES ────────────────────────────────────────────── */
-export function StaticPage({ staticPage , store }: { staticPage: string , store : Store}) {
+export function StaticPage({ staticPage, store }: { staticPage: string, store: Store }) {
   const p = staticPage.toLowerCase();
   return <>{p === 'privacy' && <Privacy />}{p === 'terms' && <Terms />}{p === 'cookies' && <Cookies />}{p === 'contact' && <Contact store={store} />}</>;
 }
@@ -1600,15 +1622,15 @@ export function Cookies() {
   );
 }
 
-export function Contact({store}:{store : Store}) {
-  const [form, setForm] = useState({ name: '', email: '', message: '' , phone : ''});
+export function Contact({ store }: { store: Store }) {
+  const [form, setForm] = useState({ name: '', email: '', message: '', phone: '' });
   const [sent, setSent] = useState(false);
 
-  const handleSubmit =async (e:any)=>{
-    e.preventDefault(); 
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
     try {
-      console.log({...form , storeId : store.id});
-      const {data} = await axios.post(`${API_URL}/user/contact-user/message` , {...form , storeId : store.id})
+      console.log({ ...form, storeId: store.id });
+      const { data } = await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id })
       setSent(true);
     } catch (error) {
       alert('حدث خطاء في الارسال يمكن محاولة بعد حين')
@@ -1673,7 +1695,7 @@ export function Contact({store}:{store : Store}) {
             </div>
           ) : (
             <form onSubmit={e => handleSubmit(e)} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {[{ label: 'اسمك', type: 'text', key: 'name', ph: 'الاسم الكامل' }, { label: 'البريد الإلكتروني', type: 'email', key: 'email', ph: 'بريدك@الإلكتروني' } , { label: 'الهاتف', type: 'tel', key: 'phone', ph: '0550000000' }].map(f => (
+              {[{ label: 'اسمك', type: 'text', key: 'name', ph: 'الاسم الكامل' }, { label: 'البريد الإلكتروني', type: 'email', key: 'email', ph: 'بريدك@الإلكتروني' }, { label: 'الهاتف', type: 'tel', key: 'phone', ph: '0550000000' }].map(f => (
                 <div key={f.key}>
                   <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.16em', color: 'var(--cyan)', marginBottom: '6px', textTransform: 'uppercase' }}>{f.label}</p>
                   <input type={f.type} value={(form as any)[f.key]} onChange={e => setForm({ ...form, [f.key]: e.target.value })} placeholder={f.ph} required className="inp"
