@@ -174,7 +174,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     if (e) e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/?search=${encodeURIComponent(searchQuery)}`);
-      setListSearch([]); 
+      setListSearch([]);
       setOpen(false); // إغلاق القائمة في الجوال عند البحث
       setSearchQuery('');
     }
@@ -183,15 +183,15 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   // مكون نتائج البحث المطور
   const SearchResults = () => (
     <div style={{
-      position: 'absolute', 
-      top: '100%', 
-      right: 0, 
+      position: 'absolute',
+      top: '100%',
+      right: 0,
       left: 0,
-      background: '#fff', 
-      border: '1px solid #eee', 
+      background: '#fff',
+      border: '1px solid #eee',
       zIndex: 999, // قيمة عالية جداً لضمان الظهور فوق الصور والمحتوى
-      maxHeight: '350px', 
-      overflowY: 'auto', 
+      maxHeight: '350px',
+      overflowY: 'auto',
       boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
       marginTop: '5px',
       borderRadius: '8px'
@@ -200,10 +200,10 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <div style={{ padding: '1.5rem', textAlign: 'center', color: '#888' }}>جاري البحث...</div>
       ) : listSearch.length > 0 ? (
         listSearch.map((p: any) => (
-          <Link 
-            href={`/product/${p.id}`} 
-            key={p.id} 
-            
+          <Link
+            href={`/product/${p.id}`}
+            key={p.id}
+
             onClick={() => { setSearchQuery(''); setOpen(false); }}
             style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.8rem', borderBottom: '1px solid #f5f5f5', transition: 'background 0.2s' }}
           >
@@ -239,12 +239,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* حقل البحث لسطح المكتب */}
           <div style={{ position: 'relative', width: '250px' }} className="lg-block">
             <form onSubmit={handleSearchSubmit}>
-              <input 
-                type="text" 
-                placeholder="ابحث هنا..." 
-                value={searchQuery} 
+              <input
+                type="text"
+                placeholder="ابحث هنا..."
+                value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.5rem', border: '1px solid #eee', background: '#f8f8f8', borderRadius: '50px', outline: 'none', fontSize: '0.8rem' }} 
+                style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.5rem', border: '1px solid #eee', background: '#f8f8f8', borderRadius: '50px', outline: 'none', fontSize: '0.8rem' }}
               />
               <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} />
             </form>
@@ -273,12 +273,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <div className="anim-fade-in" style={{ position: 'absolute', top: '75px', left: 0, right: 0, background: '#fff', borderBottom: '1px solid #eee', padding: '1.2rem', zIndex: 110 }}>
           <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
             <form onSubmit={handleSearchSubmit}>
-              <input 
-                type="text" 
-                placeholder="ابحث عن منتجات..." 
-                value={searchQuery} 
+              <input
+                type="text"
+                placeholder="ابحث عن منتجات..."
+                value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                style={{ width: '100%', padding: '0.8rem 1rem', border: '1px solid #eee', borderRadius: '8px', background: '#f8f8f8', outline: 'none' }} 
+                style={{ width: '100%', padding: '0.8rem 1rem', border: '1px solid #eee', borderRadius: '8px', background: '#f8f8f8', outline: 'none' }}
               />
             </form>
             {/* عرض نتائج البحث في الجوال مباشرة تحت الحقل */}
@@ -357,7 +357,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div style={{ padding: '1rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
           <h3 style={{ fontSize: '0.95rem', fontWeight: 500, marginBottom: '0.5rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{product.name}</h3>
           <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{color:store.design.primaryColor, fontWeight: 700, fontSize: '1.1rem' }}>{price.toLocaleString()} {store.currency || 'دج'}</span>
+            <span style={{ color: store.design.primaryColor, fontWeight: 700, fontSize: '1.1rem' }}>{price.toLocaleString()} {store.currency || 'دج'}</span>
             {orig > price && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
           </div>
         </div>
@@ -378,38 +378,67 @@ export function Home({ store, page }: any) {
   return (
     <div dir="rtl">
       {/* ── HERO ── */}
-      <section style={{ background: 'var(--bg-alt)', padding: '4rem 1.5rem', textAlign: 'center', borderBottom: '1px solid var(--border-color)' }}>
-        <div className="container anim-fade-in">
-          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', color: store.design.primaryColor, fontWeight: 700, marginBottom: '1rem', letterSpacing: '-1px' }}>
+
+      <section style={{
+        // إضافة طبقة تظليل (Overlay) مع الصورة لتحسين التباين
+        background: store.hero.imageUrl
+          ? `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${store.hero.imageUrl})`
+          : 'var(--bg-alt)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        padding: '6rem 1.5rem', // زيادة الهوامش لإعطاء مساحة أكبر
+        textAlign: 'center',
+        borderBottom: '1px solid var(--border-color)',
+        display: 'flex',
+        alignItems: 'center',
+        minHeight: '400px' // لضمان ظهور الصورة بشكل جيد
+      }}>
+        <div className="container anim-fade-in" style={{ width: '100%' }}>
+          <h1 style={{
+            fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+            // إذا كانت هناك صورة، نستخدم الأبيض للتباين، وإلا نستخدم لون المتجر الأساسي
+            color: store.hero.imageUrl ? '#ffffff' : store.design.primaryColor,
+            fontWeight: 700,
+            marginBottom: '1rem',
+            letterSpacing: '-1px',
+            textShadow: store.hero.imageUrl ? '0 2px 4px rgba(0,0,0,0.3)' : 'none'
+          }}>
             {store.hero?.title?.replace(/<[^>]+>/g, '') || 'مرحباً بك في متجرنا'}
           </h1>
-          <p style={{ fontSize: '1.1rem', color: store.design.secondaryColor, maxWidth: '600px', margin: '0 auto 2rem' }}>
+
+          <p style={{
+            fontSize: '1.2rem',
+            // استخدام لون فاتح جداً فوق الصور لضمان المقروئية
+            color: store.hero.imageUrl ? '#f8f9fa' : store.design.secondaryColor,
+            maxWidth: '600px',
+            margin: '0 auto 2rem',
+            lineHeight: '1.6'
+          }}>
             {store.hero?.subtitle || 'نقدم لك أفضل المنتجات بأعلى جودة وتجربة تسوق بسيطة.'}
           </p>
-          <a href="#products" className="btn-primary" style={{ backgroundColor: store.design.primaryColor }}>استكشف المنتجات</a>
-        </div>
-      </section>
 
-      {/* ── FEATURES ── */}
-      <section style={{ borderBottom: '1px solid var(--border-color)' }}>
-        <div className="container grid-3" style={{ padding: '3rem 1.5rem' }}>
-          {[
-            { icon: <Truck size={20} />, t: 'توصيل سريع', d: 'لجميع الولايات' },
-            { icon: <ShieldCheck size={20} />, t: 'جودة مضمونة', d: 'منتجات أصلية' },
-            { icon: <CheckCircle2 size={20} />, t: 'تسوق آمن', d: 'دفع عند الاستلام' },
-          ].map((item, idx) => (
-            <div key={idx} style={{ textAlign: 'center' }}>
-              <div style={{ display: 'inline-flex', padding: '1rem', background: 'var(--bg-alt)', borderRadius: '50%', marginBottom: '1rem' }}>{item.icon}</div>
-              <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.25rem' }}>{item.t}</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{item.d}</p>
-            </div>
-          ))}
+          <a href="#products"
+            className="btn-primary"
+            style={{
+              backgroundColor: store.design.primaryColor,
+              padding: '0.8rem 2rem',
+              borderRadius: '50px',
+              color: '#fff',
+              textDecoration: 'none',
+              display: 'inline-block',
+              fontWeight: '600'
+            }}>
+            استكشف المنتجات
+          </a>
         </div>
       </section>
 
       {/* ── CATEGORIES ── */}
       {cats.length > 0 && (
+
         <section className="container" style={{ padding: '4rem 1.5rem 0' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '2rem' }}>الفئات</h2>
           <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '1rem' }}>
             {cats.map((cat: any) => (
               <Link key={cat.id} href={`?category=${cat.id}`} className="btn-outline" style={{ whiteSpace: 'nowrap', borderRadius: '50px' }}>
@@ -454,6 +483,22 @@ export function Home({ store, page }: any) {
             })}
           </div>
         )}
+      </section>
+      {/* ── FEATURES ── */}
+      <section style={{ borderBottom: '1px solid var(--border-color)' }}>
+        <div className="container grid-3" style={{ padding: '3rem 1.5rem' }}>
+          {[
+            { icon: <Truck size={20} />, t: 'توصيل سريع', d: 'لجميع الولايات' },
+            { icon: <ShieldCheck size={20} />, t: 'جودة مضمونة', d: 'منتجات أصلية' },
+            { icon: <CheckCircle2 size={20} />, t: 'تسوق آمن', d: 'دفع عند الاستلام' },
+          ].map((item, idx) => (
+            <div key={idx} style={{ textAlign: 'center' }}>
+              <div style={{ display: 'inline-flex', padding: '1rem', background: 'var(--bg-alt)', borderRadius: '50%', marginBottom: '1rem' }}>{item.icon}</div>
+              <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.25rem' }}>{item.t}</h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{item.d}</p>
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );
@@ -767,8 +812,8 @@ export function Contact({ store }: any) {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/user/contact-user/message`, { 
-        ...form, 
+      await axios.post(`${API_URL}/user/contact-user/message`, {
+        ...form,
         storeId: store.id,
         userId: store.userId // إضافة معرف المستخدم لضمان وصول الرسالة
       });
@@ -790,7 +835,7 @@ export function Contact({ store }: any) {
           </div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase' }}>تم الإرسال</h2>
           <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '2rem' }}>شكراً لتواصلك معنا. سنقوم بالرد عليك في أقرب وقت.</p>
-          <button 
+          <button
             onClick={() => { setSent(false); setForm({ name: '', email: '', phone: '', message: '' }); }}
             style={{ background: 'none', border: 'none', borderBottom: '1px solid #000', padding: '0 0 4px 0', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}
           >
@@ -806,43 +851,43 @@ export function Contact({ store }: any) {
           </div>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-            <input 
-              value={form.name} 
-              onChange={e => setForm({ ...form, name: e.target.value })} 
-              style={minimalInputStyle} 
-              type="text" 
-              placeholder="الاسم" 
-              required 
+            <input
+              value={form.name}
+              onChange={e => setForm({ ...form, name: e.target.value })}
+              style={minimalInputStyle}
+              type="text"
+              placeholder="الاسم"
+              required
             />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <input 
-                value={form.phone} 
-                onChange={e => setForm({ ...form, phone: e.target.value })} 
-                style={minimalInputStyle} 
-                type="text" 
-                placeholder="الهاتف" 
-                required 
+              <input
+                value={form.phone}
+                onChange={e => setForm({ ...form, phone: e.target.value })}
+                style={minimalInputStyle}
+                type="text"
+                placeholder="الهاتف"
+                required
               />
-              <input 
-                value={form.email} 
-                onChange={e => setForm({ ...form, email: e.target.value })} 
-                style={minimalInputStyle} 
-                type="email" 
-                placeholder="البريد الإلكتروني" 
-                required 
+              <input
+                value={form.email}
+                onChange={e => setForm({ ...form, email: e.target.value })}
+                style={minimalInputStyle}
+                type="email"
+                placeholder="البريد الإلكتروني"
+                required
               />
             </div>
-            <textarea 
-              value={form.message} 
-              onChange={e => setForm({ ...form, message: e.target.value })} 
-              style={{ ...minimalInputStyle, resize: 'none' }} 
-              rows={5} 
-              placeholder="رسالتك..." 
-              required 
+            <textarea
+              value={form.message}
+              onChange={e => setForm({ ...form, message: e.target.value })}
+              style={{ ...minimalInputStyle, resize: 'none' }}
+              rows={5}
+              placeholder="رسالتك..."
+              required
             ></textarea>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
               style={{
                 background: '#000',

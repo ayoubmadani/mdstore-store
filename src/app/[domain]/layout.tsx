@@ -63,7 +63,7 @@ export default async function StoreLayout({ children, params }: LayoutProps) {
   if (!store) notFound();
 
   const currentThemeSlug = store?.theme?.slug || 'default';
-  console.log(store.theme);
+  console.log(store);
   
   const language = store?.language || 'ar';
 
