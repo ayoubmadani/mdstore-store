@@ -119,14 +119,45 @@ const THEME_CSS = `
     .hero-inner { grid-template-columns: 1fr 1fr; min-height: 100vh; padding: 0 4rem; }
   }
 
+  /* ── Details Section ── */
   .details-inner {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1.5rem;
-    padding: 1.5rem;
+    gap: 1rem;
+    padding: 0.5rem; /* تقليل البادينج الجانبي جداً للجوال */
   }
+
+  /* حاوية المعرض */
+  .gallery-container {
+    position: relative; /* عادٍ (Static/Relative) في الجوال */
+    top: 0;
+    width: 100%;
+  }
+
+  /* حاوية المعلومات */
+  .info-container {
+    background: #fff;
+    border-radius: 14px;
+    padding: 1.25rem; /* بادينج مريح للجوال */
+    border: 1.5px solid #E8E8E8;
+  }
+
   @media (min-width: 768px) {
-    .details-inner { grid-template-columns: 1fr 1fr; gap: 3rem; padding: 2rem; }
+    .details-inner { 
+      grid-template-columns: 1fr 1fr; 
+      gap: 3rem; 
+      padding: 2rem; 
+    }
+
+    .gallery-container {
+      position: sticky; /* ثابت فقط في الشاشات الكبيرة */
+      top: 100px;
+      z-index: 10;
+    }
+
+    .info-container {
+      padding: 1.75rem;
+    }
   }
 
   .form-row-2 {
@@ -280,6 +311,8 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   const count = useCartStore((s) => s.count);
   const initCount = useCartStore((s) => s.initCount);
 
+  const [imgError, setImgError] = useState(false);
+
   useEffect(() => {
     if (typeof window !== 'undefined' && domain) {
       try { const s = localStorage.getItem(domain); initCount(JSON.parse(s || '[]').length); } catch { initCount(0); }
@@ -342,19 +375,38 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
 
+
           {/* Logo */}
-          <Link href="/" style={{ flexShrink: 0 }}>
-            {store?.design?.logoUrl
-              ? <img src={store.design.logoUrl} style={{ height: 32 }} alt="" />
-              : (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <div style={{ width: 28, height: 28, background: '#10B981', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Zap size={16} color="#fff" fill="#fff" />
-                  </div>
-                  <span style={{ fontSize: '1.125rem', fontWeight: 800, color: '#111', letterSpacing: '-0.03em' }}>{store?.name}</span>
+          <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
+            {/* إذا لم يكن هناك رابط، أو حدث خطأ في تحميل الصورة، نعرض اللوجو المستطيل */}
+            {(!store?.design?.logoUrl || imgError) ? (
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{
+                  padding: '0 12px',
+                  height: 36,
+                  background: 'rgb(16, 185, 129)',
+                  color: '#fff',
+                  borderRadius: 8,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '0.85rem',
+                  fontWeight: 800,
+                  flexShrink: 0,
+                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                  whiteSpace: 'nowrap' // لضمان عدم انقسام الاسم
+                }}>
+                  {store?.name?.toUpperCase() || 'SHAMSOU GAME'}
                 </div>
-              )
-            }
+              </div>
+            ) : (
+              <img
+                src={store.design.logoUrl}
+                style={{ height: 34, objectFit: 'contain', display: 'block' }}
+                alt={store?.name}
+                onError={() => setImgError(true)}
+              />
+            )}
           </Link>
 
           {/* Desktop search */}
@@ -687,20 +739,27 @@ export function Home({ store, page }: any) {
 /* ═══════════════════════════════════════════════════════════
    DETAILS
 ═══════════════════════════════════════════════════════════ */
+
 export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
   const [sel, setSel] = useState(0);
 
   return (
     <div dir="rtl" style={{ background: '#F8F8F6', paddingBottom: '4rem' }}>
-      <div className="details-inner" style={{ maxWidth: 1280, margin: '0 auto' }}>
+      <div className="details-inner">
 
-        {/* Gallery */}
-        <div style={{ position: 'sticky', top: 100 }}>
-          <div style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 14, overflow: 'hidden', background: '#F0F0EE', border: '1.5px solid #E8E8E8' }}>
+        {/* 1. قسم المعرض (Gallery) */}
+        <div className="gallery-container">
+          <div style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 14, overflow: 'hidden', background: '#fff', border: '1.5px solid #E8E8E8' }}>
             {allImages[sel]
-              ? <img src={allImages[sel]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ? <img src={allImages[sel]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ShoppingBag size={48} color="#ccc" /></div>}
-            {discount > 0 && <div style={{ position: 'absolute', top: 12, right: 12, background: '#10B981', color: '#fff', padding: '3px 12px', borderRadius: 5, fontSize: 12, fontWeight: 800 }}>{discount}% خصم</div>}
+
+            {discount > 0 && (
+              <div style={{ position: 'absolute', top: 12, right: 12, background: '#10B981', color: '#fff', padding: '3px 12px', borderRadius: 5, fontSize: 12, fontWeight: 800 }}>
+                {discount}% خصم
+              </div>
+            )}
+
             {allImages.length > 1 && (
               <>
                 <button onClick={() => setSel(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 8, background: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.12)' }}><ChevronRight size={18} /></button>
@@ -708,10 +767,11 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               </>
             )}
           </div>
+
           {allImages.length > 1 && (
             <div className="thumb-row">
               {allImages.map((img: string, idx: number) => (
-                <button key={idx} onClick={() => setSel(idx)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 8, overflow: 'hidden', border: `2px solid ${sel === idx ? '#10B981' : '#E8E8E8'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.18s' }}>
+                <button key={idx} onClick={() => setSel(idx)} style={{ flexShrink: 0, width: 55, height: 55, borderRadius: 8, overflow: 'hidden', border: `2px solid ${sel === idx ? '#10B981' : '#E8E8E8'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none' }}>
                   <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
               ))}
@@ -719,20 +779,20 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           )}
         </div>
 
-        {/* Info */}
+        {/* 2. قسم المعلومات (Info) */}
         <div>
-          <div style={{ background: '#fff', borderRadius: 14, padding: '1.75rem', border: '1.5px solid #E8E8E8' }}>
-
-            <h1 style={{ fontSize: 'clamp(1.5rem,4vw,2.25rem)', fontWeight: 800, color: '#111', marginBottom: '0.75rem', lineHeight: 1.2, letterSpacing: '-0.02em' }}>
+          <div className="info-container">
+            <h1 style={{ fontSize: 'clamp(1.5rem,4vw,2.25rem)', fontWeight: 800, color: '#111', marginBottom: '0.75rem', lineHeight: 1.2 }}>
               {product.name}
             </h1>
+
             <div style={{ display: 'flex', gap: 3, marginBottom: '1.25rem' }}>
               {[...Array(5)].map((_, i) => <Star key={i} size={15} style={{ fill: i < 4 ? '#F59E0B' : 'none', color: '#F59E0B' }} />)}
             </div>
 
             {/* Price box */}
             <div style={{ background: '#ECFDF5', border: '1.5px solid #A7F3D0', borderRadius: 10, padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
-              <p style={{ fontSize: '0.75rem', color: '#10B981', fontWeight: 700, marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>السعر</p>
+              <p style={{ fontSize: '0.75rem', color: '#10B981', fontWeight: 700, marginBottom: '0.25rem' }}>السعر</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
                 <span className="price-mono" style={{ fontSize: '2.25rem', fontWeight: 800, color: '#111' }}>{finalPrice.toLocaleString()}</span>
                 <span style={{ fontWeight: 700, color: '#10B981' }}>دج</span>
@@ -743,7 +803,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             {product.offers?.length > 0 && (
               <div style={{ marginBottom: '1.25rem' }}>
                 {product.offers.map((o: any) => (
-                  <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1rem', border: `1.5px solid ${selectedOffer === o.id ? '#10B981' : '#E8E8E8'}`, borderRadius: 10, cursor: 'pointer', marginBottom: '0.5rem', background: selectedOffer === o.id ? 'rgba(230,57,70,0.04)' : 'transparent', transition: 'all 0.18s' }}>
+                  <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1rem', border: `1.5px solid ${selectedOffer === o.id ? '#10B981' : '#E8E8E8'}`, borderRadius: 10, cursor: 'pointer', marginBottom: '0.5rem', background: selectedOffer === o.id ? 'rgba(16,185,129,0.04)' : 'transparent', transition: 'all 0.18s' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
                       <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${selectedOffer === o.id ? '#10B981' : '#ccc'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {selectedOffer === o.id && <div style={{ width: 9, height: 9, borderRadius: '50%', background: '#10B981' }} />}
@@ -763,27 +823,24 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             {/* Attributes */}
             {allAttrs.map((attr: any) => (
               <div key={attr.id} style={{ marginBottom: '1.125rem' }}>
-                <p style={{ fontSize: '0.825rem', fontWeight: 700, color: '#111', marginBottom: '0.625rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{attr.name}</p>
-                {attr.displayMode === 'color' ? (
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    {attr.variants.map((v: any) => (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                        style={{ width: 30, height: 30, borderRadius: '50%', background: v.value, border: 'none', cursor: 'pointer', outline: `2.5px solid ${selectedVariants[attr.name] === v.value ? '#10B981' : 'transparent'}`, outlineOffset: 3, transition: 'outline 0.18s' }} />
-                    ))}
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                    {attr.variants.map((v: any) => (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{
-                        padding: '0.4rem 1rem', border: `1.5px solid ${selectedVariants[attr.name] === v.value ? '#10B981' : '#E8E8E8'}`, borderRadius: 6,
-                        fontSize: '0.85rem', fontWeight: 600,
+                <p style={{ fontSize: '0.825rem', fontWeight: 700, color: '#111', marginBottom: '0.625rem' }}>{attr.name}</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {attr.variants.map((v: any) => (
+                    <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
+                      style={attr.displayMode === 'color' ? {
+                        width: 32, height: 32, borderRadius: '50%', background: v.value, border: '1px solid #eee', cursor: 'pointer',
+                        outline: `2.5px solid ${selectedVariants[attr.name] === v.value ? '#10B981' : 'transparent'}`, outlineOffset: 3
+                      } : {
+                        padding: '0.4rem 1rem', border: `1.5px solid ${selectedVariants[attr.name] === v.value ? '#10B981' : '#E8E8E8'}`,
+                        borderRadius: 8, fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer',
                         color: selectedVariants[attr.name] === v.value ? '#10B981' : '#555',
-                        background: selectedVariants[attr.name] === v.value ? 'rgba(230,57,70,0.05)' : '#fff',
-                        cursor: 'pointer', transition: 'all 0.18s', fontFamily: 'inherit'
-                      }}>{v.name}</button>
-                    ))}
-                  </div>
-                )}
+                        background: selectedVariants[attr.name] === v.value ? 'rgba(16,185,129,0.05)' : '#fff'
+                      }}
+                    >
+                      {attr.displayMode !== 'color' && v.name}
+                    </button>
+                  ))}
+                </div>
               </div>
             ))}
 
@@ -793,7 +850,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             {product.desc && (
               <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #EBEBEB' }}>
                 <div style={{ fontSize: '0.9rem', lineHeight: 1.8, color: '#555' }}
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc, { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'span'], ALLOWED_ATTR: ['class', 'style'] }) }} />
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc) }} />
               </div>
             )}
           </div>
