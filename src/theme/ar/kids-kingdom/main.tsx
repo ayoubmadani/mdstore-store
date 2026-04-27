@@ -6,153 +6,79 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
-  Star, Heart, ShoppingBag, Truck, Shield, Package,
-  ChevronDown, ChevronLeft, ChevronRight, Building2,
-  AlertCircle, Check, X, Infinity, Share2, MapPin, Phone,
-  User, ShieldCheck, Lock, Database, Globe, Bell,
-  CheckCircle2, Scale, CreditCard, Ban,
-  Cookie as CookieIcon, Settings, MousePointer2, ToggleRight,
-  Smile, Gift, Zap, Sparkles, Rainbow, Mail,
-  ArrowRight, Music, Rocket,
-  // ــ أيقونات كانت مفقودة ــ
-  ShoppingCart, Minus, Plus, Loader2, Trash2, BadgeCheck,
-  Search,
+  Star, Heart, ShoppingBag, Truck, ShieldCheck,
+  ChevronDown, ChevronLeft, ChevronRight,
+  AlertCircle, Check, X, Phone, MapPin,
+  CheckCircle2, ArrowRight, Zap,
+  Menu, Search, ShoppingCart, Minus, Plus,
+  Trash2, Loader2, BadgeCheck, Lock, Package,
 } from 'lucide-react';
-import { Store } from '@/types/store';
 import { useCartStore } from '@/store/useCartStore';
 
-// ─────────────────────────────────────────────────────────────
-// CONSTANTS
-// ─────────────────────────────────────────────────────────────
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
-const FONT_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;500;600;700;800;900&display=swap');
+/* ═══════════════════════════════════════════════════════════
+   KIDS THEME CSS — Pure CSS media queries, zero Tailwind responsive
+═══════════════════════════════════════════════════════════ */
+const THEME_CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap');
 
-  *, *::before, *::after { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --sun:       #FFD93D;
-    --sun-dark:  #F4B942;
-    --coral:     #FF6B6B;
-    --coral-dk:  #E85555;
-    --sky:       #4ECDC4;
-    --sky-dk:    #38B2AA;
-    --grape:     #A855F7;
-    --grape-lt:  #C084FC;
-    --mint:      #6EE7B7;
-    --mint-dk:   #34D399;
-    --orange:    #FF9A3C;
-    --blue:      #60A5FA;
-    --pink:      #F472B6;
-    --bg:        #FFFBF0;
-    --card-bg:   #FFFFFF;
-    --text:      #2D2D2D;
-    --text-mid:  #666666;
-    --text-soft: #999999;
-    --border:    #FFE4B5;
-    --shadow:    rgba(255,107,107,0.15);
+    --coral:    #FF6B6B;
+    --coral-dk: #E85555;
+    --sun:      #FFD93D;
+    --sun-dk:   #F4B942;
+    --sky:      #4ECDC4;
+    --sky-dk:   #38B2AA;
+    --grape:    #A855F7;
+    --mint:     #6EE7B7;
+    --mint-dk:  #34D399;
+    --orange:   #FF9A3C;
+    --pink:     #F472B6;
+    --blue:     #60A5FA;
+    --bg:       #FFFBF0;
+    --bg-card:  #FFFFFF;
+    --text:     #2D2D2D;
+    --text-mid: #666;
+    --text-soft:#999;
+    --border:   #FFE4B5;
+    --shadow:   rgba(255,107,107,0.18);
   }
 
-  ::-webkit-scrollbar { width: 8px; }
+  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+  a { text-decoration: none; color: inherit; }
+  .font-display { font-family: 'Fredoka One', cursive; }
+
+  ::-webkit-scrollbar { width: 7px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--coral), var(--grape)); border-radius: 99px; }
 
-  @keyframes confetti-fall {
-    0%   { transform: translateY(-20px) rotate(0deg) scale(0.8); opacity: 0; }
-    10%  { opacity: 1; }
-    90%  { opacity: 0.8; }
-    100% { transform: translateY(110vh) rotate(720deg) scale(1.2) translateX(50px); opacity: 0; }
-  }
-  @keyframes bounce-in {
-    0%   { transform: scale(0) rotate(-10deg); opacity: 0; }
-    60%  { transform: scale(1.15) rotate(3deg); opacity: 1; }
-    80%  { transform: scale(0.95) rotate(-1deg); }
-    100% { transform: scale(1) rotate(0deg); opacity: 1; }
-  }
-  @keyframes wiggle {
-    0%,100% { transform: rotate(-3deg); }
-    50%     { transform: rotate(3deg); }
-  }
-  @keyframes float-up {
-    0%,100% { transform: translateY(0px) rotate(-2deg); }
-    50%     { transform: translateY(-12px) rotate(2deg); }
-  }
-  @keyframes spin-slow  { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  @keyframes pop-in {
-    from { opacity: 0; transform: scale(0.85) translateY(20px); }
-    to   { opacity: 1; transform: scale(1) translateY(0); }
-  }
-  @keyframes rainbow-shift {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-  @keyframes marquee-kids {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-  @keyframes star-twinkle {
-    0%,100% { opacity: 1; transform: scale(1); }
-    50%     { opacity: 0.4; transform: scale(0.7); }
-  }
-  @keyframes bounce-loop {
-    0%,100% { transform: translateY(0); }
-    40%     { transform: translateY(-18px); }
-    60%     { transform: translateY(-10px); }
-  }
-  @keyframes jelly {
-    0%,100% { transform: scaleX(1) scaleY(1); }
-    25%     { transform: scaleX(1.06) scaleY(0.94); }
-    50%     { transform: scaleX(0.94) scaleY(1.06); }
-    75%     { transform: scaleX(1.03) scaleY(0.97); }
-  }
-  @keyframes cartBounce {
-    0%   { transform: scale(1); }
-    50%  { transform: scale(1.08); }
-    100% { transform: scale(1); }
-  }
-  @keyframes checkAppear {
-    0%   { transform: scale(0) rotate(-45deg); opacity: 0; }
-    100% { transform: scale(1) rotate(0); opacity: 1; }
-  }
+  /* ── Keyframes ── */
+  @keyframes float-up   { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-12px) rotate(2deg)} }
+  @keyframes bounce-in  { 0%{transform:scale(0) rotate(-10deg);opacity:0} 60%{transform:scale(1.15) rotate(3deg);opacity:1} 100%{transform:scale(1) rotate(0)} }
+  @keyframes pop-in     { from{opacity:0;transform:scale(0.85) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+  @keyframes wiggle     { 0%,100%{transform:rotate(-3deg)} 50%{transform:rotate(3deg)} }
+  @keyframes spin-slow  { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+  @keyframes rainbow-shift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  @keyframes ticker-scroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+  @keyframes bounce-loop { 0%,100%{transform:translateY(0)} 40%{transform:translateY(-18px)} 60%{transform:translateY(-10px)} }
+  @keyframes star-twinkle { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+  @keyframes cartPop    { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+  @keyframes checkIn    { from{transform:scale(0) rotate(-45deg);opacity:0} to{transform:scale(1) rotate(0);opacity:1} }
+  @keyframes confetti   { 0%{transform:translateY(-20px) rotate(0) scale(0.8);opacity:0} 10%{opacity:1} 100%{transform:translateY(110vh) rotate(720deg) scale(1.2);opacity:0} }
 
-  .rainbow-text {
-    background: linear-gradient(90deg, var(--coral), var(--orange), var(--sun), var(--mint), var(--sky), var(--grape), var(--pink));
-    background-size: 300% 300%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: rainbow-shift 4s ease infinite;
-  }
-  .bounce-in  { animation: bounce-in 0.6s cubic-bezier(0.34,1.56,0.64,1) both; }
-  .pop-in     { animation: pop-in 0.5s cubic-bezier(0.22,1,0.36,1) both; }
-  .pop-in-d1  { animation-delay: 0.1s; }
-  .pop-in-d2  { animation-delay: 0.2s; }
-  .pop-in-d3  { animation-delay: 0.3s; }
-  .pop-in-d4  { animation-delay: 0.4s; }
-  .pop-in-d5  { animation-delay: 0.5s; }
-  .animate-cart  { animation: cartBounce 0.4s ease-in-out; }
-  .animate-check { animation: checkAppear 0.3s cubic-bezier(0.175,0.885,0.32,1.275); }
+  .anim-pop-in   { animation: pop-in 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+  .anim-bounce-in{ animation: bounce-in 0.6s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .anim-cart-pop { animation: cartPop 0.4s ease; }
+  .anim-check-in { animation: checkIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275) both; }
 
-  .card-tilt {
-    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease;
-  }
-  .card-tilt:hover {
-    transform: translateY(-10px) rotate(1.5deg) scale(1.02);
-    box-shadow: 0 20px 50px var(--shadow);
-  }
-  .card-tilt:nth-child(even):hover { transform: translateY(-10px) rotate(-1.5deg) scale(1.02); }
-
-  .btn-bouncy {
-    transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease;
-  }
-  .btn-bouncy:hover  { transform: translateY(-3px) scale(1.04); }
-  .btn-bouncy:active { transform: translateY(1px) scale(0.97); }
-
+  /* ── Patterns ── */
   .polka-dots {
-    background-image: radial-gradient(circle, rgba(255,107,107,0.12) 2px, transparent 2px),
-                      radial-gradient(circle, rgba(255,217,61,0.1) 2px, transparent 2px);
+    background-image:
+      radial-gradient(circle, rgba(255,107,107,0.12) 2px, transparent 2px),
+      radial-gradient(circle, rgba(255,217,61,0.1) 2px, transparent 2px);
     background-size: 30px 30px, 50px 50px;
     background-position: 0 0, 15px 15px;
   }
@@ -162,120 +88,221 @@ const FONT_CSS = `
       radial-gradient(circle, var(--pink) 1.5px, transparent 1.5px),
       radial-gradient(circle, var(--sky) 1.5px, transparent 1.5px);
     background-size: 40px 40px, 70px 70px, 55px 55px;
-    background-position: 10px 10px, 25px 30px, 5px 50px;
   }
-  .marquee-wrap { overflow: hidden; white-space: nowrap; }
-  .marquee-inner { display: inline-block; animation: marquee-kids 18s linear infinite; }
-  .sticker:hover { animation: wiggle 0.4s ease-in-out; }
 
+  /* ── Ticker / marquee ── */
+  .ticker-wrap  { overflow: hidden; white-space: nowrap; }
+  .ticker-inner { display: inline-block; animation: ticker-scroll 20s linear infinite; }
+
+  /* ── Buttons ── */
+  .btn-bouncy { transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease; }
+  .btn-bouncy:hover  { transform: translateY(-3px) scale(1.04); }
+  .btn-bouncy:active { transform: translateY(1px)  scale(0.97); }
+
+  /* ── Card ── */
+  .product-card { transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease, border-color 0.3s; }
+  .product-card:hover { transform: translateY(-8px) rotate(1.5deg) scale(1.02); box-shadow: 0 20px 50px var(--shadow); }
+  .product-card:nth-child(even):hover { transform: translateY(-8px) rotate(-1.5deg) scale(1.02); }
+
+  /* ── Rainbow text ── */
+  .rainbow-text {
+    background: linear-gradient(90deg, var(--coral), var(--orange), var(--sun), var(--mint-dk), var(--sky), var(--grape), var(--pink));
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: rainbow-shift 4s ease infinite;
+  }
+
+  /* ── Responsive: Navbar ── */
+  .nav-desktop-links { display: none; align-items: center; gap: 1.25rem; }
+  .nav-desktop-search { display: none; }
+  .nav-mobile-btns { display: flex; align-items: center; gap: 0.625rem; }
+  @media (min-width: 1024px) {
+    .nav-desktop-links  { display: flex; }
+    .nav-desktop-search { display: block; }
+    .nav-mobile-btns    { display: none; }
+  }
+
+  /* ── Responsive: Products grid ── */
+  .products-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  @media (min-width: 768px)  { .products-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(4, 1fr); gap: 1.25rem; } }
+
+  /* ── Responsive: Features ── */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.875rem;
+  }
+  @media (min-width: 1024px) { .features-grid { grid-template-columns: repeat(4, 1fr); } }
+
+  /* ── Responsive: Details layout ── */
+  .details-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  @media (min-width: 768px) { .details-layout { grid-template-columns: 1fr 1fr; gap: 3rem; } }
+
+  /* ── Responsive: Form rows ── */
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.875rem;
+  }
+  @media (min-width: 540px) { .form-row-2 { grid-template-columns: 1fr 1fr; } }
+
+  /* ── Responsive: Cart layout ── */
+  .cart-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  @media (min-width: 1024px) { .cart-layout { grid-template-columns: 1fr 1fr; gap: 3rem; } }
+
+  /* ── Responsive: Footer ── */
+  .footer-cols {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  @media (min-width: 768px) { .footer-cols { grid-template-columns: 1.6fr 1fr 1fr; } }
+
+  /* ── Responsive: Hero actions ── */
+  .hero-actions { display: flex; flex-direction: column; gap: 0.875rem; align-items: flex-start; }
+  @media (min-width: 540px) { .hero-actions { flex-direction: row; align-items: center; } }
+
+  /* ── Cart add buttons ── */
+  .cart-add-btns { display: flex; flex-direction: column; gap: 0.75rem; }
+  @media (min-width: 540px) { .cart-add-btns { flex-direction: row; } }
+
+  /* ── Delivery grid ── */
+  .delivery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+  /* ── Thumb row ── */
+  .thumb-row { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 4px; margin-top: 0.75rem; }
+
+  /* ── Pagination ── */
+  .pagination { display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 3rem; }
+
+  /* ── Contact layout ── */
+  .contact-layout { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+  @media (min-width: 1024px) { .contact-layout { grid-template-columns: 1fr 1.5fr; } }
+
+  /* ── Cart badge ── */
   .cart-badge {
-    position: absolute; top: -5px; left: -5px;
-    min-width: 18px; height: 18px; border-radius: 9px;
-    background: var(--coral); color: white;
+    position: absolute; top: -5px; right: -5px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--coral); color: #fff;
     font-size: 10px; font-weight: 900;
-    display: flex; align-items: center; justify-content: center; padding: 0 4px;
+    display: flex; align-items: center; justify-content: center;
     box-shadow: 0 0 8px rgba(255,107,107,0.6);
     font-family: 'Nunito', sans-serif;
   }
 `;
 
-// ─────────────────────────────────────────────────────────────
-// CONFETTI
-// ─────────────────────────────────────────────────────────────
+/* ─── CONFETTI ─── */
 function Confetti() {
-  const pieces = useMemo(() => Array.from({ length: 22 }, (_, i) => ({
-    id: i, left: `${(i * 4.7) % 100}%`, delay: `${(i * 0.6) % 10}s`,
-    duration: `${6 + (i * 0.8) % 8}s`, size: `${8 + (i * 1.3) % 12}px`,
-    color: ['#FFD93D','#FF6B6B','#4ECDC4','#A855F7','#F472B6','#FF9A3C','#60A5FA','#6EE7B7'][i % 8],
+  const pieces = useMemo(() => Array.from({ length: 18 }, (_, i) => ({
+    id: i, left: `${(i * 5.7) % 100}%`, delay: `${(i * 0.7) % 8}s`,
+    dur: `${6 + (i * 0.9) % 7}s`, size: `${8 + (i * 1.2) % 11}px`,
+    color: ['#FFD93D', '#FF6B6B', '#4ECDC4', '#A855F7', '#F472B6', '#FF9A3C', '#60A5FA'][i % 7],
     shape: i % 3,
   })), []);
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 0 }}>
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
       {pieces.map(p => (
         <div key={p.id} style={{
-          position: 'absolute', left: p.left, top: '-20px',
+          position: 'absolute', left: p.left, top: -20,
           width: p.size, height: p.size, backgroundColor: p.color,
-          borderRadius: p.shape === 0 ? '50%' : p.shape === 1 ? '2px' : '0',
+          borderRadius: p.shape === 0 ? '50%' : p.shape === 1 ? 3 : 0,
           transform: p.shape === 2 ? 'rotate(45deg)' : 'none',
-          animation: `confetti-fall ${p.duration} ${p.delay} ease-in infinite`, opacity: 0,
+          animation: `confetti ${p.dur} ${p.delay} ease-in infinite`, opacity: 0,
         }} />
       ))}
     </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// STAR DECO
-// ─────────────────────────────────────────────────────────────
-function StarDeco({ color = '#FFD93D', size = 20, delay = '0s', style = {} }: any) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={color}
-      style={{ animation: `star-twinkle 2s ${delay} ease-in-out infinite`, ...style }}>
-      <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+/* ─── STAR DECO ─── */
+const Star5 = ({ color = '#FFD93D', size = 20, delay = '0s', style = {} as any }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={color}
+    style={{ animation: `star-twinkle 2s ${delay} ease-in-out infinite`, ...style }}>
+    <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+  </svg>
+);
+
+/* ─── WAVY DIVIDER ─── */
+const WavyDivider = ({ top = '#fff', bottom = '#FFFBF0' }) => (
+  <div style={{ position: 'relative', height: 60, overflow: 'hidden', background: bottom }}>
+    <svg viewBox="0 0 1440 60" preserveAspectRatio="none" style={{ position: 'absolute', bottom: 0, width: '100%', height: '100%' }}>
+      <path d="M0,30 C180,60 360,0 540,30 C720,60 900,0 1080,30 C1260,60 1380,15 1440,30 L1440,60 L0,60 Z" fill={top} />
     </svg>
-  );
-}
+  </div>
+);
 
-// ─────────────────────────────────────────────────────────────
-// WAVY DIVIDER
-// ─────────────────────────────────────────────────────────────
-function WavyDivider({ topColor = '#fff', bottomColor = '#FFFBF0', flip = false }: any) {
-  return (
-    <div style={{ position: 'relative', height: '70px', overflow: 'hidden', backgroundColor: flip ? topColor : bottomColor }}>
-      <svg viewBox="0 0 1440 70" preserveAspectRatio="none"
-        style={{ position: 'absolute', bottom: 0, width: '100%', height: '100%', display: 'block' }}>
-        <path d="M0,35 C180,70 360,0 540,35 C720,70 900,0 1080,35 C1260,70 1380,20 1440,35 L1440,70 L0,70 Z"
-          fill={flip ? bottomColor : topColor} />
-      </svg>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────
-// TYPES
-// ─────────────────────────────────────────────────────────────
-interface Offer     { id: string; name: string; quantity: number; price: number; }
-interface Variant   { id: string; name: string; value: string; }
-interface Attribute { id: string; type: string; name: string; displayMode?: 'color'|'image'|'text'|null; variants: Variant[]; }
-interface ProductImage          { id: string; imageUrl: string; }
-interface VariantAttributeEntry { attrId: string; attrName: string; displayMode: 'color'|'image'|'text'; value: string; }
-interface VariantDetail         { id: string|number; name: VariantAttributeEntry[]; price: number; stock: number; autoGenerate: boolean; }
-interface Wilaya  { id: string; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
+/* ─── TYPES ─── */
+interface Offer { id: string; name: string; quantity: number; price: number; }
+interface Variant { id: string; name: string; value: string; }
+interface Attribute { id: string; type: string; name: string; displayMode?: 'color' | 'image' | 'text' | null; variants: Variant[]; }
+interface ProductImage { id: string; imageUrl: string; }
+interface VariantAttributeEntry { attrId: string; attrName: string; displayMode: 'color' | 'image' | 'text'; value: string; }
+interface VariantDetail { id: string | number; name: VariantAttributeEntry[]; price: number; stock: number; autoGenerate: boolean; }
+interface Wilaya { id: string; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
 interface Commune { id: string; name: string; ar_name: string; wilayaId: string; }
 export interface Product {
-  id: string; name: string; price: string|number; priceOriginal?: string|number; desc?: string;
+  id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
   variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
 }
 export interface ProductFormProps {
   product: Product; userId: string; domain: string; redirectPath?: string;
-  selectedOffer: string|null; setSelectedOffer: (id: string|null) => void;
-  selectedVariants: Record<string,string>; platform?: string; priceLoss?: number;
+  selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
+  selectedVariants: Record<string, string>; platform?: string; priceLoss?: number;
 }
 
-// ─────────────────────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────────────────────
-function variantMatches(detail: VariantDetail, sel: Record<string,string>): boolean {
-  return Object.entries(sel).every(([n,v]) => detail.name.some(e => e.attrName===n && e.value===v));
-}
-const fetchWilayas  = async (uid: string): Promise<Wilaya[]>  => { try { const {data} = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}`); return data||[]; } catch { return []; }};
-const fetchCommunes = async (wid: string): Promise<Commune[]> => { try { const {data} = await axios.get(`${API_URL}/shipping/get-communes/${wid}`); return data||[]; } catch { return []; }};
+const variantMatches = (d: VariantDetail, sel: Record<string, string>) =>
+  Object.entries(sel).every(([n, v]) => d.name.some(e => e.attrName === n && e.value === v));
+const fetchWilayas = async (uid: string): Promise<Wilaya[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}`); return data || []; } catch { return []; } };
+const fetchCommunes = async (wid: string): Promise<Commune[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/get-communes/${wid}`); return data || []; } catch { return []; } };
 
-// ─────────────────────────────────────────────────────────────
-// MAIN LAYOUT
-// ─────────────────────────────────────────────────────────────
+/* ─── INPUT STYLE ─── */
+const inp = (err?: boolean): React.CSSProperties => ({
+  width: '100%', padding: '0.75rem 1rem', fontSize: '0.9rem', fontWeight: 600,
+  background: '#fff', border: `2px solid ${err ? 'var(--coral)' : 'var(--border)'}`,
+  borderRadius: 14, color: 'var(--text)', outline: 'none',
+  fontFamily: "'Nunito', sans-serif", transition: 'border-color 0.2s', appearance: 'none'
+});
+
+const FR = ({ error, label, children }: { error?: string; label?: string; children: React.ReactNode }) => (
+  <div>
+    {label && <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-mid)', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</label>}
+    {children}
+    {error && <p style={{ fontSize: '0.72rem', color: 'var(--coral)', marginTop: '0.3rem', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700 }}><AlertCircle size={11} />{error}</p>}
+  </div>
+);
+
+/* ═══════════════════════════════════════════════════════════
+   MAIN
+═══════════════════════════════════════════════════════════ */
 export default function Main({ store, children, domain }: any) {
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', fontFamily: "'Nunito', sans-serif", color: 'var(--text)' }}>
-      <style>{FONT_CSS}</style>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', fontFamily: "'Nunito', sans-serif" }}>
+      <style>{THEME_CSS}</style>
+      {/* Ticker */}
       {store.topBar?.enabled && store.topBar?.text && (
-        <div className="marquee-wrap py-2.5"
-          style={{ background: 'linear-gradient(90deg, var(--coral), var(--orange), var(--sun), var(--mint), var(--sky), var(--grape), var(--pink), var(--coral))', backgroundSize: '200% 100%', animation: 'rainbow-shift 6s linear infinite' }}>
-          <div className="marquee-inner">
-            {Array(8).fill(null).map((_,i) => <span key={i} className="mx-8 text-white font-bold text-xs tracking-widest uppercase">⭐ {store.topBar.text}</span>)}
-            {Array(8).fill(null).map((_,i) => <span key={`b${i}`} className="mx-8 text-white font-bold text-xs tracking-widest uppercase">⭐ {store.topBar.text}</span>)}
+        <div className="ticker-wrap" style={{ background: 'linear-gradient(90deg,var(--coral),var(--orange),var(--sun),var(--mint-dk),var(--sky),var(--grape),var(--pink),var(--coral))', backgroundSize: '200%', animation: 'rainbow-shift 6s linear infinite', padding: '0.5rem 0' }}>
+          <div className="ticker-inner">
+            {Array(10).fill(null).map((_, i) => <span key={i} style={{ margin: '0 2rem', color: '#fff', fontWeight: 800, fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>⭐ {store.topBar.text}</span>)}
+            {Array(10).fill(null).map((_, i) => <span key={`b${i}`} style={{ margin: '0 2rem', color: '#fff', fontWeight: 800, fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>⭐ {store.topBar.text}</span>)}
           </div>
         </div>
       )}
@@ -286,328 +313,326 @@ export default function Main({ store, children, domain }: any) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// NAVBAR  ← مُصلح: أضيفت أيقونة السلة + عداد
-// ─────────────────────────────────────────────────────────────
-
-export function Navbar({ store, domain }: { store: any; domain?: string }) {
-  const [menuOpen, setMenuOpen] = useState(false);
+/* ═══════════════════════════════════════════════════════════
+   NAVBAR
+═══════════════════════════════════════════════════════════ */
+export function Navbar({ store, domain }: { store: any; domain: string }) {
+  const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [listSearch, setListSearch] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [isHovered, setIsHovered] = useState(false); // لحالة زر الإغلاق
   
   const router = useRouter();
-  const isRTL = store.language === 'ar';
+  const count = useCartStore(s => s.count);
+  const initCount = useCartStore(s => s.initCount);
 
-  const itemsCartCount = useCartStore((state) => state.count);
-  const initCount = useCartStore((state) => state.initCount);
-
-  // 1. مراقبة التمرير لتغيير خلفية الـ Nav
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', h);
-    return () => window.removeEventListener('scroll', h);
+    window.addEventListener('scroll', h); return () => window.removeEventListener('scroll', h);
   }, []);
 
-  // 2. تهيئة السلة من التخزين المحلي
   useEffect(() => {
     if (typeof window !== 'undefined' && domain) {
-      try {
-        const stored = localStorage.getItem(domain);
-        const items = JSON.parse(stored || '[]');
-        initCount(Array.isArray(items) ? items.length : 0);
-      } catch { initCount(0); }
+      try { initCount(JSON.parse(localStorage.getItem(domain) || '[]').length); } catch { initCount(0); }
     }
   }, [domain, initCount]);
 
-  // 3. منطق البحث الحيوي (Live Search)
   useEffect(() => {
     if (searchQuery.length < 2) { setListSearch([]); return; }
-    const delay = setTimeout(async () => {
+    const t = setTimeout(async () => {
       setLoading(true);
-      try {
-        // تأكد من تعريف API_URL في مشروعك
-        const { data } = await axios.get(`${API_URL}/products/public/${domain}`, { 
-          params: { search: searchQuery } 
-        });
-        setListSearch(data.products || []);
-      } catch { } finally { setLoading(false); }
-    }, 400);
-    return () => clearTimeout(delay);
+      try { 
+        const { data } = await axios.get(`${API_URL}/products/public/${domain}`, { params: { search: searchQuery } }); 
+        setListSearch(data.products || []); 
+      }
+      catch { } finally { setLoading(false); }
+    }, 380);
+    return () => clearTimeout(t);
   }, [searchQuery, domain]);
 
-  const handleSearchSubmit = (e?: React.FormEvent) => {
+  const doSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/?search=${encodeURIComponent(searchQuery)}`);
-      setSearchQuery('');
-      setListSearch([]);
-      setShowMobileSearch(false);
+    if (searchQuery.trim()) { 
+      router.push(`/?search=${encodeURIComponent(searchQuery)}`); 
+      setSearchQuery(''); 
+      setShowSearch(false); 
     }
   };
 
-  const nav = [
-    { href: '/',          label: isRTL ? 'الرئيسية' : 'Home',    emoji: '🏠' },
-    { href: '/contact',   label: isRTL ? 'اتصل بنا' : 'Contact', emoji: '📞' },
-    { href: '/Privacy',   label: isRTL ? 'الخصوصية' : 'Privacy', emoji: '🔒' },
-  ];
+  const SearchDrop = () => (
+    <div style={{maxHeight:"300px",overflow: 'auto', paddingTop: "25px", position: 'absolute', top: 'calc(100% + 8px)', right: 0, left: 0, background: '#fff', border: '3px solid var(--border)', borderRadius: 20, boxShadow: '0 16px 48px rgba(0,0,0,0.1)', zIndex: 200,}}>
+      
+      {/* زر إغلاق البحث */}
+      <button
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={() => setSearchQuery('')}
+        style={{ 
+          position: 'absolute', top: 10, left: 10, cursor: 'pointer', 
+          background: 'none', border: 'none', padding: '4px', 
+          display: 'flex', alignItems: 'center', justifyContent: 'center', 
+          color: isHovered ? 'red' : 'var(--text-soft)', transition: 'color 0.2s' 
+        }}>
+        <X size={18} />
+      </button>
 
-  const initials = store.name.split(' ').filter(Boolean).map((w:string)=>w[0]).join('').slice(0,2).toUpperCase();
-
-  // مكون نتائج البحث المنسدلة
-  const SearchDropdown = () => (
-    <div className="absolute top-full left-0 right-0 bg-white border-2 border-[var(--border)] rounded-2xl shadow-xl mt-2 overflow-hidden z-[60]">
       {loading ? (
-        <div className="p-4 text-center text-sm text-[var(--coral)] font-bold">جاري البحث عن ألعاب... 🧸</div>
+        <div style={{ padding: '1.25rem', textAlign: 'center', color: 'var(--coral)', fontWeight: 800, fontSize: '0.875rem' }}>🔍 جاري البحث...</div>
       ) : listSearch.length > 0 ? (
-        listSearch.map((p: any) => (
-          <Link href={`/product/${p.id}`} key={p.id} onClick={() => setSearchQuery('')}
-            className="flex items-center gap-3 p-3 border-b-2 border-[var(--bg)] hover:bg-[var(--bg)] transition-colors no-underline">
-            <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} className="w-10 h-10 rounded-xl object-cover border border-[var(--border)]" alt="" />
-            <div className="flex-1">
-              <div className="text-[var(--text)] text-xs font-bold truncate">{p.name}</div>
-              <div className="text-[var(--coral)] text-[10px] font-black">{p.price} دج</div>
-            </div>
-          </Link>
-        ))
+        <>
+          {listSearch.map((p: any, i :number) => (
+            <Link
+              href={`/product/${p.id}`}
+              key={p.id}
+              onClick={() => setSearchQuery('')}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderBottom: '2px solid var(--bg)' }}
+            >
+              <img
+                src={p.productImage || p.imagesProduct?.[0]?.imageUrl}
+                style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover', border: '2px solid var(--border)', flexShrink: 0 }}
+                alt={p.name}
+              />
+              <div>
+                <div className='line-clamp-1' style={{ fontSize: '0.85rem', fontWeight: 700 }}>{p.name}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--coral)', fontWeight: 900 }}>{p.price} دج</div>
+              </div>
+            </Link>
+          ))}
+          <button
+            onClick={doSearch}
+            type="button"
+            style={{ width: '100%', padding: '0.85rem', border: 'none', background: 'var(--bg)', cursor: 'pointer', fontWeight: 800, color: 'var(--text-mid)', fontSize: '0.85rem' }}
+          >
+            عرض جميع النتائج 🚀
+          </button>
+        </>
       ) : searchQuery.length >= 2 && (
-        <div className="p-4 text-center text-xs text-[var(--text-mid)]">لم نجد هذه اللعبة 🧩</div>
+        <div style={{ padding: '1.25rem', textAlign: 'center', color: 'var(--text-soft)', fontSize: '0.875rem', fontWeight: 600 }}>لا توجد نتائج 🧩</div>
       )}
     </div>
   );
 
+  const initials = (store.name || 'K').split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase();
+
   return (
-    <nav className="sticky top-0 z-50 transition-all duration-300" dir={isRTL?'rtl':'ltr'}
-      style={{
-        backgroundColor: scrolled ? 'rgba(255,251,240,0.95)' : 'var(--bg)',
-        backdropFilter: scrolled ? 'blur(16px)' : 'none',
-        borderBottom: '3px solid transparent',
-        borderImage: 'linear-gradient(90deg, var(--coral), var(--sun), var(--mint), var(--sky), var(--grape)) 1',
-        boxShadow: scrolled ? '0 4px 24px rgba(0,0,0,0.08)' : 'none',
-      }}>
-      <div className="max-w-7xl mx-auto px-5 lg:px-10">
-        <div className="flex items-center justify-between h-18 py-3 gap-4">
-          
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
-            <div className="relative w-12 h-12 rounded-2xl flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:rotate-6 group-hover:scale-110"
-              style={{ background: 'linear-gradient(135deg, var(--coral) 0%, var(--grape) 100%)' }}>
-              {store.design?.logoUrl
-                ? <img src={store.design.logoUrl} alt={store.name} className="w-full h-full object-cover" />
-                : <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: 'white' }}>{initials}</span>
-              }
-            </div>
-            <div className="hidden sm:block">
-              <span className="block font-black" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.3rem', color: 'var(--text)' }}>{store.name}</span>
-            </div>
-          </Link>
+    <nav dir="rtl" style={{
+      position: 'sticky', top: 0, zIndex: 100,
+      background: scrolled ? 'rgba(255,251,240,0.96)' : 'var(--bg)',
+      backdropFilter: scrolled ? 'blur(16px)' : 'none',
+      borderBottom: '3px solid transparent',
+      borderImage: 'linear-gradient(90deg, var(--coral), var(--sun), var(--mint), var(--sky), var(--grape)) 1',
+      boxShadow: scrolled ? '0 4px 24px rgba(0,0,0,0.07)' : 'none',
+      transition: 'all 0.3s ease'
+    }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem', height: 70, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
 
-          {/* Desktop Search Input */}
-          <div className="hidden lg:block flex-1 max-w-sm relative">
-            <form onSubmit={handleSearchSubmit} className="relative">
-              <input type="text" placeholder={isRTL ? "ابحث عن ألعابك..." : "Search for toys..."} 
-                value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                className="w-full py-2.5 px-5 pr-10 rounded-full border-2 border-[var(--border)] outline-none text-sm font-bold focus:border-[var(--coral)] transition-all"
-                style={{ backgroundColor: 'white' }}
-              />
-              <Search className={`absolute ${isRTL?'left-4':'right-4'} top-1/2 -translate-y-1/2 text-[var(--text-mid)]`} size={18} />
-            </form>
-            {searchQuery.length >= 2 && <SearchDropdown />}
+        {/* Logo */}
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+          <div style={{ width: 46, height: 46, borderRadius: 14, background: 'linear-gradient(135deg, var(--coral), var(--grape))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden', transition: 'transform 0.3s' }}
+            onMouseEnter={e => (e.currentTarget.style.transform = 'rotate(8deg) scale(1.1)')}
+            onMouseLeave={e => (e.currentTarget.style.transform = '')}>
+            {store?.design?.logoUrl
+              ? <img src={store.design.logoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+              : <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: '#fff' }}>{initials}</span>}
           </div>
+          <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.3rem', color: 'var(--text)' }}>{store?.name}</span>
+        </Link>
 
-          {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              {nav.map(item => (
-                <Link key={item.href} href={item.href} className="px-3 py-2 rounded-full text-xs font-bold transition-all hover:text-[var(--coral)]" style={{ color: 'var(--text-mid)' }}>
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-
-            <Link href="/cart" className="btn-bouncy relative flex items-center justify-center w-11 h-11 rounded-xl border-2 border-[var(--border)] bg-white text-[var(--coral)]">
-              <ShoppingCart className="w-5 h-5" />
-              {itemsCartCount > 0 && <span className="cart-badge">{itemsCartCount}</span>}
-            </Link>
-          </div>
-
-          {/* Mobile Buttons */}
-          <div className="md:hidden flex items-center gap-2">
-            <button onClick={() => setShowMobileSearch(!showMobileSearch)} className="w-10 h-10 rounded-xl flex items-center justify-center bg-white border-2 border-[var(--border)] text-[var(--coral)]">
-              <Search size={20} />
-            </button>
-            <Link href="/cart" className="relative w-10 h-10 rounded-xl border-2 border-[var(--border)] bg-white flex items-center justify-center text-[var(--coral)]">
-              <ShoppingCart className="w-5 h-5" />
-              {itemsCartCount > 0 && <span className="cart-badge">{itemsCartCount}</span>}
-            </Link>
-            <button onClick={() => setMenuOpen(p=>!p)} className="w-10 h-10 rounded-xl flex items-center justify-center bg-[rgba(255,107,107,0.1)] text-[var(--coral)]">
-              {menuOpen ? <X size={20} /> : <span className="text-lg">🎯</span>}
-            </button>
-          </div>
+        {/* Desktop search */}
+        <div className="nav-desktop-search" style={{ flex: 1, maxWidth: 340, position: 'relative' }}>
+          <form onSubmit={doSearch}>
+            <input type="text" placeholder="ابحث عن ألعابك... 🎮" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+              style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.75rem', borderRadius: 50, border: '2.5px solid var(--border)', background: '#fff', fontSize: '0.85rem', fontWeight: 700, outline: 'none', fontFamily: "'Nunito', sans-serif" }} />
+            <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)' }} />
+          </form>
+          {searchQuery.length >= 2 && <SearchDrop />}
         </div>
 
-        {/* Mobile Search Input Overlay */}
-        {showMobileSearch && (
-          <div className="md:hidden pb-4 relative">
-            <form onSubmit={handleSearchSubmit}>
-              <input autoFocus type="text" placeholder={isRTL ? "ماذا تبحث اليوم؟" : "Search toys..."} 
-                value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                className="w-full p-3 rounded-2xl border-2 border-[var(--coral)] outline-none font-bold"
-              />
-            </form>
-            {searchQuery.length >= 2 && <SearchDropdown />}
-          </div>
-        )}
+        {/* Desktop links */}
+        <div className="nav-desktop-links">
+          {[{ h: '/', l: 'الرئيسية' }, { h: '/contact', l: 'تواصل' }].map(i => (
+            <Link key={i.h} href={i.h} style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-mid)', padding: '0.375rem 0.75rem' }}>
+              {i.l}
+            </Link>
+          ))}
+          {/* شرط إخفاء السلة في نسخة الكمبيوتر */}
+          {store?.cart && (
+            <Link href="/cart" className="btn-bouncy" style={{ position: 'relative', width: 44, height: 44, borderRadius: 14, border: '2.5px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral)', flexShrink: 0 }}>
+              <ShoppingCart size={19} />
+              {count > 0 && <span className="cart-badge">{count}</span>}
+            </Link>
+          )}
+        </div>
 
-        {/* Mobile Menu */}
-        <div className={`md:hidden overflow-hidden transition-all duration-300 ${menuOpen ? 'max-h-72 pb-5' : 'max-h-0'}`}>
-          <div className="pt-4 space-y-2 border-t-2 border-dashed border-[var(--border)]">
-            {nav.map(item => (
-              <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)}
-                className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold text-[var(--text)] hover:bg-orange-50">
-                <span className="flex items-center gap-3"><span>{item.emoji}</span>{item.label}</span>
-                <ArrowRight size={14} className="text-[var(--coral)]" />
-              </Link>
-            ))}
-          </div>
+        {/* Mobile */}
+        <div className="nav-mobile-btns">
+          <button onClick={() => setShowSearch(!showSearch)} style={{ width: 40, height: 40, borderRadius: 12, border: '2px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral)' }}>
+            <Search size={18} />
+          </button>
+          
+          {/* شرط إخفاء السلة في نسخة الهاتف */}
+          {store?.cart && (
+            <Link href="/cart" style={{ position: 'relative', width: 40, height: 40, borderRadius: 12, border: '2px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral)' }}>
+              <ShoppingCart size={18} />
+              {count > 0 && <span className="cart-badge">{count}</span>}
+            </Link>
+          )}
+
+          <button onClick={() => setOpen(!open)} style={{ width: 40, height: 40, borderRadius: 12, border: '2px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral)' }}>
+            {open ? <X size={18} /> : <Menu size={18} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile search input and Dropdown */}
+      {showSearch && (
+        <div style={{ padding: '0.75rem 1.25rem', background: '#fff', borderTop: '2px solid var(--border)', position: 'relative' }}>
+          <form onSubmit={doSearch} style={{ position: 'relative' }}>
+            <input autoFocus type="text" placeholder="ابحث هنا... 🎯" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+              style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.75rem', borderRadius: 50, border: '2.5px solid var(--border)', outline: 'none' }} />
+            <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--coral)' }} />
+          </form>
+          {searchQuery.length >= 2 && <SearchDrop />}
+        </div>
+      )}
+
+      {/* Mobile menu with Conditional Cart Link */}
+      <div style={{ overflow: 'hidden', maxHeight: open ? 250 : 0, transition: 'max-height 0.3s ease', background: '#fff', borderTop: open ? '2px dashed var(--border)' : 'none' }}>
+        <div style={{ padding: '0.625rem 1.25rem 1rem' }}>
+          <Link href="/" onClick={() => setOpen(false)} style={mobileLinkStyle}>🏠 الرئيسية <ArrowRight size={14} /></Link>
+          <Link href="/contact" onClick={() => setOpen(false)} style={mobileLinkStyle}>📞 تواصل معنا <ArrowRight size={14} /></Link>
+          {/* إخفاء السلة من القائمة المنسدلة في الموبايل */}
+          {store?.cart && (
+            <Link href="/cart" onClick={() => setOpen(false)} style={mobileLinkStyle}>🛒 السلة <ArrowRight size={14} /></Link>
+          )}
         </div>
       </div>
     </nav>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// FOOTER
-// ─────────────────────────────────────────────────────────────
+const mobileLinkStyle = { 
+  display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
+  padding: '0.75rem 0', borderBottom: '2px dashed var(--border)', 
+  fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)' 
+};
+
+/* ═══════════════════════════════════════════════════════════
+   FOOTER — 3 أقسام
+═══════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
-  const isRTL = store.language === 'ar';
   return (
-    <footer className="relative" style={{ backgroundColor: '#1A1A2E', fontFamily: "'Nunito', sans-serif", overflow: 'hidden' }}>
-      <div className="absolute inset-0 stars-bg opacity-30 pointer-events-none" />
-      <div className="h-2 w-full" style={{ background: 'linear-gradient(90deg, var(--coral), var(--orange), var(--sun), var(--mint-dk), var(--sky), var(--grape), var(--pink))' }} />
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pb-12" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+    <footer dir="rtl" style={{ background: '#1A1A2E', color: '#aaa', marginTop: 0, padding: '4rem 1.5rem 2rem', position: 'relative', overflow: 'hidden' }}>
+      <div className="stars-bg" style={{ position: 'absolute', inset: 0, opacity: 0.25, pointerEvents: 'none' }} />
+      <div style={{ height: 4, background: 'linear-gradient(90deg, var(--coral), var(--orange), var(--sun), var(--mint-dk), var(--sky), var(--grape), var(--pink))', position: 'absolute', top: 0, left: 0, right: 0 }} />
+      <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+        <div className="footer-cols">
+
+          {/* قسم 1 — العلامة */}
           <div>
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, var(--coral), var(--grape))' }}>
-                <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: 'white' }}>{store.name.charAt(0)}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg, var(--coral), var(--grape))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: '#fff' }}>{(store?.name || 'K')[0]}</span>
               </div>
-              <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.4rem', color: 'white' }}>{store.name}</span>
+              <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.375rem', color: '#fff' }}>{store?.name}</span>
             </div>
-            <p className="text-sm font-medium leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
-              {isRTL ? '🎁 ألعاب وملابس أطفال بجودة عالية وأسعار مناسبة!' : '🎁 Quality toys & kids clothing for every little adventurer!'}
+            <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, maxWidth: 300 }}>
+              🎁 {store?.hero?.subtitle?.substring(0, 90) || 'ألعاب وملابس أطفال بجودة عالية وأسعار مناسبة!'}
             </p>
-            <div className="flex gap-2 mt-5 text-2xl">
-              {['🚀','⭐','🎨','🦄','🎮'].map((e,i) => (
-                <span key={i} className="transition-transform hover:scale-125 cursor-default"
-                  style={{ display: 'inline-block', animation: `float-up ${2+i*0.3}s ease-in-out infinite`, animationDelay: `${i*0.3}s` }}>{e}</span>
+            <div style={{ display: 'flex', gap: '0.625rem', marginTop: '1.25rem', fontSize: '1.5rem' }}>
+              {['🚀', '⭐', '🎨', '🦄'].map((e, i) => (
+                <span key={i} style={{ animation: `float-up ${2 + i * 0.3}s ${i * 0.3}s ease-in-out infinite`, display: 'inline-block' }}>{e}</span>
               ))}
             </div>
+            <p style={{ marginTop: '2rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.25)' }}>© {new Date().getFullYear()} {store?.name}. جميع الحقوق محفوظة.</p>
           </div>
+
+          {/* قسم 2 — الروابط */}
           <div>
-            <h4 className="mb-5 font-bold text-sm uppercase tracking-wider" style={{ color: 'var(--sun)', fontFamily: "'Fredoka One', cursive", fontSize: '1rem' }}>
-              🗺️ {isRTL ? 'روابط مهمة' : 'Quick Links'}
-            </h4>
-            <div className="space-y-3">
-              {[
-                { href: '/Privacy', label: isRTL ? 'سياسة الخصوصية' : 'Privacy Policy',   emoji: '🔒' },
-                { href: '/Terms',   label: isRTL ? 'شروط الخدمة'     : 'Terms of Service', emoji: '📋' },
-                { href: '/Cookies', label: isRTL ? 'ملفات الارتباط'   : 'Cookie Policy',   emoji: '🍪' },
-                { href: '/contact', label: isRTL ? 'اتصل بنا'         : 'Contact Us',      emoji: '💌' },
-              ].map(l => (
-                <a key={l.href} href={l.href} className="flex items-center gap-2 text-sm font-medium transition-all hover:translate-x-1"
-                  style={{ color: 'rgba(255,255,255,0.55)' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color='var(--sky)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color='rgba(255,255,255,0.55)'; }}>
-                  <span>{l.emoji}</span>{l.label}
-                </a>
-              ))}
+            <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--sun)', marginBottom: '1.25rem' }}>🗺️ روابط سريعة</h4>
+            {[{ h: '/', l: 'الرئيسية', e: '🏠' }, { h: '/cart', l: 'سلة التسوق', e: '🛒' }, { h: '/contact', l: 'تواصل معنا', e: '📞' }, { h: '/Privacy', l: 'الخصوصية', e: '🔒' }, { h: '/Terms', l: 'الشروط', e: '📋' }].map((lnk, i) => (
+              <a key={i} href={lnk.h} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--sky)'; el.style.transform = 'translateX(-4px)'; }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(255,255,255,0.5)'; el.style.transform = ''; }}>
+                <span>{lnk.e}</span>{lnk.l}
+              </a>
+            ))}
+          </div>
+
+          {/* قسم 3 — التواصل */}
+          <div>
+            <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--sun)', marginBottom: '1.25rem' }}>📡 تواصل معنا</h4>
+            {[
+              { e: '📞', val: store?.contact?.phone },
+              { e: '📍', val: store?.contact?.wilaya },
+              { e: '📧', val: store?.contact?.email },
+            ].filter(r => r.val).map((r, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.625rem' }}>
+                <span>{r.e}</span>{r.val}
+              </div>
+            ))}
+            <div style={{ marginTop: '1.5rem', padding: '1rem 1.25rem', borderRadius: 16, background: 'linear-gradient(135deg, rgba(255,107,107,0.15), rgba(168,85,247,0.15))', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <p style={{ fontFamily: "'Fredoka One', cursive", color: '#fff', fontSize: '0.95rem', marginBottom: '0.25rem' }}>لأن كل طفل يستحق الأفضل!</p>
+              <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)' }}>منتجات آمنة وممتعة ✅</p>
             </div>
           </div>
-          <div className="flex flex-col gap-4">
-            <div className="p-5 rounded-2xl" style={{ background: 'linear-gradient(135deg, rgba(255,107,107,0.15), rgba(168,85,247,0.15))', border: '1px solid rgba(255,255,255,0.1)' }}>
-              <p className="font-bold text-base text-white leading-snug" style={{ fontFamily: "'Fredoka One', cursive" }}>
-                {isRTL ? 'لأن كل طفل يستحق الأفضل!' : "Because every kid deserves the best!"}
-              </p>
-              <p className="text-xs font-medium mt-2" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                {isRTL ? 'منتجات آمنة وممتعة لأطفالك' : 'Safe, fun & approved for little ones'}
-              </p>
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              {[
-                { e: '✅', label: isRTL ? 'آمن للأطفال' : 'Child Safe' },
-                { e: '🏅', label: isRTL ? 'جودة عالية' : 'Top Quality' },
-              ].map((b,i) => (
-                <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold"
-                  style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)' }}>
-                  <span>{b.e}</span>{b.label}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.3)' }}>
-            © {new Date().getFullYear()} {store.name} · {isRTL ? 'جميع الحقوق محفوظة' : 'All rights reserved'} 🎉
-          </p>
-          <p className="text-xs font-bold" style={{ color: 'rgba(255,255,255,0.3)' }}>Kids' Kingdom Theme 👑</p>
+
         </div>
       </div>
     </footer>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// CARD
-// ─────────────────────────────────────────────────────────────
-export function Card({ product, displayImage, discount, isRTL, store, viewDetails }: any) {
-  const [hovered, setHovered] = useState(false);
-  const brandColor = 'var(--coral)';
-  const brandLight = `${brandColor}15`;
+/* ═══════════════════════════════════════════════════════════
+   CARD
+═══════════════════════════════════════════════════════════ */
+export function Card({ product, displayImage, discount, store, viewDetails }: any) {
+  const [hov, setHov] = useState(false);
+  const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
+  const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
 
   return (
-    <div className="card-tilt group flex flex-col overflow-hidden rounded-3xl bg-white h-full"
-      style={{ border: `3px solid ${hovered ? brandColor : 'var(--border)'}`, position: 'relative', transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}
-      onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-      <div className="h-1.5 w-full" style={{ backgroundColor: brandColor }} />
-      <div className="relative overflow-hidden" style={{ aspectRatio: '1', backgroundColor: brandLight }}>
+    <div className="product-card" style={{ background: '#fff', border: `3px solid ${hov ? 'var(--coral)' : 'var(--border)'}`, borderRadius: 24, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', cursor: 'pointer' }}
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}>
+      <div style={{ height: 4, background: 'var(--coral)', width: '100%' }} />
+
+      {/* Image */}
+      <div style={{ position: 'relative', aspectRatio: '1/1', background: 'rgba(255,107,107,0.07)', overflow: 'hidden' }}>
         {displayImage
-          ? <img src={displayImage} alt={product.name} className="w-full h-full object-cover transition-transform duration-700" style={{ transform: hovered ? 'scale(1.1)' : 'scale(1)' }} />
-          : <div className="w-full h-full flex flex-col items-center justify-center gap-3"><span className="text-5xl opacity-50">🧸</span><span className="text-xs font-bold" style={{ color: brandColor }}>لا توجد صورة</span></div>
-        }
+          ? <img src={displayImage} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s', transform: hov ? 'scale(1.1)' : 'scale(1)' }} />
+          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>🧸</div>}
         {discount > 0 && (
-          <div className="absolute top-3 right-3 w-12 h-12 rounded-full flex items-center justify-center sticker"
-            style={{ backgroundColor: brandColor, color: 'white', fontFamily: "'Fredoka One', cursive", fontSize: '0.85rem', boxShadow: `0 4px 12px ${brandColor}60`, transform: 'rotate(12deg)' }}>
+          <div style={{ position: 'absolute', top: 10, right: 10, width: 48, height: 48, borderRadius: '50%', background: 'var(--coral)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '0.8rem', boxShadow: '0 4px 12px rgba(255,107,107,0.5)', transform: 'rotate(12deg)' }}>
             -{discount}%
           </div>
         )}
       </div>
-      <div className="p-4 flex flex-col flex-1">
-        <div className="flex gap-0.5 mb-2">
-          {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < 4 ? 'fill-current' : 'opacity-30'}`} style={{ color: brandColor }} />)}
-          <span className="ml-1 text-[10px] font-bold opacity-60">4.8</span>
+
+      {/* Info */}
+      <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div style={{ display: 'flex', gap: 2, marginBottom: '0.5rem' }}>
+          {[...Array(5)].map((_, i) => <Star key={i} size={12} style={{ fill: i < 4 ? 'var(--sun-dk)' : 'none', color: 'var(--sun-dk)' }} />)}
         </div>
-        <h3 className="font-bold leading-snug mb-2 line-clamp-2" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--text)' }}>{product.name}</h3>
-        {product.desc && <div className="text-xs font-medium mb-4 line-clamp-2 opacity-70 leading-relaxed" dangerouslySetInnerHTML={{ __html: product.desc }} />}
-        <div className="mt-auto space-y-3">
-          <div className="flex items-center justify-between pt-3" style={{ borderTop: `1px solid var(--border)` }}>
-            <div className="flex flex-col">
-              <span className="text-[10px] font-bold uppercase opacity-50">السعر</span>
-              <div className="flex items-baseline gap-1">
-                <span className="font-black" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.3rem', color: brandColor }}>{product.price}</span>
-                <span className="text-[10px] font-bold opacity-60">{store.currency}</span>
-              </div>
-            </div>
-            {product.priceOriginal && product.priceOriginal > product.price && (
-              <span className="text-xs line-through opacity-40 font-medium">{product.priceOriginal}</span>
-            )}
+        <h3 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--text)', marginBottom: '0.5rem', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          {product.name}
+        </h3>
+        <div style={{ marginTop: 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', marginBottom: '0.75rem' }}>
+            <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.4rem', color: 'var(--coral)' }}>{price.toLocaleString()}</span>
+            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-soft)' }}>{store?.currency || 'دج'}</span>
+            {orig > price && <span style={{ fontSize: '0.75rem', color: 'var(--text-soft)', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
           </div>
-          <Link href={`/product/${product.slug || product.id}`}
-            className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-bold text-white transition-all active:scale-95"
-            style={{ backgroundColor: brandColor, boxShadow: hovered ? `0 8px 20px ${brandColor}40` : 'none', transform: hovered ? 'translateY(-2px)' : 'translateY(0)' }}>
-            {viewDetails} <ArrowRight className={`w-4 h-4 transition-transform ${hovered ? 'translate-x-1' : ''}`} />
+          <Link href={`/product/${product.slug || product.id}`} className="btn-bouncy" style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            width: '100%', padding: '0.7rem', borderRadius: 16,
+            background: hov ? 'linear-gradient(135deg, var(--coral), var(--grape))' : 'rgba(255,107,107,0.1)',
+            color: hov ? '#fff' : 'var(--coral)', fontWeight: 800, fontSize: '0.85rem',
+            transition: 'all 0.25s', boxShadow: hov ? '0 8px 20px rgba(255,107,107,0.35)' : 'none'
+          }}>
+            {viewDetails} <ArrowRight size={14} />
           </Link>
         </div>
       </div>
@@ -615,190 +640,155 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// HOME  ← مُصلح: أضيف الترقيم (pagination)
-// ─────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════
+   HOME
+═══════════════════════════════════════════════════════════ */
 export function Home({ store, page }: any) {
-  const isRTL = store.language === 'ar';
-  const dir   = isRTL ? 'rtl' : 'ltr';
   const products: any[] = store.products || [];
-
+  const cats: any[] = store.categories || [];
   if (!page) page = 1;
   const countPage = Math.ceil((store.count || products.length) / 48);
 
-  const t = {
-    heroLabel:   isRTL ? '🎪 عالم الأطفال الساحر'  : '🎪 The Magical Kids World',
-    heroTitle:   isRTL ? 'كل شيء\nيحبه أطفالك!'    : 'Everything\nKids Love!',
-    heroSub:     isRTL ? 'ألعاب وملابس وأدوات ترفيه آمنة وممتعة لأطفالك السعداء' : 'Safe, fun toys, clothing & accessories for your little adventurers!',
-    heroBtn:     isRTL ? '🛍️ تسوق الآن'           : '🛍️ Start Shopping!',
-    heroBtn2:    isRTL ? '🎁 العروض الخاصة'        : '🎁 Special Offers',
-    categories:  isRTL ? 'تسوق حسب الفئة'          : 'Shop by Category',
-    all:         isRTL ? 'الكل'                      : 'All',
-    products:    isRTL ? 'منتجاتنا المميزة'         : 'Our Awesome Products',
-    noProducts:  isRTL ? 'لا توجد منتجات بعد 🧸'    : 'No products yet 🧸',
-    viewDetails: isRTL ? 'اعرف المزيد'              : 'Get It!',
-  };
-
-  const features = [
-    { emoji: '🛡️', title: isRTL ? 'آمن للأطفال' : 'Child Safe',     sub: isRTL ? 'جميع المنتجات تجتاز معايير السلامة' : 'All products pass safety standards' },
-    { emoji: '🚀', title: isRTL ? 'توصيل سريع'  : 'Fast Delivery',  sub: isRTL ? 'يصل لبيتك في وقت قياسي'           : 'Delivered right to your door'       },
-    { emoji: '⭐', title: isRTL ? 'جودة عالية'  : 'Top Quality',    sub: isRTL ? 'منتجات مختارة بعناية'             : 'Handpicked for durability & fun'    },
-    { emoji: '💝', title: isRTL ? 'ضمان الرضا'  : 'Happy Guarantee', sub: isRTL ? 'رضاك يهمنا دائماً'             : 'We ensure every child smiles'       },
-  ];
-
   return (
-    <div dir={dir} style={{ backgroundColor: 'var(--bg)', fontFamily: "'Nunito', sans-serif" }}>
+    <div dir="rtl">
 
-      {/* HERO */}
-      <section className="relative overflow-hidden polka-dots" style={{ minHeight: '95vh', display: 'flex', alignItems: 'center', backgroundColor: 'var(--bg)' }}>
+      {/* ── HERO ── */}
+      <section className="polka-dots" style={{ position: 'relative', minHeight: '90vh', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
         <Confetti />
-        <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full pointer-events-none opacity-20" style={{ background: 'radial-gradient(circle, var(--grape), transparent 70%)' }} />
-        <div className="absolute -bottom-20 -left-20 w-96 h-96 rounded-full pointer-events-none opacity-15" style={{ background: 'radial-gradient(circle, var(--sky), transparent 70%)' }} />
-        <StarDeco color="var(--sun)" size={28} delay="0s" style={{ position:'absolute', top:'12%', left:'8%', animation: 'float-up 3s ease-in-out infinite' }} />
-        <StarDeco color="var(--coral)" size={20} delay="0.8s" style={{ position:'absolute', top:'20%', right:'12%', animation: 'float-up 2.5s ease-in-out infinite' }} />
-        {['🚂','🦄','🎨','🏆','🎪'].map((e,i) => (
-          <span key={e} className="absolute text-4xl pointer-events-none hidden lg:block"
-            style={{ top: `${15+i*15}%`, left: i%2===0 ? `${2+i*2}%` : undefined, right: i%2!==0 ? `${2+i*1.5}%` : undefined, animation: `float-up ${2.5+i*0.4}s ${i*0.5}s ease-in-out infinite`, opacity: 0.7 }}>{e}</span>
+        {store.hero?.imageUrl && (
+          <div style={{ position: 'absolute', inset: 0 }}>
+            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.08 }} />
+          </div>
+        )}
+        {/* Floating emojis */}
+        {['🚂', '🦄', '🎨', '🏆', '🎪'].map((e, i) => (
+          <span key={e} style={{ position: 'absolute', top: `${15 + i * 15}%`, left: i % 2 === 0 ? `${3 + i * 2}%` : undefined, right: i % 2 !== 0 ? `${3 + i * 1.5}%` : undefined, fontSize: '2.5rem', animation: `float-up ${2.5 + i * 0.4}s ${i * 0.5}s ease-in-out infinite`, opacity: 0.6, pointerEvents: 'none' }}>{e}</span>
         ))}
-        {store.hero?.imageUrl && <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}><img src={store.hero.imageUrl} alt="" className="w-full h-full object-cover" style={{ opacity: 0.1 }} /></div>}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 w-full">
-          <div className="max-w-2xl">
-            <div className="pop-in inline-flex items-center gap-2 px-5 py-2.5 rounded-full mb-7 font-bold text-sm" style={{ background: 'linear-gradient(135deg, rgba(255,107,107,0.12), rgba(168,85,247,0.12))', border: '2px solid rgba(255,107,107,0.25)', color: 'var(--coral)' }}>🎠 {t.heroLabel}</div>
-            <h1 className="pop-in pop-in-d1 whitespace-pre-line leading-tight mb-5" style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(3rem,8vw,6.5rem)', color: 'var(--text)', letterSpacing: '0.01em', lineHeight: 1.1 }}>{store.hero?.title || t.heroTitle}</h1>
-            <div className="pop-in pop-in-d1 h-2 w-40 rounded-full mb-6" style={{ background: 'linear-gradient(90deg, var(--coral), var(--sun), var(--mint), var(--sky), var(--grape))' }} />
-            <p className="pop-in pop-in-d2 text-base font-semibold leading-relaxed mb-10" style={{ color: 'var(--text-mid)', maxWidth: '420px' }}>{store.hero?.subtitle || t.heroSub}</p>
-            <div className="pop-in pop-in-d3 flex flex-wrap gap-4">
-              <a href="#products" className="btn-bouncy flex items-center gap-2.5 px-8 py-4 rounded-2xl text-base font-black text-white" style={{ background: 'linear-gradient(135deg, var(--coral) 0%, var(--grape) 100%)', boxShadow: '0 8px 28px rgba(255,107,107,0.4)' }}>{t.heroBtn}</a>
-              <a href="#categories" className="btn-bouncy flex items-center gap-2.5 px-8 py-4 rounded-2xl text-base font-black" style={{ border: '3px solid var(--sun)', color: 'var(--text)', backgroundColor: 'white', boxShadow: '0 4px 16px rgba(255,217,61,0.3)' }}>{t.heroBtn2}</a>
-            </div>
+        <Star5 color="var(--sun)" size={26} delay="0s" style={{ position: 'absolute', top: '12%', right: '10%' }} />
+        <Star5 color="var(--coral)" size={18} delay="0.8s" style={{ position: 'absolute', top: '22%', left: '8%' }} />
+
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '7rem 1.5rem 4rem', position: 'relative', zIndex: 1, width: '100%' }}>
+          <div className="anim-pop-in" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.5rem 1.25rem', borderRadius: 50, background: 'rgba(255,107,107,0.12)', border: '2px solid rgba(255,107,107,0.25)', marginBottom: '1.5rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--coral)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>🎪 عالم الأطفال الساحر</span>
+          </div>
+          <h1 className="anim-pop-in" style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(3rem, 8vw, 6rem)', color: 'var(--text)', lineHeight: 1.1, marginBottom: '1.25rem' }}
+            dangerouslySetInnerHTML={{ __html: store.hero?.title || 'كل شيء<br/>يحبه أطفالك! 🎉' }} />
+          <p className="anim-pop-in" style={{ fontSize: '1.0625rem', fontWeight: 600, color: 'var(--text-mid)', maxWidth: 460, lineHeight: 1.7, marginBottom: '2.5rem' }}>
+            {store.hero?.subtitle || 'ألعاب وملابس وأدوات ترفيه آمنة وممتعة لأطفالك السعداء 🌈'}
+          </p>
+          <div className="hero-actions">
+            <a href="#products" className="btn-bouncy" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.9rem 2rem', borderRadius: 18, background: 'linear-gradient(135deg, var(--coral), var(--grape))', color: '#fff', fontWeight: 900, fontSize: '0.95rem', boxShadow: '0 8px 28px rgba(255,107,107,0.4)' }}>
+              🛍️ تسوق الآن
+            </a>
+            <Link href="/cart" className="btn-bouncy" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.9rem 2rem', borderRadius: 18, border: '3px solid var(--sun)', background: '#fff', color: 'var(--text)', fontWeight: 900, fontSize: '0.95rem', boxShadow: '0 4px 16px rgba(255,217,61,0.3)' }}>
+              🎁 السلة
+            </Link>
           </div>
         </div>
       </section>
 
-      <WavyDivider topColor="var(--bg)" bottomColor="white" />
+      <WavyDivider top="var(--bg)" bottom="#fff" />
 
-      {/* FEATURES */}
-      <section style={{ backgroundColor: 'white', paddingBottom: '3rem' }}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {features.map((f,i) => (
-              <div key={i} className="flex flex-col items-center text-center p-5 rounded-3xl transition-all hover:-translate-y-2 group" style={{ border: '2px solid var(--border)', backgroundColor: 'var(--bg)' }}>
-                <span className="text-3xl mb-3" style={{ display: 'block', animation: `float-up ${2+i*0.3}s ${i*0.2}s ease-in-out infinite` }}>{f.emoji}</span>
-                <p className="font-black text-sm mb-1" style={{ fontFamily: "'Fredoka One', cursive", color: 'var(--text)', fontSize: '0.95rem' }}>{f.title}</p>
-                <p className="text-xs font-medium" style={{ color: 'var(--text-soft)' }}>{f.sub}</p>
+      {/* ── FEATURES ── */}
+      <section style={{ background: '#fff', paddingBottom: '3rem' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
+          <div className="features-grid">
+            {[
+              { e: '🛡️', t: 'آمن للأطفال', d: 'جميع المنتجات تجتاز معايير السلامة' },
+              { e: '🚀', t: 'توصيل سريع', d: 'يصل لبيتك في وقت قياسي' },
+              { e: '⭐', t: 'جودة عالية', d: 'منتجات مختارة بعناية' },
+              { e: '💝', t: 'ضمان الرضا', d: 'رضاك يهمنا دائماً' },
+            ].map((f, i) => (
+              <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '1.25rem', borderRadius: 20, border: '2px solid var(--border)', background: 'var(--bg)', transition: 'transform 0.3s' }}
+                onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-4px)')}
+                onMouseLeave={e => (e.currentTarget.style.transform = '')}>
+                <span style={{ fontSize: '2.25rem', marginBottom: '0.625rem', animation: `float-up ${2 + i * 0.3}s ${i * 0.2}s ease-in-out infinite`, display: 'block' }}>{f.e}</span>
+                <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '0.95rem', color: 'var(--text)', marginBottom: '0.25rem' }}>{f.t}</p>
+                <p style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-soft)' }}>{f.d}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <WavyDivider topColor="white" bottomColor="var(--bg)" />
+      <WavyDivider top="white" bottom="var(--bg)" />
 
-      {/* CATEGORIES */}
-      <section id="categories" className="py-16" style={{ backgroundColor: 'var(--bg)' }}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-3 mb-4">
-              <span className="text-3xl" style={{ animation: 'spin-slow 6s linear infinite', display: 'inline-block' }}>🎡</span>
-              <h2 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.8rem,4vw,3rem)', color: 'var(--text)' }}>{t.categories}</h2>
-              <span className="text-3xl" style={{ animation: 'spin-slow 6s linear infinite reverse', display: 'inline-block' }}>🎡</span>
-            </div>
-          </div>
-          {store.categories?.length > 0 ? (
-            <div className="flex flex-wrap justify-center gap-3">
-              <Link href={`/${store.domain}`} className="btn-bouncy flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-black text-white" style={{ background: 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: '0 4px 16px rgba(255,107,107,0.35)' }}>✨ {t.all}</Link>
-              {store.categories.map((cat: any, idx: number) => {
-                const colors = ['var(--sky)', 'var(--mint-dk)', 'var(--orange)', 'var(--grape)', 'var(--coral)'];
-                const c = colors[idx % colors.length];
-                return (
-                  <Link key={cat.id} href={`/${store.domain}?category=${cat.id}`} className="btn-bouncy px-6 py-3 rounded-2xl text-sm font-bold transition-all"
-                    style={{ border: `2px solid ${c}`, color: c, backgroundColor: `${c}10` }}
-                    onMouseEnter={e => { const el=e.currentTarget as HTMLElement; el.style.backgroundColor=c; el.style.color='white'; }}
-                    onMouseLeave={e => { const el=e.currentTarget as HTMLElement; el.style.backgroundColor=`${c}10`; el.style.color=c; }}>{cat.name}</Link>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="py-12 text-center rounded-3xl polka-dots" style={{ border: '3px dashed var(--border)' }}>
-              <span className="text-4xl block mb-3">🎪</span>
-              <p className="font-bold" style={{ color: 'var(--text-soft)' }}>{isRTL ? 'لا توجد تصنيفات بعد' : 'No categories yet'}</p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* PRODUCTS */}
-      <section id="products" className="pb-24">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="text-center mb-12">
-            <h2 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.8rem,4vw,3rem)', color: 'var(--text)' }}>🎁 {t.products}</h2>
-            <p className="mt-2 font-medium text-sm" style={{ color: 'var(--text-soft)' }}>{products.length} {isRTL ? 'منتج رائع' : 'awesome items'} 🌟</p>
-          </div>
-
-          {products.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-5">
-              {products.map((product: any) => {
-                const displayImage = product.productImage || product.imagesProduct?.[0]?.imageUrl || store.design?.logoUrl;
-                const discount = product.priceOriginal ? Math.round(((product.priceOriginal - product.price) / product.priceOriginal) * 100) : 0;
-                return <Card key={product.id} product={product} displayImage={displayImage} discount={discount} isRTL={isRTL} store={store} viewDetails={t.viewDetails} />;
-              })}
-            </div>
-          ) : (
-            <div className="py-32 text-center rounded-3xl polka-dots" style={{ border: '3px dashed var(--border)' }}>
-              <span className="text-6xl block mb-4" style={{ animation: 'bounce-loop 2s ease-in-out infinite' }}>🧸</span>
-              <p className="font-black text-xl" style={{ fontFamily: "'Fredoka One', cursive", color: 'var(--text-mid)' }}>{t.noProducts}</p>
-            </div>
-          )}
-
-          {/* ← الترقيم مُضاف */}
-          {countPage > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-12" dir={dir}>
-              <Link href={{ query: { ...Object.fromEntries(new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')), page: Math.max(1, page - 1) } }} scroll={false}
-                className={`flex items-center justify-center w-10 h-10 rounded-xl font-bold text-sm transition-all ${Number(page) === 1 ? 'pointer-events-none opacity-20' : ''}`}
-                style={{ border: '2px solid var(--border)', backgroundColor: 'white', color: 'var(--coral)' }}>
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-              </Link>
-              {Array.from({ length: Math.ceil(countPage) }).map((_, i) => {
-                const pn = i + 1; const isActive = Number(page) === pn;
-                return (
-                  <Link key={pn} href={{ query: { ...Object.fromEntries(new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')), page: pn } }} scroll={false}
-                    className="flex items-center justify-center w-10 h-10 rounded-xl font-black text-sm transition-all"
-                    style={{
-                      border: `2px solid ${isActive ? 'var(--coral)' : 'var(--border)'}`,
-                      backgroundColor: isActive ? 'var(--coral)' : 'white',
-                      color: isActive ? 'white' : 'var(--text-mid)',
-                      boxShadow: isActive ? '0 4px 16px rgba(255,107,107,0.35)' : 'none',
-                    }}>
-                    {pn}
-                  </Link>
-                );
-              })}
-              <Link href={{ query: { ...Object.fromEntries(new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')), page: Math.min(Math.ceil(countPage), Number(page) + 1) } }} scroll={false}
-                className={`flex items-center justify-center w-10 h-10 rounded-xl font-bold text-sm transition-all ${Number(page) >= Math.ceil(countPage) ? 'pointer-events-none opacity-20' : ''}`}
-                style={{ border: '2px solid var(--border)', backgroundColor: 'white', color: 'var(--coral)' }}>
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" /></svg>
-              </Link>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* FUN BANNER */}
-      <section className="relative overflow-hidden py-20" style={{ background: 'linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%)' }}>
-        <div className="absolute inset-0 stars-bg opacity-40 pointer-events-none" />
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <div className="flex justify-center gap-4 mb-6 text-4xl">
-            {['🚀','⭐','🎉','✨'].map((e,i) => <span key={i} style={{ animation: `float-up ${2+i*0.3}s ${i*0.2}s ease-in-out infinite`, display: 'inline-block' }}>{e}</span>)}
-          </div>
-          <h2 className="font-black text-white leading-tight" style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(2rem,6vw,5rem)', lineHeight: 1.15 }}>
-            {isRTL ? 'الفرح لا يتوقف هنا!' : 'The Fun Never Stops!'}
+      {/* ── CATEGORIES ── */}
+      {cats.length > 0 && (
+        <section style={{ padding: '4rem 1.5rem', maxWidth: 1280, margin: '0 auto' }}>
+          <h2 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', textAlign: 'center', color: 'var(--text)', marginBottom: '2rem' }}>
+            🎡 تسوق حسب الفئة
           </h2>
-          <p className="mt-4 text-base font-semibold" style={{ color: 'rgba(255,255,255,0.6)' }}>
-            {isRTL ? 'آلاف المنتجات الممتعة والآمنة في انتظار أطفالك' : 'Thousands of fun & safe products waiting for your kids'}
-          </p>
-          <a href="#products" className="btn-bouncy inline-flex items-center gap-3 mt-8 px-10 py-4 rounded-2xl text-base font-black text-white"
-            style={{ background: 'linear-gradient(135deg, var(--coral), var(--orange), var(--sun))', boxShadow: '0 8px 30px rgba(255,107,107,0.5)' }}>
-            🎪 {isRTL ? 'استكشف الآن!' : 'Explore Now!'}
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.625rem' }}>
+            {cats.map((cat: any, idx: number) => {
+              const colors = ['var(--sky)', 'var(--mint-dk)', 'var(--orange)', 'var(--grape)', 'var(--coral)'];
+              const c = colors[idx % colors.length];
+              return (
+                <Link key={cat.id} href={`?category=${cat.id}`} className="btn-bouncy" style={{ padding: '0.625rem 1.5rem', borderRadius: 50, border: `2.5px solid ${c}`, color: c, background: `${c}12`, fontWeight: 700, fontSize: '0.875rem', transition: 'all 0.2s' }}
+                  onMouseEnter={e => { const el = e.currentTarget; el.style.background = c; el.style.color = '#fff'; }}
+                  onMouseLeave={e => { const el = e.currentTarget; el.style.background = `${c}12`; el.style.color = c; }}>
+                  {cat.name}
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* ── PRODUCTS ── */}
+      <section id="products" style={{ padding: '1rem 1.5rem 6rem', maxWidth: 1280, margin: '0 auto' }}>
+        <h2 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', textAlign: 'center', color: 'var(--text)', marginBottom: '0.5rem' }}>
+          🎁 منتجاتنا المميزة
+        </h2>
+        <p style={{ textAlign: 'center', color: 'var(--text-soft)', fontSize: '0.9rem', fontWeight: 600, marginBottom: '2.5rem' }}>
+          {products.length} منتج رائع 🌟
+        </p>
+
+        {products.length === 0 ? (
+          <div className="polka-dots" style={{ padding: '5rem', textAlign: 'center', border: '3px dashed var(--border)', borderRadius: 24 }}>
+            <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1rem', animation: 'bounce-loop 2s ease-in-out infinite' }}>🧸</span>
+            <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.25rem', color: 'var(--text-mid)' }}>لا توجد منتجات بعد</p>
+          </div>
+        ) : (
+          <div className="products-grid">
+            {products.map((p: any) => {
+              const img = p.productImage || p.imagesProduct?.[0]?.imageUrl;
+              const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
+              return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="اعرف المزيد" />;
+            })}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {countPage > 1 && (
+          <div className="pagination" dir="rtl">
+            <Link href={{ query: { page: Math.max(1, page - 1) } }} scroll={false}
+              style={{ width: 40, height: 40, borderRadius: 14, border: '2.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', color: 'var(--coral)', fontWeight: 900, opacity: page <= 1 ? 0.3 : 1 }}>❮</Link>
+            {Array.from({ length: countPage }).map((_, i) => {
+              const pn = i + 1; const isA = Number(page) === pn;
+              return (
+                <Link key={pn} href={{ query: { page: pn } }} scroll={false} style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '1rem', border: `2.5px solid ${isA ? 'var(--coral)' : 'var(--border)'}`, background: isA ? 'var(--coral)' : '#fff', color: isA ? '#fff' : 'var(--text-mid)', boxShadow: isA ? '0 4px 16px rgba(255,107,107,0.35)' : 'none' }}>
+                  {pn}
+                </Link>
+              );
+            })}
+            <Link href={{ query: { page: Math.min(countPage, Number(page) + 1) } }} scroll={false}
+              style={{ width: 40, height: 40, borderRadius: 14, border: '2.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', color: 'var(--coral)', fontWeight: 900, opacity: page >= countPage ? 0.3 : 1 }}>❯</Link>
+          </div>
+        )}
+      </section>
+
+      {/* ── BANNER ── */}
+      <section style={{ position: 'relative', overflow: 'hidden', padding: '5rem 1.5rem', background: 'linear-gradient(135deg, #1A1A2E, #16213E, #0F3460)' }}>
+        <div className="stars-bg" style={{ position: 'absolute', inset: 0, opacity: 0.35, pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', maxWidth: 700, margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '1.5rem', fontSize: '2.5rem' }}>
+            {['🚀', '⭐', '🎉', '✨'].map((e, i) => <span key={i} style={{ animation: `float-up ${2 + i * 0.3}s ${i * 0.2}s ease-in-out infinite`, display: 'inline-block' }}>{e}</span>)}
+          </div>
+          <h2 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(2rem, 6vw, 4.5rem)', color: '#fff', marginBottom: '1rem' }}>الفرح لا يتوقف هنا!</h2>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '1rem', fontWeight: 600, marginBottom: '2rem' }}>آلاف المنتجات الممتعة والآمنة في انتظار أطفالك</p>
+          <a href="#products" className="btn-bouncy" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.875rem 2rem', borderRadius: 18, background: 'linear-gradient(135deg, var(--coral), var(--orange), var(--sun))', color: '#fff', fontWeight: 900, fontSize: '0.95rem', boxShadow: '0 8px 30px rgba(255,107,107,0.5)' }}>
+            🎪 استكشف الآن!
           </a>
         </div>
       </section>
@@ -806,405 +796,308 @@ export function Home({ store, page }: any) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// DETAILS
-// ─────────────────────────────────────────────────────────────
-export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, isRTL }: any) {
-  const [selectedImage, setSelectedImage] = useState(0);
-  const accentColor = ['var(--coral)', 'var(--sky)', 'var(--grape)', 'var(--orange)', 'var(--mint-dk)'][parseInt(product.id) % 5];
+/* ═══════════════════════════════════════════════════════════
+   DETAILS
+═══════════════════════════════════════════════════════════ */
+export function Details({ product, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
+  const [sel, setSel] = useState(0);
+  const colors = ['var(--coral)', 'var(--sky)', 'var(--grape)', 'var(--orange)', 'var(--mint-dk)'];
+  const accent = colors[parseInt(product.id || '0') % colors.length];
 
   return (
-    <div className="min-h-screen" dir={isRTL?'rtl':'ltr'} style={{ backgroundColor: 'var(--bg)', fontFamily: "'Nunito', sans-serif" }}>
-      
+    <div dir="rtl" style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: '4rem' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2.5rem 1.5rem' }}>
+        <div className="details-layout">
 
-      <main className="max-w-6xl mx-auto px-6 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Gallery */}
-          <div className="space-y-3">
-            <div className="relative overflow-hidden rounded-3xl group" style={{ aspectRatio: '1', backgroundColor: `${accentColor}15`, border: `3px solid ${accentColor}40` }}>
-              {allImages.length > 0
-                ? <img src={allImages[selectedImage]} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                : <div className="w-full h-full flex items-center justify-center polka-dots"><span className="text-8xl" style={{ animation: 'float-up 3s ease-in-out infinite' }}>🧸</span></div>
-              }
-              {discount > 0 && (
-                <div className="absolute top-4 right-4 w-14 h-14 rounded-full flex items-center justify-center font-black text-white sticker"
-                  style={{ backgroundColor: 'var(--coral)', fontFamily: "'Fredoka One', cursive", fontSize: '0.9rem', boxShadow: '0 4px 16px rgba(255,107,107,0.5)', transform: 'rotate(12deg)' }}>-{discount}%</div>
-              )}
-              <button onClick={toggleWishlist} className="absolute top-4 left-4 w-10 h-10 rounded-xl flex items-center justify-center btn-bouncy"
-                style={{ backgroundColor: 'rgba(255,255,255,0.9)', color: isWishlisted ? 'var(--coral)' : 'var(--text-soft)' }}>
-                <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
-              </button>
+          <div style={{ position: 'sticky', top: 84 }}>
+            <div style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 24, overflow: 'hidden', background: `${accent}12`, border: `3px solid ${accent}40` }}>
+              {allImages[sel]
+                ? <img src={allImages[sel]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem' }}>🧸</div>}
+              {discount > 0 && <div style={{ position: 'absolute', top: 14, right: 14, width: 52, height: 52, borderRadius: '50%', background: 'var(--coral)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '0.85rem', transform: 'rotate(12deg)', boxShadow: '0 4px 16px rgba(255,107,107,0.5)' }}>{discount}%</div>}
               {allImages.length > 1 && (
                 <>
-                  <button onClick={() => setSelectedImage(p=>p===0?allImages.length-1:p-1)} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all btn-bouncy"
-                    style={{ backgroundColor: 'rgba(255,255,255,0.9)', border: '2px solid var(--border)', color: 'var(--text)' }}><ChevronLeft className="w-4 h-4" /></button>
-                  <button onClick={() => setSelectedImage(p=>p===allImages.length-1?0:p+1)} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all btn-bouncy"
-                    style={{ backgroundColor: 'rgba(255,255,255,0.9)', border: '2px solid var(--border)', color: 'var(--text)' }}><ChevronRight className="w-4 h-4" /></button>
+                  <button onClick={() => setSel(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.9)', border: '2px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={18} /></button>
+                  <button onClick={() => setSel(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.9)', border: '2px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={18} /></button>
                 </>
               )}
               {!inStock && !autoGen && (
-                <div className="absolute inset-0 flex items-center justify-center rounded-3xl" style={{ backgroundColor: 'rgba(255,251,240,0.85)', backdropFilter: 'blur(4px)' }}>
-                  <div className="px-6 py-4 rounded-2xl text-base font-black" style={{ border: '3px solid var(--coral)', color: 'var(--coral)', backgroundColor: 'white' }}>😢 {isRTL?'نفد المخزون':'Out of Stock'}</div>
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,251,240,0.88)', backdropFilter: 'blur(4px)' }}>
+                  <div style={{ padding: '0.75rem 1.5rem', borderRadius: 16, border: '3px solid var(--coral)', color: 'var(--coral)', fontFamily: "'Fredoka One', cursive", fontSize: '1rem', background: '#fff' }}>😢 نفد المخزون</div>
                 </div>
               )}
             </div>
             {allImages.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {allImages.map((img:string,idx:number) => (
-                  <button key={idx} onClick={() => setSelectedImage(idx)} className="shrink-0 w-16 h-16 overflow-hidden rounded-2xl transition-all btn-bouncy"
-                    style={{ border: `3px solid ${selectedImage===idx ? accentColor : 'var(--border)'}`, opacity: selectedImage===idx ? 1 : 0.55 }}><img src={img} alt="" className="w-full h-full object-cover" /></button>
+              <div className="thumb-row">
+                {allImages.map((img: string, idx: number) => (
+                  <button key={idx} onClick={() => setSel(idx)} style={{ flexShrink: 0, width: 62, height: 62, borderRadius: 14, overflow: 'hidden', border: `3px solid ${sel === idx ? accent : 'var(--border)'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.2s' }}>
+                    <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </button>
                 ))}
               </div>
             )}
-            <div className="grid grid-cols-3 gap-2">
-              {[{ e:'🛡️', l:isRTL?'دفع آمن':'Secure Pay' },{ e:'🚀', l:isRTL?'توصيل سريع':'Fast Ship' },{ e:'⭐', l:isRTL?'جودة عالية':'Quality' }].map((b,i) => (
-                <div key={i} className="flex flex-col items-center gap-1 py-3 rounded-2xl" style={{ border: '2px solid var(--border)', backgroundColor: 'white' }}>
-                  <span className="text-xl">{b.e}</span><span className="text-[9px] font-bold text-center" style={{ color: 'var(--text-soft)' }}>{b.l}</span>
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* Info */}
-          <div className="space-y-6">
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="h-1.5 w-8 rounded-full" style={{ background: accentColor }} />
-                <span className="text-xs font-black uppercase tracking-wider" style={{ color: accentColor }}>🎁 {isRTL?'المنتج':'Product'}</span>
+          <div>
+            <div style={{ background: '#fff', borderRadius: 24, padding: '2rem', border: '3px solid var(--border)' }}>
+              <h1 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.5rem, 4vw, 2.25rem)', color: 'var(--text)', marginBottom: '0.625rem', lineHeight: 1.2 }}>
+                {product.name}
+              </h1>
+              <div style={{ display: 'flex', gap: 3, marginBottom: '1.25rem' }}>
+                {[...Array(5)].map((_, i) => <Star key={i} size={16} style={{ fill: i < 4 ? 'var(--sun-dk)' : 'none', color: 'var(--sun-dk)' }} />)}
               </div>
-              <h1 className="leading-tight mb-3" style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.6rem,3.5vw,2.5rem)', color: 'var(--text)', letterSpacing: '0.01em' }}>{product.name}</h1>
-              <div className="flex items-center gap-3">
-                <div className="flex gap-0.5">{[...Array(5)].map((_,i)=><Star key={i} className={`w-4 h-4 ${i<4?'fill-current':''}`} style={{ color:'var(--sun-dark)' }}/>)}</div>
-                <span className="text-xs font-bold" style={{ color:'var(--text-soft)' }}>4.8 (128 {isRTL?'تقييم':'reviews'}) 🌟</span>
+
+              {/* Price */}
+              <div style={{ background: `${accent}10`, border: `3px solid ${accent}30`, borderRadius: 18, padding: '1.125rem 1.25rem', marginBottom: '1.5rem', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 5, background: accent, borderRadius: '0 0 0 4px' }} />
+                <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--text-soft)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem' }}>💰 السعر</p>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
+                  <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2.75rem', color: accent }}>{finalPrice.toLocaleString()}</span>
+                  <span style={{ fontWeight: 700, color: 'var(--text-mid)', fontSize: '1rem' }}>دج</span>
+                </div>
               </div>
-            </div>
 
-            {/* Price */}
-            <div className="p-5 rounded-3xl relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${accentColor}10, ${accentColor}05)`, border: `3px solid ${accentColor}30` }}>
-              <div className="absolute top-0 left-0 w-1.5 h-full rounded-full" style={{ background: accentColor }} />
-              <p className="text-[10px] font-black uppercase tracking-wider mb-2 pl-4" style={{ color: 'var(--text-soft)' }}>{isRTL?'💰 السعر':'💰 Price'}</p>
-              <div className="flex items-baseline gap-3 pl-4">
-                <span className="font-black" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '3rem', color: accentColor, lineHeight: 1 }}>{finalPrice.toLocaleString()}</span>
-                <span className="text-base font-bold" style={{ color: 'var(--text-mid)' }}>دج</span>
-                {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
-                  <div>
-                    <span className="text-sm line-through font-bold block" style={{ color: 'var(--text-soft)' }}>{parseFloat(product.priceOriginal).toLocaleString()} دج</span>
-                    <span className="text-xs font-black" style={{ color: 'var(--coral)' }}>🎉 وفّر {(parseFloat(product.priceOriginal)-finalPrice).toLocaleString()} دج!</span>
-                  </div>
-                )}
+              {/* Stock */}
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '0.4rem 1rem', borderRadius: 50, fontWeight: 800, fontSize: '0.8rem', marginBottom: '1.5rem', background: autoGen ? 'rgba(255,217,61,0.15)' : inStock ? 'rgba(110,231,183,0.15)' : 'rgba(255,107,107,0.1)', border: `2px solid ${autoGen ? 'var(--sun-dk)' : inStock ? 'var(--mint-dk)' : 'var(--coral)'}`, color: autoGen ? 'var(--sun-dk)' : inStock ? 'var(--mint-dk)' : 'var(--coral)' }}>
+                {autoGen ? '♾️ مخزون غير محدود' : inStock ? '✅ متوفر' : '❌ نفد المخزون'}
               </div>
-            </div>
 
-            {/* Stock */}
-            <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-black"
-              style={{ backgroundColor: autoGen?'rgba(255,217,61,0.15)':inStock?'rgba(110,231,183,0.15)':'rgba(255,107,107,0.1)', border: `2px solid ${autoGen?'var(--sun-dark)':inStock?'var(--mint-dk)':'var(--coral)'}`, color: autoGen?'var(--sun-dark)':inStock?'var(--mint-dk)':'var(--coral)' }}>
-              {autoGen?'♾️ ':inStock?'✅ ':'❌ '}
-              {autoGen?(isRTL?'مخزون غير محدود':'Unlimited'):inStock?(isRTL?'متوفر':'In Stock'):(isRTL?'نفد':'Out')}
-            </div>
-
-            {/* Offers */}
-            {product.offers?.length > 0 && (
-              <div>
-                <p className="text-xs font-black uppercase tracking-wider mb-3" style={{ color: accentColor }}>🎁 {isRTL?'اختر الباقة':'Select Package'}</p>
-                <div className="space-y-2">
-                  {product.offers.map((offer:any) => (
-                    <label key={offer.id} className="flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all btn-bouncy"
-                      style={{ border: `3px solid ${selectedOffer===offer.id?accentColor:'var(--border)'}`, backgroundColor: selectedOffer===offer.id?`${accentColor}08`:'white' }}>
-                      <div className="flex items-center gap-3">
-                        <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ border: `2px solid ${selectedOffer===offer.id?accentColor:'var(--border)'}`, backgroundColor: selectedOffer===offer.id?accentColor:'transparent' }}>
-                          {selectedOffer===offer.id && <Check className="w-3 h-3 text-white" />}
+              {/* Offers */}
+              {product.offers?.length > 0 && (
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <p style={{ fontSize: '0.75rem', fontWeight: 900, color: accent, textTransform: 'uppercase', marginBottom: '0.625rem' }}>🎁 اختر الباقة</p>
+                  {product.offers.map((o: any) => (
+                    <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1rem', border: `3px solid ${selectedOffer === o.id ? accent : 'var(--border)'}`, borderRadius: 16, cursor: 'pointer', marginBottom: '0.5rem', background: selectedOffer === o.id ? `${accent}08` : 'transparent', transition: 'all 0.2s' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+                        <div style={{ width: 20, height: 20, borderRadius: '50%', border: `2.5px solid ${selectedOffer === o.id ? accent : 'var(--border)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', background: selectedOffer === o.id ? accent : 'transparent' }}>
+                          {selectedOffer === o.id && <Check size={10} color="#fff" />}
                         </div>
-                        <input type="radio" name="offer" value={offer.id} checked={selectedOffer===offer.id} onChange={() => setSelectedOffer(offer.id)} className="sr-only" />
-                        <div><p className="text-sm font-bold" style={{ color:'var(--text)' }}>{offer.name}</p><p className="text-[10px] font-medium" style={{ color:'var(--text-soft)' }}>Qty: {offer.quantity}</p></div>
+                        <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
+                        <div>
+                          <p style={{ fontWeight: 700, fontSize: '0.9rem' }}>{o.name}</p>
+                          <p style={{ fontSize: '0.72rem', color: 'var(--text-soft)', fontWeight: 600 }}>الكمية: {o.quantity}</p>
+                        </div>
                       </div>
-                      <span className="font-black" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.3rem', color: accentColor }}>{offer.price.toLocaleString()} <span className="text-xs">دج</span></span>
+                      <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.2rem', color: accent }}>{o.price.toLocaleString()} دج</span>
                     </label>
                   ))}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Attributes */}
-            {allAttrs.map((attr:any) => (
-              <div key={attr.id}>
-                <p className="text-xs font-black uppercase tracking-wider mb-3" style={{ color: accentColor }}>🎨 {attr.name}</p>
-                {attr.displayMode==='color' ? (
-                  <div className="flex gap-2 flex-wrap">
-                    {attr.variants.map((v:any) => {
-                      const s = selectedVariants[attr.name]===v.value;
-                      return <button key={v.id} onClick={() => handleVariantSelection(attr.name,v.value)} title={v.name} className="w-10 h-10 rounded-xl transition-all btn-bouncy"
-                        style={{ backgroundColor:v.value, boxShadow:s?`0 0 0 3px white,0 0 0 5px ${accentColor}`:'0 2px 8px rgba(0,0,0,0.15)', transform:s?'scale(1.15)':'scale(1)' }} />;
-                    })}
-                  </div>
-                ) : attr.displayMode==='image' ? (
-                  <div className="flex gap-2 flex-wrap">
-                    {attr.variants.map((v:any) => {
-                      const s = selectedVariants[attr.name]===v.value;
-                      return <button key={v.id} onClick={() => handleVariantSelection(attr.name,v.value)} className="w-14 h-14 overflow-hidden rounded-2xl transition-all btn-bouncy"
-                        style={{ border:`3px solid ${s?accentColor:'var(--border)'}`, opacity:s?1:0.6 }}><img src={v.value} alt={v.name} className="w-full h-full object-cover" /></button>;
-                    })}
-                  </div>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {attr.variants.map((v:any) => {
-                      const s = selectedVariants[attr.name]===v.value;
-                      return <button key={v.id} onClick={() => handleVariantSelection(attr.name,v.value)} className="px-5 py-2.5 rounded-2xl text-sm font-bold transition-all btn-bouncy"
-                        style={{ border:`2px solid ${s?accentColor:'var(--border)'}`, backgroundColor:s?`${accentColor}15`:'white', color:s?accentColor:'var(--text-mid)' }}>{v.name}</button>;
-                    })}
-                  </div>
-                )}
-              </div>
-            ))}
+              {/* Attributes */}
+              {allAttrs.map((attr: any) => (
+                <div key={attr.id} style={{ marginBottom: '1.125rem' }}>
+                  <p style={{ fontSize: '0.75rem', fontWeight: 900, color: accent, textTransform: 'uppercase', marginBottom: '0.625rem' }}>🎨 {attr.name}</p>
+                  {attr.displayMode === 'color' ? (
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      {attr.variants.map((v: any) => (
+                        <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ width: 32, height: 32, borderRadius: '50%', background: v.value, border: 'none', cursor: 'pointer', outline: `3px solid ${selectedVariants[attr.name] === v.value ? accent : 'transparent'}`, outlineOffset: 3, transition: 'all 0.2s' }} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {attr.variants.map((v: any) => (
+                        <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ padding: '0.4rem 1rem', border: `2.5px solid ${selectedVariants[attr.name] === v.value ? accent : 'var(--border)'}`, borderRadius: 50, fontWeight: 700, fontSize: '0.85rem', background: selectedVariants[attr.name] === v.value ? `${accent}12` : '#fff', color: selectedVariants[attr.name] === v.value ? accent : 'var(--text-mid)', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
+                          {v.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
 
-            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
+              <ProductForm product={product} userId={product.store.userId} domain={domain}
+                selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
+
+              {product.desc && (
+                <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '3px dashed var(--border)' }}>
+                  <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: 'var(--text)', marginBottom: '0.875rem' }}>📖 تفاصيل المنتج</p>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 600, lineHeight: 1.8, color: 'var(--text-mid)' }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc, { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'span'], ALLOWED_ATTR: ['class', 'style'] }) }} />
+                </div>
+              )}
+            </div>
           </div>
         </div>
-
-        {product.desc && (
-          <section className="mt-16 pt-10" style={{ borderTop: '3px dashed var(--border)' }}>
-            <h2 className="flex items-center gap-3 mb-8" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.8rem', color: 'var(--text)' }}>
-              <span className="text-3xl">📖</span> {isRTL?'تفاصيل المنتج':'Product Details'}
-            </h2>
-            <div className="p-8 rounded-3xl polka-dots" style={{ border: '2px solid var(--border)', backgroundColor: 'white' }}>
-              <div className="text-sm font-medium leading-relaxed" style={{ color: 'var(--text-mid)' }}
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc, { ALLOWED_TAGS:['p','br','strong','em','ul','ol','li','h1','h2','h3','h4','span'], ALLOWED_ATTR:['class','style'] }) }} />
-            </div>
-          </section>
-        )}
-      </main>
+      </div>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// PRODUCT FORM  ← مُصلح: أضيفت السلة + الطلب المباشر + API endpoint
-// ─────────────────────────────────────────────────────────────
-const inputSt = (err?: boolean): React.CSSProperties => ({
-  width: '100%', padding: '12px 16px', fontSize: '0.875rem', fontWeight: 600,
-  backgroundColor: 'white', border: `2px solid ${err ? 'var(--coral)' : 'var(--border)'}`,
-  borderRadius: '0.875rem', color: 'var(--text)', outline: 'none',
-  fontFamily: "'Nunito', sans-serif", transition: 'border-color 0.2s, box-shadow 0.2s',
-});
-
-const FieldWrapper = ({ error, label, children }: { error?: string; label?: string; children: React.ReactNode }) => (
-  <div className="space-y-1.5">
-    {label && <label className="block text-xs font-black uppercase tracking-wider" style={{ color: 'var(--text-mid)' }}>{label}</label>}
-    {children}
-    {error && <p className="text-xs font-bold flex items-center gap-1" style={{ color: 'var(--coral)' }}><AlertCircle className="w-3 h-3" />{error}</p>}
-  </div>
-);
-
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0 }: ProductFormProps) {
+/* ═══════════════════════════════════════════════════════════
+   PRODUCT FORM
+═══════════════════════════════════════════════════════════ */
+export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: ProductFormProps) {
   const router = useRouter();
-  const [wilayas,setWilayas] = useState<Wilaya[]>([]);
-  const [communes,setCommunes] = useState<Commune[]>([]);
-  const [loadingCommunes,setLoadingCommunes] = useState(false);
-  const [formData,setFormData] = useState({ customerId:'', customerName:'', customerPhone:'', customerWelaya:'', customerCommune:'', quantity:1, priceLoss:0, typeLivraison:'home' as 'home'|'office' });
-  const [formErrors,setFormErrors] = useState<Record<string,string>>({});
-  const [submitting,setSubmitting] = useState(false);
+  const [wilayas, setWilayas] = useState<Wilaya[]>([]);
+  const [communes, setCommunes] = useState<Commune[]>([]);
+  const [loadingC, setLC] = useState(false);
+  const [fd, setFd] = useState({ customerId: '', customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '', quantity: 1, priceLoss: 0, typeLivraison: 'home' as 'home' | 'office' });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [sub, setSub] = useState(false);
   const [isOrderNow, setIsOrderNow] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
+  const initCount = useCartStore(s => s.initCount);
 
-  const initCount = useCartStore((state) => state.initCount);
+  useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
+  useEffect(() => { if (typeof window !== 'undefined') { const id = localStorage.getItem('customerId'); if (id) setFd(p => ({ ...p, customerId: id })); } }, []);
+  useEffect(() => {
+    if (!fd.customerWelaya) { setCommunes([]); return; }
+    setLC(true); fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLC(false); });
+  }, [fd.customerWelaya]);
 
-  useEffect(() => { if(userId) fetchWilayas(userId).then(setWilayas); },[userId]);
-  useEffect(() => { if(typeof window!=='undefined'){ const id=localStorage.getItem('customerId'); if(id) setFormData(p=>({...p,customerId:id})); } },[]);
-  useEffect(() => { if(!formData.customerWelaya){setCommunes([]);return;} setLoadingCommunes(true); fetchCommunes(formData.customerWelaya).then(d=>{setCommunes(d);setLoadingCommunes(false);}); },[formData.customerWelaya]);
-
-  const selectedWilayaData = useMemo(() => wilayas.find(w=>String(w.id)===String(formData.customerWelaya)),[wilayas,formData.customerWelaya]);
-  const getFinalPrice = useCallback(():number => {
-    const base = typeof product.price==='string'?parseFloat(product.price):product.price as number;
-    const offer = product.offers?.find(o=>o.id===selectedOffer);
-    if(offer) return offer.price;
-    if(product.variantDetails?.length && Object.keys(selectedVariants).length>0){ const m=product.variantDetails.find(v=>variantMatches(v,selectedVariants)); if(m&&m.price!==-1) return m.price; }
+  const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
+  const getFP = useCallback((): number => {
+    const base = typeof product.price === 'string' ? parseFloat(product.price) : product.price as number;
+    const off = product.offers?.find((o: any) => o.id === selectedOffer);
+    if (off) return off.price;
+    if (product.variantDetails?.length && Object.keys(selectedVariants).length > 0) {
+      const m = product.variantDetails.find((v: any) => variantMatches(v, selectedVariants));
+      if (m && m.price !== -1) return m.price;
+    }
     return base;
-  },[product,selectedOffer,selectedVariants]);
-  const getPriceLivraison = useCallback(():number => { if(!selectedWilayaData) return 0; return formData.typeLivraison==='home'?selectedWilayaData.livraisonHome:selectedWilayaData.livraisonOfice; },[selectedWilayaData,formData.typeLivraison]);
-  useEffect(() => { if(selectedWilayaData) setFormData(f=>({...f,priceLoss:selectedWilayaData.livraisonReturn})); },[selectedWilayaData]);
-
-  const finalPrice = getFinalPrice();
-  const getTotalPrice = () => finalPrice*formData.quantity+ +getPriceLivraison();
-
+  }, [product, selectedOffer, selectedVariants]);
+  const getLiv = useCallback((): number => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; }, [selW, fd.typeLivraison]);
+  const fp = getFP();
+  const total = () => fp * fd.quantity + +getLiv();
   const validate = () => {
-    const e:Record<string,string>={};
-    if(!formData.customerName.trim())  e.customerName='الاسم مطلوب';
-    if(!formData.customerPhone.trim()) e.customerPhone='رقم الهاتف مطلوب';
-    if(!formData.customerWelaya)       e.customerWelaya='الولاية مطلوبة';
-    if(!formData.customerCommune)      e.customerCommune='البلدية مطلوبة';
+    const e: Record<string, string> = {};
+    if (!fd.customerName.trim()) e.customerName = 'الاسم مطلوب';
+    if (!fd.customerPhone.trim()) e.customerPhone = 'الهاتف مطلوب';
+    if (!fd.customerWelaya) e.customerWelaya = 'الولاية مطلوبة';
+    if (!fd.customerCommune) e.customerCommune = 'البلدية مطلوبة';
     return e;
   };
-
-  const getVariantDetailId = useCallback(() => {
-    if(!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+  const getVarId = useCallback(() => {
+    if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
     return product.variantDetails.find((v: any) => variantMatches(v, selectedVariants))?.id;
   }, [product.variantDetails, selectedVariants]);
 
-  // ← إضافة للسلة
   const addToCart = () => {
-    setIsOrderNow(false); setIsAdded(true);
-    const existing = localStorage.getItem(domain);
-    const cart = existing ? JSON.parse(existing) : [];
-    cart.push({
-      ...formData, product, variantDetailId: getVariantDetailId(),
-      productId: product.id, storeId: product.store.id, userId,
-      selectedOffer, selectedVariants,
-      platform: platform || 'store',
-      finalPrice, totalPrice: getTotalPrice(), priceLivraison: getPriceLivraison(),
-      addedAt: new Date().getTime(),
-    });
+    setIsAdded(true);
+    const cart = JSON.parse(localStorage.getItem(domain) || '[]');
+    cart.push({ ...fd, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
     localStorage.setItem(domain, JSON.stringify(cart));
     initCount(cart.length);
     setTimeout(() => setIsAdded(false), 2000);
   };
 
-  // ← إرسال الطلب مباشرة
-  const handleSubmit = async (e:React.FormEvent) => {
-    e.preventDefault(); const errs=validate(); if(Object.keys(errs).length){setFormErrors(errs);return;} setFormErrors({}); setSubmitting(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const er = validate(); if (Object.keys(er).length) { setErrors(er); return; }
+    setErrors({}); setSub(true);
     try {
-      await axios.post(`${API_URL}/orders/create`, {
-        ...formData, productId: product.id, storeId: product.store.id, userId,
-        selectedOffer, variantDetailId: getVariantDetailId(),
-        platform: platform || 'store', finalPrice, totalPrice: getTotalPrice(), priceLivraison: getPriceLivraison(),
-      });
-      if(typeof window!=='undefined'&&formData.customerId) localStorage.setItem('customerId',formData.customerId);
+      await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+      if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
       router.push(`/lp/${domain}/successfully`);
-    } catch(err){ console.error(err); } finally{ setSubmitting(false); }
+    } catch { } finally { setSub(false); }
   };
 
-  const onFocus = (e:React.FocusEvent<any>) => { e.target.style.borderColor='var(--sky)'; e.target.style.boxShadow='0 0 0 4px rgba(78,205,196,0.15)'; };
-  const onBlur  = (e:React.FocusEvent<any>, err?:boolean) => { e.target.style.borderColor=err?'var(--coral)':'var(--border)'; e.target.style.boxShadow='none'; };
-
-  const showForm = isOrderNow || !product.store?.cart;
-
   return (
-    <div style={{ borderTop: '3px dashed var(--border)', paddingTop: '1.5rem' }}>
-      <h3 className="flex items-center gap-2 mb-6 font-black" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.25rem', color: 'var(--text)' }}>📦 Order</h3>
+    <div style={{ paddingTop: '1.5rem', borderTop: '3px dashed var(--border)', marginTop: '1.5rem' }}>
+      <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.15rem', color: 'var(--text)', marginBottom: '1rem' }}>📦 اطلب الآن</p>
 
-      {/* أزرار السلة + الطلب */}
       {product.store?.cart && (
-        <div className="flex gap-3 mb-6">
-          <button onClick={addToCart} disabled={isAdded}
-            className={isAdded ? 'animate-cart' : ''}
-            style={{
-              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-              padding: '14px', borderRadius: '1rem', cursor: isAdded ? 'default' : 'pointer',
-              fontFamily: "'Nunito',sans-serif", fontSize: '14px', fontWeight: 800,
-              transition: 'all 0.3s ease',
-              border: isAdded ? '2px solid var(--mint-dk)' : '2px solid var(--sky)',
-              backgroundColor: isAdded ? 'rgba(110,231,183,0.1)' : 'white',
-              color: isAdded ? 'var(--mint-dk)' : 'var(--sky-dk)',
-              boxShadow: isAdded ? '0 4px 16px rgba(110,231,183,0.3)' : 'none',
-            }}>
-            {isAdded ? <><CheckCircle2 size={17} className="animate-check" /><span className="animate-check">تمت الإضافة!</span></> : <><ShoppingCart size={17} /><span>أضف للسلة</span></>}
+        <div className="cart-add-btns" style={{ marginBottom: '1.25rem' }}>
+          <button onClick={addToCart} disabled={isAdded} className={isAdded ? 'anim-cart-pop' : ''} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '0.875rem', borderRadius: 16, cursor: isAdded ? 'default' : 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: '0.875rem', transition: 'all 0.3s', border: isAdded ? '2.5px solid var(--mint-dk)' : '2.5px solid var(--sky)', background: isAdded ? 'rgba(110,231,183,0.12)' : '#fff', color: isAdded ? 'var(--mint-dk)' : 'var(--sky-dk)' }}>
+            {isAdded ? <><CheckCircle2 size={16} className="anim-check-in" /> تمت الإضافة!</> : <><ShoppingCart size={16} /> أضف للسلة</>}
           </button>
-          <button onClick={() => setIsOrderNow(true)}
-            className="btn-bouncy"
-            style={{
-              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-              padding: '14px', borderRadius: '1rem', border: 'none', cursor: 'pointer',
-              fontFamily: "'Nunito',sans-serif", fontSize: '14px', fontWeight: 800,
-              background: 'linear-gradient(135deg, var(--coral), var(--grape))',
-              color: 'white', boxShadow: '0 4px 20px rgba(255,107,107,0.4)',
-            }}>
-            <Zap size={17} /> طلب الآن
+          <button onClick={() => setIsOrderNow(true)} className="btn-bouncy" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '0.875rem', borderRadius: 16, border: 'none', cursor: 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: '0.875rem', background: 'linear-gradient(135deg, var(--coral), var(--grape))', color: '#fff', boxShadow: '0 4px 20px rgba(255,107,107,0.4)' }}>
+            <Zap size={16} /> طلب الآن
           </button>
         </div>
       )}
 
-      {/* نموذج الطلب */}
-      {showForm && (
-        <div style={{ animation: 'pop-in 0.3s ease-in-out' }}>
+      {(isOrderNow || !product.store?.cart) && (
+        <div style={{ animation: 'pop-in 0.3s ease' }}>
           {product.store?.cart && (
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-xs font-black uppercase tracking-wider" style={{ color: 'var(--coral)' }}>📦 بيانات التوصيل</p>
-              <button onClick={() => setIsOrderNow(false)} className="btn-bouncy flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold"
-                style={{ border: '2px solid var(--border)', backgroundColor: 'white', color: 'var(--text-soft)' }}><X size={12} /> إلغاء</button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <p style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--coral)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>📦 بيانات التوصيل</p>
+              <button onClick={() => setIsOrderNow(false)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0.375rem 0.75rem', borderRadius: 10, border: '2px solid var(--border)', background: '#fff', color: 'var(--text-soft)', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                <X size={12} /> إلغاء
+              </button>
             </div>
           )}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <FieldWrapper error={formErrors.customerName} label="👤 الاسم">
-                <div className="relative">
-                  <User className="absolute right-3 top-3.5 w-3.5 h-3.5" style={{ color:'var(--text-soft)' }} />
-                  <input type="text" value={formData.customerName} onChange={e=>setFormData({...formData,customerName:e.target.value})} placeholder="الاسم الكامل" style={{ ...inputSt(!!formErrors.customerName), paddingRight:'2.5rem' }} onFocus={onFocus} onBlur={e=>onBlur(e,!!formErrors.customerName)} />
+          <form onSubmit={handleSubmit}>
+            <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
+              <FR error={errors.customerName} label="👤 الاسم">
+                <div style={{ position: 'relative' }}>
+                  <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder="الاسم الكامل" style={inp(!!errors.customerName)} />
                 </div>
-              </FieldWrapper>
-              <FieldWrapper error={formErrors.customerPhone} label="📞 الهاتف">
-                <div className="relative">
-                  <Phone className="absolute right-3 top-3.5 w-3.5 h-3.5" style={{ color:'var(--text-soft)' }} />
-                  <input type="tel" value={formData.customerPhone} onChange={e=>setFormData({...formData,customerPhone:e.target.value})} placeholder="0X XX XX XX XX" style={{ ...inputSt(!!formErrors.customerPhone), paddingRight:'2.5rem' }} onFocus={onFocus} onBlur={e=>onBlur(e,!!formErrors.customerPhone)} />
-                </div>
-              </FieldWrapper>
+              </FR>
+              <FR error={errors.customerPhone} label="📞 الهاتف">
+                <input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} placeholder="0XXXXXXXXX" style={inp(!!errors.customerPhone)} />
+              </FR>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <FieldWrapper error={formErrors.customerWelaya} label="📍 الولاية">
-                <div className="relative">
-                  <MapPin className="absolute right-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-soft)' }} />
-                  <ChevronDown className="absolute left-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-soft)' }} />
-                  <select value={formData.customerWelaya} onChange={e=>setFormData({...formData,customerWelaya:e.target.value,customerCommune:''})} style={{ ...inputSt(!!formErrors.customerWelaya), paddingRight:'2.5rem', appearance:'none' as any, cursor:'pointer' }}>
-                    <option value="">اختر الولاية</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+            <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
+              <FR error={errors.customerWelaya} label="📍 الولاية">
+                <div style={{ position: 'relative' }}>
+                  <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)', pointerEvents: 'none' }} />
+                  <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...inp(!!errors.customerWelaya), paddingLeft: 32, fontFamily: 'inherit' }}>
+                    <option value="">اختر الولاية</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                   </select>
                 </div>
-              </FieldWrapper>
-              <FieldWrapper error={formErrors.customerCommune} label="🏘️ البلدية">
-                <div className="relative">
-                  <MapPin className="absolute right-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-soft)' }} />
-                  <ChevronDown className="absolute left-3 top-3.5 w-3.5 h-3.5 pointer-events-none" style={{ color:'var(--text-soft)' }} />
-                  <select value={formData.customerCommune} disabled={!formData.customerWelaya||loadingCommunes} onChange={e=>setFormData({...formData,customerCommune:e.target.value})} style={{ ...inputSt(!!formErrors.customerCommune), paddingRight:'2.5rem', appearance:'none' as any, cursor:'pointer', opacity:!formData.customerWelaya?0.5:1 }}>
-                    <option value="">{loadingCommunes?'⏳...':'اختر البلدية'}</option>{communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}
+              </FR>
+              <FR error={errors.customerCommune} label="🏘️ البلدية">
+                <div style={{ position: 'relative' }}>
+                  <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)', pointerEvents: 'none' }} />
+                  <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inp(!!errors.customerCommune), paddingLeft: 32, opacity: !fd.customerWelaya ? 0.5 : 1, fontFamily: 'inherit' }}>
+                    <option value="">{loadingC ? '⏳...' : 'اختر البلدية'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                   </select>
                 </div>
-              </FieldWrapper>
+              </FR>
             </div>
 
-            {/* التوصيل */}
-            <div>
-              <p className="text-xs font-black uppercase tracking-wider mb-3" style={{ color:'var(--text-mid)' }}>🚚 طريقة التوصيل</p>
-              <div className="grid grid-cols-2 gap-3">
-                {(['home','office'] as const).map(type => (
-                  <button key={type} type="button" onClick={() => setFormData(p=>({...p,typeLivraison:type}))} className="btn-bouncy flex flex-col items-center gap-2 py-5 rounded-2xl transition-all"
-                    style={{ border:`3px solid ${formData.typeLivraison===type?'var(--sky)':'var(--border)'}`, backgroundColor:formData.typeLivraison===type?'rgba(78,205,196,0.08)':'white' }}>
-                    <span className="text-2xl">{type==='home'?'🏠':'🏢'}</span>
-                    <p className="text-xs font-black uppercase" style={{ color:formData.typeLivraison===type?'var(--sky-dk)':'var(--text-soft)' }}>{type==='home'?'للبيت':'للمكتب'}</p>
-                    {selectedWilayaData && <p className="text-xs font-bold" style={{ color:'var(--text-mid)' }}>{(type==='home'?selectedWilayaData.livraisonHome:selectedWilayaData.livraisonOfice).toLocaleString()} دج</p>}
+            <div style={{ marginBottom: '0.875rem' }}>
+              <p style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--text-mid)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>🚚 نوع التوصيل</p>
+              <div className="delivery-grid">
+                {(['home', 'office'] as const).map(t => (
+                  <button key={t} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: t }))} style={{ padding: '0.875rem', border: `3px solid ${fd.typeLivraison === t ? 'var(--sky)' : 'var(--border)'}`, borderRadius: 16, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === t ? 'rgba(78,205,196,0.1)' : '#fff', fontFamily: 'inherit', transition: 'all 0.2s' }}>
+                    <span style={{ display: 'block', fontSize: '1.5rem', marginBottom: 4 }}>{t === 'home' ? '🏠' : '🏢'}</span>
+                    <p style={{ fontWeight: 800, fontSize: '0.8rem', color: fd.typeLivraison === t ? 'var(--sky-dk)' : 'var(--text-soft)' }}>{t === 'home' ? 'للبيت' : 'للمكتب'}</p>
+                    {selW && <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: fd.typeLivraison === t ? 'var(--text)' : 'var(--text-soft)' }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج</p>}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* الكمية */}
-            <FieldWrapper label="🔢 الكمية">
-              <div className="flex items-center gap-4">
-                <button type="button" onClick={() => setFormData(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} className="w-10 h-10 rounded-xl flex items-center justify-center btn-bouncy" style={{ border:'2px solid var(--border)', color:'var(--coral)', backgroundColor:'white' }}><Minus className="w-4 h-4" /></button>
-                <span className="w-12 text-center font-black text-2xl" style={{ fontFamily:"'Fredoka One',cursive", color:'var(--text)' }}>{formData.quantity}</span>
-                <button type="button" onClick={() => setFormData(p=>({...p,quantity:p.quantity+1}))} className="w-10 h-10 rounded-xl flex items-center justify-center btn-bouncy" style={{ border:'2px solid var(--border)', color:'var(--coral)', backgroundColor:'white' }}><Plus className="w-4 h-4" /></button>
-              </div>
-            </FieldWrapper>
-
-            {/* الملخص */}
-            <div className="p-5 rounded-3xl relative overflow-hidden polka-dots" style={{ border:'2px solid var(--border)', backgroundColor:'white' }}>
-              <p className="text-xs font-black uppercase tracking-wider mb-4" style={{ color:'var(--coral)' }}>🧾 ملخص الطلب</p>
-              <div className="space-y-2.5">
-                {[{l:'المنتج',v:product.name?.slice(0,25)},{l:'السعر',v:`${finalPrice.toLocaleString()} دج`},{l:'الكمية',v:`× ${formData.quantity}`},{l:'التوصيل',v:selectedWilayaData?`${getPriceLivraison().toLocaleString()} دج`:'---'}].map(row=>(
-                  <div key={row.l} className="flex justify-between items-center">
-                    <span className="text-[10px] font-black uppercase tracking-wider" style={{ color:'var(--text-soft)' }}>{row.l}</span>
-                    <span className="text-sm font-bold" style={{ color:'var(--text)' }}>{row.v}</span>
-                  </div>
-                ))}
-                <div className="pt-3" style={{ borderTop:'2px dashed var(--border)' }}>
-                  <div className="flex justify-between items-baseline">
-                    <span className="text-sm font-black uppercase" style={{ color:'var(--coral)' }}>💰 المجموع</span>
-                    <span className="font-black" style={{ fontFamily:"'Fredoka One',cursive", fontSize:'2rem', color:'var(--coral)' }}>{getTotalPrice().toLocaleString()}<span className="text-sm ml-1">دج</span></span>
-                  </div>
-                </div>
+            <div style={{ marginBottom: '0.875rem' }}>
+              <p style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--text-mid)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>🔢 الكمية</p>
+              <div style={{ display: 'inline-flex', alignItems: 'center', border: '2.5px solid var(--border)', borderRadius: 16, overflow: 'hidden', background: '#fff' }}>
+                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--coral)' }}><Minus size={16} /></button>
+                <span style={{ width: 46, textAlign: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '1.25rem', color: 'var(--text)' }}>{fd.quantity}</span>
+                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--coral)' }}><Plus size={16} /></button>
               </div>
             </div>
 
-            <button type="submit" disabled={submitting} className="btn-bouncy w-full py-4 rounded-2xl flex items-center justify-center gap-3 text-base font-black text-white transition-all"
-              style={{ background:submitting?'var(--text-soft)':'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow:submitting?'none':'0 8px 28px rgba(255,107,107,0.4)', cursor:submitting?'not-allowed':'pointer' }}>
-              {submitting ? <><Loader2 size={18} style={{ animation:'spin-slow 1s linear infinite' }} /> ⏳ جاري المعالجة...</> : <>🎉 تأكيد الطلب</>}
+            {/* Summary */}
+            <div className="polka-dots" style={{ background: '#fff', border: '2.5px solid var(--border)', borderRadius: 20, padding: '1.125rem', marginBottom: '1.25rem' }}>
+              <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--coral)', textTransform: 'uppercase', marginBottom: '0.875rem' }}>🧾 ملخص الطلب</p>
+              {[
+                { l: 'المنتج', v: product.name.slice(0, 24) + (product.name.length > 24 ? '...' : '') },
+                { l: 'السعر', v: `${fp.toLocaleString()} دج` },
+                { l: 'الكمية', v: `× ${fd.quantity}` },
+                { l: 'التوصيل', v: selW ? `${getLiv().toLocaleString()} دج` : '---' },
+              ].map(r => (
+                <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px dashed var(--border)' }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-soft)', textTransform: 'uppercase' }}>{r.l}</span>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)' }}>{r.v}</span>
+                </div>
+              ))}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', paddingTop: '0.5rem' }}>
+                <span style={{ fontWeight: 900, fontSize: '0.875rem', color: 'var(--coral)' }}>💰 المجموع</span>
+                <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2rem', color: 'var(--coral)' }}>{total().toLocaleString()} <span style={{ fontSize: '0.9rem', fontFamily: 'inherit' }}>دج</span></span>
+              </div>
+            </div>
+
+            <button type="submit" disabled={sub} className="btn-bouncy" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '1rem', borderRadius: 18, border: 'none', cursor: sub ? 'not-allowed' : 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 900, fontSize: '1rem', color: '#fff', background: sub ? 'var(--text-soft)' : 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: sub ? 'none' : '0 8px 28px rgba(255,107,107,0.4)', opacity: sub ? 0.8 : 1 }}>
+              {sub ? <><Loader2 size={18} style={{ animation: 'spin-slow 1s linear infinite' }} /> ⏳ جاري المعالجة...</> : '🎉 تأكيد الطلب'}
             </button>
-            <p className="text-[10px] text-center font-bold flex items-center justify-center gap-1.5" style={{ color:'var(--text-soft)' }}>🔒 دفع آمن ومشفر</p>
+            <p style={{ textAlign: 'center', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-soft)', marginTop: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              <Lock size={11} style={{ color: 'var(--sky)' }} /> دفع آمن ومشفر
+            </p>
           </form>
         </div>
       )}
@@ -1212,194 +1105,318 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// STATIC PAGES  ← مُصلح: استقبال store وتمريره لـ Contact
-// ─────────────────────────────────────────────────────────────
-export function StaticPage({ staticPage, page, store }: any) {
-  const p = (staticPage || page || '').toLowerCase();
-  return <>{p==='privacy'&&<Privacy/>}{p==='terms'&&<Terms/>}{p==='cookies'&&<Cookies/>}{p==='contact'&&<Contact store={store}/>}</>;
-}
+/* ═══════════════════════════════════════════════════════════
+   CART
+═══════════════════════════════════════════════════════════ */
+export function Cart({ domain, store }: { domain: string; store: any }) {
+  const [items, setItems] = useState<any[]>([]);
+  const [wilayas, setWilayas] = useState<Wilaya[]>([]);
+  const [communes, setCommunes] = useState<Commune[]>([]);
+  const [loadingC, setLC] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [fd, setFd] = useState({ customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '', typeLivraison: 'home' as 'home' | 'office' });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const initCount = useCartStore(s => s.initCount);
 
-function PageWrapper({ children, emoji, title, subtitle }: { children:React.ReactNode; emoji:string; title:string; subtitle:string }) {
-  return (
-    <div className="min-h-screen" style={{ backgroundColor:'var(--bg)', fontFamily:"'Nunito',sans-serif" }}>
-      <div className="relative overflow-hidden py-20 polka-dots" style={{ background:'linear-gradient(135deg, #fff9e6 0%, var(--bg) 100%)' }}>
-        <Confetti/>
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <div className="text-6xl mb-5 block" style={{ animation:'bounce-loop 2s ease-in-out infinite' }}>{emoji}</div>
-          <h1 className="font-black mb-3" style={{ fontFamily:"'Fredoka One',cursive", fontSize:'clamp(2rem,5vw,4rem)', color:'var(--text)' }}>{title}</h1>
-          <p className="text-sm font-semibold mx-auto" style={{ color:'var(--text-mid)', maxWidth:'400px' }}>{subtitle}</p>
+  useEffect(() => { setItems(JSON.parse(localStorage.getItem(domain) || '[]')); if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas); }, [domain, store]);
+  useEffect(() => { if (!fd.customerWelaya) { setCommunes([]); return; } setLC(true); fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLC(false); }); }, [fd.customerWelaya]);
+
+  const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
+  const getLiv = () => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; };
+  const cartTotal = items.reduce((a, i) => a + (i.finalPrice * i.quantity), 0);
+  const finalTotal = cartTotal + +getLiv();
+  const update = (n: any[]) => { setItems(n); localStorage.setItem(domain, JSON.stringify(n)); initCount(n.length); };
+  const changeQty = (i: number, d: number) => { const n = [...items]; n[i].quantity = Math.max(1, n[i].quantity + d); update(n); };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const er: Record<string, string> = {};
+    if (!fd.customerName.trim()) er.name = 'الاسم مطلوب';
+    if (!fd.customerPhone.trim()) er.phone = 'الهاتف مطلوب';
+    if (!fd.customerWelaya) er.w = 'الولاية مطلوبة';
+    if (!fd.customerCommune) er.c = 'البلدية مطلوبة';
+    if (Object.keys(er).length) { setErrors(er); return; }
+    setErrors({}); setSubmitting(true);
+    try {
+      await axios.post(`${API_URL}/orders/create`, items.map(i => ({ ...fd, productId: i.productId, storeId: i.storeId, userId: i.userId, selectedOffer: i.selectedOffer, variantDetailId: i.variantDetailId, selectedVariants: i.selectedVariants, platform: i.platform || 'store', finalPrice: i.finalPrice, totalPrice: finalTotal, priceLivraison: +getLiv(), quantity: i.quantity, customerId: i.customerId || '', priceLoss: selW?.livraisonReturn ?? 0 })));
+      setSuccess(true); localStorage.removeItem(domain); setItems([]); initCount(0);
+    } catch { } finally { setSubmitting(false); }
+  };
+
+  if (success) return (
+    <div dir="rtl" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
+      <div className="anim-pop-in" style={{ textAlign: 'center', background: '#fff', padding: '4rem 2.5rem', borderRadius: 28, border: '3px solid var(--mint-dk)', maxWidth: 460, width: '100%', boxShadow: '0 12px 40px rgba(110,231,183,0.2)' }}>
+        <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'rgba(110,231,183,0.15)', border: '3px solid var(--mint-dk)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+          <CheckCircle2 size={36} style={{ color: 'var(--mint-dk)' }} />
         </div>
-        <WavyDivider topColor="var(--bg)" bottomColor="white" />
+        <h2 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.875rem', color: 'var(--text)', marginBottom: '0.625rem' }}>تم استلام طلبك! 🎉</h2>
+        <p style={{ color: 'var(--text-mid)', fontWeight: 600, marginBottom: '2rem', lineHeight: 1.7 }}>شكراً لثقتك! سنتواصل معك قريباً لتأكيد الطلب.</p>
+        <Link href="/" className="btn-bouncy" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.875rem 2rem', borderRadius: 18, background: 'linear-gradient(135deg, var(--coral), var(--grape))', color: '#fff', fontWeight: 900, fontSize: '0.9rem', boxShadow: '0 8px 28px rgba(255,107,107,0.4)' }}>
+          🛍️ العودة للمتجر
+        </Link>
       </div>
-      <div className="max-w-4xl mx-auto px-6 lg:px-10 py-16">{children}</div>
+    </div>
+  );
+
+  if (!items.length) return (
+    <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
+      <div className="polka-dots" style={{ textAlign: 'center', padding: '4rem 2rem', border: '3px dashed var(--border)', borderRadius: 28, maxWidth: 400, width: '100%', background: '#fff' }}>
+        <ShoppingBag size={52} style={{ color: 'var(--text-soft)', display: 'block', margin: '0 auto 1.25rem', opacity: 0.4 }} />
+        <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.25rem', color: 'var(--text-mid)', marginBottom: '1.75rem' }}>السلة فارغة 🧸</p>
+        <Link href="/" className="btn-bouncy" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.875rem 2rem', borderRadius: 18, background: 'linear-gradient(135deg, var(--coral), var(--grape))', color: '#fff', fontWeight: 900, fontSize: '0.9rem', boxShadow: '0 8px 28px rgba(255,107,107,0.4)' }}>
+          🛒 تسوق الآن
+        </Link>
+      </div>
+    </div>
+  );
+
+  return (
+    <div dir="rtl" style={{ minHeight: '100vh', background: 'var(--bg)', padding: '2.5rem 1.5rem 5rem' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+        <h1 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(2rem, 5vw, 3rem)', color: 'var(--text)', marginBottom: '2rem' }}>🛒 سلة التسوق</h1>
+        <div className="cart-layout">
+
+          {/* Items */}
+          <div style={{ background: '#fff', borderRadius: 24, border: '3px solid var(--border)', overflow: 'hidden', alignSelf: 'start' }}>
+            <div style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '3px dashed var(--border)', background: 'rgba(255,107,107,0.04)' }}>
+              <Package size={18} style={{ color: 'var(--coral)' }} />
+              <span style={{ fontFamily: "'Fredoka One', cursive", color: 'var(--coral)', fontSize: '0.95rem' }}>منتجاتك ({items.length})</span>
+            </div>
+            {items.map((item, i) => (
+              <div key={i} style={{ display: 'flex', gap: '1rem', padding: '1rem', borderBottom: '2px dashed var(--border)' }}>
+                <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: 78, height: 78, borderRadius: 16, objectFit: 'cover', border: '2px solid var(--border)', flexShrink: 0 }} alt="" />
+                <div style={{ flex: 1 }}>
+                  <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '0.95rem', color: 'var(--text)', marginBottom: '0.25rem' }}>{item.product?.name}</h4>
+                  <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: 'var(--coral)', marginBottom: '0.5rem' }}>{item.finalPrice?.toLocaleString()} دج</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', border: '2px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
+                      <button onClick={() => changeQty(i, -1)} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--coral)' }}><Minus size={12} /></button>
+                      <span style={{ width: 36, textAlign: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '1rem', background: 'var(--bg)' }}>{item.quantity}</span>
+                      <button onClick={() => changeQty(i, 1)} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--coral)' }}><Plus size={12} /></button>
+                    </div>
+                    <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0.375rem 0.75rem', borderRadius: 10, border: '2px solid rgba(255,107,107,0.3)', background: 'transparent', color: 'var(--coral)', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      <Trash2 size={12} /> حذف
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div style={{ padding: '1rem', background: 'rgba(255,107,107,0.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 800, fontSize: '0.875rem', color: 'var(--text-soft)' }}>المجموع الفرعي</span>
+              <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.5rem', color: 'var(--coral)' }}>{cartTotal.toLocaleString()} دج</span>
+            </div>
+          </div>
+
+          {/* Checkout */}
+          <div style={{ background: '#fff', borderRadius: 24, border: '3px solid var(--border)', padding: '1.75rem', alignSelf: 'start' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '1.25rem' }}>
+              <Truck size={18} style={{ color: 'var(--sky)' }} />
+              <span style={{ fontFamily: "'Fredoka One', cursive", color: 'var(--sky)', fontSize: '0.95rem' }}>معلومات التوصيل</span>
+            </div>
+            <form onSubmit={handleSubmit}>
+              <div className="form-row-2" style={{ marginBottom: '0.75rem' }}>
+                <FR error={errors.name} label="👤 الاسم"><input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} style={inp(!!errors.name)} /></FR>
+                <FR error={errors.phone} label="📞 الهاتف"><input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} style={inp(!!errors.phone)} /></FR>
+              </div>
+              <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
+                <FR error={errors.w} label="📍 الولاية">
+                  <div style={{ position: 'relative' }}>
+                    <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)', pointerEvents: 'none' }} />
+                    <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...inp(!!errors.w), paddingLeft: 32, fontFamily: 'inherit' }}>
+                      <option value="">اختر</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                    </select>
+                  </div>
+                </FR>
+                <FR error={errors.c} label="🏘️ البلدية">
+                  <div style={{ position: 'relative' }}>
+                    <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)', pointerEvents: 'none' }} />
+                    <select value={fd.customerCommune} disabled={loadingC || !fd.customerWelaya} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inp(!!errors.c), paddingLeft: 32, opacity: !fd.customerWelaya ? 0.5 : 1, fontFamily: 'inherit' }}>
+                      <option value="">{loadingC ? '⏳...' : 'اختر'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                    </select>
+                  </div>
+                </FR>
+              </div>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--text-mid)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>🚚 نوع التوصيل</p>
+                <div className="delivery-grid">
+                  {(['home', 'office'] as const).map(t => (
+                    <button key={t} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: t }))} style={{ padding: '0.75rem', border: `3px solid ${fd.typeLivraison === t ? 'var(--sky)' : 'var(--border)'}`, borderRadius: 14, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === t ? 'rgba(78,205,196,0.08)' : '#fff', fontFamily: 'inherit', transition: 'all 0.2s' }}>
+                      <span style={{ display: 'block', fontSize: '1.25rem', marginBottom: 3 }}>{t === 'home' ? '🏠' : '🏢'}</span>
+                      <p style={{ fontWeight: 800, fontSize: '0.78rem', color: fd.typeLivraison === t ? 'var(--sky-dk)' : 'var(--text-soft)' }}>{t === 'home' ? 'للبيت' : 'للمكتب'}</p>
+                      {selW && <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '0.9rem', color: fd.typeLivraison === t ? 'var(--text)' : 'var(--text-soft)' }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج</p>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="polka-dots" style={{ background: '#fff', border: '2.5px solid var(--border)', borderRadius: 18, padding: '1rem', marginBottom: '1rem' }}>
+                <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--coral)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>🧾 الملخص</p>
+                {[
+                  { l: 'المجموع الفرعي', v: `${cartTotal.toLocaleString()} دج` },
+                  { l: 'التوصيل', v: getLiv() ? `${getLiv().toLocaleString()} دج` : '---' },
+                ].map(r => (
+                  <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px dashed var(--border)' }}>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-soft)' }}>{r.l}</span>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)' }}>{r.v}</span>
+                  </div>
+                ))}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', paddingTop: '0.375rem' }}>
+                  <span style={{ fontWeight: 900, fontSize: '0.875rem', color: 'var(--coral)' }}>💰 الإجمالي</span>
+                  <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2rem', color: 'var(--coral)' }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.85rem', fontFamily: 'inherit' }}>دج</span></span>
+                </div>
+              </div>
+
+              <button type="submit" disabled={submitting} className="btn-bouncy" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '1rem', borderRadius: 18, border: 'none', cursor: submitting ? 'not-allowed' : 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 900, fontSize: '1rem', color: '#fff', background: submitting ? 'var(--text-soft)' : 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: submitting ? 'none' : '0 8px 28px rgba(255,107,107,0.4)' }}>
+                {submitting ? <><Loader2 size={18} style={{ animation: 'spin-slow 1s linear infinite' }} /> ⏳ جاري...</> : '🎉 تأكيد الطلب'}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-function InfoCard({ icon, title, desc, status }: { icon:React.ReactNode; title:string; desc:string; status?:string }) {
-  const isActive = status==='دائماً نشطة'||status==='Always Active';
-  return (
-    <div className="group flex gap-5 p-6 mb-3 rounded-3xl transition-all duration-300 cursor-default"
-      style={{ border:'2px solid var(--border)', backgroundColor:'white' }}
-      onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.borderColor='var(--sky)';el.style.transform='translateY(-4px) rotate(0.5deg)';el.style.boxShadow='0 12px 32px rgba(78,205,196,0.15)';}}
-      onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.borderColor='var(--border)';el.style.transform='none';el.style.boxShadow='none';}}>
-      <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background:'linear-gradient(135deg,var(--sky),var(--mint-dk))', color:'white' }}>{icon}</div>
-      <div className="flex-1">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
-          <h3 className="font-black" style={{ fontFamily:"'Fredoka One',cursive", fontSize:'1.1rem', color:'var(--text)' }}>{title}</h3>
-          {status && <span className="text-[9px] font-black uppercase tracking-wider px-3 py-1 rounded-full" style={{ backgroundColor:isActive?'rgba(110,231,183,0.15)':'rgba(255,217,61,0.2)', border:`2px solid ${isActive?'var(--mint-dk)':'var(--sun-dark)'}`, color:isActive?'var(--mint-dk)':'var(--sun-dark)' }}>{status}</span>}
-        </div>
-        <p className="text-sm font-semibold leading-relaxed" style={{ color:'var(--text-mid)' }}>{desc}</p>
+/* ═══════════════════════════════════════════════════════════
+   STATIC PAGES
+═══════════════════════════════════════════════════════════ */
+const PageShell = ({ title, emoji, children }: { title: string; emoji: string; children: React.ReactNode }) => (
+  <div dir="rtl" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+    <div className="polka-dots" style={{ position: 'relative', overflow: 'hidden', padding: '5rem 1.5rem 3rem', textAlign: 'center', background: 'linear-gradient(135deg, #fff9e6, var(--bg))' }}>
+      <Confetti />
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1rem', animation: 'bounce-loop 2s ease-in-out infinite' }}>{emoji}</span>
+        <h1 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(2rem, 5vw, 3.5rem)', color: 'var(--text)' }}>{title}</h1>
       </div>
+      <WavyDivider top="var(--bg)" bottom="#fff" />
     </div>
-  );
-}
+    <div style={{ maxWidth: 860, margin: '0 auto', padding: '2rem 1.5rem 5rem' }}>{children}</div>
+  </div>
+);
+
+const InfoCard = ({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) => (
+  <div style={{ display: 'flex', gap: '1.125rem', padding: '1.25rem', marginBottom: '0.75rem', borderRadius: 20, border: '2.5px solid var(--border)', background: '#fff', transition: 'all 0.3s', cursor: 'default' }}
+    onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--sky)'; el.style.transform = 'translateY(-4px)'; el.style.boxShadow = '0 12px 32px rgba(78,205,196,0.15)'; }}
+    onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--border)'; el.style.transform = ''; el.style.boxShadow = ''; }}>
+    <div style={{ width: 44, height: 44, borderRadius: 14, background: 'linear-gradient(135deg, var(--sky), var(--mint-dk))', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{icon}</div>
+    <div>
+      <h3 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--text)', marginBottom: '0.375rem' }}>{title}</h3>
+      <p style={{ fontSize: '0.9rem', fontWeight: 600, lineHeight: 1.7, color: 'var(--text-mid)' }}>{desc}</p>
+    </div>
+  </div>
+);
 
 export function Privacy() {
   return (
-    <PageWrapper emoji="🔒" title="Privacy Policy" subtitle="We keep your info safe — promise!">
-      <InfoCard icon={<Database size={18}/>} title="Data We Collect"   desc="We only collect what we need — your name, contact info, and order details." />
-      <InfoCard icon={<Lock size={18}/>}     title="How We Protect It" desc="We use top-notch encryption to keep your data safe." />
-      <InfoCard icon={<Globe size={18}/>}    title="Sharing Policy"    desc="We never sell your info. Only shared with delivery partners." />
-      <InfoCard icon={<Bell size={18}/>}     title="Updates"           desc="We'll let you know if anything important changes." />
-      <div className="mt-8 p-5 rounded-3xl flex items-center gap-3" style={{ backgroundColor:'rgba(110,231,183,0.1)', border:'2px solid rgba(110,231,183,0.4)' }}>
-        <span className="text-2xl">✅</span>
-        <p className="text-sm font-semibold" style={{ color:'var(--text-mid)' }}>Last updated: February 2026.</p>
-      </div>
-    </PageWrapper>
+    <PageShell emoji="🔒" title="سياسة الخصوصية">
+      <InfoCard icon={<ShieldCheck size={18} />} title="البيانات التي نجمعها" desc="نجمع فقط المعلومات الضرورية لإتمام طلبك — الاسم، رقم الهاتف، والعنوان." />
+      <InfoCard icon={<Lock size={18} />} title="كيف نحمي بياناتك" desc="نستخدم تشفيراً متطوراً لضمان أمان معلوماتك الشخصية." />
+      <InfoCard icon={<BadgeCheck size={18} />} title="سياسة المشاركة" desc="لا نبيع أو نشارك بياناتك مع أطراف ثالثة لأغراض تسويقية أبداً." />
+    </PageShell>
   );
 }
 
 export function Terms() {
   return (
-    <PageWrapper emoji="📋" title="Terms of Service" subtitle="Simple, fair rules for everyone!">
-      <InfoCard icon={<CheckCircle2 size={18}/>} title="Your Account"       desc="Keep your login details safe! You're responsible for your account." />
-      <InfoCard icon={<CreditCard size={18}/>}   title="Payments & Pricing" desc="No hidden fees. What you see is what you pay!" />
-      <InfoCard icon={<Ban size={18}/>}           title="What's Not Allowed" desc="No dangerous items or copies. Keep it safe for kids!" />
-      <InfoCard icon={<Scale size={18}/>}         title="Governing Rules"    desc="These terms follow the laws of Algeria." />
-      <div className="mt-8 p-5 rounded-3xl flex items-start gap-3" style={{ backgroundColor:'rgba(255,217,61,0.1)', border:'2px solid rgba(255,217,61,0.4)' }}>
-        <span className="text-2xl mt-0.5">⚠️</span>
-        <p className="text-sm font-semibold" style={{ color:'var(--text-mid)' }}>We may update these terms occasionally.</p>
-      </div>
-    </PageWrapper>
+    <PageShell emoji="📋" title="الشروط والأحكام">
+      <InfoCard icon={<CheckCircle2 size={18} />} title="حسابك ومسؤوليتك" desc="أنت مسؤول عن دقة المعلومات المقدمة. احتفظ ببيانات حسابك بأمان." />
+      <InfoCard icon={<Truck size={18} />} title="الطلبات والمدفوعات" desc="جميع الطلبات تُؤكد عبر الهاتف قبل الشحن. الدفع عند الاستلام." />
+      <InfoCard icon={<ShieldCheck size={18} />} title="القانون المنظم" desc="تخضع كافة المعاملات للقوانين الجزائرية المعمول بها." />
+    </PageShell>
   );
 }
 
 export function Cookies() {
   return (
-    <PageWrapper emoji="🍪" title="Cookie Policy" subtitle="Cookies help make our site better!">
-      <InfoCard icon={<ShieldCheck size={18}/>}   title="Essential Cookies"  desc="Keep the store running — cart, login. Can't turn off." status="Always Active" />
-      <InfoCard icon={<Settings size={18}/>}      title="Preference Cookies" desc="Remember your language and settings." status="Optional" />
-      <InfoCard icon={<MousePointer2 size={18}/>} title="Analytics Cookies"  desc="Help us understand what kids and parents enjoy most." status="Optional" />
-      <div className="mt-8 p-6 rounded-3xl flex gap-4 items-start" style={{ background:'linear-gradient(135deg,rgba(255,107,107,0.06),rgba(168,85,247,0.06))', border:'2px solid var(--border)' }}>
-        <span className="text-2xl mt-0.5">⚙️</span>
-        <div><h3 className="font-black mb-2" style={{ fontFamily:"'Fredoka One',cursive", fontSize:'1.1rem', color:'var(--text)' }}>Control Your Cookies!</h3><p className="text-sm font-semibold leading-relaxed" style={{ color:'var(--text-mid)' }}>Change cookie settings in your browser anytime.</p></div>
-      </div>
-    </PageWrapper>
+    <PageShell emoji="🍪" title="ملفات تعريف الارتباط">
+      <InfoCard icon={<ShieldCheck size={18} />} title="الملفات الأساسية" desc="ضرورية لعمل سلة التسوق وتتبع الجلسة. لا يمكن إيقافها." />
+      <InfoCard icon={<BadgeCheck size={18} />} title="ملفات التحليل" desc="تساعدنا على فهم كيفية تفاعلك مع الموقع لتحسين تجربتك." />
+    </PageShell>
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// CONTACT  ← مُصلح: بيانات ديناميكية + حقل الهاتف + استدعاء API
-// ─────────────────────────────────────────────────────────────
-export function Contact({ store }: { store: Store }) {
-  const isRTL = store.language === 'ar';
-  const [formState, setFormState] = useState({ name: '', email: '', phone: '', message: '' });
+export function Contact({ store }: { store: any }) {
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sent, setSent] = useState(false);
-
-  const contacts = [
-    { emoji: '📞', label: isRTL ? 'الهاتف' : 'Phone',    value: store.contact?.phone || '—',    href: store.contact?.phone ? `tel:${store.contact.phone}` : undefined },
-    { emoji: '📍', label: isRTL ? 'الموقع' : 'Location', value: store.contact?.wilaya || '—',   href: undefined },
-    { emoji: '📧', label: isRTL ? 'البريد' : 'Email',    value: store.contact?.email || '—',    href: store.contact?.email ? `mailto:${store.contact.email}` : undefined },
-  ];
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await axios.post(`${API_URL}/user/contact-user/message`, { ...formState, storeId: store.id });
-      setSent(true);
-    } catch {
-      alert(isRTL ? 'حدث خطأ في الإرسال، حاول بعد حين' : 'Error sending message, try again later');
-    }
+    e.preventDefault(); setLoading(true);
+    try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
+    catch { alert('حدث خطأ في الإرسال'); } finally { setLoading(false); }
   };
 
   return (
-    <div className="min-h-screen" dir={isRTL?'rtl':'ltr'} style={{ backgroundColor:'var(--bg)', fontFamily:"'Nunito',sans-serif" }}>
-      <div className="relative overflow-hidden py-24 polka-dots" style={{ background:'linear-gradient(135deg, #fff9e6, var(--bg))' }}>
-        <Confetti/>
-        <div className="relative z-10 max-w-3xl mx-auto px-6 text-center">
-          <div className="text-6xl mb-5" style={{ animation:'bounce-loop 2s ease-in-out infinite', display:'inline-block' }}>💌</div>
-          <h1 className="font-black mb-4" style={{ fontFamily:"'Fredoka One',cursive", fontSize:'clamp(2.5rem,6vw,5rem)', color:'var(--text)' }}>
-            {isRTL ? 'تواصل معنا' : 'Say Hello!'}
-          </h1>
-          <p className="text-base font-semibold" style={{ color:'var(--text-mid)' }}>{isRTL ? 'نحب أن نسمع منك! 🌟' : 'We love hearing from you! 🌟'}</p>
+    <div dir="rtl" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+      <div className="polka-dots" style={{ position: 'relative', overflow: 'hidden', padding: '5rem 1.5rem 3rem', textAlign: 'center', background: 'linear-gradient(135deg, #fff9e6, var(--bg))' }}>
+        <Confetti />
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1rem', animation: 'bounce-loop 2s ease-in-out infinite' }}>💌</span>
+          <h1 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(2rem, 5vw, 3.5rem)', color: 'var(--text)', marginBottom: '0.5rem' }}>تواصل معنا</h1>
+          <p style={{ color: 'var(--text-mid)', fontWeight: 600 }}>نحب أن نسمع منك! 🌟</p>
         </div>
-        <WavyDivider topColor="var(--bg)" bottomColor="white" />
+        <WavyDivider top="var(--bg)" bottom="#fff" />
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '2rem 1.5rem 6rem' }}>
+        <div className="contact-layout">
+          {/* Info */}
           <div>
-            <h2 className="font-black mb-8" style={{ fontFamily:"'Fredoka One',cursive", fontSize:'1.8rem', color:'var(--text)' }}>
-              📞 {isRTL ? 'تواصل معنا' : 'Get in Touch'}
-            </h2>
-            <div className="space-y-3">
-              {contacts.map(item => (
-                <a key={item.label} href={item.href||'#'} className="group flex items-center gap-4 p-5 rounded-3xl transition-all btn-bouncy"
-                  style={{ border:'2px solid var(--border)', backgroundColor:'white', textDecoration:'none' }}
-                  onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.borderColor='var(--coral)';el.style.backgroundColor='rgba(255,107,107,0.04)';}}
-                  onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.borderColor='var(--border)';el.style.backgroundColor='white';}}>
-                  <span className="text-2xl">{item.emoji}</span>
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-wider" style={{ color:'var(--text-soft)' }}>{item.label}</p>
-                    <p className="text-sm font-bold" style={{ color:'var(--text)' }}>{item.value}</p>
-                  </div>
-                  {item.href && <ArrowRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" style={{ color:'var(--coral)' }} />}
-                </a>
-              ))}
-            </div>
-            <div className="mt-8 p-6 rounded-3xl text-white relative overflow-hidden" style={{ background:'linear-gradient(135deg, var(--coral), var(--grape))' }}>
-              <div className="absolute -right-6 -bottom-6 text-8xl opacity-20">🎪</div>
-              <p className="font-black text-xl leading-tight mb-2" style={{ fontFamily:"'Fredoka One',cursive" }}>{isRTL ? 'نرد بسرعة! ⚡' : 'We reply super fast! ⚡'}</p>
-              <p className="text-sm font-semibold opacity-80">{isRTL ? 'عادة خلال ساعات قليلة' : 'Usually within a few hours.'}</p>
+            {[
+              { e: '📞', l: 'الهاتف', v: store?.contact?.phone || 'غير متوفر' },
+              { e: '📍', l: 'الموقع', v: store?.contact?.wilaya || 'الجزائر' },
+              { e: '📧', l: 'البريد', v: store?.contact?.email || 'غير متوفر' },
+            ].map((r, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.125rem', borderRadius: 20, border: '2.5px solid var(--border)', background: '#fff', marginBottom: '0.75rem', transition: 'all 0.25s', cursor: 'default' }}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--coral)'; el.style.transform = 'translateX(-4px)'; }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--border)'; el.style.transform = ''; }}>
+                <span style={{ fontSize: '2rem' }}>{r.e}</span>
+                <div>
+                  <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--text-soft)', textTransform: 'uppercase', marginBottom: '0.2rem' }}>{r.l}</p>
+                  <p style={{ fontWeight: 700, color: 'var(--text)', fontSize: '0.9rem' }}>{r.v}</p>
+                </div>
+              </div>
+            ))}
+            <div style={{ marginTop: '1rem', padding: '1.25rem', borderRadius: 20, background: 'linear-gradient(135deg, var(--coral), var(--grape))', color: '#fff', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', bottom: -20, left: -20, fontSize: '6rem', opacity: 0.15 }}>🎪</div>
+              <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', marginBottom: '0.25rem' }}>نرد بسرعة! ⚡</p>
+              <p style={{ fontSize: '0.82rem', fontWeight: 600, opacity: 0.82 }}>عادة خلال ساعات قليلة</p>
             </div>
           </div>
 
-          <div>
-            <h2 className="font-black mb-8" style={{ fontFamily:"'Fredoka One',cursive", fontSize:'1.8rem', color:'var(--text)' }}>✉️ {isRTL ? 'أرسل رسالة' : 'Send a Message'}</h2>
+          {/* Form */}
+          <div style={{ background: '#fff', borderRadius: 24, border: '3px solid var(--border)', padding: '2rem' }}>
+            <h2 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.5rem', color: 'var(--text)', marginBottom: '1.5rem' }}>✉️ أرسل رسالة</h2>
             {sent ? (
-              <div className="p-10 rounded-3xl text-center polka-dots" style={{ border:'3px dashed var(--border)', backgroundColor:'white' }}>
-                <span className="text-6xl block mb-4" style={{ animation:'bounce-loop 1s ease-in-out infinite' }}>🎉</span>
-                <p className="font-black text-xl mb-1" style={{ fontFamily:"'Fredoka One',cursive", color:'var(--text)' }}>{isRTL ? 'تم إرسال رسالتك!' : 'Message Sent!'}</p>
-                <p className="text-sm font-semibold" style={{ color:'var(--text-mid)' }}>{isRTL ? 'سنرد عليك قريباً! 🌟' : "We'll get back to you soon! 🌟"}</p>
+              <div style={{ textAlign: 'center', padding: '3rem 1rem' }} className="anim-pop-in">
+                <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1rem', animation: 'bounce-loop 1.5s ease-in-out infinite' }}>🎉</span>
+                <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.5rem', color: 'var(--text)', marginBottom: '0.5rem' }}>تم إرسال رسالتك!</p>
+                <p style={{ color: 'var(--text-mid)', fontWeight: 600, lineHeight: 1.7 }}>سنرد عليك قريباً! 🌟</p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <FieldWrapper label={isRTL?'👤 اسمك':'👤 Your Name'}>
-                  <input type="text" value={formState.name} onChange={e=>setFormState({...formState,name:e.target.value})} placeholder={isRTL?'الاسم الكامل':'Your name'} style={inputSt()} required
-                    onFocus={e=>{e.target.style.borderColor='var(--sky)';e.target.style.boxShadow='0 0 0 4px rgba(78,205,196,0.15)';}}
-                    onBlur={e=>{e.target.style.borderColor='var(--border)';e.target.style.boxShadow='none';}} />
-                </FieldWrapper>
-                <FieldWrapper label={isRTL?'📧 البريد الإلكتروني':'📧 Email'}>
-                  <input type="email" value={formState.email} onChange={e=>setFormState({...formState,email:e.target.value})} placeholder="your@email.com" style={inputSt()} required
-                    onFocus={e=>{e.target.style.borderColor='var(--sky)';e.target.style.boxShadow='0 0 0 4px rgba(78,205,196,0.15)';}}
-                    onBlur={e=>{e.target.style.borderColor='var(--border)';e.target.style.boxShadow='none';}} />
-                </FieldWrapper>
-                {/* ← حقل الهاتف كان مفقوداً */}
-                <FieldWrapper label={isRTL?'📞 رقم الهاتف':'📞 Phone'}>
-                  <input type="tel" value={formState.phone} onChange={e=>setFormState({...formState,phone:e.target.value})} placeholder={isRTL?'05XXXXXXXX':'05XXXXXXXX'} style={inputSt()} required
-                    onFocus={e=>{e.target.style.borderColor='var(--sky)';e.target.style.boxShadow='0 0 0 4px rgba(78,205,196,0.15)';}}
-                    onBlur={e=>{e.target.style.borderColor='var(--border)';e.target.style.boxShadow='none';}} />
-                </FieldWrapper>
-                <FieldWrapper label={isRTL?'💬 رسالتك':'💬 Your Message'}>
-                  <textarea value={formState.message} onChange={e=>setFormState({...formState,message:e.target.value})} placeholder={isRTL?'كيف يمكننا مساعدتك؟ 😊':"What's on your mind? 😊"} rows={5} style={{ ...inputSt(), resize:'none' as any }} required
-                    onFocus={e=>{e.target.style.borderColor='var(--sky)';e.target.style.boxShadow='0 0 0 4px rgba(78,205,196,0.15)';}}
-                    onBlur={e=>{e.target.style.borderColor='var(--border)';e.target.style.boxShadow='none';}} />
-                </FieldWrapper>
-                <button type="submit" className="btn-bouncy w-full py-4 rounded-2xl flex items-center justify-center gap-2 text-base font-black text-white"
-                  style={{ background:'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow:'0 8px 28px rgba(255,107,107,0.4)' }}>
-                  🚀 {isRTL ? 'إرسال الرسالة' : 'Send Message!'}
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+                <div className="form-row-2">
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 900, color: 'var(--text-mid)', marginBottom: '0.375rem', textTransform: 'uppercase' }}>👤 الاسم</label>
+                    <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required placeholder="اسمك الكامل" style={inp()} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 900, color: 'var(--text-mid)', marginBottom: '0.375rem', textTransform: 'uppercase' }}>📞 الهاتف</label>
+                    <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required placeholder="05XXXXXXXX" style={inp()} />
+                  </div>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 900, color: 'var(--text-mid)', marginBottom: '0.375rem', textTransform: 'uppercase' }}>📧 البريد</label>
+                  <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required placeholder="email@example.com" style={inp()} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 900, color: 'var(--text-mid)', marginBottom: '0.375rem', textTransform: 'uppercase' }}>💬 رسالتك</label>
+                  <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} placeholder="كيف يمكننا مساعدتك؟ 😊" style={{ ...inp(), resize: 'none' }} />
+                </div>
+                <button type="submit" disabled={loading} className="btn-bouncy" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '1rem', borderRadius: 18, border: 'none', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 900, fontSize: '1rem', color: '#fff', background: 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: '0 8px 28px rgba(255,107,107,0.4)', opacity: loading ? 0.7 : 1 }}>
+                  {loading ? <><Loader2 size={18} style={{ animation: 'spin-slow 1s linear infinite' }} /> جاري الإرسال...</> : <>🚀 إرسال الرسالة</>}
                 </button>
               </form>
             )}
@@ -1410,245 +1427,14 @@ export function Contact({ store }: { store: Store }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-// CART PAGE  ← كان مفقوداً بالكامل
-// ─────────────────────────────────────────────────────────────
-export function Cart({ domain, store }: { domain: string; store: any }) {
-  const [cartItems, setCartItems] = useState<any[]>([]);
-  const [wilayas, setWilayas] = useState<Wilaya[]>([]);
-  const [communes, setCommunes] = useState<Commune[]>([]);
-  const [loadingC, setLC] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [fd, setFd] = useState({ customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '', typeLivraison: 'home' as 'home' | 'office' });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const isRTL = store?.language === 'ar';
-  const initCount = useCartStore((state) => state.initCount);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(domain);
-    if (saved) setCartItems(JSON.parse(saved));
-    if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas);
-  }, [domain, store]);
-
-  useEffect(() => {
-    if (!fd.customerWelaya) { setCommunes([]); return; }
-    setLC(true);
-    fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLC(false); });
-  }, [fd.customerWelaya]);
-
-  const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
-  const getLivPrice = useCallback(() => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; }, [selW, fd.typeLivraison]);
-  const cartTotal = cartItems.reduce((acc, item) => acc + (item.finalPrice * item.quantity), 0);
-  const finalTotal = cartTotal + +getLivPrice();
-
-  const updateCart = (newItems: any[]) => { setCartItems(newItems); localStorage.setItem(domain, JSON.stringify(newItems)); initCount(newItems.length); };
-  const removeItem = (i: number) => updateCart(cartItems.filter((_, idx) => idx !== i));
-  const changeQty = (i: number, delta: number) => { const n = [...cartItems]; n[i].quantity = Math.max(1, n[i].quantity + delta); updateCart(n); };
-
-  const validate = () => {
-    const e: Record<string, string> = {};
-    if (!fd.customerName.trim()) e.name = isRTL ? 'الاسم مطلوب' : 'Name required';
-    if (!fd.customerPhone.trim()) e.phone = isRTL ? 'الهاتف مطلوب' : 'Phone required';
-    if (!fd.customerWelaya) e.welaya = isRTL ? 'الولاية مطلوبة' : 'Wilaya required';
-    if (!fd.customerCommune) e.commune = isRTL ? 'البلدية مطلوبة' : 'Commune required';
-    setErrors(e); return Object.keys(e).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); if (!validate()) return; setSubmitting(true);
-    try {
-      const payload = cartItems.map(item => ({
-        ...fd, productId: item.productId, storeId: item.storeId, userId: item.userId,
-        selectedOffer: item.selectedOffer, variantDetailId: item.variantDetailId,
-        selectedVariants: item.selectedVariants, platform: item.platform || 'store',
-        finalPrice: item.finalPrice, totalPrice: finalTotal, priceLivraison: +getLivPrice(),
-        quantity: item.quantity, customerId: item.customerId || '', priceLoss: selW?.livraisonReturn ?? 0,
-      }));
-      await axios.post(`${API_URL}/orders/create`, payload);
-      setSuccess(true); localStorage.removeItem(domain); setCartItems([]); initCount(0);
-    } catch (err) { console.error(err); } finally { setSubmitting(false); }
-  };
-
-  /* ── Success ── */
-  if (success) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center p-10" style={{ background: 'var(--bg)' }}>
-        <div className="pop-in text-center p-16 rounded-3xl max-w-lg w-full" style={{ border: '3px solid var(--mint-dk)', backgroundColor: 'white', boxShadow: '0 12px 40px rgba(110,231,183,0.2)' }}>
-          <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ background: 'rgba(110,231,183,0.15)', border: '2px solid var(--mint-dk)' }}>
-            <CheckCircle2 size={40} style={{ color: 'var(--mint-dk)' }} />
-          </div>
-          <p className="text-xs font-black uppercase tracking-wider mb-3" style={{ color: 'var(--coral)' }}>// ORDER CONFIRMED</p>
-          <h2 className="font-black mb-3" style={{ fontFamily: "'Fredoka One',cursive", fontSize: '1.8rem', color: 'var(--text)' }}>{isRTL ? 'تم استلام طلبك!' : 'Order Received!'}</h2>
-          <p className="text-sm font-semibold mb-8" style={{ color: 'var(--text-mid)' }}>{isRTL ? 'شكراً لثقتك 🎮' : 'Thank you! 🎮'}</p>
-          <Link href="/" className="btn-bouncy inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-base font-black text-white" style={{ background: 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: '0 8px 28px rgba(255,107,107,0.4)', textDecoration: 'none' }}>
-            🛍️ {isRTL ? 'العودة للمتجر' : 'Back to Store'}
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  /* ── Empty ── */
-  if (cartItems.length === 0) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center p-10" style={{ background: 'var(--bg)' }}>
-        <div className="pop-in text-center p-16 rounded-3xl max-w-md w-full" style={{ border: '3px dashed var(--border)', backgroundColor: 'white' }}>
-          <ShoppingBag size={56} style={{ color: 'var(--text-soft)', margin: '0 auto 20px', display: 'block', opacity: 0.4 }} />
-          <p className="text-xs font-black uppercase tracking-wider mb-2" style={{ color: 'var(--coral)' }}>// EMPTY CART</p>
-          <h3 className="font-black mb-4" style={{ fontFamily: "'Fredoka One',cursive", fontSize: '1.2rem', color: 'var(--text)' }}>{isRTL ? 'السلة فارغة' : 'Cart is empty'}</h3>
-          <p className="text-sm font-semibold mb-6" style={{ color: 'var(--text-mid)' }}>{isRTL ? 'أضف منتجات للبدء' : 'Add some products to start'}</p>
-          <Link href="/" className="btn-bouncy inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-base font-black text-white" style={{ background: 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: '0 8px 28px rgba(255,107,107,0.4)', textDecoration: 'none' }}>
-            🛍️ {isRTL ? 'تسوق الآن' : 'Shop Now'}
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
+export function StaticPage({ staticPage, page, store }: any) {
+  const p = (staticPage || page || '').toLowerCase();
   return (
-    <div dir={isRTL?'rtl':'ltr'} className="min-h-screen p-8 pb-20" style={{ background: 'var(--bg)' }}>
-      <div className="max-w-6xl mx-auto">
-        <div className="pop-in mb-10">
-          <p className="text-xs font-black uppercase tracking-wider mb-2" style={{ color: 'var(--coral)' }}>// SHOPPING CART</p>
-          <h1 className="font-black" style={{ fontFamily: "'Fredoka One',cursive", fontSize: 'clamp(2rem,5vw,3rem)', color: 'var(--text)' }}>
-            🛒 {isRTL ? 'سلة التسوق' : 'Your Cart'}
-          </h1>
-          <div className="h-1.5 w-24 rounded-full mt-3" style={{ background: 'linear-gradient(90deg, var(--coral), var(--grape))' }} />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pop-in pop-in-d1">
-          {/* Items */}
-          <div>
-            <div className="rounded-3xl overflow-hidden" style={{ border: '2px solid var(--border)', backgroundColor: 'white' }}>
-              <div className="p-4 flex items-center gap-2" style={{ borderBottom: '2px dashed var(--border)', background: 'rgba(255,107,107,0.04)' }}>
-                <Package size={18} style={{ color: 'var(--coral)' }} />
-                <span className="text-xs font-black uppercase tracking-wider" style={{ color: 'var(--coral)' }}>{isRTL ? 'منتجاتك' : 'Your Items'} ({cartItems.length})</span>
-              </div>
-
-              {cartItems.map((item, index) => (
-                <div key={index} className="flex gap-4 p-5 transition-all" style={{ borderBottom: '2px dashed var(--border)' }}
-                  onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='rgba(255,107,107,0.03)'}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent'}}>
-                  <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0" style={{ border: '2px solid var(--border)', background: 'var(--bg)' }}>
-                    <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage || '/fallback-image.png'} alt="" className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1 flex flex-col gap-2">
-                    <h4 className="font-bold text-sm" style={{ color: 'var(--text)', fontFamily: "'Fredoka One', cursive" }}>{item.product?.name}</h4>
-                    <span className="font-black" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: 'var(--coral)' }}>
-                      {item.finalPrice?.toLocaleString()} <span className="text-xs font-medium" style={{ color: 'var(--text-soft)' }}>دج</span>
-                    </span>
-                    <div className="flex items-center gap-3 mt-auto">
-                      <div className="flex items-center rounded-xl overflow-hidden" style={{ border: '2px solid var(--border)' }}>
-                        <button onClick={() => changeQty(index, -1)} className="w-8 h-8 flex items-center justify-center" style={{ borderLeft: '2px solid var(--border)', background: 'white', color: 'var(--coral)', cursor: 'pointer' }}><Minus size={12} /></button>
-                        <span className="w-10 text-center font-black text-sm" style={{ background: 'var(--bg)' }}>{item.quantity}</span>
-                        <button onClick={() => changeQty(index, 1)} className="w-8 h-8 flex items-center justify-center" style={{ borderRight: '2px solid var(--border)', background: 'white', color: 'var(--coral)', cursor: 'pointer' }}><Plus size={12} /></button>
-                      </div>
-                      <button onClick={() => removeItem(index)} className="btn-bouncy flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold ml-auto"
-                        style={{ border: '2px solid rgba(255,107,107,0.3)', backgroundColor: 'transparent', color: 'var(--coral)', cursor: 'pointer' }}
-                        onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='rgba(255,107,107,0.08)'}}
-                        onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent'}}>
-                        <Trash2 size={12} /> {isRTL ? 'حذف' : 'Remove'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              <div className="p-4 flex justify-between items-center" style={{ background: 'rgba(255,107,107,0.04)', borderTop: '2px dashed var(--border)' }}>
-                <span className="text-xs font-black uppercase tracking-wider" style={{ color: 'var(--text-soft)' }}>{isRTL ? 'المجموع الفرعي' : 'Subtotal'}</span>
-                <span className="font-black" style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.4rem', color: 'var(--coral)' }}>{cartTotal.toLocaleString()} <span className="text-xs font-medium" style={{ color: 'var(--text-soft)' }}>دج</span></span>
-              </div>
-            </div>
-          </div>
-
-          {/* Delivery + Summary */}
-          <div>
-            <div className="rounded-3xl overflow-hidden" style={{ border: '2px solid var(--border)', backgroundColor: 'white' }}>
-              <div className="p-4 flex items-center gap-2" style={{ borderBottom: '2px dashed var(--border)', background: 'rgba(78,205,196,0.04)' }}>
-                <Truck size={18} style={{ color: 'var(--sky)' }} />
-                <span className="text-xs font-black uppercase tracking-wider" style={{ color: 'var(--sky)' }}>{isRTL ? 'معلومات التوصيل' : 'Delivery Info'}</span>
-              </div>
-
-              <form onSubmit={handleSubmit} className="p-5 space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <FieldWrapper error={errors.name} label={isRTL?'👤 الاسم':'👤 Name'}>
-                    <input type="text" value={fd.customerName} onChange={e=>{setFd({...fd,customerName:e.target.value});if(errors.name)setErrors({...errors,name:''})}} placeholder={isRTL?'الاسم الكامل':'Full name'} style={inputSt(!!errors.name)}
-                      onFocus={e=>{e.target.style.borderColor='var(--sky)';e.target.style.boxShadow='0 0 0 4px rgba(78,205,196,0.15)';}}
-                      onBlur={e=>{e.target.style.borderColor=errors.name?'var(--coral)':'var(--border)';e.target.style.boxShadow='none';}} />
-                  </FieldWrapper>
-                  <FieldWrapper error={errors.phone} label={isRTL?'📞 الهاتف':'📞 Phone'}>
-                    <input type="tel" value={fd.customerPhone} onChange={e=>{setFd({...fd,customerPhone:e.target.value});if(errors.phone)setErrors({...errors,phone:''})}} placeholder="0XXXXXXXXX" style={inputSt(!!errors.phone)}
-                      onFocus={e=>{e.target.style.borderColor='var(--sky)';e.target.style.boxShadow='0 0 0 4px rgba(78,205,196,0.15)';}}
-                      onBlur={e=>{e.target.style.borderColor=errors.phone?'var(--coral)':'var(--border)';e.target.style.boxShadow='none';}} />
-                  </FieldWrapper>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <FieldWrapper error={errors.welaya} label={isRTL?'📍 الولاية':'📍 Wilaya'}>
-                    <div className="relative">
-                      <ChevronDown size={13} style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', color:'var(--text-soft)', pointerEvents:'none' }} />
-                      <select value={fd.customerWelaya} onChange={e=>{setFd({...fd,customerWelaya:e.target.value,customerCommune:''});if(errors.welaya)setErrors({...errors,welaya:''})}} style={{ ...inputSt(!!errors.welaya), paddingLeft:'2.5rem', appearance:'none' as any, cursor:'pointer' }}>
-                        <option value="">{isRTL?'الولاية':'Wilaya'}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
-                      </select>
-                    </div>
-                  </FieldWrapper>
-                  <FieldWrapper error={errors.commune} label={isRTL?'🏘️ البلدية':'🏘️ Commune'}>
-                    <div className="relative">
-                      <ChevronDown size={13} style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', color:'var(--text-soft)', pointerEvents:'none' }} />
-                      <select value={fd.customerCommune} disabled={loadingC||!fd.customerWelaya} onChange={e=>{setFd({...fd,customerCommune:e.target.value});if(errors.commune)setErrors({...errors,commune:''})}} style={{ ...inputSt(!!errors.commune), paddingLeft:'2.5rem', appearance:'none' as any, cursor:'pointer', opacity:!fd.customerWelaya?0.5:1 }}>
-                        <option value="">{loadingC?'⏳...':!fd.customerWelaya?(isRTL?'الولاية أولاً':'Wilaya first'):(isRTL?'البلدية':'Commune')}</option>{communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}
-                      </select>
-                    </div>
-                  </FieldWrapper>
-                </div>
-
-                {/* Delivery type */}
-                <div>
-                  <p className="text-xs font-black uppercase tracking-wider mb-2" style={{ color:'var(--text-mid)' }}>🚚 {isRTL?'نوع التوصيل':'Delivery Type'}</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {(['home','office'] as const).map(type => (
-                      <button key={type} type="button" onClick={() => setFd({...fd,typeLivraison:type})} className="btn-bouncy flex flex-col items-center gap-1 py-4 rounded-2xl"
-                        style={{ border:`3px solid ${fd.typeLivraison===type?'var(--sky)':'var(--border)'}`, backgroundColor:fd.typeLivraison===type?'rgba(78,205,196,0.08)':'white' }}>
-                        <span className="text-xl">{type==='home'?'🏠':'🏢'}</span>
-                        <span className="text-xs font-black" style={{ color:fd.typeLivraison===type?'var(--sky-dk)':'var(--text-soft)' }}>{type==='home'?(isRTL?'للبيت':'Home'):(isRTL?'للمكتب':'Office')}</span>
-                        {selW && <span className="text-xs font-bold" style={{ color:'var(--text-mid)' }}>{(type==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} دج</span>}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Summary */}
-                <div className="p-5 rounded-3xl polka-dots" style={{ border:'2px solid var(--border)', backgroundColor:'white' }}>
-                  <p className="text-xs font-black uppercase tracking-wider mb-3" style={{ color:'var(--coral)' }}>🧾 {isRTL?'الملخص':'Summary'}</p>
-                  {[{l:isRTL?'المجموع الفرعي':'Subtotal',v:`${cartTotal.toLocaleString()} دج`},{l:isRTL?'التوصيل':'Shipping',v:getLivPrice()?`${getLivPrice().toLocaleString()} دج`:'---'}].map(row=>(
-                    <div key={row.l} className="flex justify-between py-2" style={{ borderBottom:'1px dashed var(--border)' }}>
-                      <span className="text-xs font-bold" style={{ color:'var(--text-soft)' }}>{row.l}</span>
-                      <span className="text-sm font-bold" style={{ color:'var(--text)' }}>{row.v}</span>
-                    </div>
-                  ))}
-                  <div className="flex justify-between items-baseline pt-3">
-                    <span className="text-sm font-black" style={{ color:'var(--coral)' }}>💰 {isRTL?'الإجمالي':'Total'}</span>
-                    <span className="font-black" style={{ fontFamily:"'Fredoka One',cursive", fontSize:'2.2rem', color:'var(--coral)' }}>{finalTotal.toLocaleString()} <span className="text-sm font-medium" style={{ color:'var(--text-soft)' }}>دج</span></span>
-                  </div>
-                </div>
-
-                <button type="submit" disabled={submitting} className="btn-bouncy w-full py-4 rounded-2xl flex items-center justify-center gap-3 text-base font-black text-white"
-                  style={{ background:submitting?'var(--text-soft)':'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow:submitting?'none':'0 8px 28px rgba(255,107,107,0.4)', cursor:submitting?'not-allowed':'pointer' }}>
-                  {submitting ? <><Loader2 size={18} style={{ animation:'spin-slow 1s linear infinite' }} /> ⏳...</> : <>🎉 {isRTL?'تأكيد الطلب':'Confirm Order'}</>}
-                </button>
-
-                <div className="flex justify-center gap-4 flex-wrap">
-                  {[{icon:<Lock size={11}/>,l:isRTL?'دفع آمن':'Secure'},{icon:<ShieldCheck size={11}/>,l:isRTL?'مشفر':'Encrypted'},{icon:<BadgeCheck size={11}/>,l:isRTL?'موثق':'Verified'}].map((b,i)=>(
-                    <div key={i} className="flex items-center gap-1 text-[11px] font-bold" style={{ color:'var(--text-soft)' }}>
-                      <span style={{ color:'var(--sky)' }}>{b.icon}</span> {b.l}
-                    </div>
-                  ))}
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <>
+      {p === 'privacy' && <Privacy />}
+      {p === 'terms' && <Terms />}
+      {p === 'cookies' && <Cookies />}
+      {p === 'contact' && <Contact store={store} />}
+    </>
   );
 }

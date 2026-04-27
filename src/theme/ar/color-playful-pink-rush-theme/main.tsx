@@ -11,6 +11,7 @@ import {
   CheckCircle2, ArrowRight, Zap,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Shield, Truck,
+  ArrowLeft,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
@@ -297,7 +298,7 @@ export default function Main({ store, children, domain }: any) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   NAVBAR
+   NAVBAR - PINK EDITION
 ═══════════════════════════════════════════════════════════ */
 export function Navbar({ store, domain }: { store: any; domain: string }) {
   const [scrolled, setScrolled] = useState(false);
@@ -306,13 +307,45 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [listSearch, setListSearch] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const router = useRouter();
 
   const count = useCartStore((s) => s.count);
   const initCount = useCartStore((s) => s.initCount);
 
-  const [imgError, setImgError] = useState(false);
-  
+  // --- التنسيقات المدمجة ---
+  const cartBtnStyle: React.CSSProperties = {
+    position: 'relative',
+    background: '#111',
+    color: '#fff',
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'background 0.2s',
+    textDecoration: 'none',
+    border: 'none',
+    cursor: 'pointer'
+  };
+
+  const badgeStyle: React.CSSProperties = {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    background: '#F472B6',
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 700,
+    width: 17,
+    height: 17,
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    border: '2px solid #F8F8F6'
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined' && domain) {
@@ -337,28 +370,42 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
   const handleSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (searchQuery.trim()) { router.push(`/?search=${encodeURIComponent(searchQuery)}`); setListSearch([]); setShowSearch(false); }
+    if (searchQuery.trim()) { 
+      router.push(`/?search=${encodeURIComponent(searchQuery)}`); 
+      setListSearch([]); 
+      setShowSearch(false); 
+    }
   };
 
   const DropResults = () => (
-    <div style={{ position: 'absolute', top: 'calc(100% + 6px)', right: 0, left: 0, background: '#fff', border: '1.5px solid #E0E0E0', borderRadius: 10, boxShadow: '0 12px 40px rgba(0,0,0,0.12)', zIndex: 60, overflow: 'hidden' }} className="anim-slide-down">
+    <div style={{paddingTop:25, position: 'absolute', top: 'calc(100% + 6px)', right: 0, left: 0, background: '#fff', border: '1.5px solid #E0E0E0', borderRadius: 10, boxShadow: '0 12px 40px rgba(0,0,0,0.12)', zIndex: 60, overflow: 'hidden' }} className="anim-slide-down">
+      <button onClick={()=>setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
+              <X size={14} />
+            </button>
       {loading ? <div style={{ padding: '1rem', textAlign: 'center', color: '#F472B6', fontSize: '0.85rem' }}>جاري البحث...</div>
-        : listSearch.length > 0 ? listSearch.map((p: any) => (
-          <Link href={`/product/${p.id}`} key={p.id} onClick={() => setSearchQuery('')}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderBottom: '1px solid #f0f0f0' }}>
-            <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} alt="" />
-            <div>
-              <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#111' }}>{p.name}</div>
-              <div style={{ fontSize: '0.75rem', color: '#F472B6', fontWeight: 700 }}>{p.price} دج</div>
-            </div>
-          </Link>
-        )) : searchQuery.length >= 2 && <div style={{ padding: '1rem', textAlign: 'center', color: '#aaa', fontSize: '0.85rem' }}>لا توجد نتائج</div>}
+        : listSearch.length > 0 ? (
+          <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
+            {listSearch.map((p: any) => (
+              <Link href={`/product/${p.id}`} key={p.id} onClick={() => setSearchQuery('')}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderBottom: '1px solid #f0f0f0', textDecoration: 'none' }}>
+                <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} alt="" />
+                <div>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#111' }}>{p.name}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#F472B6', fontWeight: 700 }}>{p.price} دج</div>
+                </div>
+              </Link>
+            ))}
+            {/* زر عرض المزيد انسيابي داخل القائمة */}
+            <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: '#FFF1F2', border: 'none', color: '#F472B6', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+              عرض جميع النتائج <ArrowLeft size={14} />
+            </button>
+          </div>
+        ) : searchQuery.length >= 2 && <div style={{ padding: '1rem', textAlign: 'center', color: '#aaa', fontSize: '0.85rem' }}>لا توجد نتائج</div>}
     </div>
   );
 
   return (
     <>
-      {/* Ticker */}
       <div className="ticker-wrap">
         <div className="ticker-track">
           {[...Array(8)].map((_, i) => (
@@ -378,34 +425,18 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
           {/* Logo */}
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
-            {/* إذا لم يكن هناك رابط، أو حدث خطأ في تحميل الصورة، نعرض اللوجو المستطيل */}
             {(!store?.design?.logoUrl || imgError) ? (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div style={{
-                  padding: '0 12px',
-                  height: 36,
-                  background: 'rgb(244, 114, 182)', // اللون الوردي الذي اخترته
-                  color: '#fff',
-                  borderRadius: 8,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '0.85rem',
-                  fontWeight: 800,
-                  flexShrink: 0,
-                  boxShadow: '0 4px 12px rgba(244, 114, 182, 0.3)',
-                  whiteSpace: 'nowrap' // لضمان عدم انقسام الاسم
+                  padding: '0 12px', height: 36, background: '#F472B6', color: '#fff', borderRadius: 8,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem',
+                  fontWeight: 800, flexShrink: 0, boxShadow: '0 4px 12px rgba(244, 114, 182, 0.3)', whiteSpace: 'nowrap'
                 }}>
                   {store?.name?.toUpperCase() || 'SHAMSOU GAME'}
                 </div>
               </div>
             ) : (
-              <img
-                src={store.design.logoUrl}
-                style={{ height: 34, objectFit: 'contain', display: 'block' }}
-                alt={store?.name}
-                onError={() => setImgError(true)}
-              />
+              <img src={store.design.logoUrl} style={{ height: 34, objectFit: 'contain', display: 'block' }} alt={store?.name} onError={() => setImgError(true)} />
             )}
           </Link>
 
@@ -413,9 +444,9 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div className="nav-search-d" style={{ position: 'relative' }}>
             <form onSubmit={handleSearch}>
               <input type="text" placeholder="ابحث هنا..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.75rem', borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', fontSize: '0.875rem', outline: 'none', transition: 'border-color 0.2s' }}
-                onFocus={e => (e.target.style.borderColor = '#F472B6')}
-                onBlur={e => (e.target.style.borderColor = '#E0E0E0')} />
+                style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.75rem', borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', fontSize: '0.875rem', outline: 'none' }}
+                onFocus={e => (e.currentTarget.style.borderColor = '#F472B6')}
+                onBlur={e => (e.currentTarget.style.borderColor = '#E0E0E0')} />
               <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} />
             </form>
             {searchQuery.length >= 2 && <DropResults />}
@@ -424,30 +455,32 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Desktop nav */}
           <div className="nav-desktop">
             {[{ h: '/', l: 'الرئيسية' }, { h: '/contact', l: 'تواصل' }].map(i => (
-              <Link key={i.h} href={i.h} style={{ fontSize: '0.875rem', fontWeight: 600, color: '#444', transition: 'color 0.15s' }}
+              <Link key={i.h} href={i.h} style={{ fontSize: '0.875rem', fontWeight: 600, color: '#444', transition: 'color 0.15s', textDecoration: 'none' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#F472B6')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#444')}>{i.l}</Link>
             ))}
-            <Link href="/cart" style={{ position: 'relative', background: '#111', color: '#fff', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}
-              onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#F472B6')}
-              onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#111')}>
+            {store.cart && (
+              <Link href="/cart" style={cartBtnStyle}
+              onMouseEnter={e => (e.currentTarget.style.background = '#F472B6')}
+              onMouseLeave={e => (e.currentTarget.style.background = '#111')}>
               <ShoppingCart size={17} />
-              {count > 0 && <span style={{ position: 'absolute', top: -5, right: -5, background: '#F472B6', color: '#fff', fontSize: 10, fontWeight: 700, width: 17, height: 17, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #F8F8F6' }}>{count}</span>}
+              {count > 0 && <span style={badgeStyle}>{count}</span>}
             </Link>
+            )}
           </div>
 
-          {/* Mobile */}
+          {/* Mobile Buttons */}
           <div className="nav-mobile">
-            <button onClick={() => setShowSearch(!showSearch)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <button onClick={() => setShowSearch(!showSearch)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Search size={16} />
             </button>
-            <button onClick={() => setOpen(!open)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <button onClick={() => setOpen(!open)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {open ? <X size={16} /> : <Menu size={16} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile search */}
+        {/* Mobile Search Bar */}
         {showSearch && (
           <div style={{ padding: '0.625rem 1.25rem', background: '#fff', borderTop: '1px solid #E8E8E8', position: 'relative' }} className="anim-slide-down">
             <form onSubmit={handleSearch} style={{ position: 'relative' }}>
@@ -459,14 +492,19 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           </div>
         )}
 
-        {/* Mobile nav */}
+        {/* Mobile Menu Content */}
         <div style={{ overflow: 'hidden', maxHeight: open ? 180 : 0, transition: 'max-height 0.28s ease', background: '#fff', borderTop: open ? '1px solid #E8E8E8' : 'none' }}>
           <div style={{ padding: '0.375rem 1.25rem 0.875rem' }}>
-            {[{ h: '/', l: 'الرئيسية' }, { h: '/contact', l: 'تواصل معنا' }, { h: '/cart', l: 'السلة' }].map(i => (
-              <Link key={i.h} href={i.h} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid #F0F0F0', fontSize: '0.9rem', fontWeight: 600, color: '#111' }}>
+            {[{ h: '/', l: 'الرئيسية' }, { h: '/contact', l: 'تواصل معنا' }].map(i => (
+              <Link key={i.h} href={i.h} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid #F0F0F0', fontSize: '0.9rem', fontWeight: 600, color: '#111', textDecoration: 'none' }}>
                 {i.l} <ArrowRight size={14} style={{ color: '#F472B6' }} />
               </Link>
             ))}
+            {store?.cart && (
+              <Link href={'/cart'} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid #F0F0F0', fontSize: '0.9rem', fontWeight: 600, color: '#111', textDecoration: 'none' }}>
+                {'السلة'} <ArrowRight size={14} style={{ color: '#F472B6' }} />
+              </Link>
+            )}
           </div>
         </div>
       </nav>
@@ -640,11 +678,14 @@ export function Home({ store, page }: any) {
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#F472B6')}>
                 تسوق الآن <ArrowRight size={16} />
               </a>
-              <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 600, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', transition: 'background 0.2s' }}
+              {store?.cart && (
+                <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 600, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', transition: 'background 0.2s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.14)')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.08)')}>
                 السلة
               </Link>
+              )}
+              
             </div>
           </div>
         </div>
@@ -1351,10 +1392,36 @@ export function Contact({ store }: { store: any }) {
                 <label style={{ display: 'block', fontSize: '0.775rem', fontWeight: 700, color: '#555', marginBottom: '0.35rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>رسالتك</label>
                 <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} placeholder="كيف يمكننا مساعدتك؟" style={{ ...S.input, resize: 'none' }} />
               </div>
-              <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }}
-                onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.background = '#C0303C')}
-                onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#F472B6')}>
-                {loading ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> جاري الإرسال...</> : <>إرسال الرسالة <ArrowRight size={16} /></>}
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  ...S.btnPrimary,
+                  background: '#F472B6', // اللون الوردي الأساسي (Pink 400)
+                  color: '#fff',
+                  opacity: loading ? 0.7 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  fontWeight: 700,
+                  border: 'none',
+                  borderRadius: 10,
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.background = '#DB2777')} // وردي غامق (Deep Pink) عند التحويم
+                onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#F472B6')}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                    جاري الإرسال...
+                  </>
+                ) : (
+                  <>
+                    إرسال الرسالة <ArrowRight size={16} />
+                  </>
+                )}
               </button>
             </form>
           )}

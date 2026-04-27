@@ -11,6 +11,7 @@ import {
   CheckCircle2, ArrowRight, Zap,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Shield, Truck,
+  ArrowLeft,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
@@ -340,18 +341,37 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   };
 
   const DropResults = () => (
-    <div style={{ position: 'absolute', top: 'calc(100% + 6px)', right: 0, left: 0, background: '#fff', border: '1.5px solid #E0E0E0', borderRadius: 10, boxShadow: '0 12px 40px rgba(0,0,0,0.12)', zIndex: 60, overflow: 'hidden' }} className="anim-slide-down">
-      {loading ? <div style={{ padding: '1rem', textAlign: 'center', color: '#10B981', fontSize: '0.85rem' }}>جاري البحث...</div>
-        : listSearch.length > 0 ? listSearch.map((p: any) => (
-          <Link href={`/product/${p.id}`} key={p.id} onClick={() => setSearchQuery('')}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderBottom: '1px solid #f0f0f0' }}>
-            <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} alt="" />
-            <div>
-              <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#111' }}>{p.name}</div>
-              <div style={{ fontSize: '0.75rem', color: '#10B981', fontWeight: 700 }}>{p.price} دج</div>
-            </div>
-          </Link>
-        )) : searchQuery.length >= 2 && <div style={{ padding: '1rem', textAlign: 'center', color: '#aaa', fontSize: '0.85rem' }}>لا توجد نتائج</div>}
+    <div style={{paddingTop:25, position: 'absolute', top: 'calc(100% + 6px)', right: 0, left: 0, background: '#fff', border: '1.5px solid #E0E0E0', borderRadius: 10, boxShadow: '0 12px 40px rgba(0,0,0,0.12)', zIndex: 60, overflow: 'hidden' }} className="anim-slide-down">
+      <button onClick={()=>setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
+              <X size={14} />
+            </button>
+      {loading ? <div style={{ padding: '1.5rem', textAlign: 'center', color: '#10B981', fontSize: '0.85rem', fontWeight: 600 }}>جاري البحث...</div>
+        : listSearch.length > 0 ? (
+          <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
+            {listSearch.map((p: any) => (
+              <Link href={`/product/${p.id}`} key={p.id} onClick={() => setSearchQuery('')}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderBottom: '1px solid #f0f0f0', textDecoration: 'none' }}>
+                <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} alt="" />
+                <div style={{ flex: 1 }}>
+                  <div className='line-clamp-1' style={{ fontSize: '0.875rem', fontWeight: 600, color: '#111' }}>{p.name}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#10B981', fontWeight: 700 }}>{p.price} دج</div>
+                </div>
+              </Link>
+            ))}
+
+            {/* زر عرض المزيد - يتحرك مع القائمة (بدون Fixed) */}
+            <button
+              onClick={handleSearch}
+              style={{
+                width: '100%', padding: '12px', background: '#ECFDF5', border: 'none',
+                borderTop: '1px solid #D1FAE5', color: '#10B981', fontWeight: 800,
+                fontSize: '0.85rem', cursor: 'pointer', display: 'flex',
+                alignItems: 'center', justifyContent: 'center', gap: '8px'
+              }}>
+              عرض جميع النتائج <ArrowLeft size={14} />
+            </button>
+          </div>
+        ) : searchQuery.length >= 2 && <div style={{ padding: '1.5rem', textAlign: 'center', color: '#aaa', fontSize: '0.85rem' }}>لا توجد نتائج</div>}
     </div>
   );
 
@@ -381,21 +401,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             {/* إذا لم يكن هناك رابط، أو حدث خطأ في تحميل الصورة، نعرض اللوجو المستطيل */}
             {(!store?.design?.logoUrl || imgError) ? (
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div style={{
-                  padding: '0 12px',
-                  height: 36,
-                  background: 'rgb(16, 185, 129)',
-                  color: '#fff',
-                  borderRadius: 8,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '0.85rem',
-                  fontWeight: 800,
-                  flexShrink: 0,
-                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
-                  whiteSpace: 'nowrap' // لضمان عدم انقسام الاسم
-                }}>
+                <div style={{ padding: '0 12px', height: 36, background: 'rgb(16, 185, 129)', color: '#fff', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 800, flexShrink: 0, boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)', whiteSpace: 'nowrap'}}>
                   {store?.name?.toUpperCase() || 'SHAMSOU GAME'}
                 </div>
               </div>
@@ -428,12 +434,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 onMouseEnter={e => (e.currentTarget.style.color = '#10B981')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#444')}>{i.l}</Link>
             ))}
+            {store?.cart && 
             <Link href="/cart" style={{ position: 'relative', background: '#111', color: '#fff', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}
               onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#10B981')}
               onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#111')}>
               <ShoppingCart size={17} />
               {count > 0 && <span style={{ position: 'absolute', top: -5, right: -5, background: '#10B981', color: '#fff', fontSize: 10, fontWeight: 700, width: 17, height: 17, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #F8F8F6' }}>{count}</span>}
             </Link>
+            }
           </div>
 
           {/* Mobile */}
@@ -462,11 +470,16 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         {/* Mobile nav */}
         <div style={{ overflow: 'hidden', maxHeight: open ? 180 : 0, transition: 'max-height 0.28s ease', background: '#fff', borderTop: open ? '1px solid #E8E8E8' : 'none' }}>
           <div style={{ padding: '0.375rem 1.25rem 0.875rem' }}>
-            {[{ h: '/', l: 'الرئيسية' }, { h: '/contact', l: 'تواصل معنا' }, { h: '/cart', l: 'السلة' }].map(i => (
+            {[{ h: '/', l: 'الرئيسية' }, { h: '/contact', l: 'تواصل معنا' }].map(i => (
               <Link key={i.h} href={i.h} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid #F0F0F0', fontSize: '0.9rem', fontWeight: 600, color: '#111' }}>
-                {i.l} <ArrowRight size={14} style={{ color: '#10B981' }} />
+                {i.l} <ArrowLeft size={14} style={{ color: '#10B981' }} />
               </Link>
             ))}
+            {store?.cart && (
+              <Link href={'/cart'} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid #F0F0F0', fontSize: '0.9rem', fontWeight: 600, color: '#111' }}>
+                {'السلة'} <ArrowLeft size={14} style={{ color: '#10B981' }} />
+              </Link>
+            )} 
           </div>
         </div>
       </nav>
@@ -578,13 +591,28 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
             {orig > price && <span style={{ fontSize: '0.75rem', color: '#ccc', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
           </div>
           <Link href={`/product/${product.slug || product.id}`} style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            width: '100%', padding: '0.625rem', borderRadius: 8,
-            background: '#111', color: '#fff', fontSize: '0.825rem', fontWeight: 700,
-            transition: 'background 0.2s'
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            width: '100%',
+            padding: '0.625rem',
+            borderRadius: 8,
+            background: '#111', // الخلفية الأساسية س وداء فخمة
+            color: '#fff',
+            fontSize: '0.825rem',
+            fontWeight: 700,
+            transition: 'all 0.3s ease' // انتقال ناعم للألوان
           }}
-            onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#10B981')}
-            onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#111')}>
+            onMouseEnter={e => {
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.background = '#10B981'; // يتحول للأخضر عند التحويم
+              el.style.color = '#fff';
+            }}
+            onMouseLeave={e => {
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.background = '#111'; // يعود للأسود
+            }}>
             {viewDetails} <ArrowRight size={13} />
           </Link>
         </div>
@@ -643,11 +671,15 @@ export function Home({ store, page }: any) {
                 تسوق الآن <ArrowRight size={16} />
               </a>
 
-              <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 600, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', transition: 'background 0.2s' }}
+              {store?.cart && (
+                <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 600, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', transition: 'background 0.2s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.14)')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.08)')}>
                 السلة
               </Link>
+              )}
+
+              
             </div>
           </div>
         </div>
@@ -1340,10 +1372,36 @@ export function Contact({ store }: { store: any }) {
                 <label style={{ display: 'block', fontSize: '0.775rem', fontWeight: 700, color: '#555', marginBottom: '0.35rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>رسالتك</label>
                 <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} placeholder="كيف يمكننا مساعدتك؟" style={{ ...S.input, resize: 'none' }} />
               </div>
-              <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }}
-                onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.background = '#C0303C')}
-                onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#10B981')}>
-                {loading ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> جاري الإرسال...</> : <>إرسال الرسالة <ArrowRight size={16} /></>}
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  ...S.btnPrimary,
+                  background: '#10B981', // اللون الأخضر الأساسي (Emerald 500)
+                  color: '#fff',
+                  opacity: loading ? 0.7 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  fontWeight: 700,
+                  border: 'none',
+                  borderRadius: 10,
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.background = '#059669')} // أخضر غامق عند التحويم
+                onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#10B981')}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                    جاري الإرسال...
+                  </>
+                ) : (
+                  <>
+                    إرسال الرسالة <ArrowRight size={16} />
+                  </>
+                )}
               </button>
             </form>
           )}
