@@ -851,7 +851,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                 <div className="details-layout">
 
                     {/* Gallery */}
-                    <div style={{ position: 'sticky', top: 84 }}>
+                    <div style={{top: 84 }}>
                         <div style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 20, overflow: 'hidden', background: pal.bg, border: `3px solid ${pal.border}` }}>
                             {allImages[sel]
                                 ? <img src={allImages[sel]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />

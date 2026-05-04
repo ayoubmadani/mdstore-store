@@ -425,18 +425,35 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
           {/* Logo */}
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
-            {(store.design.logoUrl && store.design.logoUrl !== '/default-logo.png') ? (
+            {/* إذا كان هناك رابط مخصص للصورة، نعرض الشعار */}
+            {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
+              <img
+                src={store.design.logoUrl}
+                style={{ height: 34, objectFit: 'contain', display: 'block' }}
+                alt={store?.name || 'Store Logo'}
+                onError={() => setImgError(true)}
+              />
+            ) : (
+              // وإذا لم يكن هناك رابط أو حدث خطأ، نعرض اللوجو المستطيل بالتصميم الجديد
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div style={{
-                  padding: '0 12px', height: 36, background: '#F472B6', color: '#fff', borderRadius: 8,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem',
-                  fontWeight: 800, flexShrink: 0, boxShadow: '0 4px 12px rgba(244, 114, 182, 0.3)', whiteSpace: 'nowrap'
+                  padding: '0 12px',
+                  height: 36,
+                  background: '#F472B6',
+                  color: '#fff',
+                  borderRadius: 8,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '0.85rem',
+                  fontWeight: 800,
+                  flexShrink: 0,
+                  boxShadow: '0 4px 12px rgba(244, 114, 182, 0.3)',
+                  whiteSpace: 'nowrap'
                 }}>
                   {store?.name?.toUpperCase() || 'SHAMSOU GAME'}
                 </div>
               </div>
-            ) : (
-              <img src={store.design.logoUrl} style={{ height: 34, objectFit: 'contain', display: 'block' }} alt={store?.name} onError={() => setImgError(true)} />
             )}
           </Link>
 

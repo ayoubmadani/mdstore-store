@@ -749,7 +749,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
             <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2.5rem 1.5rem' }}>
                 <div className="details-layout">
                     {/* Gallery */}
-                    <div style={{ position: 'sticky', top: 84 }}>
+                    <div style={{top: 84 }}>
                         <div style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 24, overflow: 'hidden', background: 'var(--lavender-lt)', border: '2px solid var(--lavender-lt)' }}>
                             {allImages[sel] ? <img src={allImages[sel]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem' }}>🧸</div>}
