@@ -374,22 +374,22 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   };
 
   const DropResults = () => (
-    <div style={{ 
-      paddingTop:25,
-      position: 'absolute', 
-      top: 'calc(100% + 6px)', 
-      right: 0, 
-      left: 0, 
-      background: '#fff', 
-      border: '1.5px solid #E0E0E0', 
-      borderRadius: 10, 
-      boxShadow: '0 12px 40px rgba(0,0,0,0.12)', 
-      zIndex: 60, 
-      overflow: 'hidden' 
+    <div style={{
+      paddingTop: 25,
+      position: 'absolute',
+      top: 'calc(100% + 6px)',
+      right: 0,
+      left: 0,
+      background: '#fff',
+      border: '1.5px solid #E0E0E0',
+      borderRadius: 10,
+      boxShadow: '0 12px 40px rgba(0,0,0,0.12)',
+      zIndex: 60,
+      overflow: 'hidden'
     }} className="anim-slide-down">
-      <button onClick={()=>setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
-              <X size={14} />
-            </button>
+      <button onClick={() => setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
+        <X size={14} />
+      </button>
       {loading ? (
         <div style={{ padding: '1rem', textAlign: 'center', color: '#F97316', fontSize: '0.85rem' }}>جاري البحث...</div>
 
@@ -408,16 +408,16 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           ))}
 
           {/* زر عرض المزيد - يظهر في نهاية القائمة وليس ثابتاً */}
-          <button 
-            onClick={handleSearch} 
-            style={{ 
-              width: '100%', 
-              padding: '10px', 
+          <button
+            onClick={handleSearch}
+            style={{
+              width: '100%',
+              padding: '10px',
               background: '#FFF7ED', // برتقالي خفيف جداً
-              border: 'none', 
-              color: '#F97316', 
-              fontSize: '0.85rem', 
-              fontWeight: 800, 
+              border: 'none',
+              color: '#F97316',
+              fontSize: '0.85rem',
+              fontWeight: 800,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -457,7 +457,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
 
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
-            {(!store?.design?.logoUrl || imgError) ? (
+            {(store.design.logoUrl && store.design.logoUrl !== '/default-logo.png') ? (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div style={{
                   padding: '0 12px', height: 36, background: '#F97316', color: '#fff', borderRadius: 8,
@@ -491,13 +491,13 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             ))}
             {store.cart && (
               <Link href="/cart" style={cartBtnStyle}
-              onMouseEnter={e => (e.currentTarget.style.background = '#F97316')}
-              onMouseLeave={e => (e.currentTarget.style.background = '#111')}>
-              <ShoppingCart size={17} />
-              {count > 0 && <span style={badgeStyle}>{count}</span>}
-            </Link>
+                onMouseEnter={e => (e.currentTarget.style.background = '#F97316')}
+                onMouseLeave={e => (e.currentTarget.style.background = '#111')}>
+                <ShoppingCart size={17} />
+                {count > 0 && <span style={badgeStyle}>{count}</span>}
+              </Link>
             )}
-            
+
           </div>
 
           <div className="nav-mobile">
@@ -711,10 +711,10 @@ export function Home({ store, page }: any) {
 
               {store.cart && (
                 <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 600, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', transition: 'background 0.2s' }}
-                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.14)')}
-                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.08)')}>
-                السلة
-              </Link>
+                  onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.14)')}
+                  onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.08)')}>
+                  السلة
+                </Link>
               )}
             </div>
           </div>
@@ -937,23 +937,36 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               <div key={attr.id} style={{ marginBottom: '1.125rem' }}>
                 <p style={{ fontSize: '0.825rem', fontWeight: 700, color: '#111', marginBottom: '0.625rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{attr.name}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {attr.variants.map((v: any) => (
-                    <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                      style={attr.displayMode === 'color' ? {
-                        width: 32, height: 32, borderRadius: '50%', background: v.value, border: '1px solid #eee', cursor: 'pointer',
-                        outline: `2.5px solid ${selectedVariants[attr.name] === v.value ? '#F97316' : 'transparent'}`, outlineOffset: 3, transition: 'all 0.18s'
-                      } : {
-                        padding: '0.45rem 1.1rem', border: `1.5px solid ${selectedVariants[attr.name] === v.value ? '#F97316' : '#E8E8E8'}`, borderRadius: 8,
-                        fontSize: '0.85rem', fontWeight: 600, color: selectedVariants[attr.name] === v.value ? '#F97316' : '#555',
-                        background: selectedVariants[attr.name] === v.value ? 'rgba(249, 115, 22, 0.05)' : '#fff', cursor: 'pointer', transition: 'all 0.18s'
-                      }}>
-                      {attr.displayMode !== 'color' && v.name}
-                    </button>
-                  ))}
+                  {attr.variants.map((v: any) => {
+                    const isSelected = selectedVariants[attr.name] === v.value;
+
+                    return (
+                      <button
+                        key={v.id}
+                        onClick={() => handleVariantSelection(attr.name, v.value)}
+                        style={
+                          attr.displayMode === 'color' ? {
+                            width: 32, height: 32, borderRadius: '50%', background: v.value, border: '1px solid #eee', cursor: 'pointer',
+                            outline: `2.5px solid ${isSelected ? '#F97316' : 'transparent'}`, outlineOffset: 3, transition: 'all 0.18s'
+                          } : attr.displayMode === 'image' ? {
+                            width: 48, height: 48, borderRadius: 10, backgroundImage: `url(${v.value})`, backgroundSize: 'cover',
+                            backgroundPosition: 'center', border: `2px solid ${isSelected ? '#F97316' : '#E8E8E8'}`,
+                            cursor: 'pointer', transition: 'all 0.18s'
+                          } : {
+                            padding: '0.45rem 1.1rem', border: `1.5px solid ${isSelected ? '#F97316' : '#E8E8E8'}`, borderRadius: 8,
+                            fontSize: '0.85rem', fontWeight: 600, color: isSelected ? '#F97316' : '#555',
+                            background: isSelected ? 'rgba(249, 115, 22, 0.05)' : '#fff', cursor: 'pointer', transition: 'all 0.18s'
+                          }
+                        }
+                      >
+                        {/* النص يظهر فقط إذا لم يكن العرض لوناً أو صورة */}
+                        {attr.displayMode !== 'color' && attr.displayMode !== 'image' && v.name}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ))}
-
             <ProductForm product={product} userId={product.store.userId} domain={domain}
               selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
 
@@ -1277,6 +1290,34 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               </FR>
             </div>
 
+            {/* نوع التوصيل — جديد */}
+            <div style={{ margin: '1rem 0' }}>
+              <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#888', textTransform: 'uppercase', marginBottom: '0.5rem', letterSpacing: '0.04em' }}>نوع التوصيل</p>
+              <div className="delivery-grid">
+                {(['home', 'office'] as const).map(t => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setFd(p => ({ ...p, typeLivraison: t }))}
+                    style={{
+                      padding: '0.75rem',
+                      border: `2px solid ${fd.typeLivraison === t ? '#F97316' : '#E8E8E8'}`,
+                      borderRadius: 10,
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      background: fd.typeLivraison === t ? 'rgba(249,115,22,0.04)' : '#fff',
+                      fontFamily: 'inherit',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <span style={{ display: 'block', fontSize: '1.25rem', marginBottom: 3 }}>{t === 'home' ? '🏠' : '🏢'}</span>
+                    <p style={{ fontWeight: 700, fontSize: '0.78rem', color: fd.typeLivraison === t ? '#F97316' : '#888' }}>{t === 'home' ? 'للبيت' : 'للمكتب'}</p>
+                    {selW && <p style={{ fontWeight: 800, fontSize: '0.875rem', color: '#111', marginTop: 2 }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج</p>}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div style={{ background: '#F8F8F6', border: '1.5px solid #EBEBEB', borderRadius: 10, padding: '1rem 1.125rem', margin: '1rem 0' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px solid #E8E8E8' }}>
                 <span style={{ fontSize: '0.85rem', color: '#888' }}>المجموع الفرعي</span>
@@ -1297,10 +1338,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               disabled={submitting}
               style={{
                 ...S.btnPrimary,
-                background: '#F97316', // اللون البرتقالي الأساسي
+                background: '#F97316',
                 opacity: submitting ? 0.7 : 1
               }}
-              onMouseEnter={e => !submitting && ((e.currentTarget as HTMLButtonElement).style.background = '#EA580C')} // برتقالي داكن عند التحويم
+              onMouseEnter={e => !submitting && ((e.currentTarget as HTMLButtonElement).style.background = '#EA580C')}
               onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#F97316')}
             >
               {submitting ? (

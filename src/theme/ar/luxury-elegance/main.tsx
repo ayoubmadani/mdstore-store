@@ -1349,7 +1349,7 @@ export function Contact({ store }: { store: any }) {
           {sent ? (
             <div style={{ textAlign:'center', padding:'4rem 1rem' }}>
               <div style={{ width:80, height:80, borderRadius:'50%', background:'rgba(184,134,11,0.1)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 1.5rem' }}>
-                <CheckCircle2 size={40} style={{ color:'#B8860B' }} />
+                <CheckCircle2 size={40}   style={{ color:'#B8860B' }} />
               </div>
               <h2 className="font-display" style={{ fontSize:'1.75rem', fontWeight:700, color:'#1C1612', marginBottom:'0.5rem' }}>تم الإرسال!</h2>
               <p style={{ color:'#777', marginBottom:'2rem' }}>سنرد عليك في أقرب وقت ممكن.</p>

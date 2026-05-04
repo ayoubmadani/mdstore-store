@@ -324,7 +324,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   const [loading, setLoading] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [isHovered, setIsHovered] = useState(false); // لحالة زر الإغلاق
-  
+
   const router = useRouter();
   const count = useCartStore(s => s.count);
   const initCount = useCartStore(s => s.initCount);
@@ -344,9 +344,9 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     if (searchQuery.length < 2) { setListSearch([]); return; }
     const t = setTimeout(async () => {
       setLoading(true);
-      try { 
-        const { data } = await axios.get(`${API_URL}/products/public/${domain}`, { params: { search: searchQuery } }); 
-        setListSearch(data.products || []); 
+      try {
+        const { data } = await axios.get(`${API_URL}/products/public/${domain}`, { params: { search: searchQuery } });
+        setListSearch(data.products || []);
       }
       catch { } finally { setLoading(false); }
     }, 380);
@@ -355,26 +355,26 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
   const doSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (searchQuery.trim()) { 
-      router.push(`/?search=${encodeURIComponent(searchQuery)}`); 
-      setSearchQuery(''); 
-      setShowSearch(false); 
+    if (searchQuery.trim()) {
+      router.push(`/?search=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery('');
+      setShowSearch(false);
     }
   };
 
   const SearchDrop = () => (
-    <div style={{maxHeight:"300px",overflow: 'auto', paddingTop: "25px", position: 'absolute', top: 'calc(100% + 8px)', right: 0, left: 0, background: '#fff', border: '3px solid var(--border)', borderRadius: 20, boxShadow: '0 16px 48px rgba(0,0,0,0.1)', zIndex: 200,}}>
-      
+    <div style={{ maxHeight: "300px", overflow: 'auto', paddingTop: "25px", position: 'absolute', top: 'calc(100% + 8px)', right: 0, left: 0, background: '#fff', border: '3px solid var(--border)', borderRadius: 20, boxShadow: '0 16px 48px rgba(0,0,0,0.1)', zIndex: 200, }}>
+
       {/* زر إغلاق البحث */}
       <button
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={() => setSearchQuery('')}
-        style={{ 
-          position: 'absolute', top: 10, left: 10, cursor: 'pointer', 
-          background: 'none', border: 'none', padding: '4px', 
-          display: 'flex', alignItems: 'center', justifyContent: 'center', 
-          color: isHovered ? 'red' : 'var(--text-soft)', transition: 'color 0.2s' 
+        style={{
+          position: 'absolute', top: 10, left: 10, cursor: 'pointer',
+          background: 'none', border: 'none', padding: '4px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: isHovered ? 'red' : 'var(--text-soft)', transition: 'color 0.2s'
         }}>
         <X size={18} />
       </button>
@@ -383,7 +383,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <div style={{ padding: '1.25rem', textAlign: 'center', color: 'var(--coral)', fontWeight: 800, fontSize: '0.875rem' }}>🔍 جاري البحث...</div>
       ) : listSearch.length > 0 ? (
         <>
-          {listSearch.map((p: any, i :number) => (
+          {listSearch.map((p: any, i: number) => (
             <Link
               href={`/product/${p.id}`}
               key={p.id}
@@ -434,7 +434,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div style={{ width: 46, height: 46, borderRadius: 14, background: 'linear-gradient(135deg, var(--coral), var(--grape))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden', transition: 'transform 0.3s' }}
             onMouseEnter={e => (e.currentTarget.style.transform = 'rotate(8deg) scale(1.1)')}
             onMouseLeave={e => (e.currentTarget.style.transform = '')}>
-            {store?.design?.logoUrl
+            {(store.design.logoUrl && store.design.logoUrl !== '/default-logo.png')
               ? <img src={store.design.logoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
               : <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: '#fff' }}>{initials}</span>}
           </div>
@@ -472,7 +472,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <button onClick={() => setShowSearch(!showSearch)} style={{ width: 40, height: 40, borderRadius: 12, border: '2px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral)' }}>
             <Search size={18} />
           </button>
-          
+
           {/* شرط إخفاء السلة في نسخة الهاتف */}
           {store?.cart && (
             <Link href="/cart" style={{ position: 'relative', width: 40, height: 40, borderRadius: 12, border: '2px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral)' }}>
@@ -514,10 +514,10 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   );
 }
 
-const mobileLinkStyle = { 
-  display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
-  padding: '0.75rem 0', borderBottom: '2px dashed var(--border)', 
-  fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)' 
+const mobileLinkStyle = {
+  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+  padding: '0.75rem 0', borderBottom: '2px dashed var(--border)',
+  fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)'
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -653,11 +653,20 @@ export function Home({ store, page }: any) {
     <div dir="rtl">
 
       {/* ── HERO ── */}
-      <section className="polka-dots" style={{ position: 'relative', minHeight: '90vh', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
+      <section className="polka-dots" style={{ position: 'relative', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
         <Confetti />
         {store.hero?.imageUrl && (
-          <div style={{ position: 'absolute', inset: 0 }}>
-            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.08 }} />
+          <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+            <img
+              src={store.hero.imageUrl}
+              alt=""
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                opacity: 0.3 /* قمنا بزيادة نسبة الوضوح هنا */
+              }}
+            />
           </div>
         )}
         {/* Floating emojis */}

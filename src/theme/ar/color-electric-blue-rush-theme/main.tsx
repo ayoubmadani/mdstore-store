@@ -375,7 +375,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   // 2. مكون نتائج البحث مع خاصية التمرير (Overflow Max Height)
   const DropResults = () => (
     <div style={{
-      paddingTop:25,
+      paddingTop: 25,
       position: 'absolute', top: 'calc(100% + 6px)', right: 0, left: 0,
       background: '#fff', border: '1.5px solid #E0E0E0', borderRadius: 10,
       boxShadow: '0 12px 40px rgba(0,0,0,0.12)', zIndex: 60,
@@ -425,7 +425,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
           {/* Logo */}
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
-            {(!store?.design?.logoUrl || imgError) ? (
+            {(store.design.logoUrl && store.design.logoUrl !== '/default-logo.png') ? (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div style={{
                   padding: '0 12px',
@@ -928,19 +928,33 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               <div key={attr.id} style={{ marginBottom: '1.125rem' }}>
                 <p style={{ fontSize: '0.825rem', fontWeight: 700, color: '#111', marginBottom: '0.625rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{attr.name}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {attr.variants.map((v: any) => (
-                    <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                      style={attr.displayMode === 'color' ? {
-                        width: 32, height: 32, borderRadius: '50%', background: v.value, border: '1px solid #eee', cursor: 'pointer',
-                        outline: `2.5px solid ${selectedVariants[attr.name] === v.value ? '#1D4ED8' : 'transparent'}`, outlineOffset: 3, transition: 'outline 0.18s'
-                      } : {
-                        padding: '0.45rem 1.1rem', border: `1.5px solid ${selectedVariants[attr.name] === v.value ? '#1D4ED8' : '#E8E8E8'}`, borderRadius: 8,
-                        fontSize: '0.85rem', fontWeight: 600, color: selectedVariants[attr.name] === v.value ? '#1D4ED8' : '#555',
-                        background: selectedVariants[attr.name] === v.value ? 'rgba(29, 78, 216, 0.05)' : '#fff', cursor: 'pointer', transition: 'all 0.18s'
-                      }}>
-                      {attr.displayMode !== 'color' && v.name}
-                    </button>
-                  ))}
+                  {attr.variants.map((v: any) => {
+                    const isSelected = selectedVariants[attr.name] === v.value;
+
+                    return (
+                      <button
+                        key={v.id}
+                        onClick={() => handleVariantSelection(attr.name, v.value)}
+                        style={
+                          attr.displayMode === 'color' ? {
+                            width: 32, height: 32, borderRadius: '50%', background: v.value, border: '1px solid #eee', cursor: 'pointer',
+                            outline: `2.5px solid ${isSelected ? '#1D4ED8' : 'transparent'}`, outlineOffset: 3, transition: 'outline 0.18s'
+                          } : attr.displayMode === 'image' ? {
+                            width: 44, height: 44, borderRadius: 10, backgroundImage: `url(${v.value})`, backgroundSize: 'cover',
+                            backgroundPosition: 'center', border: `2px solid ${isSelected ? '#1D4ED8' : '#E8E8E8'}`,
+                            cursor: 'pointer', transition: 'all 0.18s'
+                          } : {
+                            padding: '0.45rem 1.1rem', border: `1.5px solid ${isSelected ? '#1D4ED8' : '#E8E8E8'}`, borderRadius: 8,
+                            fontSize: '0.85rem', fontWeight: 600, color: isSelected ? '#1D4ED8' : '#555',
+                            background: isSelected ? 'rgba(29, 78, 216, 0.05)' : '#fff', cursor: 'pointer', transition: 'all 0.18s'
+                          }
+                        }
+                      >
+                        {/* إظهار النص فقط في الحالات غير المرئية (color/image) */}
+                        {attr.displayMode !== 'color' && attr.displayMode !== 'image' && v.name}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -1269,6 +1283,34 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               </FR>
             </div>
 
+            {/* نوع التوصيل — جديد */}
+            <div style={{ margin: '1rem 0' }}>
+              <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#888', textTransform: 'uppercase', marginBottom: '0.5rem', letterSpacing: '0.04em' }}>نوع التوصيل</p>
+              <div className="delivery-grid">
+                {(['home', 'office'] as const).map(t => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setFd(p => ({ ...p, typeLivraison: t }))}
+                    style={{
+                      padding: '0.75rem',
+                      border: `2px solid ${fd.typeLivraison === t ? '#1D4ED8' : '#E8E8E8'}`,
+                      borderRadius: 10,
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      background: fd.typeLivraison === t ? 'rgba(29,78,216,0.04)' : '#fff',
+                      fontFamily: 'inherit',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <span style={{ display: 'block', fontSize: '1.25rem', marginBottom: 3 }}>{t === 'home' ? '🏠' : '🏢'}</span>
+                    <p style={{ fontWeight: 700, fontSize: '0.78rem', color: fd.typeLivraison === t ? '#1D4ED8' : '#888' }}>{t === 'home' ? 'للبيت' : 'للمكتب'}</p>
+                    {selW && <p style={{ fontWeight: 800, fontSize: '0.875rem', color: '#111', marginTop: 2 }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج</p>}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div style={{ background: '#F8F8F6', border: '1.5px solid #EBEBEB', borderRadius: 10, padding: '1rem 1.125rem', margin: '1rem 0' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px solid #E8E8E8' }}>
                 <span style={{ fontSize: '0.85rem', color: '#888' }}>المجموع الفرعي</span>
@@ -1289,10 +1331,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               disabled={submitting}
               style={{
                 ...S.btnPrimary,
-                background: '#3B82F6', // اللون الأزرق الأساسي
+                background: '#3B82F6',
                 opacity: submitting ? 0.7 : 1
               }}
-              onMouseEnter={e => !submitting && ((e.currentTarget as HTMLButtonElement).style.background = '#2563EB')} // درجة أزرق أغمق عند التمرير
+              onMouseEnter={e => !submitting && ((e.currentTarget as HTMLButtonElement).style.background = '#2563EB')}
               onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#3B82F6')}
             >
               {submitting ? (

@@ -365,7 +365,7 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
 
         {/* Logo */}
         <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
-          {store?.design?.logoUrl
+          {(store.design.logoUrl && store.design.logoUrl !== '/default-logo.png')
             ? <img src={store.design.logoUrl} style={{ height: '32px' }} alt={store.name} />
             : <span className="neon-cyan orb" style={{ fontWeight: 900, fontSize: '1.1rem' }}>{store?.name}</span>
           }

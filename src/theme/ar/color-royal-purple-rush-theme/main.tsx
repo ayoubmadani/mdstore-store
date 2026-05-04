@@ -379,10 +379,10 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   };
 
   const DropResults = () => (
-    <div style={{paddingTop:25, position: 'absolute', top: 'calc(100% + 6px)', right: 0, left: 0, background: '#fff', border: '1.5px solid #E0E0E0', borderRadius: 10, boxShadow: '0 12px 40px rgba(0,0,0,0.12)', zIndex: 60, overflow: 'hidden' }} className="anim-slide-down">
-      <button onClick={()=>setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
-              <X size={14} />
-            </button>
+    <div style={{ paddingTop: 25, position: 'absolute', top: 'calc(100% + 6px)', right: 0, left: 0, background: '#fff', border: '1.5px solid #E0E0E0', borderRadius: 10, boxShadow: '0 12px 40px rgba(0,0,0,0.12)', zIndex: 60, overflow: 'auto' }} className="anim-slide-down">
+      <button onClick={() => setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
+        <X size={14} />
+      </button>
       {loading ? <div style={{ padding: '1.5rem', textAlign: 'center', color: '#8B5CF6', fontSize: '0.85rem', fontWeight: 600 }}>جاري البحث...</div>
         : listSearch.length > 0 ? (
           <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
@@ -396,15 +396,15 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 </div>
               </Link>
             ))}
-            
+
             {/* زر عرض المزيد - Static (يتحرك مع التمرير) */}
-            <button 
-              onClick={handleSearch} 
-              style={{ 
-                width: '100%', padding: '12px', background: '#F5F3FF', border: 'none', 
-                borderTop: '1px solid #EDE9FE', color: '#8B5CF6', fontWeight: 800, 
-                fontSize: '0.85rem', cursor: 'pointer', display: 'flex', 
-                alignItems: 'center', justifyContent: 'center', gap: '8px' 
+            <button
+              onClick={handleSearch}
+              style={{
+                width: '100%', padding: '12px', background: '#F5F3FF', border: 'none',
+                borderTop: '1px solid #EDE9FE', color: '#8B5CF6', fontWeight: 800,
+                fontSize: '0.85rem', cursor: 'pointer', display: 'flex',
+                alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}>
               عرض جميع النتائج <ArrowLeft size={14} />
             </button>
@@ -436,7 +436,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Logo */}
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
             {/* إذا لم يكن هناك رابط، أو حدث خطأ في تحميل الصورة، نعرض اللوجو المستطيل */}
-            {(!store?.design?.logoUrl || imgError) ? (
+            {(store.design.logoUrl && store.design.logoUrl !== '/default-logo.png') ? (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div style={{
                   padding: '0 12px',
@@ -487,11 +487,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             ))}
             {store?.cart && (
               <Link href="/cart" style={{ position: 'relative', background: '#111', color: '#fff', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}
-              onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#8B5CF6')}
-              onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#111')}>
-              <ShoppingCart size={17} />
-              {count > 0 && <span style={{ position: 'absolute', top: -5, right: -5, background: '#8B5CF6', color: '#fff', fontSize: 10, fontWeight: 700, width: 17, height: 17, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #F8F8F6' }}>{count}</span>}
-            </Link>
+                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#8B5CF6')}
+                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#111')}>
+                <ShoppingCart size={17} />
+                {count > 0 && <span style={{ position: 'absolute', top: -5, right: -5, background: '#8B5CF6', color: '#fff', fontSize: 10, fontWeight: 700, width: 17, height: 17, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #F8F8F6' }}>{count}</span>}
+              </Link>
             )}
           </div>
 
@@ -700,12 +700,12 @@ export function Home({ store, page }: any) {
               </a>
               {store?.cart && (
                 <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 600, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', transition: 'background 0.2s' }}
-                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.14)')}
-                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.08)')}>
-                السلة
-              </Link>
+                  onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.14)')}
+                  onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.08)')}>
+                  السلة
+                </Link>
               )}
-              
+
             </div>
           </div>
         </div>
@@ -920,19 +920,33 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               <div key={attr.id} style={{ marginBottom: '1.125rem' }}>
                 <p style={{ fontSize: '0.825rem', fontWeight: 700, color: '#111', marginBottom: '0.625rem', textTransform: 'uppercase' }}>{attr.name}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {attr.variants.map((v: any) => (
-                    <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                      style={attr.displayMode === 'color' ? {
-                        width: 32, height: 32, borderRadius: '50%', background: v.value, border: '1px solid #eee', cursor: 'pointer',
-                        outline: `2.5px solid ${selectedVariants[attr.name] === v.value ? '#8B5CF6' : 'transparent'}`, outlineOffset: 3
-                      } : {
-                        padding: '0.45rem 1.1rem', border: `1.5px solid ${selectedVariants[attr.name] === v.value ? '#8B5CF6' : '#E8E8E8'}`, borderRadius: 8,
-                        fontSize: '0.85rem', fontWeight: 600, background: selectedVariants[attr.name] === v.value ? 'rgba(139, 92, 246, 0.05)' : '#fff',
-                        color: selectedVariants[attr.name] === v.value ? '#8B5CF6' : '#555', cursor: 'pointer', transition: 'all 0.18s'
-                      }}>
-                      {attr.displayMode !== 'color' && v.name}
-                    </button>
-                  ))}
+                  {attr.variants.map((v: any) => {
+                    const isSelected = selectedVariants[attr.name] === v.value;
+
+                    return (
+                      <button
+                        key={v.id}
+                        onClick={() => handleVariantSelection(attr.name, v.value)}
+                        style={
+                          attr.displayMode === 'color' ? {
+                            width: 32, height: 32, borderRadius: '50%', background: v.value, border: '1px solid #eee', cursor: 'pointer',
+                            outline: `2.5px solid ${isSelected ? '#8B5CF6' : 'transparent'}`, outlineOffset: 3
+                          } : attr.displayMode === 'image' ? {
+                            width: 44, height: 44, borderRadius: 10, backgroundImage: `url(${v.value})`, backgroundSize: 'cover',
+                            backgroundPosition: 'center', border: `2px solid ${isSelected ? '#8B5CF6' : '#E8E8E8'}`,
+                            cursor: 'pointer', transition: 'all 0.18s', outline: isSelected ? '2px solid rgba(139, 92, 246, 0.2)' : 'none'
+                          } : {
+                            padding: '0.45rem 1.1rem', border: `1.5px solid ${isSelected ? '#8B5CF6' : '#E8E8E8'}`, borderRadius: 8,
+                            fontSize: '0.85rem', fontWeight: 600, background: isSelected ? 'rgba(139, 92, 246, 0.05)' : '#fff',
+                            color: isSelected ? '#8B5CF6' : '#555', cursor: 'pointer', transition: 'all 0.18s'
+                          }
+                        }
+                      >
+                        {/* إظهار النص فقط إذا لم يكن النوع لوناً أو صورة */}
+                        {attr.displayMode !== 'color' && attr.displayMode !== 'image' && v.name}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -1260,6 +1274,34 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               </FR>
             </div>
 
+            {/* نوع التوصيل — جديد */}
+            <div style={{ margin: '1rem 0' }}>
+              <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#888', textTransform: 'uppercase', marginBottom: '0.5rem', letterSpacing: '0.04em' }}>نوع التوصيل</p>
+              <div className="delivery-grid">
+                {(['home', 'office'] as const).map(t => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setFd(p => ({ ...p, typeLivraison: t }))}
+                    style={{
+                      padding: '0.75rem',
+                      border: `2px solid ${fd.typeLivraison === t ? '#8B5CF6' : '#E8E8E8'}`,
+                      borderRadius: 10,
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      background: fd.typeLivraison === t ? 'rgba(139,92,246,0.04)' : '#fff',
+                      fontFamily: 'inherit',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <span style={{ display: 'block', fontSize: '1.25rem', marginBottom: 3 }}>{t === 'home' ? '🏠' : '🏢'}</span>
+                    <p style={{ fontWeight: 700, fontSize: '0.78rem', color: fd.typeLivraison === t ? '#8B5CF6' : '#888' }}>{t === 'home' ? 'للبيت' : 'للمكتب'}</p>
+                    {selW && <p style={{ fontWeight: 800, fontSize: '0.875rem', color: '#111', marginTop: 2 }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج</p>}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div style={{ background: '#F8F8F6', border: '1.5px solid #EBEBEB', borderRadius: 10, padding: '1rem 1.125rem', margin: '1rem 0' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px solid #E8E8E8' }}>
                 <span style={{ fontSize: '0.85rem', color: '#888' }}>المجموع الفرعي</span>
@@ -1276,7 +1318,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             </div>
 
             <button type="submit" disabled={submitting} style={{ ...S.btnPrimary, opacity: submitting ? 0.7 : 1 }}
-              onMouseEnter={e => !submitting && ((e.currentTarget as HTMLButtonElement).style.background = '#C0303C')}
+              onMouseEnter={e => !submitting && ((e.currentTarget as HTMLButtonElement).style.background = '#7C3AED')}
               onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#8B5CF6')}>
               {submitting ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> جاري المعالجة...</> : 'تأكيد الطلب'}
             </button>

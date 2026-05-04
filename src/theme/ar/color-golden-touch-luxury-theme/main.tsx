@@ -340,15 +340,15 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   };
 
   const DropResults = () => (
-    <div style={{ 
-      paddingTop:25,
-      position: 'absolute', top: 'calc(100% + 6px)', right: 0, left: 0, 
-      background: '#fff', border: '1.5px solid #E0E0E0', borderRadius: 10, 
-      boxShadow: '0 12px 40px rgba(0,0,0,0.12)', zIndex: 60, overflow: 'hidden' 
+    <div style={{
+      paddingTop: 25,
+      position: 'absolute', top: 'calc(100% + 6px)', right: 0, left: 0,
+      background: '#fff', border: '1.5px solid #E0E0E0', borderRadius: 10,
+      boxShadow: '0 12px 40px rgba(0,0,0,0.12)', zIndex: 60, overflow: 'hidden'
     }} className="anim-slide-down">
-      <button onClick={()=>setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
-              <X size={14} />
-            </button>
+      <button onClick={() => setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
+        <X size={14} />
+      </button>
       {loading ? (
         <div style={{ padding: '1rem', textAlign: 'center', color: '#D4AF37', fontSize: '0.85rem', fontWeight: 600 }}>جاري البحث...</div>
       ) : listSearch.length > 0 ? (
@@ -364,11 +364,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             </Link>
           ))}
           {/* زر عرض المزيد - بدون Fixed */}
-          <button onClick={handleSearch} style={{ 
-            width: '100%', padding: '12px', background: '#fcfcfc', border: 'none', 
-            borderTop: '1px solid #eee', color: '#D4AF37', fontWeight: 800, 
-            fontSize: '0.85rem', cursor: 'pointer', display: 'flex', 
-            alignItems: 'center', justifyContent: 'center', gap: '6px' 
+          <button onClick={handleSearch} style={{
+            width: '100%', padding: '12px', background: '#fcfcfc', border: 'none',
+            borderTop: '1px solid #eee', color: '#D4AF37', fontWeight: 800,
+            fontSize: '0.85rem', cursor: 'pointer', display: 'flex',
+            alignItems: 'center', justifyContent: 'center', gap: '6px'
           }}>
             عرض جميع النتائج <ArrowLeft size={14} />
           </button>
@@ -420,7 +420,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Logo */}
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
             {/* إذا لم يكن هناك رابط، أو حدث خطأ في تحميل الصورة، نعرض اللوجو المستطيل */}
-            {(!store?.design?.logoUrl || imgError) ? (
+            {(store.design.logoUrl && store.design.logoUrl !== '/default-logo.png') ? (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div style={{
                   padding: '0 12px',
@@ -471,11 +471,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             ))}
             {store.cart && (
               <Link href="/cart" style={{ position: 'relative', background: '#111', color: '#fff', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}
-              onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#D4AF37')}
-              onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#111')}>
-              <ShoppingCart size={17} />
-              {count > 0 && <span style={{ position: 'absolute', top: -5, right: -5, background: '#D4AF37', color: '#fff', fontSize: 10, fontWeight: 700, width: 17, height: 17, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #F8F8F6' }}>{count}</span>}
-            </Link>
+                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#D4AF37')}
+                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#111')}>
+                <ShoppingCart size={17} />
+                {count > 0 && <span style={{ position: 'absolute', top: -5, right: -5, background: '#D4AF37', color: '#fff', fontSize: 10, fontWeight: 700, width: 17, height: 17, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #F8F8F6' }}>{count}</span>}
+              </Link>
             )}
           </div>
 
@@ -727,14 +727,14 @@ export function Home({ store, page }: any) {
               </a>
 
               {store.cart && (
-              <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 600, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', transition: 'background 0.2s' }}
-                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.14)')}
-                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.08)')}>
-                السلة
-              </Link>
+                <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 600, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', transition: 'background 0.2s' }}
+                  onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.14)')}
+                  onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.08)')}>
+                  السلة
+                </Link>
               )}
 
-              
+
             </div>
           </div>
         </div>
@@ -914,22 +914,33 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               <div key={attr.id} style={{ marginBottom: '1.125rem' }}>
                 <p style={{ fontSize: '0.825rem', fontWeight: 700, color: '#111', marginBottom: '0.625rem' }}>{attr.name}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {attr.variants.map((v: any) => (
-                    <button
-                      key={v.id}
-                      onClick={() => handleVariantSelection(attr.name, v.value)}
-                      style={attr.displayMode === 'color' ? {
-                        width: 32, height: 32, borderRadius: '50%', background: v.value, border: '1px solid #eee', cursor: 'pointer',
-                        outline: `2.5px solid ${selectedVariants[attr.name] === v.value ? '#D4AF37' : 'transparent'}`, outlineOffset: 2
-                      } : {
-                        padding: '0.5rem 1rem', border: `1.5px solid ${selectedVariants[attr.name] === v.value ? '#D4AF37' : '#E8E8E8'}`,
-                        borderRadius: 8, fontSize: '0.85rem', fontWeight: 600, background: selectedVariants[attr.name] === v.value ? 'rgba(212, 175, 55, 0.05)' : '#fff',
-                        color: selectedVariants[attr.name] === v.value ? '#D4AF37' : '#555', cursor: 'pointer'
-                      }}
-                    >
-                      {attr.displayMode !== 'color' && v.name}
-                    </button>
-                  ))}
+                  {attr.variants.map((v: any) => {
+                    const isSelected = selectedVariants[attr.name] === v.value;
+
+                    return (
+                      <button
+                        key={v.id}
+                        onClick={() => handleVariantSelection(attr.name, v.value)}
+                        style={
+                          attr.displayMode === 'color' ? {
+                            width: 32, height: 32, borderRadius: '50%', background: v.value, border: '1px solid #eee', cursor: 'pointer',
+                            outline: `2.5px solid ${isSelected ? '#D4AF37' : 'transparent'}`, outlineOffset: 2
+                          } : attr.displayMode === 'image' ? {
+                            width: 44, height: 44, borderRadius: 10, backgroundImage: `url(${v.value})`, backgroundSize: 'cover',
+                            backgroundPosition: 'center', border: `2px solid ${isSelected ? '#D4AF37' : '#E8E8E8'}`,
+                            cursor: 'pointer', transition: 'all 0.2s'
+                          } : {
+                            padding: '0.5rem 1rem', border: `1.5px solid ${isSelected ? '#D4AF37' : '#E8E8E8'}`,
+                            borderRadius: 8, fontSize: '0.85rem', fontWeight: 600, background: isSelected ? 'rgba(212, 175, 55, 0.05)' : '#fff',
+                            color: isSelected ? '#D4AF37' : '#555', cursor: 'pointer'
+                          }
+                        }
+                      >
+                        {/* إظهار النص فقط إذا لم يكن النوع لوناً أو صورة */}
+                        {attr.displayMode !== 'color' && attr.displayMode !== 'image' && v.name}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -1269,6 +1280,34 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   </select>
                 </div>
               </FR>
+            </div>
+
+            {/* نوع التوصيل — جديد */}
+            <div style={{ margin: '1rem 0' }}>
+              <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#888', textTransform: 'uppercase', marginBottom: '0.5rem', letterSpacing: '0.04em' }}>نوع التوصيل</p>
+              <div className="delivery-grid">
+                {(['home', 'office'] as const).map(t => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setFd(p => ({ ...p, typeLivraison: t }))}
+                    style={{
+                      padding: '0.75rem',
+                      border: `2px solid ${fd.typeLivraison === t ? '#D4AF37' : '#E8E8E8'}`,
+                      borderRadius: 10,
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      background: fd.typeLivraison === t ? 'rgba(212,175,55,0.04)' : '#fff',
+                      fontFamily: 'inherit',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <span style={{ display: 'block', fontSize: '1.25rem', marginBottom: 3 }}>{t === 'home' ? '🏠' : '🏢'}</span>
+                    <p style={{ fontWeight: 700, fontSize: '0.78rem', color: fd.typeLivraison === t ? '#D4AF37' : '#888' }}>{t === 'home' ? 'للبيت' : 'للمكتب'}</p>
+                    {selW && <p style={{ fontWeight: 800, fontSize: '0.875rem', color: '#111', marginTop: 2 }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج</p>}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div style={{ background: '#F8F8F6', border: '1.5px solid #EBEBEB', borderRadius: 10, padding: '1rem 1.125rem', margin: '1rem 0' }}>

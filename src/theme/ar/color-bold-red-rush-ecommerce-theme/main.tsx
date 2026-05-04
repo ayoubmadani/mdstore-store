@@ -338,8 +338,8 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   };
 
   const DropResults = () => (
-    <div style={{paddingTop:25, position: 'absolute', top: 'calc(100% + 6px)', right: 0, left: 0, background: '#fff', border: '1.5px solid #E0E0E0', borderRadius: 10, boxShadow: '0 12px 40px rgba(0,0,0,0.12)', zIndex: 60, overflow: 'hidden' }} className="anim-slide-down">
-      <button onClick={()=>setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
+    <div style={{ paddingTop: 25, position: 'absolute', top: 'calc(100% + 6px)', right: 0, left: 0, background: '#fff', border: '1.5px solid #E0E0E0', borderRadius: 10, boxShadow: '0 12px 40px rgba(0,0,0,0.12)', zIndex: 60, maxHeight: '300px', overflowY: 'auto' }} className="anim-slide-down">
+      <button onClick={() => setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
         <X size={14} />
       </button>
       {loading ? <div style={{ padding: '1.5rem', textAlign: 'center', color: '#E63946', fontSize: '0.85rem', fontWeight: 600 }}>جاري البحث...</div>
@@ -355,13 +355,13 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 </div>
               </Link>
             ))}
-            <button 
-              onClick={handleSearch} 
-              style={{ 
-                width: '100%', padding: '12px', background: '#FEF2F2', border: 'none', 
-                borderTop: '1px solid #FEE2E2', color: '#E63946', fontWeight: 800, 
-                fontSize: '0.85rem', cursor: 'pointer', display: 'flex', 
-                alignItems: 'center', justifyContent: 'center', gap: '8px' 
+            <button
+              onClick={handleSearch}
+              style={{
+                width: '100%', padding: '12px', background: '#FEF2F2', border: 'none',
+                borderTop: '1px solid #FEE2E2', color: '#E63946', fontWeight: 800,
+                fontSize: '0.85rem', cursor: 'pointer', display: 'flex',
+                alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}>
               عرض جميع النتائج <ArrowLeft size={14} />
             </button>
@@ -393,7 +393,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Logo */}
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
             {/* إذا لم يكن هناك رابط، أو حدث خطأ في تحميل الصورة، نعرض اللوجو المستطيل */}
-            {(!store?.design?.logoUrl || imgError) ? (
+            {(store.design.logoUrl && store.design.logoUrl !== '/default-logo.png') ? (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div style={{
                   padding: '0 12px',
@@ -444,13 +444,13 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             ))}
             {store.cart && (
               <Link href="/cart" style={{ position: 'relative', background: '#111', color: '#fff', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}
-              onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#E63946')}
-              onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#111')}>
-              <ShoppingCart size={17} />
-              {count > 0 && <span style={{ position: 'absolute', top: -5, right: -5, background: '#E63946', color: '#fff', fontSize: 10, fontWeight: 700, width: 17, height: 17, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #F8F8F6' }}>{count}</span>}
-            </Link>
+                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#E63946')}
+                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#111')}>
+                <ShoppingCart size={17} />
+                {count > 0 && <span style={{ position: 'absolute', top: -5, right: -5, background: '#E63946', color: '#fff', fontSize: 10, fontWeight: 700, width: 17, height: 17, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #F8F8F6' }}>{count}</span>}
+              </Link>
             )}
-            
+
           </div>
 
           {/* Mobile */}
@@ -658,12 +658,12 @@ export function Home({ store, page }: any) {
               </a>
               {store.cart && (
                 <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 600, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', transition: 'background 0.2s' }}
-                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.14)')}
-                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.08)')}>
-                السلة
-              </Link>
+                  onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.14)')}
+                  onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.08)')}>
+                  السلة
+                </Link>
               )}
-              
+
             </div>
           </div>
         </div>
@@ -807,49 +807,49 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             </div>
 
             {/* Price box - Power Red Version */}
-<div style={{ 
-  background: '#FFF5F5', // خلفية حمراء باهتة جداً لراحة العين
-  border: '1.5px solid #E63946', // إطار أحمر صريح
-  borderRadius: 12, 
-  padding: '1rem 1.25rem', 
-  marginBottom: '1.5rem',
-  boxShadow: '0 4px 15px rgba(230, 57, 70, 0.1)' 
-}}>
-  <p style={{ 
-    fontSize: '0.75rem', 
-    color: '#E63946', 
-    fontWeight: 700, 
-    marginBottom: '0.25rem', 
-    textTransform: 'uppercase', 
-    letterSpacing: '0.08em' 
-  }}>السعر الإجمالي</p>
-  
-  <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-    <span className="price-mono" style={{ 
-      fontSize: '2.5rem', 
-      fontWeight: 800, 
-      color: '#111' // السعر بالأسود ليكون التباين مع الأحمر قوياً
-    }}>
-      {finalPrice.toLocaleString()}
-    </span>
-    <span style={{ 
-      fontSize: '1.1rem', 
-      fontWeight: 700, 
-      color: '#E63946' // العملة بالأحمر
-    }}>
-      دج
-    </span>
-  </div>
-</div>
+            <div style={{
+              background: '#FFF5F5', // خلفية حمراء باهتة جداً لراحة العين
+              border: '1.5px solid #E63946', // إطار أحمر صريح
+              borderRadius: 12,
+              padding: '1rem 1.25rem',
+              marginBottom: '1.5rem',
+              boxShadow: '0 4px 15px rgba(230, 57, 70, 0.1)'
+            }}>
+              <p style={{
+                fontSize: '0.75rem',
+                color: '#E63946',
+                fontWeight: 700,
+                marginBottom: '0.25rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em'
+              }}>السعر الإجمالي</p>
 
-            {/* Offers - تم تغيير اللون للأحمر الذهبي المتناسق */}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
+                <span className="price-mono" style={{
+                  fontSize: '2.5rem',
+                  fontWeight: 800,
+                  color: '#111' // السعر بالأسود ليكون التباين مع الأحمر قوياً
+                }}>
+                  {finalPrice.toLocaleString()}
+                </span>
+                <span style={{
+                  fontSize: '1.1rem',
+                  fontWeight: 700,
+                  color: '#E63946' // العملة بالأحمر
+                }}>
+                  دج
+                </span>
+              </div>
+            </div>
+
+            {/* Offers - تم تغيير اللون للأحمر المتناسق */}
             {product.offers?.length > 0 && (
               <div style={{ marginBottom: '1.25rem' }}>
                 {product.offers.map((o: any) => (
-                  <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1rem', border: `1.5px solid ${selectedOffer === o.id ? '#D4AF37' : '#E8E8E8'}`, borderRadius: 10, cursor: 'pointer', marginBottom: '0.5rem', background: selectedOffer === o.id ? 'rgba(212,175,55,0.04)' : 'transparent', transition: 'all 0.18s' }}>
+                  <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1rem', border: `1.5px solid ${selectedOffer === o.id ? '#E63946' : '#E8E8E8'}`, borderRadius: 10, cursor: 'pointer', marginBottom: '0.5rem', background: selectedOffer === o.id ? 'rgba(230, 57, 70, 0.04)' : 'transparent', transition: 'all 0.18s' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                      <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${selectedOffer === o.id ? '#D4AF37' : '#ccc'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {selectedOffer === o.id && <div style={{ width: 9, height: 9, borderRadius: '50%', background: '#D4AF37' }} />}
+                      <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${selectedOffer === o.id ? '#E63946' : '#ccc'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {selectedOffer === o.id && <div style={{ width: 9, height: 9, borderRadius: '50%', background: '#E63946' }} />}
                       </div>
                       <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
                       <div>
@@ -857,30 +857,44 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                         <p style={{ fontSize: '0.72rem', color: '#999' }}>الكمية: {o.quantity}</p>
                       </div>
                     </div>
-                    <span className="price-mono" style={{ fontWeight: 800, color: '#D4AF37', fontSize: '1.1rem' }}>{o.price.toLocaleString()} دج</span>
+                    <span className="price-mono" style={{ fontWeight: 800, color: '#E63946', fontSize: '1.1rem' }}>{o.price.toLocaleString()} دج</span>
                   </label>
                 ))}
               </div>
             )}
 
-            {/* Attributes */}
+            {/* Attributes - تم تغيير اللون للأحمر المتناسق */}
             {allAttrs.map((attr: any) => (
               <div key={attr.id} style={{ marginBottom: '1.125rem' }}>
                 <p style={{ fontSize: '0.825rem', fontWeight: 700, color: '#111', marginBottom: '0.625rem', textTransform: 'uppercase' }}>{attr.name}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {attr.variants.map((v: any) => (
-                    <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                      style={attr.displayMode === 'color' ? {
-                        width: 32, height: 32, borderRadius: '50%', background: v.value, border: '1px solid #eee', cursor: 'pointer',
-                        outline: `2.5px solid ${selectedVariants[attr.name] === v.value ? '#D4AF37' : 'transparent'}`, outlineOffset: 3
-                      } : {
-                        padding: '0.45rem 1.1rem', border: `1.5px solid ${selectedVariants[attr.name] === v.value ? '#D4AF37' : '#E8E8E8'}`, borderRadius: 8,
-                        fontSize: '0.85rem', fontWeight: 600, background: selectedVariants[attr.name] === v.value ? 'rgba(212,175,55,0.05)' : '#fff',
-                        color: selectedVariants[attr.name] === v.value ? '#D4AF37' : '#555', cursor: 'pointer', transition: 'all 0.18s'
-                      }}>
-                      {attr.displayMode !== 'color' && v.name}
-                    </button>
-                  ))}
+                  {attr.variants.map((v: any) => {
+                    const isSelected = selectedVariants[attr.name] === v.value;
+
+                    return (
+                      <button
+                        key={v.id}
+                        onClick={() => handleVariantSelection(attr.name, v.value)}
+                        style={
+                          attr.displayMode === 'color' ? {
+                            width: 32, height: 32, borderRadius: '50%', background: v.value, border: '1px solid #eee', cursor: 'pointer',
+                            outline: `2.5px solid ${isSelected ? '#E63946' : 'transparent'}`, outlineOffset: 3
+                          } : attr.displayMode === 'image' ? {
+                            width: 44, height: 44, borderRadius: 10, backgroundImage: `url(${v.value})`, backgroundSize: 'cover',
+                            backgroundPosition: 'center', border: `2px solid ${isSelected ? '#E63946' : '#E8E8E8'}`,
+                            cursor: 'pointer', transition: 'all 0.18s'
+                          } : {
+                            padding: '0.45rem 1.1rem', border: `1.5px solid ${isSelected ? '#E63946' : '#E8E8E8'}`, borderRadius: 8,
+                            fontSize: '0.85rem', fontWeight: 600, background: isSelected ? 'rgba(230, 57, 70, 0.05)' : '#fff',
+                            color: isSelected ? '#E63946' : '#555', cursor: 'pointer', transition: 'all 0.18s'
+                          }
+                        }
+                      >
+                        {/* إظهار النص فقط إذا لم يكن النوع لوناً أو صورة */}
+                        {attr.displayMode !== 'color' && attr.displayMode !== 'image' && v.name}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -1092,15 +1106,34 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const [loadingC, setLC] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [fd, setFd] = useState({ customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '', typeLivraison: 'home' as 'home' | 'office' });
+  const [fd, setFd] = useState({
+    customerName: '',
+    customerPhone: '',
+    customerWelaya: '',
+    customerCommune: '',
+    typeLivraison: 'home' as 'home' | 'office'
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const initCount = useCartStore((s) => s.initCount);
 
-  useEffect(() => { setItems(JSON.parse(localStorage.getItem(domain) || '[]')); if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas); }, [domain, store]);
-  useEffect(() => { if (!fd.customerWelaya) { setCommunes([]); return; } setLC(true); fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLC(false); }); }, [fd.customerWelaya]);
+  useEffect(() => {
+    setItems(JSON.parse(localStorage.getItem(domain) || '[]'));
+    if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas);
+  }, [domain, store]);
+
+  useEffect(() => {
+    if (!fd.customerWelaya) { setCommunes([]); return; }
+    setLC(true);
+    fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLC(false); });
+  }, [fd.customerWelaya]);
 
   const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
-  const getLiv = () => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; };
+
+  const getLiv = () => {
+    if (!selW) return 0;
+    return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice;
+  };
+
   const cartTotal = items.reduce((a, i) => a + (i.finalPrice * i.quantity), 0);
   const finalTotal = cartTotal + +getLiv();
   const update = (n: any[]) => { setItems(n); localStorage.setItem(domain, JSON.stringify(n)); initCount(n.length); };
@@ -1115,7 +1148,22 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     if (Object.keys(er).length) { setErrors(er); return; }
     setErrors({}); setSubmitting(true);
     try {
-      await axios.post(`${API_URL}/orders/create`, items.map(i => ({ ...fd, productId: i.productId, storeId: i.storeId, userId: i.userId, selectedOffer: i.selectedOffer, variantDetailId: i.variantDetailId, selectedVariants: i.selectedVariants, platform: i.platform || 'store', finalPrice: i.finalPrice, totalPrice: finalTotal, priceLivraison: +getLiv(), quantity: i.quantity, customerId: i.customerId || '', priceLoss: selW?.livraisonReturn ?? 0 })));
+      await axios.post(`${API_URL}/orders/create`, items.map(i => ({
+        ...fd,
+        productId: i.productId,
+        storeId: i.storeId,
+        userId: i.userId,
+        selectedOffer: i.selectedOffer,
+        variantDetailId: i.variantDetailId,
+        selectedVariants: i.selectedVariants,
+        platform: i.platform || 'store',
+        finalPrice: i.finalPrice,
+        totalPrice: finalTotal,
+        priceLivraison: +getLiv(),
+        quantity: i.quantity,
+        customerId: i.customerId || '',
+        priceLoss: selW?.livraisonReturn ?? 0
+      })));
       setSuccess(true); localStorage.removeItem(domain); setItems([]); initCount(0);
     } catch { /* handle */ } finally { setSubmitting(false); }
   };
@@ -1197,6 +1245,34 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   </select>
                 </div>
               </FR>
+            </div>
+
+            {/* نوع التوصيل — جديد */}
+            <div style={{ margin: '1rem 0' }}>
+              <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#888', textTransform: 'uppercase', marginBottom: '0.5rem', letterSpacing: '0.04em' }}>نوع التوصيل</p>
+              <div className="delivery-grid">
+                {(['home', 'office'] as const).map(t => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setFd(p => ({ ...p, typeLivraison: t }))}
+                    style={{
+                      padding: '0.75rem',
+                      border: `2px solid ${fd.typeLivraison === t ? '#E63946' : '#E8E8E8'}`,
+                      borderRadius: 10,
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      background: fd.typeLivraison === t ? 'rgba(230,57,70,0.04)' : '#fff',
+                      fontFamily: 'inherit',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <span style={{ display: 'block', fontSize: '1.25rem', marginBottom: 3 }}>{t === 'home' ? '🏠' : '🏢'}</span>
+                    <p style={{ fontWeight: 700, fontSize: '0.78rem', color: fd.typeLivraison === t ? '#E63946' : '#888' }}>{t === 'home' ? 'للبيت' : 'للمكتب'}</p>
+                    {selW && <p style={{ fontWeight: 800, fontSize: '0.875rem', color: '#111', marginTop: 2 }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج</p>}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div style={{ background: '#F8F8F6', border: '1.5px solid #EBEBEB', borderRadius: 10, padding: '1rem 1.125rem', margin: '1rem 0' }}>
