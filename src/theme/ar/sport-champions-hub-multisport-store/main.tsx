@@ -898,15 +898,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
 
   return (
     <div dir="rtl" style={{ background: 'var(--g50)', minHeight: '100vh', paddingBottom: '5rem' }}>
-      {/* Breadcrumb */}
-      <div style={{ borderBottom: '1px solid var(--g200)', padding: '10px 24px', background: '#fff', fontSize: '0.8rem', color: 'var(--g500)' }}>
-        <div style={{ maxWidth: 1400, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Link href="/" style={{ color: 'var(--g600)', transition: 'color 0.2s' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--accent)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--g600)'; }}>الرئيسية</Link>
-          <span>›</span><span style={{ color: 'var(--g800)' }}>{product.name.slice(0, 40)}</span>
-        </div>
-      </div>
+      
 
       <div style={{ maxWidth: 1400, margin: '0 auto', padding: '2.5rem 1.5rem' }}>
         <div className="details-layout">

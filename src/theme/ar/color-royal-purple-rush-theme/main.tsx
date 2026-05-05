@@ -8,10 +8,9 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Phone,
-  CheckCircle2, ArrowRight, Zap,
+  CheckCircle2, ArrowLeft, Zap,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Shield, Truck,
-  ArrowLeft,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
@@ -523,12 +522,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div style={{ padding: '0.375rem 1.25rem 0.875rem' }}>
             {[{ h: '/', l: 'الرئيسية' }, { h: '/contact', l: 'تواصل معنا' }].map(i => (
               <Link key={i.h} href={i.h} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid #F0F0F0', fontSize: '0.9rem', fontWeight: 600, color: '#111' }}>
-                {i.l} <ArrowRight size={14} style={{ color: '#8B5CF6' }} />
+                {i.l} <ArrowLeft size={14} style={{ color: '#8B5CF6' }} />
               </Link>
             ))}
             {store?.cart && (
               <Link href={'/cart'} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid #F0F0F0', fontSize: '0.9rem', fontWeight: 600, color: '#111' }}>
-                {'السلة'} <ArrowRight size={14} style={{ color: '#8B5CF6' }} />
+                {'السلة'} <ArrowLeft size={14} style={{ color: '#8B5CF6' }} />
               </Link>
             )}
           </div>
@@ -641,15 +640,37 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
             <span style={{ fontSize: '0.75rem', color: '#999', fontWeight: 500 }}>{store.currency || 'دج'}</span>
             {orig > price && <span style={{ fontSize: '0.75rem', color: '#ccc', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
           </div>
-          <Link href={`/product/${product.slug || product.id}`} style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            width: '100%', padding: '0.625rem', borderRadius: 8,
-            background: '#111', color: '#fff', fontSize: '0.825rem', fontWeight: 700,
-            transition: 'background 0.2s'
-          }}
-            onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#8B5CF6')}
-            onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#111')}>
-            {viewDetails} <ArrowRight size={13} />
+          <Link
+            href={`/product/${product.slug || product.id}`}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+              width: '100%',
+              padding: '0.625rem',
+              borderRadius: 8,
+              background: 'transparent',
+              border: '1.5px solid #8B5CF6',
+              color: '#8B5CF6',
+              fontSize: '0.825rem',
+              fontWeight: 700,
+              transition: 'background 0.2s, border-color 0.2s, color 0.2s'
+            }}
+            onMouseEnter={e => {
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.background = '#8B5CF6';
+              el.style.borderColor = '#8B5CF6';
+              el.style.color = '#fff';
+            }}
+            onMouseLeave={e => {
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.background = 'transparent';
+              el.style.borderColor = '#8B5CF6';
+              el.style.color = '#8B5CF6';
+            }}
+          >
+            {viewDetails} <ArrowLeft size={13} />
           </Link>
         </div>
       </div>
@@ -696,7 +717,7 @@ export function Home({ store, page }: any) {
               <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#8B5CF6', color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, transition: 'all 0.2s', boxShadow: '0 4px 20px rgba(230,57,70,0.35)' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#C0303C')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#8B5CF6')}>
-                تسوق الآن <ArrowRight size={16} />
+                تسوق الآن <ArrowLeft size={16} />
               </a>
               {store?.cart && (
                 <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 600, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', transition: 'background 0.2s' }}
@@ -1488,7 +1509,7 @@ export function Contact({ store }: { store: any }) {
                   </>
                 ) : (
                   <>
-                    إرسال الرسالة <ArrowRight size={16} />
+                    إرسال الرسالة <ArrowLeft size={16} />
                   </>
                 )}
               </button>

@@ -818,20 +818,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
   if (!product) return null;
   return (
     <div dir="rtl" style={{backgroundColor:'var(--black)'}}>
-      <div style={{backgroundColor:'var(--dark)',borderBottom:'1px solid var(--line)',padding:'11px 20px'}}>
-        <div style={{maxWidth:'1280px',margin:'0 auto',display:'flex',alignItems:'center',gap:'8px',fontSize:'12px',color:'var(--dim)'}}>
-          <Link href="/" className="bc" style={{color:'var(--mid)',fontWeight:500,letterSpacing:'0.06em',textTransform:'uppercase'}}>الرئيسية</Link>
-          <span style={{color:'var(--fire)'}}>/</span>
-          <span className="bc" style={{color:'var(--white)',fontWeight:600,letterSpacing:'0.06em'}}>{product.name.slice(0,40)}</span>
-          <div style={{marginRight:'auto',display:'flex',gap:'8px'}}>
-            {toggleWishlist && (
-              <button onClick={toggleWishlist} style={{width:'32px',height:'32px',display:'flex',alignItems:'center',justifyContent:'center',border:`1.5px solid ${isWishlisted?'var(--fire)':'var(--dim)'}`,background:isWishlisted?'rgba(255,69,0,0.1)':'transparent',cursor:'pointer',color:isWishlisted?'var(--fire)':'var(--mid)'}}>
-                <Heart style={{width:'13px',height:'13px',fill:isWishlisted?'currentColor':'none'}}/>
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+      
 
       <div style={{maxWidth:'1280px',margin:'0 auto',padding:'32px 20px'}}>
         <div className="details-g">

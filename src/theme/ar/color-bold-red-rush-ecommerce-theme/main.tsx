@@ -599,14 +599,36 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
             <span style={{ fontSize: '0.75rem', color: '#999', fontWeight: 500 }}>{store.currency || 'دج'}</span>
             {orig > price && <span style={{ fontSize: '0.75rem', color: '#ccc', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
           </div>
-          <Link href={`/product/${product.slug || product.id}`} style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            width: '100%', padding: '0.625rem', borderRadius: 8,
-            background: '#111', color: '#fff', fontSize: '0.825rem', fontWeight: 700,
-            transition: 'background 0.2s'
-          }}
-            onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#E63946')}
-            onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#111')}>
+          <Link
+            href={`/product/${product.slug || product.id}`}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+              width: '100%',
+              padding: '0.625rem',
+              borderRadius: 8,
+              background: 'transparent',
+              border: '1.5px solid #E63946',
+              color: '#E63946',
+              fontSize: '0.825rem',
+              fontWeight: 700,
+              transition: 'background 0.2s, border-color 0.2s, color 0.2s'
+            }}
+            onMouseEnter={e => {
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.background = '#E63946';
+              el.style.borderColor = '#E63946';
+              el.style.color = '#fff';
+            }}
+            onMouseLeave={e => {
+              const el = e.currentTarget as HTMLAnchorElement;
+              el.style.background = 'transparent';
+              el.style.borderColor = '#E63946';
+              el.style.color = '#E63946';
+            }}
+          >
             {viewDetails} <ArrowRight size={13} />
           </Link>
         </div>
