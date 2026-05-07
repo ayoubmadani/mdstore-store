@@ -457,9 +457,9 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                     ))}
                     {store.cart && (
                         <Link href="/cart" className="btn-adv" style={{ position: 'relative', width: 46, height: 46, borderRadius: 12, border: '3px solid var(--yellow)', background: 'var(--yellow)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--dark)' }}>
-                        <ShoppingCart size={19} />
-                        {count > 0 && <span className="cart-badge">{count}</span>}
-                    </Link>
+                            <ShoppingCart size={19} />
+                            {count > 0 && <span className="cart-badge">{count}</span>}
+                        </Link>
                     )}
                 </div>
 
@@ -716,8 +716,8 @@ export function Home({ store, page }: any) {
                                 </a>
                                 {store.cart && (
                                     <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '1rem 2rem', borderRadius: 16, border: '2.5px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontWeight: 800, fontSize: '1.05rem', backdropFilter: 'blur(5px)', transition: '0.3s', textDecoration: 'none' }}>
-                                    السلة
-                                </Link>
+                                        السلة
+                                    </Link>
                                 )}
                             </div>
                         </div>
@@ -841,9 +841,14 @@ export function Home({ store, page }: any) {
 /* ══════════════════════════════════════════════════════════════
    DETAILS
 ══════════════════════════════════════════════════════════════ */
+
 export function Details({ product, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
     const [sel, setSel] = useState(0);
-    const pal = PALETTES[parseInt(product.id || '0') % PALETTES.length];
+    // توليد رقم عشوائي بين 0 و 10000
+    const id = Math.floor(Math.random() * 10001);
+
+    // اختيار لوحة الألوان باستخدام "باقي القسمة" لضمان عدم تخطي طول المصفوفة
+    const pal = PALETTES[id % PALETTES.length];
 
     return (
         <div dir="rtl" style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: '4rem' }}>
@@ -851,7 +856,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                 <div className="details-layout">
 
                     {/* Gallery */}
-                    <div style={{top: 84 }}>
+                    <div style={{ top: 84 }}>
                         <div style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 20, overflow: 'hidden', background: pal.bg, border: `3px solid ${pal.border}` }}>
                             {allImages[sel]
                                 ? <img src={allImages[sel]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />

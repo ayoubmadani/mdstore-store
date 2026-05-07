@@ -816,23 +816,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
   const [sel, setSel] = useState(0);
   return (
     <div dir="rtl" style={{ backgroundColor: 'var(--navy)' }}>
-      <div style={{ borderBottom: '1px solid var(--line)', padding: '11px 20px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--dim)', backgroundColor: 'var(--navy-2)' }}>
-        <Link href="/" style={{ textDecoration: 'none', color: 'var(--dim)', transition: 'color 0.2s' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--cyan)'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--dim)'; }}>
-          الرئيسية
-        </Link>
-        <ChevronLeft style={{ width: '12px', height: '12px', transform: 'rotate(180deg)' }} />
-        <span style={{ color: 'var(--cyan)', fontWeight: 600 }}>{product.name.slice(0, 40)}</span>
-        <div style={{ marginRight: 'auto', display: 'flex', gap: '8px' }}>
-          <button onClick={toggleWishlist} style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${isWishlisted ? 'var(--pink)' : 'var(--line)'}`, background: isWishlisted ? 'rgba(255,45,138,0.1)' : 'transparent', cursor: 'pointer', color: isWishlisted ? 'var(--pink)' : 'var(--mid)', borderRadius: '4px' }}>
-            <Heart style={{ width: '13px', height: '13px', fill: isWishlisted ? 'currentColor' : 'none' }} />
-          </button>
-          <button onClick={handleShare} style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--mid)', borderRadius: '4px' }}>
-            <Share2 style={{ width: '13px', height: '13px' }} />
-          </button>
-        </div>
-      </div>
+     
 
       <div className="details-g" style={{ maxWidth: '1280px', margin: '0 auto' }}>
         {/* Gallery */}
