@@ -253,7 +253,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     fontWeight: 700,
     width: 17,
     height: 17,
-    background:'var(--plum)',
+    background: 'var(--plum)',
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
@@ -559,7 +559,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <Link
               href="/cart"
               style={cartBtnStyle}
-              >
+            >
               <ShoppingBag size={17} />
               {count > 0 && <span style={badgeStyle}>{count}</span>}
             </Link>
@@ -738,15 +738,19 @@ export function Footer({ store }: any) {
             <p style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--plum-lt)', marginBottom: '18px' }}>تواصل</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {[
-                { icon: <Phone size={13} />, val: store?.contact?.phone || '+213 550 000 000' },
-                { icon: <MapPin size={13} />, val: store?.contact?.wilaya || 'الجزائر' },
-                { icon: <span style={{ fontSize: '13px' }}>✉️</span>, val: store?.contact?.email || 'info@store.dz' },
-              ].map((item, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ color: 'var(--plum-lt)', flexShrink: 0 }}>{item.icon}</span>
-                  <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>{item.val}</span>
-                </div>
-              ))}
+                { icon: <Phone size={13} />, val: store?.contact?.phone || 'سوف ينم اضافة الرقم لاحقا' },
+                { icon: <MapPin size={13} />, val: `${store?.contact?.wilaya} / ${store?.contact?.address}` },
+                { icon: <span style={{ fontSize: '13px' }}>✉️</span>, val: store?.contact?.email || 'سوف يتم اضافة الايميل لاحقا' },
+              ].map((item, i) => {
+                if(item)
+                return ((
+
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ color: 'var(--plum-lt)', flexShrink: 0 }}>{item.icon}</span>
+                    <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>{item.val}</span>
+                  </div>
+                ))
+              })}
             </div>
             <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--rose)', display: 'inline-block' }} />
