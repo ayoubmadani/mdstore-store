@@ -651,7 +651,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, selectedVa
     setSub(true);
     try {
       await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
-      router.push(`/lp/${domain}/successfully`);
+      router.push(`/${domain}/successfully`);
     } catch { } finally { setSub(false); }
   };
 

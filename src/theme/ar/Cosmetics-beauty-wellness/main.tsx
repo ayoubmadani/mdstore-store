@@ -1169,7 +1169,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     try {
       await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (typeof window !== 'undefined' && fd.customerId) localStorage.setItem('customerId', fd.customerId);
-      router.push(`/lp/${domain}/successfully`);
+      router.push(`/${domain}/successfully`);
     } catch (err) { console.error(err); } finally { setSub(false); }
   };
 

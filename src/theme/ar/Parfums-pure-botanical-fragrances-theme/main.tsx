@@ -266,7 +266,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     const [loading, setLoading] = useState(false);
     const [showS, setShowS] = useState(false);
     const router = useRouter();
-    
+
     const count = useCartStore(s => s.count);
     const initCount = useCartStore(s => s.initCount);
 
@@ -280,153 +280,155 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         if (sq.length < 2) { setLs([]); return; }
         const t = setTimeout(async () => {
             setLoading(true);
-            try { 
-                const { data } = await axios.get(`${API_URL}/products/public/${domain}`, { params: { search: sq } }); 
-                setLs(data.products || []); 
+            try {
+                const { data } = await axios.get(`${API_URL}/products/public/${domain}`, { params: { search: sq } });
+                setLs(data.products || []);
             }
             catch { } finally { setLoading(false); }
         }, 380);
         return () => clearTimeout(t);
     }, [sq, domain]);
 
-    const doSearch = (e?: React.FormEvent) => { 
-        if (e) e.preventDefault(); 
-        if (sq.trim()) { 
-            router.push(`/?search=${encodeURIComponent(sq)}`); 
-            setSq(''); 
-            setShowS(false); 
-        } 
+    const doSearch = (e?: React.FormEvent) => {
+        if (e) e.preventDefault();
+        if (sq.trim()) {
+            router.push(`/?search=${encodeURIComponent(sq)}`);
+            setSq('');
+            setShowS(false);
+        }
     };
 
     return (
         <nav dir="rtl" style={{ background: 'var(--white)', borderBottom: '1px solid var(--line)', padding: '0 20px', position: 'sticky', top: 0, zIndex: 100 }}>
-            {/* الشريط العلوي الرئيسي */}
-            <div style={{ height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
-                
-                {/* أيقونة البحث وتفعيل الشريط */}
-                <button onClick={() => setShowS(!showS)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--char)', display: 'flex', padding: '8px' }}>
-                    {showS ? <X style={{ width: '20px', height: '20px' }} /> : <Search style={{ width: '20px', height: '20px' }} />}
-                </button>
+            <div style={{maxWidth: 1080 , margin: 'auto'}}>
+                {/* الشريط العلوي الرئيسي */}
+                <div style={{ height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
 
-                {/* روابط التنقل - Desktop */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1, justifyContent: 'center' }}>
-                    <Link href="/" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--sage)', borderBottom: '2px solid var(--sage)', paddingBottom: '4px' }}>الرئيسية</Link>
-                    <Link href="/contact" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--char)' }}>تواصل معنا</Link>
-                </div>
+                    {/* أيقونة البحث وتفعيل الشريط */}
+                    <button onClick={() => setShowS(!showS)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--char)', display: 'flex', padding: '8px' }}>
+                        {showS ? <X style={{ width: '20px', height: '20px' }} /> : <Search style={{ width: '20px', height: '20px' }} />}
+                    </button>
 
-                {/* اللوغو وسلة المشتريات */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
-                        {store?.design?.logoUrl
-                            ? <img src={store.design.logoUrl} alt={store?.name} style={{ height: '35px', width: 'auto' }} />
-                            : <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--char)' }}>{store?.name || 'عبير الطبيعة'}</span>
-                        }
-                    </Link>
-                    
-                    <Link href="/cart" style={{ position: 'relative', color: 'var(--char)', display: 'flex', padding: '6px' }}>
-                        <ShoppingBag style={{ width: '20px', height: '20px' }} />
-                        {count > 0 && (
-                            <span style={{ position: 'absolute', top: 0, right: 0, width: '17px', height: '17px', background: 'var(--sage)', color: 'var(--white)', fontSize: '10px', fontWeight: 700, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-                                {count}
-                            </span>
-                        )}
-                    </Link>
-                </div>
-            </div>
+                    {/* روابط التنقل - Desktop */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1, justifyContent: 'center' }}>
+                        <Link href="/" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--sage)', borderBottom: '2px solid var(--sage)', paddingBottom: '4px' }}>الرئيسية</Link>
+                        <Link href="/contact" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--char)' }}>تواصل معنا</Link>
+                    </div>
 
-            {/* شريط البحث المنسدل عند الضغط على الأيقونة */}
-            {showS && (
-                <div style={{ padding: '12px 0', borderTop: '1px solid var(--line)', position: 'relative' }}>
-                    <form onSubmit={doSearch}>
-                        <div style={{ position: 'relative', maxWidth: '600px', margin: '0 auto' }}>
-                            <Search style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: 'var(--mist)' }} />
-                            <input 
-                                autoFocus 
-                                type="text" 
-                                placeholder="ابحث عن عطر أو منتج..." 
-                                value={sq} 
-                                onChange={e => setSq(e.target.value)}
-                                style={{ 
-                                    width: '100%',
-                                    padding: '10px 40px 10px 15px',
-                                    borderRadius: '8px',
-                                    border: '1px solid var(--line)',
-                                    background: 'var(--sage-lt)',
-                                    fontSize: '14px',
-                                    outline: 'none'
-                                }} 
-                            />
-                        </div>
-                    </form>
+                    {/* اللوغو وسلة المشتريات */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
+                            {store?.design?.logoUrl
+                                ? <img src={store.design.logoUrl} alt={store?.name} style={{ height: '35px', width: 'auto' }} />
+                                : <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--char)' }}>{store?.name || 'عبير الطبيعة'}</span>
+                            }
+                        </Link>
 
-                    {/* قائمة النتائج (Drop) - خلفية بيضاء صلبة */}
-                    {sq.length >= 2 && (
-                        <div style={{ 
-                            position: 'absolute', 
-                            top: '100%', 
-                            right: 0, 
-                            left: 0, 
-                            background: '#FFFFFF', 
-                            border: '1px solid var(--line)', 
-                            borderRadius: '0 0 12px 12px', 
-                            boxShadow: '0 10px 30px rgba(0,0,0,0.1)', 
-                            zIndex: 200, 
-                            overflow: 'hidden',
-                            maxWidth: '600px',
-                            margin: '0 auto'
-                        }}>
-                            {loading ? (
-                                <div style={{ padding: '1.5rem', textAlign: 'center', fontSize: '13px', color: 'var(--sage)', fontWeight: 600 }}>جاري البحث...</div>
-                            ) : ls.length > 0 ? (
-                                <>
-                                    <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
-                                        {ls.map((p: any) => (
-                                            <Link href={`/product/${p.id}`} key={p.id} onClick={() => { setSq(''); setShowS(false); }}
-                                                style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderBottom: '1px solid var(--line)', transition: 'background 0.2s' }}
-                                                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f9f9f9'; }}
-                                                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
-                                                
-                                                <div style={{ width: 48, height: 48, flexShrink: 0, overflow: 'hidden', borderRadius: '6px', background: 'var(--cream)', border: '1px solid var(--line)' }}>
-                                                    <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
-                                                </div>
-                                                
-                                                <div style={{ flex: 1 }}>
-                                                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--char)' }}>{p.name}</div>
-                                                    <div style={{ fontSize: '14px', color: 'var(--sage)', fontWeight: 700, marginTop: '2px' }}>{p.price} دج</div>
-                                                </div>
-                                                <ArrowLeft size={14} style={{ color: 'var(--mist)' }} />
-                                            </Link>
-                                        ))}
-                                    </div>
-                                    
-                                    {/* زر عرض كل النتائج */}
-                                    <button 
-                                        onClick={doSearch}
-                                        style={{
-                                            width: '100%',
-                                            padding: '12px',
-                                            background: 'var(--sage)',
-                                            color: 'white',
-                                            border: 'none',
-                                            fontSize: '12px',
-                                            fontWeight: 700,
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: '8px'
-                                        }}
-                                    >
-                                        عرض جميع النتائج لـ "{sq}"
-                                    </button>
-                                </>
-                            ) : (
-                                <div style={{ padding: '1.5rem', textAlign: 'center', fontSize: '13px', color: 'var(--mist)' }}>لا توجد نتائج مطابقة</div>
+                        <Link href="/cart" style={{ position: 'relative', color: 'var(--char)', display: 'flex', padding: '6px' }}>
+                            <ShoppingBag style={{ width: '20px', height: '20px' }} />
+                            {count > 0 && (
+                                <span style={{ position: 'absolute', top: 0, right: 0, width: '17px', height: '17px', background: 'var(--sage)', color: 'var(--white)', fontSize: '10px', fontWeight: 700, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                                    {count}
+                                </span>
                             )}
-                        </div>
-                    )}
+                        </Link>
+                    </div>
                 </div>
-            )}
+
+                {/* شريط البحث المنسدل عند الضغط على الأيقونة */}
+                {showS && (
+                    <div style={{ padding: '12px 0', borderTop: '1px solid var(--line)', position: 'relative' }}>
+                        <form onSubmit={doSearch}>
+                            <div style={{ position: 'relative', maxWidth: '600px', margin: '0 auto' }}>
+                                <Search style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: 'var(--mist)' }} />
+                                <input
+                                    autoFocus
+                                    type="text"
+                                    placeholder="ابحث عن عطر أو منتج..."
+                                    value={sq}
+                                    onChange={e => setSq(e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px 40px 10px 15px',
+                                        borderRadius: '8px',
+                                        border: '1px solid var(--line)',
+                                        background: 'var(--sage-lt)',
+                                        fontSize: '14px',
+                                        outline: 'none'
+                                    }}
+                                />
+                            </div>
+                        </form>
+
+                        {/* قائمة النتائج (Drop) - خلفية بيضاء صلبة */}
+                        {sq.length >= 2 && (
+                            <div style={{
+                                position: 'absolute',
+                                top: '100%',
+                                right: 0,
+                                left: 0,
+                                background: '#FFFFFF',
+                                border: '1px solid var(--line)',
+                                borderRadius: '0 0 12px 12px',
+                                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                                zIndex: 200,
+                                overflow: 'hidden',
+                                maxWidth: '600px',
+                                margin: '0 auto'
+                            }}>
+                                {loading ? (
+                                    <div style={{ padding: '1.5rem', textAlign: 'center', fontSize: '13px', color: 'var(--sage)', fontWeight: 600 }}>جاري البحث...</div>
+                                ) : ls.length > 0 ? (
+                                    <>
+                                        <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
+                                            {ls.map((p: any) => (
+                                                <Link href={`/product/${p.id}`} key={p.id} onClick={() => { setSq(''); setShowS(false); }}
+                                                    style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderBottom: '1px solid var(--line)', transition: 'background 0.2s' }}
+                                                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f9f9f9'; }}
+                                                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+
+                                                    <div style={{ width: 48, height: 48, flexShrink: 0, overflow: 'hidden', borderRadius: '6px', background: 'var(--cream)', border: '1px solid var(--line)' }}>
+                                                        <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+                                                    </div>
+
+                                                    <div style={{ flex: 1 }}>
+                                                        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--char)' }}>{p.name}</div>
+                                                        <div style={{ fontSize: '14px', color: 'var(--sage)', fontWeight: 700, marginTop: '2px' }}>{p.price} دج</div>
+                                                    </div>
+                                                    <ArrowLeft size={14} style={{ color: 'var(--mist)' }} />
+                                                </Link>
+                                            ))}
+                                        </div>
+
+                                        {/* زر عرض كل النتائج */}
+                                        <button
+                                            onClick={doSearch}
+                                            style={{
+                                                width: '100%',
+                                                padding: '12px',
+                                                background: 'var(--sage)',
+                                                color: 'white',
+                                                border: 'none',
+                                                fontSize: '12px',
+                                                fontWeight: 700,
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '8px'
+                                            }}
+                                        >
+                                            عرض جميع النتائج لـ "{sq}"
+                                        </button>
+                                    </>
+                                ) : (
+                                    <div style={{ padding: '1.5rem', textAlign: 'center', fontSize: '13px', color: 'var(--mist)' }}>لا توجد نتائج مطابقة</div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
         </nav>
     );
 }
@@ -438,7 +440,7 @@ export function Footer({ store }: any) {
     const yr = new Date().getFullYear();
     return (
         <footer dir="rtl" style={{ background: 'var(--sage)', fontFamily: "'Cairo',sans-serif", marginTop: '0' }}>
-            <div style={{ padding: '40px 24px 24px' }}>
+            <div style={{ padding: '40px 24px 24px' , maxWidth:1080, margin: 'auto' }}>
                 <div className="footer-g">
                     {/* قسم 1 — صنع في الجزائر */}
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '16px' }}>
@@ -594,7 +596,7 @@ export function Home({ store, page }: any) {
         : fragranceCats;
 
     return (
-        <div dir="rtl" style={{maxWidth : 1080, margin: 'auto'}}>
+        <div dir="rtl" style={{ maxWidth: 1080, margin: 'auto' }}>
             {/* ── HERO ── */}
             <section style={{ position: 'relative', background: 'var(--cream)', overflow: 'hidden', minHeight: '260px' }}>
                 {store.hero?.imageUrl && (
@@ -631,7 +633,7 @@ export function Home({ store, page }: any) {
                     {displayCats.map((cat, i) => (
                         <button
                             key={cat.id || i}
-                            onClick={()=>setActiveCat(activeCat===cat.id?null:cat.id)}
+                            onClick={() => setActiveCat(activeCat === cat.id ? null : cat.id)}
                             onMouseEnter={() => setHoveredId(cat.id)}
                             onMouseLeave={() => setHoveredId(null)}
                             style={{ background: 'none', border: 'none' }}
@@ -710,8 +712,8 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
     const [sel, setSel] = useState(0);
     if (!product) return null;
     return (
-        <div dir="rtl" style={{maxWidth: 1080, margin: "auto", background: 'var(--white)', fontFamily: "'Cairo',sans-serif" }}>
-           
+        <div dir="rtl" style={{ maxWidth: 1080, margin: "auto", background: 'var(--white)', fontFamily: "'Cairo',sans-serif" }}>
+
 
             <div style={{ padding: '20px' }}>
                 <div className="details-g" style={{ gap: '24px' }}>
@@ -886,7 +888,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         try {
             await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
             if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
-            router.push(`/lp/${domain}/successfully`);
+            router.push(`/${domain}/successfully`);
         } catch { } finally { setSub(false); }
     };
 

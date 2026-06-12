@@ -1270,7 +1270,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         finalPrice: fp, totalPrice: total(), priceLivraison: getLiv()
       });
       if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
-      router.push(`/lp/${domain}/successfully`);
+      router.push(`/${domain}/successfully`);
     } catch { } finally { setSub(false); }
   };
 
