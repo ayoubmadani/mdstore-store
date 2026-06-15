@@ -99,22 +99,22 @@ export default async function StoreLayout({ children, params }: LayoutProps) {
   console.log("Contains /lp/:", isLanding);
   console.log("=======================");
 
-  if (isLanding) {
-    return (
-      <div>
-        {children}
-      </div>
-    )
-  }
-
   return (
     <StoreProvider store={store} theme={currentThemeSlug}>
       <AddShow storeId={store.id} />
       <div dir={direction}>
         <CustomerTracker pixels={store.pixels} />
-        <Main store={store} domain={domain}>
-          {children}
-        </Main>
+        
+        {/* ✅ إذا كان الرابط لصفحة هبوط، نمرر الـ children مباشرة بدون ثيم المتجر المحيط بها */}
+        {isLanding ? (
+          <main>
+            {children}
+          </main>
+        ) : (
+          <Main store={store} domain={domain}>
+            {children}
+          </Main>
+        )}
       </div>
     </StoreProvider>
   );
