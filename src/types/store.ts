@@ -1,11 +1,13 @@
-export interface  Store {
+export interface Store {
   id: string;
   name: string;
   subdomain: string;
   currency: string;
   language: 'ar' | 'en' | string;
   isActive: boolean;
-  cart:boolean,
+  cart: boolean;
+  theme?: { slug: string };
+  pixels?: Pixel[];
   design: {
     primaryColor: string;
     secondaryColor: string;
@@ -29,6 +31,14 @@ export interface  Store {
   };
   products?: Product[];
   categories?: Category[];
+}
+
+export interface Pixel {
+  id: string;
+  type: 'facebook' | 'tiktok' | 'google' | 'snapchat';
+  pixelId: string;
+  isActive: boolean;
+  events?: string[];
 }
 
 export interface Product {

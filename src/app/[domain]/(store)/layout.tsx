@@ -8,7 +8,6 @@ import CustomerTracker from '@/components/CustomerTracker';
 import Landing from '@/components/landing';
 import AddShow from '@/components/addShow';
 import { Metadata } from 'next';
-import { headers } from 'next/headers';
 
 // ✅ كاش يعتمد على الـ domain فقط لضمان استقرار الـ Layout
 const getStoreCached = cache(async (domain: string) => {
@@ -58,7 +57,7 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
 export default async function StoreLayout({ children, params }: LayoutProps) {
   const { domain } = await params;
 
-  const store: any = await getStoreCached(domain);
+  const store = await getStoreCached(domain);
 
   if (!store) notFound();
 
@@ -78,33 +77,11 @@ export default async function StoreLayout({ children, params }: LayoutProps) {
 
   const direction = language === 'ar' ? 'rtl' : 'ltr';
 
-  // ✅ 1. جلب الهيدرز الحالية للطلب لمعرفة الـ Host والـ Protocol
-  const headersList = await headers();
-  const host = headersList.get('host') || '';
-  const protocol = headersList.get('x-forwarded-proto') || 'https';
-
-  // ✅ 2. جلب الرابط الفعلي المباشر من المتصفح عبر هيدر الـ referer
-  const refererUrl = headersList.get('referer') || '';
-  
-  // كبديل احتياطي في حال عدم وجود referer نستخدم الهيدر الداخلي لـ Next.js
-  const invokePath = headersList.get('x-invoke-path') || '';
-  const reconstructedUrl = refererUrl || `${protocol}://${host}${invokePath}`;
-
-  // ✅ 3. فحص ما إذا كان الرابط يحتوي على صفحة هبوط
-  const isLanding = reconstructedUrl.includes('/lp/');
-
-  console.log("=== DEBUG URL FINAL ===");
-  console.log("Referer URL from Browser:", refererUrl);
-  console.log("Final Target URL:", reconstructedUrl);
-  console.log("Contains /lp/:", isLanding);
-  console.log("=======================");
-
-
   return (
     <StoreProvider store={store} theme={currentThemeSlug}>
       <AddShow storeId={store.id} />
       <div dir={direction}>
-        <CustomerTracker pixels={store.pixels} />
+        <CustomerTracker pixels={store.pixels ?? []} />
         <Main store={store} domain={domain}>
           {children}
         </Main>

@@ -1,14 +1,14 @@
 'use client';
 
 import { useStore } from "./store-provider";
-
+import type { Pixel } from "@/types/store";
 
 export const usePixel = () => {
   const { store } = useStore();
-  const pixels = store?.pixels || [];
+  const pixels: Pixel[] = store?.pixels || [];
 
   const trackPurchase = (total: number, currency: string = 'DZD', orderId: string) => {
-    pixels.forEach((pixel: any) => {
+    pixels.forEach((pixel) => {
       if (!pixel.isActive) return;
 
       // 1. Facebook Purchase

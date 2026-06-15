@@ -4,7 +4,6 @@ import { getStoreByDomain } from '@/lib/api';
 
 // ✅ 1. إجبار الصفحة على التحقق من البيانات في كل طلب (حل مشكلة Production)
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
 const getStoreCached = cache(async (domain: string, category?: string , search? :string , page?:string ) => {
   return getStoreByDomain(domain, category , search , page);
@@ -25,7 +24,7 @@ function StoreNotFound({ domain }: { domain: string }) {
   );
 }
 
-function StoreInactive({ store }: { store: any }) {
+function StoreInactive({ store }: { store: NonNullable<Awaited<ReturnType<typeof getStoreCached>>> }) {
   const isRTL = store.language === 'ar';
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -48,20 +47,17 @@ export default async function StorePage(props: {
   const searchParams = await props.searchParams;
   const category = searchParams.category;
   const search = searchParams.search;
-  const page = searchParams.page
-  console.log('-----------------------------------');
-  
-  console.log({search});
+  const page = searchParams.page;
 
-  const store: any = await getStoreCached(domain, category,search , page);
+  const store = await getStoreCached(domain, category, search, page);
 
   if (!store) return <StoreNotFound domain={domain} />;
   if (!store.isActive) return <StoreInactive store={store} />;
 
-  const activeTheme = store?.theme?.slug || 'default';
-  const language = store?.language || 'ar';
+  const activeTheme = store.theme?.slug || 'default';
+  const language = store.language || 'ar';
 
-  const SelectedTheme = nextDynamic<any>(
+  const SelectedTheme = nextDynamic<{ store: typeof store; page: number; domain: string }>(
     () =>
       import(`@/theme/${language}/${activeTheme}/main`)
         .then((mod) => mod.Home || mod.default)
