@@ -41,6 +41,7 @@ export interface ProductFormProps {
   selectedVariants: Record<string, string>;
   platform?:        string;       // LP only
   priceLoss?:       number;       // LP only
+  lpId?:string
 }
 
 /* ─── Helpers ────────────────────────────────────────── */
@@ -88,7 +89,7 @@ const inputCls = (err?: boolean) =>
 export default function ProductForm({
   product, userId, domain,
   selectedOffer, setSelectedOffer, selectedVariants,
-  platform, priceLoss = 0,
+  platform, priceLoss = 0,lpId
 }: ProductFormProps) {
   const router = useRouter();
 
@@ -207,6 +208,7 @@ export default function ProductForm({
         customerPhone:     formData.customerPhone,
         customerWilayaId:  formData.customerWelaya,
         customerCommuneId: formData.customerCommune,
+        lpId
       }
       
       setSubmitting(true);
@@ -222,7 +224,7 @@ export default function ProductForm({
           });
         }
         if (res.data?.customerId) localStorage.setItem('customerId', res.data.customerId);
-        router.push(`/successfully`);
+        router.push(`../../successfully`);
       }
     } catch {
       alert('حدث خطأ في الاتصال بالخادم');

@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { notFound } from 'next/navigation';
-import ProductForm from '@/components/productForm/productForm2';
+import ProductForm from '@/components/productForm/productForm';
 import AddShow from '@/components/addShow';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
@@ -50,13 +50,60 @@ function variantMatches(detail: VariantDetail, sel: Record<string, string>): boo
   );
 }
 
-async function getLandingPage(domain: string): Promise<LandingPage | null> {
+async function getLandingPage(lpdomain: string): Promise<LandingPage | null> {
+  console.log({ lpdomain });
   try {
-    const res = await axios.get(`${API_URL}/landing-page/${domain}`);
+
+    const res = await axios.get(`${API_URL}/landing-page/find?domain=${lpdomain}`);
+
+
     return res.data;
   } catch (err) {
     console.error('LP fetch error:', err);
     return null;
+  }
+}
+
+function cleanDomain(url: string) {
+  if (!url) return { domain: '', pathname: '', fullPath: '' };
+
+  let targetUrl = url;
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    targetUrl = 'https://' + url;
+  }
+
+  try {
+    const parsedUrl = new URL(targetUrl);
+    const originalPathname = parsedUrl.pathname; // يعود بـ "/shamsou-game.mdstore.top/lp/test"
+
+    // 1. تقطيع المسار إلى أجزاء
+    const pathParts = originalPathname.split('/').filter(Boolean);
+
+    let domain = '';
+    let pathname = '';
+
+    // 2. التحقق إذا كان الجزء الأول هو الدومين المستهدف (يحتوي على نقطة)
+    if (pathParts[0] && pathParts[0].includes('.')) {
+      domain = pathParts[0]; // "shamsou-game.mdstore.top"
+
+      // إعادة بناء الـ Pathname الحقيقي لصفحة الهبوط واستبعاد الدومين منه
+      // تحويل ['lp', 'test'] إلى "/lp/test"
+      pathname = '/' + pathParts.slice(1).join('/');
+    } else {
+      // حالة الـ Production (لو كان الدومين في الـ Hostname مباشرة)
+      domain = parsedUrl.hostname.split(':')[0];
+      pathname = originalPathname;
+    }
+
+    return {
+      domain: domain,               // shamsou-game.mdstore.top
+      pathname: pathname,           // /lp/test
+      fullPath: domain + pathname   // shamsou-game.mdstore.top/lp/test
+    };
+
+  } catch (error) {
+    console.error("رابط غير صالح", error);
+    return { domain: '', pathname: '', fullPath: '' };
   }
 }
 
@@ -77,12 +124,15 @@ export default function LandingPageView({
 
   /* ── Load LP ── */
   useEffect(() => {
+    const url = cleanDomain(window.location.href);
+
+
     const load = async () => {
       try {
 
         const { lpdomain } = await params;
         setLpDomain(lpdomain);
-        const data = await getLandingPage(lpdomain);
+        const data = await getLandingPage(url.fullPath);
         if (data) {
           setLp(data);
           if (data.product.offers?.length) setSelectedOffer(data.product.offers[0].id);
@@ -157,8 +207,8 @@ export default function LandingPageView({
   const autoGen = product.variantDetails?.every(v => v.autoGenerate) ?? false;
 
   return (
-    <>
-      <AddShow lpId={lp.id} />
+    <div style={{
+      }}>         <AddShow lpId={lp.id} />
 
       <div className="min-h-screen bg-gray-50" dir="rtl">
 
@@ -380,6 +430,6 @@ export default function LandingPageView({
           </div>
         </footer>
       </div>
-    </>
+    </div>
   );
 }
