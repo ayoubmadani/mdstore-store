@@ -1010,7 +1010,8 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     try {
       await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
-      router.push(`/successfully?productId=${product.id}`);
+      // استبدل السطر القديم بهذا السطر
+      router.push(`${window.location.origin}/successfully?productId=${product.id}`);
     } catch { /* handle */ } finally { setSub(false); }
   };
 
