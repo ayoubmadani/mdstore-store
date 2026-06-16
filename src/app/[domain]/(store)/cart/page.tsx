@@ -66,7 +66,7 @@ export default function CheckoutPage() {
     );
   }
 
-  if (!store?.cart) {
+  if (store?.cart === false) {
     return (
       <div dir="rtl" style={{
         minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: '#F8F8F6'

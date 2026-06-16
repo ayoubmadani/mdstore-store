@@ -62,7 +62,6 @@ export default async function StorePage(props: {
       import(`@/theme/${language}/${activeTheme}/main`)
         .then((mod) => mod.Home || mod.default)
         .catch(async (err) => {
-          console.error('Failed to load theme:', activeTheme, err);
           const fallback = await import(`@/theme/${language}/default/main`);
           return fallback.Home || fallback.default;
         }),

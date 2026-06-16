@@ -1,4 +1,5 @@
 'use client';
+import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -8,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Phone,
-  CheckCircle2, Truck, ArrowRight,
+  CheckCircle2, Truck, ArrowLeft,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, ShieldCheck,
   Send
@@ -329,7 +330,7 @@ export function Footer({ store }: any) {
           <h4 style={{ fontWeight: 700, marginBottom: '1rem' }}>تواصل</h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
             {store?.contact?.phone && <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Phone size={14} /> {store.contact.phone}</span>}
-            {store?.contact?.wilaya && <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><MapPin size={14} /> {store.contact.wilaya}</span>}
+            {[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') && <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><MapPin size={14} /> {[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')}</span>}
           </div>
         </div>
       </div>
@@ -629,7 +630,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, selectedVa
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'مطلوب';
-    if (!fd.customerPhone.trim()) e.customerPhone = 'مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) e.customerWelaya = 'مطلوب';
     if (!fd.customerCommune) e.customerCommune = 'مطلوب';
     return e;
@@ -819,7 +820,7 @@ export function Contact({ store }: any) {
       });
       setSent(true);
     } catch (err) {
-      alert('حدث خطأ في الإرسال، يرجى المحاولة لاحقاً');
+      showError('حدث خطأ في الإرسال، يرجى المحاولة لاحقاً');
     } finally {
       setLoading(false);
     }

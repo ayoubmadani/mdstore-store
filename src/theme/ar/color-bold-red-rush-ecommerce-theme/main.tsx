@@ -1,4 +1,5 @@
 'use client';
+import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -8,10 +9,9 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Phone,
-  CheckCircle2, ArrowRight, Zap,
+  CheckCircle2, ArrowLeft, Zap,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Shield, Truck,
-  ArrowLeft,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
@@ -442,7 +442,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 onMouseEnter={e => (e.currentTarget.style.color = '#E63946')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#444')}>{i.l}</Link>
             ))}
-            {store.cart && (
+            {store?.cart !== false && (
               <Link href="/cart" style={{ position: 'relative', background: '#111', color: '#fff', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#E63946')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#111')}>
@@ -481,12 +481,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div style={{ padding: '0.375rem 1.25rem 0.875rem' }}>
             {[{ h: '/', l: 'الرئيسية' }, { h: '/contact', l: 'تواصل معنا' }].map(i => (
               <Link key={i.h} href={i.h} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid #F0F0F0', fontSize: '0.9rem', fontWeight: 600, color: '#111' }}>
-                {i.l} <ArrowRight size={14} style={{ color: '#E63946' }} />
+                {i.l} <ArrowLeft size={14} style={{ color: '#E63946' }} />
               </Link>
             ))}
-            {store.cart && (
+            {store?.cart !== false && (
               <Link href={'/cart'} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid #F0F0F0', fontSize: '0.9rem', fontWeight: 600, color: '#111' }}>
-                {'السلة'} <ArrowRight size={14} style={{ color: '#E63946' }} />
+                {'السلة'} <ArrowLeft size={14} style={{ color: '#E63946' }} />
               </Link>
             )}
           </div>
@@ -538,7 +538,7 @@ export function Footer({ store }: any) {
             <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1.25rem' }}>تواصل</h4>
             {[
               { icon: <Phone size={14} />, val: store?.contact?.phone },
-              { icon: <MapPin size={14} />, val: store?.contact?.wilaya },
+              { icon: <MapPin size={14} />, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
             ].filter(r => r.val).map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem', color: '#666', fontSize: '0.875rem' }}>
                 <span style={{ color: '#E63946' }}>{r.icon}</span>{r.val}
@@ -629,7 +629,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
               el.style.color = '#E63946';
             }}
           >
-            {viewDetails} <ArrowRight size={13} />
+            {viewDetails} <ArrowLeft size={13} />
           </Link>
         </div>
       </div>
@@ -668,7 +668,7 @@ export function Home({ store, page }: any) {
               <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#E63946', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{store.name}</span>
             </div>
             <h1 style={{ fontSize: 'clamp(2.25rem,6vw,4.5rem)', fontWeight: 800, color: '#fff', lineHeight: 1.1, letterSpacing: '-0.03em', marginBottom: '1.25rem' }}
-              dangerouslySetInnerHTML={{ __html: store.hero?.title || 'تسوق<br/><span style="color:#E63946">بثقة</span> واحصل<br/>على الأفضل' }} />
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'تسوق<br/><span style="color:#E63946">بثقة</span> واحصل<br/>على الأفضل') }} />
             <p style={{ fontSize: '1.0625rem', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, marginBottom: '2rem', maxWidth: 480 }}>
               {store.hero?.subtitle || 'منتجات أصلية بأسعار مناسبة. توصيل لجميع الولايات في أسرع وقت.'}
             </p>
@@ -676,9 +676,9 @@ export function Home({ store, page }: any) {
               <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#E63946', color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, transition: 'all 0.2s', boxShadow: '0 4px 20px rgba(230,57,70,0.35)' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#C0303C')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#E63946')}>
-                تسوق الآن <ArrowRight size={16} />
+                تسوق الآن <ArrowLeft size={16} />
               </a>
-              {store.cart && (
+              {store?.cart !== false && (
                 <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 600, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', transition: 'background 0.2s' }}
                   onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.14)')}
                   onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.08)')}>
@@ -984,7 +984,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'مطلوب';
-    if (!fd.customerPhone.trim()) e.customerPhone = 'مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) e.customerWelaya = 'مطلوب';
     if (!fd.customerCommune) e.customerCommune = 'مطلوب';
     return e;
@@ -1010,7 +1010,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     try {
       await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
-      router.push(`/${domain}/successfully`);
+      router.push(`/${domain}/successfully?productId=${product.id}`);
     } catch { /* handle */ } finally { setSub(false); }
   };
 
@@ -1164,7 +1164,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'مطلوب';
-    if (!fd.customerPhone.trim()) er.phone = 'مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) er.w = 'مطلوب';
     if (!fd.customerCommune) er.c = 'مطلوب';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -1392,7 +1392,7 @@ export function Contact({ store }: { store: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-    catch { alert('حدث خطأ في الإرسال'); } finally { setLoading(false); }
+    catch { showError('حدث خطأ في الإرسال'); } finally { setLoading(false); }
   };
 
   return (
@@ -1408,7 +1408,7 @@ export function Contact({ store }: { store: any }) {
             <p style={{ fontSize: '0.7rem', fontWeight: 800, color: '#E63946', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1.25rem' }}>معلومات الاتصال</p>
             {[
               { icon: <Phone size={16} />, label: 'الهاتف', val: store?.contact?.phone || 'غير متوفر' },
-              { icon: <MapPin size={16} />, label: 'الموقع', val: store?.contact?.wilaya || 'الجزائر' },
+              { icon: <MapPin size={16} />, label: 'الموقع', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') || 'الجزائر' },
             ].map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginBottom: '1.125rem' }}>
                 <div style={{ width: 44, height: 44, borderRadius: 10, background: 'rgba(230,57,70,0.08)', border: '1px solid rgba(230,57,70,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#E63946', flexShrink: 0 }}>{r.icon}</div>
@@ -1459,7 +1459,7 @@ export function Contact({ store }: { store: any }) {
               <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }}
                 onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.background = '#C0303C')}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#E63946')}>
-                {loading ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> جاري الإرسال...</> : <>إرسال الرسالة <ArrowRight size={16} /></>}
+                {loading ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> جاري الإرسال...</> : <>إرسال الرسالة <ArrowLeft size={16} /></>}
               </button>
             </form>
           )}

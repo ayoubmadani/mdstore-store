@@ -23,6 +23,7 @@ export interface Store {
     email?: string | null;
     phone?: string | null;
     wilaya?: string | null;
+    address?: string | null;
   };
   hero: {
     imageUrl?: string | null;

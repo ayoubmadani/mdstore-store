@@ -1,4 +1,5 @@
 'use client';
+import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -455,7 +456,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                             {i.l}
                         </Link>
                     ))}
-                    {store.cart && (
+                    {store?.cart !== false && (
                         <Link href="/cart" className="btn-adv" style={{ position: 'relative', width: 46, height: 46, borderRadius: 12, border: '3px solid var(--yellow)', background: 'var(--yellow)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--dark)' }}>
                             <ShoppingCart size={19} />
                             {count > 0 && <span className="cart-badge">{count}</span>}
@@ -494,7 +495,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                             {i.l} <ArrowLeft size={15} style={{ color: 'var(--blue)' }} />
                         </Link>
                     ))}
-                    {store.cart && (
+                    {store?.cart !== false && (
                         <Link href={'/cart'} onClick={() => setOpen(false)}
                             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '2px solid var(--border)', fontSize: '0.925rem', fontWeight: 800, color: 'var(--text)' }}>
                             {'🛒 السلة'} <ArrowLeft size={15} style={{ color: 'var(--blue)' }} />
@@ -553,7 +554,7 @@ export function Footer({ store }: any) {
                     {/* قسم 3 */}
                     <div>
                         <h4 style={{ fontFamily: "'Boogaloo',cursive", fontSize: '1.1rem', color: 'var(--yellow)', marginBottom: '1.25rem' }}>📡 تواصل معنا</h4>
-                        {[{ e: '📞', v: store?.contact?.phone }, { e: '📍', v: store?.contact?.wilaya }, { e: '📧', v: store?.contact?.email }].filter(r => r.v).map((r, i) => (
+                        {[{ e: '📞', v: store?.contact?.phone }, { e: '📍', v: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') }, { e: '📧', v: store?.contact?.email }].filter(r => r.v).map((r, i) => (
                             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginBottom: '0.625rem' }}>
                                 <span>{r.e}</span>{r.v}
                             </div>
@@ -699,7 +700,7 @@ export function Home({ store, page }: any) {
 
                             {/* العنوان الرئيسي */}
                             <h1 className="anim-slide-up font-boogaloo" style={{ fontSize: 'clamp(2.5rem, 7vw, 5rem)', color: '#fff', lineHeight: 1.1, marginBottom: '1.5rem', textShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
-                                dangerouslySetInnerHTML={{ __html: store.hero?.title || 'ألعاب · أزياء<br/><span style="color:#FFE000">تعليم · مغامرة!</span>🚀' }} />
+                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'ألعاب · أزياء<br/><span style="color:#FFE000">تعليم · مغامرة!</span>🚀') }} />
 
                             {/* الخط الملون الفاصل */}
                             <div style={{ height: 6, width: 120, borderRadius: 3, background: 'linear-gradient(90deg, var(--yellow), var(--orange))', marginBottom: '2rem' }} />
@@ -714,7 +715,7 @@ export function Home({ store, page }: any) {
                                 <a href="#products" className="btn-adv" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '1rem 2.5rem', borderRadius: 16, background: 'var(--yellow)', color: 'var(--dark)', fontWeight: 900, fontSize: '1.1rem', textShadow: 'none', boxShadow: '0 10px 25px rgba(255,224,0,0.4)', transition: '0.3s', textDecoration: 'none' }}>
                                     🛍️ تسوق الآن
                                 </a>
-                                {store.cart && (
+                                {store?.cart !== false && (
                                     <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '1rem 2rem', borderRadius: 16, border: '2.5px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontWeight: 800, fontSize: '1.05rem', backdropFilter: 'blur(5px)', transition: '0.3s', textDecoration: 'none' }}>
                                         السلة
                                     </Link>
@@ -1024,7 +1025,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const validate = () => {
         const e: Record<string, string> = {};
         if (!fd.customerName.trim()) e.customerName = 'مطلوب';
-        if (!fd.customerPhone.trim()) e.customerPhone = 'مطلوب';
+        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
         if (!fd.customerWelaya) e.customerWelaya = 'مطلوب';
         if (!fd.customerCommune) e.customerCommune = 'مطلوب';
         return e;
@@ -1215,7 +1216,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         e.preventDefault();
         const er: Record<string, string> = {};
         if (!fd.customerName.trim()) er.name = 'مطلوب';
-        if (!fd.customerPhone.trim()) er.phone = 'مطلوب';
+        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم هاتف غير صالح (مثال: 0550123456)';
         if (!fd.customerWelaya) er.w = 'مطلوب';
         if (!fd.customerCommune) er.c = 'مطلوب';
         if (Object.keys(er).length) { setErrors(er); return; }
@@ -1435,7 +1436,7 @@ export function Contact({ store }: { store: any }) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); setLoading(true);
         try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-        catch { alert('حدث خطأ'); } finally { setLoading(false); }
+        catch { showError('حدث خطأ'); } finally { setLoading(false); }
     };
     return (
         <div dir="rtl" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
@@ -1448,7 +1449,7 @@ export function Contact({ store }: { store: any }) {
             <div style={{ maxWidth: 1000, margin: '0 auto', padding: '3rem 1.5rem 5rem' }}>
                 <div className="contact-layout">
                     <div>
-                        {[{ e: '📞', l: 'الهاتف', v: store?.contact?.phone, c: 'var(--blue)' }, { e: '📍', l: 'الموقع', v: store?.contact?.wilaya, c: 'var(--green)' }, { e: '📧', l: 'البريد', v: store?.contact?.email, c: 'var(--orange)' }].filter(r => r.v).map((r, i) => (
+                        {[{ e: '📞', l: 'الهاتف', v: store?.contact?.phone, c: 'var(--blue)' }, { e: '📍', l: 'الموقع', v: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / '), c: 'var(--green)' }, { e: '📧', l: 'البريد', v: store?.contact?.email, c: 'var(--orange)' }].filter(r => r.v).map((r, i) => (
                             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', padding: '1.125rem', borderRadius: 16, border: `2.5px solid var(--border)`, background: '#fff', marginBottom: '0.75rem', transition: 'all 0.25s' }}
                                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = r.c; el.style.transform = 'translateX(-4px)'; }}
                                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--border)'; el.style.transform = ''; }}>

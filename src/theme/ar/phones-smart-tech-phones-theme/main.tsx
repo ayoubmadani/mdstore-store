@@ -1,4 +1,5 @@
 'use client';
+import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -7,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
     Star, ChevronDown, AlertCircle, X, ToggleRight,
-    ArrowRight, Plus, Minus, CheckCircle2, Lock, Shield,
+    ArrowLeft, Plus, Minus, CheckCircle2, Lock, Shield,
     Package, ShieldCheck, Phone, User, Search, ShoppingBag,
     Trash2, Loader2, ChevronLeft, ChevronRight, Heart,
     ShoppingCart, Cpu, Wifi, Battery, Zap, Monitor,
@@ -930,7 +931,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const validate = () => {
         const e: Record<string, string> = {};
         if (!fd.customerName.trim() || fd.customerName.length < 3) e.customerName = 'الاسم مطلوب';
-        if (!fd.customerPhone.trim()) e.customerPhone = 'الهاتف مطلوب';
+        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
         if (!fd.customerWelaya) e.customerWelaya = 'اختر الولاية';
         if (!fd.customerCommune) e.customerCommune = 'اختر البلدية';
         return e;
@@ -1106,7 +1107,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         e.preventDefault();
         const er: Record<string, string> = {};
         if (!fd.customerName.trim() || fd.customerName.length < 3) er.n = 'مطلوب';
-        if (!fd.customerPhone.trim()) er.p = 'مطلوب';
+        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.p = 'رقم هاتف غير صالح (مثال: 0550123456)';
         if (!fd.customerWelaya) er.w = 'مطلوب';
         if (!fd.customerCommune) er.c = 'مطلوب';
         if (Object.keys(er).length) { setErrors(er); return; }
@@ -1335,7 +1336,7 @@ export function Contact({ store }: { store?: any }) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); setLoading(true);
         try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store?.id }); setSent(true); }
-        catch { alert('حدث خطأ'); } finally { setLoading(false); }
+        catch { showError('حدث خطأ'); } finally { setLoading(false); }
     };
     const onF = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = 'var(--teal)'; };
     const onB = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = 'var(--line)'; };
@@ -1357,7 +1358,7 @@ export function Contact({ store }: { store?: any }) {
                     {[
                         { icon: '📞', label: 'الهاتف', val: store?.contact?.phone, teal: true },
                         { icon: '✉️', label: 'البريد الإلكتروني', val: store?.contact?.email, teal: false },
-                        { icon: '📍', label: 'الموقع', val: store?.contact?.wilaya, teal: false },
+                        { icon: '📍', label: 'الموقع', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / '), teal: false },
                     ].filter(r => r.val).map(item => (
                         <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '16px 18px', borderRadius: '14px', background: 'var(--white)', border: '1px solid var(--line)', boxShadow: '0 2px 10px rgba(10,189,227,0.06)' }}>
                             <div style={{ width: 44, height: 44, borderRadius: '12px', background: item.teal ? 'linear-gradient(135deg,var(--teal),var(--teal-2))' : 'var(--teal-lt)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', flexShrink: 0 }}>

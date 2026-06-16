@@ -434,7 +434,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 onMouseEnter={e => (e.currentTarget.style.color = '#F59E0B')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#374151')}>{i.l}</Link>
             ))}
-            {store?.cart && (
+            {store?.cart !== false && (
               <Link href="/cart" style={{ position: 'relative', background: '#111827', color: '#fff', width: 40, height: 40, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#F59E0B')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#111827')}>
@@ -449,7 +449,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <button onClick={() => setShowSearch(!showSearch)} style={{ width: 38, height: 38, borderRadius: 4, border: '1.5px solid #D1D5DB', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
               <Search size={16} />
             </button>
-            {store?.cart && (
+            {store?.cart !== false && (
               <Link href="/cart" style={{ position: 'relative', width: 38, height: 38, borderRadius: 4, border: '1.5px solid #D1D5DB', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#111827' }}>
                 <ShoppingCart size={16} />
                 {count > 0 && <span style={{ position: 'absolute', top: -4, right: -4, background: '#EA580C', color: '#fff', fontSize: 9, fontWeight: 800, width: 16, height: 16, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
@@ -481,7 +481,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 {i.l} <ArrowLeft size={14} style={{ color: '#F59E0B' }} />
               </Link>
             ))}
-            {store?.cart && (
+            {store?.cart !== false && (
               <Link href="/cart" onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid #F0F0F0', fontSize: '0.9rem', fontWeight: 700, color: '#111827' }}>
                 السلة <ArrowLeft size={14} style={{ color: '#F59E0B' }} />
               </Link>
@@ -537,7 +537,7 @@ export function Footer({ store }: any) {
             <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1.25rem' }}>تواصل</h4>
             {[
               { icon: <Phone size={14} />, val: store?.contact?.phone },
-              { icon: <MapPin size={14} />, val: store?.contact?.wilaya },
+              { icon: <MapPin size={14} />, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
             ].filter(r => r.val).map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem', color: '#6B7280', fontSize: '0.875rem' }}>
                 <span style={{ color: '#F59E0B' }}>{r.icon}</span>{r.val}
@@ -639,7 +639,7 @@ export function Home({ store, page }: any) {
               <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#F59E0B', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{store?.name || 'معدات صناعية'}</span>
             </div>
             <h1 style={{ fontFamily: "'Oswald', sans-serif", fontSize: 'clamp(2.5rem,6vw,5rem)', fontWeight: 700, color: '#fff', lineHeight: 1.05, letterSpacing: '-0.02em', marginBottom: '1.25rem' }}
-              dangerouslySetInnerHTML={{ __html: store.hero?.title || 'معدات ثقيلة<br/>للمشاريع الكبرى' }} />
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'معدات ثقيلة<br/>للمشاريع الكبرى') }} />
             <p style={{ fontSize: '1.0625rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.7, marginBottom: '2rem', maxWidth: 480 }}>
               {store.hero?.subtitle || 'نوفر لك أجود المعدات الصناعية وأدوات البناء بأسعار تنافسية وتوصيل لجميع الولايات.'}
             </p>
@@ -649,7 +649,7 @@ export function Home({ store, page }: any) {
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#F59E0B')}>
                 تسوق الآن <ArrowLeft size={16} />
               </a>
-              {store?.cart && (
+              {store?.cart !== false && (
                 <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.06)', color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 4, border: '1px solid rgba(255,255,255,0.12)', transition: 'background 0.2s' }}
                   onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.12)')}
                   onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.06)')}>
@@ -935,7 +935,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'الاسم مطلوب';
-    if (!fd.customerPhone.trim()) e.customerPhone = 'الهاتف مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) e.customerWelaya = 'الولاية مطلوبة';
     if (!fd.customerCommune) e.customerCommune = 'البلدية مطلوبة';
     return e;
@@ -1121,7 +1121,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'الاسم مطلوب';
-    if (!fd.customerPhone.trim()) er.phone = 'الهاتف مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) er.w = 'الولاية مطلوبة';
     if (!fd.customerCommune) er.c = 'البلدية مطلوبة';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -1324,7 +1324,7 @@ export function Contact({ store }: { store: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-    catch { alert('حدث خطأ في الإرسال'); } finally { setLoading(false); }
+    catch { showError('حدث خطأ في الإرسال'); } finally { setLoading(false); }
   };
 
   return (
@@ -1340,7 +1340,7 @@ export function Contact({ store }: { store: any }) {
             <p style={{ fontSize: '0.7rem', fontWeight: 800, color: '#F59E0B', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1.25rem' }}>معلومات الاتصال</p>
             {[
               { icon: <Phone size={16} />, label: 'الهاتف', val: store?.contact?.phone || 'غير متوفر' },
-              { icon: <MapPin size={16} />, label: 'الموقع', val: store?.contact?.wilaya || 'الجزائر' },
+              { icon: <MapPin size={16} />, label: 'الموقع', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') || 'الجزائر' },
             ].map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginBottom: '1.125rem' }}>
                 <div style={{ width: 44, height: 44, borderRadius: 4, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F59E0B', flexShrink: 0 }}>{r.icon}</div>

@@ -1,4 +1,5 @@
 'use client';
+import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
@@ -494,7 +495,7 @@ export function Footer({ store }: any) {
             {[
               { icon: <Phone style={{ width: '13px', height: '13px' }} />, val: store?.contact?.phone },
               { icon: <Mail style={{ width: '13px', height: '13px' }} />, val: store?.contact?.email },
-              { icon: <MapPin style={{ width: '13px', height: '13px' }} />, val: store?.contact?.wilaya },
+              { icon: <MapPin style={{ width: '13px', height: '13px' }} />, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
             ].filter(r => r.val).map((item, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: 'rgba(255,255,255,0.45)' }}>
                 {item.icon}<span style={{ fontSize: '12px' }}>{item.val}</span>
@@ -951,7 +952,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'الاسم مطلوب';
-    if (!fd.customerPhone.trim()) e.customerPhone = 'رقم الهاتف مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) e.customerWelaya = 'الولاية مطلوبة';
     if (!fd.customerCommune) e.customerCommune = 'البلدية مطلوبة';
     return e;
@@ -1139,7 +1140,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'الاسم مطلوب';
-    if (!fd.customerPhone.trim()) er.phone = 'الهاتف مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) er.welaya = 'الولاية مطلوبة';
     if (!fd.customerCommune) er.commune = 'البلدية مطلوبة';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -1398,7 +1399,7 @@ export function Contact({ store }: { store?: any }) {
       await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store?.id });
       setSent(true);
     } catch {
-      alert('حدث خطأ أثناء إرسال الرسالة، يرجى المحاولة لاحقاً');
+      showError('حدث خطأ أثناء إرسال الرسالة، يرجى المحاولة لاحقاً');
     } finally {
       setLoading(false);
     }
@@ -1431,7 +1432,7 @@ export function Contact({ store }: { store?: any }) {
             {[
               { icon: <Phone size={18} />, label: 'الهاتف', val: store?.contact?.phone },
               { icon: <Mail size={18} />, label: 'البريد', val: store?.contact?.email },
-              { icon: <MapPin size={18} />, label: 'الموقع', val: store?.contact?.wilaya },
+              { icon: <MapPin size={18} />, label: 'الموقع', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
             ].filter(r => r.val).map(item => (
               <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '13px 0', borderBottom: '1px solid var(--line)', transition: 'padding-right 0.2s' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.paddingRight = '8px'; }}

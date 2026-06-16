@@ -1,4 +1,5 @@
 'use client';
+import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -477,7 +478,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             ))}
 
             {/* 3. استخدام الستايلات المعرفة مسبقاً */}
-            {store.cart && (
+            {store?.cart !== false && (
               <Link href="/cart" style={cartBtnStyle}
                 onMouseEnter={e => (e.currentTarget.style.background = '#1D4ED8')}
                 onMouseLeave={e => (e.currentTarget.style.background = '#111')}>
@@ -519,7 +520,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 {i.l} <ArrowLeft size={14} style={{ color: '#1D4ED8' }} />
               </Link>
             ))}
-            {store.cart && (
+            {store?.cart !== false && (
               <Link href={'/cart'} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid #F0F0F0', fontSize: '0.9rem', fontWeight: 600, color: '#111' }}>
                 {'السلة'} <ArrowLeft size={14} style={{ color: '#1D4ED8' }} />
               </Link>
@@ -573,7 +574,7 @@ export function Footer({ store }: any) {
             <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1.25rem' }}>تواصل</h4>
             {[
               { icon: <Phone size={14} />, val: store?.contact?.phone },
-              { icon: <MapPin size={14} />, val: store?.contact?.wilaya },
+              { icon: <MapPin size={14} />, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
             ].filter(r => r.val).map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem', color: '#666', fontSize: '0.875rem' }}>
                 <span style={{ color: '#1D4ED8' }}>{r.icon}</span>{r.val}
@@ -708,7 +709,7 @@ export function Home({ store, page }: any) {
             </div>
 
             <h1 style={{ fontSize: 'clamp(2.25rem,6vw,4.5rem)', fontWeight: 800, color: '#fff', lineHeight: 1.1, letterSpacing: '-0.03em', marginBottom: '1.25rem' }}
-              dangerouslySetInnerHTML={{ __html: store.hero?.title || 'تسوق<br/><span style="color:#3B82F6">بثقة</span> واحصل<br/>على الأفضل' }} />
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'تسوق<br/><span style="color:#3B82F6">بثقة</span> واحصل<br/>على الأفضل') }} />
 
             <p style={{ fontSize: '1.0625rem', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, marginBottom: '2rem', maxWidth: 480 }}>
               {store.hero?.subtitle || 'منتجات أصلية بأسعار مناسبة. توصيل لجميع الولايات في أسرع وقت.'}
@@ -720,7 +721,7 @@ export function Home({ store, page }: any) {
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#3B82F6')}>
                 تسوق الآن <ArrowLeft size={16} />
               </a>
-              {store.cart && (
+              {store?.cart !== false && (
                 <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 600, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', transition: 'background 0.2s' }}
                   onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.14)')}
                   onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.08)')}>
@@ -1051,7 +1052,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'مطلوب';
-    if (!fd.customerPhone.trim()) e.customerPhone = 'مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) e.customerWelaya = 'مطلوب';
     if (!fd.customerCommune) e.customerCommune = 'مطلوب';
     return e;
@@ -1221,7 +1222,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'مطلوب';
-    if (!fd.customerPhone.trim()) er.phone = 'مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) er.w = 'مطلوب';
     if (!fd.customerCommune) er.c = 'مطلوب';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -1448,7 +1449,7 @@ export function Contact({ store }: { store: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-    catch { alert('حدث خطأ في الإرسال'); } finally { setLoading(false); }
+    catch { showError('حدث خطأ في الإرسال'); } finally { setLoading(false); }
   };
 
   return (
@@ -1464,7 +1465,7 @@ export function Contact({ store }: { store: any }) {
             <p style={{ fontSize: '0.7rem', fontWeight: 800, color: '#1D4ED8', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1.25rem' }}>معلومات الاتصال</p>
             {[
               { icon: <Phone size={16} />, label: 'الهاتف', val: store?.contact?.phone || 'غير متوفر' },
-              { icon: <MapPin size={16} />, label: 'الموقع', val: store?.contact?.wilaya || 'الجزائر' },
+              { icon: <MapPin size={16} />, label: 'الموقع', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') || 'الجزائر' },
             ].map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginBottom: '1.125rem' }}>
                 <div style={{ width: 44, height: 44, borderRadius: 10, background: 'rgba(230,57,70,0.08)', border: '1px solid rgb(85 57 230 / 15%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1D4ED8', flexShrink: 0 }}>{r.icon}</div>

@@ -1,4 +1,5 @@
 'use client';
+import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -8,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, Heart, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Share2, Phone, User, ToggleRight,
-  Shield, ArrowRight, Plus, Minus, CheckCircle2, Lock,
+  Shield, ArrowLeft, Plus, Minus, CheckCircle2, Lock,
   Menu, Gamepad2, Zap, Trophy, Package, Truck,
   Search, ShoppingCart, ShoppingBag, Trash2, Loader2,
   BadgeCheck, ShieldCheck,
@@ -340,19 +341,31 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
   }, []);
 
   const DropdownResults = () => (
-    <div style={{ position: 'absolute', top: '100%', right: 0, left: 0, background: 'rgba(10,22,40,0.98)', border: '1px solid var(--line)', borderRadius: '0 0 8px 8px', zIndex: 100, boxShadow: '0 10px 30px rgba(0,0,0,0.5)', marginTop: '4px', overflow: 'hidden' }}>
+    <div style={{ position: 'absolute', top: '100%', right: 0, left: 0, maxWidth: '400px', background: 'rgba(10,22,40,0.98)', border: '1px solid var(--line)', borderRadius: '0 0 8px 8px', zIndex: 100, boxShadow: '0 10px 30px rgba(0,0,0,0.5)', marginTop: '4px', maxHeight: '300px', overflowY: 'auto' }}>
+      <button onClick={() => setSearchQuery('')} style={{ position: 'sticky', top: 0, float: 'left', margin: '6px', background: 'none', border: 'none', color: 'var(--mid)', cursor: 'pointer', lineHeight: 1 }}>
+        <X size={14} />
+      </button>
       {loading
         ? <div style={{ padding: '15px', color: 'var(--cyan)', textAlign: 'center', fontSize: '12px' }}>جاري البحث...</div>
-        : listSearch.length > 0 ? listSearch.map((p: any) => (
-          <Link href={`/product/${p.id}`} key={p.id} onClick={() => setSearchQuery('')}
-            style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px', borderBottom: '1px solid rgba(255,255,255,0.05)', textDecoration: 'none' }}>
-            <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} style={{ width: '40px', height: '40px', borderRadius: '4px', objectFit: 'cover', border: '1px solid var(--line)' }} alt="" />
-            <div style={{ flex: 1 }}>
-              <div style={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}>{p.name}</div>
-              <div style={{ color: 'var(--cyan)', fontSize: '11px' }}>{p.price} دج</div>
-            </div>
-          </Link>
-        )) : searchQuery.length >= 2 && (
+        : listSearch.length > 0 ? (
+          <>
+            {listSearch.map((p: any) => (
+              <Link href={`/product/${p.id}`} key={p.id} onClick={() => setSearchQuery('')}
+                style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px', borderBottom: '1px solid rgba(255,255,255,0.05)', textDecoration: 'none' }}>
+                <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} style={{ width: '40px', height: '40px', borderRadius: '4px', objectFit: 'cover', border: '1px solid var(--line)' }} alt="" />
+                <div style={{ flex: 1 }}>
+                  <div style={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}>{p.name}</div>
+                  <div style={{ color: 'var(--cyan)', fontSize: '11px' }}>{p.price} دج</div>
+                </div>
+              </Link>
+            ))}
+            <button
+              onClick={() => handleSearchSubmit()}
+              style={{ width: '100%', padding: '12px', background: 'rgba(0,255,255,0.05)', border: 'none', borderTop: '1px solid var(--line)', color: 'var(--cyan)', fontWeight: 700, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontFamily: "'Tajawal',sans-serif" }}>
+              عرض جميع النتائج <ArrowLeft size={14} />
+            </button>
+          </>
+        ) : searchQuery.length >= 2 && (
           <div style={{ padding: '15px', color: 'var(--mid)', textAlign: 'center', fontSize: '12px' }}>لا توجد نتائج</div>
         )
       }
@@ -409,13 +422,15 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
 
       {/* Mobile Search */}
       {showSearch && (
-        <div style={{ padding: '10px 20px', background: 'var(--navy-2)', borderTop: '1px solid var(--line)', position: 'relative' }}>
-          <form onSubmit={handleSearchSubmit}>
-            <input autoFocus type="text" placeholder="ابحث هنا..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              style={{ width: '100%', padding: '12px 40px', borderRadius: '8px', background: '#000', border: '1px solid var(--cyan)', color: '#fff', fontFamily: "'Tajawal',sans-serif" }} />
-            <Search size={18} style={{ position: 'absolute', right: '30px', top: '50%', transform: 'translateY(-50%)', color: 'var(--cyan)' }} />
-          </form>
-          {searchQuery.length >= 2 && <DropdownResults />}
+        <div style={{ padding: '10px 20px', background: 'var(--navy-2)', borderTop: '1px solid var(--line)' }}>
+          <div style={{ maxWidth: '600px', margin: '0 auto', position: 'relative' }}>
+            <form onSubmit={handleSearchSubmit}>
+              <input autoFocus type="text" placeholder="ابحث هنا..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                style={{ width: '100%', padding: '12px 40px', borderRadius: '8px', background: '#000', border: '1px solid var(--cyan)', color: '#fff', fontFamily: "'Tajawal',sans-serif" }} />
+              <Search size={18} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--cyan)' }} />
+            </form>
+            {searchQuery.length >= 2 && <DropdownResults />}
+          </div>
         </div>
       )}
 
@@ -423,10 +438,10 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
       <div style={{ maxHeight: open ? '240px' : '0', overflow: 'hidden', transition: 'all 0.3s', background: 'var(--navy-2)' }}>
         <div style={{ padding: '10px 20px' }}>
           <Link href="/" onClick={() => setOpen(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', color: '#fff', textDecoration: 'none', borderBottom: '1px solid var(--line)', fontSize: '15px' }}>
-            المتجر <ArrowRight size={14} style={{ color: 'var(--cyan)' }} />
+            المتجر <ArrowLeft size={14} style={{ color: 'var(--cyan)' }} />
           </Link>
           <Link href="/contact" onClick={() => setOpen(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', color: '#fff', textDecoration: 'none', fontSize: '15px' }}>
-            تواصل معنا <ArrowRight size={14} style={{ color: 'var(--cyan)' }} />
+            تواصل معنا <ArrowLeft size={14} style={{ color: 'var(--cyan)' }} />
           </Link>
         </div>
       </div>
@@ -478,7 +493,7 @@ export function Footer({ store }: any) {
           </div>
           {[
             { title: 'روابط سريعة', links: [['/', 'المتجر'], ['/cart', 'السلة'], ['/contact', 'الدعم الفني'], ['/Privacy', 'سياسة الخصوصية'], ['/Terms', 'شروط الاستخدام']] },
-            { title: 'تواصل معنا', links: [[`tel:${store.contact.phone}`, store.contact.phone], ['#', store.contact.wilaya], [`email:${store.contact.email}`, store.contact.email]] },
+            { title: 'تواصل معنا', links: [[`tel:${store.contact.phone}`, store.contact.phone], ['#', [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')], [`email:${store.contact.email}`, store.contact.email]] },
           ].map(col => (
             <div key={col.title}>
               <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '11px', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase', color: cyan, marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -547,7 +562,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
           <Link href={`/product/${product.slug || product.id}`}
             style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', fontSize: '13px', fontWeight: 800, padding: '14px', textTransform: 'uppercase', letterSpacing: '0.1em', backgroundColor: hov ? brandColor : 'transparent', color: hov ? 'var(--navy-3)' : brandColor, border: `2px solid ${brandColor}`, boxShadow: hov ? `0 0 20px ${brandColor}80` : 'none', transition: 'all 0.25s ease', clipPath: 'polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%)' }}>
             <span style={{ position: 'relative', top: '1px' }}>{viewDetails}</span>
-            <ArrowRight style={{ width: '16px', height: '16px' }} />
+            <ArrowLeft style={{ width: '16px', height: '16px' }} />
           </Link>
         </div>
       </div>
@@ -673,7 +688,7 @@ export function Home({ store, page }: any) {
               <Link href="/" style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cyan)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 عرض كل الفئات
                 <div style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid var(--cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ArrowRight style={{ width: '14px', height: '14px' }} />
+                  <ArrowLeft style={{ width: '14px', height: '14px' }} />
                 </div>
               </Link>
             </div>
@@ -995,7 +1010,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'الاسم مطلوب';
-    if (!fd.customerPhone.trim()) e.customerPhone = 'رقم الهاتف مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) e.customerWelaya = 'الولاية مطلوبة';
     if (!fd.customerCommune) e.customerCommune = 'البلدية مطلوبة';
     return e;
@@ -1248,7 +1263,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.name = 'الاسم مطلوب';
-    if (!fd.customerPhone.trim()) e.phone = 'الهاتف مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.phone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) e.welaya = 'الولاية مطلوبة';
     if (!fd.customerCommune) e.commune = 'البلدية مطلوبة';
     setErrors(e); return Object.keys(e).length === 0;
@@ -1617,7 +1632,7 @@ export function Contact({ store }: { store: Store }) {
       const { data } = await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id })
       setSent(true);
     } catch (error) {
-      alert('حدث خطاء في الارسال يمكن محاولة بعد حين')
+      showError('حدث خطاء في الارسال يمكن محاولة بعد حين')
     }
   }
   return (
@@ -1640,7 +1655,7 @@ export function Contact({ store }: { store: Store }) {
             <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '16px', textTransform: 'uppercase' }}>طرق التواصل</p>
             {[
               { icon: '📞', label: 'الهاتف', val: store.contact.phone, href: `tel:${store.contact.phone}` },
-              { icon: '📍', label: 'الموقع', val: store.contact.wilaya, href: undefined },
+              { icon: '📍', label: 'الموقع', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / '), href: undefined },
               { icon: '🎮', label: 'المتجر', val: 'كل ما تحتاجه للعب الاحترافي', href: undefined },
             ].map(item => (
               <a key={item.label} href={item.href || '#'} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '13px 0', borderBottom: '1px solid var(--line)', textDecoration: 'none', transition: 'padding-right 0.25s' }}
@@ -1651,7 +1666,7 @@ export function Contact({ store }: { store: Store }) {
                   <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.14em', margin: '0 0 3px', textTransform: 'uppercase' }}>{item.label}</p>
                   <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--white)', margin: 0, lineHeight: 1.5 }}>{item.val}</p>
                 </div>
-                {item.href && <ArrowRight style={{ width: '13px', height: '13px', color: 'var(--pink)', marginRight: 'auto', marginTop: '4px' }} />}
+                {item.href && <ArrowLeft style={{ width: '13px', height: '13px', color: 'var(--pink)', marginRight: 'auto', marginTop: '4px' }} />}
               </a>
             ))}
           </div>
@@ -1695,7 +1710,7 @@ export function Contact({ store }: { store: Store }) {
                   onBlur={e => { e.target.style.borderColor = 'var(--dim)'; e.target.style.boxShadow = 'none'; }} />
               </div>
               <button type="submit" className="btn-cyan" style={{ justifyContent: 'center', width: '100%', clipPath: 'none', borderRadius: '6px', fontSize: '14px', padding: '13px' }}>
-                إرسال الرسالة <ArrowRight style={{ width: '14px', height: '14px' }} />
+                إرسال الرسالة <ArrowLeft style={{ width: '14px', height: '14px' }} />
               </button>
             </form>
           )}

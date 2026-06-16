@@ -1,4 +1,5 @@
 'use client';
+import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -9,7 +10,7 @@ import {
   Star, Heart, ShoppingBag, Truck, ShieldCheck,
   ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, Check, X, Phone, MapPin,
-  CheckCircle2, ArrowRight, Zap,
+  CheckCircle2, ArrowLeft, Zap,
   Menu, Search, ShoppingCart, Minus, Plus,
   Trash2, Loader2, BadgeCheck, Lock, Package,
 } from 'lucide-react';
@@ -459,7 +460,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             </Link>
           ))}
           {/* شرط إخفاء السلة في نسخة الكمبيوتر */}
-          {store?.cart && (
+          {store?.cart !== false && (
             <Link href="/cart" className="btn-bouncy" style={{ position: 'relative', width: 44, height: 44, borderRadius: 14, border: '2.5px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral)', flexShrink: 0 }}>
               <ShoppingCart size={19} />
               {count > 0 && <span className="cart-badge">{count}</span>}
@@ -474,7 +475,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           </button>
 
           {/* شرط إخفاء السلة في نسخة الهاتف */}
-          {store?.cart && (
+          {store?.cart !== false && (
             <Link href="/cart" style={{ position: 'relative', width: 40, height: 40, borderRadius: 12, border: '2px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral)' }}>
               <ShoppingCart size={18} />
               {count > 0 && <span className="cart-badge">{count}</span>}
@@ -502,11 +503,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       {/* Mobile menu with Conditional Cart Link */}
       <div style={{ overflow: 'hidden', maxHeight: open ? 250 : 0, transition: 'max-height 0.3s ease', background: '#fff', borderTop: open ? '2px dashed var(--border)' : 'none' }}>
         <div style={{ padding: '0.625rem 1.25rem 1rem' }}>
-          <Link href="/" onClick={() => setOpen(false)} style={mobileLinkStyle}>🏠 الرئيسية <ArrowRight size={14} /></Link>
-          <Link href="/contact" onClick={() => setOpen(false)} style={mobileLinkStyle}>📞 تواصل معنا <ArrowRight size={14} /></Link>
+          <Link href="/" onClick={() => setOpen(false)} style={mobileLinkStyle}>🏠 الرئيسية <ArrowLeft size={14} /></Link>
+          <Link href="/contact" onClick={() => setOpen(false)} style={mobileLinkStyle}>📞 تواصل معنا <ArrowLeft size={14} /></Link>
           {/* إخفاء السلة من القائمة المنسدلة في الموبايل */}
-          {store?.cart && (
-            <Link href="/cart" onClick={() => setOpen(false)} style={mobileLinkStyle}>🛒 السلة <ArrowRight size={14} /></Link>
+          {store?.cart !== false && (
+            <Link href="/cart" onClick={() => setOpen(false)} style={mobileLinkStyle}>🛒 السلة <ArrowLeft size={14} /></Link>
           )}
         </div>
       </div>
@@ -567,7 +568,7 @@ export function Footer({ store }: any) {
             <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--sun)', marginBottom: '1.25rem' }}>📡 تواصل معنا</h4>
             {[
               { e: '📞', val: store?.contact?.phone },
-              { e: '📍', val: store?.contact?.wilaya },
+              { e: '📍', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
               { e: '📧', val: store?.contact?.email },
             ].filter(r => r.val).map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.625rem' }}>
@@ -632,7 +633,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
             color: hov ? '#fff' : 'var(--coral)', fontWeight: 800, fontSize: '0.85rem',
             transition: 'all 0.25s', boxShadow: hov ? '0 8px 20px rgba(255,107,107,0.35)' : 'none'
           }}>
-            {viewDetails} <ArrowRight size={14} />
+            {viewDetails} <ArrowLeft size={14} />
           </Link>
         </div>
       </div>
@@ -681,7 +682,7 @@ export function Home({ store, page }: any) {
             <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--coral)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>🎪 عالم الأطفال الساحر</span>
           </div>
           <h1 className="anim-pop-in" style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(3rem, 8vw, 6rem)', color: 'var(--text)', lineHeight: 1.1, marginBottom: '1.25rem' }}
-            dangerouslySetInnerHTML={{ __html: store.hero?.title || 'كل شيء<br/>يحبه أطفالك! 🎉' }} />
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'كل شيء<br/>يحبه أطفالك! 🎉') }} />
           <p className="anim-pop-in" style={{ fontSize: '1.0625rem', fontWeight: 600, color: 'var(--text-mid)', maxWidth: 460, lineHeight: 1.7, marginBottom: '2.5rem' }}>
             {store.hero?.subtitle || 'ألعاب وملابس وأدوات ترفيه آمنة وممتعة لأطفالك السعداء 🌈'}
           </p>
@@ -974,7 +975,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'الاسم مطلوب';
-    if (!fd.customerPhone.trim()) e.customerPhone = 'الهاتف مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) e.customerWelaya = 'الولاية مطلوبة';
     if (!fd.customerCommune) e.customerCommune = 'البلدية مطلوبة';
     return e;
@@ -1142,7 +1143,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'الاسم مطلوب';
-    if (!fd.customerPhone.trim()) er.phone = 'الهاتف مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) er.w = 'الولاية مطلوبة';
     if (!fd.customerCommune) er.c = 'البلدية مطلوبة';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -1354,7 +1355,7 @@ export function Contact({ store }: { store: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-    catch { alert('حدث خطأ في الإرسال'); } finally { setLoading(false); }
+    catch { showError('حدث خطأ في الإرسال'); } finally { setLoading(false); }
   };
 
   return (
@@ -1375,7 +1376,7 @@ export function Contact({ store }: { store: any }) {
           <div>
             {[
               { e: '📞', l: 'الهاتف', v: store?.contact?.phone || 'غير متوفر' },
-              { e: '📍', l: 'الموقع', v: store?.contact?.wilaya || 'الجزائر' },
+              { e: '📍', l: 'الموقع', v: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') || 'الجزائر' },
               { e: '📧', l: 'البريد', v: store?.contact?.email || 'غير متوفر' },
             ].map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.125rem', borderRadius: 20, border: '2.5px solid var(--border)', background: '#fff', marginBottom: '0.75rem', transition: 'all 0.25s', cursor: 'default' }}

@@ -1,4 +1,5 @@
 'use client';
+import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -479,7 +480,7 @@ export function Footer({ store }: any) {
             </p>
             {[
               { icon:'📞', val: store?.contact?.phone },
-              { icon:'📍', val: store?.contact?.wilaya },
+              { icon:'📍', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
               { icon:'✉️', val: store?.contact?.email },
             ].filter(r => r.val).map((r, i) => (
               <div key={i} style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'9px' }}>
@@ -593,8 +594,10 @@ export function Home({ store, page }: any) {
             color:'var(--ink)', marginBottom:'14px'
           }}
             dangerouslySetInnerHTML={{
-              __html: store.hero?.title?.replace(/<[^>]+>/g, '').replace('الصحة', '<span style="color:var(--sky)">الصحة</span>')
+              __html: DOMPurify.sanitize(
+                store.hero?.title?.replace(/<[^>]+>/g, '').replace('الصحة', '<span style="color:var(--sky)">الصحة</span>')
                 || 'صحتك <span style="color:var(--sky)">أولاً</span><br/>نحن هنا لمساعدتك'
+              )
             }}>
           </h1>
 
@@ -1045,7 +1048,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = ()=>{
     const e:Record<string,string>={};
     if(!fd.customerName.trim()) e.customerName='الاسم مطلوب';
-    if(!fd.customerPhone.trim()) e.customerPhone='رقم الهاتف مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if(!fd.customerWelaya) e.customerWelaya='الولاية مطلوبة';
     if(!fd.customerCommune) e.customerCommune='البلدية مطلوبة';
     return e;
@@ -1229,7 +1232,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er:Record<string,string>={};
     if(!fd.customerName.trim()) er.name='مطلوب';
-    if(!fd.customerPhone.trim()) er.phone='مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if(!fd.customerWelaya) er.w='مطلوب';
     if(!fd.customerCommune) er.c='مطلوب';
     if(Object.keys(er).length){setErrors(er);return;}
@@ -1463,7 +1466,7 @@ export function Contact({ store }: { store?: any }) {
   const handleSubmit = async (e:React.FormEvent)=>{
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`,{...form,storeId:store?.id}); setSent(true); }
-    catch { alert('حدث خطأ'); } finally { setLoading(false); }
+    catch { showError('حدث خطأ'); } finally { setLoading(false); }
   };
 
   return (
@@ -1487,7 +1490,7 @@ export function Contact({ store }: { store?: any }) {
             <p className="pjs" style={{ fontSize:'11px', fontWeight:700, letterSpacing:'0.08em', color:'var(--sky)', marginBottom:'16px' }}>معلومات الاتصال</p>
             {[
               { icon:'📞', label:'الهاتف', val:store?.contact?.phone },
-              { icon:'📍', label:'الموقع', val:store?.contact?.wilaya },
+              { icon:'📍', label:'الموقع', val:[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
               { icon:'✉️', label:'البريد', val:store?.contact?.email },
             ].filter(r=>r.val).map((item,i)=>(
               <div key={i} style={{ display:'flex', alignItems:'center', gap:'12px', padding:'11px 0', borderBottom:'1px solid var(--line)' }}>

@@ -1,4 +1,5 @@
 'use client';
+import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -403,7 +404,7 @@ export function Footer({ store }: any) {
             {[
               {icon:'📞',val:store?.contact?.phone},
               {icon:'✉️',val:store?.contact?.email},
-              {icon:'📍',val:store?.contact?.wilaya},
+              {icon:'📍',val:[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')},
             ].filter(r=>r.val).map((item,i)=>(
               <div key={i} style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'14px'}}>
                 <span style={{fontSize:'14px',opacity:0.8}}>{item.icon}</span>
@@ -493,7 +494,7 @@ export function Home({ store, page }: any) {
           </p>
 
           <h1 className="fu fu-2 bc" style={{fontSize:'clamp(2.5rem,6vw,4.8rem)',fontWeight:900,color:'var(--white)',lineHeight:1.05,marginBottom:'24px',maxWidth:'800px',letterSpacing:'0.02em'}}
-            dangerouslySetInnerHTML={{__html:store.hero?.title||'مُصمَّم للتميز.<br/>أداء شامل.'}}>
+            dangerouslySetInnerHTML={{__html:DOMPurify.sanitize(store.hero?.title||'مُصمَّم للتميز.<br/>أداء شامل.')}}>
           </h1>
 
           <p className="fu fu-3" style={{fontSize:'17px',lineHeight:'1.7',color:'rgba(255,255,255,0.7)',marginBottom:'40px',maxWidth:'520px',fontWeight:300}}>
@@ -809,7 +810,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = ()=>{
     const e:Record<string,string>={};
     if(!fd.customerName.trim())  e.customerName='الاسم مطلوب';
-    if(!fd.customerPhone.trim()) e.customerPhone='رقم الهاتف مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if(!fd.customerWelaya)       e.customerWelaya='الولاية مطلوبة';
     if(!fd.customerCommune)      e.customerCommune='البلدية مطلوبة';
     return e;
@@ -998,7 +999,7 @@ export function Cart({ domain, store }: { domain:string; store:any }) {
     e.preventDefault();
     const er:Record<string,string>={};
     if(!fd.customerName.trim()) er.name='مطلوب';
-    if(!fd.customerPhone.trim()) er.phone='مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if(!fd.customerWelaya) er.w='مطلوب';
     if(!fd.customerCommune) er.c='مطلوب';
     if(Object.keys(er).length){setErrors(er);return;}
@@ -1229,7 +1230,7 @@ export function Contact({ store }: { store?:any }) {
   const handleSubmit = async (e:React.FormEvent)=>{
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`,{...form,storeId:store?.id}); setSent(true); }
-    catch { alert('حدث خطأ'); } finally { setLoading(false); }
+    catch { showError('حدث خطأ'); } finally { setLoading(false); }
   };
   const onF=(e:React.FocusEvent<HTMLInputElement|HTMLTextAreaElement>)=>{e.target.style.borderColor='var(--blue)';};
   const onB=(e:React.FocusEvent<HTMLInputElement|HTMLTextAreaElement>)=>{e.target.style.borderColor='var(--line)';};
@@ -1253,7 +1254,7 @@ export function Contact({ store }: { store?:any }) {
             {[
               {icon:'📞',label:'الهاتف',val:store?.contact?.phone},
               {icon:'✉️',label:'البريد',val:store?.contact?.email},
-              {icon:'📍',label:'الموقع',val:store?.contact?.wilaya},
+              {icon:'📍',label:'الموقع',val:[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')},
             ].filter(r=>r.val).map(item=>(
               <div key={item.label} style={{display:'flex',alignItems:'center',gap:'14px',padding:'13px 0',borderBottom:'1px solid var(--line)',transition:'padding-right 0.2s'}}
                 onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.paddingRight='8px';}}

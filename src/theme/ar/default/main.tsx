@@ -1,4 +1,5 @@
 'use client';
+import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -6,16 +7,13 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
-  ShoppingCart, MapPin, Phone, User,
-  Home as HomeIcon, ChevronDown, Truck, Shield, Package,
-  Building2, AlertCircle, Tag,
-  Check, ChevronLeft, ChevronRight, FileText, Heart,
-  Infinity, Link2, RefreshCw, Share2, Star, X,
-  ShieldCheck, Eye, Lock, Database, Globe, Bell,
-  CheckCircle2, Scale, CreditCard, Ban,
-  Cookie as CookieIcon, Settings, MousePointer2, ToggleRight,
+  ShoppingCart, MapPin, Phone, Mail, User,
+  ChevronDown, Truck, Package, AlertCircle,
+  Check, ChevronLeft, Home as HomeIcon, Building2,
+  Shield, X, Menu, Minus, Plus, Trash2, Loader2,
 } from 'lucide-react';
 import { Store } from '@/types/store';
+import { useCartStore } from '@/store/useCartStore';
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -36,7 +34,7 @@ export interface Product {
   productImage?: string; imagesProduct?: ProductImage[];
   offers?: Offer[]; attributes?: Attribute[];
   variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-  store: { id: string; name: string; subdomain: string; userId: string; };
+  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
 }
 
 export interface ProductFormProps {
@@ -56,7 +54,31 @@ export interface ProductFormProps {
 // ─────────────────────────────────────────────────────────────
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
-const FONT_IMPORT = `@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap'); * { -webkit-font-smoothing: antialiased; }`;
+
+const S: Record<string, React.CSSProperties> = {
+  body:      { fontFamily: 'system-ui, -apple-system, Arial, sans-serif', color: '#111', background: '#fff' },
+  container: { maxWidth: 1100, margin: '0 auto', padding: '0 1rem' },
+  hr:        { border: 'none', borderTop: '1px solid #e5e5e5', margin: '0' },
+  inputBase: {
+    width: '100%', padding: '0.6rem 0.75rem', border: '1px solid #ccc',
+    borderRadius: 4, fontSize: '0.9rem', fontFamily: 'inherit',
+    outline: 'none', background: '#fff', color: '#111', boxSizing: 'border-box' as const,
+  },
+  btnBlack: {
+    background: '#111', color: '#fff', border: 'none', borderRadius: 4,
+    padding: '0.65rem 1.25rem', fontSize: '0.85rem', fontWeight: 600,
+    cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
+    fontFamily: 'inherit',
+  },
+  btnOutline: {
+    background: '#fff', color: '#111', border: '1px solid #ccc', borderRadius: 4,
+    padding: '0.65rem 1.25rem', fontSize: '0.85rem', fontWeight: 600,
+    cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
+    fontFamily: 'inherit',
+  },
+  label: { display: 'block', fontSize: '0.78rem', fontWeight: 600, marginBottom: 4, color: '#444' },
+  error: { fontSize: '0.75rem', color: '#c00', marginTop: 3, display: 'flex', alignItems: 'center', gap: 4 },
+};
 
 function variantMatches(detail: VariantDetail, sel: Record<string, string>): boolean {
   return Object.entries(sel).every(([attrName, val]) =>
@@ -64,36 +86,32 @@ function variantMatches(detail: VariantDetail, sel: Record<string, string>): boo
   );
 }
 
-const fetchWilayas = async (userId: string): Promise<Wilaya[]> => {
-  try { const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${userId}`); return data || []; }
-  catch { return []; }
-};
+const fetchWilayas  = async (uid: string): Promise<Wilaya[]>  => { try { const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}`); return data || []; } catch { return []; } };
+const fetchCommunes = async (wid: string): Promise<Commune[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/get-communes/${wid}`); return data || []; } catch { return []; } };
 
-const fetchCommunes = async (wilayaId: string): Promise<Commune[]> => {
-  try { const { data } = await axios.get(`${API_URL}/shipping/get-communes/${wilayaId}`); return data || []; }
-  catch { return []; }
-};
+const FR = ({ label, error, children }: { label?: string; error?: string; children: React.ReactNode }) => (
+  <div style={{ marginBottom: '0.85rem' }}>
+    {label && <label style={S.label}>{label}</label>}
+    {children}
+    {error && <p style={S.error}><AlertCircle size={12} />{error}</p>}
+  </div>
+);
 
 // ─────────────────────────────────────────────────────────────
 // MAIN LAYOUT
 // ─────────────────────────────────────────────────────────────
 
 export default function Main({ store, children }: any) {
+  const isRTL = (store?.language || 'ar') === 'ar';
   return (
-    <div className="min-h-screen bg-[#FAFAF8]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-      <style>{FONT_IMPORT}</style>
-
+    <div style={{ ...S.body, minHeight: '100vh', display: 'flex', flexDirection: 'column' }} dir={isRTL ? 'rtl' : 'ltr'}>
       {store.topBar?.enabled && store.topBar?.text && (
-        <div
-          className="py-2 px-4 text-center text-xs tracking-[0.15em] uppercase font-medium"
-          style={{ backgroundColor: store.topBar.color || '#1C1C1C', color: '#FAFAF8' }}
-        >
+        <div style={{ background: store.topBar.color || '#111', color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.8rem' }}>
           {store.topBar.text}
         </div>
       )}
-
       <Navbar store={store} />
-      <main>{children}</main>
+      <main style={{ flex: 1 }}>{children}</main>
       <Footer store={store} />
     </div>
   );
@@ -104,87 +122,70 @@ export default function Main({ store, children }: any) {
 // ─────────────────────────────────────────────────────────────
 
 export function Navbar({ store }: { store: Store }) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrolled,   setScrolled]   = useState(false);
-  const isRTL = store.language === 'ar';
+  const [open, setOpen] = useState(false);
+  const isRTL = (store?.language || 'ar') === 'ar';
+  const itemsCartCount = useCartStore((s) => s.count);
+  const initCount = useCartStore((s) => s.initCount);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    if (typeof window !== 'undefined') {
+      try { initCount(JSON.parse(localStorage.getItem(store.subdomain) || '[]').length || 0); } catch { initCount(0); }
+    }
+  }, [store.subdomain, initCount]);
 
-  const navItems = [
-    { href: `/`,         label: isRTL ? 'الرئيسية'       : 'Home'    },
-    { href: `/contact`,  label: isRTL ? 'اتصل بنا'       : 'Contact' },
-    { href: `/Privacy`,  label: isRTL ? 'سياسة الخصوصية' : 'Privacy' },
+  const links = [
+    { href: '/',        label: isRTL ? 'الرئيسية'       : 'Home'    },
+    { href: '/contact', label: isRTL ? 'تواصل معنا'      : 'Contact' },
   ];
 
   return (
-    <nav
-      className={`sticky top-0 z-50 transition-all duration-500 border-b border-[#E4E0DB] ${scrolled ? 'bg-[#FAFAF8]/95 backdrop-blur-md' : 'bg-[#FAFAF8]'}`}
-      dir={isRTL ? 'rtl' : 'ltr'}
-      style={{ fontFamily: "'DM Sans', sans-serif" }}
-    >
-      <div className="max-w-7xl mx-auto px-6 lg:px-10">
-        <div className="flex justify-between items-center h-16">
+    <nav style={{ borderBottom: '1px solid #e5e5e5', background: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
+      <div style={{ ...S.container, display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
+        <Link href="/" style={{ fontWeight: 700, fontSize: '1rem', color: '#111', textDecoration: 'none' }}>
+          {store.design?.logoUrl
+            ? <img src={store.design.logoUrl} alt={store.name} style={{ height: 32, display: 'block' }} />
+            : store.name}
+        </Link>
 
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            {store.design.logoUrl ? (
-              <img src={store.design.logoUrl} alt={store.name} className="h-8 w-auto object-contain opacity-90" />
-            ) : (
-              <span
-                className="text-xl tracking-widest uppercase text-[#1C1C1C] group-hover:opacity-70 transition-opacity duration-300"
-                style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, letterSpacing: '0.15em' }}
-              >
-                {store.name}
-              </span>
-            )}
-          </Link>
-
-          {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-10">
-            {navItems.map(item => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="text-[#5A5753] hover:text-[#1C1C1C] text-xs tracking-[0.12em] uppercase font-medium transition-colors duration-200 relative group"
-              >
-                {item.label}
-                <span className="absolute -bottom-0.5 left-0 h-px w-0 group-hover:w-full transition-all duration-300 bg-[#1C1C1C]" />
-              </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+          <div style={{ display: 'none' }} className="desk-nav">
+            {links.map(l => (
+              <Link key={l.href} href={l.href} style={{ fontSize: '0.85rem', color: '#444', textDecoration: 'none', fontWeight: 500 }}>{l.label}</Link>
             ))}
           </div>
 
-          {/* Mobile toggle */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden flex flex-col gap-1.5 p-2"
-            aria-label="Toggle menu"
-          >
-            <span className={`block h-px w-6 bg-[#1C1C1C] transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-2.5' : ''}`} />
-            <span className={`block h-px w-6 bg-[#1C1C1C] transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`} />
-            <span className={`block h-px w-6 bg-[#1C1C1C] transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-2.5' : ''}`} />
+          {store?.cart !== false && (
+            <Link href="/cart" style={{ position: 'relative', color: '#111', textDecoration: 'none' }}>
+              <ShoppingCart size={20} />
+              {itemsCartCount > 0 && (
+                <span style={{ position: 'absolute', top: -6, right: -8, background: '#111', color: '#fff', fontSize: 9, width: 16, height: 16, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
+                  {itemsCartCount}
+                </span>
+              )}
+            </Link>
+          )}
+
+          <button onClick={() => setOpen(!open)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#111' }} className="mob-btn">
+            {open ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
-
-        {/* Mobile menu */}
-        <div className={`md:hidden overflow-hidden transition-all duration-400 ${isMenuOpen ? 'max-h-64 pb-6' : 'max-h-0'}`}>
-          <div className="pt-4 border-t border-[#E4E0DB] flex flex-col gap-5">
-            {navItems.map(item => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setIsMenuOpen(false)}
-                className="text-[#5A5753] hover:text-[#1C1C1C] text-xs tracking-[0.12em] uppercase font-medium transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </div>
       </div>
+
+      {open && (
+        <div style={{ borderTop: '1px solid #e5e5e5', padding: '1rem', background: '#fff' }}>
+          {links.map(l => (
+            <Link key={l.href} href={l.href} onClick={() => setOpen(false)}
+              style={{ display: 'block', padding: '0.6rem 0', fontSize: '0.9rem', color: '#111', textDecoration: 'none', borderBottom: '1px solid #f0f0f0', fontWeight: 500 }}>
+              {l.label}
+            </Link>
+          ))}
+        </div>
+      )}
+
+      <style>{`
+        .desk-nav { display: none; gap: 1.5rem; }
+        @media (min-width: 768px) { .desk-nav { display: flex !important; } .mob-btn { display: none !important; } }
+      `}</style>
     </nav>
   );
 }
@@ -194,52 +195,55 @@ export function Navbar({ store }: { store: Store }) {
 // ─────────────────────────────────────────────────────────────
 
 export function Footer({ store }: any) {
+  const isRTL = (store?.language || 'ar') === 'ar';
   return (
-    <footer className="bg-[#1C1C1C] text-[#FAFAF8]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-14">
-
-        {/* Top row */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 pb-10 border-b border-white/10">
-          <div className="flex items-center gap-3">
-            {store.design.logoUrl ? (
-              <img src={store.design.logoUrl} alt={store.name} className="h-7 w-auto opacity-60 invert" />
-            ) : (
-              <span
-                className="text-lg tracking-widest uppercase text-white/80"
-                style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, letterSpacing: '0.2em' }}
-              >
-                {store.name}
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center gap-8">
+    <footer style={{ borderTop: '1px solid #e5e5e5', background: '#f8f8f8', padding: '2.5rem 0 1.5rem' }}>
+      <div style={{ ...S.container, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '2rem' }}>
+        <div>
+          <p style={{ fontWeight: 700, marginBottom: '0.5rem', fontSize: '0.9rem' }}>{store?.name}</p>
+          <p style={{ fontSize: '0.8rem', color: '#666', lineHeight: 1.6 }}>{isRTL ? 'متجر إلكتروني' : 'Online Store'}</p>
+        </div>
+        <div>
+          <p style={{ fontWeight: 700, marginBottom: '0.75rem', fontSize: '0.85rem', color: '#444' }}>{isRTL ? 'روابط' : 'Links'}</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
             {[
-              { href: `/Privacy`, label: 'Privacy' },
-              { href: `/Terms`,   label: 'Terms'   },
-              { href: `/Cookies`, label: 'Cookies' },
-            ].map(link => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-white/40 hover:text-white/80 text-xs tracking-[0.1em] uppercase transition-colors duration-200"
-              >
-                {link.label}
-              </a>
+              { href: '/',        label: isRTL ? 'الرئيسية'         : 'Home'    },
+              { href: '/contact', label: isRTL ? 'تواصل معنا'        : 'Contact' },
+              { href: '/Privacy', label: isRTL ? 'سياسة الخصوصية'   : 'Privacy' },
+              { href: '/Terms',   label: isRTL ? 'الشروط والأحكام'  : 'Terms'   },
+            ].map(l => (
+              <Link key={l.href} href={l.href} style={{ fontSize: '0.82rem', color: '#555', textDecoration: 'none' }}>{l.label}</Link>
             ))}
           </div>
         </div>
-
-        {/* Bottom row */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-3">
-          <p className="text-white/25 text-xs tracking-[0.08em]">
-            © {new Date().getFullYear()} {store.name}. All rights reserved.
-          </p>
-          <div className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-white/20" />
-            <span className="text-white/20 text-xs tracking-wider">Minimalist Shop</span>
+        {(store?.contact?.phone || store?.contact?.email || store?.contact?.wilaya || store?.contact?.address) && (
+          <div>
+            <p style={{ fontWeight: 700, marginBottom: '0.75rem', fontSize: '0.85rem', color: '#444' }}>{isRTL ? 'تواصل معنا' : 'Contact'}</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              {store?.contact?.phone && (
+                <a href={`tel:${store.contact.phone}`} style={{ fontSize: '0.82rem', color: '#555', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Phone size={12} />{store.contact.phone}
+                </a>
+              )}
+              {store?.contact?.email && (
+                <a href={`mailto:${store.contact.email}`} style={{ fontSize: '0.82rem', color: '#555', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Mail size={12} />{store.contact.email}
+                </a>
+              )}
+              {(store?.contact?.wilaya || store?.contact?.address) && (
+                <span style={{ fontSize: '0.82rem', color: '#555', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <MapPin size={12} />{[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
+        )}
+      </div>
+      <div style={{ ...S.container, marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid #e5e5e5', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+        <p style={{ fontSize: '0.75rem', color: '#999' }}>© {new Date().getFullYear()} {store?.name}</p>
+        <a href="https://mdstore.app" target="_blank" rel="noreferrer" style={{ fontSize: '0.72rem', color: '#bbb', textDecoration: 'none' }}>
+          Powered by MdStore
+        </a>
       </div>
     </footer>
   );
@@ -250,431 +254,185 @@ export function Footer({ store }: any) {
 // ─────────────────────────────────────────────────────────────
 
 export function Card({ product, displayImage, discount, isRTL, store, viewDetails }: any) {
+  const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
+  const orig  = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
   return (
-    <div
-      className="group flex flex-col bg-[#FAFAF8] border border-[#E4E0DB] hover:border-[#1C1C1C] transition-all duration-500 overflow-hidden"
-      style={{ fontFamily: "'DM Sans', sans-serif" }}
-    >
-      {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-[#F0EDE8]">
-        {displayImage ? (
-          <img
-            src={displayImage}
-            alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-xs tracking-[0.15em] uppercase text-[#B0ABA5]">
-              {isRTL ? 'لا توجد صورة' : 'No Image'}
-            </span>
-          </div>
-        )}
-
+    <Link href={`/product/${product.slug || product.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', border: '1px solid #e5e5e5', borderRadius: 4, overflow: 'hidden', background: '#fff', transition: 'border-color 0.15s' }}>
+      <div style={{ aspectRatio: '1/1', background: '#f5f5f5', position: 'relative', overflow: 'hidden' }}>
+        {displayImage
+          ? <img src={displayImage} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ccc' }}><Package size={32} /></div>
+        }
         {discount > 0 && (
-          <div className="absolute top-3 right-3 bg-[#1C1C1C] text-[#FAFAF8] text-[10px] tracking-[0.1em] uppercase px-2.5 py-1">
-            −{discount}%
-          </div>
+          <span style={{ position: 'absolute', top: 8, right: 8, background: '#111', color: '#fff', fontSize: 10, padding: '2px 6px', borderRadius: 2, fontWeight: 700 }}>
+            -{discount}%
+          </span>
         )}
-
-        <div className="absolute inset-0 bg-[#1C1C1C]/0 group-hover:bg-[#1C1C1C]/10 transition-all duration-500" />
       </div>
-
-      {/* Content */}
-      <div className="p-5 flex flex-col flex-1">
-        <h3
-          className="text-[#1C1C1C] mb-1 line-clamp-1 tracking-wide"
-          style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1rem', fontWeight: 400 }}
-        >
+      <div style={{ padding: '0.75rem', flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <p style={{ fontSize: '0.85rem', fontWeight: 500, margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
           {product.name}
-        </h3>
-
-        {product.desc && (
-          <div
-            className="text-xs text-[#8A8580] mb-4 line-clamp-2 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: product.desc }}
-          />
-        )}
-
-        <div className="mt-auto space-y-4">
-          <div className="flex items-baseline gap-2">
-            <span
-              className="text-[#1C1C1C] font-light"
-              style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.4rem', fontWeight: 300 }}
-            >
-              {product.price}
-            </span>
-            <span className="text-xs text-[#8A8580] tracking-wider">{store.currency}</span>
-            {product.priceOriginal && product.priceOriginal > product.price && (
-              <span className="text-xs text-[#B0ABA5] line-through ml-1">{product.priceOriginal}</span>
-            )}
-          </div>
-
-          <Link
-            href={`/product/${product.slug || product.id}`}
-            className="block w-full py-3 text-center text-xs tracking-[0.18em] uppercase font-medium border border-[#1C1C1C] text-[#1C1C1C] hover:bg-[#1C1C1C] hover:text-[#FAFAF8] transition-all duration-300"
-          >
-            {viewDetails}
-          </Link>
+        </p>
+        <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{price.toLocaleString()} <span style={{ fontWeight: 400, fontSize: '0.8rem', color: '#666' }}>{store?.currency || 'دج'}</span></span>
+          {orig > price && <span style={{ fontSize: '0.78rem', color: '#aaa', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
+        </div>
+        <div style={{ ...S.btnBlack, justifyContent: 'center', padding: '0.5rem', fontSize: '0.78rem', borderRadius: 3 }}>
+          {viewDetails || 'عرض'}
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
 // ─────────────────────────────────────────────────────────────
-// HOME PAGE
+// HOME
 // ─────────────────────────────────────────────────────────────
 
 export const Home = ({ store }: any) => {
-  const isRTL = store.language === 'ar';
-  const dir   = isRTL ? 'rtl' : 'ltr';
-
+  const isRTL = (store?.language || 'ar') === 'ar';
   const t = {
-    categories:       isRTL ? 'التصنيفات'                    : 'Collections',
-    noCategories:     isRTL ? 'لا توجد تصنيفات'              : 'No Collections',
-    noCategoriesDesc: isRTL ? 'لم يتم إضافة أي تصنيفات بعد'  : 'No collections have been added yet',
-    products:         isRTL ? 'المنتجات'                     : 'Products',
-    noProducts:       isRTL ? 'لا توجد منتجات'               : 'No Products',
-    noProductsDesc:   isRTL ? 'لم يتم إضافة أي منتجات بعد'   : 'No products have been added yet',
-    viewDetails:      isRTL ? 'عرض التفاصيل'                 : 'View Details',
-    all:              isRTL ? 'الكل'                          : 'All',
+    viewDetails: isRTL ? 'عرض التفاصيل' : 'View Details',
+    products:    isRTL ? 'المنتجات'      : 'Products',
+    categories:  isRTL ? 'الأقسام'       : 'Categories',
+    all:         isRTL ? 'الكل'           : 'All',
+    noProducts:  isRTL ? 'لا توجد منتجات بعد' : 'No products yet',
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8]" dir={dir} style={{ fontFamily: "'DM Sans', sans-serif" }}>
-
-      {/* ── HERO ── */}
-      <section
-        className="relative flex items-end justify-start overflow-hidden"
-        style={{
-          minHeight:          '85vh',
-          backgroundImage:    store.hero.imageUrl ? `url(${store.hero.imageUrl})` : 'none',
-          backgroundColor:    !store.hero.imageUrl ? '#E8E4DF' : undefined,
-          backgroundSize:     'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        {store.hero.imageUrl && (
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1C]/60 via-transparent to-transparent" />
-        )}
-
-        {(store.hero.title || store.hero.subtitle) ? (
-          <div className="relative z-10 px-10 lg:px-16 pb-16 max-w-3xl">
-            {store.hero.title && (
-              <h1
-                className="text-white mb-4 leading-tight"
-                style={{
-                  fontFamily:    "'Cormorant Garamond', serif",
-                  fontSize:      'clamp(2.5rem, 6vw, 5rem)',
-                  fontWeight:    300,
-                  letterSpacing: '-0.01em',
-                  textShadow:    '0 2px 20px rgba(0,0,0,0.2)',
-                }}
-              >
-                {store.hero.title}
-              </h1>
-            )}
-            {store.hero.subtitle && (
-              <p className="text-white/75 text-sm tracking-[0.12em] uppercase font-light max-w-md">
-                {store.hero.subtitle}
-              </p>
-            )}
-          </div>
-        ) : !store.hero.imageUrl && (
-          <div className="w-full h-full flex items-center justify-center" style={{ minHeight: '85vh' }}>
-            <span
-              className="text-[#B0ABA5] tracking-[0.3em] uppercase text-sm"
-              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
-            >
-              {store.name}
-            </span>
-          </div>
-        )}
-
-        <div className="absolute bottom-8 right-10 flex flex-col items-center gap-2 opacity-50">
-          <span className="text-white text-[9px] tracking-[0.2em] uppercase rotate-90 origin-center">scroll</span>
-          <span className="block w-px h-8 bg-white/50" />
+    <div style={S.body}>
+      {/* Hero */}
+      <section style={{
+        background: store.hero?.imageUrl ? `linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)) url(${store.hero.imageUrl})` : '#111',
+        backgroundSize: 'cover', backgroundPosition: 'center',
+        padding: '4rem 1rem', textAlign: 'center', color: '#fff',
+        minHeight: store.hero?.imageUrl ? 320 : 200, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <div>
+          <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', fontWeight: 700, margin: '0 0 0.75rem' }}>
+            {store.hero?.title?.replace(/<[^>]+>/g, '') || store.name}
+          </h1>
+          {store.hero?.subtitle && (
+            <p style={{ fontSize: '0.95rem', opacity: 0.85, maxWidth: 520, margin: '0 auto 1.5rem' }}>
+              {store.hero.subtitle}
+            </p>
+          )}
+          <a href="#products" style={{ ...S.btnBlack, background: '#fff', color: '#111', textDecoration: 'none', display: 'inline-flex' }}>
+            {isRTL ? 'تسوق الآن' : 'Shop Now'}
+          </a>
         </div>
       </section>
 
-      {/* ── CATEGORIES ── */}
-      <section className="py-20 bg-[#FAFAF8]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="flex items-center gap-6 mb-14">
-            <span className="block h-px flex-1 max-w-[3rem] bg-[#E4E0DB]" />
-            <h2 className="text-xs tracking-[0.25em] uppercase text-[#8A8580]">{t.categories}</h2>
-            <span className="block h-px flex-1 bg-[#E4E0DB]" />
-          </div>
-
-          {store.categories && store.categories.length > 0 ? (
-            <div className="flex flex-wrap gap-3 justify-center">
-              <Link
-                href="/"
-                className="px-7 py-2.5 border border-[#1C1C1C] text-[#1C1C1C] text-xs tracking-[0.15em] uppercase hover:bg-[#1C1C1C] hover:text-[#FAFAF8] transition-all duration-300 font-medium"
-              >
-                {t.all}
+      {/* Categories */}
+      {store.categories?.length > 0 && (
+        <section style={{ borderBottom: '1px solid #e5e5e5', padding: '1rem' }}>
+          <div style={{ ...S.container, display: 'flex', gap: '0.5rem', overflowX: 'auto', flexWrap: 'wrap' }}>
+            <Link href="/" style={{ ...S.btnOutline, textDecoration: 'none', padding: '0.4rem 0.9rem', fontSize: '0.8rem', whiteSpace: 'nowrap' }}>{t.all}</Link>
+            {store.categories.map((cat: any) => (
+              <Link key={cat.id} href={`/?category=${cat.id}`} style={{ ...S.btnOutline, textDecoration: 'none', padding: '0.4rem 0.9rem', fontSize: '0.8rem', whiteSpace: 'nowrap' }}>
+                {cat.name}
               </Link>
-              {store.categories.map((cat: any) => (
-                <Link
-                  key={cat.id}
-                  href={`/?category=${cat.id}`}
-                  className="px-7 py-2.5 border border-[#E4E0DB] text-[#5A5753] text-xs tracking-[0.15em] uppercase hover:border-[#1C1C1C] hover:text-[#1C1C1C] transition-all duration-300 font-medium"
-                >
-                  {cat.name}
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-xs tracking-[0.2em] uppercase text-[#B0ABA5]">{t.noCategoriesDesc}</p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ── PRODUCTS ── */}
-      <section className="pb-24 bg-[#FAFAF8]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="flex items-center gap-6 mb-14">
-            <span className="block h-px flex-1 max-w-[3rem] bg-[#E4E0DB]" />
-            <h2 className="text-xs tracking-[0.25em] uppercase text-[#8A8580]">{t.products}</h2>
-            <span className="block h-px flex-1 bg-[#E4E0DB]" />
+            ))}
           </div>
+        </section>
+      )}
 
-          {store.products && store.products.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[#E4E0DB]">
-              {store.products.map((product: any) => {
-                const displayImage = product.productImage || product.imagesProduct?.[0]?.imageUrl || store.design?.logoUrl;
-                const discount = product.priceOriginal
-                  ? Math.round(((product.priceOriginal - product.price) / product.priceOriginal) * 100)
-                  : 0;
-                return (
-                  <Card
-                    key={product.id}
-                    product={product}
-                    displayImage={displayImage}
-                    discount={discount}
-                    isRTL={isRTL}
-                    store={store}
-                    viewDetails={t.viewDetails}
-                  />
-                );
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-24 border border-dashed border-[#E4E0DB]">
-              <p
-                className="text-[#B0ABA5] mb-3"
-                style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.5rem', fontWeight: 300 }}
-              >
-                {t.noProducts}
-              </p>
-              <p className="text-xs tracking-[0.15em] uppercase text-[#C8C3BC]">{t.noProductsDesc}</p>
-            </div>
-          )}
-        </div>
+      {/* Products */}
+      <section id="products" style={{ ...S.container, padding: '2rem 1rem' }}>
+        <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1.5rem', color: '#333' }}>{t.products}</h2>
+        {store.products?.length > 0 ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '1rem' }}>
+            {store.products.map((p: any) => {
+              const img  = p.productImage || p.imagesProduct?.[0]?.imageUrl;
+              const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
+              return <Card key={p.id} product={p} displayImage={img} discount={disc} isRTL={isRTL} store={store} viewDetails={t.viewDetails} />;
+            })}
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center', padding: '4rem 1rem', background: '#f8f8f8', borderRadius: 4 }}>
+            <p style={{ color: '#aaa', fontSize: '0.9rem' }}>{t.noProducts}</p>
+          </div>
+        )}
       </section>
     </div>
   );
 };
 
 // ─────────────────────────────────────────────────────────────
-// DETAILS PAGE
+// DETAILS
 // ─────────────────────────────────────────────────────────────
 
-export function Details({
-  product, toggleWishlist, isWishlisted, handleShare, discount,
-  allImages, allAttrs, finalPrice, inStock, autoGen,
-  selectedVariants, setSelectedOffer, selectedOffer,
-  handleVariantSelection, domain,
-}: any) {
-  const [showShareToast, setShowShareToast] = useState(false);
-  const [selectedImage,  setSelectedImage]  = useState(0);
+export function Details({ product, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, toggleWishlist, isWishlisted, handleShare }: any) {
+  const [selImg, setSelImg] = useState(0);
+  const isRTL = true;
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8]" dir="rtl" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-      <style>{FONT_IMPORT}</style>
-
-      {showShareToast && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[#1C1C1C] text-[#FAFAF8] px-5 py-2.5 text-xs tracking-[0.1em] flex items-center gap-2 shadow-lg">
-          <Link2 className="w-3.5 h-3.5" /> تم نسخ الرابط
-        </div>
-      )}
-
+    <div style={S.body} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Breadcrumb */}
-      <header className="border-b border-[#E4E0DB] bg-[#FAFAF8]/95 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-6 h-12 flex items-center justify-between">
-          <nav className="flex items-center gap-2 text-xs text-[#B0ABA5] tracking-[0.1em]">
-            <Link href="/" className="hover:text-[#1C1C1C] cursor-pointer transition-colors uppercase">الرئيسية</Link>
-            <ChevronLeft className="w-3 h-3" />
-            <span className="text-[#1C1C1C] truncate max-w-[160px]">{product.name}</span>
+      <div style={{ borderBottom: '1px solid #e5e5e5', padding: '0.6rem 1rem', background: '#f8f8f8' }}>
+        <div style={S.container}>
+          <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: '#888' }}>
+            <Link href="/" style={{ color: '#555', textDecoration: 'none' }}>الرئيسية</Link>
+            <ChevronLeft size={12} />
+            <span style={{ color: '#111', fontWeight: 500 }}>{product.name}</span>
           </nav>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={toggleWishlist}
-              className={`p-2 transition-all ${isWishlisted ? 'text-[#1C1C1C]' : 'text-[#B0ABA5] hover:text-[#1C1C1C]'}`}
-            >
-              <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
-            </button>
-            <button onClick={handleShare} className="p-2 text-[#B0ABA5] hover:text-[#1C1C1C] transition-all">
-              <Share2 className="w-4 h-4" />
-            </button>
-            <div className={`text-[10px] tracking-[0.15em] uppercase px-3 py-1 ${inStock ? 'bg-[#1C1C1C] text-[#FAFAF8]' : 'border border-[#E4E0DB] text-[#8A8580]'}`}>
-              {inStock ? 'متوفر' : 'نفد المخزون'}
-            </div>
-          </div>
         </div>
-      </header>
+      </div>
 
-      <main className="max-w-6xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+      <div style={{ ...S.container, padding: '2rem 1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', alignItems: 'start' }}>
 
-          {/* ── Images ── */}
-          <div className="space-y-3">
-            <div className="relative overflow-hidden bg-[#F0EDE8] group" style={{ aspectRatio: '4/5' }}>
-              {allImages.length > 0 ? (
-                <img
-                  src={allImages[selectedImage]}
-                  alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  loading="eager"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Package className="w-16 h-16 text-[#D8D3CD]" />
-                </div>
-              )}
-
+          {/* Images */}
+          <div>
+            <div style={{ aspectRatio: '1/1', background: '#f5f5f5', position: 'relative', overflow: 'hidden', borderRadius: 4 }}>
+              {allImages[selImg]
+                ? <img src={allImages[selImg]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ccc' }}><Package size={48} /></div>
+              }
               {discount > 0 && (
-                <div className="absolute top-4 right-4 bg-[#1C1C1C] text-[#FAFAF8] text-[10px] tracking-[0.1em] uppercase px-3 py-1.5">
-                  −{discount}%
-                </div>
+                <span style={{ position: 'absolute', top: 10, right: 10, background: '#111', color: '#fff', fontSize: 11, padding: '3px 8px', borderRadius: 3, fontWeight: 700 }}>
+                  -{discount}%
+                </span>
               )}
-
-              <button
-                onClick={toggleWishlist}
-                className={`absolute top-4 left-4 p-2.5 transition-all ${isWishlisted ? 'bg-[#1C1C1C] text-[#FAFAF8]' : 'bg-[#FAFAF8]/80 text-[#8A8580] hover:bg-[#FAFAF8]'}`}
-              >
-                <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
-              </button>
-
               {!inStock && !autoGen && (
-                <div className="absolute inset-0 bg-[#FAFAF8]/80 backdrop-blur-sm flex items-center justify-center">
-                  <div className="bg-[#1C1C1C] text-[#FAFAF8] px-6 py-3 text-xs tracking-[0.15em] uppercase">
-                    نفذت الكمية
-                  </div>
+                <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ background: '#111', color: '#fff', padding: '0.5rem 1rem', fontSize: '0.85rem', fontWeight: 600 }}>نفذ المخزون</span>
                 </div>
-              )}
-
-              {allImages.length > 1 && (
-                <>
-                  <button
-                    onClick={() => setSelectedImage(p => p === 0 ? allImages.length - 1 : p - 1)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-[#FAFAF8]/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-[#FAFAF8]"
-                  >
-                    <ChevronRight className="w-4 h-4 text-[#1C1C1C]" />
-                  </button>
-                  <button
-                    onClick={() => setSelectedImage(p => p === allImages.length - 1 ? 0 : p + 1)}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-[#FAFAF8]/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-[#FAFAF8]"
-                  >
-                    <ChevronLeft className="w-4 h-4 text-[#1C1C1C]" />
-                  </button>
-                </>
               )}
             </div>
-
             {allImages.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {allImages.map((img: string, idx: number) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImage(idx)}
-                    className={`shrink-0 w-16 h-20 overflow-hidden transition-all duration-200 border-2 ${selectedImage === idx ? 'border-[#1C1C1C]' : 'border-transparent opacity-50 hover:opacity-80'}`}
-                  >
-                    <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', overflowX: 'auto' }}>
+                {allImages.map((img: string, i: number) => (
+                  <button key={i} onClick={() => setSelImg(i)} style={{ width: 56, height: 56, flexShrink: 0, border: `2px solid ${selImg === i ? '#111' : '#e5e5e5'}`, borderRadius: 3, padding: 0, cursor: 'pointer', overflow: 'hidden', background: 'none' }}>
+                    <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* ── Info + Form ── */}
-          <div className="space-y-8">
-
-            <div>
-              <h1
-                className="text-[#1C1C1C] leading-tight mb-4"
-                style={{
-                  fontFamily:    "'Cormorant Garamond', serif",
-                  fontSize:      'clamp(1.8rem, 4vw, 2.8rem)',
-                  fontWeight:    300,
-                  letterSpacing: '-0.01em',
-                }}
-              >
-                {product.name}
-              </h1>
-              <div className="flex items-center gap-2">
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className={`w-3.5 h-3.5 ${i < 4 ? 'fill-[#1C1C1C] text-[#1C1C1C]' : 'fill-[#E4E0DB] text-[#E4E0DB]'}`} />
-                  ))}
-                </div>
-                <span className="text-xs text-[#B0ABA5] tracking-wider">١٢٨ تقييم</span>
-              </div>
+          {/* Info + Form */}
+          <div>
+            <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '0.5rem' }}>{product.name}</h1>
+            <div style={{ fontSize: '1.6rem', fontWeight: 700, marginBottom: '1rem' }}>
+              {finalPrice.toLocaleString()} <span style={{ fontSize: '0.9rem', fontWeight: 400, color: '#666' }}>دج</span>
             </div>
-
-            {/* Price */}
-            <div className="border-t border-b border-[#E4E0DB] py-6">
-              <div className="flex items-baseline gap-4">
-                <span
-                  className="text-[#1C1C1C]"
-                  style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2.5rem', fontWeight: 300 }}
-                >
-                  {finalPrice.toLocaleString('ar-DZ')}
-                </span>
-                <span className="text-sm text-[#8A8580] tracking-wider">دج</span>
-                {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
-                  <div>
-                    <span className="text-sm text-[#B0ABA5] line-through">{parseFloat(product.priceOriginal).toLocaleString('ar-DZ')} دج</span>
-                    <p className="text-xs text-[#8A8580] mt-0.5 tracking-wide">
-                      وفّر {(parseFloat(product.priceOriginal) - finalPrice).toLocaleString('ar-DZ')} دج
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Stock */}
-            <div className={`inline-flex items-center gap-2 text-xs tracking-[0.15em] uppercase px-3 py-1.5 ${autoGen ? 'bg-[#1C1C1C] text-[#FAFAF8]' : inStock ? 'bg-[#1C1C1C] text-[#FAFAF8]' : 'border border-[#E4E0DB] text-[#8A8580]'}`}>
-              {autoGen ? <Infinity className="w-3.5 h-3.5" /> : inStock ? <span className="w-1.5 h-1.5 bg-current rounded-full" /> : <X className="w-3.5 h-3.5" />}
-              {autoGen ? 'متوفر دائماً' : inStock ? 'متوفر' : 'غير متوفر'}
+            <div style={{ display: 'inline-block', background: (inStock || autoGen) ? '#111' : '#e5e5e5', color: (inStock || autoGen) ? '#fff' : '#666', fontSize: '0.75rem', padding: '3px 10px', borderRadius: 3, marginBottom: '1.5rem', fontWeight: 600 }}>
+              {(inStock || autoGen) ? 'متوفر' : 'غير متوفر'}
             </div>
 
             {/* Offers */}
             {product.offers?.length > 0 && (
-              <div>
-                <p className="text-[10px] tracking-[0.2em] uppercase text-[#8A8580] mb-4">العروض المتاحة</p>
-                <div className="space-y-2">
-                  {product.offers.map((offer: any) => (
-                    <label
-                      key={offer.id}
-                      className={`flex items-center justify-between p-4 cursor-pointer transition-all border ${selectedOffer === offer.id ? 'border-[#1C1C1C] bg-[#1C1C1C] text-[#FAFAF8]' : 'border-[#E4E0DB] hover:border-[#1C1C1C]'}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-4 h-4 border flex items-center justify-center shrink-0 ${selectedOffer === offer.id ? 'border-[#FAFAF8] bg-[#FAFAF8]' : 'border-[#1C1C1C]'}`}>
-                          {selectedOffer === offer.id && <div className="w-2 h-2 bg-[#1C1C1C]" />}
-                        </div>
-                        <input type="radio" name="offer" value={offer.id} checked={selectedOffer === offer.id} onChange={() => setSelectedOffer(offer.id)} className="sr-only" />
-                        <div>
-                          <p className="text-sm font-medium">{offer.name}</p>
-                          <p className={`text-xs ${selectedOffer === offer.id ? 'text-white/60' : 'text-[#8A8580]'}`}>{offer.quantity} قطع</p>
-                        </div>
+              <div style={{ marginBottom: '1.25rem' }}>
+                <p style={{ fontSize: '0.82rem', fontWeight: 600, color: '#444', marginBottom: '0.5rem' }}>العروض</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  {product.offers.map((o: any) => (
+                    <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.75rem', border: `1px solid ${selectedOffer === o.id ? '#111' : '#ddd'}`, borderRadius: 4, cursor: 'pointer', background: selectedOffer === o.id ? '#f8f8f8' : '#fff' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <input type="radio" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ accentColor: '#111' }} />
+                        <span style={{ fontSize: '0.85rem' }}>{o.name} <span style={{ color: '#888', fontSize: '0.8rem' }}>({o.quantity} قطع)</span></span>
                       </div>
-                      <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.2rem', fontWeight: 300 }}>
-                        {offer.price.toLocaleString('ar-DZ')} <span className="text-xs">دج</span>
-                      </span>
+                      <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{o.price.toLocaleString()} دج</span>
                     </label>
                   ))}
                 </div>
@@ -683,86 +441,36 @@ export function Details({
 
             {/* Attributes */}
             {allAttrs.map((attr: any) => (
-              <div key={attr.id}>
-                <p className="text-[10px] tracking-[0.2em] uppercase text-[#8A8580] mb-4">{attr.name}</p>
-                {attr.displayMode === 'color' ? (
-                  <div className="flex gap-3 flex-wrap">
-                    {attr.variants.map((v: any) => {
-                      const isSel = selectedVariants[attr.name] === v.value;
-                      return (
-                        <button
-                          key={v.id}
-                          onClick={() => handleVariantSelection(attr.name, v.value)}
-                          title={v.name}
-                          className={`w-8 h-8 transition-all ${isSel ? 'ring-2 ring-[#1C1C1C] ring-offset-2' : 'ring-1 ring-[#E4E0DB] hover:ring-[#1C1C1C]'}`}
-                          style={{ backgroundColor: v.value }}
-                        />
-                      );
-                    })}
-                  </div>
-                ) : attr.displayMode === 'image' ? (
-                  <div className="flex gap-2 flex-wrap">
-                    {attr.variants.map((v: any) => {
-                      const isSel = selectedVariants[attr.name] === v.value;
-                      return (
-                        <button
-                          key={v.id}
-                          onClick={() => handleVariantSelection(attr.name, v.value)}
-                          className={`w-16 h-16 overflow-hidden transition-all border-2 ${isSel ? 'border-[#1C1C1C]' : 'border-[#E4E0DB] opacity-70 hover:opacity-100 hover:border-[#1C1C1C]'}`}
-                        >
-                          <img src={v.value} alt={v.name} className="w-full h-full object-cover" />
-                        </button>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {attr.variants.map((v: any) => {
-                      const isSel = selectedVariants[attr.name] === v.value;
-                      return (
-                        <button
-                          key={v.id}
-                          onClick={() => handleVariantSelection(attr.name, v.value)}
-                          className={`px-5 py-2 text-xs tracking-[0.12em] uppercase font-medium border transition-all ${isSel ? 'border-[#1C1C1C] bg-[#1C1C1C] text-[#FAFAF8]' : 'border-[#E4E0DB] text-[#5A5753] hover:border-[#1C1C1C] hover:text-[#1C1C1C]'}`}
-                        >
-                          {v.name}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+              <div key={attr.id} style={{ marginBottom: '1.25rem' }}>
+                <p style={{ fontSize: '0.82rem', fontWeight: 600, color: '#444', marginBottom: '0.5rem' }}>{attr.name}</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                  {attr.variants.map((v: any) => {
+                    const sel = selectedVariants[attr.name] === v.value;
+                    return attr.displayMode === 'color' ? (
+                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name}
+                        style={{ width: 28, height: 28, borderRadius: '50%', background: v.value, border: sel ? '2px solid #111' : '2px solid #ddd', cursor: 'pointer', outline: sel ? '2px solid #111' : 'none', outlineOffset: 2 }} />
+                    ) : (
+                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
+                        style={{ padding: '0.35rem 0.8rem', border: `1px solid ${sel ? '#111' : '#ddd'}`, borderRadius: 3, background: sel ? '#111' : '#fff', color: sel ? '#fff' : '#333', fontSize: '0.82rem', cursor: 'pointer', fontFamily: 'inherit', fontWeight: sel ? 600 : 400 }}>
+                        {v.name}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             ))}
 
-            <ProductForm
-              product={product}
-              userId={product.store.userId}
-              domain={domain}
-              selectedOffer={selectedOffer}
-              setSelectedOffer={setSelectedOffer}
-              selectedVariants={selectedVariants}
-            />
+            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
+
+            {product.desc && (
+              <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #e5e5e5' }}>
+                <p style={{ fontSize: '0.82rem', fontWeight: 600, color: '#444', marginBottom: '0.75rem' }}>وصف المنتج</p>
+                <div style={{ fontSize: '0.88rem', lineHeight: 1.7, color: '#555' }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc, { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'span'], ALLOWED_ATTR: ['class'] }) }} />
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Description */}
-        {product.desc && (
-          <section className="mt-20 pt-14 border-t border-[#E4E0DB]">
-            <div className="flex items-center gap-5 mb-8">
-              <h2 className="text-xs tracking-[0.2em] uppercase text-[#8A8580]">وصف المنتج</h2>
-            </div>
-            <div
-              className="text-sm leading-relaxed text-[#5A5753] font-light"
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(product.desc, {
-                  ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'span'],
-                  ALLOWED_ATTR: ['class', 'style'],
-                }),
-              }}
-            />
-          </section>
-        )}
-      </main>
+      </div>
     </div>
   );
 }
@@ -771,320 +479,237 @@ export function Details({
 // PRODUCT FORM
 // ─────────────────────────────────────────────────────────────
 
-const FieldWrapper = ({ error, children, label }: { error?: string; children: React.ReactNode; label?: string }) => (
-  <div className="space-y-1.5">
-    {label && <label className="text-[10px] tracking-[0.2em] uppercase text-[#8A8580] font-medium">{label}</label>}
-    {children}
-    {error && (
-      <p className="text-xs text-red-500 flex items-center gap-1">
-        <AlertCircle className="w-3 h-3" />{error}
-      </p>
-    )}
-  </div>
-);
-
-const inputCls = (err?: boolean) =>
-  `w-full px-4 py-3 text-sm outline-none transition-all bg-[#F5F2EE] text-[#1C1C1C] placeholder-[#B0ABA5] font-light
-   border ${err ? 'border-red-400 focus:border-red-500' : 'border-[#E4E0DB] focus:border-[#1C1C1C]'}`;
-
-export function ProductForm({
-  product, userId, domain,
-  selectedOffer, setSelectedOffer, selectedVariants,
-  platform, priceLoss = 0,
-}: ProductFormProps) {
+export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0 }: ProductFormProps) {
   const router = useRouter();
-
   const [wilayas,         setWilayas]         = useState<Wilaya[]>([]);
   const [communes,        setCommunes]        = useState<Commune[]>([]);
   const [loadingCommunes, setLoadingCommunes] = useState(false);
-  const [formData,        setFormData]        = useState({
-    customerId: '', customerName: '', customerPhone: '',
-    customerWelaya: '', customerCommune: '',
-    quantity: 1, priceLoss: 0,
-    typeLivraison: 'home' as 'home' | 'office',
-  });
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [fd, setFd] = useState({ customerId: '', customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '', quantity: 1, priceLoss: 0, typeLivraison: 'home' as 'home' | 'office' });
+  const [errors,  setErrors]  = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
+  const initCount = useCartStore((s) => s.initCount);
 
   useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
-
+  useEffect(() => { const id = typeof window !== 'undefined' && localStorage.getItem('customerId'); if (id) setFd(p => ({ ...p, customerId: id as string })); }, []);
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const id = localStorage.getItem('customerId');
-      if (id) setFormData(p => ({ ...p, customerId: id }));
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!formData.customerWelaya) { setCommunes([]); return; }
+    if (!fd.customerWelaya) { setCommunes([]); return; }
     setLoadingCommunes(true);
-    fetchCommunes(formData.customerWelaya).then(data => { setCommunes(data); setLoadingCommunes(false); });
-  }, [formData.customerWelaya]);
+    fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLoadingCommunes(false); });
+  }, [fd.customerWelaya]);
 
-  const selectedWilayaData = useMemo(
-    () => wilayas.find(w => String(w.id) === String(formData.customerWelaya)),
-    [wilayas, formData.customerWelaya],
-  );
+  const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
 
-  const getFinalPrice = useCallback((): number => {
-    const base = typeof product.price === 'string' ? parseFloat(product.price) : (product.price as number);
+  const getFP = useCallback((): number => {
+    const base  = typeof product.price === 'string' ? parseFloat(product.price) : product.price as number;
     const offer = product.offers?.find(o => o.id === selectedOffer);
     if (offer) return offer.price;
     if (product.variantDetails?.length && Object.keys(selectedVariants).length > 0) {
-      const match = product.variantDetails.find(v => variantMatches(v, selectedVariants));
-      if (match && match.price !== -1) return match.price;
+      const m = product.variantDetails.find(v => variantMatches(v, selectedVariants));
+      if (m && m.price !== -1) return m.price;
     }
     return base;
   }, [product, selectedOffer, selectedVariants]);
 
-  const getPriceLivraison = useCallback((): number => {
-    if (!selectedWilayaData) return 0;
-    return formData.typeLivraison === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice;
-  }, [selectedWilayaData, formData.typeLivraison]);
+  const getLiv = useCallback(() => selW ? (fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice) : 0, [selW, fd.typeLivraison]);
+  const getTotal = useCallback(() => getFP() * fd.quantity + getLiv(), [getFP, fd.quantity, getLiv]);
 
-  useEffect(() => {
-    if (selectedWilayaData) setFormData(f => ({ ...f, priceLoss: selectedWilayaData.livraisonReturn }));
-  }, [selectedWilayaData]);
-
-  const getTotalPrice = useCallback(
-    () => getFinalPrice() * formData.quantity + +getPriceLivraison(),
-    [getFinalPrice, formData.quantity, getPriceLivraison],
-  );
-
-  const getVariantDetailId = useCallback(() => {
+  const getVariantId = useCallback(() => {
     if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
     return product.variantDetails.find(v => variantMatches(v, selectedVariants))?.id;
   }, [product.variantDetails, selectedVariants]);
 
-  const validate = useCallback((): boolean => {
+  const validate = () => {
     const e: Record<string, string> = {};
-    if (!formData.customerName.trim() || formData.customerName.length < 3)
-      e.customerName  = 'الاسم الكامل مطلوب (3 أحرف على الأقل)';
-    if (!/^(0|\+213)[5-7][0-9]{8}$/.test(formData.customerPhone.replace(/\s/g, '')))
-      e.customerPhone = 'رقم هاتف جزائري صحيح مطلوب';
-    if (!formData.customerWelaya)  e.customerWelaya  = 'اختر الولاية';
-    if (!formData.customerCommune) e.customerCommune = 'اختر البلدية';
-    if (formData.quantity < 1)     e.quantity        = 'الكمية يجب أن تكون 1 على الأقل';
-    setFormErrors(e);
+    if (!fd.customerName.trim() || fd.customerName.length < 3) e.customerName = 'الاسم مطلوب (3 أحرف على الأقل)';
+    if (!/^(0|\+213)[5-7][0-9]{8}$/.test(fd.customerPhone.replace(/\s/g, ''))) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
+    if (!fd.customerWelaya)  e.customerWelaya  = 'اختر الولاية';
+    if (!fd.customerCommune) e.customerCommune = 'اختر البلدية';
+    setErrors(e);
     return Object.keys(e).length === 0;
-  }, [formData]);
+  };
+
+  const addToCart = () => {
+    const cart = JSON.parse(localStorage.getItem(domain) || '[]');
+    cart.push({ ...fd, product, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, finalPrice: getFP(), quantity: fd.quantity });
+    localStorage.setItem(domain, JSON.stringify(cart));
+    initCount(cart.length);
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 2000);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
     setSubmitting(true);
-    const payload = {
-      productId:         product.id,
-      variantDetailId:   getVariantDetailId(),
-      domain,
-      storeId:           product.store.id,
-      offerId:           selectedOffer ?? undefined,
-      platform,
-      quantity:          formData.quantity,
-      totalPrice:        getTotalPrice(),
-      typeShip:          formData.typeLivraison,
-      priceShip:         getPriceLivraison(),
-      priceLoss:         formData.priceLoss,
-      customerId:        formData.customerId,
-      customerName:      formData.customerName,
-      customerPhone:     formData.customerPhone,
-      customerWilayaId:  formData.customerWelaya,
-      customerCommuneId: formData.customerCommune,
-    };
-
     try {
-      const res = await axios.post(`${API_URL}/orders`, payload);
+      const res = await axios.post(`${API_URL}/orders`, {
+        productId: product.id, variantDetailId: getVariantId(), domain,
+        storeId: product.store.id, offerId: selectedOffer ?? undefined, platform,
+        quantity: fd.quantity, totalPrice: getTotal(), typeShip: fd.typeLivraison,
+        priceShip: getLiv(), priceLoss: fd.priceLoss, customerId: fd.customerId,
+        customerName: fd.customerName, customerPhone: fd.customerPhone,
+        customerWilayaId: fd.customerWelaya, customerCommuneId: fd.customerCommune,
+      });
       if (res.status === 200 || res.status === 201) {
-        if (typeof window !== 'undefined' && res.data?.customerId)
-          localStorage.setItem('customerId', res.data.customerId);
+        if (typeof window !== 'undefined' && res.data?.customerId) localStorage.setItem('customerId', res.data.customerId);
         router.push(`/${domain}/successfully`);
       }
-    } catch {
-      alert('حدث خطأ في الاتصال بالخادم');
-    } finally {
-      setSubmitting(false);
-    }
+    } catch { showError('حدث خطأ في الاتصال بالخادم'); } finally { setSubmitting(false); }
   };
 
-  const finalPrice = getFinalPrice();
+  const fp = getFP();
 
   return (
-    <div className="border border-[#E4E0DB]">
-      <div className="px-6 py-5 border-b border-[#E4E0DB] bg-[#F5F2EE]">
-        <div className="flex items-center gap-2">
-          <ShoppingCart className="w-4 h-4 text-[#5A5753]" />
-          <p className="text-xs tracking-[0.15em] uppercase text-[#1C1C1C] font-medium">تأكيد الطلب</p>
-        </div>
-        <p className="text-xs text-[#8A8580] mt-1 font-light">سنتواصل معك خلال 24 ساعة لتأكيد طلبك</p>
+    <div style={{ border: '1px solid #e5e5e5', borderRadius: 4, overflow: 'hidden', marginTop: '1.5rem' }}>
+      <div style={{ padding: '0.75rem 1rem', background: '#f8f8f8', borderBottom: '1px solid #e5e5e5' }}>
+        <p style={{ fontSize: '0.85rem', fontWeight: 700 }}>تأكيد الطلب</p>
       </div>
-
-      <form onSubmit={handleSubmit} className="p-6 space-y-5">
-
-        {/* Name + Phone */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FieldWrapper error={formErrors.customerName} label="الاسم الكامل">
-            <div className="relative">
-              <User className="absolute right-3 top-3.5 w-4 h-4 text-[#B0ABA5]" />
-              <input type="text" value={formData.customerName} placeholder="محمد أحمد"
-                onChange={e => setFormData({ ...formData, customerName: e.target.value })}
-                className={`${inputCls(!!formErrors.customerName)} pr-10`} />
+      <form onSubmit={handleSubmit} style={{ padding: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: 0 }}>
+          <FR label="الاسم الكامل" error={errors.customerName}>
+            <div style={{ position: 'relative' }}>
+              <User size={14} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} />
+              <input type="text" value={fd.customerName} placeholder="محمد أحمد"
+                onChange={e => setFd({ ...fd, customerName: e.target.value })}
+                style={{ ...S.inputBase, paddingRight: 30 }} />
             </div>
-          </FieldWrapper>
-
-          <FieldWrapper error={formErrors.customerPhone} label="رقم الهاتف">
-            <div className="relative">
-              <Phone className="absolute right-3 top-3.5 w-4 h-4 text-[#B0ABA5]" />
-              <input type="tel" dir="ltr" value={formData.customerPhone} placeholder="0550 123 456"
-                onChange={e => setFormData({ ...formData, customerPhone: e.target.value })}
-                className={`${inputCls(!!formErrors.customerPhone)} pr-10 font-mono`} />
+          </FR>
+          <FR label="رقم الهاتف" error={errors.customerPhone}>
+            <div style={{ position: 'relative' }}>
+              <Phone size={14} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} />
+              <input type="tel" dir="ltr" value={fd.customerPhone} placeholder="0550 123 456"
+                onChange={e => setFd({ ...fd, customerPhone: e.target.value })}
+                style={{ ...S.inputBase, paddingRight: 30 }} />
             </div>
-          </FieldWrapper>
+          </FR>
         </div>
 
-        {/* Wilaya + Commune */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FieldWrapper error={formErrors.customerWelaya} label="الولاية">
-            <div className="relative">
-              <MapPin className="absolute right-3 top-3.5 w-4 h-4 text-[#B0ABA5]" />
-              <select value={formData.customerWelaya}
-                onChange={e => setFormData({ ...formData, customerWelaya: e.target.value, customerCommune: '' })}
-                className={`${inputCls(!!formErrors.customerWelaya)} pr-10 appearance-none cursor-pointer`}>
-                <option value="">اختر الولاية</option>
-                {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
-              </select>
-              <ChevronDown className="absolute left-3 top-3.5 w-4 h-4 text-[#B0ABA5] pointer-events-none" />
-            </div>
-          </FieldWrapper>
-
-          <FieldWrapper error={formErrors.customerCommune} label="البلدية">
-            <div className="relative">
-              <MapPin className="absolute right-3 top-3.5 w-4 h-4 text-[#B0ABA5]" />
-              <select value={formData.customerCommune}
-                disabled={!formData.customerWelaya || loadingCommunes}
-                onChange={e => setFormData({ ...formData, customerCommune: e.target.value })}
-                className={`${inputCls(!!formErrors.customerCommune)} pr-10 appearance-none cursor-pointer disabled:opacity-40`}>
-                <option value="">
-                  {loadingCommunes ? 'جاري التحميل...' : formData.customerWelaya ? 'اختر البلدية' : 'اختر الولاية أولاً'}
-                </option>
-                {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
-              </select>
-              <ChevronDown className="absolute left-3 top-3.5 w-4 h-4 text-[#B0ABA5] pointer-events-none" />
-            </div>
-          </FieldWrapper>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: 0 }}>
+          <FR label="الولاية" error={errors.customerWelaya}>
+            <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...S.inputBase, appearance: 'none' as any }}>
+              <option value="">اختر الولاية</option>
+              {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+            </select>
+          </FR>
+          <FR label="البلدية" error={errors.customerCommune}>
+            <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingCommunes} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...S.inputBase, appearance: 'none' as any, opacity: (!fd.customerWelaya || loadingCommunes) ? 0.5 : 1 }}>
+              <option value="">{loadingCommunes ? 'جاري...' : 'اختر البلدية'}</option>
+              {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+            </select>
+          </FR>
         </div>
 
-        {/* Delivery type */}
-        <div>
-          <p className="text-[10px] tracking-[0.2em] uppercase text-[#8A8580] mb-3">نوع التوصيل</p>
-          <div className="grid grid-cols-2 gap-3">
-            {(['home', 'office'] as const).map(type => (
-              <button
-                key={type} type="button"
-                onClick={() => setFormData(p => ({ ...p, typeLivraison: type }))}
-                className={`flex flex-col items-center gap-2 py-5 border transition-all duration-200 ${formData.typeLivraison === type ? 'border-[#1C1C1C] bg-[#1C1C1C] text-[#FAFAF8]' : 'border-[#E4E0DB] text-[#8A8580] hover:border-[#1C1C1C]'}`}
-              >
-                {type === 'home'
-                  ? <HomeIcon   className="w-5 h-5" />
-                  : <Building2  className="w-5 h-5" />
-                }
-                <p className="text-[10px] tracking-[0.12em] uppercase font-medium">
-                  {type === 'home' ? 'توصيل للمنزل' : 'استلام من المكتب'}
-                </p>
-                {selectedWilayaData && (
-                  <p className={`text-xs ${formData.typeLivraison === type ? 'text-white/60' : 'text-[#B0ABA5]'}`}>
-                    {(type === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice).toLocaleString('ar-DZ')} دج
-                  </p>
-                )}
+        <FR label="طريقة التوصيل">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+            {(['home', 'office'] as const).map(t => (
+              <button key={t} type="button" onClick={() => setFd({ ...fd, typeLivraison: t })}
+                style={{ ...S.btnOutline, justifyContent: 'center', flexDirection: 'column', gap: 2, padding: '0.6rem', borderColor: fd.typeLivraison === t ? '#111' : '#ddd', background: fd.typeLivraison === t ? '#111' : '#fff', color: fd.typeLivraison === t ? '#fff' : '#333' }}>
+                {t === 'home' ? <HomeIcon size={14} /> : <Building2 size={14} />}
+                <span style={{ fontSize: '0.75rem' }}>{t === 'home' ? 'المنزل' : 'المكتب'}</span>
+                {selW && <span style={{ fontSize: '0.72rem', opacity: 0.7 }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice)} دج</span>}
               </button>
             ))}
           </div>
-          {!selectedWilayaData && (
-            <p className="text-[10px] text-[#B0ABA5] mt-2 text-center tracking-wider">اختر الولاية لعرض تكلفة التوصيل</p>
+        </FR>
+
+        <FR label="الكمية">
+          <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: 4, width: 'fit-content', background: '#fff', overflow: 'hidden' }}>
+            <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={14} /></button>
+            <span style={{ width: 36, textAlign: 'center', fontWeight: 700 }}>{fd.quantity}</span>
+            <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 36, height: 36, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={14} /></button>
+          </div>
+        </FR>
+
+        {/* Summary */}
+        <div style={{ background: '#f8f8f8', padding: '0.75rem', borderRadius: 4, marginBottom: '1rem', fontSize: '0.82rem', color: '#555' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+            <span>سعر القطعة</span><span style={{ fontWeight: 600, color: '#111' }}>{fp.toLocaleString()} دج</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+            <span>الكمية</span><span>× {fd.quantity}</span>
+          </div>
+          {selW && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <span>التوصيل</span><span>{getLiv()} دج</span>
+            </div>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 6, borderTop: '1px solid #e5e5e5', fontWeight: 700, fontSize: '0.95rem', color: '#111' }}>
+            <span>الإجمالي</span><span>{getTotal().toLocaleString()} دج</span>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button type="submit" disabled={submitting} style={{ ...S.btnBlack, flex: 1, justifyContent: 'center', opacity: submitting ? 0.7 : 1 }}>
+            {submitting ? <><Loader2 size={14} /> جاري الإرسال...</> : <><ShoppingCart size={14} /> تأكيد الطلب</>}
+          </button>
+          {product.store.cart && (
+            <button type="button" onClick={addToCart} disabled={isAdded} style={{ ...S.btnOutline, padding: '0.65rem 0.9rem' }}>
+              {isAdded ? <Check size={16} color="green" /> : <ShoppingCart size={16} />}
+            </button>
           )}
         </div>
 
-        {/* Quantity */}
-        <FieldWrapper error={formErrors.quantity} label="الكمية">
-          <div className="flex items-center gap-4">
-            <button type="button"
-              onClick={() => setFormData(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
-              className="w-10 h-10 border border-[#E4E0DB] flex items-center justify-center text-[#5A5753] hover:border-[#1C1C1C] hover:bg-[#1C1C1C] hover:text-[#FAFAF8] transition-all font-light text-xl">
-              −
-            </button>
-            <span
-              className="w-12 text-center text-2xl text-[#1C1C1C]"
-              style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
-            >
-              {formData.quantity}
-            </span>
-            <button type="button"
-              onClick={() => setFormData(p => ({ ...p, quantity: p.quantity + 1 }))}
-              className="w-10 h-10 border border-[#E4E0DB] flex items-center justify-center text-[#5A5753] hover:border-[#1C1C1C] hover:bg-[#1C1C1C] hover:text-[#FAFAF8] transition-all font-light text-xl">
-              +
-            </button>
-            <span className="text-xs text-[#B0ABA5] tracking-wider uppercase">قطعة</span>
-          </div>
-        </FieldWrapper>
-
-        {/* Summary */}
-        <div className="bg-[#F5F2EE] p-5 space-y-3 text-xs border border-[#E4E0DB]">
-          <div className="flex justify-between text-[#8A8580]">
-            <span className="flex items-center gap-1.5"><Package className="w-3.5 h-3.5" /> المنتج</span>
-            <span className="text-[#1C1C1C] font-medium truncate max-w-[50%]">{product.name}</span>
-          </div>
-
-          {selectedOffer && (() => {
-            const offer = product.offers?.find(o => o.id === selectedOffer);
-            if (!offer) return null;
-            return (
-              <div className="flex justify-between items-center text-[#8A8580]">
-                <span className="flex items-center gap-1.5"><Tag className="w-3.5 h-3.5" /> العرض</span>
-                <span className="text-[#1C1C1C] font-medium tracking-wide">{offer.name}</span>
-              </div>
-            );
-          })()}
-
-          <div className="flex justify-between text-[#8A8580]">
-            <span className="flex items-center gap-1.5"><Truck className="w-3.5 h-3.5" /> التوصيل</span>
-            <span className="text-[#1C1C1C]">
-              {formData.typeLivraison === 'home' ? 'المنزل' : 'المكتب'}
-              {selectedWilayaData && <span className="text-[#8A8580] mr-1">({getPriceLivraison().toLocaleString('ar-DZ')} دج)</span>}
-            </span>
-          </div>
-
-          <div className="flex justify-between text-[#8A8580]">
-            <span>سعر القطعة</span>
-            <span className="text-[#1C1C1C] font-medium">{finalPrice.toLocaleString('ar-DZ')} دج</span>
-          </div>
-          <div className="flex justify-between text-[#8A8580]">
-            <span>الكمية</span>
-            <span className="text-[#1C1C1C] font-medium">× {formData.quantity}</span>
-          </div>
-
-          <div className="flex justify-between items-baseline pt-4 border-t border-[#E4E0DB]">
-            <span className="text-xs tracking-[0.15em] uppercase text-[#1C1C1C] font-medium">الإجمالي</span>
-            <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2rem', fontWeight: 300, color: '#1C1C1C' }}>
-              {getTotalPrice().toLocaleString('ar-DZ')}
-              <span className="text-sm mr-1 text-[#8A8580]">دج</span>
-            </span>
-          </div>
-        </div>
-
-        {/* Submit */}
-        <button
-          type="submit" disabled={submitting}
-          className={`w-full py-4 text-xs tracking-[0.2em] uppercase font-medium transition-all flex items-center justify-center gap-2 ${submitting ? 'bg-[#5A5753] text-[#FAFAF8] cursor-not-allowed' : 'bg-[#1C1C1C] text-[#FAFAF8] hover:bg-[#3A3A3A]'}`}
-        >
-          {submitting
-            ? <><div className="w-4 h-4 border border-white/40 border-t-white rounded-full animate-spin" /> جاري الإرسال...</>
-            : <><ShoppingCart className="w-4 h-4" /> تأكيد الطلب</>
-          }
-        </button>
-
-        <p className="text-[10px] text-center text-[#B0ABA5] flex items-center justify-center gap-1.5 tracking-wider uppercase">
-          <Shield className="w-3 h-3" /> بياناتك آمنة ومشفرة
+        <p style={{ fontSize: '0.72rem', color: '#aaa', textAlign: 'center', marginTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+          <Shield size={11} /> بياناتك آمنة ومشفرة
         </p>
       </form>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// CART
+// ─────────────────────────────────────────────────────────────
+
+export function Cart({ domain, store }: { domain: string; store: any }) {
+  const [items, setItems] = useState<any[]>([]);
+  const initCount = useCartStore((s) => s.initCount);
+  const isRTL = (store?.language || 'ar') === 'ar';
+
+  useEffect(() => { setItems(JSON.parse(localStorage.getItem(domain) || '[]')); }, [domain]);
+
+  const remove = (i: number) => {
+    const n = items.filter((_, idx) => idx !== i);
+    setItems(n); localStorage.setItem(domain, JSON.stringify(n)); initCount(n.length);
+  };
+
+  const total = items.reduce((acc, it) => acc + (it.finalPrice * it.quantity), 0);
+
+  if (!items.length) return (
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ ...S.body, textAlign: 'center', padding: '5rem 1rem', minHeight: '50vh' }}>
+      <ShoppingCart size={40} color="#ccc" style={{ margin: '0 auto 1rem' }} />
+      <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>{isRTL ? 'السلة فارغة' : 'Cart is empty'}</p>
+      <Link href="/" style={{ ...S.btnBlack, textDecoration: 'none', display: 'inline-flex' }}>{isRTL ? 'مواصلة التسوق' : 'Continue Shopping'}</Link>
+    </div>
+  );
+
+  return (
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ ...S.body, padding: '2rem 0', minHeight: '60vh' }}>
+      <div style={{ ...S.container, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', alignItems: 'start' }}>
+        <div>
+          <h1 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '1.5rem' }}>{isRTL ? 'سلة المشتريات' : 'Cart'}</h1>
+          {items.map((item, i) => (
+            <div key={i} style={{ display: 'flex', gap: '0.75rem', padding: '0.75rem', border: '1px solid #e5e5e5', borderRadius: 4, marginBottom: '0.75rem', background: '#fff' }}>
+              <img src={item.product?.productImage} alt="" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 3, background: '#f5f5f5' }} />
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: '0.85rem', fontWeight: 500, marginBottom: 4 }}>{item.product?.name}</p>
+                <p style={{ fontSize: '0.9rem', fontWeight: 700 }}>{item.finalPrice} دج <span style={{ fontWeight: 400, color: '#888', fontSize: '0.8rem' }}>× {item.quantity}</span></p>
+              </div>
+              <button onClick={() => remove(i)} style={{ background: 'none', border: 'none', color: '#c00', cursor: 'pointer', padding: 4 }}><Trash2 size={16} /></button>
+            </div>
+          ))}
+        </div>
+        <div style={{ border: '1px solid #e5e5e5', borderRadius: 4, padding: '1.25rem', background: '#f8f8f8' }}>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem' }}>{isRTL ? 'ملخص السلة' : 'Summary'}</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem', fontWeight: 700, marginBottom: '1rem' }}>
+            <span>{isRTL ? 'الإجمالي' : 'Total'}:</span>
+            <span>{total.toLocaleString()} دج</span>
+          </div>
+          <p style={{ fontSize: '0.75rem', color: '#aaa', marginBottom: '1rem' }}>* تكاليف التوصيل تُحتسب عند الطلب</p>
+          <button style={{ ...S.btnBlack, width: '100%', justifyContent: 'center' }}>{isRTL ? 'إتمام الطلب' : 'Checkout'}</button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1093,68 +718,13 @@ export function ProductForm({
 // STATIC PAGES
 // ─────────────────────────────────────────────────────────────
 
-interface StaticPageProps { page: string; }
-interface CardProps       { icon: React.ReactNode; title: string; desc: string; status?: string; }
-
-export function StaticPage({ page }: StaticPageProps) {
-  const p = page.toLowerCase();
+function SimplePage({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <>
-      {p === 'privacy' && <Privacy />}
-      {p === 'terms'   && <Terms />}
-      {p === 'cookies' && <Cookies />}
-      {p === 'contact' && <Contact />}
-    </>
-  );
-}
-
-function PageWrapper({ children, icon, title, subtitle, tag }: {
-  children: React.ReactNode; icon: React.ReactNode;
-  title: string; subtitle: string; tag?: string;
-}) {
-  return (
-    <div className="min-h-screen bg-[#FAFAF8] py-24" dir="rtl" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-      <style>{FONT_IMPORT}</style>
-      <div className="max-w-3xl mx-auto px-6 lg:px-10">
-        <div className="mb-16">
-          <div className="flex items-center gap-5 mb-8">
-            <span className="block h-px w-8 bg-[#E4E0DB]" />
-            <span className="text-[10px] tracking-[0.3em] uppercase text-[#B0ABA5]">{tag || 'Legal'}</span>
-          </div>
-          <h1
-            className="text-[#1C1C1C] mb-5 leading-tight"
-            style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', letterSpacing: '-0.01em' }}
-          >
-            {title}
-          </h1>
-          <p className="text-[#8A8580] text-sm leading-relaxed font-light max-w-xl">{subtitle}</p>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function InfoCard({ icon, title, desc, status }: CardProps) {
-  const isActive = status === 'دائماً نشطة';
-  return (
-    <div className="border-t border-[#E4E0DB] py-7 flex gap-6 group hover:bg-[#F5F2EE] transition-colors duration-200 px-1">
-      <div className="text-[#8A8580] mt-0.5 shrink-0 group-hover:text-[#1C1C1C] transition-colors">{icon}</div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between gap-4 mb-2">
-          <h3
-            className="text-[#1C1C1C] font-medium"
-            style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.1rem', fontWeight: 400 }}
-          >
-            {title}
-          </h3>
-          {status && (
-            <span className={`text-[9px] tracking-[0.15em] uppercase px-2.5 py-1 shrink-0 ${isActive ? 'bg-[#1C1C1C] text-[#FAFAF8]' : 'border border-[#E4E0DB] text-[#8A8580]'}`}>
-              {status}
-            </span>
-          )}
-        </div>
-        <p className="text-[#8A8580] text-sm leading-relaxed font-light">{desc}</p>
+    <div style={{ ...S.body, padding: '3rem 0', minHeight: '60vh' }} dir="rtl">
+      <div style={{ ...S.container, maxWidth: 700 }}>
+        <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '0.5rem' }}>{title}</h1>
+        <hr style={{ ...S.hr, marginBottom: '1.5rem' }} />
+        <div style={{ fontSize: '0.88rem', lineHeight: 1.8, color: '#444' }}>{children}</div>
       </div>
     </div>
   );
@@ -1162,143 +732,68 @@ function InfoCard({ icon, title, desc, status }: CardProps) {
 
 export function Privacy() {
   return (
-    <PageWrapper icon={<ShieldCheck size={18} />} title="سياسة الخصوصية" subtitle="في MdStore، نضع خصوصية بياناتك وأمان متجرك على رأس أولوياتنا." tag="Privacy">
-      <div className="mb-2">
-        <InfoCard icon={<Database size={16} />} title="البيانات التي نجمعها"   desc="نجمع فقط البيانات الضرورية لتشغيل متجرك، مثل الاسم، البريد الإلكتروني، ومعلومات الدفع." />
-        <InfoCard icon={<Eye size={16} />}      title="كيفية استخدام البيانات" desc="تُستخدم بياناتك لتحسين خدماتنا، ومعالجة الطلبات، وتوفير تقارير ذكية." />
-        <InfoCard icon={<Lock size={16} />}     title="حماية المعلومات"         desc="نستخدم تقنيات تشفير متطورة ومعايير أمان عالمية لحماية بياناتك من أي وصول غير مصرح به." />
-        <InfoCard icon={<Globe size={16} />}    title="مشاركة البيانات"          desc="نحن لا نبيع بياناتك أبداً. نشاركها فقط مع مزودي الخدمات الموثوقين لإتمام عملياتك." />
-      </div>
-      <div className="mt-10 flex items-center justify-between py-5 border-t border-b border-[#E4E0DB]">
-        <div className="flex items-center gap-3">
-          <Bell size={14} className="text-[#B0ABA5]" />
-          <span className="text-xs text-[#8A8580] tracking-wide">يتم تحديث هذه السياسة دورياً لمواكبة أحدث معايير الأمان.</span>
-        </div>
-        <span className="text-[10px] text-[#B0ABA5] tracking-[0.1em] shrink-0 mr-4">06/02/2026</span>
-      </div>
-    </PageWrapper>
+    <SimplePage title="سياسة الخصوصية">
+      <p>نجمع فقط البيانات الضرورية لإتمام طلبك وتوصيله (الاسم، العنوان، رقم الهاتف).</p>
+      <br />
+      <p>تُستخدم بياناتك حصراً لمعالجة شحناتك والتواصل معك. لا نشارك بياناتك مع أطراف خارجية لأغراض تسويقية.</p>
+    </SimplePage>
   );
 }
 
 export function Terms() {
   return (
-    <PageWrapper icon={<FileText size={18} />} title="شروط الاستخدام" subtitle="باستخدامك لمنصة MdStore، فإنك توافق على الالتزام بالشروط والقواعد التالية." tag="Terms">
-      <div className="mb-2">
-        <InfoCard icon={<CheckCircle2 size={16} />} title="مسؤولية الحساب"     desc="أنت مسؤول عن الحفاظ على سرية بيانات حسابك وعن جميع الأنشطة التي تحدث تحته." />
-        <InfoCard icon={<CreditCard size={16} />}   title="الرسوم والاشتراكات" desc="تخضع خدماتنا لرسوم اشتراك دورية. جميع الرسوم واضحة ولا توجد تكاليف مخفية." />
-        <InfoCard icon={<Ban size={16} />}           title="المحتوى المحظور"    desc="يُمنع استخدام المنصة لبيع سلع غير قانونية أو انتهاك حقوق الملكية الفكرية." />
-        <InfoCard icon={<Scale size={16} />}         title="القانون المعمول به" desc="تخضع هذه الشروط وفقاً للقوانين المحلية المعمول بها في الجزائر." />
-      </div>
-      <div className="mt-10 py-5 border-t border-b border-[#E4E0DB] flex items-start gap-3">
-        <AlertCircle size={14} className="text-[#B0ABA5] shrink-0 mt-0.5" />
-        <p className="text-xs text-[#8A8580] leading-relaxed font-light">
-          نحتفظ بالحق في تعديل هذه الشروط في أي وقت. استمرار استخدامك للمنصة يعد موافقة على الشروط الجديدة.
-        </p>
-      </div>
-    </PageWrapper>
+    <SimplePage title="الشروط والأحكام">
+      <p>باستخدامك لموقعنا، فإنك توافق على الالتزام بالشروط الموضحة.</p>
+      <br />
+      <p>نحتفظ بالحق في تعديل الأسعار وتوافر المنتجات دون إشعار مسبق.</p>
+    </SimplePage>
   );
 }
 
 export function Cookies() {
   return (
-    <PageWrapper icon={<CookieIcon size={18} />} title="سياسة ملفات تعريف الارتباط" subtitle="نستخدم ملفات تعريف الارتباط لتحسين تجربتك وتخصيص المحتوى." tag="Cookies">
-      <div className="mb-2">
-        <InfoCard icon={<ShieldCheck size={16} />}   title="ملفات ضرورية"    desc="مطلوبة لتشغيل الوظائف الأساسية للموقع مثل تسجيل الدخول وتأمين سلة التسوق." status="دائماً نشطة" />
-        <InfoCard icon={<Settings size={16} />}      title="ملفات التفضيلات" desc="تسمح للموقع بتذكر خياراتك مثل اللغة والمنطقة الزمنية." status="اختياري" />
-        <InfoCard icon={<MousePointer2 size={16} />} title="ملفات التحليل"   desc="تساعدنا على فهم كيفية تفاعل التجار مع MdStore لتطوير أدوات أكثر كفاءة." status="اختياري" />
-      </div>
-      <div className="mt-10 bg-[#1C1C1C] p-8 flex gap-5 items-start">
-        <ToggleRight size={18} className="text-white/50 shrink-0 mt-0.5" />
-        <div>
-          <h3
-            className="text-white mb-2 font-light"
-            style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.1rem', fontWeight: 400 }}
-          >
-            كيف تتحكم في خياراتك؟
-          </h3>
-          <p className="text-white/50 text-sm leading-relaxed font-light">
-            يمكنك إدارة أو مسح ملفات تعريف الارتباط من خلال إعدادات متصفحك في أي وقت.
-          </p>
-        </div>
-      </div>
-    </PageWrapper>
+    <SimplePage title="سياسة ملفات الارتباط">
+      <p>نستخدم ملفات تعريف الارتباط الضرورية فقط لتشغيل الوظائف الأساسية للموقع كتسجيل الدخول وسلة التسوق.</p>
+    </SimplePage>
   );
 }
 
-export function Contact() {
-  const store = {
-    language: 'ar',
-    design: { primaryColor: '#1C1C1C', secondaryColor: '#5A5753' },
-    contact: {
-      email:    'support@teststore.com',
-      phone:    '+213550123456',
-      wilaya:   'الجزائر العاصمة',
-      facebook: 'https://facebook.com',
-      whatsapp: '213550123456',
-      tiktok:   'https://tiktok.com',
-    },
-  };
-
-  const isRTL = store.language === 'ar';
-
+export function Contact({ store }: { store: any }) {
+  const isRTL = (store?.language || 'ar') === 'ar';
   return (
-    <section className="min-h-screen bg-[#FAFAF8] py-24" dir={isRTL ? 'rtl' : 'ltr'} style={{ fontFamily: "'DM Sans', sans-serif" }}>
-      <style>{FONT_IMPORT}</style>
-      <div className="max-w-2xl mx-auto px-6">
-
-        {/* Header */}
-        <div className="mb-16">
-          <div className="flex items-center gap-5 mb-6">
-            <span className="block h-px w-8 bg-[#E4E0DB]" />
-            <span className="text-xs tracking-[0.25em] uppercase text-[#8A8580]">Contact</span>
-          </div>
-          <h1
-            className="text-[#1C1C1C] leading-tight"
-            style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, letterSpacing: '-0.01em', fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}
-          >
-            {isRTL ? 'تواصل معنا' : 'Get in Touch'}
-          </h1>
-        </div>
-
-        {/* Contact lines */}
-        <div className="border-t border-[#E4E0DB]">
-          {[
-            { label: isRTL ? 'البريد الإلكتروني' : 'Email', value: store.contact.email, href: `mailto:${store.contact.email}` },
-            { label: isRTL ? 'الهاتف' : 'Phone',             value: store.contact.phone,  href: `tel:${store.contact.phone}`,  dir: 'ltr' as const },
-            { label: isRTL ? 'الموقع' : 'Location',          value: store.contact.wilaya, href: undefined },
-          ].map((item, i) => (
-            item.href ? (
-              <a key={i} href={item.href} dir={item.dir}
-                className="flex items-center justify-between py-6 border-b border-[#E4E0DB] group hover:bg-[#F5F2EE] transition-colors duration-200 px-1">
-                <span className="text-xs tracking-[0.15em] uppercase text-[#8A8580] group-hover:text-[#1C1C1C] transition-colors">{item.label}</span>
-                <span className="text-[#1C1C1C] text-sm font-light group-hover:opacity-70 transition-opacity">{item.value}</span>
-              </a>
-            ) : (
-              <div key={i} className="flex items-center justify-between py-6 border-b border-[#E4E0DB] px-1">
-                <span className="text-xs tracking-[0.15em] uppercase text-[#8A8580]">{item.label}</span>
-                <span className="text-[#1C1C1C] text-sm font-light">{item.value}</span>
-              </div>
-            )
-          ))}
-        </div>
-
-        {/* Socials */}
-        <div className="mt-16">
-          <p className="text-xs tracking-[0.2em] uppercase text-[#8A8580] mb-8">{isRTL ? 'تواصل معنا' : 'Follow Us'}</p>
-          <div className="flex gap-4 flex-wrap">
-            {[
-              { name: 'Facebook', href: store.contact.facebook,                   icon: <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> },
-              { name: 'WhatsApp', href: `https://wa.me/${store.contact.whatsapp}`, icon: <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.94 3.675 1.438 5.662 1.439h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> },
-              { name: 'TikTok',   href: store.contact.tiktok,                    icon: <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.06-2.89-.44-4.11-1.24-.03 2.15-.02 4.31-.02 6.46 0 1.19-.21 2.4-.78 3.46-.94 1.83-2.86 2.92-4.88 3.12-1.84.23-3.83-.24-5.26-1.48-1.57-1.32-2.3-3.43-1.95-5.44.25-1.58 1.15-3.05 2.51-3.9 1.14-.73 2.51-.99 3.84-.81v4.11c-.71-.12-1.47.05-2.05.5-.66.52-.96 1.4-.78 2.21.14.73.72 1.34 1.45 1.5.88.2 1.88-.16 2.37-.93.2-.34.28-.73.28-1.12V0l-.02.02z"/></svg> },
-            ].map(s => (
-              <a key={s.name} href={s.href} target="_blank" rel="noreferrer"
-                className="flex items-center gap-2.5 border border-[#E4E0DB] px-5 py-3 text-xs tracking-[0.12em] uppercase text-[#5A5753] hover:border-[#1C1C1C] hover:text-[#1C1C1C] transition-all duration-300">
-                {s.icon}{s.name}
-              </a>
-            ))}
-          </div>
-        </div>
+    <SimplePage title={isRTL ? 'تواصل معنا' : 'Contact Us'}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+        {store?.contact?.phone && (
+          <a href={`tel:${store.contact.phone}`} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#111', textDecoration: 'none' }}>
+            <Phone size={15} />{store.contact.phone}
+          </a>
+        )}
+        {store?.contact?.email && (
+          <a href={`mailto:${store.contact.email}`} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#111', textDecoration: 'none' }}>
+            <Mail size={15} />{store.contact.email}
+          </a>
+        )}
+        {(store?.contact?.wilaya || store?.contact?.address) && (
+          <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#555' }}>
+            <MapPin size={15} />{[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')}
+          </span>
+        )}
+        {!store?.contact?.phone && !store?.contact?.email && (
+          <p style={{ color: '#aaa' }}>{isRTL ? 'لا توجد معلومات تواصل' : 'No contact info available'}</p>
+        )}
       </div>
-    </section>
+    </SimplePage>
+  );
+}
+
+export function StaticPage({ page, store }: { page: string; store: any }) {
+  const p = (page || '').toLowerCase();
+  return (
+    <>
+      {p === 'privacy' && <Privacy />}
+      {p === 'terms'   && <Terms />}
+      {p === 'cookies' && <Cookies />}
+      {p === 'contact' && <Contact store={store} />}
+    </>
   );
 }

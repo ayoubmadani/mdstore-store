@@ -1,4 +1,5 @@
 'use client';
+import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -507,7 +508,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <button onClick={() => setShowSearch(!showSearch)} style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 'var(--radius-s)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#fff' }}>
             <Search size={17} />
           </button>
-          {store.cart && (
+          {store?.cart !== false && (
             <Link href="/cart" style={{ position: 'relative', width: 40, height: 40, background: 'var(--accent)', border: 'none', borderRadius: 'var(--radius-s)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
             <ShoppingCart size={17} />
             {count > 0 && <span className="cart-badge" style={{ border: '2px solid var(--accent)' }}>{count}</span>}
@@ -597,7 +598,7 @@ export function Footer({ store }: any) {
             <h4 className="oswald" style={{ fontSize: '1rem', fontWeight: 600, color: '#fff', marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>تواصل معنا</h4>
             {[
               { icon: <Phone size={13} />, val: store?.contact?.phone },
-              { icon: <MapPin size={13} />, val: store?.contact?.wilaya },
+              { icon: <MapPin size={13} />, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
             ].filter(r => r.val).map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', fontSize: '0.875rem', color: 'var(--g500)', marginBottom: '0.875rem' }}>
                 <span style={{ color: 'var(--accent)', flexShrink: 0 }}>{r.icon}</span>{r.val}
@@ -721,7 +722,7 @@ export function Home({ store, page }: any) {
             </div>
 
             <h1 className="oswald anim-fade-up d1" style={{ fontSize: 'clamp(2.5rem,6vw,4.5rem)', fontWeight: 700, color: '#fff', lineHeight: 1.1, marginBottom: '1.375rem', textTransform: 'uppercase', letterSpacing: '1px' }}
-              dangerouslySetInnerHTML={{ __html: store.hero?.title || 'ارتقِ بـ <span style="color:var(--accent);display:block">مستواك الرياضي</span>' }}>
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'ارتقِ بـ <span style="color:var(--accent);display:block">مستواك الرياضي</span>') }}>
             </h1>
 
             <p className="anim-fade-up d2" style={{ fontSize: '1.0625rem', color: 'var(--g400)', maxWidth: 480, lineHeight: 1.75, marginBottom: '2.5rem' }}>
@@ -740,7 +741,7 @@ export function Home({ store, page }: any) {
 
             <div className="hero-actions anim-fade-up d3">
               <a href="#products" className="btn-pri" style={{ textDecoration: 'none' }}>تسوق الآن <ArrowLeft size={16} /></a>
-              {store.cart && (<Link href="/cart" className="btn-out">السلة</Link>)}
+              {store?.cart !== false && (<Link href="/cart" className="btn-out">السلة</Link>)}
             </div>
           </div>
 
@@ -1090,7 +1091,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'مطلوب';
-    if (!fd.customerPhone.trim()) e.customerPhone = 'مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) e.customerWelaya = 'مطلوب';
     if (!fd.customerCommune) e.customerCommune = 'مطلوب';
     return e;
@@ -1256,7 +1257,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'مطلوب';
-    if (!fd.customerPhone.trim()) er.phone = 'مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) er.w = 'مطلوب';
     if (!fd.customerCommune) er.c = 'مطلوب';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -1480,7 +1481,7 @@ export function Contact({ store }: { store: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store?.id }); setSent(true); }
-    catch { alert('حدث خطأ'); } finally { setLoading(false); }
+    catch { showError('حدث خطأ'); } finally { setLoading(false); }
   };
   return (
     <div dir="rtl" style={{ background: 'var(--g50)', minHeight: '100vh' }}>
@@ -1496,7 +1497,7 @@ export function Contact({ store }: { store: any }) {
         <div className="contact-layout">
           {/* Info */}
           <div>
-            {[{ e: '📞', l: 'الهاتف', v: store?.contact?.phone || '—' }, { e: '📍', l: 'الموقع', v: store?.contact?.wilaya || '—' }, { e: '📧', l: 'البريد', v: store?.contact?.email || '—' }].map((r, i) => (
+            {[{ e: '📞', l: 'الهاتف', v: store?.contact?.phone || '—' }, { e: '📍', l: 'الموقع', v: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') || '—' }, { e: '📧', l: 'البريد', v: store?.contact?.email || '—' }].map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', border: '1px solid var(--g200)', borderRadius: 'var(--radius-s)', background: '#fff', marginBottom: '0.75rem', transition: 'var(--tr)' }}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--accent)'; el.style.transform = 'translateX(-4px)'; }}
                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--g200)'; el.style.transform = ''; }}>

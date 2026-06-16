@@ -1,4 +1,5 @@
 'use client';
+import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -1143,7 +1144,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'الاسم مطلوب';
-    if (!fd.customerPhone.trim()) e.customerPhone = 'رقم الهاتف مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) e.customerWelaya = 'الولاية مطلوبة';
     if (!fd.customerCommune) e.customerCommune = 'البلدية مطلوبة';
     return e;
@@ -1329,7 +1330,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'مطلوب';
-    if (!fd.customerPhone.trim()) er.phone = 'مطلوب';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (!fd.customerWelaya) er.w = 'مطلوب';
     if (!fd.customerCommune) er.c = 'مطلوب';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -1569,13 +1570,13 @@ export function Contact({ store }: { store?: any }) {
     try {
       await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store?.id });
       setSent(true);
-    } catch { alert('حدث خطأ في الإرسال'); } finally { setLoading(false); }
+    } catch { showError('حدث خطأ في الإرسال'); } finally { setLoading(false); }
   };
 
   const contactItems = [
     { icon: '📞', label: 'الهاتف', val: store?.contact?.phone || '+213 550 000 000' },
     { icon: '✉️', label: 'البريد', val: store?.contact?.email || 'info@store.dz' },
-    { icon: '📍', label: 'الموقع', val: store?.contact?.wilaya || 'الجزائر' },
+    { icon: '📍', label: 'الموقع', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') || 'الجزائر' },
   ];
 
   return (

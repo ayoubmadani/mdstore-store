@@ -1,4 +1,5 @@
 'use client';
+import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -398,7 +399,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                             {i.l}
                         </Link>
                     ))}
-                    {store.cart && (
+                    {store?.cart !== false && (
                         <Link href="/cart" className="btn-soft" style={{ position: 'relative', width: 44, height: 44, borderRadius: 14, border: '2px solid var(--lavender-lt)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--lavender-dk)' }}>
                             <ShoppingCart size={18} />
                             {count > 0 && <span className="cart-badge">{count}</span>}
@@ -437,7 +438,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                             {i.l} <ArrowLeft size={14} style={{ color: 'var(--lavender-dk)' }} />
                         </Link>
                     ))}
-                    {store.cart && (
+                    {store?.cart !== false && (
                         <Link href={'/cart'} onClick={() => setOpen(false)}
                             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid var(--lavender-lt)', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)' }}>
                             {'🛒 السلة'} <ArrowLeft size={14} style={{ color: 'var(--lavender-dk)' }} />
@@ -495,7 +496,7 @@ export function Footer({ store }: any) {
                         <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--peach)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>تواصلي معنا</h4>
                         {[
                             { e: '📞', v: store?.contact?.phone },
-                            { e: '📍', v: store?.contact?.wilaya },
+                            { e: '📍', v: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
                             { e: '📧', v: store?.contact?.email },
                         ].filter(r => r.v).map((r, i) => (
                             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', fontSize: '0.9rem', fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: '0.625rem' }}>
@@ -619,7 +620,7 @@ export function Home({ store, page }: any) {
                         <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{store?.name} — العناية بطفلك بكل محبة</span>
                     </div>
                     <h1 className="anim-fade font-serif" style={{ fontSize: 'clamp(2.75rem, 7vw, 5.5rem)', fontWeight: 700, color: 'var(--text)', lineHeight: 1.1, marginBottom: '1.25rem', letterSpacing: '-0.02em' }}
-                        dangerouslySetInnerHTML={{ __html: store.hero?.title || 'كل ما يحتاجه<br/>طفلك الصغير' }} />
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'كل ما يحتاجه<br/>طفلك الصغير') }} />
                     <div style={{ height: 3, width: 80, borderRadius: 99, background: 'linear-gradient(90deg, var(--lavender), var(--rose), var(--peach))', marginBottom: '1.5rem' }} />
                     <p className="anim-fade" style={{ fontSize: '1.0625rem', fontWeight: 600, color: 'var(--text-mid)', maxWidth: 480, lineHeight: 1.75, marginBottom: '2.5rem' }}>
                         {store.hero?.subtitle || '🌸 منتجات آمنة وناعمة مختارة بعناية لراحة طفلك وصحته منذ اليوم الأول.'}
@@ -628,7 +629,7 @@ export function Home({ store, page }: any) {
                         <a href="#products" className="btn-soft" style={{ ...BTN_PRI, textDecoration: 'none' }}>
                             اكتشفي المنتجات 🌸
                         </a>
-                        {store.cart && (
+                        {store?.cart !== false && (
                             <Link href="/cart" className="btn-soft" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.875rem 1.75rem', borderRadius: 50, border: '2px solid var(--lavender)', background: '#fff', color: 'var(--lavender-dk)', fontWeight: 700, fontSize: '0.925rem' }}>
                                 السلة
                             </Link>
@@ -945,7 +946,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const validate = () => {
         const e: Record<string, string> = {};
         if (!fd.customerName.trim()) e.customerName = 'مطلوب';
-        if (!fd.customerPhone.trim()) e.customerPhone = 'مطلوب';
+        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
         if (!fd.customerWelaya) e.customerWelaya = 'مطلوب';
         if (!fd.customerCommune) e.customerCommune = 'مطلوب';
         return e;
@@ -1106,7 +1107,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         e.preventDefault();
         const er: Record<string, string> = {};
         if (!fd.customerName.trim()) er.name = 'مطلوب';
-        if (!fd.customerPhone.trim()) er.phone = 'مطلوب';
+        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم هاتف غير صالح (مثال: 0550123456)';
         if (!fd.customerWelaya) er.w = 'مطلوب';
         if (!fd.customerCommune) er.c = 'مطلوب';
         if (Object.keys(er).length) { setErrors(er); return; }
@@ -1289,7 +1290,7 @@ export function Contact({ store }: { store: any }) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); setLoading(true);
         try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-        catch { alert('حدث خطأ'); } finally { setLoading(false); }
+        catch { showError('حدث خطأ'); } finally { setLoading(false); }
     };
     return (
         <div dir="rtl" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
@@ -1301,7 +1302,7 @@ export function Contact({ store }: { store: any }) {
             <div style={{ maxWidth: 1000, margin: '0 auto', padding: '3rem 1.5rem 5rem' }}>
                 <div className="contact-layout">
                     <div>
-                        {[{ e: '📞', l: 'الهاتف', v: store?.contact?.phone || 'غير متوفر' }, { e: '📍', l: 'الموقع', v: store?.contact?.wilaya || 'الجزائر' }, { e: '📧', l: 'البريد', v: store?.contact?.email || 'غير متوفر' }].map((r, i) => (
+                        {[{ e: '📞', l: 'الهاتف', v: store?.contact?.phone || 'غير متوفر' }, { e: '📍', l: 'الموقع', v: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') || 'الجزائر' }, { e: '📧', l: 'البريد', v: store?.contact?.email || 'غير متوفر' }].map((r, i) => (
                             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', padding: '1rem', borderRadius: 18, border: '2px solid var(--lavender-lt)', background: '#fff', marginBottom: '0.75rem', transition: 'all 0.25s' }}
                                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--lavender)'; el.style.boxShadow = '0 8px 24px var(--shadow)'; }}
                                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--lavender-lt)'; el.style.boxShadow = ''; }}>

@@ -1,4 +1,5 @@
 'use client';
+import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -7,11 +8,11 @@ import { useRouter } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
     Star, ChevronDown, AlertCircle, X, ToggleRight,
-    ArrowRight, Plus, Minus, CheckCircle2, Lock, Shield,
+    ArrowLeft, Plus, Minus, CheckCircle2, Lock, Shield,
     Package, ShieldCheck, Phone, User, Search, ShoppingBag,
     Trash2, Loader2, ChevronLeft, ChevronRight, Heart,
     ShoppingCart, Leaf, Sparkles, Droplets, Home as HomeIcon, Building2,
-    ArrowLeft,
+    
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
@@ -488,7 +489,7 @@ export function Footer({ store }: any) {
                         {[
                             { val: store?.contact?.phone },
                             { val: store?.contact?.email },
-                            { val: store?.contact?.wilaya },
+                            { val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
                         ].filter(r => r.val).map((item, i) => (
                             <p key={i} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', marginBottom: '8px' }}>{item.val}</p>
                         ))}
@@ -864,7 +865,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const validate = () => {
         const e: Record<string, string> = {};
         if (!fd.customerName.trim() || fd.customerName.length < 3) e.customerName = 'الاسم مطلوب';
-        if (!fd.customerPhone.trim()) e.customerPhone = 'الهاتف مطلوب';
+        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
         if (!fd.customerWelaya) e.customerWelaya = 'اختر الولاية';
         if (!fd.customerCommune) e.customerCommune = 'اختر البلدية';
         return e;
@@ -1041,7 +1042,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         e.preventDefault();
         const er: Record<string, string> = {};
         if (!fd.customerName.trim() || fd.customerName.length < 3) er.n = 'الاسم مطلوب';
-        if (!fd.customerPhone.trim()) er.p = 'الهاتف مطلوب';
+        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.p = 'رقم هاتف غير صالح (مثال: 0550123456)';
         if (!fd.customerWelaya) er.w = 'الولاية مطلوبة';
         if (!fd.customerCommune) er.c = 'البلدية مطلوبة';
         if (Object.keys(er).length) { setErrors(er); return; }
@@ -1261,7 +1262,7 @@ export function Contact({ store }: { store?: any }) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); setLoading(true);
         try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store?.id }); setSent(true); }
-        catch { alert('حدث خطأ'); } finally { setLoading(false); }
+        catch { showError('حدث خطأ'); } finally { setLoading(false); }
     };
     const onF = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = 'var(--sage)'; };
     const onB = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = 'var(--line-2)'; };
@@ -1277,7 +1278,7 @@ export function Contact({ store }: { store?: any }) {
             {[
                 { icon: '📞', label: 'الهاتف', val: store?.contact?.phone },
                 { icon: '✉️', label: 'البريد', val: store?.contact?.email },
-                { icon: '📍', label: 'الموقع', val: store?.contact?.wilaya },
+                { icon: '📍', label: 'الموقع', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
             ].filter(r => r.val).map(item => (
                 <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '13px 16px', borderRadius: '10px', background: 'var(--sage-lt)', border: '1px solid var(--line)', marginBottom: '8px' }}>
                     <span style={{ fontSize: '1.2rem' }}>{item.icon}</span>
