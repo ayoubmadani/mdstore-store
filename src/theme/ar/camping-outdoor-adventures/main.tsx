@@ -433,11 +433,18 @@ export function Home({ store, page }: any) {
   return (
     <div dir="rtl">
       {/* HERO */}
-      <section style={{ position: 'relative', overflow: 'hidden', display: 'grid', gridTemplateColumns: '1fr', minHeight: 'clamp(520px,75vh,760px)' }}
-        className="oa-hero-grid">
-        {/* Left: Content */}
-        <div style={{ background: DARK, display: 'flex', alignItems: 'center', position: 'relative', zIndex: 1 }}>
-          <div style={{ padding: 'clamp(3rem,7vw,5rem) clamp(1.5rem,4vw,3rem)', width: '100%', maxWidth: 620 }}>
+      <section style={{ position: 'relative', overflow: 'hidden', minHeight: 'clamp(520px,75vh,760px)', display: 'flex', alignItems: 'center' }}>
+        {/* Background image - always visible */}
+        {store.hero?.imageUrl
+          ? <img src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          : <div style={{ position: 'absolute', inset: 0, background: DARK, opacity: 0.97 }} />
+        }
+        {/* Overlay: dark left-to-right gradient so text is readable */}
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to left, rgba(19,31,16,0.35) 0%, rgba(19,31,16,0.82) 45%, rgba(19,31,16,0.97) 100%)' }} />
+
+        {/* Content */}
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 1280, margin: '0 auto', width: '100%', padding: 'clamp(3rem,7vw,5rem) clamp(1.5rem,4vw,3rem)' }}>
+          <div style={{ maxWidth: 620 }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(212,98,42,0.15)', border: '1px solid rgba(212,98,42,0.3)', borderRadius: 3, padding: '0.35rem 0.875rem', marginBottom: '1.5rem' }}>
               <Compass size={11} color={OR} />
               <span style={{ fontSize: '0.62rem', fontWeight: 700, color: OR, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: "'Barlow Condensed', sans-serif" }}>مغامرات في الهواء الطلق</span>
@@ -466,7 +473,6 @@ export function Home({ store, page }: any) {
                 </Link>
               )}
             </div>
-            {/* Stats */}
             <div style={{ display: 'flex', gap: 'clamp(1.5rem,5vw,4rem)', marginTop: '2.5rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
               {[{ n: '+300', l: 'منتج' }, { n: '58', l: 'ولاية' }, { n: '100%', l: 'مضمون' }].map((s, i) => (
                 <div key={i}>
@@ -477,17 +483,6 @@ export function Home({ store, page }: any) {
             </div>
           </div>
         </div>
-        {/* Right: Image */}
-        {store.hero?.imageUrl && (
-          <div style={{ position: 'absolute', inset: 0, zIndex: 0, display: 'none' }} className="oa-hero-img-panel">
-            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(19,31,16,1) 0%, rgba(19,31,16,0.4) 60%, transparent 100%)' }} />
-          </div>
-        )}
-        {/* Fallback: pattern if no image */}
-        {!store.hero?.imageUrl && (
-          <div style={{ position: 'absolute', inset: 0, zIndex: 0, opacity: 0.04, backgroundImage: 'repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%)', backgroundSize: '20px 20px' }} />
-        )}
       </section>
 
       {/* TRUST */}
