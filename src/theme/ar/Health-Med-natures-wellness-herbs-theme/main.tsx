@@ -4,7 +4,7 @@ import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
@@ -410,6 +410,8 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 export function Home({ store, page }: any) {
   const products: any[] = store.products || [];
   const cats: any[] = store.categories || [];
+  const searchParams = useSearchParams();
+  const activeCategory = searchParams.get('category');
   if (!page) page = 1;
   const countPage = Math.ceil((store.count || products.length) / 48);
 
@@ -490,16 +492,25 @@ export function Home({ store, page }: any) {
             <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: INK }}>تصفح الفئات</h2>
           </div>
           <div className="cats-grid">
-            {cats.map((cat: any) => (
-              <Link key={cat.id} href={`?category=${cat.id}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', padding: '1rem 0.75rem', border: `1px solid ${BD}`, borderRadius: 14, background: CARD, textAlign: 'center', transition: 'all 0.2s' }}
+            <Link href="?" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', padding: '1rem 0.75rem', border: `1px solid ${!activeCategory ? G : BD}`, borderRadius: 14, background: !activeCategory ? GL : CARD, textAlign: 'center', transition: 'all 0.2s' }}>
+              <div style={{ width: 38, height: 38, background: GL, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Leaf size={17} color={G} />
+              </div>
+              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: !activeCategory ? GD : INK, lineHeight: 1.3 }}>الكل</span>
+            </Link>
+              {cats.map((cat: any) => {
+              const isActive = activeCategory === String(cat.id);
+              return (
+              <Link key={cat.id} href={`?category=${cat.id}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', padding: '1rem 0.75rem', border: `1px solid ${isActive ? G : BD}`, borderRadius: 14, background: isActive ? GL : CARD, textAlign: 'center', transition: 'all 0.2s' }}
                 onMouseEnter={e => { const el = e.currentTarget; el.style.borderColor = GA; el.style.background = GL; el.style.transform = 'translateY(-2px)'; }}
-                onMouseLeave={e => { const el = e.currentTarget; el.style.borderColor = BD; el.style.background = CARD; el.style.transform = ''; }}>
+                onMouseLeave={e => { const el = e.currentTarget; el.style.borderColor = isActive ? G : BD; el.style.background = isActive ? GL : CARD; el.style.transform = ''; }}>
                 <div style={{ width: 38, height: 38, background: GL, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Leaf size={17} color={G} />
                 </div>
-                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: INK, lineHeight: 1.3 }}>{cat.name}</span>
+                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: isActive ? GD : INK, lineHeight: 1.3 }}>{cat.name}</span>
               </Link>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}

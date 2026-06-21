@@ -4,7 +4,7 @@ import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
@@ -683,6 +683,8 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 export function Home({ store, page }: any) {
   const products: any[] = store.products || [];
   const cats: any[] = store.categories || [];
+  const searchParams = useSearchParams();
+  const activeCategory = searchParams.get('category');
   if (!page) page = 1;
   const countPage = Math.ceil((store.count || products.length) / 48);
 
@@ -757,17 +759,23 @@ export function Home({ store, page }: any) {
             <h2 style={{ fontSize: 'clamp(1.375rem,3.5vw,2rem)', fontWeight: 800, color: '#111' }}>الفئات</h2>
           </div>
           <div className="cats-grid">
-            {cats.map((cat: any) => (
+            <Link href="?" style={{ display:'inline-flex', alignItems:'center', padding:'0.5rem 1.25rem', borderRadius:999, border:`1.5px solid ${!activeCategory ? '#8B5CF6' : '#ccc'}`, background: !activeCategory ? '#8B5CF6' : 'transparent', color: !activeCategory ? '#fff' : 'inherit', fontSize:'0.82rem', fontWeight:600, cursor:'pointer' }}>
+                الكل
+              </Link>
+              {cats.map((cat: any) => {
+              const isActive = activeCategory === String(cat.id);
+              return (
               <Link key={cat.id} href={`?category=${cat.id}`} style={{
-                padding: '0.75rem 0.875rem', border: '1.5px solid #EBEBEB', borderRadius: 8,
-                textAlign: 'center', fontSize: '0.875rem', fontWeight: 600, color: '#333',
-                background: '#fff', transition: 'all 0.18s'
+                padding: '0.75rem 0.875rem', border: `1.5px solid ${isActive ? '#8B5CF6' : '#EBEBEB'}`, borderRadius: 8,
+                textAlign: 'center', fontSize: '0.875rem', fontWeight: 600, color: isActive ? '#fff' : '#333',
+                background: isActive ? '#8B5CF6' : '#fff', transition: 'all 0.18s'
               }}
                 onMouseEnter={e => { const el = e.currentTarget; el.style.borderColor = '#8B5CF6'; el.style.color = '#8B5CF6'; el.style.background = 'rgba(230,57,70,0.04)'; }}
-                onMouseLeave={e => { const el = e.currentTarget; el.style.borderColor = '#EBEBEB'; el.style.color = '#333'; el.style.background = '#fff'; }}>
+                onMouseLeave={e => { const el = e.currentTarget; el.style.borderColor = isActive ? '#8B5CF6' : '#EBEBEB'; el.style.color = isActive ? '#fff' : '#333'; el.style.background = isActive ? '#8B5CF6' : '#fff'; }}>
                 {cat.name}
               </Link>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}

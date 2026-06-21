@@ -4,7 +4,7 @@ import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
@@ -434,6 +434,8 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 export function Home({ store, page }: any) {
   const products: any[] = store.products || [];
   const cats: any[] = store.categories || [];
+  const searchParams = useSearchParams();
+  const activeCategory = searchParams.get('category');
   if (!page) page = 1;
   const countPage = Math.ceil((store.count || products.length) / 48);
 
@@ -517,13 +519,19 @@ export function Home({ store, page }: any) {
             <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748B' }}>التصنيفات</p>
           </div>
           <div className="cats-grid">
-            {cats.map((cat: any) => (
-              <Link key={cat.id} href={`?category=${cat.id}`} style={{ flexShrink: 0, padding: '0.5rem 1rem', border: `1px solid ${BD}`, borderRadius: 8, fontSize: '0.82rem', fontWeight: 500, color: '#64748B', background: CARD, whiteSpace: 'nowrap', transition: 'all 0.2s' }}
+                          <Link href="?" style={{ display:'inline-flex', alignItems:'center', padding:'0.5rem 1.25rem', borderRadius:999, border:`1.5px solid ${!activeCategory ? A : '#ccc'}`, background: !activeCategory ? A : 'transparent', color: !activeCategory ? '#fff' : 'inherit', fontSize:'0.82rem', fontWeight:600, cursor:'pointer' }}>
+                الكل
+              </Link>
+              {cats.map((cat: any) => {
+              const isActive = activeCategory === String(cat.id);
+              return (
+              <Link key={cat.id} href={`?category=${cat.id}`} style={{ flexShrink: 0, padding: '0.5rem 1rem', border: `1px solid ${isActive ? A : BD}`, borderRadius: 8, fontSize: '0.82rem', fontWeight: 500, color: isActive ? '#fff' : '#64748B', background: isActive ? A : CARD, whiteSpace: 'nowrap', transition: 'all 0.2s' }}
                 onMouseEnter={e => { const el = e.currentTarget; el.style.background = AB; el.style.color = AD; el.style.borderColor = A; }}
-                onMouseLeave={e => { const el = e.currentTarget; el.style.background = CARD; el.style.color = '#64748B'; el.style.borderColor = BD; }}>
+                onMouseLeave={e => { const el = e.currentTarget; el.style.background = isActive ? A : CARD; el.style.color = isActive ? '#fff' : '#64748B'; el.style.borderColor = isActive ? A : BD; }}>
                 {cat.name}
               </Link>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}

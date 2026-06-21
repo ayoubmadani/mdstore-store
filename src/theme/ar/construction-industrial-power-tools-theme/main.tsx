@@ -4,7 +4,7 @@ import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
@@ -418,6 +418,8 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 export function Home({ store, page }: any) {
   const products: any[] = store.products || [];
   const cats: any[] = store.categories || [];
+  const searchParams = useSearchParams();
+  const activeCategory = searchParams.get('category');
   if (!page) page = 1;
   const countPage = Math.ceil((store.count || products.length) / 48);
 
@@ -500,13 +502,19 @@ export function Home({ store, page }: any) {
             <h2 style={{ fontSize: '0.875rem', fontWeight: 700, color: INK, textTransform: 'uppercase', letterSpacing: '0.06em' }}>الفئات</h2>
           </div>
           <div className="cats-row">
-            {cats.map((cat: any) => (
-              <Link key={cat.id} href={`?category=${cat.id}`} style={{ flexShrink: 0, padding: '0.5rem 1.25rem', border: `1px solid ${BD}`, fontSize: '0.8rem', fontWeight: 700, color: SUB, textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap', transition: 'all 0.18s', background: CARD }}
+                          <Link href="?" style={{ display:'inline-flex', alignItems:'center', padding:'0.5rem 1.25rem', borderRadius:999, border:`1.5px solid ${!activeCategory ? B : '#ccc'}`, background: !activeCategory ? B : 'transparent', color: !activeCategory ? '#fff' : 'inherit', fontSize:'0.82rem', fontWeight:600, cursor:'pointer' }}>
+                الكل
+              </Link>
+              {cats.map((cat: any) => {
+              const isActive = activeCategory === String(cat.id);
+              return (
+              <Link key={cat.id} href={`?category=${cat.id}`} style={{ flexShrink: 0, padding: '0.5rem 1.25rem', border: `1px solid ${isActive ? B : BD}`, fontSize: '0.8rem', fontWeight: 700, color: isActive ? '#fff' : SUB, textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap', transition: 'all 0.18s', background: isActive ? B : CARD }}
                 onMouseEnter={e => { const el = e.currentTarget; el.style.background = B; el.style.color = '#fff'; el.style.borderColor = B; }}
-                onMouseLeave={e => { const el = e.currentTarget; el.style.background = CARD; el.style.color = SUB; el.style.borderColor = BD; }}>
+                onMouseLeave={e => { const el = e.currentTarget; el.style.background = isActive ? B : CARD; el.style.color = isActive ? '#fff' : SUB; el.style.borderColor = isActive ? B : BD; }}>
                 {cat.name}
               </Link>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}

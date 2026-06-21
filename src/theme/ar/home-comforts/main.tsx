@@ -4,7 +4,7 @@ import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
@@ -403,6 +403,8 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 export function Home({ store, page }: any) {
   const products: any[] = store.products || [];
   const cats: any[] = store.categories || [];
+  const searchParams = useSearchParams();
+  const activeCategory = searchParams.get('category');
   if (!page) page = 1;
   const countPage = Math.ceil((store.count || products.length) / 48);
 
@@ -478,14 +480,20 @@ export function Home({ store, page }: any) {
             <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: INK }}>تصفح الفئات</h2>
           </div>
           <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-            {cats.map((cat: any) => (
+                          <Link href="?" style={{ display:'inline-flex', alignItems:'center', padding:'0.5rem 1.25rem', borderRadius:999, border:`1.5px solid ${!activeCategory ? W : '#ccc'}`, background: !activeCategory ? W : 'transparent', color: !activeCategory ? '#fff' : 'inherit', fontSize:'0.82rem', fontWeight:600, cursor:'pointer' }}>
+                الكل
+              </Link>
+              {cats.map((cat: any) => {
+              const isActive = activeCategory === String(cat.id);
+              return (
               <Link key={cat.id} href={`?category=${cat.id}`}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1.125rem', border: `1.5px solid ${BD}`, borderRadius: 999, background: CARD, fontSize: '0.82rem', fontWeight: 600, color: SUB, transition: 'all 0.18s', textDecoration: 'none' }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1.125rem', border: `1.5px solid ${isActive ? W : BD}`, borderRadius: 999, background: isActive ? W : CARD, fontSize: '0.82rem', fontWeight: 600, color: isActive ? '#fff' : SUB, transition: 'all 0.18s', textDecoration: 'none' }}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = W; el.style.borderColor = W; el.style.color = '#fff'; }}
-                onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = CARD; el.style.borderColor = BD; el.style.color = SUB; }}>
+                onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = isActive ? W : CARD; el.style.borderColor = isActive ? W : BD; el.style.color = isActive ? '#fff' : SUB; }}>
                 <Sofa size={13} /> {cat.name}
               </Link>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}

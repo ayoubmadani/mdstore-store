@@ -784,7 +784,10 @@ export function Home({ store, page }: any) {
 
       {/* ── CATEGORIES ── */}
       <div className="cats-grid">
-        {cats.map((cat: any) => (
+        <Link href="?" className="cat-card">
+                الكل
+              </Link>
+              {cats.map((cat: any) => (
           <Link key={cat.id} href={`?category=${cat.id}`} className="cat-card">
             <div className="cat-img" style={{ height: 160, overflow: 'hidden', position: 'relative', background: 'var(--g100)' }}>
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '4rem', background: `linear-gradient(135deg, var(--primary) 0%, var(--primary-l) 100%)` }}>

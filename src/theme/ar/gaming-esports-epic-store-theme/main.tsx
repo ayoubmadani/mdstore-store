@@ -454,7 +454,10 @@ export function Home({ store, page }: any) {
         <section className="container" style={{ padding: '4rem 1.5rem 0' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '2rem', color: '#E8E0F0' }}>الفئات</h2>
           <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '1rem' }}>
-            {cats.map((cat: any) => (
+            <Link href="?" className="btn-outline" style={{ whiteSpace: 'nowrap', borderRadius: '50px' }}>
+                الكل
+              </Link>
+              {cats.map((cat: any) => (
               <Link key={cat.id} href={`?category=${cat.id}`} className="btn-outline" style={{ whiteSpace: 'nowrap', borderRadius: '50px' }}>
                 {cat.name}
               </Link>

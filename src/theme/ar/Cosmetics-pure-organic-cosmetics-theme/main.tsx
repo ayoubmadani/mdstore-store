@@ -2,13 +2,14 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Phone, CheckCircle2, ArrowLeft,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Leaf, Sparkles, Droplets, Heart, Flower2,
+  Mail,
 } from 'lucide-react';
 import { useCartStore } from '../../../store/useCartStore';
 
@@ -477,6 +478,8 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 export function Home({ store, page }: any) {
   const products: any[] = store.products || [];
   const cats:     any[] = store.categories || [];
+  const searchParams = useSearchParams();
+  const activeCategory = searchParams.get('category');
   if (!page) page = 1;
   const countPage = Math.ceil((store.count || products.length) / 48);
 
@@ -576,14 +579,20 @@ export function Home({ store, page }: any) {
             <div style={{ flex:1, height:1, background: BD }} />
           </div>
           <div className="cats-scroll">
-            {cats.map((cat:any) => (
-              <Link key={cat.id} href={`?category=${cat.id}`}
-                style={{ display:'inline-flex', alignItems:'center', gap:7, padding:'0.5rem 1.25rem', borderRadius:50, border:`1px solid ${BD}`, background: CARD, fontSize:'0.8rem', fontWeight:500, color: INK, transition:'all 0.2s', whiteSpace:'nowrap' as const }}
-                onMouseEnter={e => { const el=e.currentTarget as HTMLAnchorElement; el.style.background=ROL; el.style.borderColor=RO; el.style.color=ROD; }}
-                onMouseLeave={e => { const el=e.currentTarget as HTMLAnchorElement; el.style.background=CARD; el.style.borderColor=BD; el.style.color=INK; }}>
-                <Flower2 size={11} color={RO} />{cat.name}
+            <Link href="?" style={{ display:'inline-flex', alignItems:'center', padding:'0.5rem 1.25rem', borderRadius:999, border:`1.5px solid ${!activeCategory ? RO : '#ccc'}`, background: !activeCategory ? RO : 'transparent', color: !activeCategory ? '#fff' : 'inherit', fontSize:'0.82rem', fontWeight:600, cursor:'pointer' }}>
+                الكل
               </Link>
-            ))}
+            {cats.map((cat:any) => {
+              const isActive = activeCategory === String(cat.id);
+              return (
+              <Link key={cat.id} href={`?category=${cat.id}`}
+                style={{ display:'inline-flex', alignItems:'center', gap:7, padding:'0.5rem 1.25rem', borderRadius:50, border:`1px solid ${isActive ? RO : BD}`, background: isActive ? RO : CARD, fontSize:'0.8rem', fontWeight:500, color: isActive ? '#fff' : INK, transition:'all 0.2s', whiteSpace:'nowrap' as const }}
+                onMouseEnter={e => { const el=e.currentTarget as HTMLAnchorElement; el.style.background=ROL; el.style.borderColor=RO; el.style.color=ROD; }}
+                onMouseLeave={e => { const el=e.currentTarget as HTMLAnchorElement; el.style.background=isActive ? RO : CARD; el.style.borderColor=isActive ? RO : BD; el.style.color=isActive ? '#fff' : INK; }}>
+                <Flower2 size={11} color={isActive ? '#fff' : RO} />{cat.name}
+              </Link>
+              );
+            })}
           </div>
         </section>
       )}

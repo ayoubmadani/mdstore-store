@@ -4,7 +4,7 @@ import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
@@ -384,6 +384,8 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 export function Home({ store, page }: any) {
   const products: any[] = store.products || [];
   const cats: any[] = store.categories || [];
+  const searchParams = useSearchParams();
+  const activeCategory = searchParams.get('category');
   if (!page) page = 1;
   const countPage = Math.ceil((store.count || products.length) / 48);
 
@@ -459,14 +461,23 @@ export function Home({ store, page }: any) {
             <h2 style={{ fontSize: '0.875rem', fontWeight: 700, color: INK }}>تصفح حسب الفئة</h2>
           </div>
           <div className="cats-section-grid">
-            {cats.map((cat: any, i: number) => (
-              <Link key={cat.id} href={`?category=${cat.id}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '1rem 0.75rem', border: `1px solid ${BD}`, borderRadius: 4, background: CARD, textAlign: 'center', transition: 'all 0.18s' }}
+            <Link href="?" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '1rem 0.75rem', border: `1px solid ${!activeCategory ? E : BD}`, borderRadius: 4, background: !activeCategory ? EL : CARD, textAlign: 'center', transition: 'all 0.18s' }}
+              onMouseEnter={e => { const el = e.currentTarget; el.style.borderColor = E; el.style.background = EL; }}
+              onMouseLeave={e => { const el = e.currentTarget; el.style.borderColor = !activeCategory ? E : BD; el.style.background = !activeCategory ? EL : CARD; }}>
+              <span style={{ fontSize: '1.375rem' }}>🏪</span>
+              <span style={{ fontSize: '0.78rem', fontWeight: 600, color: INK, lineHeight: 1.3 }}>الكل</span>
+            </Link>
+            {cats.map((cat: any, i: number) => {
+              const isActive = activeCategory === String(cat.id);
+              return (
+              <Link key={cat.id} href={`?category=${cat.id}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '1rem 0.75rem', border: `1px solid ${isActive ? E : BD}`, borderRadius: 4, background: isActive ? EL : CARD, textAlign: 'center', transition: 'all 0.18s' }}
                 onMouseEnter={e => { const el = e.currentTarget; el.style.borderColor = E; el.style.background = EL; }}
-                onMouseLeave={e => { const el = e.currentTarget; el.style.borderColor = BD; el.style.background = CARD; }}>
+                onMouseLeave={e => { const el = e.currentTarget; el.style.borderColor = isActive ? E : BD; el.style.background = isActive ? EL : CARD; }}>
                 <span style={{ fontSize: '1.375rem' }}>{['🔩', '🧱', '🪚', '🔨', '🪛', '⚙️'][i % 6]}</span>
                 <span style={{ fontSize: '0.78rem', fontWeight: 600, color: INK, lineHeight: 1.3 }}>{cat.name}</span>
               </Link>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}

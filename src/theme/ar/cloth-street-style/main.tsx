@@ -670,7 +670,10 @@ export function Home({ store, page }: any) {
           <Link href="/" style={{ display: 'flex', alignItems: 'center', padding: '10px 22px', borderRight: '1px solid var(--ink)', fontSize: '8px', letterSpacing: '0.18em', backgroundColor: 'var(--ink)', color: 'var(--punch)', whiteSpace: 'nowrap', flexShrink: 0, textTransform: 'uppercase' }}>
             ★ الكل
           </Link>
-          {cats.map((cat: any) => (
+                        <Link href="?" style={{ display:'inline-flex', alignItems:'center', padding:'0.5rem 1.25rem', borderRadius:999, border:'1.5px solid #ccc', background:'transparent', fontSize:'0.82rem', fontWeight:600, cursor:'pointer' }}>
+                الكل
+              </Link>
+              {cats.map((cat: any) => (
             <Link key={cat.id} href={`?category=${cat.id}`} style={{ display: 'flex', alignItems: 'center', padding: '10px 22px', borderRight: '1px solid var(--ink)', fontSize: '8px', letterSpacing: '0.18em', color: 'var(--ink)', whiteSpace: 'nowrap', flexShrink: 0, textTransform: 'uppercase', transition: 'background 0.2s,color 0.2s' }}
               onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'var(--ink)'; el.style.color = 'var(--punch)'; }}
               onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.color = 'var(--ink)'; }}>
