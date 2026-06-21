@@ -44,7 +44,7 @@ const THEME_CSS = `
   @keyframes glb-ov-in { from { opacity:0; } to { opacity:1; } }
   @keyframes glb-ov-panel { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
   @keyframes spin { to { transform: rotate(360deg); } }
-  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
   .anim-fade-up { animation: fadeUp 0.35s ease both; }
   .anim-check   { animation: checkPop 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }
@@ -53,8 +53,9 @@ const THEME_CSS = `
   .nav-mobile  { display: flex; gap: 0.5rem; }
   @media (min-width: 1024px) { .nav-desktop { display: flex; } .nav-mobile { display: none; } }
 
-  .ann-track { display: flex; animation: marquee 22s linear infinite; white-space: nowrap; }
-  .ann-track span { padding: 0 2.5rem; }
+  .ann-wrap { overflow: hidden; direction: ltr; }
+  .ann-track { display: flex; width: max-content; animation: ticker 30s linear infinite; }
+  .ann-track span { padding: 0 2.5rem; white-space: nowrap; direction: rtl; unicode-bidi: embed; }
 
   .cats-grid { display: flex; gap: 0.75rem; overflow-x: auto; padding-bottom: 4px; }
   .cats-grid::-webkit-scrollbar { height: 0; }
@@ -63,12 +64,12 @@ const THEME_CSS = `
   @media (min-width: 768px)  { .products-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (min-width: 1280px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
 
-  .oa-card { background: ${CARD}; border-radius: 10px; overflow: hidden; border: 1px solid ${BD}; transition: all 0.3s; display: flex; flex-direction: column; }
-  .oa-card:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(28,43,24,0.14); border-color: ${G}; }
-  .oa-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
-  .oa-card:hover .oa-img { transform: scale(1.05); }
-  .oa-cta { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; background: ${OR}; color: #fff; font-size: 0.82rem; font-weight: 700; padding: 0.75rem 1rem; border: none; cursor: pointer; transition: background 0.2s; font-family: 'Cairo', sans-serif; text-decoration: none; letter-spacing: 0.03em; }
-  .oa-cta:hover { background: ${ORD}; }
+  .oa-card { background: ${CARD}; border-radius: 0; overflow: hidden; border: 1px solid ${BD}; transition: all 0.3s; display: flex; flex-direction: column; }
+  .oa-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(28,43,24,0.16); border-color: ${OR}; }
+  .oa-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.55s ease; }
+  .oa-card:hover .oa-img { transform: scale(1.06); }
+  .oa-cta { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; background: ${G}; color: #fff; font-size: 0.8rem; font-weight: 700; padding: 0.7rem 1rem; border: none; cursor: pointer; transition: background 0.2s; font-family: 'Cairo', sans-serif; text-decoration: none; letter-spacing: 0.04em; text-transform: uppercase; font-family: "'Barlow Condensed', 'Cairo', sans-serif"; }
+  .oa-cta:hover { background: ${GD}; }
 
   .trust-bar { display: grid; grid-template-columns: repeat(2,1fr); }
   @media (min-width: 768px) { .trust-bar { grid-template-columns: repeat(4,1fr); } }
@@ -94,8 +95,11 @@ const THEME_CSS = `
   .footer-cols { display: grid; grid-template-columns: 1fr; gap: 2.5rem; }
   @media (min-width: 768px) { .footer-cols { grid-template-columns: 2fr 1fr 1fr; } }
 
-  .hero-layout { display: grid; grid-template-columns: 1fr; }
-  @media (min-width: 900px) { .hero-layout { grid-template-columns: 1fr 1fr; } }
+  .oa-hero-grid { grid-template-columns: 1fr; }
+  @media (min-width: 900px) {
+    .oa-hero-grid { grid-template-columns: 1fr 1fr; }
+    .oa-hero-img-panel { display: block !important; position: relative !important; inset: auto !important; }
+  }
 
   .cart-add-btns { display: flex; flex-direction: column; gap: 0.75rem; }
   @media (min-width: 500px) { .cart-add-btns { flex-direction: row; } }
@@ -212,11 +216,13 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   return (
     <>
       {/* Announcement ticker */}
-      <div style={{ background: OR, color: '#fff', overflow: 'hidden', height: 30, display: 'flex', alignItems: 'center', direction: 'rtl' }}>
-        <div className="ann-track" style={{ fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.06em' }}>
-          {['توصيل لجميع ولايات الجزائر', 'معدات تخييم احترافية', 'دفع عند الاستلام', 'جودة مضمونة 100%', 'توصيل لجميع ولايات الجزائر', 'معدات تخييم احترافية', 'دفع عند الاستلام', 'جودة مضمونة 100%'].map((t, i) => (
-            <span key={i}>⛺ {t}</span>
-          ))}
+      <div style={{ background: OR, color: '#fff', height: 28 }} className="ann-wrap">
+        <div className="ann-track" style={{ fontSize: '0.67rem', fontWeight: 700, letterSpacing: '0.07em', lineHeight: '28px' }}>
+          {Array.from({ length: 2 }).flatMap((_, set) =>
+            ['⛺ توصيل لجميع ولايات الجزائر', '🏔 معدات تخييم احترافية', '✅ دفع عند الاستلام', '🌿 جودة مضمونة 100%'].map((t, i) => (
+              <span key={`${set}-${i}`}>{t}</span>
+            ))
+          )}
         </div>
       </div>
 
@@ -386,23 +392,30 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
   const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
   return (
     <div className="oa-card">
-      <div style={{ position: 'relative', aspectRatio: '4/3', background: GL, overflow: 'hidden' }}>
+      {/* Image */}
+      <div style={{ position: 'relative', aspectRatio: '1/1', background: 'rgba(61,107,53,0.06)', overflow: 'hidden' }}>
         {displayImage
           ? <img className="oa-img" src={displayImage} alt={product.name} />
-          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `rgba(61,107,53,0.08)` }}><Tent size={40} color={GL} /></div>
+          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Tent size={40} color={BD} /></div>
         }
-        {discount > 0 && (
-          <div style={{ position: 'absolute', top: 8, right: 8, background: OR, color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 4, fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.04em' }}>-{discount}%</div>
-        )}
-        <div style={{ position: 'absolute', top: 8, left: 8, background: GD, color: '#fff', fontSize: '0.58rem', fontWeight: 700, padding: '3px 8px', borderRadius: 4, letterSpacing: '0.06em', textTransform: 'uppercase', opacity: 0.9 }}>{store?.name}</div>
-      </div>
-      <div style={{ padding: '0.875rem 1rem 0.75rem', flex: 1 }}>
-        <h3 style={{ fontSize: '0.88rem', fontWeight: 600, color: INK, lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: '0.6rem' }}>{product.name}</h3>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginBottom: '0.875rem' }}>
-          <span className="price-mono" style={{ fontSize: '1.25rem', fontWeight: 700, color: GD }}>{price.toLocaleString()}</span>
-          <span style={{ fontSize: '0.65rem', color: SUB }}>{store.currency || 'دج'}</span>
-          {orig > price && <span className="price-mono" style={{ fontSize: '0.7rem', color: BD, textDecoration: 'line-through', marginRight: 2 }}>{orig.toLocaleString()}</span>}
+        {/* Dark gradient at bottom for readability */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '45%', background: 'linear-gradient(to top, rgba(19,31,16,0.75) 0%, transparent 100%)' }} />
+        {/* Price badge inside image */}
+        <div style={{ position: 'absolute', bottom: 10, right: 10 }}>
+          <span className="price-mono" style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.5)', fontFamily: "'Barlow Condensed', sans-serif" }}>{price.toLocaleString()}</span>
+          <span style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.75)', marginRight: 3 }}>{store.currency || 'دج'}</span>
         </div>
+        {discount > 0 && (
+          <div style={{ position: 'absolute', top: 0, left: 0, background: OR, color: '#fff', fontSize: '0.68rem', fontWeight: 800, padding: '5px 10px', fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.04em' }}>-{discount}%</div>
+        )}
+      </div>
+      {/* Info */}
+      <div style={{ padding: '0.75rem 0.875rem 0', flex: 1, borderTop: `3px solid ${OR}` }}>
+        <p style={{ fontSize: '0.58rem', fontWeight: 700, color: OR, marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: "'Barlow Condensed', sans-serif" }}>{store?.name}</p>
+        <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: INK, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: '0.75rem' }}>{product.name}</h3>
+        {orig > price && (
+          <p className="price-mono" style={{ fontSize: '0.7rem', color: SUB, textDecoration: 'line-through', marginBottom: '0.5rem' }}>{orig.toLocaleString()} {store.currency || 'دج'}</p>
+        )}
       </div>
       <Link href={`/product/${product.slug || product.id}`} className="oa-cta">
         {viewDetails} <ArrowLeft size={13} />
@@ -420,67 +433,77 @@ export function Home({ store, page }: any) {
   return (
     <div dir="rtl">
       {/* HERO */}
-      <section style={{ position: 'relative', overflow: 'hidden', minHeight: 'clamp(480px, 70vh, 700px)', display: 'flex', alignItems: 'center' }}>
-        <div style={{ position: 'absolute', inset: 0, background: DARK }} />
-        {store.hero?.imageUrl && (
-          <img src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.28 }} />
-        )}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to left, transparent 30%, rgba(19,31,16,0.9) 100%)' }} />
-        {/* Diagonal accent stripe */}
-        <div style={{ position: 'absolute', bottom: 0, right: 0, width: '45%', height: '100%', background: `linear-gradient(to bottom-right, transparent 50%, rgba(212,98,42,0.12) 100%)`, pointerEvents: 'none' }} />
-
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 1280, margin: '0 auto', padding: 'clamp(3rem,7vw,5rem) 1.5rem', width: '100%' }}>
-          <div style={{ maxWidth: 680 }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: '1.25rem' }}>
-              <Compass size={13} style={{ color: OR }} />
-              <span style={{ fontSize: '0.68rem', fontWeight: 700, color: OR, letterSpacing: '0.18em', textTransform: 'uppercase', fontFamily: "'Barlow Condensed', sans-serif" }}>مغامرات في الهواء الطلق</span>
+      <section style={{ position: 'relative', overflow: 'hidden', display: 'grid', gridTemplateColumns: '1fr', minHeight: 'clamp(520px,75vh,760px)' }}
+        className="oa-hero-grid">
+        {/* Left: Content */}
+        <div style={{ background: DARK, display: 'flex', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+          <div style={{ padding: 'clamp(3rem,7vw,5rem) clamp(1.5rem,4vw,3rem)', width: '100%', maxWidth: 620 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(212,98,42,0.15)', border: '1px solid rgba(212,98,42,0.3)', borderRadius: 3, padding: '0.35rem 0.875rem', marginBottom: '1.5rem' }}>
+              <Compass size={11} color={OR} />
+              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: OR, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: "'Barlow Condensed', sans-serif" }}>مغامرات في الهواء الطلق</span>
             </div>
-            <h1 style={{ fontFamily: "'Barlow Condensed', 'Cairo', sans-serif", fontSize: 'clamp(3rem,8vw,6rem)', fontWeight: 800, color: '#fff', lineHeight: 0.95, letterSpacing: '-0.01em', textTransform: 'uppercase', marginBottom: '1.25rem' }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || `ابدأ<br/><span style="color:${OR}">مغامرتك</span><br/>الآن`) }} />
-            <div style={{ width: 60, height: 4, background: OR, borderRadius: 2, marginBottom: '1.25rem' }} />
-            <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.8, marginBottom: '2rem', maxWidth: 460 }}>
+            <h1 style={{ fontFamily: "'Barlow Condensed', 'Cairo', sans-serif", fontSize: 'clamp(3.5rem,9vw,7rem)', fontWeight: 800, color: '#FAFAF8', lineHeight: 0.9, letterSpacing: '-0.02em', textTransform: 'uppercase', marginBottom: '1.25rem' }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || `اكتشف<br/><em style="color:${OR};font-style:normal">المجهول</em>`) }} />
+            <div style={{ display: 'flex', gap: 6, marginBottom: '1.5rem' }}>
+              <div style={{ width: 40, height: 3, background: OR }} />
+              <div style={{ width: 12, height: 3, background: G }} />
+              <div style={{ width: 6, height: 3, background: 'rgba(255,255,255,0.2)' }} />
+            </div>
+            <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.55)', lineHeight: 1.85, marginBottom: '2rem', maxWidth: 440 }}>
               {store.hero?.subtitle || 'معدات وأدوات التخييم والمغامرات الخارجية. جاهز لكل تضاريس وكل رحلة.'}
             </p>
-            <div style={{ display: 'flex', gap: '0.875rem', flexWrap: 'wrap' }}>
-              <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: OR, color: '#fff', fontWeight: 700, fontSize: '0.875rem', padding: '0.875rem 2rem', borderRadius: 6, transition: 'background 0.18s', textDecoration: 'none', fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.06em', textTransform: 'uppercase' }}
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: OR, color: '#fff', fontWeight: 800, fontSize: '0.8rem', padding: '0.875rem 1.875rem', transition: 'background 0.18s', textDecoration: 'none', fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.1em', textTransform: 'uppercase' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = ORD)}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = OR)}>
-                استكشف المنتجات <ArrowLeft size={15} />
+                استكشف المنتجات <ArrowLeft size={14} />
               </a>
               {store?.cart !== false && (
-                <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.65)', fontWeight: 600, fontSize: '0.875rem', padding: '0.875rem 1.5rem', borderRadius: 6, border: '1px solid rgba(255,255,255,0.18)', transition: 'all 0.18s' }}
-                  onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = OR; el.style.color = OR; }}
-                  onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = 'rgba(255,255,255,0.18)'; el.style.color = 'rgba(255,255,255,0.65)'; }}>
-                  <ShoppingCart size={15} /> السلة
+                <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, color: 'rgba(255,255,255,0.6)', fontWeight: 600, fontSize: '0.8rem', padding: '0.875rem 1.5rem', border: '1px solid rgba(255,255,255,0.15)', letterSpacing: '0.06em', transition: 'all 0.18s' }}
+                  onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = G; el.style.color = '#fff'; }}
+                  onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = 'rgba(255,255,255,0.15)'; el.style.color = 'rgba(255,255,255,0.6)'; }}>
+                  <ShoppingCart size={14} /> السلة
                 </Link>
               )}
             </div>
-            <div style={{ display: 'flex', gap: 'clamp(1.5rem,4vw,3.5rem)', marginTop: 'clamp(2rem,4vw,3rem)', paddingTop: '1.75rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+            {/* Stats */}
+            <div style={{ display: 'flex', gap: 'clamp(1.5rem,5vw,4rem)', marginTop: '2.5rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
               {[{ n: '+300', l: 'منتج' }, { n: '58', l: 'ولاية' }, { n: '100%', l: 'مضمون' }].map((s, i) => (
                 <div key={i}>
-                  <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(2rem,4vw,2.75rem)', fontWeight: 800, color: OR, lineHeight: 1, textTransform: 'uppercase' }}>{s.n}</p>
-                  <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', marginTop: 4, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{s.l}</p>
+                  <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, color: OR, lineHeight: 1 }}>{s.n}</p>
+                  <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', marginTop: 5, letterSpacing: '0.1em', textTransform: 'uppercase' }}>{s.l}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
+        {/* Right: Image */}
+        {store.hero?.imageUrl && (
+          <div style={{ position: 'absolute', inset: 0, zIndex: 0, display: 'none' }} className="oa-hero-img-panel">
+            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(19,31,16,1) 0%, rgba(19,31,16,0.4) 60%, transparent 100%)' }} />
+          </div>
+        )}
+        {/* Fallback: pattern if no image */}
+        {!store.hero?.imageUrl && (
+          <div style={{ position: 'absolute', inset: 0, zIndex: 0, opacity: 0.04, backgroundImage: 'repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%)', backgroundSize: '20px 20px' }} />
+        )}
       </section>
 
       {/* TRUST */}
-      <section style={{ background: GD, borderBottom: '2px solid rgba(212,98,42,0.3)' }}>
+      <section style={{ background: '#0E1A0C' }}>
         <div className="trust-bar" style={{ maxWidth: 1280, margin: '0 auto' }}>
           {[
-            { icon: <Truck size={15} />, t: 'توصيل لـ 58 ولاية', s: 'سريع وآمن' },
-            { icon: <Shield size={15} />, t: 'دفع عند الاستلام', s: 'بدون مخاطرة' },
-            { icon: <Tent size={15} />, t: 'معدات احترافية', s: 'لكل المغامرات' },
-            { icon: <Wind size={15} />, t: 'مقاومة للطقس', s: 'جودة عالية' },
+            { icon: <Truck size={14} />, t: 'توصيل لـ 58 ولاية', s: 'سريع وآمن' },
+            { icon: <Shield size={14} />, t: 'دفع عند الاستلام', s: 'بدون مخاطرة' },
+            { icon: <Tent size={14} />, t: 'معدات احترافية', s: 'لكل المغامرات' },
+            { icon: <Wind size={14} />, t: 'مقاومة للطقس', s: 'جودة عالية' },
           ].map((item, i) => (
-            <div key={i} style={{ padding: '0.875rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.625rem', borderLeft: i % 2 !== 0 ? '1px solid rgba(255,255,255,0.07)' : 'none', borderTop: i >= 2 ? '1px solid rgba(255,255,255,0.07)' : 'none' }}>
-              <span style={{ color: OR, flexShrink: 0 }}>{item.icon}</span>
+            <div key={i} style={{ padding: '0.875rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', borderLeft: i % 2 !== 0 ? '1px solid rgba(255,255,255,0.05)' : 'none', borderTop: i >= 2 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+              <div style={{ width: 30, height: 30, background: 'rgba(212,98,42,0.2)', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', color: OR, flexShrink: 0 }}>{item.icon}</div>
               <div>
-                <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#fff', letterSpacing: '0.03em' }}>{item.t}</p>
-                <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.45)' }}>{item.s}</p>
+                <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#FAFAF8', letterSpacing: '0.02em' }}>{item.t}</p>
+                <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>{item.s}</p>
               </div>
             </div>
           ))}
