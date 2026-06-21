@@ -258,7 +258,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         transition:'box-shadow 0.3s, background 0.3s',
         boxShadow: scrolled ? '0 2px 24px rgba(193,123,142,0.08)' : 'none',
       }}>
-        <div style={{ maxWidth:1320, margin:'0 auto', padding:'0 1.5rem', height:66, display:'flex', alignItems:'center', gap:'1.5rem' }}>
+        <div style={{ maxWidth:1320, margin:'0 auto', padding:'0 1.5rem', height:66, display:'flex', alignItems:'center', justifyContent:'space-between', gap:'1.5rem' }}>
 
           {/* Logo */}
           <Link href="/" style={{ flexShrink:0, display:'flex', alignItems:'center', gap:10 }}>
@@ -306,7 +306,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           </div>
 
           {/* Mobile */}
-          <div className="nav-mobile" style={{ marginRight:'auto' }}>
+          <div className="nav-mobile">
             <button onClick={() => setShowSearch(true)} style={{ width:36, height:36, borderRadius:'50%', border:`1px solid ${BD}`, background:'transparent', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color: SUB }}><Search size={14} /></button>
             {store?.cart !== false && (
               <Link href="/cart" style={{ position:'relative', background:`linear-gradient(135deg,${RO},${ROD})`, color:'#fff', width:36, height:36, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center' }}>
@@ -321,18 +321,13 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         </div>
 
         {/* Mobile menu */}
-        <div style={{ overflow:'hidden', maxHeight: open ? 240 : 0, transition:'max-height 0.28s ease', background: CR, borderTop: open ? `1px solid ${BD}` : 'none' }}>
+        <div style={{ overflow:'hidden', maxHeight: open ? 180 : 0, transition:'max-height 0.28s ease', background: CR, borderTop: open ? `1px solid ${BD}` : 'none' }}>
           <div style={{ padding:'0.875rem 1.5rem 1.5rem' }}>
             {[{ h:'/', l:'الرئيسية' }, { h:'/contact', l:'تواصل معنا' }].map(lnk => (
               <Link key={lnk.h} href={lnk.h} onClick={() => setOpen(false)} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'0.8rem 0', borderBottom:`1px solid ${BD}`, fontSize:'0.9rem', fontWeight:500, color: INK }}>
                 {lnk.l} <ArrowLeft size={13} style={{ color: RO }} />
               </Link>
             ))}
-            {store?.cart !== false && (
-              <Link href="/cart" onClick={() => setOpen(false)} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'0.8rem 0', fontSize:'0.9rem', fontWeight:500, color: INK }}>
-                السلة <ArrowLeft size={13} style={{ color: RO }} />
-              </Link>
-            )}
           </div>
         </div>
       </nav>

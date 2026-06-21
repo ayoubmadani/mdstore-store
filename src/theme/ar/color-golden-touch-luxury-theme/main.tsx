@@ -510,11 +510,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 {i.l} <ArrowLeft size={14} style={{ color: '#D4AF37' }} />
               </Link>
             ))}
-            {store?.cart !== false && (
-              <Link href={'/cart'} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid #F0F0F0', fontSize: '0.9rem', fontWeight: 600, color: '#111' }}>
-                {'السلة'} <ArrowLeft size={14} style={{ color: '#D4AF37' }} />
-              </Link>
-            )}
+            
           </div>
         </div>
       </nav>

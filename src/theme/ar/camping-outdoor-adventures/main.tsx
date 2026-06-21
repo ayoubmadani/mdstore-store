@@ -228,7 +228,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
       {/* Main nav */}
       <nav dir="rtl" style={{ background: scrolled ? DARK : DARK, borderBottom: '3px solid ' + OR, position: 'sticky', top: 0, zIndex: 50, transition: 'box-shadow 0.25s', boxShadow: scrolled ? '0 4px 24px rgba(0,0,0,0.35)' : 'none' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', height: 60, display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
           {/* Logo */}
           <Link href="/" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
@@ -297,11 +297,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 {i.l} <ArrowLeft size={13} style={{ color: OR }} />
               </Link>
             ))}
-            {store?.cart !== false && (
-              <Link href="/cart" onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', fontSize: '0.875rem', fontWeight: 600, color: 'rgba(255,255,255,0.75)' }}>
-                السلة <ArrowLeft size={13} style={{ color: OR }} />
-              </Link>
-            )}
+
           </div>
         </div>
       </nav>

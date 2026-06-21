@@ -217,7 +217,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         ✦ توصيل لجميع ولايات الجزائر &nbsp;·&nbsp; دفع عند الاستلام &nbsp;·&nbsp; أثاث وديكور راقي ✦
       </div>
       <nav dir="rtl" style={{ position: 'sticky', top: 0, zIndex: 50, background: scrolled ? 'rgba(250,247,244,0.97)' : CARD, backdropFilter: 'blur(14px)', borderBottom: `1px solid ${BD}`, boxShadow: scrolled ? '0 4px 24px rgba(44,24,16,0.08)' : 'none', transition: 'all 0.25s' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', height: 64, display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
           <Link href="/" style={{ flexShrink: 0 }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
               <img src={store.design.logoUrl} style={{ height: 36, objectFit: 'contain', display: 'block' }} alt={store?.name || ''} onError={() => setImgError(true)} />
@@ -280,11 +280,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 {i.l} <ArrowLeft size={14} style={{ color: W }} />
               </Link>
             ))}
-            {store?.cart !== false && (
-              <Link href="/cart" onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', fontSize: '0.9rem', fontWeight: 500, color: INK }}>
-                السلة <ArrowLeft size={14} style={{ color: W }} />
-              </Link>
-            )}
+
           </div>
         </div>
       </nav>

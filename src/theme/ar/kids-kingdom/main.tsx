@@ -505,10 +505,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <div style={{ padding: '0.625rem 1.25rem 1rem' }}>
           <Link href="/" onClick={() => setOpen(false)} style={mobileLinkStyle}>🏠 الرئيسية <ArrowLeft size={14} /></Link>
           <Link href="/contact" onClick={() => setOpen(false)} style={mobileLinkStyle}>📞 تواصل معنا <ArrowLeft size={14} /></Link>
-          {/* إخفاء السلة من القائمة المنسدلة في الموبايل */}
-          {store?.cart !== false && (
-            <Link href="/cart" onClick={() => setOpen(false)} style={mobileLinkStyle}>🛒 السلة <ArrowLeft size={14} /></Link>
-          )}
+
         </div>
       </div>
     </nav>

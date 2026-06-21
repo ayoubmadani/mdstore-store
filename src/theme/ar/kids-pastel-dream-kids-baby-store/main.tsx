@@ -438,12 +438,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                             {i.l} <ArrowLeft size={14} style={{ color: 'var(--lavender-dk)' }} />
                         </Link>
                     ))}
-                    {store?.cart !== false && (
-                        <Link href={'/cart'} onClick={() => setOpen(false)}
-                            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid var(--lavender-lt)', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)' }}>
-                            {'🛒 السلة'} <ArrowLeft size={14} style={{ color: 'var(--lavender-dk)' }} />
-                        </Link>
-                    )}
+
                 </div>
             </div>
         </nav>
