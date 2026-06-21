@@ -11,7 +11,7 @@ import {
   AlertCircle, X, Phone,
   CheckCircle2, ArrowLeft, Package,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
-  Trash2, Loader2, MapPin, Shield, Truck, Home, Sofa,
+  Trash2, Loader2, MapPin, Shield, Truck, Home as HomeIcon, Sofa,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
@@ -215,7 +215,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ width: 34, height: 34, background: WL, border: `1px solid ${WB}`, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Home size={16} color={W} />
+                  <HomeIcon size={16} color={W} />
                 </div>
                 <div>
                   <span style={{ fontSize: '0.9rem', fontWeight: 700, color: INK, display: 'block', lineHeight: 1.15 }}>{store?.name || 'Home Comforts'}</span>
@@ -325,7 +325,7 @@ export function Footer({ store }: any) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '1rem' }}>
               <div style={{ width: 30, height: 30, background: 'rgba(196,154,108,0.2)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Home size={14} color={W} />
+                <HomeIcon size={14} color={W} />
               </div>
               <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>{store?.name}</span>
             </div>
@@ -412,7 +412,7 @@ export function Home({ store, page }: any) {
           <div className="hero-inner">
             <div>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: WL, border: `1px solid ${WB}`, borderRadius: 20, padding: '0.35rem 1rem', marginBottom: '1.5rem' }}>
-                <Home size={12} style={{ color: W }} />
+                <HomeIcon size={12} style={{ color: W }} />
                 <span style={{ fontSize: '0.7rem', fontWeight: 600, color: WD }}>أثاث وديكور منزلي</span>
               </div>
               <h1 style={{ fontSize: 'clamp(2.25rem,5vw,4rem)', fontWeight: 700, color: INK, lineHeight: 1.15, letterSpacing: '-0.02em', marginBottom: '1rem' }}
@@ -460,7 +460,7 @@ export function Home({ store, page }: any) {
             { icon: <Truck size={18} />, t: 'توصيل لـ 58 ولاية', s: 'سريع وآمن' },
             { icon: <Shield size={18} />, t: 'دفع عند الاستلام', s: 'بدون مخاطر' },
             { icon: <Sofa size={18} />, t: 'أثاث عالي الجودة', s: 'متين ومريح' },
-            { icon: <Home size={18} />, t: 'تصاميم حصرية', s: 'لكل بيت' },
+            { icon: <HomeIcon size={18} />, t: 'تصاميم حصرية', s: 'لكل بيت' },
           ].map((item, i) => (
             <div key={i} style={{ padding: '1.25rem', background: CARD, display: 'flex', alignItems: 'center', gap: '0.875rem', borderLeft: i > 0 ? `1px solid ${BD}` : 'none', borderTop: i >= 2 ? `1px solid ${BD}` : 'none' }}>
               <div style={{ width: 42, height: 42, background: WL, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: W, flexShrink: 0 }}>{item.icon}</div>
@@ -564,7 +564,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
         <div>
           <div className="info-container">
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', background: WL, border: `1px solid ${WB}`, borderRadius: 20, padding: '0.3rem 0.875rem', marginBottom: '0.75rem' }}>
-              <Home size={11} color={W} /><span style={{ fontSize: '0.65rem', fontWeight: 600, color: WD }}>أثاث وديكور</span>
+              <HomeIcon size={11} color={W} /><span style={{ fontSize: '0.65rem', fontWeight: 600, color: WD }}>أثاث وديكور</span>
             </div>
             <h1 style={{ fontSize: 'clamp(1.5rem,4vw,2.25rem)', fontWeight: 700, color: INK, marginBottom: '0.5rem', lineHeight: 1.2 }}>{product.name}</h1>
             <div style={{ display: 'flex', gap: 2, marginBottom: '1.25rem' }}>{[...Array(5)].map((_, i) => <Star key={i} size={13} style={{ fill: i < 4 ? W : 'none', color: W }} />)}</div>
@@ -947,7 +947,7 @@ const Shell = ({ children, title }: { children: React.ReactNode; title: string }
     <div style={{ background: '#2C1810', paddingTop: 88, paddingBottom: 48, paddingLeft: 24, paddingRight: 24 }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(196,154,108,0.15)', border: '1px solid rgba(196,154,108,0.3)', borderRadius: 20, padding: '0.3rem 0.875rem', marginBottom: '1rem' }}>
-          <Home size={12} style={{ color: W }} /><span style={{ fontSize: '0.68rem', fontWeight: 600, color: W }}>Home Comforts</span>
+          <HomeIcon size={12} style={{ color: W }} /><span style={{ fontSize: '0.68rem', fontWeight: 600, color: W }}>Home Comforts</span>
         </div>
         <h1 style={{ fontSize: 'clamp(2rem,6vw,3.5rem)', fontWeight: 700, color: '#fff' }}>{title}</h1>
       </div>
@@ -959,7 +959,7 @@ const Shell = ({ children, title }: { children: React.ReactNode; title: string }
 const InfoBlock = ({ title, body }: { title: string; body: string }) => (
   <div style={{ padding: '1.125rem 0', borderBottom: `1px solid ${BD}`, display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
     <div style={{ width: 28, height: 28, background: WL, border: `1px solid ${WB}`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
-      <Home size={13} color={W} />
+      <HomeIcon size={13} color={W} />
     </div>
     <div>
       <h3 style={{ fontWeight: 700, fontSize: '0.9375rem', color: INK, marginBottom: '0.35rem' }}>{title}</h3>
@@ -1019,7 +1019,7 @@ export function Contact({ store }: { store: any }) {
       <div style={{ background: '#2C1810', paddingTop: 88, paddingBottom: 48, paddingLeft: 24, paddingRight: 24 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(196,154,108,0.15)', border: '1px solid rgba(196,154,108,0.3)', borderRadius: 20, padding: '0.3rem 0.875rem', marginBottom: '1rem' }}>
-            <Home size={12} style={{ color: W }} /><span style={{ fontSize: '0.68rem', fontWeight: 600, color: W }}>Home Comforts</span>
+            <HomeIcon size={12} style={{ color: W }} /><span style={{ fontSize: '0.68rem', fontWeight: 600, color: W }}>Home Comforts</span>
           </div>
           <h1 style={{ fontSize: 'clamp(2rem,6vw,3.5rem)', fontWeight: 700, color: '#fff' }}>تواصل معنا</h1>
         </div>
