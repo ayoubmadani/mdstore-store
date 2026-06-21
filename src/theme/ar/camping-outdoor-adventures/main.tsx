@@ -13,6 +13,7 @@ import {
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Shield, Truck,
   Compass, Mountain, Tent, Wind,
+  Mail,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
@@ -369,6 +370,7 @@ export function Footer({ store }: any) {
             <h4 style={{ fontSize: '0.65rem', fontWeight: 700, color: OR, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1rem' }}>تواصل</h4>
             {[
               { icon: <Phone size={12} />, val: store?.contact?.phone },
+              { icon: <Mail size={12} />, val: store?.contact?.email },
               { icon: <MapPin size={12} />, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
             ].filter(r => r.val).map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', fontSize: '0.875rem' }}>

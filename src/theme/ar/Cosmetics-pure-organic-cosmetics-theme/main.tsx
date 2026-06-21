@@ -410,6 +410,7 @@ export function Footer({ store }: any) {
             <h4 style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.16em', marginBottom:'1.5rem' }}>تواصل</h4>
             {[
               { icon:<Phone size={12}/>, val: store?.contact?.phone },
+              { icon:<Mail size={12}/>, val: store?.contact?.email },
               { icon:<MapPin size={12}/>, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
             ].filter(r => r.val).map((r,i) => (
               <div key={i} style={{ display:'flex', alignItems:'center', gap:'0.625rem', marginBottom:'0.875rem' }}>
