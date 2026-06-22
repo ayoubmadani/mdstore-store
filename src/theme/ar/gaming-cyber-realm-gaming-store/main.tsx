@@ -373,7 +373,13 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
   );
 
   return (
-    <nav dir="rtl" style={{ position: 'sticky', top: 0, zIndex: 50, background: scrolled ? 'rgba(5,11,26,0.97)' : 'rgba(5,11,26,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--line)', transition: 'all 0.3s' }}>
+    <>
+      {store?.topBar?.enabled && store?.topBar?.text && (
+        <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+          {store.topBar.text}
+        </div>
+      )}
+      <nav dir="rtl" style={{ position: 'sticky', top: 0, zIndex: 50, background: scrolled ? 'rgba(5,11,26,0.97)' : 'rgba(5,11,26,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--line)', transition: 'all 0.3s' }}>
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '15px' }}>
 
         {/* Logo */}
@@ -453,6 +459,7 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
         }
       `}</style>
     </nav>
+    </>
   );
 }
 

@@ -18,6 +18,7 @@ import { useRouter } from 'next/navigation';
 //import Details from '@/theme/tech-innovation/page/details';
 import dynamic from 'next/dynamic';
 import AddShow from '@/components/addShow';
+import { useStore } from '@/Hook/store-provider';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -143,6 +144,7 @@ const inputBase = (hasError?: boolean) =>
 
 /* ══════════════════════════════════════════════════════ */
 export default function ProductPage({ params }: { params: Promise<{ domain: string; productId: string }> }) {
+  const { store: contextStore, theme: contextThemeSlug } = useStore();
   const [resolvedParams, setResolvedParams] = useState<{ domain: string; productId: string } | null>(null);
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -338,8 +340,8 @@ export default function ProductPage({ params }: { params: Promise<{ domain: stri
 
   // 2. Add inside your component (with other hooks)
   const router = useRouter();
-  const currentThemeSlug = product?.store?.theme?.slug || 'default';
-  const language = product?.store?.language || 'ar';
+  const currentThemeSlug = contextThemeSlug || product?.store?.theme?.slug || 'default';
+  const language = contextStore?.language || product?.store?.language || 'ar';
 
   // أضف هذا الجزء داخل ProductPage
   useEffect(() => {

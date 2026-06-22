@@ -409,7 +409,13 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
   );
 
   return (
-    <header dir="rtl" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, height: '52px', backgroundColor: 'var(--paper)', borderBottom: '1px solid var(--ink)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', fontFamily: "'Space Mono',monospace" }}>
+    <>
+      {store?.topBar?.enabled && store?.topBar?.text && (
+        <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+          {store.topBar.text}
+        </div>
+      )}
+      <header dir="rtl" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, height: '52px', backgroundColor: 'var(--paper)', borderBottom: '1px solid var(--ink)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', fontFamily: "'Space Mono',monospace" }}>
       {/* Logo */}
       <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
         {store?.design?.logoUrl
@@ -467,6 +473,7 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
         </button>
       </div>
     </header>
+    </>
   );
 }
 

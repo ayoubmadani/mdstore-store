@@ -360,6 +360,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     );
 
     return (
+        <>
+        {store?.topBar?.enabled && store?.topBar?.text && (
+          <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+            {store.topBar.text}
+          </div>
+        )}
         <nav dir="rtl" style={{
             position: 'sticky', top: 0, zIndex: 100,
             background: scrolled ? 'rgba(250,249,247,0.95)' : 'var(--bg)',
@@ -442,6 +448,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 </div>
             </div>
         </nav>
+        </>
     );
 }
 

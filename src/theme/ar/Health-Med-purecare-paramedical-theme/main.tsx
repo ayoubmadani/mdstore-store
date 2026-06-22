@@ -377,16 +377,18 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   return (
     <header dir="rtl" style={{ position: 'sticky', top: 0, zIndex: 100, fontFamily: "'Inter',sans-serif" }}>
       {/* Ticker */}
-      <div style={{ backgroundColor: 'var(--blue)', overflow: 'hidden', whiteSpace: 'nowrap', padding: '7px 0' }}>
-        <div style={{ display: 'inline-block', animation: 'ticker 28s linear infinite' }}>
-          {Array(8).fill(null).map((_, i) => <span key={i} style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.9)', margin: '0 48px' }}>
-            ✅ منتجات موثّقة ومعتمدة — شحن سريع لجميع ولايات الجزائر
-          </span>)}
-          {Array(8).fill(null).map((_, i) => <span key={`b${i}`} style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.9)', margin: '0 48px' }}>
-            ✅ منتجات موثّقة ومعتمدة — شحن سريع لجميع ولايات الجزائر
-          </span>)}
+      {store?.topBar?.enabled && store?.topBar?.text && (
+        <div style={{ backgroundColor: 'var(--blue)', overflow: 'hidden', whiteSpace: 'nowrap', padding: '7px 0' }}>
+          <div style={{ display: 'inline-block', animation: 'ticker 28s linear infinite' }}>
+            {Array(8).fill(null).map((_, i) => <span key={i} style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.9)', margin: '0 48px' }}>
+              ✅ {store.topBar.text}
+            </span>)}
+            {Array(8).fill(null).map((_, i) => <span key={`b${i}`} style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.9)', margin: '0 48px' }}>
+              ✅ {store.topBar.text}
+            </span>)}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Main bar */}
       <div style={{ backgroundColor: 'var(--white)', borderBottom: '1px solid var(--line)', boxShadow: scrolled ? '0 2px 10px rgba(15,23,42,0.07)' : 'none', transition: 'box-shadow 0.3s' }}>

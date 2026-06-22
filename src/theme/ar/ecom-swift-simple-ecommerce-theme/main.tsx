@@ -222,7 +222,13 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   );
 
   return (
-    <header dir="rtl" style={{ borderBottom: '1px solid var(--border-color)', background: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
+    <>
+      {store?.topBar?.enabled && store?.topBar?.text && (
+        <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+          {store.topBar.text}
+        </div>
+      )}
+      <header dir="rtl" style={{ borderBottom: '1px solid var(--border-color)', background: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '75px' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
@@ -303,6 +309,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         }
       `}</style>
     </header>
+    </>
   );
 }
 

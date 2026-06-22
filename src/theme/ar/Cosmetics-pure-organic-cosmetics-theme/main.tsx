@@ -240,15 +240,15 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   return (
     <>
       {/* ── Announcement ticker ── */}
-      <div className="ann-wrap" style={{ height:32, display:'flex', alignItems:'center', background: INK, color:'rgba(255,255,255,0.82)' }}>
-        <div className="ann-track">
-          {Array.from({ length:2 }).flatMap((_,s) =>
-            ['🌸 مستحضرات طبيعية 100%', '✨ توصيل لجميع الولايات', '🌿 خالية من الكيماويات الضارة', '💧 زيوت نقية عضوية', '🐇 Cruelty-Free'].map((t,i) => (
-              <span key={`${s}-${i}`}>{t}</span>
-            ))
-          )}
+      {store?.topBar?.enabled && store?.topBar?.text && (
+        <div className="ann-wrap" style={{ height:32, display:'flex', alignItems:'center', background: INK, color:'rgba(255,255,255,0.82)' }}>
+          <div className="ann-track">
+            {Array.from({ length:8 }).map((_,i) => (
+              <span key={i}>✨ {store.topBar.text}</span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ── Nav bar ── */}
       <nav dir="rtl" style={{

@@ -300,6 +300,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     };
 
     return (
+        <>
+        {store?.topBar?.enabled && store?.topBar?.text && (
+          <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+            {store.topBar.text}
+          </div>
+        )}
         <nav dir="rtl" style={{ background: 'var(--white)', borderBottom: '1px solid var(--line)', padding: '0 20px', position: 'sticky', top: 0, zIndex: 100 }}>
             <div style={{maxWidth: 1080 , margin: 'auto'}}>
                 {/* الشريط العلوي الرئيسي */}
@@ -431,6 +437,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 )}
             </div>
         </nav>
+        </>
     );
 }
 

@@ -217,15 +217,15 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   return (
     <>
       {/* Announcement ticker */}
-      <div style={{ background: OR, color: '#fff', height: 28 }} className="ann-wrap">
-        <div className="ann-track" style={{ fontSize: '0.67rem', fontWeight: 700, letterSpacing: '0.07em', lineHeight: '28px' }}>
-          {Array.from({ length: 2 }).flatMap((_, set) =>
-            ['⛺ توصيل لجميع ولايات الجزائر', '🏔 معدات تخييم احترافية', '✅ دفع عند الاستلام', '🌿 جودة مضمونة 100%'].map((t, i) => (
-              <span key={`${set}-${i}`}>{t}</span>
-            ))
-          )}
+      {store?.topBar?.enabled && store?.topBar?.text && (
+        <div style={{ background: OR, color: '#fff', height: 28 }} className="ann-wrap">
+          <div className="ann-track" style={{ fontSize: '0.67rem', fontWeight: 700, letterSpacing: '0.07em', lineHeight: '28px' }}>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <span key={i}>⚡ {store.topBar.text}</span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Main nav */}
       <nav dir="rtl" style={{ background: scrolled ? DARK : DARK, borderBottom: '3px solid ' + OR, position: 'sticky', top: 0, zIndex: 50, transition: 'box-shadow 0.25s', boxShadow: scrolled ? '0 4px 24px rgba(0,0,0,0.35)' : 'none' }}>

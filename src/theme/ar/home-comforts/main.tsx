@@ -214,9 +214,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
   return (
     <>
-      <div className="hc-annbar">
-        ✦ توصيل لجميع ولايات الجزائر &nbsp;·&nbsp; دفع عند الاستلام &nbsp;·&nbsp; أثاث وديكور راقي ✦
-      </div>
+      {store?.topBar?.enabled && store?.topBar?.text && (
+        <div className="hc-annbar">
+          ✦ {store.topBar.text} ✦
+        </div>
+      )}
       <nav dir="rtl" style={{ position: 'sticky', top: 0, zIndex: 50, background: scrolled ? 'rgba(250,247,244,0.97)' : CARD, backdropFilter: 'blur(14px)', borderBottom: `1px solid ${BD}`, boxShadow: scrolled ? '0 4px 24px rgba(44,24,16,0.08)' : 'none', transition: 'all 0.25s' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
           <Link href="/" style={{ flexShrink: 0 }}>

@@ -211,14 +211,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       {/* Top bar */}
       <div className="top-bar" dir="rtl">
         <div style={{ display: 'flex', gap: '1.5rem' }}>
-          {[
-            { icon: <Truck size={11} />, t: 'توصيل لـ 58 ولاية' },
-            { icon: <Shield size={11} />, t: 'دفع عند الاستلام' },
-          ].map((item, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', color: 'rgba(255,255,255,0.55)', fontSize: '0.7rem' }}>
-              <span style={{ color: R }}>{item.icon}</span>{item.t}
+          {store?.topBar?.enabled && store?.topBar?.text ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', color: 'rgba(255,255,255,0.9)', fontSize: '0.7rem' }}>
+              ⚡ {store.topBar.text}
             </div>
-          ))}
+          ) : null}
         </div>
         <div style={{ display: 'flex', gap: '1rem' }}>
           {[{ h: '/Privacy', l: 'الخصوصية' }, { h: '/Terms', l: 'الشروط' }].map(lnk => (

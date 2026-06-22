@@ -211,13 +211,15 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
   return (
     <>
-      <div dir="rtl" style={{ background: G, padding: '0.375rem 1.5rem' }}>
-        <p style={{ fontSize: '0.72rem', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', textAlign: 'center' as const }}>
-          <Leaf size={10} style={{ flexShrink: 0 }} />
-          توصيل مجاني للطلبات فوق 5000 دج · منتجات طبيعية 100% معتمدة
-          <Leaf size={10} style={{ flexShrink: 0 }} />
-        </p>
-      </div>
+      {store?.topBar?.enabled && store?.topBar?.text && (
+        <div dir="rtl" style={{ background: G, padding: '0.375rem 1.5rem' }}>
+          <p style={{ fontSize: '0.72rem', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', textAlign: 'center' as const }}>
+            <Leaf size={10} style={{ flexShrink: 0 }} />
+            {store.topBar.text}
+            <Leaf size={10} style={{ flexShrink: 0 }} />
+          </p>
+        </div>
+      )}
       <nav dir="rtl" style={{ position: 'sticky', top: 0, zIndex: 50, background: scrolled ? 'rgba(246,248,245,0.95)' : '#fff', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${scrolled ? BD : '#EDF2EE'}`, boxShadow: scrolled ? '0 2px 20px rgba(45,106,79,0.08)' : 'none', transition: 'all 0.25s' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
           <Link href="/" style={{ flexShrink: 0 }}>

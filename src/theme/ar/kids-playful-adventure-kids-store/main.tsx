@@ -278,20 +278,22 @@ export default function Main({ store, children, domain }: any) {
             <style>{CSS}</style>
 
             {/* Animated stripe ticker */}
-            <div className="ticker-wrap" style={{ height: 36, display: 'flex', alignItems: 'center' }}>
+            {store?.topBar?.enabled && store?.topBar?.text && (
+              <div className="ticker-wrap" style={{ height: 36, display: 'flex', alignItems: 'center' }}>
                 <div className="ticker-inner">
-                    {Array(10).fill(null).map((_, i) => (
-                        <span key={i} style={{ margin: '0 2.5rem', color: '#fff', fontWeight: 900, fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: "'Boogaloo',cursive" }}>
-                            🚀 مغامرة جديدة &nbsp; ⭐ جودة عالية &nbsp; 🎯 توصيل سريع
-                        </span>
-                    ))}
-                    {Array(10).fill(null).map((_, i) => (
-                        <span key={`b${i}`} style={{ margin: '0 2.5rem', color: '#fff', fontWeight: 900, fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: "'Boogaloo',cursive" }}>
-                            🚀 مغامرة جديدة &nbsp; ⭐ جودة عالية &nbsp; 🎯 توصيل سريع
-                        </span>
-                    ))}
+                  {Array(10).fill(null).map((_, i) => (
+                    <span key={i} style={{ margin: '0 2.5rem', color: '#fff', fontWeight: 900, fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: "'Boogaloo',cursive" }}>
+                      ⭐ {store.topBar.text}
+                    </span>
+                  ))}
+                  {Array(10).fill(null).map((_, i) => (
+                    <span key={`b${i}`} style={{ margin: '0 2.5rem', color: '#fff', fontWeight: 900, fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: "'Boogaloo',cursive" }}>
+                      ⭐ {store.topBar.text}
+                    </span>
+                  ))}
                 </div>
-            </div>
+              </div>
+            )}
 
             <Navbar store={store} domain={domain} />
             <main>{children}</main>

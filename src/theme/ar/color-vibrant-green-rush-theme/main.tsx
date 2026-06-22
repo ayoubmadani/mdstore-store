@@ -379,13 +379,15 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   return (
     <>
       {/* Ticker */}
-      <div className="ticker-wrap">
-        <div className="ticker-track">
-          {[...Array(8)].map((_, i) => (
-            <span key={i} className="ticker-item">⚡ توصيل لجميع ولايات الجزائر · منتجات أصلية · دفع عند الاستلام</span>
-          ))}
+      {store?.topBar?.enabled && store?.topBar?.text && (
+        <div className="ticker-wrap">
+          <div className="ticker-track">
+            {[...Array(8)].map((_, i) => (
+              <span key={i} className="ticker-item">⚡ {store.topBar.text}</span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <nav dir="rtl" style={{
         position: 'sticky', top: 0, zIndex: 50,

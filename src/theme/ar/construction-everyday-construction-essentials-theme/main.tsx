@@ -205,6 +205,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
   return (
     <>
+      {store?.topBar?.enabled && store?.topBar?.text && (
+        <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+          {store.topBar.text}
+        </div>
+      )}
       <nav dir="rtl" style={{ position: 'sticky', top: 0, zIndex: 50, background: '#fff', borderBottom: `1px solid ${scrolled ? BD : '#F3F4F6'}`, boxShadow: scrolled ? '0 1px 6px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
           <Link href="/" style={{ flexShrink: 0 }}>
