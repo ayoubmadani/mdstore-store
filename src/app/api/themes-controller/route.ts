@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
+export const runtime = 'nodejs';
+
 const VALID_LANGS = ['ar', 'en', 'fr'];
 
 const CORS_HEADERS = {
