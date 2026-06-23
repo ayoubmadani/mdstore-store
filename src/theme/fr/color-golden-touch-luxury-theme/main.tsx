@@ -409,7 +409,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       )
       }
 
-      <nav dir="rtl" style={{
+      <nav dir="ltr" style={{
         position: 'sticky', top: 0, zIndex: 50,
         background: scrolled ? 'rgba(248,248,246,0.96)' : '#F8F8F6',
         borderBottom: `2px solid ${scrolled ? '#E8E8E8' : 'transparent'}`,
@@ -524,7 +524,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 ═══════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
   return (
-    <footer dir="rtl" style={{ background: '#111', color: '#aaa', marginTop: 80, padding: '4rem 1.5rem 1.5rem' }}>
+    <footer dir="ltr" style={{ background: '#111', color: '#aaa', marginTop: 80, padding: '4rem 1.5rem 1.5rem' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div className="footer-inner">
 
@@ -688,7 +688,7 @@ export function Home({ store, page }: any) {
   const countPage = Math.ceil((store.count || products.length) / 48);
 
   return (
-    <div dir="rtl">
+    <div dir="ltr">
 
       {/* ── HERO ── */}
       <section style={{ position: 'relative', background: '#000', overflow: 'hidden' }}>
@@ -809,7 +809,7 @@ export function Home({ store, page }: any) {
         )}
 
         {countPage > 1 && (
-          <div className="pagination" dir="rtl">
+          <div className="pagination" dir="ltr">
             <Link href={{ query: { page: Math.max(1, page - 1) } }} scroll={false}
               style={{ width: 36, height: 36, borderRadius: 8, border: '1.5px solid #EBEBEB', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', color: '#111' }}>❮</Link>
             {Array.from({ length: countPage }).map((_, i) => {
@@ -837,7 +837,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
   const [sel, setSel] = useState(0);
 
   return (
-    <div dir="rtl" style={{ background: '#F8F8F6', paddingBottom: '4rem' }}>
+    <div dir="ltr" style={{ background: '#F8F8F6', paddingBottom: '4rem' }}>
       <div className="details-inner" style={{ maxWidth: 1280, margin: '0 auto' }}>
 
         {/* 1. قسم المVoir (Gallery) */}
@@ -1212,7 +1212,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const inp = (err?: boolean) => ({ ...S.input, ...(err ? S.inputErr : {}) });
 
   if (success) return (
-    <div dir="rtl" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: '#F8F8F6' }}>
+    <div dir="ltr" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: '#F8F8F6' }}>
       <div style={{ textAlign: 'center', background: '#fff', padding: '3.5rem 2rem', borderRadius: 16, border: '1.5px solid #E8E8E8', maxWidth: 460, width: '100%' }}>
         <div style={{ width: 64, height: 64, background: 'rgba(34,197,94,0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem' }}>
           <CheckCircle2 size={32} style={{ color: '#22C55E' }} />
@@ -1225,7 +1225,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   if (!items.length) return (
-    <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: '#F8F8F6' }}>
+    <div dir="ltr" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: '#F8F8F6' }}>
       <div style={{ textAlign: 'center', padding: '4rem 2rem', border: '2px dashed #E8E8E8', borderRadius: 16, maxWidth: 440, width: '100%', background: '#fff' }}>
         <ShoppingBag size={52} style={{ color: '#E0E0E0', display: 'block', margin: '0 auto 1.25rem' }} />
         <p style={{ color: '#bbb', fontSize: '1rem', marginBottom: '2rem' }}>Panier vide</p>
@@ -1235,7 +1235,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   return (
-    <div dir="rtl" style={{ padding: '2.5rem 1.5rem', maxWidth: 1280, margin: '0 auto', minHeight: '100vh' }}>
+    <div dir="ltr" style={{ padding: '2.5rem 1.5rem', maxWidth: 1280, margin: '0 auto', minHeight: '100vh' }}>
       <h1 style={{ fontSize: 'clamp(1.75rem,5vw,2.75rem)', fontWeight: 800, color: '#111', letterSpacing: '-0.03em', marginBottom: '2rem' }}>Panier</h1>
       <div className="cart-inner">
         {/* Products */}
@@ -1371,7 +1371,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
    STATIC PAGES
 ═══════════════════════════════════════════════════════════ */
 const Shell = ({ children, title }: { children: React.ReactNode; title: string }) => (
-  <div dir="rtl" style={{ minHeight: '100vh', background: '#F8F8F6' }}>
+  <div dir="ltr" style={{ minHeight: '100vh', background: '#F8F8F6' }}>
     <div style={{ background: '#111', paddingTop: 96, paddingBottom: 48, paddingLeft: 24, paddingRight: 24, textAlign: 'center' }}>
       <div style={{ display: 'inline-block', background: 'rgba(230,57,70,0.15)', border: '1px solid rgba(230,57,70,0.3)', padding: '0.375rem 1rem', borderRadius: 6, marginBottom: '1.25rem' }}>
         <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#D4AF37', letterSpacing: '0.1em', textTransform: 'uppercase' }}>MdStore</span>
@@ -1439,7 +1439,7 @@ export function Contact({ store }: { store: any }) {
   };
 
   return (
-    <div dir="rtl" style={{ background: '#F8F8F6', minHeight: '100vh' }}>
+    <div dir="ltr" style={{ background: '#F8F8F6', minHeight: '100vh' }}>
       <div style={{ background: '#111', paddingTop: 96, paddingBottom: 48, paddingLeft: 24, paddingRight: 24, textAlign: 'center' }}>
         <h1 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', marginBottom: '0.625rem' }}>Contactez-nous</h1>
         <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9375rem' }}>Nous sommes là pour répondre à vos questions</p>

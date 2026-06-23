@@ -373,7 +373,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 );
 
   return (
-    <header dir="rtl" style={{position:'sticky', top:0, zIndex:100, fontFamily:"'Barlow',sans-serif"}}>
+    <header dir="ltr" style={{position:'sticky', top:0, zIndex:100, fontFamily:"'Barlow',sans-serif"}}>
       
       {/* Ticker - شريط الإعلانات المتحرك */}
       {store?.topBar?.enabled && store?.topBar?.text && (
@@ -503,7 +503,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
   return (
-    <footer dir="rtl" style={{backgroundColor:'var(--dark)',borderTop:'2px solid var(--fire)',fontFamily:"'Barlow',sans-serif"}}>
+    <footer dir="ltr" style={{backgroundColor:'var(--dark)',borderTop:'2px solid var(--fire)',fontFamily:"'Barlow',sans-serif"}}>
       {/* Moto stripe */}
       <div style={{overflow:'hidden',whiteSpace:'nowrap',background:'var(--fire)',padding:'10px 0'}}>
         <div className="moto-inner">
@@ -578,7 +578,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
   const price = typeof product.price==='string' ? parseFloat(product.price) : product.price;
   const orig  = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
   return (
-    <div className="p-card" dir="rtl">
+    <div className="p-card" dir="ltr">
       <div className="p-img" style={{position:'relative',aspectRatio:'1/1',overflow:'hidden',backgroundColor:'var(--panel-2)'}}>
         {displayImage
           ? <img src={displayImage} alt={product.name}/>
@@ -622,7 +622,7 @@ export function Home({ store, page }: any) {
   useEffect(() => { const t = setInterval(() => setMIdx(p=>(p+1)%mottos.length), 2500); return () => clearInterval(t); }, []);
 
   return (
-    <div dir="rtl">
+    <div dir="ltr">
 
       {/* ── HERO ── */}
       <section style={{position:'relative',overflow:'hidden',backgroundColor:'var(--black)',minHeight:'80vh',display:'flex',alignItems:'center',justifyContent:'center',paddingTop:30 , paddingBottom: 25}}>
@@ -767,7 +767,7 @@ export function Home({ store, page }: any) {
 
           {/* Pagination */}
           {countPage > 1 && (
-            <div className="pagination" dir="rtl">
+            <div className="pagination" dir="ltr">
               <Link href={{query:{page:Math.max(1,page-1)}}} scroll={false}
                 style={{width:40,height:40,border:'1px solid var(--dim)',background:'transparent',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--mid)',opacity:page<=1?0.3:1}}>❮</Link>
               {Array.from({length:countPage}).map((_,i)=>{
@@ -818,7 +818,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
   const [sel, setSel] = useState(0);
   if (!product) return null;
   return (
-    <div dir="rtl" style={{backgroundColor:'var(--black)'}}>
+    <div dir="ltr" style={{backgroundColor:'var(--black)'}}>
       
 
       <div style={{maxWidth:'1280px',margin:'0 auto',padding:'32px 20px'}}>
@@ -1023,7 +1023,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   };
 
   return (
-    <div dir="rtl" style={{marginTop:'22px',paddingTop:'20px',borderTop:'1px solid var(--line)'}}>
+    <div dir="ltr" style={{marginTop:'22px',paddingTop:'20px',borderTop:'1px solid var(--line)'}}>
       {/* Cart + Order buttons */}
       {product.store?.cart && (
         <div style={{display:'flex',gap:'8px',marginBottom:'16px'}}>
@@ -1177,7 +1177,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   };
 
   if(success) return (
-    <div dir="rtl" style={{minHeight:'70vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem',background:'var(--black)'}}>
+    <div dir="ltr" style={{minHeight:'70vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem',background:'var(--black)'}}>
       <div style={{textAlign:'center',background:'var(--panel)',padding:'4rem 2.5rem',border:'2px solid var(--fire)',maxWidth:460,width:'100%'}}>
         <CheckCircle2 style={{width:'48px',height:'48px',color:'var(--green)',display:'block',margin:'0 auto 1.25rem'}}/>
         <h2 className="bb" style={{fontSize:'2.5rem',color:'var(--white)',marginBottom:'0.625rem'}}>Commande reçue !</h2>
@@ -1188,7 +1188,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   if(!items.length) return (
-    <div dir="rtl" style={{minHeight:'60vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem',background:'var(--black)'}}>
+    <div dir="ltr" style={{minHeight:'60vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem',background:'var(--black)'}}>
       <div style={{textAlign:'center',padding:'4rem 2rem',border:'1px dashed var(--dim)',maxWidth:400,width:'100%'}}>
         <Dumbbell style={{width:'48px',height:'48px',color:'var(--dim)',display:'block',margin:'0 auto 1.25rem',opacity:0.4}}/>
         <p className="bb" style={{fontSize:'2rem',color:'var(--dim)',marginBottom:'1.75rem'}}>Panier vide</p>
@@ -1198,7 +1198,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   return (
-    <div dir="rtl" style={{minHeight:'100vh',background:'var(--black)',padding:'2.5rem 1.5rem 5rem'}}>
+    <div dir="ltr" style={{minHeight:'100vh',background:'var(--black)',padding:'2.5rem 1.5rem 5rem'}}>
       <div style={{maxWidth:1280,margin:'0 auto'}}>
         <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',marginBottom:'2rem',paddingBottom:'1rem',borderBottom:'2px solid var(--fire)'}}>
           <h1 className="bb" style={{fontSize:'clamp(2rem,5vw,3rem)',color:'var(--white)'}}>Panier</h1>
@@ -1342,7 +1342,7 @@ export function StaticPage({ staticPage, page, store }: any) {
 }
 
 const Shell = ({ children, title, sub }: { children: React.ReactNode; title: string; sub?: string }) => (
-  <div dir="rtl" style={{backgroundColor:'var(--black)',minHeight:'100vh'}}>
+  <div dir="ltr" style={{backgroundColor:'var(--black)',minHeight:'100vh'}}>
     <div style={{backgroundColor:'var(--dark)',padding:'56px 20px 40px',borderBottom:`2px solid var(--fire)`,position:'relative',overflow:'hidden'}}>
       <div style={{position:'absolute',inset:0,backgroundImage:'linear-gradient(rgba(255,69,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,69,0,0.04) 1px,transparent 1px)',backgroundSize:'40px 40px',pointerEvents:'none'}}/>
       <div style={{maxWidth:'720px',margin:'0 auto',position:'relative',zIndex:2,textAlign:'right'}}>
@@ -1419,7 +1419,7 @@ export function Contact({ store }: { store?: any }) {
   };
 
   return (
-    <div dir="rtl" style={{backgroundColor:'var(--black)',minHeight:'100vh'}}>
+    <div dir="ltr" style={{backgroundColor:'var(--black)',minHeight:'100vh'}}>
       <div style={{backgroundColor:'var(--dark)',padding:'56px 20px 40px',borderBottom:`2px solid var(--fire)`,position:'relative',overflow:'hidden'}}>
         <div style={{position:'absolute',inset:0,backgroundImage:'linear-gradient(rgba(255,69,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,69,0,0.04) 1px,transparent 1px)',backgroundSize:'40px 40px',pointerEvents:'none'}}/>
         <div style={{maxWidth:'960px',margin:'0 auto',position:'relative',zIndex:2,textAlign:'right'}}>

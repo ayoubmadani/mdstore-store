@@ -399,7 +399,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 </div>
               </Link>
             ))}
-            <button onClick={handleSearch} style={{ width: '100%', padding: '0.75rem', background: '#F8F8F6', border: 'none', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem', color: '#444' }}>عرض الكل</button>
+            <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: 'rgba(29,78,216,0.07)', border: 'none', borderTop: '1px solid rgba(29,78,216,0.2)', color: '#1D4ED8', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>عرض جميع النتائج <ArrowLeft size={14} /></button>
           </>
         ) : searchQuery.length >= 2 && <div style={{ padding: '1rem', textAlign: 'center', color: '#aaa', fontSize: '0.85rem' }}>لا توجد نتائج</div>}
     </div>

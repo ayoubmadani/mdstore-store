@@ -415,7 +415,7 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
           {store.topBar.text}
         </div>
       )}
-      <header dir="rtl" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, height: '52px', backgroundColor: 'var(--paper)', borderBottom: '1px solid var(--ink)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', fontFamily: "'Space Mono',monospace" }}>
+      <header dir="ltr" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, height: '52px', backgroundColor: 'var(--paper)', borderBottom: '1px solid var(--ink)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', fontFamily: "'Space Mono',monospace" }}>
       {/* Logo */}
       <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
         {store?.design?.logoUrl
@@ -483,7 +483,7 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
 export function Footer({ store }: any) {
   const yr = new Date().getFullYear();
   return (
-    <footer dir="rtl" className="noise-ov" style={{ backgroundColor: 'var(--ink)', color: 'var(--paper)', position: 'relative', overflow: 'hidden', fontFamily: "'Space Mono',monospace" }}>
+    <footer dir="ltr" className="noise-ov" style={{ backgroundColor: 'var(--ink)', color: 'var(--paper)', position: 'relative', overflow: 'hidden', fontFamily: "'Space Mono',monospace" }}>
       {/* Ghost watermark */}
       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', overflow: 'hidden' }}>
         <span className="ub" style={{ fontWeight: 900, fontSize: 'clamp(6rem,22vw,20rem)', color: 'rgba(242,239,232,0.025)', letterSpacing: '-0.05em', whiteSpace: 'nowrap', lineHeight: 1 }}>
@@ -610,7 +610,7 @@ export function Home({ store, page }: any) {
   const countPage = Math.ceil((store.count || products.length) / 48);
 
   return (
-    <div dir="rtl" style={{ backgroundColor: 'var(--paper)' }}>
+    <div dir="ltr" style={{ backgroundColor: 'var(--paper)' }}>
 
       {/* ── POSTER HERO ── */}
       <section className="noise-ov" style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--ink)', overflow: 'hidden' }}>
@@ -725,7 +725,7 @@ export function Home({ store, page }: any) {
 
         {/* Pagination */}
         {countPage > 1 && (
-          <div className="pagination" dir="rtl" style={{ padding: '0 0 40px' }}>
+          <div className="pagination" dir="ltr" style={{ padding: '0 0 40px' }}>
             <Link href={{ query: { page: Math.max(1, page - 1) } }} scroll={false}
               style={{ width: 40, height: 40, border: '1px solid var(--ink)', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', opacity: page <= 1 ? 0.3 : 1 }}>❮</Link>
             {Array.from({ length: countPage }).map((_, i) => {
@@ -770,7 +770,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
   const [sel, setSel] = useState(0);
   if (!product) return null;
   return (
-    <div dir="rtl" style={{ backgroundColor: 'var(--paper)', fontFamily: "'Space Mono',monospace" }}>
+    <div dir="ltr" style={{ backgroundColor: 'var(--paper)', fontFamily: "'Space Mono',monospace" }}>
       
 
       <div className="details-split">
@@ -946,7 +946,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   };
 
   return (
-    <div dir="rtl" style={{ marginTop: '22px', paddingTop: '22px', borderTop: '2px solid var(--ink)' }}>
+    <div dir="ltr" style={{ marginTop: '22px', paddingTop: '22px', borderTop: '2px solid var(--ink)' }}>
       {product.store?.cart && (
         <div className="cart-add-btns" style={{ marginBottom: '14px' }}>
           <button onClick={addToCart} disabled={isAdded} className="sm" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px', cursor: isAdded ? 'default' : 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', border: `1px solid ${isAdded ? '#22c55e' : 'var(--ink)'}`, background: isAdded ? 'rgba(34,197,94,0.08)' : 'transparent', color: isAdded ? '#22c55e' : 'var(--ink)', transition: 'all 0.25s' }}>
@@ -1099,7 +1099,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   };
 
   if (success) return (
-    <div dir="rtl" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--paper)', fontFamily: "'Space Mono',monospace" }}>
+    <div dir="ltr" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--paper)', fontFamily: "'Space Mono',monospace" }}>
       <div style={{ textAlign: 'center', padding: '4rem 2.5rem', border: '2px solid var(--ink)', borderTop: '4px solid var(--punch)', maxWidth: 460, width: '100%' }}>
         <CheckCircle2 style={{ width: '40px', height: '40px', color: 'var(--punch)', display: 'block', margin: '0 auto 1.25rem' }} />
         <h2 className="ub" style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--ink)', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>CONFIRMED.</h2>
@@ -1110,7 +1110,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   if (!items.length) return (
-    <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--paper)', fontFamily: "'Space Mono',monospace" }}>
+    <div dir="ltr" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--paper)', fontFamily: "'Space Mono',monospace" }}>
       <div style={{ textAlign: 'center', padding: '4rem 2rem', border: '1px solid var(--ink)', maxWidth: 400, width: '100%' }}>
         <span className="ub" style={{ fontWeight: 900, fontSize: '4rem', color: 'rgba(10,9,6,0.08)', letterSpacing: '-0.04em', display: 'block', marginBottom: '1rem' }}>EMPTY.</span>
         <p style={{ fontSize: '9px', letterSpacing: '0.2em', color: 'var(--mist)', marginBottom: '1.75rem' }}>Panier vide</p>
@@ -1120,7 +1120,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   return (
-    <div dir="rtl" style={{ minHeight: '100vh', background: 'var(--paper)', padding: '2.5rem 1.5rem 5rem', fontFamily: "'Space Mono',monospace" }}>
+    <div dir="ltr" style={{ minHeight: '100vh', background: 'var(--paper)', padding: '2.5rem 1.5rem 5rem', fontFamily: "'Space Mono',monospace" }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '2px solid var(--ink)' }}>
           <h1 className="ub" style={{ fontSize: 'clamp(2rem,5vw,4rem)', fontWeight: 900, letterSpacing: '-0.03em', color: 'var(--ink)' }}>CART.</h1>
@@ -1236,7 +1236,7 @@ export function StaticPage({ staticPage, page, store }: any) {
 }
 
 const PageShell = ({ children, title, code }: { children: React.ReactNode; title: string; code: string }) => (
-  <div dir="rtl" style={{ backgroundColor: 'var(--paper)', fontFamily: "'Space Mono',monospace", minHeight: '100vh' }}>
+  <div dir="ltr" style={{ backgroundColor: 'var(--paper)', fontFamily: "'Space Mono',monospace", minHeight: '100vh' }}>
     <div style={{ backgroundColor: 'var(--ink)', padding: '80px 6vw 40px', position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', right: '-3%', bottom: '-20%', pointerEvents: 'none', userSelect: 'none', opacity: 0.04 }}>
         <span className="ub" style={{ fontWeight: 900, fontSize: 'clamp(10rem,28vw,26rem)', color: 'var(--paper)', letterSpacing: '-0.05em', lineHeight: 1, whiteSpace: 'nowrap' }}>{title.toUpperCase()}</span>
@@ -1310,7 +1310,7 @@ export function Contact({ store }: { store?: any }) {
   };
 
   return (
-    <div dir="rtl" style={{ backgroundColor: 'var(--paper)', fontFamily: "'Space Mono',monospace", minHeight: '100vh' }}>
+    <div dir="ltr" style={{ backgroundColor: 'var(--paper)', fontFamily: "'Space Mono',monospace", minHeight: '100vh' }}>
       <div style={{ backgroundColor: 'var(--punch)', padding: '80px 6vw 40px', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', right: '-3%', bottom: '-15%', pointerEvents: 'none', userSelect: 'none', opacity: 0.1 }}>
           <span className="ub" style={{ fontWeight: 900, fontSize: 'clamp(10rem,28vw,26rem)', color: 'var(--paper)', letterSpacing: '-0.05em', lineHeight: 1 }}>HIT</span>

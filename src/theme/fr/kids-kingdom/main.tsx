@@ -419,7 +419,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   const initials = (store.name || 'K').split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase();
 
   return (
-    <nav dir="rtl" style={{
+    <nav dir="ltr" style={{
       position: 'sticky', top: 0, zIndex: 100,
       background: scrolled ? 'rgba(255,251,240,0.96)' : 'var(--bg)',
       backdropFilter: scrolled ? 'blur(16px)' : 'none',
@@ -523,7 +523,7 @@ const mobileLinkStyle = {
 ═══════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
   return (
-    <footer dir="rtl" style={{ background: '#1A1A2E', color: '#aaa', marginTop: 0, padding: '4rem 1.5rem 2rem', position: 'relative', overflow: 'hidden' }}>
+    <footer dir="ltr" style={{ background: '#1A1A2E', color: '#aaa', marginTop: 0, padding: '4rem 1.5rem 2rem', position: 'relative', overflow: 'hidden' }}>
       <div className="stars-bg" style={{ position: 'absolute', inset: 0, opacity: 0.25, pointerEvents: 'none' }} />
       <div style={{ height: 4, background: 'linear-gradient(90deg, var(--coral), var(--orange), var(--sun), var(--mint-dk), var(--sky), var(--grape), var(--pink))', position: 'absolute', top: 0, left: 0, right: 0 }} />
       <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1 }}>
@@ -648,7 +648,7 @@ export function Home({ store, page }: any) {
   const countPage = Math.ceil((store.count || products.length) / 48);
 
   return (
-    <div dir="rtl">
+    <div dir="ltr">
 
       {/* ── HERO ── */}
       <section className="polka-dots" style={{ position: 'relative', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
@@ -768,7 +768,7 @@ export function Home({ store, page }: any) {
 
         {/* Pagination */}
         {countPage > 1 && (
-          <div className="pagination" dir="rtl">
+          <div className="pagination" dir="ltr">
             <Link href={{ query: { page: Math.max(1, page - 1) } }} scroll={false}
               style={{ width: 40, height: 40, borderRadius: 14, border: '2.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', color: 'var(--coral)', fontWeight: 900, opacity: page <= 1 ? 0.3 : 1 }}>❮</Link>
             {Array.from({ length: countPage }).map((_, i) => {
@@ -812,7 +812,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
   const accent = colors[parseInt(product.id || '0') % colors.length];
 
   return (
-    <div dir="rtl" style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: '4rem' }}>
+    <div dir="ltr" style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: '4rem' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2.5rem 1.5rem' }}>
         <div className="details-layout">
 
@@ -1152,7 +1152,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   };
 
   if (success) return (
-    <div dir="rtl" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
+    <div dir="ltr" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
       <div className="anim-pop-in" style={{ textAlign: 'center', background: '#fff', padding: '4rem 2.5rem', borderRadius: 28, border: '3px solid var(--mint-dk)', maxWidth: 460, width: '100%', boxShadow: '0 12px 40px rgba(110,231,183,0.2)' }}>
         <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'rgba(110,231,183,0.15)', border: '3px solid var(--mint-dk)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
           <CheckCircle2 size={36} style={{ color: 'var(--mint-dk)' }} />
@@ -1167,7 +1167,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   if (!items.length) return (
-    <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
+    <div dir="ltr" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
       <div className="polka-dots" style={{ textAlign: 'center', padding: '4rem 2rem', border: '3px dashed var(--border)', borderRadius: 28, maxWidth: 400, width: '100%', background: '#fff' }}>
         <ShoppingBag size={52} style={{ color: 'var(--text-soft)', display: 'block', margin: '0 auto 1.25rem', opacity: 0.4 }} />
         <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.25rem', color: 'var(--text-mid)', marginBottom: '1.75rem' }}>Panier vide 🧸</p>
@@ -1179,7 +1179,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   return (
-    <div dir="rtl" style={{ minHeight: '100vh', background: 'var(--bg)', padding: '2.5rem 1.5rem 5rem' }}>
+    <div dir="ltr" style={{ minHeight: '100vh', background: 'var(--bg)', padding: '2.5rem 1.5rem 5rem' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <h1 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(2rem, 5vw, 3rem)', color: 'var(--text)', marginBottom: '2rem' }}>🛒 Panier</h1>
         <div className="cart-layout">
@@ -1290,7 +1290,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
    STATIC PAGES
 ═══════════════════════════════════════════════════════════ */
 const PageShell = ({ title, emoji, children }: { title: string; emoji: string; children: React.ReactNode }) => (
-  <div dir="rtl" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+  <div dir="ltr" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
     <div className="polka-dots" style={{ position: 'relative', overflow: 'hidden', padding: '5rem 1.5rem 3rem', textAlign: 'center', background: 'linear-gradient(135deg, #fff9e6, var(--bg))' }}>
       <Confetti />
       <div style={{ position: 'relative', zIndex: 1 }}>
@@ -1356,7 +1356,7 @@ export function Contact({ store }: { store: any }) {
   };
 
   return (
-    <div dir="rtl" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+    <div dir="ltr" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <div className="polka-dots" style={{ position: 'relative', overflow: 'hidden', padding: '5rem 1.5rem 3rem', textAlign: 'center', background: 'linear-gradient(135deg, #fff9e6, var(--bg))' }}>
         <Confetti />
         <div style={{ position: 'relative', zIndex: 1 }}>

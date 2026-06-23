@@ -720,7 +720,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 
 function SimplePage({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ ...S.body, padding: '3rem 0', minHeight: '60vh' }} dir="rtl">
+    <div style={{ ...S.body, padding: '3rem 0', minHeight: '60vh' }} dir="ltr">
       <div style={{ ...S.container, maxWidth: 700 }}>
         <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '0.5rem' }}>{title}</h1>
         <hr style={{ ...S.hr, marginBottom: '1.5rem' }} />

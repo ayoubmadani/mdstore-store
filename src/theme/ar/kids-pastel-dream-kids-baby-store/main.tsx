@@ -347,9 +347,8 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                             </Link>
                         ))}
 
-                        {/* زر عرض المزيد يظهر فقط عند وجود نتائج */}
-                        <button style={{ width: '100%', padding: '10px', color: 'var(--lavender-dk)', fontWeight: 700, cursor: 'pointer' }}>
-                            عرض المزيد
+                        <button onClick={doSearch} style={{ width: '100%', padding: '12px', background: 'var(--lavender-lt)', border: 'none', borderTop: '1px solid var(--lavender)', color: 'var(--lavender-dk)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                            عرض جميع النتائج <ArrowLeft size={14} />
                         </button>
                     </>
                 ) : searchQuery.length >= 2 && (

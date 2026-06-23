@@ -190,17 +190,22 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       left: 0,
       background: '#fff',
       border: '1px solid #eee',
-      zIndex: 999, // قيمة عالية جداً لضمان الظهور فوق الصور والمحتوى
+      zIndex: 999,
       maxHeight: '350px',
       overflowY: 'auto',
       boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
       marginTop: '5px',
-      borderRadius: '8px'
+      borderRadius: '8px',
+      paddingTop: 25
     }}>
+      <button onClick={() => setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
+        <X size={14} />
+      </button>
       {loading ? (
         <div style={{ padding: '1.5rem', textAlign: 'center', color: '#888' }}>جاري البحث...</div>
       ) : listSearch.length > 0 ? (
-        listSearch.map((p: any) => (
+        <>
+        {listSearch.map((p: any) => (
           <Link
             href={`/product/${p.id}`}
             key={p.id}
@@ -214,7 +219,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               <div style={{ fontSize: '0.8rem', color: '#666' }}>{p.price} دج</div>
             </div>
           </Link>
-        ))
+        ))}
+        <button onClick={handleSearchSubmit} style={{ width: '100%', padding: '12px', background: '#f9f9f9', border: 'none', borderTop: '1px solid #e5e7eb', color: 'var(--primary)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          عرض جميع النتائج <ArrowLeft size={14} />
+        </button>
+        </>
       ) : searchQuery.length >= 2 && (
         <div style={{ padding: '1.5rem', textAlign: 'center', color: '#888' }}>لا توجد نتائج</div>
       )}

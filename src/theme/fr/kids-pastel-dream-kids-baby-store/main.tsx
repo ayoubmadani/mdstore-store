@@ -347,9 +347,8 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                             </Link>
                         ))}
 
-                        {/* زر Voir plus يظهر uniquement عند وجود نتائج */}
-                        <button style={{ width: '100%', padding: '10px', color: 'var(--lavender-dk)', fontWeight: 700, cursor: 'pointer' }}>
-                            Voir plus
+                        <button onClick={doSearch} style={{ width: '100%', padding: '12px', background: 'var(--lavender-lt)', border: 'none', borderTop: '1px solid var(--lavender)', color: 'var(--lavender-dk)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                            Voir tous les résultats <ArrowLeft size={14} />
                         </button>
                     </>
                 ) : searchQuery.length >= 2 && (
@@ -366,7 +365,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             {store.topBar.text}
           </div>
         )}
-        <nav dir="rtl" style={{
+        <nav dir="ltr" style={{
             position: 'sticky', top: 0, zIndex: 100,
             background: scrolled ? 'rgba(250,249,247,0.95)' : 'var(--bg)',
             backdropFilter: scrolled ? 'blur(20px)' : 'none',
@@ -457,7 +456,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
     return (
-        <footer dir="rtl" style={{ background: 'linear-gradient(135deg, #4C1D95 0%, #7C3AED 50%, #5B21B6 100%)', color: '#fff', padding: '4rem 1.5rem 2rem', position: 'relative', overflow: 'hidden' }}>
+        <footer dir="ltr" style={{ background: 'linear-gradient(135deg, #4C1D95 0%, #7C3AED 50%, #5B21B6 100%)', color: '#fff', padding: '4rem 1.5rem 2rem', position: 'relative', overflow: 'hidden' }}>
             {/* Cloud deco */}
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, opacity: 0.08, pointerEvents: 'none' }}>
                 <div className="cloud-wrap">
@@ -593,7 +592,7 @@ export function Home({ store, page }: any) {
     const countPage = Math.ceil((store.count || products.length) / 48);
 
     return (
-        <div dir="rtl">
+        <div dir="ltr">
             {/* ── HERO ── */}
             <section className="pastel-dots" style={{ position: 'relative', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
                 {/* Cloud decoration */}
@@ -709,7 +708,7 @@ export function Home({ store, page }: any) {
                 )}
 
                 {countPage > 1 && (
-                    <div className="pagination" dir="rtl">
+                    <div className="pagination" dir="ltr">
                         <Link href={{ query: { page: Math.max(1, page - 1) } }} scroll={false} style={{ width: 38, height: 38, borderRadius: 12, border: '2px solid var(--lavender-lt)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', color: 'var(--lavender-dk)', opacity: page <= 1 ? 0.3 : 1 }}>❮</Link>
                         {Array.from({ length: countPage }).map((_, i) => {
                             const pn = i + 1; const isA = Number(page) === pn;
@@ -748,7 +747,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
     const [sel, setSel] = useState(0);
 
     return (
-        <div dir="rtl" style={{ background: 'var(--bg)', paddingBottom: '4rem' }}>
+        <div dir="ltr" style={{ background: 'var(--bg)', paddingBottom: '4rem' }}>
             <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2.5rem 1.5rem' }}>
                 <div className="details-layout">
                     {/* Gallery */}
@@ -1121,7 +1120,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     };
 
     if (success) return (
-        <div dir="rtl" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
+        <div dir="ltr" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
             <div className="anim-fade" style={{ textAlign: 'center', background: '#fff', padding: '4rem 2.5rem', borderRadius: 28, border: '2px solid var(--lavender-lt)', maxWidth: 460, width: '100%', boxShadow: '0 12px 40px var(--shadow)' }}>
                 <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1.25rem', animation: 'gentle-float 3s ease-in-out infinite' }}>🌸</span>
                 <h2 className="font-serif" style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--lavender-dk)', marginBottom: '0.625rem' }}>Commande reçue !</h2>
@@ -1132,7 +1131,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     );
 
     if (!items.length) return (
-        <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
+        <div dir="ltr" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
             <div className="pastel-dots" style={{ textAlign: 'center', padding: '4rem 2rem', border: '2px dashed var(--lavender)', borderRadius: 28, maxWidth: 400, width: '100%', background: 'var(--lavender-lt)' }}>
                 <ShoppingBag size={52} style={{ color: 'var(--lavender)', display: 'block', margin: '0 auto 1.25rem', opacity: 0.5 }} />
                 <p className="font-serif" style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--lavender-dk)', marginBottom: '1.75rem' }}>Panier vide 🌸</p>
@@ -1142,7 +1141,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     );
 
     return (
-        <div dir="rtl" style={{ minHeight: '100vh', background: 'var(--bg)', padding: '2.5rem 1.5rem 5rem' }}>
+        <div dir="ltr" style={{ minHeight: '100vh', background: 'var(--bg)', padding: '2.5rem 1.5rem 5rem' }}>
             <div style={{ maxWidth: 1200, margin: '0 auto' }}>
                 <h1 className="font-serif" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, color: 'var(--text)', marginBottom: '2rem' }}>🛒 Panier</h1>
                 <div className="cart-layout">
@@ -1258,7 +1257,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
    STATIC PAGES
 ══════════════════════════════════════════════════════════════ */
 const Shell = ({ title, emoji, children }: { title: string; emoji: string; children: React.ReactNode }) => (
-    <div dir="rtl" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+    <div dir="ltr" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
         <div className="pastel-dots" style={{ padding: '5rem 1.5rem 3rem', textAlign: 'center', background: 'linear-gradient(135deg, var(--lavender-lt), var(--rose-lt))' }}>
             <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1rem', animation: 'gentle-float 4s ease-in-out infinite' }}>{emoji}</span>
             <h1 className="font-serif" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 700, color: 'var(--lavender-dk)' }}>{title}</h1>
@@ -1295,7 +1294,7 @@ export function Contact({ store }: { store: any }) {
         catch { showError('Une Erreur est survenue'); } finally { setLoading(false); }
     };
     return (
-        <div dir="rtl" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+        <div dir="ltr" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
             <div className="pastel-dots" style={{ padding: '5rem 1.5rem 3rem', textAlign: 'center', background: 'linear-gradient(135deg, var(--lavender-lt), var(--rose-lt))' }}>
                 <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1rem', animation: 'gentle-float 4s ease-in-out infinite' }}>💌</span>
                 <h1 className="font-serif" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 700, color: 'var(--lavender-dk)' }}>Contactez-nous</h1>

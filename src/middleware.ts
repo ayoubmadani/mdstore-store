@@ -6,12 +6,27 @@ export function middleware(req: NextRequest) {
   const path = url.pathname;
 
   // 1. استثناء الملفات التقنية والملفات الثابتة
-  if (
-    path.startsWith('/_next') || 
-    path.startsWith('/api') || 
-    path.includes('.')
-  ) {
+  if (path.startsWith('/_next') || path.includes('.')) {
     return NextResponse.next();
+  }
+
+  // CORS للـ API routes
+  if (path.startsWith('/api')) {
+    if (req.method === 'OPTIONS') {
+      return new NextResponse(null, {
+        status: 204,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        },
+      });
+    }
+    const res = NextResponse.next();
+    res.headers.set('Access-Control-Allow-Origin', '*');
+    res.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.headers.set('Access-Control-Allow-Headers', 'Content-Type');
+    return res;
   }
 
   // 2. جلب وتجهيز الـ Hostname

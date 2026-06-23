@@ -375,7 +375,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   );
 
   return (
-    <header dir="rtl" style={{ position: 'sticky', top: 0, zIndex: 100, fontFamily: "'Inter',sans-serif" }}>
+    <header dir="ltr" style={{ position: 'sticky', top: 0, zIndex: 100, fontFamily: "'Inter',sans-serif" }}>
       {/* Ticker */}
       {store?.topBar?.enabled && store?.topBar?.text && (
         <div style={{ backgroundColor: 'var(--blue)', overflow: 'hidden', whiteSpace: 'nowrap', padding: '7px 0' }}>
@@ -456,7 +456,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 export function Footer({ store }: any) {
   const yr = new Date().getFullYear();
   return (
-    <footer dir="rtl" style={{ backgroundColor: 'var(--ink)', fontFamily: "'Inter',sans-serif" }}>
+    <footer dir="ltr" style={{ backgroundColor: 'var(--ink)', fontFamily: "'Inter',sans-serif" }}>
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '48px 20px 32px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: '40px', paddingBottom: '36px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
 
@@ -616,7 +616,7 @@ export function Home({ store, page }: any) {
   const displayCats = cats.length > 0 ? cats.slice(0, 4) : [];
 
   return (
-    <div dir="rtl">
+    <div dir="ltr">
 
       {/* ── HERO ── */}
       <section style={{ position: 'relative', width: '100%', overflow: 'hidden', backgroundColor: 'var(--slate)' }}>
@@ -789,7 +789,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
   const [sel, setSel] = useState(0);
   if (!product) return null;
   return (
-    <div dir="rtl" style={{ backgroundColor: 'var(--off)' }}>
+    <div dir="ltr" style={{ backgroundColor: 'var(--off)' }}>
 
 
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '28px 20px' }}>
@@ -986,7 +986,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const onB = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>, err?: boolean) => { e.target.style.borderColor = err ? 'var(--red)' : 'var(--line-dk)'; };
 
   return (
-    <div dir="rtl">
+    <div dir="ltr">
       {/* Cart + Order buttons */}
       {product.store?.cart && (
         <div className="cart-btns" style={{ marginBottom: '20px' }}>
@@ -1154,7 +1154,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   };
 
   if (success) return (
-    <div dir="rtl" style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: 'var(--white)', borderRadius: '10px', border: '1px solid var(--line)' }}>
+    <div dir="ltr" style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: 'var(--white)', borderRadius: '10px', border: '1px solid var(--line)' }}>
       <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: 'rgba(22,163,74,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
         <CheckCircle2 size={40} style={{ color: 'var(--green)' }} />
       </div>
@@ -1165,7 +1165,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   if (!items.length) return (
-    <div dir="rtl" style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: 'var(--white)', borderRadius: '10px', border: '1px solid var(--line)' }}>
+    <div dir="ltr" style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: 'var(--white)', borderRadius: '10px', border: '1px solid var(--line)' }}>
       <ShoppingBag size={48} style={{ color: 'var(--dim)', marginBottom: '16px', opacity: 0.5, display: 'block', margin: '0 auto 16px' }} />
       <h3 className="pjs" style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--ink)', marginBottom: '16px' }}>Panier vide</h3>
       <Link href="/" className="btn-blue" style={{ display: 'inline-flex', borderRadius: '8px', padding: '12px 28px' }}>Acheter maintenant</Link>
@@ -1173,7 +1173,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   return (
-    <div dir="rtl">
+    <div dir="ltr">
       <div className="cart-g">
         {/* Items */}
         <div>
@@ -1316,7 +1316,7 @@ export function StaticPage({ staticPage, page, store }: any) {
 }
 
 const Shell = ({ children, title, sub }: { children: React.ReactNode; title: string; sub?: string }) => (
-  <div dir="rtl" style={{ backgroundColor: 'var(--off)', minHeight: '100vh' }}>
+  <div dir="ltr" style={{ backgroundColor: 'var(--off)', minHeight: '100vh' }}>
     <div style={{ backgroundColor: 'var(--white)', padding: '48px 20px 36px', borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(to right,var(--blue),var(--teal))' }} />
       <div style={{ maxWidth: '720px', margin: '0 auto' }}>
@@ -1415,7 +1415,7 @@ export function Contact({ store }: { store?: any }) {
   };
 
   return (
-    <div dir="rtl" style={{ backgroundColor: 'var(--off)', minHeight: '100vh' }}>
+    <div dir="ltr" style={{ backgroundColor: 'var(--off)', minHeight: '100vh' }}>
       {/* Header Section */}
       <div style={{ backgroundColor: 'var(--navy)', padding: '64px 24px 48px', borderBottom: '3px solid var(--blue)', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, opacity: 0.04 }} className="dot-bg" />

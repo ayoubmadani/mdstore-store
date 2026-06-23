@@ -251,7 +251,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       )}
 
       {/* ── Nav bar ── */}
-      <nav dir="rtl" style={{
+      <nav dir="ltr" style={{
         position:'sticky', top:0, zIndex:50,
         background: scrolled ? 'rgba(250,246,243,0.96)' : '#fff',
         backdropFilter:'blur(16px)',
@@ -350,6 +350,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             </form>
             {loading && <p style={{ textAlign:'center', color: RO, fontSize:'0.82rem', padding:'2rem' }}>Recherche en cours...</p>}
             {!loading && listSearch.length > 0 && (
+              <>
               <div className="glb-search-grid">
                 {listSearch.map((p:any) => (
                   <Link key={p.id} href={`/product/${p.slug||p.id}`} className="glb-search-card" onClick={() => setShowSearch(false)}>
@@ -363,6 +364,10 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                   </Link>
                 ))}
               </div>
+              <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: ROL, border: 'none', borderTop: `1px solid rgba(193,123,142,0.2)`, color: RO, fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                Voir tous les résultats <ArrowLeft size={14} />
+              </button>
+              </>
             )}
             {!loading && searchQuery.length >= 2 && listSearch.length === 0 && (
               <p style={{ textAlign:'center', color: BD, fontSize:'0.875rem', padding:'3rem' }}>Aucun résultat</p>
@@ -379,7 +384,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 ══════════════════════════════════════════ */
 export function Footer({ store }: any) {
   return (
-    <footer dir="rtl" style={{ background: INK, color:'rgba(255,255,255,0.38)', marginTop:80 }}>
+    <footer dir="ltr" style={{ background: INK, color:'rgba(255,255,255,0.38)', marginTop:80 }}>
       <div style={{ maxWidth:1320, margin:'0 auto', padding:'4.5rem 2rem 2rem' }}>
         <div className="footer-cols" style={{ paddingBottom:'3rem', marginBottom:'2rem', borderBottom:'1px solid rgba(255,255,255,0.06)' }}>
           <div>
@@ -484,7 +489,7 @@ export function Home({ store, page }: any) {
   const countPage = Math.ceil((store.count || products.length) / 48);
 
   return (
-    <div dir="rtl">
+    <div dir="ltr">
 
       {/* ══ HERO — صورة خلفية كاملة ══ */}
       <section style={{ position:'relative', minHeight:'clamp(580px,88vh,820px)', overflow:'hidden' }}>
@@ -626,7 +631,7 @@ export function Home({ store, page }: any) {
         )}
 
         {countPage > 1 && (
-          <div className="pagination" dir="rtl">
+          <div className="pagination" dir="ltr">
             <Link href={{ query:{ page: Math.max(1,page-1) } }} scroll={false} style={{ height:38, padding:'0 1rem', border:`1px solid ${BD}`, display:'flex', alignItems:'center', background: CARD, color: SUB, fontSize:'0.8rem', borderRadius:10 }}>❮</Link>
             {Array.from({ length: countPage }).map((_,i) => {
               const pn = i+1; const isA = Number(page)===pn;
@@ -672,7 +677,7 @@ export function Home({ store, page }: any) {
 export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
   const [sel, setSel] = useState(0);
   return (
-    <div dir="rtl" style={{ background: BG, paddingBottom:'4rem' }}>
+    <div dir="ltr" style={{ background: BG, paddingBottom:'4rem' }}>
       <div className="details-inner" style={{ maxWidth:1320, margin:'0 auto' }}>
         {/* Gallery */}
         <div className="gallery-container">
@@ -982,7 +987,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const inp = (err?: boolean) => ({ ...S.input, ...(err ? S.inputErr : {}) });
 
   if (success) return (
-    <div dir="rtl" style={{ minHeight:'70vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'1.5rem', background: BG }}>
+    <div dir="ltr" style={{ minHeight:'70vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'1.5rem', background: BG }}>
       <div style={{ textAlign:'center', background: CARD, padding:'4rem 2.5rem', borderRadius:24, border:`1px solid ${BD}`, maxWidth:440, width:'100%', boxShadow:'0 24px 64px rgba(193,123,142,0.1)' }}>
         <div style={{ width:60, height:60, borderRadius:'50%', background:`linear-gradient(135deg,${RO},${ROD})`, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 1.75rem', boxShadow:`0 8px 24px rgba(193,123,142,0.4)` }}>
           <CheckCircle2 size={28} color="#fff" />
@@ -997,7 +1002,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   if (!items.length) return (
-    <div dir="rtl" style={{ minHeight:'60vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'1.5rem', background: BG }}>
+    <div dir="ltr" style={{ minHeight:'60vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'1.5rem', background: BG }}>
       <div style={{ textAlign:'center', padding:'4.5rem 2.5rem', border:`1.5px dashed ${BD}`, borderRadius:24, maxWidth:400, width:'100%', background: CARD }}>
         <ShoppingBag size={44} style={{ color: BD, display:'block', margin:'0 auto 1.5rem' }} />
         <p style={{ color: SUB, fontSize:'0.9rem', marginBottom:'2.25rem', fontWeight:300 }}>Votre panier est vide</p>
@@ -1009,7 +1014,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   return (
-    <div dir="rtl" style={{ padding:'2.5rem 1.5rem', maxWidth:1320, margin:'0 auto', minHeight:'100vh', background: BG }}>
+    <div dir="ltr" style={{ padding:'2.5rem 1.5rem', maxWidth:1320, margin:'0 auto', minHeight:'100vh', background: BG }}>
       <div style={{ marginBottom:'2.25rem', paddingBottom:'1.25rem', borderBottom:`1px solid ${BD}` }}>
         <p style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.18em', marginBottom:8 }}>Pure Organics</p>
         <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(1.75rem,4vw,2.5rem)', fontWeight:600, color: INK, letterSpacing:'-0.02em' }}>Panier</h1>
@@ -1104,7 +1109,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
    STATIC PAGES
 ══════════════════════════════════════════ */
 const Shell = ({ children, title }: { children: React.ReactNode; title: string }) => (
-  <div dir="rtl" style={{ minHeight:'100vh', background: BG }}>
+  <div dir="ltr" style={{ minHeight:'100vh', background: BG }}>
     <div style={{ background:`linear-gradient(135deg,${CR} 0%,rgba(193,123,142,0.08) 100%)`, borderBottom:`1px solid ${BD}`, paddingTop:72, paddingBottom:52, paddingLeft:24, paddingRight:24 }}>
       <div style={{ maxWidth:860, margin:'0 auto' }}>
         <div style={{ display:'inline-flex', alignItems:'center', gap:8, marginBottom:'1rem' }}>
@@ -1175,7 +1180,7 @@ export function Contact({ store }: { store: any }) {
   };
 
   return (
-    <div dir="rtl" style={{ background: BG, minHeight:'100vh' }}>
+    <div dir="ltr" style={{ background: BG, minHeight:'100vh' }}>
       <div style={{ background:`linear-gradient(135deg,${CR} 0%,rgba(193,123,142,0.08) 100%)`, borderBottom:`1px solid ${BD}`, paddingTop:72, paddingBottom:52, paddingLeft:24, paddingRight:24 }}>
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
           <div style={{ display:'inline-flex', alignItems:'center', gap:8, marginBottom:'1rem' }}>

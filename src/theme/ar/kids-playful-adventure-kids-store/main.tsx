@@ -388,25 +388,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                         </Link>
                     ))}
 
-                    {/* زر عرض المزيد - يظهر فقط عند وجود نتائج */}
                     <button
-                        onClick={() => {/* أضف هنا الوظيفة المطلوبة مثل الانتقال لصفحة البحث الشامل */ }}
-                        style={{
-                            width: '100%',
-                            padding: '12px',
-                            background: 'var(--bg)', // أو استخدم لوناً خفيفاً
-                            color: 'var(--blue)',
-                            border: 'none',
-                            fontSize: '0.85rem',
-                            fontWeight: 800,
-                            cursor: 'pointer',
-                            textAlign: 'center',
-                            transition: 'background 0.2s'
-                        }}
-                        onMouseOver={(e) => e.currentTarget.style.background = '#f0f4f8'}
-                        onMouseOut={(e) => e.currentTarget.style.background = 'var(--bg)'}
+                        onClick={doSearch}
+                        style={{ width: '100%', padding: '12px', background: 'var(--blue-lt)', border: 'none', borderTop: '2px solid var(--blue)', color: 'var(--blue)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                     >
-                        عرض المزيد من النتائج
+                        عرض جميع النتائج <ArrowLeft size={14} />
                     </button>
                 </>
             ) : sq.length >= 2 && (

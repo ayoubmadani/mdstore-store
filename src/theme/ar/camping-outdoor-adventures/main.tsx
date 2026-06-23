@@ -317,6 +317,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             </form>
             {loading && <p style={{ textAlign: 'center', color: OR, fontSize: '0.82rem', padding: '2rem' }}>جاري البحث...</p>}
             {!loading && listSearch.length > 0 && (
+              <>
               <div className="glb-search-grid">
                 {listSearch.map((p: any) => (
                   <Link key={p.id} href={`/product/${p.slug || p.id}`} className="glb-search-card" onClick={() => setShowSearch(false)}>
@@ -330,6 +331,10 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                   </Link>
                 ))}
               </div>
+              <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: 'rgba(212,98,42,0.08)', border: 'none', borderTop: '1px solid rgba(212,98,42,0.2)', color: OR, fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                عرض جميع النتائج <ArrowLeft size={14} />
+              </button>
+              </>
             )}
             {!loading && searchQuery.length >= 2 && listSearch.length === 0 && (
               <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.25)', fontSize: '0.875rem', padding: '3rem' }}>لا توجد نتائج</p>

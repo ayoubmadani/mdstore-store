@@ -210,7 +210,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {store.topBar.text}
         </div>
       )}
-      <nav dir="rtl" style={{ position: 'sticky', top: 0, zIndex: 50, background: '#fff', borderBottom: `1px solid ${scrolled ? BD : '#F3F4F6'}`, boxShadow: scrolled ? '0 1px 6px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s' }}>
+      <nav dir="ltr" style={{ position: 'sticky', top: 0, zIndex: 50, background: '#fff', borderBottom: `1px solid ${scrolled ? BD : '#F3F4F6'}`, boxShadow: scrolled ? '0 1px 6px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
           <Link href="/" style={{ flexShrink: 0 }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
@@ -284,6 +284,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             </form>
             {loading && <p style={{ textAlign: 'center', color: ED, fontSize: '0.82rem', padding: '2rem' }}>Recherche en cours...</p>}
             {!loading && listSearch.length > 0 && (
+              <>
               <div className="glb-search-grid">
                 {listSearch.map((p: any) => (
                   <Link key={p.id} href={`/product/${p.slug || p.id}`} className="glb-search-card" onClick={() => setShowSearch(false)}>
@@ -297,6 +298,10 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                   </Link>
                 ))}
               </div>
+              <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: EL, border: 'none', borderTop: `1px solid rgba(16,185,129,0.2)`, color: E, fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                Voir tous les résultats <ArrowLeft size={14} />
+              </button>
+              </>
             )}
             {!loading && searchQuery.length >= 2 && listSearch.length === 0 && (
               <p style={{ textAlign: 'center', color: '#D1D5DB', fontSize: '0.875rem', padding: '3rem' }}>Aucun résultat</p>
@@ -310,7 +315,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
 export function Footer({ store }: any) {
   return (
-    <footer dir="rtl" style={{ background: INK, color: 'rgba(255,255,255,0.4)', marginTop: 80, padding: '3.5rem 1.5rem 1.25rem' }}>
+    <footer dir="ltr" style={{ background: INK, color: 'rgba(255,255,255,0.4)', marginTop: 80, padding: '3.5rem 1.5rem 1.25rem' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div className="footer-inner">
           <div>
@@ -395,7 +400,7 @@ export function Home({ store, page }: any) {
   const countPage = Math.ceil((store.count || products.length) / 48);
 
   return (
-    <div dir="rtl">
+    <div dir="ltr">
       {/* HERO */}
       <section style={{ position: 'relative', overflow: 'hidden', background: '#F0FDF4', minHeight: 'clamp(360px, 50vh, 540px)', display: 'flex', alignItems: 'center', borderBottom: `1px solid rgba(16,185,129,0.12)` }}>
         <div style={{ position: 'absolute', top: 0, right: 0, width: 4, height: '100%', background: E }} />
@@ -513,7 +518,7 @@ export function Home({ store, page }: any) {
           )}
         </div>
         {countPage > 1 && (
-          <div className="pagination" dir="rtl">
+          <div className="pagination" dir="ltr">
             <Link href={{ query: { page: Math.max(1, page - 1) } }} scroll={false} style={{ height: 34, padding: '0 0.75rem', borderRadius: 4, border: `1px solid ${BD}`, display: 'flex', alignItems: 'center', background: CARD, color: SUB, fontSize: '0.8rem' }}>❮</Link>
             {Array.from({ length: countPage }).map((_, i) => {
               const pn = i + 1; const isA = Number(page) === pn;
@@ -530,7 +535,7 @@ export function Home({ store, page }: any) {
 export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
   const [sel, setSel] = useState(0);
   return (
-    <div dir="rtl" style={{ background: BG, paddingBottom: '4rem' }}>
+    <div dir="ltr" style={{ background: BG, paddingBottom: '4rem' }}>
       <div className="details-inner" style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div className="gallery-container">
           <div style={{ position: 'relative', aspectRatio: '1/1', overflow: 'hidden', background: '#F3F4F6', border: `1px solid ${BD}` }}>
@@ -822,7 +827,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const inp = (err?: boolean) => ({ ...S.input, ...(err ? S.inputErr : {}) });
 
   if (success) return (
-    <div dir="rtl" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: BG }}>
+    <div dir="ltr" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: BG }}>
       <div style={{ textAlign: 'center', background: CARD, padding: '3rem 2rem', border: `1px solid ${BD}`, borderTop: `3px solid ${E}`, maxWidth: 440, width: '100%' }}>
         <CheckCircle2 size={40} style={{ color: E, display: 'block', margin: '0 auto 1.25rem' }} />
         <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: INK, marginBottom: '0.5rem' }}>Commande reçue !</h2>
@@ -833,7 +838,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   if (!items.length) return (
-    <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: BG }}>
+    <div dir="ltr" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: BG }}>
       <div style={{ textAlign: 'center', padding: '4rem 2rem', border: `1px solid ${BD}`, maxWidth: 400, width: '100%', background: CARD }}>
         <ShoppingBag size={40} style={{ color: BD, display: 'block', margin: '0 auto 1.25rem' }} />
         <p style={{ color: '#9CA3AF', fontSize: '0.9rem', marginBottom: '2rem' }}>Panier vide</p>
@@ -843,7 +848,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   return (
-    <div dir="rtl" style={{ padding: '2rem 1.5rem', maxWidth: 1280, margin: '0 auto', minHeight: '100vh', background: BG }}>
+    <div dir="ltr" style={{ padding: '2rem 1.5rem', maxWidth: 1280, margin: '0 auto', minHeight: '100vh', background: BG }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2rem' }}>
         <span style={{ width: 3, height: 20, background: E, borderRadius: 1, display: 'inline-block' }} />
         <h1 style={{ fontSize: 'clamp(1.375rem,5vw,2rem)', fontWeight: 800, color: INK }}>Panier</h1>
@@ -931,7 +936,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 }
 
 const Shell = ({ children, title }: { children: React.ReactNode; title: string }) => (
-  <div dir="rtl" style={{ minHeight: '100vh', background: BG }}>
+  <div dir="ltr" style={{ minHeight: '100vh', background: BG }}>
     <div style={{ background: INK, paddingTop: 88, paddingBottom: 40, paddingLeft: 24, paddingRight: 24, borderTop: `3px solid ${E}` }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }}>
         <p style={{ fontSize: '0.65rem', fontWeight: 700, color: E, textTransform: 'uppercase' as const, letterSpacing: '0.12em', marginBottom: '0.625rem' }}>Everyday Hardware</p>
@@ -999,7 +1004,7 @@ export function Contact({ store }: { store: any }) {
   };
 
   return (
-    <div dir="rtl" style={{ background: BG, minHeight: '100vh' }}>
+    <div dir="ltr" style={{ background: BG, minHeight: '100vh' }}>
       <div style={{ background: INK, paddingTop: 88, paddingBottom: 40, paddingLeft: 24, paddingRight: 24, borderTop: `3px solid ${E}` }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <p style={{ fontSize: '0.65rem', fontWeight: 700, color: E, textTransform: 'uppercase' as const, letterSpacing: '0.12em', marginBottom: '0.625rem' }}>Everyday Hardware</p>

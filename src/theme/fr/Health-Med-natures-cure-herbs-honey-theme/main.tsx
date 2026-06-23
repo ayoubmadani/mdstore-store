@@ -313,7 +313,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   );
 
   return (
-    <header dir="rtl" style={{ position:'sticky', top:0, zIndex:100, fontFamily:"'Inter',sans-serif" }}>
+    <header dir="ltr" style={{ position:'sticky', top:0, zIndex:100, fontFamily:"'Inter',sans-serif" }}>
       {store?.topBar?.enabled && store?.topBar?.text && (
         <div className="ticker-stripe" style={{ background:'var(--green)', padding:'5px 0' }}>
           <div className="ticker-inner">
@@ -448,7 +448,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
 export function Footer({ store }: any) {
   return (
-    <footer dir="rtl" style={{ backgroundColor:'var(--brown)', color:'var(--cream)', fontFamily:"'Inter',sans-serif" }}>
+    <footer dir="ltr" style={{ backgroundColor:'var(--brown)', color:'var(--cream)', fontFamily:"'Inter',sans-serif" }}>
       <div style={{
         background:'var(--green)', padding:'10px 0', textAlign:'center'
       }}>
@@ -523,7 +523,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
   const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
   return (
-    <div className="p-card" dir="rtl">
+    <div className="p-card" dir="ltr">
       <div style={{ position:'relative', aspectRatio:'1/1', overflow:'hidden', backgroundColor:'var(--beige)' }}>
         {displayImage
           ? <img src={displayImage} alt={product.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
@@ -577,7 +577,7 @@ export function Home({ store, page }: any) {
   const countPage = Math.ceil((store.count || products.length) / 48);
 
   return (
-    <div dir="rtl">
+    <div dir="ltr">
       <section style={{
         position:'relative', overflow:'hidden',
         background:'linear-gradient(180deg, var(--green-lt) 0%, var(--cream) 100%)',
@@ -776,7 +776,7 @@ export function Home({ store, page }: any) {
           )}
 
           {countPage > 1 && (
-            <div className="pagination" dir="rtl">
+            <div className="pagination" dir="ltr">
               <Link href={{ query:{ page:Math.max(1, page-1) } }} scroll={false}
                 style={{ width:40, height:40, border:'1px solid var(--tan)', borderRadius:'8px', background:'transparent', display:'flex', alignItems:'center', justifyContent:'center', color:'var(--dim)', opacity:page<=1?0.3:1 }}>❮</Link>
               {Array.from({ length:countPage }).map((_, i) => {
@@ -866,7 +866,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
   const [sel, setSel] = useState(0);
   if (!product) return null;
   return (
-    <div dir="rtl" style={{ background:'var(--cream)' }}>
+    <div dir="ltr" style={{ background:'var(--cream)' }}>
       <div style={{ maxWidth:'1280px', margin:'0 auto', padding:'32px 20px' }}>
         <div className="details-g">
           <div>
@@ -1123,7 +1123,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   };
 
   return (
-    <div dir="rtl" style={{ marginTop:'22px', paddingTop:'20px', borderTop:'1px solid var(--tan)' }}>
+    <div dir="ltr" style={{ marginTop:'22px', paddingTop:'20px', borderTop:'1px solid var(--tan)' }}>
       {product.store?.cart && (
         <div style={{ display:'flex', gap:'8px', marginBottom:'16px' }}>
           <button onClick={addToCart} disabled={isAdded} className="pd" style={{
@@ -1287,7 +1287,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   };
 
   if(success) return (
-    <div dir="rtl" style={{ minHeight:'70vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'2rem', background:'var(--cream)' }}>
+    <div dir="ltr" style={{ minHeight:'70vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'2rem', background:'var(--cream)' }}>
       <div style={{ textAlign:'center', background:'var(--white)', padding:'4rem 2.5rem', borderRadius:'16px', border:'1px solid var(--gold)', maxWidth:460, width:'100%', boxShadow:'0 8px 30px rgba(201,149,44,0.08)' }}>
         <CheckCircle2 size={48} style={{ color:'var(--emerald)', display:'block', margin:'0 auto 1.25rem' }}/>
         <h2 className="pd" style={{ fontSize:'2.5rem', color:'var(--brown)', marginBottom:'0.625rem' }}>Commande reçue !</h2>
@@ -1298,7 +1298,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   if(!items.length) return (
-    <div dir="rtl" style={{ minHeight:'60vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'2rem', background:'var(--cream)' }}>
+    <div dir="ltr" style={{ minHeight:'60vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'2rem', background:'var(--cream)' }}>
       <div style={{ textAlign:'center', padding:'4rem 2rem', borderRadius:'16px', border:'1px dashed var(--tan)', maxWidth:400, width:'100%' }}>
         <HerbLeaf size={48} style={{ color:'var(--dim)', display:'block', margin:'0 auto 1.25rem', opacity:0.4 }}/>
         <p className="pd" style={{ fontSize:'2rem', color:'var(--dim)', marginBottom:'1.75rem' }}>Panier vide</p>
@@ -1308,7 +1308,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   return (
-    <div dir="rtl" style={{ minHeight:'100vh', background:'var(--cream)', padding:'2.5rem 1.5rem 5rem' }}>
+    <div dir="ltr" style={{ minHeight:'100vh', background:'var(--cream)', padding:'2.5rem 1.5rem 5rem' }}>
       <div style={{ maxWidth:1280, margin:'0 auto' }}>
         <div style={{ display:'flex', alignItems:'baseline', justifyContent:'space-between', marginBottom:'2rem', paddingBottom:'1rem', borderBottom:'2px solid var(--gold)' }}>
           <h1 className="pd" style={{ fontSize:'clamp(2rem, 5vw, 3rem)', color:'var(--brown)' }}>Panier</h1>
@@ -1433,7 +1433,7 @@ export function StaticPage({ staticPage, page, store }: any) {
 }
 
 const Shell = ({ children, title, sub }: { children: React.ReactNode; title: string; sub?: string }) => (
-  <div dir="rtl" style={{ background:'var(--cream)', minHeight:'100vh' }}>
+  <div dir="ltr" style={{ background:'var(--cream)', minHeight:'100vh' }}>
     <div style={{
       background:'linear-gradient(135deg, var(--green-lt), var(--cream))', padding:'56px 20px 40px',
       borderBottom:'1px solid var(--gold)', position:'relative', overflow:'hidden'
@@ -1513,7 +1513,7 @@ export function Contact({ store }: { store?: any }) {
   };
 
   return (
-    <div dir="rtl" style={{ background:'var(--cream)', minHeight:'100vh' }}>
+    <div dir="ltr" style={{ background:'var(--cream)', minHeight:'100vh' }}>
       <div style={{
         background:'linear-gradient(135deg, var(--green-lt), var(--cream))', padding:'56px 20px 40px',
         borderBottom:'1px solid var(--gold)', position:'relative', overflow:'hidden'

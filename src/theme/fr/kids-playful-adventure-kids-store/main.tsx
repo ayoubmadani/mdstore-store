@@ -388,25 +388,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                         </Link>
                     ))}
 
-                    {/* زر Voir plus - يظهر uniquement عند وجود نتائج */}
                     <button
-                        onClick={() => {/* أضف هنا الوظيفة الrequis مثل الانتقال لصفحة Recherche الشامل */ }}
-                        style={{
-                            width: '100%',
-                            padding: '12px',
-                            background: 'var(--bg)', // أو استخدم لوناً خفيفاً
-                            color: 'var(--blue)',
-                            border: 'none',
-                            fontSize: '0.85rem',
-                            fontWeight: 800,
-                            cursor: 'pointer',
-                            textAlign: 'center',
-                            transition: 'background 0.2s'
-                        }}
-                        onMouseOver={(e) => e.currentTarget.style.background = '#f0f4f8'}
-                        onMouseOut={(e) => e.currentTarget.style.background = 'var(--bg)'}
+                        onClick={doSearch}
+                        style={{ width: '100%', padding: '12px', background: 'var(--blue-lt)', border: 'none', borderTop: '2px solid var(--blue)', color: 'var(--blue)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                     >
-                        Voir plus de résultats
+                        Voir tous les résultats <ArrowLeft size={14} />
                     </button>
                 </>
             ) : sq.length >= 2 && (
@@ -418,7 +404,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     const initials = (store?.name || 'A').split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase();
 
     return (
-        <nav dir="rtl" style={{
+        <nav dir="ltr" style={{
             position: 'sticky', top: 0, zIndex: 100,
             background: scrolled ? 'rgba(245,247,255,0.96)' : 'var(--bg)',
             backdropFilter: scrolled ? 'blur(20px)' : 'none',
@@ -515,7 +501,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
     return (
-        <footer dir="rtl" style={{ background: 'var(--dark)', color: '#aaa', position: 'relative', overflow: 'hidden' }}>
+        <footer dir="ltr" style={{ background: 'var(--dark)', color: '#aaa', position: 'relative', overflow: 'hidden' }}>
             {/* Stripe accent */}
             <div className="stripe-bar" style={{ height: 6 }} />
 
@@ -667,7 +653,7 @@ export function Home({ store, page }: any) {
     const countPage = Math.ceil((store.count || products.length) / 48);
 
     return (
-        <div dir="rtl">
+        <div dir="ltr">
             {/* ── HERO SECTION ── */}
             <section
                 className="dot-bg"
@@ -802,7 +788,7 @@ export function Home({ store, page }: any) {
                 )}
 
                 {countPage > 1 && (
-                    <div className="pagination" dir="rtl">
+                    <div className="pagination" dir="ltr">
                         <Link href={{ query: { page: Math.max(1, page - 1) } }} scroll={false} style={{ width: 38, height: 38, borderRadius: 10, border: '2.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', color: 'var(--blue)', opacity: page <= 1 ? 0.3 : 1 }}>❮</Link>
                         {Array.from({ length: countPage }).map((_, i) => {
                             const pn = i + 1; const isA = Number(page) === pn;
@@ -854,7 +840,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
     const pal = PALETTES[id % PALETTES.length];
 
     return (
-        <div dir="rtl" style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: '4rem' }}>
+        <div dir="ltr" style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: '4rem' }}>
             <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2.5rem 1.5rem' }}>
                 <div className="details-layout">
 
@@ -1245,7 +1231,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     };
 
     if (success) return (
-        <div dir="rtl" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
+        <div dir="ltr" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
             <div className="anim-zoom-in" style={{ textAlign: 'center', background: '#fff', padding: '4rem 2.5rem', borderRadius: 24, border: '3px solid var(--yellow)', maxWidth: 460, width: '100%', boxShadow: '0 12px 40px rgba(255,224,0,0.2)' }}>
                 <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1.25rem', animation: 'bounce-up 2s ease-in-out infinite' }}>🎉</span>
                 <h2 className="font-boogaloo" style={{ fontSize: '2rem', color: 'var(--blue)', marginBottom: '0.625rem' }}>Commande reçue !</h2>
@@ -1258,7 +1244,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     );
 
     if (!items.length) return (
-        <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
+        <div dir="ltr" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
             <div className="dot-bg" style={{ textAlign: 'center', padding: '4rem 2rem', border: '3px dashed var(--blue)', borderRadius: 24, maxWidth: 400, width: '100%', background: '#fff' }}>
                 <ShoppingBag size={52} style={{ color: 'var(--border)', display: 'block', margin: '0 auto 1.25rem', opacity: 0.5 }} />
                 <p className="font-boogaloo" style={{ fontSize: '1.5rem', color: 'var(--soft)', marginBottom: '1.75rem' }}>Panier vide 🎮</p>
@@ -1270,7 +1256,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     );
 
     return (
-        <div dir="rtl" style={{ minHeight: '100vh', background: 'var(--bg)', padding: '2.5rem 1.5rem 5rem' }}>
+        <div dir="ltr" style={{ minHeight: '100vh', background: 'var(--bg)', padding: '2.5rem 1.5rem 5rem' }}>
             <div style={{ maxWidth: 1200, margin: '0 auto' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginBottom: '2rem' }}>
                     <div style={{ width: 5, height: 36, borderRadius: 3, background: 'var(--yellow)' }} />
@@ -1399,7 +1385,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
    STATIC PAGES
 ══════════════════════════════════════════════════════════════ */
 const Shell = ({ title, emoji, children }: { title: string; emoji: string; children: React.ReactNode }) => (
-    <div dir="rtl" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+    <div dir="ltr" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
         <div className="dot-bg" style={{ background: 'var(--dark)', padding: '5rem 1.5rem 4rem', textAlign: 'center', position: 'relative' }}>
             <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1.25rem', animation: 'bounce-up 2s ease-in-out infinite' }}>{emoji}</span>
             <h1 className="font-boogaloo" style={{ fontSize: 'clamp(2rem,5vw,3.5rem)', color: '#fff' }}>{title}</h1>
@@ -1441,7 +1427,7 @@ export function Contact({ store }: { store: any }) {
         catch { showError('Une Erreur est survenue'); } finally { setLoading(false); }
     };
     return (
-        <div dir="rtl" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+        <div dir="ltr" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
             <div className="dot-bg" style={{ background: 'var(--dark)', padding: '5rem 1.5rem 4rem', textAlign: 'center', position: 'relative' }}>
                 <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1.25rem', animation: 'bounce-up 2s ease-in-out infinite' }}>📞</span>
                 <h1 className="font-boogaloo" style={{ fontSize: 'clamp(2rem,5vw,3.5rem)', color: '#fff', marginBottom: '0.5rem' }}>Contactez-nous</h1>

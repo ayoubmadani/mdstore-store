@@ -1792,6 +1792,10 @@ def process_file(src_path: str, dst_path: str):
     with open(src_path, 'r', encoding='utf-8') as f:
         content = f.read()
     content = translate(content)
+    content = content.replace('dir="rtl"', 'dir="ltr"')
+    content = content.replace("dir:'rtl'", "dir:'ltr'")
+    content = content.replace('dir: "rtl"', 'dir: "ltr"')
+    content = content.replace("dir: 'rtl'", "dir: 'ltr'")
     os.makedirs(os.path.dirname(dst_path), exist_ok=True)
     with open(dst_path, 'w', encoding='utf-8') as f:
         f.write(content)

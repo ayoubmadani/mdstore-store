@@ -190,17 +190,22 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       left: 0,
       background: '#fff',
       border: '1px solid #eee',
-      zIndex: 999, // قيمة hauteة جداً لGarantie الظهور فوق الصور والمحتوى
+      zIndex: 999,
       maxHeight: '350px',
       overflowY: 'auto',
       boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
       marginTop: '5px',
-      borderRadius: '8px'
+      borderRadius: '8px',
+      paddingTop: 25
     }}>
+      <button onClick={() => setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
+        <X size={14} />
+      </button>
       {loading ? (
         <div style={{ padding: '1.5rem', textAlign: 'center', color: '#888' }}>Recherche en cours...</div>
       ) : listSearch.length > 0 ? (
-        listSearch.map((p: any) => (
+        <>
+        {listSearch.map((p: any) => (
           <Link
             href={`/product/${p.id}`}
             key={p.id}
@@ -214,7 +219,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               <div style={{ fontSize: '0.8rem', color: '#666' }}>{p.price} DA</div>
             </div>
           </Link>
-        ))
+        ))}
+        <button onClick={handleSearchSubmit} style={{ width: '100%', padding: '12px', background: '#f9f9f9', border: 'none', borderTop: '1px solid #e5e7eb', color: 'var(--primary)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          Voir tous les résultats <ArrowLeft size={14} />
+        </button>
+        </>
       ) : searchQuery.length >= 2 && (
         <div style={{ padding: '1.5rem', textAlign: 'center', color: '#888' }}>Aucun résultat</div>
       )}
@@ -228,7 +237,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {store.topBar.text}
         </div>
       )}
-      <header dir="rtl" style={{ borderBottom: '1px solid var(--border-color)', background: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
+      <header dir="ltr" style={{ borderBottom: '1px solid var(--border-color)', background: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '75px' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
@@ -318,7 +327,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 ═══════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
   return (
-    <footer dir="rtl" style={{ borderTop: '1px solid var(--border-color)', padding: '4rem 0 2rem', background: 'var(--bg-alt)' }}>
+    <footer dir="ltr" style={{ borderTop: '1px solid var(--border-color)', padding: '4rem 0 2rem', background: 'var(--bg-alt)' }}>
       <div className="container grid-3">
         <div>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem' }}>{store?.name}</h3>
@@ -384,7 +393,7 @@ export function Home({ store, page }: any) {
   const countPage = Math.ceil((store.count || products.length) / 48);
 
   return (
-    <div dir="rtl">
+    <div dir="ltr">
       {/* ── HERO ── */}
 
       <section style={{
@@ -521,7 +530,7 @@ export function Home({ store, page }: any) {
 export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
   const [sel, setSel] = useState(0);
   return (
-    <div dir="rtl" className="container" style={{ padding: '3rem 1.5rem' }}>
+    <div dir="ltr" className="container" style={{ padding: '3rem 1.5rem' }}>
       <div className="grid-2" style={{ gap: '3rem', alignItems: 'start' }}>
 
         {/* Gallery */}
@@ -837,7 +846,7 @@ export function Contact({ store }: any) {
   };
 
   return (
-    <div className="container" style={{ padding: '5rem 1.5rem', maxWidth: '450px', margin: '0 auto' }} dir="rtl">
+    <div className="container" style={{ padding: '5rem 1.5rem', maxWidth: '450px', margin: '0 auto' }} dir="ltr">
       {sent ? (
         /* واجهة النجاح - عملي وأسود */
         <div style={{ textAlign: 'center', padding: '2rem 0' }} className="anim-fade-in">

@@ -431,22 +431,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 </div>
               </Link>
             ))}
-            <button 
-              onClick={() => doSearch()} 
-              style={{ 
-                width: '100%', 
-                padding: '0.85rem', 
-                background: '#F9FAFB', 
-                border: 'none', 
-                borderTop: '1px solid var(--g100)', 
-                color: '#374151', 
-                fontWeight: 600, 
-                fontSize: '0.85rem', 
-                cursor: 'pointer', 
-                textAlign: 'center' 
-              }}
+            <button
+              onClick={() => doSearch()}
+              style={{ width: '100%', padding: '12px', background: 'rgba(233,69,96,0.07)', border: 'none', borderTop: '1px solid rgba(233,69,96,0.2)', color: 'var(--accent)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
             >
-              عرض المزيد
+              عرض جميع النتائج <ArrowLeft size={14} />
             </button>
           </div>
         )

@@ -431,22 +431,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 </div>
               </Link>
             ))}
-            <button 
-              onClick={() => doSearch()} 
-              style={{ 
-                width: '100%', 
-                padding: '0.85rem', 
-                background: '#F9FAFB', 
-                border: 'none', 
-                borderTop: '1px solid var(--g100)', 
-                color: '#374151', 
-                fontWeight: 600, 
-                fontSize: '0.85rem', 
-                cursor: 'pointer', 
-                textAlign: 'center' 
-              }}
+            <button
+              onClick={() => doSearch()}
+              style={{ width: '100%', padding: '12px', background: 'rgba(233,69,96,0.07)', border: 'none', borderTop: '1px solid rgba(233,69,96,0.2)', color: 'var(--accent)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
             >
-              Voir plus
+              Voir tous les résultats <ArrowLeft size={14} />
             </button>
           </div>
         )
@@ -460,7 +449,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 );
 
   return (
-    <nav dir="rtl" style={{
+    <nav dir="ltr" style={{
       position: 'sticky', top: 0, zIndex: 100,
       background: scrolled ? 'rgba(26,26,46,0.98)' : 'rgba(26,26,46,0.95)',
       backdropFilter: 'blur(20px)',
@@ -556,7 +545,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
   return (
-    <footer dir="rtl" style={{ background: 'var(--primary)', color: 'var(--g500)', padding: '5rem 1.5rem 0' }}>
+    <footer dir="ltr" style={{ background: 'var(--primary)', color: 'var(--g500)', padding: '5rem 1.5rem 0' }}>
       <div style={{ maxWidth: 1400, margin: '0 auto' }}>
         <div className="footer-cols">
 
@@ -699,7 +688,7 @@ export function Home({ store, page }: any) {
   const countPage = Math.ceil((store.count || products.length) / 48);
 
   return (
-    <div dir="rtl">
+    <div dir="ltr">
 
       {/* ── HERO ── */}
       <section style={{ position: 'relative', background: 'var(--primary)', overflow: 'hidden', minHeight: '100vh', display: 'flex', alignItems: 'center', paddingTop: 72 }}>
@@ -835,7 +824,7 @@ export function Home({ store, page }: any) {
         )}
 
         {countPage > 1 && (
-          <div className="pagination" dir="rtl">
+          <div className="pagination" dir="ltr">
             <Link href={{ query: { page: Math.max(1, page - 1) } }} scroll={false}
               style={{ width: 44, height: 44, border: '1px solid var(--g300)', background: '#fff', borderRadius: 'var(--radius-s)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, opacity: page <= 1 ? 0.5 : 1 }}>❮</Link>
             {Array.from({ length: countPage }).map((_, i) => {
@@ -903,7 +892,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
   const [sel, setSel] = useState(0);
 
   return (
-    <div dir="rtl" style={{ background: 'var(--g50)', minHeight: '100vh', paddingBottom: '5rem' }}>
+    <div dir="ltr" style={{ background: 'var(--g50)', minHeight: '100vh', paddingBottom: '5rem' }}>
       
 
       <div style={{ maxWidth: 1400, margin: '0 auto', padding: '2.5rem 1.5rem' }}>
@@ -1274,7 +1263,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   };
 
   if (success) return (
-    <div dir="rtl" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--g50)' }}>
+    <div dir="ltr" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--g50)' }}>
       <div className="anim-fade-up" style={{ textAlign: 'center', background: '#fff', padding: '4rem 2.5rem', borderRadius: 'var(--radius)', border: '1px solid var(--g200)', maxWidth: 460, width: '100%', boxShadow: 'var(--shadow-m)' }}>
         <CheckCircle2 size={52} style={{ color: 'var(--success)', display: 'block', margin: '0 auto 1.5rem' }} />
         <h2 className="oswald" style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--g900)', marginBottom: '0.625rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Commande reçue !</h2>
@@ -1285,7 +1274,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   if (!items.length) return (
-    <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--g50)' }}>
+    <div dir="ltr" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--g50)' }}>
       <div style={{ textAlign: 'center', padding: '4rem 2rem', border: '1px solid var(--g200)', borderRadius: 'var(--radius)', maxWidth: 400, width: '100%', background: '#fff' }}>
         <ShoppingBag size={52} style={{ color: 'var(--g300)', display: 'block', margin: '0 auto 1.25rem' }} />
         <p className="oswald" style={{ fontSize: '1.375rem', fontWeight: 700, color: 'var(--g500)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Panier vide</p>
@@ -1296,7 +1285,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   return (
-    <div dir="rtl" style={{ minHeight: '100vh', background: 'var(--g50)', padding: '2.5rem 1.5rem 5rem' }}>
+    <div dir="ltr" style={{ minHeight: '100vh', background: 'var(--g50)', padding: '2.5rem 1.5rem 5rem' }}>
       <div style={{ maxWidth: 1400, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '2.5rem', paddingBottom: '1.25rem', borderBottom: '1px solid var(--g200)' }}>
           <h1 className="oswald" style={{ fontSize: 'clamp(1.75rem,4vw,2.5rem)', fontWeight: 700, color: 'var(--g900)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Panier</h1>
@@ -1428,7 +1417,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
    STATIC PAGES
 ══════════════════════════════════════════════════════════════ */
 const Shell = ({ title, sub, children }: { title: string; sub?: string; children: React.ReactNode }) => (
-  <div dir="rtl" style={{ background: 'var(--g50)', minHeight: '100vh' }}>
+  <div dir="ltr" style={{ background: 'var(--g50)', minHeight: '100vh' }}>
     <div style={{ background: 'var(--primary)', padding: '5rem 1.5rem 3.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)', position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 20% 80%, var(--accent) 0%, transparent 50%)', opacity: 0.08, pointerEvents: 'none' }} />
       <div style={{ maxWidth: 800, margin: '0 auto', position: 'relative', zIndex: 1 }}>
@@ -1489,7 +1478,7 @@ export function Contact({ store }: { store: any }) {
     catch { showError('Une Erreur est survenue'); } finally { setLoading(false); }
   };
   return (
-    <div dir="rtl" style={{ background: 'var(--g50)', minHeight: '100vh' }}>
+    <div dir="ltr" style={{ background: 'var(--g50)', minHeight: '100vh' }}>
       <div style={{ background: 'var(--primary)', padding: '5rem 1.5rem 3.5rem', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 20% 80%, var(--accent) 0%, transparent 50%)', opacity: 0.08, pointerEvents: 'none' }} />
         <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative', zIndex: 1 }}>

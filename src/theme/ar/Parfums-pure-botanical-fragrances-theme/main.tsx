@@ -381,8 +381,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                                 zIndex: 200,
                                 overflow: 'hidden',
                                 maxWidth: '600px',
-                                margin: '0 auto'
+                                margin: '0 auto',
+                                paddingTop: 25
                             }}>
+                                <button onClick={() => setSq('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
+                                    <X style={{ width: '14px', height: '14px' }} />
+                                </button>
                                 {loading ? (
                                     <div style={{ padding: '1.5rem', textAlign: 'center', fontSize: '13px', color: 'var(--sage)', fontWeight: 600 }}>جاري البحث...</div>
                                 ) : ls.length > 0 ? (

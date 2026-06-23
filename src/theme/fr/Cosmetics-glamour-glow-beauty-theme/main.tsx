@@ -244,7 +244,7 @@ const GLOBAL_CSS = `
 export default function Main({ children, store, domain }: { children: React.ReactNode; store: any; domain: string }) {
   if (!store) return null;
   return (
-    <div dir="rtl" style={{ fontFamily: "'Nunito Sans',sans-serif", background: 'var(--soft)', minHeight: '100vh', color: 'var(--ink)' }}>
+    <div dir="ltr" style={{ fontFamily: "'Nunito Sans',sans-serif", background: 'var(--soft)', minHeight: '100vh', color: 'var(--ink)' }}>
       <style dangerouslySetInnerHTML={{ __html: GLOBAL_CSS }} />
       <Navbar store={store} domain={domain} />
       <main>{children}</main>
@@ -642,7 +642,7 @@ export function Details({ product, discount, allImages, domain, allAttrs, finalP
   const price = typeof product.price === 'string' ? parseFloat(product.price) : (product.price as number) || 0;
 
   return (
-    <div dir="rtl" style={{ background: 'var(--soft)', minHeight: '100vh', padding: '20px 0 60px' }}>
+    <div dir="ltr" style={{ background: 'var(--soft)', minHeight: '100vh', padding: '20px 0 60px' }}>
       {/* Breadcrumb */}
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 20px', display: 'flex', alignItems: 'center', gap: 8 }}>
         <Link href="/" style={{ fontSize: 13, color: 'var(--dim)', textDecoration: 'none' }}>Accueil</Link>
@@ -1018,7 +1018,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   };
 
   if (success) return (
-    <div dir="rtl" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--soft)' }}>
+    <div dir="ltr" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--soft)' }}>
       <div style={{ textAlign: 'center', background: 'var(--white)', padding: '4rem 2.5rem', border: '1px solid var(--line)', borderRadius: 16, maxWidth: 460, width: '100%', boxShadow: '0 8px 40px rgba(255,31,142,0.1)' }}>
         <CheckCircle2 size={48} style={{ color: 'var(--pink)', margin: '0 auto 20px', display: 'block' }} />
         <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.9rem', fontStyle: 'italic', color: 'var(--ink)', marginBottom: 8 }}>Commande reçue ! ✨</h2>
@@ -1029,7 +1029,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   if (!items.length) return (
-    <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--soft)' }}>
+    <div dir="ltr" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--soft)' }}>
       <div style={{ textAlign: 'center', padding: '4rem 2rem', border: '1px dashed var(--line-dk)', borderRadius: 12, maxWidth: 400, width: '100%', background: 'var(--white)' }}>
         <ShoppingBag size={48} style={{ color: 'var(--pink)', opacity: 0.35, margin: '0 auto 16px', display: 'block' }} />
         <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.5rem', fontStyle: 'italic', color: 'var(--mid)', marginBottom: 20 }}>Panier vide</p>
@@ -1039,7 +1039,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   return (
-    <div dir="rtl" style={{ maxWidth: 1280, margin: '0 auto', padding: '40px 24px 80px', minHeight: '100vh', background: 'var(--soft)' }}>
+    <div dir="ltr" style={{ maxWidth: 1280, margin: '0 auto', padding: '40px 24px 80px', minHeight: '100vh', background: 'var(--soft)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, paddingBottom: 16, borderBottom: '1.5px solid var(--line)', flexWrap: 'wrap', gap: 12 }}>
         <div>
           <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '2rem', fontWeight: 600, fontStyle: 'italic', color: 'var(--ink)', margin: 0 }}>Panier</h1>
@@ -1164,7 +1164,7 @@ export function StaticPage({ staticPage, page, store }: any) {
 }
 
 const Shell = ({ children, title, sub }: { children: React.ReactNode; title: string; sub?: string }) => (
-  <div dir="rtl" style={{ backgroundColor: 'var(--soft)', minHeight: '100vh' }}>
+  <div dir="ltr" style={{ backgroundColor: 'var(--soft)', minHeight: '100vh' }}>
     <div style={{ background: 'linear-gradient(135deg,var(--blush) 0%,var(--blush-2) 100%)', padding: '56px 24px 40px', borderBottom: '1px solid var(--line)' }}>
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
         {sub && <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 8 }}>{sub}</p>}
@@ -1243,7 +1243,7 @@ export function Contact({ store }: { store?: any }) {
   ];
 
   return (
-    <div dir="rtl" style={{ background: 'var(--soft)', minHeight: '100vh' }}>
+    <div dir="ltr" style={{ background: 'var(--soft)', minHeight: '100vh' }}>
       <div style={{ background: 'linear-gradient(135deg,var(--blush) 0%,var(--blush-2) 100%)', padding: '56px 24px 40px', borderBottom: '1px solid var(--line)' }}>
         <div style={{ maxWidth: 960, margin: '0 auto' }}>
           <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 8 }}>Contact</p>

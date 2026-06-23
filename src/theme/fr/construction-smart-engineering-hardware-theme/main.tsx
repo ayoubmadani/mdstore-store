@@ -226,7 +226,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {store.topBar.text}
         </div>
       )}
-      <nav dir="rtl" style={{
+      <nav dir="ltr" style={{
         position: 'sticky', top: 0, zIndex: 50,
         background: '#fff',
         borderBottom: `1px solid ${scrolled ? BD : '#F1F5F9'}`,
@@ -317,9 +317,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <form className="glb-search-form" onSubmit={handleSearch}>
               <Search size={20} style={{ color: A, flexShrink: 0, marginLeft: 12 }} />
               <input ref={searchInputRef} className="glb-search-input" type="text" placeholder="Rechercher un outil ou équipement..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+              {searchQuery && <button type="button" onClick={() => setSearchQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', padding: 0, display: 'flex', alignItems: 'center', flexShrink: 0 }}><X size={14} /></button>}
             </form>
             {loading && <p style={{ textAlign: 'center', color: AD, fontSize: '0.85rem', fontWeight: 600, padding: '2rem' }}>Recherche en cours...</p>}
             {!loading && listSearch.length > 0 && (
+              <>
               <div className="glb-search-grid">
                 {listSearch.map((p: any) => (
                   <Link key={p.id} href={`/product/${p.slug || p.id}`} className="glb-search-card" onClick={() => setShowSearch(false)}>
@@ -333,6 +335,10 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                   </Link>
                 ))}
               </div>
+              <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: AL, border: 'none', borderTop: `1px solid rgba(245,158,11,0.2)`, color: A, fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                Voir tous les résultats <ArrowLeft size={14} />
+              </button>
+              </>
             )}
             {!loading && searchQuery.length >= 2 && listSearch.length === 0 && (
               <p style={{ textAlign: 'center', color: '#CBD5E1', fontSize: '0.9rem', padding: '3rem' }}>Aucun résultat</p>
@@ -346,7 +352,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
 export function Footer({ store }: any) {
   return (
-    <footer dir="rtl" style={{ background: SL, color: 'rgba(255,255,255,0.5)', marginTop: 80, padding: '4rem 1.5rem 1.5rem' }}>
+    <footer dir="ltr" style={{ background: SL, color: 'rgba(255,255,255,0.5)', marginTop: 80, padding: '4rem 1.5rem 1.5rem' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div className="footer-inner">
           <div>
@@ -445,7 +451,7 @@ export function Home({ store, page }: any) {
   const countPage = Math.ceil((store.count || products.length) / 48);
 
   return (
-    <div dir="rtl">
+    <div dir="ltr">
       {/* HERO */}
       <section style={{ position: 'relative', overflow: 'hidden', background: SL, minHeight: 'clamp(460px, 60vh, 680px)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
         {store.hero?.imageUrl && (
@@ -562,7 +568,7 @@ export function Home({ store, page }: any) {
           </div>
         )}
         {countPage > 1 && (
-          <div className="pagination" dir="rtl">
+          <div className="pagination" dir="ltr">
             <Link href={{ query: { page: Math.max(1, page - 1) } }} scroll={false} style={{ width: 36, height: 36, borderRadius: 8, border: `1px solid ${BD}`, display: 'flex', alignItems: 'center', justifyContent: 'center', background: CARD, color: '#64748B' }}>❮</Link>
             {Array.from({ length: countPage }).map((_, i) => {
               const pn = i + 1; const isA = Number(page) === pn;
@@ -583,7 +589,7 @@ export function Home({ store, page }: any) {
 export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
   const [sel, setSel] = useState(0);
   return (
-    <div dir="rtl" style={{ background: BG, paddingBottom: '4rem' }}>
+    <div dir="ltr" style={{ background: BG, paddingBottom: '4rem' }}>
       <div className="details-inner" style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div className="gallery-container">
           <div style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 10, overflow: 'hidden', background: '#F8FAFC', border: `1px solid ${BD}` }}>
@@ -900,7 +906,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const inp = (err?: boolean) => ({ ...S.input, ...(err ? S.inputErr : {}) });
 
   if (success) return (
-    <div dir="rtl" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: BG }}>
+    <div dir="ltr" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: BG }}>
       <div style={{ textAlign: 'center', background: CARD, padding: '3.5rem 2rem', borderRadius: 12, border: `1px solid ${BD}`, borderTop: `3px solid ${A}`, maxWidth: 460, width: '100%' }}>
         <CheckCircle2 size={40} style={{ color: '#22C55E', display: 'block', margin: '0 auto 1.25rem' }} />
         <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: SL, marginBottom: '0.625rem' }}>Commande reçue !</h2>
@@ -911,7 +917,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   if (!items.length) return (
-    <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: BG }}>
+    <div dir="ltr" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: BG }}>
       <div style={{ textAlign: 'center', padding: '4rem 2rem', border: `1px dashed ${BD}`, borderRadius: 12, maxWidth: 440, width: '100%', background: CARD }}>
         <ShoppingBag size={48} style={{ color: BD, display: 'block', margin: '0 auto 1.25rem' }} />
         <p style={{ color: '#94A3B8', fontSize: '0.95rem', marginBottom: '2rem' }}>Panier vide</p>
@@ -921,7 +927,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 
   return (
-    <div dir="rtl" style={{ padding: '2.5rem 1.5rem', maxWidth: 1280, margin: '0 auto', minHeight: '100vh', background: BG }}>
+    <div dir="ltr" style={{ padding: '2.5rem 1.5rem', maxWidth: 1280, margin: '0 auto', minHeight: '100vh', background: BG }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
         <div style={{ width: 4, height: 26, background: A, borderRadius: 2 }} />
         <h1 style={{ fontSize: 'clamp(1.5rem,5vw,2.25rem)', fontWeight: 700, color: SL }}>Panier</h1>
@@ -1015,7 +1021,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 }
 
 const Shell = ({ children, title }: { children: React.ReactNode; title: string }) => (
-  <div dir="rtl" style={{ minHeight: '100vh', background: BG }}>
+  <div dir="ltr" style={{ minHeight: '100vh', background: BG }}>
     <div style={{ background: SL, paddingTop: 96, paddingBottom: 48, paddingLeft: 24, paddingRight: 24 }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: AL, border: `1px solid rgba(245,158,11,0.3)`, borderRadius: 6, padding: '0.3rem 0.875rem', marginBottom: '1rem' }}>
@@ -1086,7 +1092,7 @@ export function Contact({ store }: { store: any }) {
   };
 
   return (
-    <div dir="rtl" style={{ background: BG, minHeight: '100vh' }}>
+    <div dir="ltr" style={{ background: BG, minHeight: '100vh' }}>
       <div style={{ background: SL, paddingTop: 96, paddingBottom: 48, paddingLeft: 24, paddingRight: 24 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <h1 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 700, color: '#fff', marginBottom: '0.5rem' }}>Contactez-nous</h1>

@@ -242,18 +242,26 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
   const doSearch=(e?:React.FormEvent)=>{ if(e) e.preventDefault(); if(sq.trim()){ router.push(`/?search=${encodeURIComponent(sq)}`); setSq(''); setShowSearch(false); }};
 
   const Drop=()=>(
-    <div style={{position:'absolute',top:'calc(100% + 6px)',right:0,left:0,background:'var(--white)',border:'1px solid var(--line)',boxShadow:'0 12px 36px rgba(13,27,42,0.12)',zIndex:200,overflow:'hidden',borderTop:'2px solid var(--blue)'}}>
+    <div style={{position:'absolute',top:'calc(100% + 6px)',right:0,left:0,background:'var(--white)',border:'1px solid var(--line)',boxShadow:'0 12px 36px rgba(13,27,42,0.12)',zIndex:200,overflow:'hidden',borderTop:'2px solid var(--blue)',paddingTop:25}}>
+      <button onClick={()=>setSq('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
+        <X style={{width:'14px',height:'14px'}}/>
+      </button>
       {loading ? <div style={{padding:'1rem',textAlign:'center',fontSize:'12px',color:'var(--blue)'}}>جاري البحث...</div>
-      : ls.length>0 ? ls.map((p:any)=>(
-        <Link href={`/product/${p.id}`} key={p.id} onClick={()=>setSq('')}
-          style={{display:'flex',alignItems:'center',gap:'0.75rem',padding:'10px 14px',borderBottom:'1px solid var(--line)'}}>
-          <img src={p.productImage||p.imagesProduct?.[0]?.imageUrl} style={{width:40,height:40,objectFit:'cover',flexShrink:0,border:'1px solid var(--line)'}} alt=""/>
-          <div>
-            <div style={{fontSize:'13px',fontWeight:600,color:'var(--ink)'}}>{p.name}</div>
-            <div style={{fontSize:'13px',fontWeight:700,color:'var(--blue)'}}>{p.price} دج</div>
-          </div>
-        </Link>
-      )) : sq.length>=2 && <div style={{padding:'1rem',textAlign:'center',fontSize:'12px',color:'var(--dim)'}}>لا توجد نتائج</div>}
+      : ls.length>0 ? (<>
+        {ls.map((p:any)=>(
+          <Link href={`/product/${p.id}`} key={p.id} onClick={()=>setSq('')}
+            style={{display:'flex',alignItems:'center',gap:'0.75rem',padding:'10px 14px',borderBottom:'1px solid var(--line)'}}>
+            <img src={p.productImage||p.imagesProduct?.[0]?.imageUrl} style={{width:40,height:40,objectFit:'cover',flexShrink:0,border:'1px solid var(--line)'}} alt=""/>
+            <div>
+              <div style={{fontSize:'13px',fontWeight:600,color:'var(--ink)'}}>{p.name}</div>
+              <div style={{fontSize:'13px',fontWeight:700,color:'var(--blue)'}}>{p.price} دج</div>
+            </div>
+          </Link>
+        ))}
+        <button onClick={doSearch} style={{width:'100%',padding:'12px',background:'rgba(58,134,255,0.07)',border:'none',borderTop:'1px solid rgba(58,134,255,0.2)',color:'var(--blue)',fontWeight:800,fontSize:'0.85rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px'}}>
+          عرض جميع النتائج <ArrowLeft style={{width:'14px',height:'14px'}}/>
+        </button>
+      </>) : sq.length>=2 && <div style={{padding:'1rem',textAlign:'center',fontSize:'12px',color:'var(--dim)'}}>لا توجد نتائج</div>}
     </div>
   );
 

@@ -379,7 +379,7 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
           {store.topBar.text}
         </div>
       )}
-      <nav dir="rtl" style={{ position: 'sticky', top: 0, zIndex: 50, background: scrolled ? 'rgba(5,11,26,0.97)' : 'rgba(5,11,26,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--line)', transition: 'all 0.3s' }}>
+      <nav dir="ltr" style={{ position: 'sticky', top: 0, zIndex: 50, background: scrolled ? 'rgba(5,11,26,0.97)' : 'rgba(5,11,26,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--line)', transition: 'all 0.3s' }}>
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '15px' }}>
 
         {/* Logo */}
@@ -469,7 +469,7 @@ export function Footer({ store }: any) {
   const cyan = 'var(--cyan)';
   const pink = 'var(--pink)';
   return (
-    <footer dir="rtl" style={{ backgroundColor: 'var(--navy-3)', borderTop: '2px solid var(--line)', fontFamily: "'Tajawal',sans-serif", marginTop: '80px', position: 'relative', overflow: 'hidden' }}>
+    <footer dir="ltr" style={{ backgroundColor: 'var(--navy-3)', borderTop: '2px solid var(--line)', fontFamily: "'Tajawal',sans-serif", marginTop: '80px', position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', bottom: 0, left: 0, width: '300px', height: '300px', background: `radial-gradient(circle, ${cyan}05 0%, transparent 70%)`, pointerEvents: 'none' }} />
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '60px 20px 30px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '40px', paddingBottom: '40px', borderBottom: '1px solid var(--line)' }}>
@@ -596,7 +596,7 @@ export function Home({ store, page }: any) {
   const countPage = Math.ceil(store.count / 48);
 
   return (
-    <div dir="rtl">
+    <div dir="ltr">
       {/* ── HERO ── */}
       <section style={{ position: 'relative', minHeight: '92vh', display: 'flex', alignItems: 'center', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }} className="circuit-bg">
         {store.hero?.imageUrl && (
@@ -751,7 +751,7 @@ export function Home({ store, page }: any) {
           }
           {/* ── PAGINATION SECTION ── */}
           {countPage > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-12 font-tajawal" dir="rtl">
+            <div className="flex items-center justify-center gap-2 mt-12 font-tajawal" dir="ltr">
 
               {/* 1. زر السابق (يقلل الصفحة) */}
               <Link
@@ -837,7 +837,7 @@ export function Home({ store, page }: any) {
 export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, isRTL }: any) {
   const [sel, setSel] = useState(0);
   return (
-    <div dir="rtl" style={{ backgroundColor: 'var(--navy)' }}>
+    <div dir="ltr" style={{ backgroundColor: 'var(--navy)' }}>
      
 
       <div className="details-g" style={{ maxWidth: '1280px', margin: '0 auto' }}>
@@ -1298,7 +1298,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   /* ── Success ── */
   if (success) {
     return (
-      <div dir="rtl" style={{
+      <div dir="ltr" style={{
         minHeight: '70vh',
         display: 'flex',
         alignItems: 'center',
@@ -1324,7 +1324,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   /* ── Empty ── */
   if (cartItems.length === 0) {
     return (
-      <div dir="rtl" style={{
+      <div dir="ltr" style={{
         minHeight: '60vh',
         display: 'flex',
         alignItems: 'center',
@@ -1346,7 +1346,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   }
 
   return (
-    <div dir="rtl" style={{
+    <div dir="ltr" style={{
       minHeight: '100vh',
       padding: '32px 20px 80px',
       background: 'var(--navy)'
@@ -1561,7 +1561,7 @@ export function StaticPage({ staticPage, store }: { staticPage: string, store: S
 }
 
 const Shell = ({ children, title, sub }: { children: React.ReactNode; title: string; sub?: string }) => (
-  <div dir="rtl" style={{ backgroundColor: 'var(--navy)', minHeight: '100vh' }} className="hex-bg">
+  <div dir="ltr" style={{ backgroundColor: 'var(--navy)', minHeight: '100vh' }} className="hex-bg">
     <div style={{ background: 'linear-gradient(135deg,var(--navy-2),var(--navy-3))', padding: '72px 20px 48px', borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }} className="circuit-bg">
       <div style={{ maxWidth: '760px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
         {sub && <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--pink)', marginBottom: '10px', textTransform: 'uppercase' }}>{sub}</p>}
@@ -1643,7 +1643,7 @@ export function Contact({ store }: { store: Store }) {
     }
   }
   return (
-    <div dir="rtl" style={{ backgroundColor: 'var(--navy)', minHeight: '100vh' }} className="hex-bg">
+    <div dir="ltr" style={{ backgroundColor: 'var(--navy)', minHeight: '100vh' }} className="hex-bg">
       <div style={{ background: 'linear-gradient(135deg,var(--navy-2),var(--navy-3))', padding: '72px 20px 48px', borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }} className="circuit-bg">
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 30% 50%,rgba(0,212,255,0.06) 0%,transparent 60%)', pointerEvents: 'none' }} />
         <div style={{ maxWidth: '960px', margin: '0 auto', position: 'relative', zIndex: 2 }}>

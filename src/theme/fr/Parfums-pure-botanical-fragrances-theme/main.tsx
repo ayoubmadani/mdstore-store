@@ -306,7 +306,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             {store.topBar.text}
           </div>
         )}
-        <nav dir="rtl" style={{ background: 'var(--white)', borderBottom: '1px solid var(--line)', padding: '0 20px', position: 'sticky', top: 0, zIndex: 100 }}>
+        <nav dir="ltr" style={{ background: 'var(--white)', borderBottom: '1px solid var(--line)', padding: '0 20px', position: 'sticky', top: 0, zIndex: 100 }}>
             <div style={{maxWidth: 1080 , margin: 'auto'}}>
                 {/* الشريط العلوي الرئيسي */}
                 <div style={{ height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
@@ -381,8 +381,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                                 zIndex: 200,
                                 overflow: 'hidden',
                                 maxWidth: '600px',
-                                margin: '0 auto'
+                                margin: '0 auto',
+                                paddingTop: 25
                             }}>
+                                <button onClick={() => setSq('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
+                                    <X style={{ width: '14px', height: '14px' }} />
+                                </button>
                                 {loading ? (
                                     <div style={{ padding: '1.5rem', textAlign: 'center', fontSize: '13px', color: 'var(--sage)', fontWeight: 600 }}>Recherche en cours...</div>
                                 ) : ls.length > 0 ? (
@@ -447,7 +451,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 export function Footer({ store }: any) {
     const yr = new Date().getFullYear();
     return (
-        <footer dir="rtl" style={{ background: 'var(--sage)', fontFamily: "'Cairo',sans-serif", marginTop: '0' }}>
+        <footer dir="ltr" style={{ background: 'var(--sage)', fontFamily: "'Cairo',sans-serif", marginTop: '0' }}>
             <div style={{ padding: '40px 24px 24px' , maxWidth:1080, margin: 'auto' }}>
                 <div className="footer-g">
                     {/* قسم 1 — Fabriqué en Algérie */}
@@ -604,7 +608,7 @@ export function Home({ store, page }: any) {
         : fragranceCats;
 
     return (
-        <div dir="rtl" style={{ maxWidth: 1080, margin: 'auto' }}>
+        <div dir="ltr" style={{ maxWidth: 1080, margin: 'auto' }}>
             {/* ── HERO ── */}
             <section style={{ position: 'relative', background: 'var(--cream)', overflow: 'hidden', minHeight: '260px' }}>
                 {store.hero?.imageUrl && (
@@ -692,7 +696,7 @@ export function Home({ store, page }: any) {
 
                 {/* Pagination */}
                 {countPage > 1 && (
-                    <div className="pagination" dir="rtl">
+                    <div className="pagination" dir="ltr">
                         <Link href={{ query: { page: Math.max(1, page - 1) } }} scroll={false}
                             style={{ width: 36, height: 36, borderRadius: '8px', border: '1.5px solid var(--line-2)', background: 'var(--white)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--sage)', opacity: page <= 1 ? 0.3 : 1 }}>‹</Link>
                         {Array.from({ length: countPage }).map((_, i) => {
@@ -720,7 +724,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
     const [sel, setSel] = useState(0);
     if (!product) return null;
     return (
-        <div dir="rtl" style={{ maxWidth: 1080, margin: "auto", background: 'var(--white)', fontFamily: "'Cairo',sans-serif" }}>
+        <div dir="ltr" style={{ maxWidth: 1080, margin: "auto", background: 'var(--white)', fontFamily: "'Cairo',sans-serif" }}>
 
 
             <div style={{ padding: '20px' }}>
@@ -904,7 +908,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const onB = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>, err?: boolean) => { e.target.style.borderColor = err ? 'var(--red)' : 'var(--line-2)'; };
 
     return (
-        <div dir="rtl" style={{ marginTop: '16px' }}>
+        <div dir="ltr" style={{ marginTop: '16px' }}>
             {/* Cart/Order toggle */}
             {product.store?.cart && (
                 <div className="cart-btns" style={{ marginBottom: '12px' }}>
@@ -1064,7 +1068,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     const onB = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>, err?: boolean) => { e.target.style.borderColor = err ? 'var(--red)' : 'var(--line-2)'; };
 
     if (success) return (
-        <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--white)', fontFamily: "'Cairo',sans-serif" }}>
+        <div dir="ltr" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--white)', fontFamily: "'Cairo',sans-serif" }}>
             <div style={{ textAlign: 'center', padding: '3rem 2rem', border: '1px solid var(--line)', borderRadius: '16px', maxWidth: 400, width: '100%', background: 'var(--ivory)' }}>
                 <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'var(--sage-lt)', border: '2px solid var(--sage)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
                     <CheckCircle2 size={28} style={{ color: 'var(--sage)' }} />
@@ -1077,7 +1081,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     );
 
     if (!items.length) return (
-        <div dir="rtl" style={{ minHeight: '55vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--white)', fontFamily: "'Cairo',sans-serif" }}>
+        <div dir="ltr" style={{ minHeight: '55vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--white)', fontFamily: "'Cairo',sans-serif" }}>
             <div style={{ textAlign: 'center', padding: '3rem 2rem', maxWidth: 320, width: '100%' }}>
                 <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'var(--sage-lt)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
                     <ShoppingBag size={32} style={{ color: 'var(--sage)', opacity: 0.6 }} />
@@ -1090,7 +1094,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     );
 
     return (
-        <div dir="rtl" style={{ minHeight: '100vh', background: 'var(--ivory)', padding: '20px 16px 60px', fontFamily: "'Cairo',sans-serif" }}>
+        <div dir="ltr" style={{ minHeight: '100vh', background: 'var(--ivory)', padding: '20px 16px 60px', fontFamily: "'Cairo',sans-serif" }}>
             <div style={{ maxWidth: 860, margin: '0 auto' }}>
                 <h1 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--char)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: 8 }}>
                     <ShoppingBag size={20} style={{ color: 'var(--sage)' }} /> Panier
@@ -1209,7 +1213,7 @@ export function StaticPage({ staticPage, page, store }: any) {
 }
 
 const Shell = ({ children, title, emoji }: { children: React.ReactNode; title: string; emoji?: string }) => (
-    <div dir="rtl" style={{ background: 'var(--white)', minHeight: '100vh', fontFamily: "'Cairo',sans-serif" }}>
+    <div dir="ltr" style={{ background: 'var(--white)', minHeight: '100vh', fontFamily: "'Cairo',sans-serif" }}>
         <div style={{ background: 'var(--sage-lt)', borderBottom: '1px solid var(--line)', padding: '28px 20px' }}>
             <h1 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--char)', display: 'flex', alignItems: 'center', gap: 10 }}>
                 {emoji && <span style={{ fontSize: '1.5rem' }}>{emoji}</span>}
@@ -1275,7 +1279,7 @@ export function Contact({ store }: { store?: any }) {
     const onB = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = 'var(--line-2)'; };
 
     return (
-        <div dir="rtl" style={{ background: 'var(--white)', minHeight: '100vh', fontFamily: "'Cairo',sans-serif", padding: '24px 20px 60px' }}>
+        <div dir="ltr" style={{ background: 'var(--white)', minHeight: '100vh', fontFamily: "'Cairo',sans-serif", padding: '24px 20px 60px' }}>
             <h1 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--char)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: '1.4rem' }}>💬</span> Contactez-nous
             </h1>

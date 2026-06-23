@@ -213,12 +213,17 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       overflowY: 'auto',
       boxShadow: '0 10px 25px rgba(0,0,0,0.7)',
       marginTop: '5px',
-      borderRadius: '8px'
+      borderRadius: '8px',
+      paddingTop: 25
     }}>
+      <button onClick={() => setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
+        <X size={14} />
+      </button>
       {loading ? (
         <div style={{ padding: '1.5rem', textAlign: 'center', color: '#8A80A0' }}>Recherche en cours...</div>
       ) : listSearch.length > 0 ? (
-        listSearch.map((p: any) => (
+        <>
+        {listSearch.map((p: any) => (
           <Link
             href={`/product/${p.id}`}
             key={p.id}
@@ -231,7 +236,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               <div style={{ fontSize: '0.8rem', color: '#00D4FF' }}>{p.price} DA</div>
             </div>
           </Link>
-        ))
+        ))}
+        <button onClick={handleSearchSubmit} style={{ width: '100%', padding: '12px', background: 'rgba(0,212,255,0.07)', border: 'none', borderTop: '1px solid rgba(0,212,255,0.2)', color: '#00D4FF', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          Voir tous les résultats <ArrowLeft size={14} />
+        </button>
+        </>
       ) : searchQuery.length >= 2 && (
         <div style={{ padding: '1.5rem', textAlign: 'center', color: '#8A80A0' }}>Aucun résultat</div>
       )}
@@ -245,7 +254,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {store.topBar.text}
         </div>
       )}
-      <header dir="rtl" style={{ background: '#0D0D1A', position: 'sticky', top: 0, zIndex: 100 }}>
+      <header dir="ltr" style={{ background: '#0D0D1A', position: 'sticky', top: 0, zIndex: 100 }}>
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '75px' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
@@ -335,7 +344,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 ═══════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
   return (
-    <footer dir="rtl" style={{ borderTop: '1px solid #252040', padding: '4rem 0 2rem', background: '#07071A' }}>
+    <footer dir="ltr" style={{ borderTop: '1px solid #252040', padding: '4rem 0 2rem', background: '#07071A' }}>
       <div className="container grid-3">
         <div>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem', color: '#7B2FBE' }}>{store?.name}</h3>
@@ -401,7 +410,7 @@ export function Home({ store, page }: any) {
   const countPage = Math.ceil((store.count || products.length) / 48);
 
   return (
-    <div dir="rtl">
+    <div dir="ltr">
       {/* ── HERO ── */}
       <section style={{
         background: store.hero.imageUrl
@@ -535,7 +544,7 @@ export function Home({ store, page }: any) {
 export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
   const [sel, setSel] = useState(0);
   return (
-    <div dir="rtl" className="container" style={{ padding: '3rem 1.5rem' }}>
+    <div dir="ltr" className="container" style={{ padding: '3rem 1.5rem' }}>
       <div className="grid-2" style={{ gap: '3rem', alignItems: 'start' }}>
 
         {/* Gallery */}
@@ -850,7 +859,7 @@ export function Contact({ store }: any) {
   };
 
   return (
-    <div className="container" style={{ padding: '5rem 1.5rem', maxWidth: '450px', margin: '0 auto' }} dir="rtl">
+    <div className="container" style={{ padding: '5rem 1.5rem', maxWidth: '450px', margin: '0 auto' }} dir="ltr">
       {sent ? (
         <div style={{ textAlign: 'center', padding: '2rem 0' }} className="anim-fade-in">
           <div style={{ display: 'inline-flex', padding: '1rem', background: '#15152A', borderRadius: '50%', marginBottom: '1.5rem', border: '1px solid #7B2FBE' }}>

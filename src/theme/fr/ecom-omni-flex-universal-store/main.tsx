@@ -242,23 +242,31 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
   const doSearch=(e?:React.FormEvent)=>{ if(e) e.preventDefault(); if(sq.trim()){ router.push(`/?search=${encodeURIComponent(sq)}`); setSq(''); setShowSearch(false); }};
 
   const Drop=()=>(
-    <div style={{position:'absolute',top:'calc(100% + 6px)',right:0,left:0,background:'var(--white)',border:'1px solid var(--line)',boxShadow:'0 12px 36px rgba(13,27,42,0.12)',zIndex:200,overflow:'hidden',borderTop:'2px solid var(--blue)'}}>
+    <div style={{position:'absolute',top:'calc(100% + 6px)',right:0,left:0,background:'var(--white)',border:'1px solid var(--line)',boxShadow:'0 12px 36px rgba(13,27,42,0.12)',zIndex:200,overflow:'hidden',borderTop:'2px solid var(--blue)',paddingTop:25}}>
+      <button onClick={()=>setSq('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
+        <X style={{width:'14px',height:'14px'}}/>
+      </button>
       {loading ? <div style={{padding:'1rem',textAlign:'center',fontSize:'12px',color:'var(--blue)'}}>Recherche en cours...</div>
-      : ls.length>0 ? ls.map((p:any)=>(
-        <Link href={`/product/${p.id}`} key={p.id} onClick={()=>setSq('')}
-          style={{display:'flex',alignItems:'center',gap:'0.75rem',padding:'10px 14px',borderBottom:'1px solid var(--line)'}}>
-          <img src={p.productImage||p.imagesProduct?.[0]?.imageUrl} style={{width:40,height:40,objectFit:'cover',flexShrink:0,border:'1px solid var(--line)'}} alt=""/>
-          <div>
-            <div style={{fontSize:'13px',fontWeight:600,color:'var(--ink)'}}>{p.name}</div>
-            <div style={{fontSize:'13px',fontWeight:700,color:'var(--blue)'}}>{p.price} DA</div>
-          </div>
-        </Link>
-      )) : sq.length>=2 && <div style={{padding:'1rem',textAlign:'center',fontSize:'12px',color:'var(--dim)'}}>Aucun résultat</div>}
+      : ls.length>0 ? (<>
+        {ls.map((p:any)=>(
+          <Link href={`/product/${p.id}`} key={p.id} onClick={()=>setSq('')}
+            style={{display:'flex',alignItems:'center',gap:'0.75rem',padding:'10px 14px',borderBottom:'1px solid var(--line)'}}>
+            <img src={p.productImage||p.imagesProduct?.[0]?.imageUrl} style={{width:40,height:40,objectFit:'cover',flexShrink:0,border:'1px solid var(--line)'}} alt=""/>
+            <div>
+              <div style={{fontSize:'13px',fontWeight:600,color:'var(--ink)'}}>{p.name}</div>
+              <div style={{fontSize:'13px',fontWeight:700,color:'var(--blue)'}}>{p.price} DA</div>
+            </div>
+          </Link>
+        ))}
+        <button onClick={doSearch} style={{width:'100%',padding:'12px',background:'rgba(58,134,255,0.07)',border:'none',borderTop:'1px solid rgba(58,134,255,0.2)',color:'var(--blue)',fontWeight:800,fontSize:'0.85rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px'}}>
+          Voir tous les résultats <ArrowLeft style={{width:'14px',height:'14px'}}/>
+        </button>
+      </>) : sq.length>=2 && <div style={{padding:'1rem',textAlign:'center',fontSize:'12px',color:'var(--dim)'}}>Aucun résultat</div>}
     </div>
   );
 
   return (
-    <nav dir="rtl" style={{
+    <nav dir="ltr" style={{
       position:'sticky',top:0,zIndex:100,
       backgroundColor:'var(--navy)',
       borderBottom:scrolled?'2px solid var(--blue)':'2px solid transparent',
@@ -365,7 +373,7 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
 export function Footer({ store }: any) {
   const yr = new Date().getFullYear();
   return (
-    <footer dir="rtl" style={{backgroundColor:'var(--navy)',fontFamily:"'Inter',sans-serif",borderTop:'1px solid var(--line-lt)'}}>
+    <footer dir="ltr" style={{backgroundColor:'var(--navy)',fontFamily:"'Inter',sans-serif",borderTop:'1px solid var(--line-lt)'}}>
       <div style={{maxWidth:'1280px',margin:'0 auto',padding:'64px 24px 32px'}}>
         <div className="footer-g" style={{paddingBottom:'48px',borderBottom:'1px solid rgba(255,255,255,0.05)'}}>
 
@@ -471,7 +479,7 @@ export function Home({ store, page }: any) {
   const countPage = Math.ceil((store.count||products.length)/48);
 
   return (
-    <div dir="rtl">
+    <div dir="ltr">
 
       {/* ── HERO ── */}
       <section style={{position:'relative',minHeight:'85vh',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',backgroundColor:'var(--navy)'}}>
@@ -610,7 +618,7 @@ export function Home({ store, page }: any) {
           )}
 
           {countPage>1 && (
-            <div className="pagination" dir="rtl">
+            <div className="pagination" dir="ltr">
               <Link href={{query:{page:Math.max(1,page-1)}}} scroll={false}
                 style={{width:44,height:44,border:'1px solid var(--line)',background:'var(--white)',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:600,opacity:page<=1?0.4:1}}>❮</Link>
               {Array.from({length:countPage}).map((_,i)=>{
@@ -639,7 +647,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
   const [sel, setSel] = useState(0);
   if(!product) return null;
   return (
-    <div dir="rtl" style={{backgroundColor:'var(--off)'}}>
+    <div dir="ltr" style={{backgroundColor:'var(--off)'}}>
       <div style={{backgroundColor:'var(--navy)',borderBottom:'2px solid var(--blue)',padding:'10px 24px',display:'flex',alignItems:'center',gap:'8px',fontSize:'12px',fontWeight:600,letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(255,255,255,0.4)'}}>
         <Link href="/" className="bc" style={{color:'rgba(255,255,255,0.4)',transition:'color 0.2s'}}
           onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--blue)';}}
@@ -842,7 +850,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const onBlur  = (e:React.FocusEvent<HTMLInputElement|HTMLSelectElement>, err?:boolean) => { e.target.style.borderColor=err?'#C0392B':'var(--line)'; };
 
   return (
-    <div dir="rtl" style={{marginTop:'22px',paddingTop:'20px',borderTop:'2px solid var(--blue)'}}>
+    <div dir="ltr" style={{marginTop:'22px',paddingTop:'20px',borderTop:'2px solid var(--blue)'}}>
       {product.store?.cart && (
         <div className="cart-add-btns" style={{marginBottom:'14px'}}>
           <button onClick={addToCart} disabled={isAdded} className="bc"
@@ -1014,7 +1022,7 @@ export function Cart({ domain, store }: { domain:string; store:any }) {
   const onBlur  = (e:React.FocusEvent<HTMLInputElement|HTMLSelectElement>, err?:boolean) => { e.target.style.borderColor=err?'#C0392B':'var(--line)'; };
 
   if(success) return (
-    <div dir="rtl" style={{minHeight:'70vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem',background:'var(--off)'}}>
+    <div dir="ltr" style={{minHeight:'70vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem',background:'var(--off)'}}>
       <div style={{textAlign:'center',background:'var(--white)',padding:'4rem 2.5rem',border:'1px solid var(--line)',borderTop:'3px solid var(--blue)',maxWidth:460,width:'100%'}}>
         <CheckCircle2 style={{width:'48px',height:'48px',color:'var(--blue)',display:'block',margin:'0 auto 1.25rem'}}/>
         <h2 className="bc" style={{fontSize:'2rem',fontWeight:800,color:'var(--navy)',marginBottom:'0.5rem',letterSpacing:'0.04em'}}>Commande reçue !</h2>
@@ -1025,7 +1033,7 @@ export function Cart({ domain, store }: { domain:string; store:any }) {
   );
 
   if(!items.length) return (
-    <div dir="rtl" style={{minHeight:'60vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem',background:'var(--off)'}}>
+    <div dir="ltr" style={{minHeight:'60vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem',background:'var(--off)'}}>
       <div style={{textAlign:'center',padding:'4rem 2rem',border:'2px dashed var(--line)',maxWidth:400,width:'100%'}}>
         <Package style={{width:'48px',height:'48px',color:'var(--dim)',opacity:0.3,display:'block',margin:'0 auto 1.25rem'}}/>
         <p className="bc" style={{fontSize:'1.375rem',fontWeight:800,color:'var(--dim)',marginBottom:'0.5rem',letterSpacing:'0.04em'}}>Panier vide</p>
@@ -1036,7 +1044,7 @@ export function Cart({ domain, store }: { domain:string; store:any }) {
   );
 
   return (
-    <div dir="rtl" style={{minHeight:'100vh',background:'var(--off)',padding:'2.5rem 1.5rem 5rem'}}>
+    <div dir="ltr" style={{minHeight:'100vh',background:'var(--off)',padding:'2.5rem 1.5rem 5rem'}}>
       <div style={{maxWidth:1280,margin:'0 auto'}}>
         <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',marginBottom:'2rem',paddingBottom:'1rem',borderBottom:'3px solid var(--blue)'}}>
           <h1 className="bc" style={{fontSize:'clamp(1.75rem,4vw,2.5rem)',fontWeight:900,color:'var(--navy)',letterSpacing:'0.04em'}}>Panier</h1>
@@ -1161,7 +1169,7 @@ export function StaticPage({ staticPage, page, store }: any) {
 }
 
 const Shell = ({ children, title, sub }: { children:React.ReactNode; title:string; sub?:string }) => (
-  <div dir="rtl" style={{backgroundColor:'var(--off)',minHeight:'100vh'}}>
+  <div dir="ltr" style={{backgroundColor:'var(--off)',minHeight:'100vh'}}>
     <div style={{backgroundColor:'var(--navy)',padding:'64px 24px 48px',borderBottom:'3px solid var(--blue)',position:'relative',overflow:'hidden'}}>
       <div style={{position:'absolute',inset:0,opacity:0.04}} className="dot-bg"/>
       <div style={{maxWidth:'720px',margin:'0 auto',position:'relative',zIndex:2}}>
@@ -1236,7 +1244,7 @@ export function Contact({ store }: { store?:any }) {
   const onB=(e:React.FocusEvent<HTMLInputElement|HTMLTextAreaElement>)=>{e.target.style.borderColor='var(--line)';};
 
   return (
-    <div dir="rtl" style={{backgroundColor:'var(--off)',minHeight:'100vh'}}>
+    <div dir="ltr" style={{backgroundColor:'var(--off)',minHeight:'100vh'}}>
       <div style={{backgroundColor:'var(--navy)',padding:'64px 24px 48px',borderBottom:'3px solid var(--blue)',position:'relative',overflow:'hidden'}}>
         <div style={{position:'absolute',inset:0,opacity:0.04}} className="dot-bg"/>
         <div style={{maxWidth:'960px',margin:'0 auto',position:'relative',zIndex:2}}>
