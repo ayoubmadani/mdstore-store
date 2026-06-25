@@ -718,7 +718,7 @@ export function Home({ store, page }: any) {
             </p>
             <div className="hero-actions">
               <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#8B5CF6', color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, transition: 'all 0.2s', boxShadow: '0 4px 20px rgba(230,57,70,0.35)' }}
-                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#C0303C')}
+                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#7C3AED')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#8B5CF6')}>
                 تسوق الآن <ArrowLeft size={16} />
               </a>
@@ -1176,7 +1176,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
 
             <button type="submit" disabled={sub} style={{ ...S.btnPrimary, opacity: sub ? 0.7 : 1 }}
-              onMouseEnter={e => !sub && ((e.currentTarget as HTMLButtonElement).style.background = '#C0303C')}
+              onMouseEnter={e => !sub && ((e.currentTarget as HTMLButtonElement).style.background = '#7C3AED')}
               onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#8B5CF6')}>
               {sub ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> جاري المعالجة...</> : 'تأكيد الطلب'}
             </button>

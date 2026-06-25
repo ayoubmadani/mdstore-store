@@ -4,22 +4,74 @@
 // SUCCESSFULLY
 // ==========================================
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import axios from 'axios';
 import {
   CheckCircle, Package, Phone,
   Truck, Star, ShoppingBag, ArrowLeft,
   Sparkles, Clock3
 } from 'lucide-react';
+import type { Pixel } from '@/types/store';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
+function cleanFullPath(href: string) {
+  let url = href;
+  if (!url.startsWith('http')) url = 'https://' + url;
+  try {
+    const parsed = new URL(url);
+    const parts = parsed.pathname.split('/').filter(Boolean);
+    if (parts[0]?.includes('.')) {
+      return parts[0] + '/' + parts.slice(1).join('/');
+    }
+    return parsed.hostname.split(':')[0] + parsed.pathname;
+  } catch { return ''; }
+}
 
 export default function SuccessPage({
   params,
 }: {
-  params: Promise<{ domain: string }>;
+  params: Promise<{ domain: string; lpdomain: string }>;
 }) {
   const [domain, setDomain] = useState('');
   const [visible, setVisible] = useState(false);
   const [count, setCount] = useState(0);
+  const [pixels, setPixels] = useState<Pixel[]>([]);
+  const hasTracked = useRef(false);
+
+  // fetch LP pixels
+  useEffect(() => {
+    const fullPath = cleanFullPath(window.location.href)
+      .replace(/\/successfully\/?$/, '');
+    axios.get(`${API_URL}/landing-page/find?domain=${fullPath}`)
+      .then(res => setPixels(res.data?.product?.store?.pixels ?? []))
+      .catch(() => {});
+  }, []);
+
+  // fire purchase event once pixels scripts are ready
+  useEffect(() => {
+    if (hasTracked.current) return;
+    const savedOrder = localStorage.getItem('last_order');
+    if (!savedOrder) return;
+    const fire = () => {
+      try {
+        const { total, id } = JSON.parse(savedOrder);
+        pixels.forEach(px => {
+          if (!px.isActive) return;
+          if (px.type === 'facebook' && (window as any).fbq) {
+            (window as any).fbq('track', 'Purchase', { value: total, currency: 'DZD', order_id: id });
+          }
+          if (px.type === 'tiktok' && (window as any).ttq) {
+            (window as any).ttq.track('CompletePayment', { value: total, currency: 'DZD', order_id: id });
+          }
+        });
+        hasTracked.current = true;
+      } catch {}
+    };
+    // give scripts 1.5s to initialise
+    const t = setTimeout(fire, 1500);
+    return () => clearTimeout(t);
+  }, [pixels]);
 
   useEffect(() => {
     params.then(({ domain }) => setDomain(domain));

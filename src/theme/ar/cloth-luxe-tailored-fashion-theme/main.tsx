@@ -493,8 +493,8 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
     if(product.variantDetails?.length&&Object.keys(selectedVariants).length>0){const m=product.variantDetails.find((v:any)=>vm(v,selectedVariants));if(m&&m.price!==-1)return m.price}
     return base;
   },[product,selectedOffer,selectedVariants]);
-  const getLiv=useCallback(():number=>{if(!selW)return 0;return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice},[selW,fd.typeLivraison]);
-  const fp=getFP();const total=()=>fp*fd.quantity+getLiv();
+  const getLiv=useCallback(():any=>{if(!selW)return 0;return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice},[selW,fd.typeLivraison]);
+  const fp=getFP();const total = () => Number(fp) * Number(fd.quantity) + Number(getLiv());
   const getVarId=useCallback(()=>{if(!product.variantDetails?.length||!Object.keys(selectedVariants).length)return undefined;return product.variantDetails.find((v:any)=>vm(v,selectedVariants))?.id},[product.variantDetails,selectedVariants]);
   const validate=()=>{const e:Record<string,string>={};if(!fd.customerName.trim())e.name='الاسم مطلوب';if(!fd.customerPhone.trim()||!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim()))e.phone='رقم غير صالح';if(!fd.customerWelaya)e.w='الولاية مطلوبة';if(!fd.customerCommune)e.c='البلدية مطلوبة';return e};
 
@@ -508,7 +508,7 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
   const submit=async(e:React.FormEvent)=>{
     e.preventDefault();const er=validate();if(Object.keys(er).length){setE(er);return}
     setE({});setSub(true);
-    try{await axios.post(`${API}/orders/create`,{...fd,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});if(fd.customerId)localStorage.setItem('customerId',fd.customerId);router.push(`/lp/${domain}/successfully`)}
+    try{await axios.post(`${API}/orders/create`,{...fd,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});if(fd.customerId)localStorage.setItem('customerId',fd.customerId);router.push(`/${domain}/successfully?productId=${product.id}`)}
     catch{}finally{setSub(false)}
   };
 

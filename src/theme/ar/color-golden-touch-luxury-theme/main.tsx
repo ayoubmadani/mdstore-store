@@ -1160,7 +1160,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
 
             <button type="submit" disabled={sub} style={{ ...S.btnPrimary, opacity: sub ? 0.7 : 1 }}
-              onMouseEnter={e => !sub && ((e.currentTarget as HTMLButtonElement).style.background = '#C0303C')}
+              onMouseEnter={e => !sub && ((e.currentTarget as HTMLButtonElement).style.background = '#B8931D')}
               onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#D4AF37')}>
               {sub ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> جاري المعالجة...</> : 'تأكيد الطلب'}
             </button>

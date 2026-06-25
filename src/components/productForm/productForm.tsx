@@ -224,7 +224,7 @@ export default function ProductForm({
           });
         }
         if (res.data?.customerId) localStorage.setItem('customerId', res.data.customerId);
-        router.push(`../../successfully`);
+        router.push(`${window.location.pathname}/successfully?productId=${product.id}`);
       }
     } catch {
       alert('حدث خطأ في الاتصال بالخادم');

@@ -10,6 +10,8 @@ import axios from 'axios';
 import { notFound } from 'next/navigation';
 import ProductForm from '@/components/productForm/productForm';
 import AddShow from '@/components/addShow';
+import CustomerTracker from '@/components/CustomerTracker';
+import type { Pixel } from '@/types/store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -35,7 +37,7 @@ interface Product {
   productImage?: string; imagesProduct?: ProductImage[];
   offers?: Offer[]; attributes?: Attribute[];
   variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-  store: { id: string; name: string; subdomain: string; userId: string; };
+  store: { id: string; name: string; subdomain: string; userId: string; pixels?: Pixel[]; };
 }
 interface LandingPage {
   id: string; domain: string;
@@ -209,6 +211,7 @@ export default function LandingPageView({
   return (
     <div style={{
       }}>         <AddShow lpId={lp.id} />
+      <CustomerTracker pixels={product.store.pixels ?? []} />
 
       <div className="min-h-screen bg-gray-50" dir="rtl">
 

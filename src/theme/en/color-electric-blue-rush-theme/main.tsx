@@ -676,7 +676,7 @@ export function Home({ store, page }: any) {
             </p>
             <div className="hero-actions">
               <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#E63946', color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, transition: 'all 0.2s', boxShadow: '0 4px 20px rgba(230,57,70,0.35)' }}
-                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#C0303C')}
+                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#1E40AF')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#E63946')}>
                 Acheter maintenant <ArrowLeft size={16} />
               </a>
@@ -1033,7 +1033,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             {isAdded ? <><CheckCircle2 size={14} className="anim-check" />Ajouté</> : <><ShoppingCart size={14} />Ajouter au panier</>}
           </button>
           <button onClick={() => setIsOrderNow(true)} style={{ flex: 1, ...S.btnPrimary, width: 'auto', borderRadius: 10 }}
-            onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = '#C0303C')}
+            onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = '#1E40AF')}
             onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#E63946')}>
             Commander maintenant
           </button>
@@ -1116,7 +1116,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
 
             <button type="submit" disabled={sub} style={{ ...S.btnPrimary, opacity: sub ? 0.7 : 1 }}
-              onMouseEnter={e => !sub && ((e.currentTarget as HTMLButtonElement).style.background = '#C0303C')}
+              onMouseEnter={e => !sub && ((e.currentTarget as HTMLButtonElement).style.background = '#1E40AF')}
               onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#E63946')}>
               {sub ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Traitement en cours...</> : 'Confirmer la commande'}
             </button>
@@ -1322,7 +1322,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             </div>
 
             <button type="submit" disabled={submitting} style={{ ...S.btnPrimary, opacity: submitting ? 0.7 : 1 }}
-              onMouseEnter={e => !submitting && ((e.currentTarget as HTMLButtonElement).style.background = '#C0303C')}
+              onMouseEnter={e => !submitting && ((e.currentTarget as HTMLButtonElement).style.background = '#1E40AF')}
               onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#E63946')}>
               {submitting ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Traitement en cours...</> : 'Confirmer la commande'}
             </button>
@@ -1466,7 +1466,7 @@ export function Contact({ store }: { store: any }) {
                 <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} placeholder="Comment pouvons-nous vous aider ?" style={{ ...S.input, resize: 'none' }} />
               </div>
               <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }}
-                onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.background = '#C0303C')}
+                onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.background = '#1E40AF')}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#E63946')}>
                 {loading ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Envoi en cours...</> : <>Envoyer le message <ArrowLeft size={16} /></>}
               </button>

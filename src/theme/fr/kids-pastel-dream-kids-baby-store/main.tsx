@@ -361,7 +361,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     return (
         <>
         {store?.topBar?.enabled && store?.topBar?.text && (
-          <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+          <div style={{ background: 'linear-gradient(90deg, #7C3AED 0%, #C4B5FD 50%, #FDBA74 100%)', color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
             {store.topBar.text}
           </div>
         )}
