@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Phone,
-  CheckCircle2, ArrowLeft, Package,
+  CheckCircle2, ArrowRight, Package,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Shield, Truck,
   Compass, Mountain, Tent, Wind,
@@ -295,7 +295,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div style={{ padding: '0.5rem 1.5rem 1rem' }}>
             {[{ h: '/', l: 'Accueil' }, { h: '/contact', l: 'Contactez-nous' }].map(i => (
               <Link key={i.h} href={i.h} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid rgba(255,255,255,0.06)', fontSize: '0.875rem', fontWeight: 600, color: 'rgba(255,255,255,0.75)' }}>
-                {i.l} <ArrowLeft size={13} style={{ color: OR }} />
+                {i.l} <ArrowRight size={13} style={{ color: OR }} />
               </Link>
             ))}
 
@@ -332,7 +332,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 ))}
               </div>
               <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: 'rgba(212,98,42,0.08)', border: 'none', borderTop: '1px solid rgba(212,98,42,0.2)', color: OR, fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                Voir tous les résultats <ArrowLeft size={14} />
+                Voir tous les résultats <ArrowRight size={14} />
               </button>
               </>
             )}
@@ -421,7 +421,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         )}
       </div>
       <Link href={`/product/${product.slug || product.id}`} className="oa-cta">
-        {viewDetails} <ArrowLeft size={13} />
+        {viewDetails} <ArrowRight size={13} />
       </Link>
     </div>
   );
@@ -462,13 +462,13 @@ export function Home({ store, page }: any) {
               <div style={{ width: 6, height: 3, background: 'rgba(255,255,255,0.2)' }} />
             </div>
             <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.55)', lineHeight: 1.85, marginBottom: '2rem', maxWidth: 440 }}>
-              {store.hero?.subtitle || 'Équipements et outils de camping وaventures الextérieur. Prêt pour tout terrain et chaque voyage.'}
+              {store.hero?.subtitle || 'Équipements et outils de camping et aventures en plein air. Prêt pour tous les terrains et chaque voyage.'}
             </p>
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
               <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: OR, color: '#fff', fontWeight: 800, fontSize: '0.8rem', padding: '0.875rem 1.875rem', transition: 'background 0.18s', textDecoration: 'none', fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.1em', textTransform: 'uppercase' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = ORD)}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = OR)}>
-                Explorer Produits <ArrowLeft size={14} />
+                Explorer Produits <ArrowRight size={14} />
               </a>
               {store?.cart !== false && (
                 <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, color: 'rgba(255,255,255,0.6)', fontWeight: 600, fontSize: '0.8rem', padding: '0.875rem 1.5rem', border: '1px solid rgba(255,255,255,0.15)', letterSpacing: '0.06em', transition: 'all 0.18s' }}
@@ -495,7 +495,7 @@ export function Home({ store, page }: any) {
         <div className="trust-bar" style={{ maxWidth: 1280, margin: '0 auto' }}>
           {[
             { icon: <Truck size={14} />, t: 'Livraison pour 58 wilayas', s: 'Rapide et Sécurisé' },
-            { icon: <Shield size={14} />, t: 'Paiement À la livraison', s: 'Sans risquesة' },
+            { icon: <Shield size={14} />, t: 'Paiement À la livraison', s: 'Sans risques' },
             { icon: <Tent size={14} />, t: 'Équipements professionnelle', s: 'Pour toutes les aventures' },
             { icon: <Wind size={14} />, t: 'Résistant aux intempéries', s: 'Haute qualité' },
           ].map((item, i) => (
@@ -1007,7 +1007,7 @@ export function Privacy() {
     <Shell title="Politique de confidentialité">
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 10, border: `1px solid ${BD}` }}>
         <InfoBlock title="Les données que nous collectons" body="Nous collectons uniquement : Nom, Téléphone et adresse de Livraison." />
-        <InfoBlock title="Protection des données" body="Stockées Tous les données de manière chiffrée. Nous utilisons protocoles حماية Certifiée لGarantie la sécurité de vos informations." />
+        <InfoBlock title="Protection des données" body="Toutes les données sont chiffrées. Nous utilisons des protocoles de protection certifiés pour garantir la sécurité de vos informations." />
         <InfoBlock title="Partage des informations" body="Nous ne vendons ni ne partageons vos données, sauf avec les partenaires de livraison." />
       </div>
     </Shell>
@@ -1030,7 +1030,7 @@ export function Cookies() {
   return (
     <Shell title="Cookies">
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 10, border: `1px solid ${BD}` }}>
-        <InfoBlock title="Fichiers essentiels" body="Nous utilisons Cookies الEssentiels pour garantir le fonctionnement du Panier et la sécurité de la session." />
+        <InfoBlock title="Fichiers essentiels" body="Nous utilisons des cookies essentiels pour garantir le fonctionnement du panier et la sécurité de la session." />
         <InfoBlock title="Amélioration de l’expérience" body="Nous utilisons certains fichiers pour comprendre l’utilisation du site et améliorer l’expérience." />
       </div>
     </Shell>
@@ -1103,7 +1103,7 @@ export function Contact({ store }: { store: any }) {
               <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = ORD)}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = OR)}>
-                {loading ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />Envoi en cours...</> : <>Envoyer le message <ArrowLeft size={15} /></>}
+                {loading ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />Envoi en cours...</> : <>Envoyer le message <ArrowRight size={15} /></>}
               </button>
             </form>
           )}

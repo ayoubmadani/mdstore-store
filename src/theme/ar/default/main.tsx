@@ -142,7 +142,7 @@ export function Navbar({ store }: { store: Store }) {
     <nav style={{ borderBottom: '1px solid #e5e5e5', background: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
       <div style={{ ...S.container, display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
         <Link href="/" style={{ fontWeight: 700, fontSize: '1rem', color: '#111', textDecoration: 'none' }}>
-          {store.design?.logoUrl
+          {store.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
             ? <img src={store.design.logoUrl} alt={store.name} style={{ height: 32, display: 'block' }} />
             : store.name}
         </Link>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import {
   ShoppingBag, Search, X, ChevronDown, Heart, Star, Sparkles,
-  CheckCircle2, Loader2, Trash2, ArrowLeft, Menu, Phone, Mail,
+  CheckCircle2, Loader2, Trash2, ArrowRight, Menu, Phone, Mail,
   MapPin, ToggleRight, ChevronLeft, ChevronRight, ZoomIn,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
@@ -360,7 +360,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 <button
                   onClick={() => { closeSearch(); window.location.href = `/?search=${encodeURIComponent(search)}`; }}
                   style={{ width: '100%', padding: '12px', background: 'var(--blush-2)', border: 'none', borderTop: '1px solid var(--line)', color: 'var(--pink)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontFamily: "'Nunito Sans',sans-serif" }}>
-                  Voir tous les résultats <ArrowLeft size={14} />
+                  Voir tous les résultats <ArrowRight size={14} />
                 </button>
               </div>
             )}
@@ -403,7 +403,7 @@ export function Footer({ store }: { store: any }) {
         {/* Brand */}
         <div>
           <div className="gg-footer-logo">{store?.name || 'Glamour & Glow'}</div>
-          <p className="gg-footer-desc">{store?.description || 'Produits تجميل premium تُضيء جمالك الNaturel. Découvrirي notre collection الحصرية.'}</p>
+          <p className="gg-footer-desc">{store?.description || 'Produits de beauté premium qui illuminent votre beauté naturelle. Découvrez notre collection exclusive.'}</p>
           <div style={{ display: 'flex', gap: '10px' }}>
             {[
               ['instagram', socials.instagram, '📸'],
@@ -526,16 +526,16 @@ export function Home({ store, domain, page }: { store: any; domain: string; page
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to left, rgba(26,10,18,0.7) 0%, rgba(26,10,18,0.35) 60%, transparent 100%)' }} />
           <div style={{ position: 'relative', zIndex: 2, maxWidth: 1360, margin: '0 auto', padding: '80px 24px', display: 'flex', alignItems: 'center', minHeight: 480 }}>
             <div style={{ maxWidth: 540 }}>
-              <p className="gg-hero-eyebrow" style={{ color: 'var(--gold-lt)' }}>✨ كوليكشن Nouveau</p>
+              <p className="gg-hero-eyebrow" style={{ color: 'var(--gold-lt)' }}>✨ Nouvelle Collection</p>
               <h1 className="gg-hero-h1" style={{ color: '#fff' }}>
-                {store.hero.title?.replace(/<[^>]+>/g, '') || 'تألقي بجمالك الحقيقي'}
+                {store.hero.title?.replace(/<[^>]+>/g, '') || 'Révélez votre vraie beauté'}
               </h1>
               <p className="gg-hero-sub" style={{ color: 'rgba(255,255,255,0.82)' }}>
-                {store.hero.subtitle || 'Découvrirي أرقى Produits التجميل et soins بالبشرة.'}
+                {store.hero.subtitle || 'Découvrez les meilleurs produits de beauté et soins de la peau.'}
               </p>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 <a href="#products" className="gg-btn gg-btn-pink">Acheter maintenant</a>
-                <Link href="/contact" className="gg-btn" style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1.5px solid rgba(255,255,255,0.4)', backdropFilter: 'blur(4px)' }}>اعرفي المزيد</Link>
+                <Link href="/contact" className="gg-btn" style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1.5px solid rgba(255,255,255,0.4)', backdropFilter: 'blur(4px)' }}>En savoir plus</Link>
               </div>
             </div>
           </div>
@@ -546,16 +546,16 @@ export function Home({ store, domain, page }: { store: any; domain: string; page
           <div className="gg-hero-deco" style={{ width: 220, height: 220, background: 'rgba(201,169,110,0.12)', bottom: -60, right: 80 }} />
           <div className="gg-hero-content">
             <div className="gg-hero-text">
-              <p className="gg-hero-eyebrow">✨ كوليكشن Nouveau</p>
+              <p className="gg-hero-eyebrow">✨ Nouvelle Collection</p>
               <h1 className="gg-hero-h1">
-                {store?.hero?.title?.replace(/<[^>]+>/g, '') || 'تألقي بجمالك الحقيقي'}
+                {store?.hero?.title?.replace(/<[^>]+>/g, '') || 'Révélez votre vraie beauté'}
               </h1>
               <p className="gg-hero-sub">
-                {store?.hero?.subtitle || 'Découvrirي أرقى Produits التجميل et soins بالبشرة. تركيبات premium تُعيد لبشرتك نضارتها وإشراقها.'}
+                {store?.hero?.subtitle || 'Découvrez les meilleurs produits de beauté et soins de la peau. Des formules premium qui redonnent éclat et jeunesse à votre peau.'}
               </p>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 <a href="#products" className="gg-btn gg-btn-pink">Acheter maintenant</a>
-                <Link href="/contact" className="gg-btn gg-btn-outline">اعرفي المزيد</Link>
+                <Link href="/contact" className="gg-btn gg-btn-outline">En savoir plus</Link>
               </div>
             </div>
           </div>
@@ -569,7 +569,7 @@ export function Home({ store, domain, page }: { store: any; domain: string; page
             { icon: '🚚', title: 'Livraison rapide', desc: 'pour toutes les wilayas de Algérie' },
             { icon: '💎', title: 'Qualité authentique', desc: 'Produits premium 100%' },
             { icon: '💳', title: 'Paiement Sécurisé', desc: 'À la livraison' },
-            { icon: '🔄', title: 'Retour facile', desc: 'خلال 7 أيام' },
+            { icon: '🔄', title: 'Retour facile', desc: 'Sous 7 jours' },
           ].map(item => (
             <div key={item.title} className="gg-trust-item">
               <div className="gg-trust-icon">{item.icon}</div>
@@ -583,7 +583,7 @@ export function Home({ store, domain, page }: { store: any; domain: string; page
       {/* Products section */}
       <section id="products" style={{ maxWidth: 1360, margin: '0 auto', padding: '20px 24px 80px' }}>
         <div className="gg-sec-hd">
-          <p className="gg-sec-eyebrow">تشكيلتنا</p>
+          <p className="gg-sec-eyebrow">Notre collection</p>
           <h2 className="gg-sec-title">Nos produits Spéciales</h2>
         </div>
 
@@ -908,7 +908,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 <div style={{ position: 'relative' }}>
                   <ChevronDown size={13} style={{ position: 'absolute', right: 11, top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
                   <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP(!!errors.customerWelaya), paddingRight: 32, fontFamily: 'inherit' }}>
-                    <option value="">Choisirي</option>
+                    <option value="">Choisir</option>
                     {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                   </select>
                 </div>
@@ -917,7 +917,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 <div style={{ position: 'relative' }}>
                   <ChevronDown size={13} style={{ position: 'absolute', right: 11, top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
                   <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...INP(!!errors.customerCommune), paddingRight: 32, opacity: !fd.customerWelaya ? 0.4 : 1, fontFamily: 'inherit' }}>
-                    <option value="">{loadingC ? '...' : 'Choisirي'}</option>
+                    <option value="">{loadingC ? '...' : 'Choisir'}</option>
                     {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                   </select>
                 </div>
@@ -1022,7 +1022,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{ textAlign: 'center', background: 'var(--white)', padding: '4rem 2.5rem', border: '1px solid var(--line)', borderRadius: 16, maxWidth: 460, width: '100%', boxShadow: '0 8px 40px rgba(255,31,142,0.1)' }}>
         <CheckCircle2 size={48} style={{ color: 'var(--pink)', margin: '0 auto 20px', display: 'block' }} />
         <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.9rem', fontStyle: 'italic', color: 'var(--ink)', marginBottom: 8 }}>Commande reçue ! ✨</h2>
-        <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 14, color: 'var(--dim)', marginBottom: 28, lineHeight: 1.7 }}>شكراً لاختيارك إيانا. Nous vous contacterons Bient’t.</p>
+        <p style={{ fontFamily: "’Nunito Sans’,sans-serif", fontSize: 14, color: ‘var(--dim)’, marginBottom: 28, lineHeight: 1.7 }}>Merci de nous avoir choisis. Nous vous contacterons bientôt.</p>
         <Link href="/" className="gg-btn gg-btn-pink">Retour à la boutique</Link>
       </div>
     </div>
@@ -1046,7 +1046,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
           <span style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 13, color: 'var(--dim)' }}>{items.length} Produit</span>
         </div>
         <Link href="/" className="gg-btn gg-btn-outline" style={{ fontSize: 13, padding: '9px 18px' }}>
-          <ShoppingBag size={14} /> متابعة Shopping
+          <ShoppingBag size={14} /> Continuer les achats
         </Link>
       </div>
 
@@ -1094,7 +1094,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <div style={{ position: 'relative' }}>
                   <ChevronDown size={13} style={{ position: 'absolute', right: 11, top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
                   <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP(!!errors.w), paddingRight: 32, fontFamily: 'inherit' }}>
-                    <option value="">Choisirي</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                    <option value="">Choisir</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
@@ -1102,7 +1102,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <div style={{ position: 'relative' }}>
                   <ChevronDown size={13} style={{ position: 'absolute', right: 11, top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
                   <select value={fd.customerCommune} disabled={loadingC || !fd.customerWelaya} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...INP(!!errors.c), paddingRight: 32, opacity: !fd.customerWelaya ? 0.4 : 1, fontFamily: 'inherit' }}>
-                    <option value="">{loadingC ? '...' : 'Choisirي'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                    <option value="">{loadingC ? '...' : 'Choisir'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
@@ -1190,7 +1190,7 @@ const InfoBlock = ({ title, body, tag }: { title: string; body: string; tag?: st
 export function Privacy() {
   return (
     <Shell title="Politique de confidentialité" sub="Légal">
-      <InfoBlock title="Les données que nous collectons" body="uniquement Votre nom et numéro de هاتفك et adresse de Livraison — ما هو ضروري pour traiter votre commande." />
+      <InfoBlock title="Les données que nous collectons" body="Uniquement votre nom, numéro de téléphone et adresse de livraison — le strict nécessaire pour traiter votre commande." />
       <InfoBlock title="Comment nous les utilisons" body="Exclusivement pour traiter et livrer vos achats. Aucun usage commercial." />
       <InfoBlock title="Sécurité" body="Vos données sont protégées par un chiffrement standard et une infrastructure sécurisée." />
       <InfoBlock title="Partage des données" body="Nous ne vendons pas vos données. Partagées avec les partenaires de livraison de confiance." />
@@ -1201,9 +1201,9 @@ export function Privacy() {
 export function Terms() {
   return (
     <Shell title="Conditions de service" sub="Légal">
-      <InfoBlock title="Votre compte" body="أنت مسؤولة عن أمان بيانات connexion وكل النشاط تحت Votre compte." />
+      <InfoBlock title="Votre compte" body="Vous êtes responsable de la sécurité de vos données de connexion et de toute activité sous votre compte." />
       <InfoBlock title="Paiements" body="Aucuns frais cachés. Le prix affiché est le prix final." />
-      <InfoBlock title="Utilisation interdite" body="Produits authentiques uniquement. Non place للProduits les contrefaçons." tag="Strict" />
+      <InfoBlock title="Utilisation interdite" body="Produits authentiques uniquement. Pas de place pour les contrefaçons." tag="Strict" />
       <InfoBlock title="Loi applicable" body="Ces Conditions sont soumises aux lois de la République Algérienne Démocratique et Populaire." />
     </Shell>
   );
@@ -1248,7 +1248,7 @@ export function Contact({ store }: { store?: any }) {
         <div style={{ maxWidth: 960, margin: '0 auto' }}>
           <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 8 }}>Contact</p>
           <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 'clamp(1.8rem,4vw,3rem)', fontWeight: 600, fontStyle: 'italic', color: 'var(--ink)', margin: '0 0 8px' }}>Ravi de vous aider 💄</h1>
-          <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 14, color: 'var(--dim)' }}>نRéponse sous 24h</p>
+          <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 14, color: 'var(--dim)' }}>Réponse sous 24h</p>
         </div>
       </div>
 
@@ -1275,7 +1275,7 @@ export function Contact({ store }: { store?: any }) {
 
         {/* Form */}
         <div style={{ background: 'var(--white)', border: '1px solid var(--line)', borderRadius: 12, padding: 28 }}>
-          <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--pink)', marginBottom: 20 }}>أرسلي رسالة</p>
+          <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--pink)', marginBottom: 20 }}>Envoyer un message</p>
           {sent ? (
             <div style={{ minHeight: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--line)', borderRadius: 8, textAlign: 'center', background: 'var(--blush)', padding: 32 }}>
               <CheckCircle2 size={32} style={{ color: 'var(--pink)', marginBottom: 12 }} />
@@ -1291,7 +1291,7 @@ export function Contact({ store }: { store?: any }) {
               <FR label="Email"><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="votre@email.com" required style={INP()} /></FR>
               <FR label="Votre message"><textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder="Comment pouvons-nous vous aider ?" rows={4} required style={{ ...INP(), resize: 'none' }} /></FR>
               <button type="submit" disabled={loading} className="gg-btn gg-btn-pink" style={{ justifyContent: 'center', width: '100%', opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}>
-                {loading ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} /> En cours...</> : <>Envoyer le message <ArrowLeft size={14} /></>}
+                {loading ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} /> En cours...</> : <>Envoyer le message <ArrowRight size={14} /></>}
               </button>
             </form>
           )}

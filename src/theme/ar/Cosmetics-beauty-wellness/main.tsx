@@ -585,6 +585,13 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             >
               <Search size={16} />
             </button>
+            {store?.cart !== false && (
+              <Link href="/cart" style={{ position: 'relative', width: 38, height: 38, borderRadius: 8, border: '1.5px solid var(--line-dk)', background: 'var(--white)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--plum)' }}>
+                <ShoppingCart size={16} />
+                {count > 0 && <span style={{ position: 'absolute', top: -4, right: -4, background: 'var(--plum)', color: '#fff', fontSize: 9, fontWeight: 800, width: 15, height: 15, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
+              </Link>
+            )}
+
 
             <button
               onClick={() => setOpen(p => !p)}

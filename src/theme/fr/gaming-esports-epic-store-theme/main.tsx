@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Phone,
-  CheckCircle2, Truck, ArrowLeft,
+  CheckCircle2, Truck, ArrowRight,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, ShieldCheck,
   Send
@@ -238,7 +238,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           </Link>
         ))}
         <button onClick={handleSearchSubmit} style={{ width: '100%', padding: '12px', background: 'rgba(0,212,255,0.07)', border: 'none', borderTop: '1px solid rgba(0,212,255,0.2)', color: '#00D4FF', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-          Voir tous les résultats <ArrowLeft size={14} />
+          Voir tous les résultats <ArrowRight size={14} />
         </button>
         </>
       ) : searchQuery.length >= 2 && (
@@ -250,7 +250,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   return (
     <>
       {store?.topBar?.enabled && store?.topBar?.text && (
-        <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+        <div style={{ background: '#7B2FBE', color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
           {store.topBar.text}
         </div>
       )}
@@ -259,7 +259,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
           <Link href="/" style={{ fontSize: '1.3rem', fontWeight: 900, color: '#7B2FBE' }}>
-            {store?.design?.logoUrl ? <img src={store.design.logoUrl} style={{ height: 30 }} /> : store?.name}
+            {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' ? <img src={store.design.logoUrl} style={{ height: 30 }} /> : store?.name}
           </Link>
 
           <nav className="lg-flex" style={{ gap: '1.5rem', fontSize: '0.85rem', fontWeight: 600 }}>
@@ -348,7 +348,7 @@ export function Footer({ store }: any) {
       <div className="container grid-3">
         <div>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem', color: '#7B2FBE' }}>{store?.name}</h3>
-          <p style={{ color: '#8A80A0', fontSize: '0.9rem', lineHeight: 1.6 }}>Votre boutique #1 لÉquipements les jeux et électroniques. Achetez et dominez la compétition.</p>
+          <p style={{ color: '#8A80A0', fontSize: '0.9rem', lineHeight: 1.6 }}>Votre boutique #1 pour les équipements de jeux et électroniques. Achetez et dominez la compétition.</p>
         </div>
         <div>
           <h4 style={{ fontWeight: 700, marginBottom: '1rem', color: '#E8E0F0' }}>Liens</h4>
@@ -435,7 +435,7 @@ export function Home({ store, page }: any) {
             letterSpacing: '-1px',
             textShadow: '0 0 40px rgba(123,47,190,0.5)'
           }}>
-            {store.hero?.title?.replace(/<[^>]+>/g, '') || 'العب بلا حدود'}
+            {store.hero?.title?.replace(/<[^>]+>/g, '') || 'Jouez sans limites'}
           </h1>
 
           <p style={{
@@ -815,7 +815,7 @@ export function Privacy() {
       <SimpleDivider />
       <div style={{ lineHeight: 1.8, color: '#8A80A0' }}>
         <h3 style={{ color: '#E8E0F0', marginTop: '2rem', marginBottom: '0.5rem' }}>1. Collecte des informations</h3>
-        <p>نقوم بجمع الinformations الشخصية الEssentiels uniquement pour traiter votre commande et Livraisonه (Nom، adresse، Numéro de Téléphone).</p>
+        <p>Nous collectons uniquement les informations personnelles essentielles pour traiter votre commande et la livraison (Nom, adresse, Numéro de Téléphone).</p>
 
         <h3 style={{ color: '#E8E0F0', marginTop: '2rem', marginBottom: '0.5rem' }}>2. Utilisation</h3>
         <p>Vos données sont utilisées exclusivement pour traiter vos commandes. Nous ne les vendons ni ne les partageons à des fins marketing.</p>
@@ -852,7 +852,7 @@ export function Contact({ store }: any) {
       });
       setSent(true);
     } catch (err) {
-      showError('Erreur lors de l’envoi، veuillez réessayer ultérieurement');
+      showError(‘Erreur lors de l\’envoi, veuillez réessayer ultérieurement’);
     } finally {
       setLoading(false);
     }

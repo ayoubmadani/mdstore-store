@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Phone,
-  CheckCircle2, ArrowLeft, Package,
+  CheckCircle2, ArrowRight, Package,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Shield, Truck, Wrench, Layers,
   Mail,
@@ -206,7 +206,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   return (
     <>
       {store?.topBar?.enabled && store?.topBar?.text && (
-        <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+        <div style={{ background: E, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
           {store.topBar.text}
         </div>
       )}
@@ -263,7 +263,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div style={{ padding: '0.25rem 1.5rem 0.875rem' }}>
             {[{ h: '/', l: 'Accueil' }, { h: '/contact', l: 'Contactez-nous' }].map(i => (
               <Link key={i.h} href={i.h} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.7rem 0', borderBottom: `1px solid ${BD}`, fontSize: '0.875rem', fontWeight: 500, color: INK }}>
-                {i.l} <ArrowLeft size={13} style={{ color: E }} />
+                {i.l} <ArrowRight size={13} style={{ color: E }} />
               </Link>
             ))}
             
@@ -275,7 +275,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <div className="glb-search-ov" onClick={e => { if (e.target === e.currentTarget) setShowSearch(false); }}>
           <div className="glb-search-panel">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: SUB }}>Recherche في Produits</span>
+              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: SUB }}>Rechercher des produits</span>
               <button onClick={() => setShowSearch(false)} style={{ width: 32, height: 32, borderRadius: 4, border: `1px solid ${BD}`, background: CARD, color: SUB, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><X size={14} /></button>
             </div>
             <form className="glb-search-form" onSubmit={handleSearch}>
@@ -299,7 +299,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 ))}
               </div>
               <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: EL, border: 'none', borderTop: `1px solid rgba(16,185,129,0.2)`, color: E, fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                Voir tous les résultats <ArrowLeft size={14} />
+                Voir tous les résultats <ArrowRight size={14} />
               </button>
               </>
             )}
@@ -385,7 +385,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
       <Link href={`/product/${product.slug || product.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: E, color: '#fff', fontWeight: 700, fontSize: '0.82rem', padding: '0.7rem', transition: 'background 0.18s' }}
         onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = ED)}
         onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = E)}>
-        Parcourir les Produits <ArrowLeft size={12} />
+        Parcourir les Produits <ArrowRight size={12} />
       </Link>
     </div>
   );
@@ -425,7 +425,7 @@ export function Home({ store, page }: any) {
               <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: E, color: '#fff', fontWeight: 700, fontSize: '0.875rem', padding: '0.8rem 1.75rem', borderRadius: 4, transition: 'background 0.18s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = ED)}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = E)}>
-                Parcourir les Produitss <ArrowLeft size={15} />
+                Parcourir les Produitss <ArrowRight size={15} />
               </a>
               {store?.cart !== false && (
                 <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, color: SUB, fontWeight: 500, fontSize: '0.875rem', padding: '0.8rem 1.25rem', borderRadius: 4, border: `1px solid ${BD}`, background: CARD, transition: 'all 0.18s' }}
@@ -962,7 +962,7 @@ export function Privacy() {
     <Shell title="Politique de confidentialité">
       <div style={{ background: CARD, padding: '1.5rem', border: `1px solid ${BD}` }}>
         <InfoBlock title="Les données que nous collectons" body="Nous collectons uniquement : Nom, Téléphone et adresse de Livraison." />
-        <InfoBlock title="Protection des données" body="Stockées Tous les données de manière chiffrée. Nous utilisons protocoles حماية Certifiée لGarantie la sécurité de vos informations." />
+        <InfoBlock title="Protection des données" body="Toutes les données sont chiffrées. Nous utilisons des protocoles de protection certifiés pour garantir la sécurité de vos informations." />
         <InfoBlock title="Partage des informations" body="Nous ne vendons ni ne partageons vos données, sauf avec les partenaires de livraison." />
       </div>
     </Shell>
@@ -985,7 +985,7 @@ export function Cookies() {
   return (
     <Shell title="Cookies">
       <div style={{ background: CARD, padding: '1.5rem', border: `1px solid ${BD}` }}>
-        <InfoBlock title="Fichiers essentiels" body="Nous utilisons Cookies الEssentiels pour garantir le fonctionnement du Panier et la sécurité de la session." />
+        <InfoBlock title="Fichiers essentiels" body="Nous utilisons des cookies essentiels pour garantir le fonctionnement du panier et la sécurité de la session." />
         <InfoBlock title="Amélioration de l’expérience" body="Nous utilisons certains fichiers pour comprendre l’utilisation du site et améliorer l’expérience." />
       </div>
     </Shell>
@@ -1063,7 +1063,7 @@ export function Contact({ store }: { store: any }) {
               <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = ED)}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = E)}>
-                {loading ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />Envoi en cours...</> : <>Envoyer le message <ArrowLeft size={15} /></>}
+                {loading ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />Envoi en cours...</> : <>Envoyer le message <ArrowRight size={15} /></>}
               </button>
             </form>
           )}

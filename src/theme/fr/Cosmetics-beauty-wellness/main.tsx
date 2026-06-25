@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, Heart, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Share2, Phone, User, ToggleRight,
-  Shield, ArrowLeft, Plus, Minus, CheckCircle2, Lock,
+  Shield, ArrowRight, Plus, Minus, CheckCircle2, Lock,
   Menu, Sparkles, Package, Truck, RefreshCw, Search,
   ShoppingCart, ShoppingBag, Trash2, Loader2, MapPin,
 } from 'lucide-react';
@@ -229,7 +229,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   const count = useCartStore(s => s.count);
   const initCount = useCartStore(s => s.initCount);
 
-  /* ═══════ 1. تعريف le styleات داخل المكون (مثل Navbar 2) ═══════ */
+  /* ═══════ 1. Définition des styles dans le composant ═══════ */
   const cartBtnStyle: React.CSSProperties = {
     position: 'relative',
     background: 'var(--plum)',
@@ -290,7 +290,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     return () => clearTimeout(t);
   }, [searchQuery, domain]);
 
-  /* ═══════ 3. دوال Recherche ═══════ */
+  /* ═══════ 3. Fonctions de recherche ═══════ */
   const handleSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (searchQuery.trim()) {
@@ -300,7 +300,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     }
   };
 
-  /* ═══════ 4. مكون Résultats de recherche (DropResults) ═══════ */
+  /* ═══════ 4. Composant résultats de recherche (DropResults) ═══════ */
   const DropResults = () => (
     <div
       style={{
@@ -317,7 +317,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       }}
       className="anim-slide-down"
     >
-      {/* رأس القائمة */}
+      {/* En-tête de la liste */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -386,10 +386,10 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                     {p.price} DA
                   </div>
                 </div>
-                <ArrowLeft size={14} style={{ color: '#CCC' }} />
+                <ArrowRight size={14} style={{ color: '#CCC' }} />
               </Link>
             ))}
-            {/* زر Voir tout */}
+            {/* Bouton Voir tout */}
             <button
               onClick={() => handleSearch()}
               style={{
@@ -408,12 +408,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 gap: '8px'
               }}
             >
-              Voir tous les résultats <ArrowLeft size={14} />
+              Voir tous les résultats <ArrowRight size={14} />
             </button>
           </div>
         ) : searchQuery.length >= 2 && (
           <div style={{ padding: '2.5rem', textAlign: 'center', color: '#999', fontSize: '13px' }}>
-            Aucun résultat لـ "{searchQuery}"
+            Aucun résultat pour "{searchQuery}"
           </div>
         )}
       </div>
@@ -556,7 +556,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               </Link>
             ))}
 
-            {/* Cart button (باستخدام le styleات المعرفة مسبقاً) */}
+            {/* Bouton panier */}
             <Link
               href="/cart"
               style={cartBtnStyle}
@@ -585,6 +585,13 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             >
               <Search size={16} />
             </button>
+            {store?.cart !== false && (
+              <Link href="/cart" style={{ position: 'relative', width: 38, height: 38, borderRadius: 8, border: '1.5px solid var(--line-dk)', background: 'var(--white)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--plum)' }}>
+                <ShoppingCart size={16} />
+                {count > 0 && <span style={{ position: 'absolute', top: -4, right: -4, background: 'var(--plum)', color: '#fff', fontSize: 9, fontWeight: 800, width: 15, height: 15, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
+              </Link>
+            )}
+
 
             <button
               onClick={() => setOpen(p => !p)}
@@ -679,7 +686,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                   textDecoration: 'none'
                 }}
               >
-                {i.label} <ArrowLeft size={14} style={{ color: 'var(--plum)' }} />
+                {i.label} <ArrowRight size={14} style={{ color: 'var(--plum)' }} />
               </Link>
             ))}
           </div>
@@ -689,7 +696,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   );
 }
 /* ══════════════════════════════════════════════════════════════
-   FOOTER — 3 أقسام: العلامة · Liens · التواصل
+   FOOTER — 3 sections: Marque · Liens · Contact
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
   const yr = new Date().getFullYear();
@@ -699,7 +706,7 @@ export function Footer({ store }: any) {
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '56px 24px 36px' }}>
         <div className="footer-g" style={{ paddingBottom: '40px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
 
-          {/* قسم 1 — العلامة */}
+          {/* Section 1 — Marque */}
           <div>
             <Link href="/" style={{ display: 'inline-flex', flexDirection: 'column', marginBottom: '14px' }}>
               {store.design?.logoUrl
@@ -714,7 +721,7 @@ export function Footer({ store }: any) {
             <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.2)', marginTop: '2rem' }}>© {yr} {store.name}. Tous droits réservés.</p>
           </div>
 
-          {/* قسم 2 — Liens */}
+          {/* Section 2 — Liens */}
           <div>
             <p style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--plum-lt)', marginBottom: '18px' }}>Liens</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -734,7 +741,7 @@ export function Footer({ store }: any) {
             </div>
           </div>
 
-          {/* قسم 3 — التواصل */}
+          {/* Section 3 — Contact */}
           <div>
             <p style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--plum-lt)', marginBottom: '18px' }}>Contact</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -843,7 +850,7 @@ export function Home({ store, page }: any) {
                   {store.hero.subtitle || 'Les meilleurs Produits de soin et beauté.'}
                 </p>
                 <a href="#products" className="btn-plum fu fu-2" style={{ fontSize: '14px', padding: '12px 28px' }}>
-                  Voir tout Totalة
+                  Voir tout
                 </a>
               </div>
             </div>
@@ -853,13 +860,13 @@ export function Home({ store, page }: any) {
             <div style={{ flex: '0 0 auto' }}>
               {store.design?.logoUrl && <img src={store.design.logoUrl} alt={store.name} style={{ height: '48px', marginBottom: '16px', display: 'block' }} />}
               <h1 className="fu serif" style={{ fontSize: 'clamp(1.6rem,4vw,3rem)', fontWeight: 700, fontStyle: 'italic', color: 'var(--plum)', lineHeight: 1.1, marginBottom: '10px' }}>
-                {store.hero?.title?.replace(/<[^>]+>/g, '') || 'جمالك، أولويتنا.'}
+                {store.hero?.title?.replace(/<[^>]+>/g, '') || 'Votre beauté, notre priorité.'}
               </h1>
               <p className="fu fu-1" style={{ fontSize: '14px', color: 'var(--mid)', marginBottom: '20px', maxWidth: '340px', lineHeight: '1.7' }}>
                 {store.hero?.subtitle || 'Les meilleurs Produits de soin et beauté Sélectionnés soigneusement.'}
               </p>
               <a href="#products" className="btn-plum fu fu-2" style={{ fontSize: '14px', padding: '12px 28px' }}>
-                Voir tout Totalة
+                Voir tout
               </a>
             </div>
             {products[0] && (products[0].productImage || products[0].imagesProduct?.[0]?.imageUrl) && (
@@ -1304,7 +1311,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 }
 
 /* ══════════════════════════════════════════════════════════════
-   CART — مكتمل مع نموذج Livraison
+   CART — complet avec formulaire de livraison
 ══════════════════════════════════════════════════════════════ */
 export function Cart({ domain, store }: { domain: string; store: any }) {
   const [items, setItems] = useState<any[]>([]);
@@ -1527,7 +1534,7 @@ const IB = ({ title, body, tag }: { title: string; body: string; tag?: string })
 export function Privacy() {
   return (
     <Shell title="Politique de confidentialité" sub="Légal">
-      <IB title="Les données que nous collectons" body="uniquement Votre nom et numéro de هاتفك et adresse de Livraison — ما هو ضروري pour traiter votre commande." />
+      <IB title="Les données que nous collectons" body="Uniquement votre nom, numéro de téléphone et adresse de livraison — le strict nécessaire pour traiter votre commande." />
       <IB title="Comment nous les utilisons" body="Exclusivement pour traiter et livrer vos achats. Aucun usage commercial." />
       <IB title="Sécurité" body="Vos données sont protégées par un chiffrement standard et une infrastructure sécurisée." />
       <IB title="Partage des données" body="Nous ne vendons pas vos données. Partagées avec les partenaires de livraison de confiance." />
@@ -1540,7 +1547,7 @@ export function Terms() {
     <Shell title="Conditions de service" sub="Légal">
       <IB title="Votre compte" body="Vous êtes responsable de la sécurité de vos identifiants et de toute activité sous votre compte." />
       <IB title="Paiements" body="Aucuns frais cachés. Le prix affiché est le prix final." />
-      <IB title="Utilisation interdite" body="Produits authentiques uniquement. Non place للProduits les contrefaçons." tag="Strict" />
+      <IB title="Utilisation interdite" body="Produits authentiques uniquement. Pas de place pour les contrefaçons." tag="Strict" />
       <IB title="Loi applicable" body="Ces Conditions sont soumises aux lois de la République Algérienne Démocratique et Populaire." />
     </Shell>
   );
@@ -1585,7 +1592,7 @@ export function Contact({ store }: { store?: any }) {
         <div style={{ maxWidth: '960px', margin: '0 auto' }}>
           <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--plum)', marginBottom: '8px' }}>Contact</p>
           <h1 className="serif" style={{ fontSize: 'clamp(1.8rem,4vw,3rem)', fontWeight: 600, fontStyle: 'italic', color: 'var(--ink)', margin: '0 0 8px' }}>Ravi de vous aider</h1>
-          <p style={{ fontSize: '14px', color: 'var(--dim)' }}>نRéponse sous 24h 💄</p>
+          <p style={{ fontSize: '14px', color: 'var(--dim)' }}>Réponse sous 24h 💄</p>
         </div>
       </div>
 
@@ -1645,7 +1652,7 @@ export function Contact({ store }: { store?: any }) {
                   onFocus={e => (e.target.style.borderColor = 'var(--plum)')} onBlur={e => (e.target.style.borderColor = 'var(--line-dk)')} />
               </div>
               <button type="submit" disabled={loading} className="btn-plum" style={{ justifyContent: 'center', width: '100%', fontSize: '14px', padding: '12px', opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}>
-                {loading ? <><Loader2 style={{ width: '15px', height: '15px', animation: 'spin 1s linear infinite' }} /> En cours...</> : <>Envoyer le message <ArrowLeft style={{ width: '14px', height: '14px' }} /></>}
+                {loading ? <><Loader2 style={{ width: '15px', height: '15px', animation: 'spin 1s linear infinite' }} /> En cours...</> : <>Envoyer le message <ArrowRight style={{ width: '14px', height: '14px' }} /></>}
               </button>
             </form>
           )}

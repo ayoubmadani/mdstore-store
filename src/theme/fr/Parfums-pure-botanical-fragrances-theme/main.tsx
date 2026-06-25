@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
     Star, ChevronDown, AlertCircle, X, ToggleRight,
-    ArrowLeft, Plus, Minus, CheckCircle2, Lock, Shield,
+    ArrowRight, Plus, Minus, CheckCircle2, Lock, Shield,
     Package, ShieldCheck, Phone, User, Search, ShoppingBag,
     Trash2, Loader2, ChevronLeft, ChevronRight, Heart,
     ShoppingCart, Leaf, Sparkles, Droplets, Home as HomeIcon, Building2,
@@ -302,30 +302,30 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     return (
         <>
         {store?.topBar?.enabled && store?.topBar?.text && (
-          <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+          <div style={{ background: '#6B8F6B', color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
             {store.topBar.text}
           </div>
         )}
         <nav dir="ltr" style={{ background: 'var(--white)', borderBottom: '1px solid var(--line)', padding: '0 20px', position: 'sticky', top: 0, zIndex: 100 }}>
             <div style={{maxWidth: 1080 , margin: 'auto'}}>
-                {/* الشريط العلوي الرئيسي */}
+                {/* Barre supérieure principale */}
                 <div style={{ height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
 
-                    {/* أيقونة Recherche وتفعيل الشريط */}
+                    {/* Icône Recherche et activation de la barre */}
                     <button onClick={() => setShowS(!showS)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--char)', display: 'flex', padding: '8px' }}>
                         {showS ? <X style={{ width: '20px', height: '20px' }} /> : <Search style={{ width: '20px', height: '20px' }} />}
                     </button>
 
-                    {/* Liens التنقل - Desktop */}
+                    {/* Liens de navigation - Desktop */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1, justifyContent: 'center' }}>
                         <Link href="/" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--sage)', borderBottom: '2px solid var(--sage)', paddingBottom: '4px' }}>Accueil</Link>
                         <Link href="/contact" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--char)' }}>Contactez-nous</Link>
                     </div>
 
-                    {/* اللوغو et Panier */}
+                    {/* Logo et Panier */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
-                            {store?.design?.logoUrl
+                            {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
                                 ? <img src={store.design.logoUrl} alt={store?.name} style={{ height: '35px', width: 'auto' }} />
                                 : <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--char)' }}>{store?.name || 'Parfum de la Nature'}</span>
                             }
@@ -342,7 +342,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                     </div>
                 </div>
 
-                {/* شريط Recherche المنسدل عند الضغط على الأيقونة */}
+                {/* Barre Recherche déroulante au clic sur l'icône */}
                 {showS && (
                     <div style={{ padding: '12px 0', borderTop: '1px solid var(--line)', position: 'relative' }}>
                         <form onSubmit={doSearch}>
@@ -367,7 +367,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                             </div>
                         </form>
 
-                        {/* قائمة النتائج (Drop) - خلفية بيضاء صلبة */}
+                        {/* Liste des résultats (Drop) - fond blanc solide */}
                         {sq.length >= 2 && (
                             <div style={{
                                 position: 'absolute',
@@ -406,12 +406,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                                                         <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--char)' }}>{p.name}</div>
                                                         <div style={{ fontSize: '14px', color: 'var(--sage)', fontWeight: 700, marginTop: '2px' }}>{p.price} DA</div>
                                                     </div>
-                                                    <ArrowLeft size={14} style={{ color: 'var(--mist)' }} />
+                                                    <ArrowRight size={14} style={{ color: 'var(--mist)' }} />
                                                 </Link>
                                             ))}
                                         </div>
 
-                                        {/* زر Voir كل النتائج */}
+                                        {/* Bouton Voir tous les résultats */}
                                         <button
                                             onClick={doSearch}
                                             style={{
@@ -429,7 +429,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                                                 gap: '8px'
                                             }}
                                         >
-                                            Voir tous les résultats لـ "{sq}"
+                                            Voir tous les résultats pour "{sq}"
                                         </button>
                                     </>
                                 ) : (
@@ -454,10 +454,10 @@ export function Footer({ store }: any) {
         <footer dir="ltr" style={{ background: 'var(--sage)', fontFamily: "'Cairo',sans-serif", marginTop: '0' }}>
             <div style={{ padding: '40px 24px 24px' , maxWidth:1080, margin: 'auto' }}>
                 <div className="footer-g">
-                    {/* قسم 1 — Fabriqué en Algérie */}
+                    {/* Section 1 — Fabriqué en Algérie */}
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '16px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                            {store?.design?.logoUrl
+                            {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
                                 ? <img src={store.design.logoUrl} alt={store?.name} style={{ height: '28px', filter: 'brightness(0) invert(1)', opacity: 0.8 }} />
                                 : <span style={{ fontSize: '1rem', fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>{store?.name}</span>
                             }
@@ -482,10 +482,10 @@ export function Footer({ store }: any) {
                         </div>
                     </div>
 
-                    {/* قسم 2 — Liens */}
+                    {/* Section 2 — Liens */}
                     <div>
                         <p style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.6)', marginBottom: '16px', textTransform: 'uppercase' }}>Produits</p>
-                        {[{ h: '/', l: 'المنجدية La nature' }, { h: '/Privacy', l: 'Privacy Policy' }, { h: '/contact', l: 'صفحة Algérienne' }, { h: '/Terms', l: 'تسبة الشباك رباية الهواية' }].map(lnk => (
+                        {[{ h: '/', l: 'La Nature' }, { h: '/Privacy', l: 'Politique de confidentialité' }, { h: '/contact', l: 'Contact' }, { h: '/Terms', l: 'Conditions d\'utilisation' }].map(lnk => (
                             <a key={lnk.h} href={lnk.h} style={{ display: 'block', fontSize: '12px', color: 'rgba(255,255,255,0.7)', marginBottom: '10px', transition: 'color 0.2s' }}
                                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'white'; }}
                                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)'; }}>
@@ -494,7 +494,7 @@ export function Footer({ store }: any) {
                         ))}
                     </div>
 
-                    {/* قسم 3 — Contact */}
+                    {/* Section 3 — Contact */}
                     <div>
                         <p style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.6)', marginBottom: '16px', textTransform: 'uppercase' }}>Contact</p>
                         {[
@@ -509,7 +509,7 @@ export function Footer({ store }: any) {
 
                 <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', textAlign: 'center' }}>
-                        © Privacy Policy عمور الطوابر الحقوق المحفوظة {yr}
+                        © Tous droits réservés {yr}
                     </p>
                 </div>
             </div>
@@ -563,7 +563,7 @@ export function Card({ product, displayImage, discount, domain, userId }: any) {
                     {product.name}
                 </h3>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--char)' }}>{price.toLocaleString()} د.ج</span>
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--char)' }}>{price.toLocaleString()} DA</span>
                     {orig > price && <span style={{ fontSize: '11px', color: 'var(--mist)', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
                 </div>
                 < Link href={`/product/${product.slug || product.id}`}
@@ -653,15 +653,15 @@ export function Home({ store, page }: any) {
                             <span style={{
                                 fontSize: '12px',
                                 fontWeight: 600,
-                                // تغيير لون النص والخلفية بناءً على حالة التحديد
+                                // Changer la couleur du texte et du fond selon l'état de sélection
                                 color: hoveredId === cat.id ? 'var(--white)' : 'var(--char)',
                                 backgroundColor: hoveredId === cat.id ? 'var(--sage)' : 'transparent',
                                 textAlign: 'center',
                                 lineHeight: 1.3,
                                 border: "1px solid var(--sage)",
                                 padding: '8px 20px',
-                                borderRadius: '20px', // لجعلها دائرية الحواف (Pill shape)
-                                transition: 'all 0.3s ease', // حركة ناعمة عند الضغط
+                                borderRadius: '20px', // pour des bords arrondis (forme Pill)
+                                transition: 'all 0.3s ease', // animation douce au clic
                                 display: 'inline-block'
                             }}>
                                 {cat.name}
@@ -781,9 +781,9 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
                         {/* Price */}
                         <div style={{ background: 'var(--sage-lt)', borderRadius: '10px', padding: '14px 16px', marginBottom: '18px', display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
                             <span style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--char)' }}>{finalPrice.toLocaleString()}</span>
-                            <span style={{ fontSize: '13px', color: 'var(--mid)', fontWeight: 500 }}>د.ج</span>
+                            <span style={{ fontSize: '13px', color: 'var(--mid)', fontWeight: 500 }}>DA</span>
                             {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
-                                <span style={{ fontSize: '12px', color: 'var(--mist)', textDecoration: 'line-through' }}>{parseFloat(product.priceOriginal).toLocaleString()} د.ج</span>
+                                <span style={{ fontSize: '12px', color: 'var(--mist)', textDecoration: 'line-through' }}>{parseFloat(product.priceOriginal).toLocaleString()} DA</span>
                             )}
                         </div>
 
@@ -800,7 +800,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
                                             <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
                                             <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--char)' }}>{o.name}</span>
                                         </div>
-                                        <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--sage)' }}>{o.price.toLocaleString()} د.ج</span>
+                                        <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--sage)' }}>{o.price.toLocaleString()} DA</span>
                                     </label>
                                 ))}
                             </div>
@@ -1283,7 +1283,7 @@ export function Contact({ store }: { store?: any }) {
             <h1 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--char)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: '1.4rem' }}>💬</span> Contactez-nous
             </h1>
-            <p style={{ fontSize: '12px', color: 'var(--mist)', marginBottom: '24px' }}>نRéponse sous 24h</p>
+            <p style={{ fontSize: '12px', color: 'var(--mist)', marginBottom: '24px' }}>Réponse sous 24h</p>
 
             {/* Contact info */}
             {[

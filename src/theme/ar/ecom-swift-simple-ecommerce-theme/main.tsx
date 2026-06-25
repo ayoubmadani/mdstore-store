@@ -233,7 +233,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   return (
     <>
       {store?.topBar?.enabled && store?.topBar?.text && (
-        <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+        <div style={{ background: '#000000', color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
           {store.topBar.text}
         </div>
       )}
@@ -242,7 +242,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
           <Link href="/" style={{ fontSize: '1.3rem', fontWeight: 900, color: '#000' }}>
-            {store?.design?.logoUrl ? <img src={store.design.logoUrl} style={{ height: 30 }} /> : store?.name}
+            {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' ? <img src={store.design.logoUrl} style={{ height: 30 }} /> : store?.name}
           </Link>
 
           <nav className="lg-flex" style={{ gap: '1.5rem', fontSize: '0.85rem', fontWeight: 600 }}>

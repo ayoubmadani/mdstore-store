@@ -151,7 +151,7 @@ export function Navbar({store,domain}:{store:any;domain:string}){
 
         {/* Logo */}
         <Link href="/" style={{flexShrink:0}}>
-          {store?.design?.logoUrl
+          {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
             ?<img src={store.design.logoUrl} alt={store.name} style={{height:'28px',objectFit:'contain'}}/>
             :<span className="bn" style={{fontSize:'1.5rem',color:'var(--tx)',letterSpacing:'0.08em'}}>{store?.name}</span>
           }

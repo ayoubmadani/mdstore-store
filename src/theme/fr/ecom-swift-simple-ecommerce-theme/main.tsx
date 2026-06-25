@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Phone,
-  CheckCircle2, Truck, ArrowLeft,
+  CheckCircle2, Truck, ArrowRight,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, ShieldCheck,
   Send
@@ -176,12 +176,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     if (searchQuery.trim()) {
       router.push(`/?search=${encodeURIComponent(searchQuery)}`);
       setListSearch([]);
-      setOpen(false); // إغلاق القائمة في الجوال عند Recherche
+      setOpen(false); // fermer le menu mobile lors de la recherche
       setSearchQuery('');
     }
   };
 
-  // مكون Résultats de recherche المطور
+  // Composant résultats de recherche amélioré
   const SearchResults = () => (
     <div style={{
       position: 'absolute',
@@ -221,7 +221,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           </Link>
         ))}
         <button onClick={handleSearchSubmit} style={{ width: '100%', padding: '12px', background: '#f9f9f9', border: 'none', borderTop: '1px solid #e5e7eb', color: 'var(--primary)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-          Voir tous les résultats <ArrowLeft size={14} />
+          Voir tous les résultats <ArrowRight size={14} />
         </button>
         </>
       ) : searchQuery.length >= 2 && (
@@ -233,7 +233,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   return (
     <>
       {store?.topBar?.enabled && store?.topBar?.text && (
-        <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+        <div style={{ background: '#000000', color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
           {store.topBar.text}
         </div>
       )}
@@ -242,7 +242,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
           <Link href="/" style={{ fontSize: '1.3rem', fontWeight: 900, color: '#000' }}>
-            {store?.design?.logoUrl ? <img src={store.design.logoUrl} style={{ height: 30 }} /> : store?.name}
+            {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' ? <img src={store.design.logoUrl} style={{ height: 30 }} /> : store?.name}
           </Link>
 
           <nav className="lg-flex" style={{ gap: '1.5rem', fontSize: '0.85rem', fontWeight: 600 }}>
@@ -252,7 +252,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
-          {/* حقل Recherche لسطح Bureau */}
+          {/* Champ Recherche pour bureau */}
           <div style={{ position: 'relative', width: '250px' }} className="lg-block">
             <form onSubmit={handleSearchSubmit}>
               <input
@@ -284,7 +284,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         </div>
       </div>
 
-      {/* قائمة الجوال */}
+      {/* Menu mobile */}
       {open && (
         <div className="anim-fade-in" style={{ position: 'absolute', top: '75px', left: 0, right: 0, background: '#fff', borderBottom: '1px solid #eee', padding: '1.2rem', zIndex: 110 }}>
           <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
@@ -297,7 +297,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 style={{ width: '100%', padding: '0.8rem 1rem', border: '1px solid #eee', borderRadius: '8px', background: '#f8f8f8', outline: 'none' }}
               />
             </form>
-            {/* Voir Résultats de recherche في الجوال مباشرة تحت الحقل */}
+            {/* Afficher résultats de recherche sur mobile */}
             {searchQuery.length >= 2 && <SearchResults />}
           </div>
 
@@ -397,36 +397,36 @@ export function Home({ store, page }: any) {
       {/* ── HERO ── */}
 
       <section style={{
-        // إضافة طبقة تظليل (Overlay) مع الصورة لتحسين التباين
+        // Ajouter une couche d'ombre avec l'image pour améliorer le contraste
         background: store.hero.imageUrl
           ? `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${store.hero.imageUrl})`
           : 'var(--bg-alt)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
-        padding: '6rem 1.5rem', // زيادة الهوامش لإعطاء مساحة أكبر
+        padding: '6rem 1.5rem', // marges augmentées pour plus d'espace
         textAlign: 'center',
         borderBottom: '1px solid var(--border-color)',
         display: 'flex',
         alignItems: 'center',
-        minHeight: '400px' // لGarantie ظهور الصورة بشكل جيد
+        minHeight: '400px' // pour garantir l'affichage de l'image
       }}>
         <div className="container anim-fade-in" style={{ width: '100%' }}>
           <h1 style={{
             fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-            // إذا كانت هناك صورة، Nous utilisons الأبيض للتباين، وإلا Nous utilisons لون Boutique الأساسي
+            // Si image présente, utiliser blanc pour contraste, sinon couleur principale de la boutique
             color: store.hero.imageUrl ? '#ffffff' : store.design.primaryColor,
             fontWeight: 700,
             marginBottom: '1rem',
             letterSpacing: '-1px',
             textShadow: store.hero.imageUrl ? '0 2px 4px rgba(0,0,0,0.3)' : 'none'
           }}>
-            {store.hero?.title?.replace(/<[^>]+>/g, '') || 'مرحباً بك في متجرنا'}
+            {store.hero?.title?.replace(/<[^>]+>/g, '') || 'Bienvenue dans notre boutique'}
           </h1>
 
           <p style={{
             fontSize: '1.2rem',
-            // استخدام لون فاتح جداً فوق الصور لGarantie المقروئية
+            // Utiliser une couleur très claire sur les images pour garantir la lisibilité
             color: store.hero.imageUrl ? '#f8f9fa' : store.design.secondaryColor,
             maxWidth: '600px',
             margin: '0 auto 2rem',
@@ -801,10 +801,10 @@ export function Privacy() {
       <SimpleDivider />
       <div style={{ lineHeight: 1.8, color: 'var(--text-muted)' }}>
         <h3 style={{ color: 'var(--text-main)', marginTop: '2rem', marginBottom: '0.5rem' }}>1. Collecte des informations</h3>
-        <p>نقوم بجمع الinformations الشخصية الEssentiels uniquement pour traiter votre commande et Livraisonه (Nom، adresse، Numéro de Téléphone).</p>
+        <p>Nous collectons uniquement les informations personnelles essentielles pour traiter votre commande et la livraison (Nom, adresse, Numéro de téléphone).</p>
 
         <h3 style={{ color: 'var(--text-main)', marginTop: '2rem', marginBottom: '0.5rem' }}>2. Utilisation</h3>
-        <p>تُستخدم بياناتك حصراً لمعالجة شحناتك والتواصل معك بخصوصها. Non نقوم ببيع أو مشاركة بياناتك لأي أطراف extérieur لتغراض تسويقية.</p>
+        <p>Vos données sont utilisées exclusivement pour traiter vos expéditions et vous contacter à ce sujet. Nous ne vendons ni ne partageons vos données à des tiers à des fins marketing.</p>
       </div>
     </div>
   );
@@ -823,7 +823,7 @@ export function Terms() {
 }
 
 export function Contact({ store }: any) {
-  // الحالات البرمجية: sent يجب أن تكون false في البداية
+  // États : sent doit être false au départ
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -835,11 +835,11 @@ export function Contact({ store }: any) {
       await axios.post(`${API_URL}/user/contact-user/message`, {
         ...form,
         storeId: store.id,
-        userId: store.userId // إضافة معرف L’utilisateur لGarantie وصول Message
+        userId: store.userId // ajouter l’identifiant utilisateur pour garantir la réception
       });
       setSent(true);
     } catch (err) {
-      showError('Erreur lors de l’envoi، veuillez réessayer ultérieurement');
+      showError(‘Erreur lors de l\’envoi, veuillez réessayer ultérieurement’);
     } finally {
       setLoading(false);
     }
@@ -848,7 +848,7 @@ export function Contact({ store }: any) {
   return (
     <div className="container" style={{ padding: '5rem 1.5rem', maxWidth: '450px', margin: '0 auto' }} dir="ltr">
       {sent ? (
-        /* واجهة النجاح - عملي وأسود */
+        /* Interface de succès */
         <div style={{ textAlign: 'center', padding: '2rem 0' }} className="anim-fade-in">
           <div style={{ display: 'inline-flex', padding: '1rem', background: '#f8f8f8', borderRadius: '50%', marginBottom: '1.5rem' }}>
             <CheckCircle2 size={32} color="#000" />
@@ -863,7 +863,7 @@ export function Contact({ store }: any) {
           </button>
         </div>
       ) : (
-        /* نموذج الاتصال - تصميم Minimalist */
+        /* Formulaire de contact - design minimaliste */
         <div>
           <div style={{ marginBottom: '2.5rem' }}>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '-0.5px' }}>Contactez-nous</h1>
@@ -941,7 +941,7 @@ export function Contact({ store }: any) {
   );
 }
 
-// Tennisيق الحقول البسيط
+// Style des champs simple
 const minimalInputStyle = {
   width: '100%',
   padding: '0.9rem 1rem',

@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, Heart, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Share2, Phone, User, ToggleRight,
-  Shield, ArrowLeft, Plus, Minus, CheckCircle2, Lock,
+  Shield, ArrowRight, Plus, Minus, CheckCircle2, Lock,
   Menu, Gamepad2, Zap, Trophy, Package, Truck,
   Search, ShoppingCart, ShoppingBag, Trash2, Loader2,
   BadgeCheck, ShieldCheck,
@@ -362,7 +362,7 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
             <button
               onClick={() => handleSearchSubmit()}
               style={{ width: '100%', padding: '12px', background: 'rgba(0,255,255,0.05)', border: 'none', borderTop: '1px solid var(--line)', color: 'var(--cyan)', fontWeight: 700, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontFamily: "'Tajawal',sans-serif" }}>
-              Voir tous les résultats <ArrowLeft size={14} />
+              Voir tous les résultats <ArrowRight size={14} />
             </button>
           </>
         ) : searchQuery.length >= 2 && (
@@ -375,7 +375,7 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
   return (
     <>
       {store?.topBar?.enabled && store?.topBar?.text && (
-        <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+        <div style={{ background: 'linear-gradient(90deg, #0099CC 0%, #FF2D8A 100%)', color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
           {store.topBar.text}
         </div>
       )}
@@ -444,10 +444,10 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
       <div style={{ maxHeight: open ? '240px' : '0', overflow: 'hidden', transition: 'all 0.3s', background: 'var(--navy-2)' }}>
         <div style={{ padding: '10px 20px' }}>
           <Link href="/" onClick={() => setOpen(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', color: '#fff', textDecoration: 'none', borderBottom: '1px solid var(--line)', fontSize: '15px' }}>
-            Boutique <ArrowLeft size={14} style={{ color: 'var(--cyan)' }} />
+            Boutique <ArrowRight size={14} style={{ color: 'var(--cyan)' }} />
           </Link>
           <Link href="/contact" onClick={() => setOpen(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', color: '#fff', textDecoration: 'none', fontSize: '15px' }}>
-            Contactez-nous <ArrowLeft size={14} style={{ color: 'var(--cyan)' }} />
+            Contactez-nous <ArrowRight size={14} style={{ color: 'var(--cyan)' }} />
           </Link>
         </div>
       </div>
@@ -486,7 +486,7 @@ export function Footer({ store }: any) {
               </span>
             </div>
             <p style={{ fontSize: '15px', lineHeight: '1.8', color: 'var(--mid)', maxWidth: '300px' }}>
-              {store?.hero?.subtitle?.substring(0, 80) || 'Votre destination #1 لLe monde des jeux وle professionnalisme في Algérie. Qualité authentique et Livraison rapide.'}
+              {store?.hero?.subtitle?.substring(0, 80) || 'Votre destination #1 pour le monde des jeux et le professionnalisme en Algérie. Qualité authentique et Livraison rapide.'}
             </p>
             <div style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
               {['🎮', '🕹️', '👾', '🔥'].map((e, i) => (
@@ -569,7 +569,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
           <Link href={`/product/${product.slug || product.id}`}
             style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', fontSize: '13px', fontWeight: 800, padding: '14px', textTransform: 'uppercase', letterSpacing: '0.1em', backgroundColor: hov ? brandColor : 'transparent', color: hov ? 'var(--navy-3)' : brandColor, border: `2px solid ${brandColor}`, boxShadow: hov ? `0 0 20px ${brandColor}80` : 'none', transition: 'all 0.25s ease', clipPath: 'polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%)' }}>
             <span style={{ position: 'relative', top: '1px' }}>{viewDetails}</span>
-            <ArrowLeft style={{ width: '16px', height: '16px' }} />
+            <ArrowRight style={{ width: '16px', height: '16px' }} />
           </Link>
         </div>
       </div>
@@ -615,11 +615,11 @@ export function Home({ store, page }: any) {
           </div>
           {
             store?.hero?.title ? (() => {
-              // تقسيم النص إلى كلمات
+              // Diviser le texte en mots
               const words = store.hero.title.split(' ');
               const third = Math.ceil(words.length / 3);
 
-              // تقسيم Toutمات إلى ثلاث مجموعات
+              // Diviser les mots en trois groupes
               const part1 = words.slice(0, third).join(' ');
               const part2 = words.slice(third, third * 2).join(' ');
               const part3 = words.slice(third * 2).join(' ');
@@ -632,7 +632,7 @@ export function Home({ store, page }: any) {
                 </h1>
               );
             })() : (
-              /* adresse الافتراضي في حال عدم وجود عنوان في Boutique */
+              /* adresse par défaut si aucune adresse dans la boutique */
               <h1 className="fu fu-1" style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(2.2rem,7vw,5.5rem)', lineHeight: 1.05, marginBottom: '16px', letterSpacing: '-0.01em', textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
                 <span className="gold-shimmer">Le monde des jeux</span><br />
                 <span style={{ color: 'var(--white)' }}>entre </span>
@@ -642,7 +642,7 @@ export function Home({ store, page }: any) {
           }
           <NeonDivider color="cyan" />
           <p className="fu fu-2" style={{ fontSize: 'clamp(14px,2vw,18px)', lineHeight: '1.8', color: 'var(--white)', opacity: 0.9, marginBottom: '32px', maxWidth: '520px', fontWeight: 400, textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
-            {store.hero?.subtitle || 'كل ما تحتاجه للعب le professionnalismeي — PS5، Xbox، يدات Contrôle، les jeux وكل الإكسسوارات. Livraison pour toutes les wilayas de Algérie.'}
+            {store.hero?.subtitle || 'Tout ce qu\'il vous faut pour jouer — PS5, Xbox, manettes, jeux et tous les accessoires. Livraison dans toutes les wilayas d\'Algérie.'}
           </p>
           <div className="fu fu-3" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
             <a href="#products" className="btn-cyan" style={{ fontSize: '15px', padding: '14px 32px', textDecoration: 'none' }}>
@@ -695,7 +695,7 @@ export function Home({ store, page }: any) {
               <Link href="/" style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cyan)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 Voir toutes les Catégories
                 <div style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid var(--cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ArrowLeft style={{ width: '14px', height: '14px' }} />
+                  <ArrowRight style={{ width: '14px', height: '14px' }} />
                 </div>
               </Link>
             </div>
@@ -731,7 +731,7 @@ export function Home({ store, page }: any) {
             <div>
               <div className="slabel" style={{ marginBottom: '10px' }}>Produits</div>
               <h2 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(1.6rem,3vw,2.4rem)', color: 'var(--white)', margin: 0 }}>
-                كل <span className="neon-cyan">Produits</span>
+                Tous les <span className="neon-cyan">Produits</span>
               </h2>
             </div>
             <p style={{ fontSize: '13px', color: 'var(--dim)' }}>{countPage} / {page} Produit</p>
@@ -743,7 +743,7 @@ export function Home({ store, page }: any) {
             </div>
             : <div className="prod-grid">
               {products.map((p: any) => {
-                const img = p.productImage || p.imagesProduct?.[0]?.imageUrl || store?.design?.logoUrl || '/fallback-image.png';
+                const img = p.productImage || p.imagesProduct?.[0]?.imageUrl || store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' || '/fallback-image.png';
                 const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
                 return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="Voir le produit" />;
               })}
@@ -753,7 +753,7 @@ export function Home({ store, page }: any) {
           {countPage > 1 && (
             <div className="flex items-center justify-center gap-2 mt-12 font-tajawal" dir="ltr">
 
-              {/* 1. زر السابق (يقلل الصفحة) */}
+              {/* 1. Bouton précédent */}
               <Link
                 href={{ query: { ...Object.fromEntries(new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')), page: Math.max(1, page - 1) } }}
                 className={`flex items-center justify-center w-10 h-10 transition-colors duration-300 rounded-lg text-dim hover:text-cyan-400 bg-panel/50 
@@ -765,7 +765,7 @@ export function Home({ store, page }: any) {
                 </svg>
               </Link>
 
-              {/* 2. أرقام Pages */}
+              {/* 2. Numéros de page */}
               {Array.from({ length: Math.ceil(countPage) }).map((_, i) => {
                 const pageNum = i + 1;
                 const isActive = Number(page) === pageNum;
@@ -788,7 +788,7 @@ export function Home({ store, page }: any) {
                 );
               })}
 
-              {/* 3. زر التالي (يزيد الصفحة) */}
+              {/* 3. Bouton suivant */}
               <Link
                 href={{ query: { ...Object.fromEntries(new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')), page: Math.min(Math.ceil(countPage), Number(page) + 1) } }}
                 className={`flex items-center justify-center w-10 h-10 transition-colors duration-300 rounded-lg text-dim hover:text-cyan-400 bg-panel/50 
@@ -815,7 +815,7 @@ export function Home({ store, page }: any) {
               Livraison <span className="neon-cyan">58 wilayas</span>
             </h2>
             <p style={{ fontSize: '15px', lineHeight: '1.8', color: 'var(--mid)', marginBottom: '28px' }}>
-              Algérie بلدية اولاد فايت بلاطو قرب مسجد ابوبكر الصديق
+              Algérie
             </p>
           </div>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -1057,10 +1057,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   return (
     <div style={{ direction: 'rtl', marginTop: '20px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
 
-      {/* ── أزرار Panier / الطلب المباشر ── */}
+      {/* ── Boutons Panier / Commande directe ── */}
       {product.store.cart && (
         <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-          {/* زر Ajouter au panier */}
+          {/* Bouton Ajouter au panier */}
           <button onClick={addToCart} disabled={isAdded}
             className={isAdded ? 'animate-cart' : ''}
             style={{
@@ -1086,7 +1086,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             )}
           </button>
 
-          {/* زر Commander maintenant */}
+          {/* Bouton Commander maintenant */}
           <button onClick={() => setIsOrderNow(true)}
             style={{
               flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
@@ -1105,7 +1105,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         </div>
       )}
 
-      {/* ── نموذج الطلب ── */}
+      {/* ── Formulaire de commande ── */}
       {(isOrderNow || !product.store.cart) && (
         <div style={{ animation: 'fadeIn 0.3s ease-in-out' }}>
           {product.store.cart && (
@@ -1362,13 +1362,13 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         </div>
 
         <div className="cart-g fu fu-1">
-          {/* ── عمود Produits ── */}
+          {/* ── Colonne Produits ── */}
           <div>
             <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', overflow: 'hidden' }}>
               {/* Header */}
               <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--line)', background: 'rgba(0,212,255,0.04)', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Package size={18} style={{ color: 'var(--cyan)' }} />
-                <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.16em', color: 'var(--cyan)', textTransform: 'uppercase' }}>Produitsك ({cartItems.length})</span>
+                <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.16em', color: 'var(--cyan)', textTransform: 'uppercase' }}>Produits ({cartItems.length})</span>
               </div>
 
               {/* Items */}
@@ -1376,15 +1376,15 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <div key={index} style={{ display: 'flex', gap: '16px', padding: '18px 20px', borderBottom: '1px solid var(--line)', transition: 'background 0.2s' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.02)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
-                  {/* صورة Produit */}
+                  {/* Image du produit */}
                   <div style={{ width: '80px', height: '80px', flexShrink: 0, borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--line)', background: 'var(--navy-2)' }}>
                     <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage || '/fallback-image.png'} alt={item.product?.name}
                       style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   </div>
-                  {/* تفاصيل */}
+                  {/* Détails */}
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: 'var(--white)', lineHeight: 1.4 }}>{item.product?.name}</h4>
-                    {item.selectedOffer && <p style={{ margin: 0, fontSize: '11px', color: 'var(--mid)' }}>الباقة: {item.selectedOffer}</p>}
+                    {item.selectedOffer && <p style={{ margin: 0, fontSize: '11px', color: 'var(--mid)' }}>Offre: {item.selectedOffer}</p>}
                     <p className="neon-cyan orb" style={{ fontSize: '1.1rem', fontWeight: 900, margin: 0 }}>
                       {item.finalPrice?.toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '12px', color: 'var(--mid)' }}>DA</span>
                     </p>
@@ -1421,7 +1421,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             </div>
           </div>
 
-          {/* ── عمود Livraison ── */}
+          {/* ── Colonne Livraison ── */}
           <div>
             <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', overflow: 'hidden' }}>
               {/* Header */}
@@ -1503,10 +1503,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   </div>
                 </div>
 
-                {/* Résumé الحساب */}
+                {/* Résumé du compte */}
                 <div style={{ border: '1px solid var(--line)', borderRadius: '6px', overflow: 'hidden', background: 'var(--navy-3)' }}>
                   <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--line)', background: 'rgba(0,212,255,0.04)' }}>
-                    <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase' }}>// الRésumé المالي</span>
+                    <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase' }}>// Résumé financier</span>
                   </div>
                   {[
                     { l: 'Sous-total', v: `${cartTotal.toLocaleString()} DA` },
@@ -1525,7 +1525,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   </div>
                 </div>
 
-                {/* زر التأكيد */}
+                {/* Bouton de confirmation */}
                 <button type="submit" disabled={submitting} className="btn-cyan"
                   style={{ width: '100%', justifyContent: 'center', fontSize: '15px', padding: '14px', cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1, clipPath: 'none', borderRadius: '6px' }}>
                   {submitting
@@ -1534,12 +1534,12 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   }
                 </button>
 
-                {/* Garantieات */}
+                {/* Garanties */}
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
                   {[
                     { icon: <Lock size={11} />, label: 'Paiement Sécurisé' },
                     { icon: <ShieldCheck size={11} />, label: 'Données chiffrées' },
-                    { icon: <BadgeCheck size={11} />, label: 'certifié وCertifié' },
+                    { icon: <BadgeCheck size={11} />, label: 'Certifié et garanti' },
                   ].map((b, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: 'var(--dim)' }}>
                       <span style={{ color: 'var(--cyan)' }}>{b.icon}</span> {b.label}
@@ -1594,11 +1594,11 @@ const IB = ({ title, body, tag }: { title: string; body: string; tag?: string })
 export function Privacy() {
   return (
     <Shell title="Politique de confidentialité" sub="// Légal">
-      <IB title="Les données que nous collectons" body="uniquement Votre nom et numéro de هاتفك et adresse de Livraison — ما هو ضروري pour traiter votre commande." />
+      <IB title="Les données que nous collectons" body="Uniquement votre nom, numéro de téléphone et adresse de livraison — le strict nécessaire pour traiter votre commande." />
       <IB title="Comment nous les utilisons" body="Exclusivement pour traiter et livrer vos achats." />
       <IB title="Sécurité" body="Vos données sont protégées par un chiffrement de niveau entreprise." />
       <IB title="Partage des données" body="Nous ne vendons jamais les données. Partagées avec les partenaires de livraison de confiance." />
-      <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--dim)', marginTop: '16px', letterSpacing: '0.12em' }}>// آخر تحديث: فبراير 2026</p>
+      <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--dim)', marginTop: '16px', letterSpacing: '0.12em' }}>// Dernière mise à jour: février 2026</p>
     </Shell>
   );
 }
@@ -1608,7 +1608,7 @@ export function Terms() {
     <Shell title="Conditions d’utilisation" sub="// Légal">
       <IB title="Votre compte" body="Vous êtes responsable de la sécurité de vos identifiants et de toute activité sous votre compte." />
       <IB title="Paiements" body="Aucuns frais cachés. Le prix affiché est le prix final." />
-      <IB title="Utilisation interdite" body="Produits authentiques uniquement. Non place للProduits les contrefaçons." tag="Strict" />
+      <IB title="Utilisation interdite" body="Produits authentiques uniquement. Pas de place pour les contrefaçons." tag="Strict" />
       <IB title="Loi applicable" body="Ces Conditions sont soumises aux lois de la République Algérienne Démocratique et Populaire." />
     </Shell>
   );
@@ -1663,7 +1663,7 @@ export function Contact({ store }: { store: Store }) {
             {[
               { icon: '📞', label: 'Téléphone', val: store.contact.phone, href: `tel:${store.contact.phone}` },
               { icon: '📍', label: 'Adresse', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / '), href: undefined },
-              { icon: '🎮', label: 'Boutique', val: 'كل ما تحتاجه للعب le professionnalismeي', href: undefined },
+              { icon: '🎮', label: 'Boutique', val: 'Tout ce qu\'il vous faut pour jouer', href: undefined },
             ].map(item => (
               <a key={item.label} href={item.href || '#'} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '13px 0', borderBottom: '1px solid var(--line)', textDecoration: 'none', transition: 'padding-right 0.25s' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.paddingRight = '8px'; }}
@@ -1673,7 +1673,7 @@ export function Contact({ store }: { store: Store }) {
                   <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.14em', margin: '0 0 3px', textTransform: 'uppercase' }}>{item.label}</p>
                   <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--white)', margin: 0, lineHeight: 1.5 }}>{item.val}</p>
                 </div>
-                {item.href && <ArrowLeft style={{ width: '13px', height: '13px', color: 'var(--pink)', marginRight: 'auto', marginTop: '4px' }} />}
+                {item.href && <ArrowRight style={{ width: '13px', height: '13px', color: 'var(--pink)', marginRight: 'auto', marginTop: '4px' }} />}
               </a>
             ))}
           </div>
@@ -1717,7 +1717,7 @@ export function Contact({ store }: { store: Store }) {
                   onBlur={e => { e.target.style.borderColor = 'var(--dim)'; e.target.style.boxShadow = 'none'; }} />
               </div>
               <button type="submit" className="btn-cyan" style={{ justifyContent: 'center', width: '100%', clipPath: 'none', borderRadius: '6px', fontSize: '14px', padding: '13px' }}>
-                Envoyer le message <ArrowLeft style={{ width: '14px', height: '14px' }} />
+                Envoyer le message <ArrowRight style={{ width: '14px', height: '14px' }} />
               </button>
             </form>
           )}

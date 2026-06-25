@@ -10,7 +10,7 @@ import {
   Star, Heart, ShoppingBag, Truck, ShieldCheck,
   ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, Check, X, Phone, MapPin,
-  CheckCircle2, ArrowLeft, Zap,
+  CheckCircle2, ArrowRight, Zap,
   Menu, Search, ShoppingCart, Minus, Plus,
   Trash2, Loader2, BadgeCheck, Lock, Package,
 } from 'lucide-react';
@@ -324,7 +324,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   const [listSearch, setListSearch] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
-  const [isHovered, setIsHovered] = useState(false); // لحالة زر الإغلاق
+  const [isHovered, setIsHovered] = useState(false); // état du bouton fermer
 
   const router = useRouter();
   const count = useCartStore(s => s.count);
@@ -366,7 +366,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   const SearchDrop = () => (
     <div style={{ maxHeight: "300px", overflow: 'auto', paddingTop: "25px", position: 'absolute', top: 'calc(100% + 8px)', right: 0, left: 0, background: '#fff', border: '3px solid var(--border)', borderRadius: 20, boxShadow: '0 16px 48px rgba(0,0,0,0.1)', zIndex: 200, }}>
 
-      {/* زر إغلاق Recherche */}
+      {/* Bouton fermer Recherche */}
       <button
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -459,7 +459,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               {i.l}
             </Link>
           ))}
-          {/* شرط إخفاء Panier في نسخة الكمبيوتر */}
+          {/* Masquer Panier sur desktop */}
           {store?.cart !== false && (
             <Link href="/cart" className="btn-bouncy" style={{ position: 'relative', width: 44, height: 44, borderRadius: 14, border: '2.5px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral)', flexShrink: 0 }}>
               <ShoppingCart size={19} />
@@ -474,7 +474,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <Search size={18} />
           </button>
 
-          {/* شرط إخفاء Panier في نسخة Téléphone */}
+          {/* Masquer Panier sur mobile */}
           {store?.cart !== false && (
             <Link href="/cart" style={{ position: 'relative', width: 40, height: 40, borderRadius: 12, border: '2px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral)' }}>
               <ShoppingCart size={18} />
@@ -503,8 +503,8 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       {/* Mobile menu with Conditional Cart Link */}
       <div style={{ overflow: 'hidden', maxHeight: open ? 250 : 0, transition: 'max-height 0.3s ease', background: '#fff', borderTop: open ? '2px dashed var(--border)' : 'none' }}>
         <div style={{ padding: '0.625rem 1.25rem 1rem' }}>
-          <Link href="/" onClick={() => setOpen(false)} style={mobileLinkStyle}>🏠 Accueil <ArrowLeft size={14} /></Link>
-          <Link href="/contact" onClick={() => setOpen(false)} style={mobileLinkStyle}>📞 Contactez-nous <ArrowLeft size={14} /></Link>
+          <Link href="/" onClick={() => setOpen(false)} style={mobileLinkStyle}>🏠 Accueil <ArrowRight size={14} /></Link>
+          <Link href="/contact" onClick={() => setOpen(false)} style={mobileLinkStyle}>📞 Contactez-nous <ArrowRight size={14} /></Link>
 
         </div>
       </div>
@@ -519,7 +519,7 @@ const mobileLinkStyle = {
 };
 
 /* ═══════════════════════════════════════════════════════════
-   FOOTER — 3 أقسام
+   FOOTER — 3 sections
 ═══════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
   return (
@@ -529,7 +529,7 @@ export function Footer({ store }: any) {
       <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <div className="footer-cols">
 
-          {/* قسم 1 — العلامة */}
+          {/* Section 1 — Marque */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg, var(--coral), var(--grape))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -548,7 +548,7 @@ export function Footer({ store }: any) {
             <p style={{ marginTop: '2rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.25)' }}>© {new Date().getFullYear()} {store?.name}. Tous droits réservés.</p>
           </div>
 
-          {/* قسم 2 — Liens */}
+          {/* Section 2 — Liens */}
           <div>
             <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--sun)', marginBottom: '1.25rem' }}>🗺️ Liens Rapide</h4>
             {[{ h: '/', l: 'Accueil', e: '🏠' }, { h: '/cart', l: 'Panier', e: '🛒' }, { h: '/contact', l: 'Contactez-nous', e: '📞' }, { h: '/Privacy', l: 'Confidentialité', e: '🔒' }, { h: '/Terms', l: 'Conditions', e: '📋' }].map((lnk, i) => (
@@ -560,7 +560,7 @@ export function Footer({ store }: any) {
             ))}
           </div>
 
-          {/* قسم 3 — التواصل */}
+          {/* Section 3 — Contact */}
           <div>
             <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--sun)', marginBottom: '1.25rem' }}>📡 Contactez-nous</h4>
             {[
@@ -630,7 +630,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
             color: hov ? '#fff' : 'var(--coral)', fontWeight: 800, fontSize: '0.85rem',
             transition: 'all 0.25s', boxShadow: hov ? '0 8px 20px rgba(255,107,107,0.35)' : 'none'
           }}>
-            {viewDetails} <ArrowLeft size={14} />
+            {viewDetails} <ArrowRight size={14} />
           </Link>
         </div>
       </div>
@@ -662,7 +662,7 @@ export function Home({ store, page }: any) {
                 width: '100%',
                 height: '100%',
                 objectFit: 'cover',
-                opacity: 0.3 /* قمنا بزيادة نسبة الوضوح هنا */
+                opacity: 0.3 /* opacité augmentée */
               }}
             />
           </div>
@@ -702,9 +702,9 @@ export function Home({ store, page }: any) {
           <div className="features-grid">
             {[
               { e: '🛡️', t: 'Sécurisé Pour enfants', d: 'Tous les Produits répondent aux normes de sécurité' },
-              { e: '🚀', t: 'Livraison rapide', d: 'يصل لvotre maison في وقت قياسي' },
+              { e: '🚀', t: 'Livraison rapide', d: 'Livré chez vous en un temps record' },
               { e: '⭐', t: 'Haute qualité', d: 'Produits Sélectionnés soigneusement' },
-              { e: '💝', t: 'Garantie الرضا', d: 'رضاك يهمنا toujours' },
+              { e: '💝', t: 'Garantie satisfaction', d: 'Votre satisfaction nous tient à cœur toujours' },
             ].map((f, i) => (
               <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '1.25rem', borderRadius: 20, border: '2px solid var(--border)', background: 'var(--bg)', transition: 'transform 0.3s' }}
                 onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-4px)')}
@@ -748,7 +748,7 @@ export function Home({ store, page }: any) {
           🎁 Nos produits Spéciales
         </h2>
         <p style={{ textAlign: 'center', color: 'var(--text-soft)', fontSize: '0.9rem', fontWeight: 600, marginBottom: '2.5rem' }}>
-          {products.length} Produit رائع 🌟
+          {products.length} Produit génial 🌟
         </p>
 
         {products.length === 0 ? (
@@ -1188,7 +1188,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
           <div style={{ background: '#fff', borderRadius: 24, border: '3px solid var(--border)', overflow: 'hidden', alignSelf: 'start' }}>
             <div style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '3px dashed var(--border)', background: 'rgba(255,107,107,0.04)' }}>
               <Package size={18} style={{ color: 'var(--coral)' }} />
-              <span style={{ fontFamily: "'Fredoka One', cursive", color: 'var(--coral)', fontSize: '0.95rem' }}>Produitsك ({items.length})</span>
+              <span style={{ fontFamily: "'Fredoka One', cursive", color: 'var(--coral)', fontSize: '0.95rem' }}>Produits ({items.length})</span>
             </div>
             {items.map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: '1rem', padding: '1rem', borderBottom: '2px dashed var(--border)' }}>
@@ -1259,7 +1259,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               </div>
 
               <div className="polka-dots" style={{ background: '#fff', border: '2.5px solid var(--border)', borderRadius: 18, padding: '1rem', marginBottom: '1rem' }}>
-                <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--coral)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>🧾 الRésumé</p>
+                <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--coral)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>🧾 Résumé</p>
                 {[
                   { l: 'Sous-total', v: `${cartTotal.toLocaleString()} DA` },
                   { l: 'Livraison', v: getLiv() ? `${getLiv().toLocaleString()} DA` : '---' },
@@ -1318,7 +1318,7 @@ const InfoCard = ({ icon, title, desc }: { icon: React.ReactNode; title: string;
 export function Privacy() {
   return (
     <PageShell emoji="🔒" title="Politique de confidentialité">
-      <InfoCard icon={<ShieldCheck size={18} />} title="Les données que nous collectons" desc="نجمع uniquement الinformations الEssentiels pour traiter votre commande — Nom، Numéro de Téléphone، وadresse." />
+      <InfoCard icon={<ShieldCheck size={18} />} title="Les données que nous collectons" desc="Nous collectons uniquement les informations essentielles pour traiter votre commande — Nom, Numéro de téléphone et adresse." />
       <InfoCard icon={<Lock size={18} />} title="Comment nous protégeons vos données" desc="Nous utilisons un chiffrement avancé pour garantir la sécurité de vos informations." />
       <InfoCard icon={<BadgeCheck size={18} />} title="Politique de partage" desc="Nous ne vendons ni ne partageons jamais vos données à des fins marketing." />
     </PageShell>

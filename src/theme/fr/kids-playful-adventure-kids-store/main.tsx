@@ -12,7 +12,7 @@ import {
     CheckCircle2, Zap, Rocket, Trophy,
     Menu, Search, ShoppingCart, Minus, Plus,
     Trash2, Loader2, Package, Shield, Truck, Lock, Sparkles,
-    ArrowLeft,
+    ArrowRight,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
@@ -351,7 +351,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             boxShadow: '0 16px 48px rgba(0,102,255,0.12)',
             zIndex: 200
         }}>
-            {/* زر الإغلاق الثابت في الأعلى */}
+            {/* Bouton de fermeture fixe en haut */}
             <div style={{ position: 'sticky', top: 0, background: '#fff', zIndex: 10, padding: '10px 15px' }}>
                 <button
                     className='cursor-pointer hover:text-red-400'
@@ -366,7 +366,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 <div style={{ padding: '1.25rem', textAlign: 'center', color: 'var(--blue)', fontWeight: 800, fontSize: '0.875rem' }}>🔍 Recherche en cours...</div>
             ) : ls.length > 0 ? (
                 <>
-                    {/* قائمة النتائج */}
+                    {/* Liste des résultats */}
                     {ls.map((p: any) => (
                         <Link
                             href={`/product/${p.id}`}
@@ -392,7 +392,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                         onClick={doSearch}
                         style={{ width: '100%', padding: '12px', background: 'var(--blue-lt)', border: 'none', borderTop: '2px solid var(--blue)', color: 'var(--blue)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                     >
-                        Voir tous les résultats <ArrowLeft size={14} />
+                        Voir tous les résultats <ArrowRight size={14} />
                     </button>
                 </>
             ) : sq.length >= 2 && (
@@ -480,13 +480,13 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                     {[{ h: '/', l: '🏠 Accueil' }, { h: '/contact', l: '📞 Contactez-nous' }].map(i => (
                         <Link key={i.h} href={i.h} onClick={() => setOpen(false)}
                             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '2px solid var(--border)', fontSize: '0.925rem', fontWeight: 800, color: 'var(--text)' }}>
-                            {i.l} <ArrowLeft size={15} style={{ color: 'var(--blue)' }} />
+                            {i.l} <ArrowRight size={15} style={{ color: 'var(--blue)' }} />
                         </Link>
                     ))}
                     {store?.cart !== false && (
                         <Link href={'/cart'} onClick={() => setOpen(false)}
                             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '2px solid var(--border)', fontSize: '0.925rem', fontWeight: 800, color: 'var(--text)' }}>
-                            {'🛒 Panier'} <ArrowLeft size={15} style={{ color: 'var(--blue)' }} />
+                            {'🛒 Panier'} <ArrowRight size={15} style={{ color: 'var(--blue)' }} />
                         </Link>
                     )}
                 </div>
@@ -497,7 +497,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   FOOTER — 3 أقسام
+   FOOTER — 3 sections
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
     return (
@@ -508,7 +508,7 @@ export function Footer({ store }: any) {
             <div style={{ padding: '3.5rem 1.5rem 2rem', maxWidth: 1280, margin: '0 auto' }}>
                 <div className="footer-cols">
 
-                    {/* قسم 1 */}
+                    {/* Section 1 */}
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
                             <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--blue)', border: '3px solid var(--yellow)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -527,7 +527,7 @@ export function Footer({ store }: any) {
                         <p style={{ marginTop: '2rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.2)' }}>© {new Date().getFullYear()} {store?.name}. Tous droits réservés.</p>
                     </div>
 
-                    {/* قسم 2 */}
+                    {/* Section 2 */}
                     <div>
                         <h4 style={{ fontFamily: "'Boogaloo',cursive", fontSize: '1.1rem', color: 'var(--yellow)', marginBottom: '1.25rem' }}>🗺️ Liens Rapide</h4>
                         {[{ h: '/', l: 'Accueil', e: '🏠' }, { h: '/cart', l: 'Panier', e: '🛒' }, { h: '/contact', l: 'Contactez-nous', e: '📞' }, { h: '/Privacy', l: 'Confidentialité', e: '🔒' }, { h: '/Terms', l: 'Conditions', e: '📋' }].map((lnk, i) => (
@@ -539,7 +539,7 @@ export function Footer({ store }: any) {
                         ))}
                     </div>
 
-                    {/* قسم 3 */}
+                    {/* Section 3 */}
                     <div>
                         <h4 style={{ fontFamily: "'Boogaloo',cursive", fontSize: '1.1rem', color: 'var(--yellow)', marginBottom: '1.25rem' }}>📡 Contactez-nous</h4>
                         {[{ e: '📞', v: store?.contact?.phone }, { e: '📍', v: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') }, { e: '📧', v: store?.contact?.email }].filter(r => r.v).map((r, i) => (
@@ -576,12 +576,12 @@ const PALETTES = [
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
     const [hov, setHov] = useState(false);
 
-    // 1. تحويل les prix مع التأكد من القيم
+    // 1. Convertir les prix en s'assurant des valeurs
     const price = typeof product.price === 'string' ? parseFloat(product.price) : (product.price || 0);
     const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
 
-    // 2. تعريف الألوان محلياً إذا لم تكن مستوردة (PALETTES)
-    // ملاحظة: تأكد من وجود هذه المصفوفة في ملفك أو استيرادها
+    // 2. Définir les couleurs localement si non importées (PALETTES)
+    // Note: s'assurer que ce tableau existe dans le fichier ou l'importer
     const palettesList = [
         { bg: '#FFF5F5', border: '#FEB2B2', accent: '#F56565' },
         { bg: '#F0FFF4', border: '#9AE6B4', accent: '#48BB78' },
@@ -589,8 +589,8 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         { bg: '#FAF5FF', border: '#D6BCFA', accent: '#9F7AEA' },
     ];
 
-    // 3. حساب الاختيار مع حماية كاملة ضد القيم الvide أو النصوص
-    const idValue = product.id ? String(product.id).length : 0; // استخدام الطول أضمن إذا كان الـ ID نصياً
+    // 3. Calculer la sélection avec protection complète contre les valeurs vides
+    const idValue = product.id ? String(product.id).length : 0; // utiliser la longueur est plus sûr si l'ID est une chaîne
     const pal = palettesList[idValue % palettesList.length];
     return (
         <div className="adv-card" style={{ background: '#fff', border: `3px solid ${hov ? pal.border : 'var(--border)'}`, borderRadius: 18, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', boxShadow: hov ? `0 16px 48px ${pal.border}22` : '0 2px 10px rgba(0,0,0,0.05)' }}
@@ -635,7 +635,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
                         transition: 'all 0.22s',
                         boxShadow: hov ? `0 6px 18px ${pal.border}44` : 'none'
                     }}>
-                        {viewDetails} <ArrowLeft size={13} />
+                        {viewDetails} <ArrowRight size={13} />
                     </Link>
                 </div>
             </div>
@@ -659,46 +659,46 @@ export function Home({ store, page }: any) {
                 className="dot-bg"
                 style={{
                     position: 'relative',
-                    // دمج طبقة تعتيم متدرجة مع صورة الخلفية لGarantie بروز النصوص
+                    // Fusionner une couche de dégradé sombre avec l'image de fond pour garantir la lisibilité des textes
                     background: `linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.7) 100%), url(${store.hero?.imageUrl || 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=2070'})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    backgroundAttachment: 'fixed', // تأثير بارالاكس عند التمرير
+                    backgroundAttachment: 'fixed', // effet parallaxe au défilement
                     overflow: 'hidden',
                     display: 'flex',
                     alignItems: 'center'
                 }}
             >
-                {/* الدوائر الضوئية الجمالية (Geometric Accents) */}
+                {/* Cercles lumineux décoratifs (Geometric Accents) */}
                 <div style={{ position: 'absolute', top: -150, left: -150, width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0, 102, 255, 0.2), transparent 70%)', pointerEvents: 'none', zIndex: 1 }} />
                 <div style={{ position: 'absolute', bottom: -100, right: -100, width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255, 224, 0, 0.15), transparent 70%)', pointerEvents: 'none', zIndex: 1 }} />
 
                 <div style={{ maxWidth: 1280, margin: '0 auto', width: '100%', padding: '4rem 1.5rem', position: 'relative', zIndex: 10 }}>
                     <div className="hero-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '4rem', alignItems: 'center' }}>
 
-                        {/* الجانب الأيسر: النصوص والأزرار */}
+                        {/* Côté gauche: textes et boutons */}
                         <div className="hero-text-content">
-                            {/* ملصق الترحيب (Badge) */}
+                            {/* Badge de bienvenue */}
                             <div className="anim-slide-up" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.6rem 1.25rem', borderRadius: 50, background: 'var(--yellow)', marginBottom: '1.5rem', boxShadow: '0 4px 15px rgba(255, 224, 0, 0.3)' }}>
                                 <Rocket size={16} style={{ color: 'var(--dark)' }} />
                                 <span className="font-boogaloo" style={{ fontSize: '1rem', color: 'var(--dark)', fontWeight: 700, letterSpacing: '0.03em' }}>
-                                    {store?.name} — مغامرة بلا حدود!
+                                    {store?.name} — Aventure sans limites !
                                 </span>
                             </div>
 
-                            {/* adresse الرئيسي */}
+                            {/* Titre principal */}
                             <h1 className="anim-slide-up font-boogaloo" style={{ fontSize: 'clamp(2.5rem, 7vw, 5rem)', color: '#fff', lineHeight: 1.1, marginBottom: '1.5rem', textShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
                                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'Jeux · Mode<br/><span style="color:#FFE000">Éducation · Aventure !</span>🚀') }} />
 
-                            {/* الخط الملون الفاصل */}
+                            {/* Ligne de séparation colorée */}
                             <div style={{ height: 6, width: 120, borderRadius: 3, background: 'linear-gradient(90deg, var(--yellow), var(--orange))', marginBottom: '2rem' }} />
 
-                            {/* الوصف */}
+                            {/* Description */}
                             <p className="anim-slide-up" style={{ fontSize: '1.15rem', fontWeight: 600, color: 'rgba(255,255,255,0.85)', maxWidth: 520, lineHeight: 1.8, marginBottom: '3rem' }}>
                                 {store.hero?.subtitle || '🎯 Tout ce dont votre enfant a besoin : jeux intelligents, Mode confortable et outils éducatifs !'}
                             </p>
 
-                            {/* أزرار Travailيات (CTAs) */}
+                            {/* Boutons d'action (CTAs) */}
                             <div className="hero-actions" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                                 <a href="#products" className="btn-adv" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '1rem 2.5rem', borderRadius: 16, background: 'var(--yellow)', color: 'var(--dark)', fontWeight: 900, fontSize: '1.1rem', textShadow: 'none', boxShadow: '0 10px 25px rgba(255,224,0,0.4)', transition: '0.3s', textDecoration: 'none' }}>
                                     🛍️ Acheter maintenant
@@ -833,10 +833,10 @@ export function Home({ store, page }: any) {
 
 export function Details({ product, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
     const [sel, setSel] = useState(0);
-    // توليد رقم عشوائي entre 0 و 10000
+    // Générer un nombre aléatoire entre 0 et 10000
     const id = Math.floor(Math.random() * 10001);
 
-    // اختيار لوحة الألوان باستخدام "Restant Section" لGarantie عدم تخطي طول المصفوفة
+    // Choisir la palette de couleurs en utilisant le modulo pour ne pas dépasser la longueur du tableau
     const pal = PALETTES[id % PALETTES.length];
 
     return (
@@ -925,7 +925,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                         {attr.variants.map((v: any) => {
                                             const isSelected = selectedVariants[attr.name] === v.value;
 
-                                            // حالة الألوان
+                                            // Cas des couleurs
                                             if (attr.displayMode === 'color') {
                                                 return (
                                                     <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
@@ -934,7 +934,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                                 );
                                             }
 
-                                            // حالة الصور (Nouveau)
+                                            // Cas des images
                                             if (attr.displayMode === 'image') {
                                                 return (
                                                     <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
@@ -948,7 +948,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                                 );
                                             }
 
-                                            // الحالة الافتراضية (نصوص)
+                                            // Cas par défaut (textes)
                                             return (
                                                 <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
                                                     style={{ padding: '0.4rem 1rem', border: `2.5px solid ${isSelected ? pal.border : 'var(--border)'}`, borderRadius: 8, fontWeight: 800, fontSize: '0.85rem', background: isSelected ? pal.bg : '#fff', color: isSelected ? pal.accent : 'var(--mid)', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
@@ -1267,7 +1267,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     <div style={{ background: '#fff', borderRadius: 20, border: '3px solid var(--border)', overflow: 'hidden', alignSelf: 'start' }}>
                         <div style={{ padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '3px solid var(--border)', background: 'var(--blue-lt)' }}>
                             <Package size={18} style={{ color: 'var(--blue)' }} />
-                            <span className="font-boogaloo" style={{ color: 'var(--blue)', fontSize: '1rem' }}>Produitsك ({items.length})</span>
+                            <span className="font-boogaloo" style={{ color: 'var(--blue)', fontSize: '1rem' }}>Produits ({items.length})</span>
                         </div>
                         {items.map((item, i) => (
                             <div key={i} style={{ display: 'flex', gap: '1rem', padding: '1rem 1.25rem', borderBottom: '2px solid var(--border)' }}>
@@ -1408,13 +1408,13 @@ const IB = ({ icon, title, desc, color = 'var(--blue)', bg = 'var(--blue-lt)' }:
 );
 
 export function Privacy() {
-    return <Shell emoji="🔒" title="Politique de confidentialité"><IB color="var(--blue)" bg="var(--blue-lt)" icon={<Shield size={18} />} title="Les données que nous collectons" desc="نجمع uniquement les données الEssentiels pour traiter votre commande — Nom، Numéro de Téléphone، وadresse." /><IB color="var(--green)" bg="var(--green-lt)" icon={<Lock size={18} />} title="حماية بياناتك" desc="Nous utilisons un chiffrement avancé pour garantir la sécurité de vos informations." /><IB color="var(--orange)" bg="var(--orange-lt)" icon={<Shield size={18} />} title="Politique de partage" desc="Non نبيع أو نشارك بياناتك مع أطراف ثالثة. خصوصيتك أولويتنا." /></Shell>;
+    return <Shell emoji="🔒" title="Politique de confidentialité"><IB color="var(--blue)" bg="var(--blue-lt)" icon={<Shield size={18} />} title="Les données que nous collectons" desc="Nous collectons uniquement les données essentielles pour traiter votre commande — Nom, Numéro de téléphone et adresse." /><IB color="var(--green)" bg="var(--green-lt)" icon={<Lock size={18} />} title="Protection de vos données" desc="Nous utilisons un chiffrement avancé pour garantir la sécurité de vos informations." /><IB color="var(--orange)" bg="var(--orange-lt)" icon={<Shield size={18} />} title="Politique de partage" desc="Nous ne vendons ni ne partageons vos données avec des tiers. Votre confidentialité est notre priorité." /></Shell>;
 }
 export function Terms() {
-    return <Shell emoji="📋" title="Conditions et clauses"><IB color="var(--blue)" bg="var(--blue-lt)" icon={<CheckCircle2 size={18} />} title="Commandes" desc="يتم Confirmations de commande عبر Téléphone قبل الشحن. الPaiement À la livraison." /><IB color="var(--green)" bg="var(--green-lt)" icon={<Truck size={18} />} title="Livraison" desc="نوفر service Livraison pour toutes les wilayas de Algérie." /><IB color="var(--orange)" bg="var(--orange-lt)" icon={<Shield size={18} />} title="الGarantieات" desc="نلتزم بأعلى معايير la qualité والسلامة في Tous nos Produits." /></Shell>;
+    return <Shell emoji="📋" title="Conditions et clauses"><IB color="var(--blue)" bg="var(--blue-lt)" icon={<CheckCircle2 size={18} />} title="Commandes" desc="Les commandes sont confirmées par téléphone avant l'expédition. Paiement à la livraison." /><IB color="var(--green)" bg="var(--green-lt)" icon={<Truck size={18} />} title="Livraison" desc="Nous proposons la livraison dans toutes les wilayas d'Algérie." /><IB color="var(--orange)" bg="var(--orange-lt)" icon={<Shield size={18} />} title="Garanties" desc="Nous nous engageons aux plus hauts standards de qualité et de sécurité pour tous nos produits." /></Shell>;
 }
 export function Cookies() {
-    return <Shell emoji="🍪" title="Cookies"><IB color="var(--blue)" bg="var(--blue-lt)" icon={<Shield size={18} />} title="Fichiers essentiels" desc="Essentiels لعمل Panier وحفظ بيانات جلستك." /><IB color="var(--green)" bg="var(--green-lt)" icon={<Sparkles size={18} />} title="Amélioration de l’expérience" desc="تساعدنا على تقديم تجربة مخصصة وأفضل لك." /></Shell>;
+    return <Shell emoji="🍪" title="Cookies"><IB color="var(--blue)" bg="var(--blue-lt)" icon={<Shield size={18} />} title="Fichiers essentiels" desc="Essentiels pour le fonctionnement du panier et la conservation de vos données de session." /><IB color="var(--green)" bg="var(--green-lt)" icon={<Sparkles size={18} />} title="Amélioration de l’expérience" desc="Nous aident à offrir une expérience personnalisée et meilleure pour vous." /></Shell>;
 }
 
 export function Contact({ store }: { store: any }) {

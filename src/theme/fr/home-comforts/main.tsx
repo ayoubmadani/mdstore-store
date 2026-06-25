@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Phone,
-  CheckCircle2, ArrowLeft, Package,
+  CheckCircle2, ArrowRight, Package,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Shield, Truck, Home as HomeIcon, Sofa,
   Mail,
@@ -280,7 +280,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div style={{ padding: '0.5rem 1.5rem 1rem' }}>
             {[{ h: '/', l: 'Accueil' }, { h: '/contact', l: 'Contactez-nous' }].map(i => (
               <Link key={i.h} href={i.h} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: `1px solid ${BD}`, fontSize: '0.9rem', fontWeight: 500, color: INK }}>
-                {i.l} <ArrowLeft size={14} style={{ color: W }} />
+                {i.l} <ArrowRight size={14} style={{ color: W }} />
               </Link>
             ))}
 
@@ -316,7 +316,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 ))}
               </div>
               <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: WL, border: 'none', borderTop: `1px solid rgba(196,154,108,0.2)`, color: W, fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                Voir tous les résultats <ArrowLeft size={14} />
+                Voir tous les résultats <ArrowRight size={14} />
               </button>
               </>
             )}
@@ -401,7 +401,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         </div>
       </div>
       <Link href={`/product/${product.slug || product.id}`} className="hc-btn">
-        {viewDetails} <ArrowLeft size={13} />
+        {viewDetails} <ArrowRight size={13} />
       </Link>
     </div>
   );
@@ -432,13 +432,13 @@ export function Home({ store, page }: any) {
             <h1 style={{ fontSize: 'clamp(2.5rem,7vw,5rem)', fontWeight: 700, color: '#FBF8F5', lineHeight: 1.1, letterSpacing: '-0.025em', marginBottom: '1.25rem' }}
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'Votre maison mérite<br/><em style="color:#C49A6C;font-style:normal">Le plus beau</em>') }} />
             <p style={{ fontSize: '1.05rem', color: 'rgba(251,248,245,0.65)', lineHeight: 1.8, marginBottom: '2.5rem', maxWidth: 500 }}>
-              {store.hero?.subtitle || 'Mobilier وقطع ديكور dans une ambiance chaleureuse et confortable transformez votre maison إلى مكان où vous aimez revenir.'}
+              {store.hero?.subtitle || 'Mobilier et décoration dans une ambiance chaleureuse et confortable — transformez votre maison en un endroit où vous aimez revenir.'}
             </p>
             <div className="hero-actions">
               <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: W, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.9rem 2rem', borderRadius: 8, transition: 'background 0.18s', textDecoration: 'none' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = WD)}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = W)}>
-                Parcourir les Produitss <ArrowLeft size={15} />
+                Parcourir les Produitss <ArrowRight size={15} />
               </a>
               {store?.cart !== false && (
                 <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'rgba(251,248,245,0.7)', fontWeight: 500, fontSize: '0.9rem', padding: '0.9rem 1.75rem', borderRadius: 8, border: '1px solid rgba(251,248,245,0.2)', transition: 'all 0.18s' }}
@@ -980,7 +980,7 @@ export function Privacy() {
     <Shell title="Politique de confidentialité">
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 16, border: `1px solid ${BD}` }}>
         <InfoBlock title="Les données que nous collectons" body="Nous collectons uniquement : Nom, Téléphone et adresse de Livraison." />
-        <InfoBlock title="Protection des données" body="Stockées Tous les données de manière chiffrée. Nous utilisons protocoles حماية Certifiée لGarantie la sécurité de vos informations." />
+        <InfoBlock title="Protection des données" body="Toutes les données sont chiffrées. Nous utilisons des protocoles de protection certifiés pour garantir la sécurité de vos informations." />
         <InfoBlock title="Partage des informations" body="Nous ne vendons ni ne partageons vos données, sauf avec les partenaires de livraison." />
       </div>
     </Shell>
@@ -1003,7 +1003,7 @@ export function Cookies() {
   return (
     <Shell title="Cookies">
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 16, border: `1px solid ${BD}` }}>
-        <InfoBlock title="Fichiers essentiels" body="Nous utilisons Cookies الEssentiels pour garantir le fonctionnement du Panier et la sécurité de la session." />
+        <InfoBlock title="Fichiers essentiels" body="Nous utilisons des cookies essentiels pour garantir le fonctionnement du panier et la sécurité de la session." />
         <InfoBlock title="Amélioration de l’expérience" body="Nous utilisons certains fichiers pour comprendre l’utilisation du site et améliorer l’expérience." />
       </div>
     </Shell>
@@ -1075,7 +1075,7 @@ export function Contact({ store }: { store: any }) {
               <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = WD)}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = W)}>
-                {loading ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />Envoi en cours...</> : <>Envoyer le message <ArrowLeft size={15} /></>}
+                {loading ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />Envoi en cours...</> : <>Envoyer le message <ArrowRight size={15} /></>}
               </button>
             </form>
           )}

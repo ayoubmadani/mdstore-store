@@ -400,7 +400,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
           {/* Logo */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-            {store?.design?.logoUrl
+            {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
               ? <img src={store.design.logoUrl} alt={store.name} style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
               : <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'linear-gradient(135deg,var(--blue),var(--teal))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -463,7 +463,7 @@ export function Footer({ store }: any) {
           {/* قسم 1 */}
           <div>
             <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-              {store?.design?.logoUrl
+              {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
                 ? <img src={store.design.logoUrl} alt={store?.name} style={{ height: '28px', filter: 'brightness(0) invert(1)', opacity: 0.8 }} />
                 : <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <div style={{ width: '26px', height: '26px', borderRadius: '6px', background: 'linear-gradient(135deg,var(--blue),var(--teal))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -627,7 +627,7 @@ export function Home({ store, page }: any) {
           }
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right,rgba(12,47,107,0.88) 0%,rgba(12,47,107,0.5) 55%,transparent 100%)', display: 'flex', alignItems: 'center' }}>
             <div className="fi" style={{ padding: '32px 5vw', zIndex: 2, maxWidth: 460 }}>
-              {store?.design?.logoUrl && <img src={store.design.logoUrl} alt="" style={{ height: '36px', filter: 'brightness(0) invert(1)', opacity: 0.9, marginBottom: '12px', display: 'block' }} />}
+              {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && <img src={store.design.logoUrl} alt="" style={{ height: '36px', filter: 'brightness(0) invert(1)', opacity: 0.9, marginBottom: '12px', display: 'block' }} />}
               <h1 className="pjs" style={{ fontSize: 'clamp(1.6rem,5vw,3.2rem)', fontWeight: 800, color: 'white', lineHeight: 1.05, marginBottom: '10px', letterSpacing: '-0.01em' }}>
                 {store.hero?.title || 'شريكك الطبي الموثوق'}
               </h1>

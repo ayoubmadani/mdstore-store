@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ShoppingBag, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, Check, X, Phone, MapPin,
-  CheckCircle2, ArrowLeft, Zap, Trophy,
+  CheckCircle2, ArrowRight, Zap, Trophy,
   Menu, Search, ShoppingCart, Minus, Plus,
   Trash2, Loader2, Package, Shield, Truck, Lock, RotateCcw,
 } from 'lucide-react';
@@ -392,7 +392,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   const Drop = () => (
   <div style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, left: 0, background: '#fff', border: '1px solid var(--g200)', borderRadius: 'var(--radius-s)', boxShadow: 'var(--shadow-m)', zIndex: 200, overflowY: 'auto', maxHeight: 300 }}>
     
-    {/* زر إغلاق انسيابي داخل القائمة */}
+    {/* Bouton fermer intégré dans la liste */}
     <div style={{ display: 'flex', justifyContent: 'flex-start', padding: '0.75rem 0.75rem 0.25rem' }}>
       <button 
         onClick={() => setSq('')} 
@@ -435,7 +435,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               onClick={() => doSearch()}
               style={{ width: '100%', padding: '12px', background: 'rgba(233,69,96,0.07)', border: 'none', borderTop: '1px solid rgba(233,69,96,0.2)', color: 'var(--accent)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
             >
-              Voir tous les résultats <ArrowLeft size={14} />
+              Voir tous les résultats <ArrowRight size={14} />
             </button>
           </div>
         )
@@ -531,7 +531,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '0.95rem', fontWeight: 500, color: 'var(--g300)', transition: 'color 0.2s' }}
               onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--g300)'; }}>
-              {i.l} <ArrowLeft size={14} style={{ color: 'var(--accent)' }} />
+              {i.l} <ArrowRight size={14} style={{ color: 'var(--accent)' }} />
             </Link>
           ))}
         </div>
@@ -541,7 +541,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   FOOTER — 3 أقسام
+   FOOTER — 3 sections
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
   return (
@@ -549,7 +549,7 @@ export function Footer({ store }: any) {
       <div style={{ maxWidth: 1400, margin: '0 auto' }}>
         <div className="footer-cols">
 
-          {/* قسم 1 */}
+          {/* Section 1 */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.125rem' }}>
               <div style={{ width: 40, height: 40, background: 'var(--accent)', borderRadius: 'var(--radius-s)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -558,7 +558,7 @@ export function Footer({ store }: any) {
               <span className="oswald" style={{ fontSize: '1.375rem', fontWeight: 700, color: '#fff', letterSpacing: '1px' }}>{store?.name}</span>
             </div>
             <p style={{ fontSize: '0.875rem', fontWeight: 400, color: 'var(--g500)', lineHeight: 1.75, maxWidth: 280 }}>
-              {store?.hero?.subtitle?.substring(0, 90) || 'Votre destination #1 للÉquipements الsportifs hauteة la qualité — Football، Tennis، Panier، et plus.'}
+              {store?.hero?.subtitle?.substring(0, 90) || 'Votre destination #1 pour les équipements sportifs de haute qualité — Football, Tennis, Basket et plus.'}
             </p>
             <div style={{ display: 'flex', gap: '0.625rem', marginTop: '1.5rem' }}>
               {['⚽', '🎾', '🏀', '🏋️', '🏃'].map((e, i) => (
@@ -572,7 +572,7 @@ export function Footer({ store }: any) {
             <p style={{ marginTop: '2.5rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.2)' }}>© {new Date().getFullYear()} {store?.name}. Tous droits réservés.</p>
           </div>
 
-          {/* قسم 2 — Liens */}
+          {/* Section 2 — Liens */}
           <div>
             <h4 className="oswald" style={{ fontSize: '1rem', fontWeight: 600, color: '#fff', marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Liens Rapide</h4>
             {[{ h: '/', l: 'Accueil' }, { h: '/cart', l: 'Panier' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/Privacy', l: 'Politique de confidentialité' }, { h: '/Terms', l: 'Conditions de service' }].map((lnk, i) => (
@@ -584,7 +584,7 @@ export function Footer({ store }: any) {
             ))}
           </div>
 
-          {/* قسم 3 — التواصل */}
+          {/* Section 3 — Contact */}
           <div>
             <h4 className="oswald" style={{ fontSize: '1rem', fontWeight: 600, color: '#fff', marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Contactez-nous</h4>
             {[
@@ -634,7 +634,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
   const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
   const badge = discount > 0 ? 'sale' : null;
-  // استخدم Nom للبحث في قائمة الإيموجي
+  // Utiliser le nom pour chercher dans la liste d'emojis
   const categoryEmoji = catEmojis[product.category?.name || product.category] || '🏆';
 
   return (
@@ -650,9 +650,9 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 
       {/* Info */}
       <div style={{ padding: '18px' }}>
-        {/* ابحث عن هذا الجزء داخل مكون Card وقم بتعديله */}
+        
         <p style={{ fontSize: '0.72rem', color: 'var(--accent)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
-          {/* التحقق إذا كانت Catégorie كائناً أو نصاً */}
+          {/* Vérifier si la catégorie est un objet ou une chaîne */}
           {product.category && typeof product.category === 'object' ? product.category.name : (product.category || 'Sport')}        </p>
         <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--g800)', marginBottom: 8, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
           {product.name}
@@ -717,7 +717,7 @@ export function Home({ store, page }: any) {
             </h1>
 
             <p className="anim-fade-up d2" style={{ fontSize: '1.0625rem', color: 'var(--g400)', maxWidth: 480, lineHeight: 1.75, marginBottom: '2.5rem' }}>
-              {store.hero?.subtitle || 'Les meilleurs الÉquipements الsportifs pour les champions — من Football إلى الTennis، كل ما تحتاجه للتميز.'}
+              {store.hero?.subtitle || 'Les meilleurs équipements sportifs pour les champions — du Football au Tennis, tout ce qu\'il vous faut pour exceller.'}
             </p>
 
             {/* Stats */}
@@ -731,7 +731,7 @@ export function Home({ store, page }: any) {
             </div>
 
             <div className="hero-actions anim-fade-up d3">
-              <a href="#products" className="btn-pri" style={{ textDecoration: 'none' }}>Acheter maintenant <ArrowLeft size={16} /></a>
+              <a href="#products" className="btn-pri" style={{ textDecoration: 'none' }}>Acheter maintenant <ArrowRight size={16} /></a>
               {store?.cart !== false && (<Link href="/cart" className="btn-out">Panier</Link>)}
             </div>
           </div>
@@ -775,14 +775,12 @@ export function Home({ store, page }: any) {
 
       {/* ── CATEGORIES ── */}
       <div className="cats-grid">
-        <Link href="?" className="cat-card">
-                Tout
-              </Link>
+        
               {cats.map((cat: any) => (
           <Link key={cat.id} href={`?category=${cat.id}`} className="cat-card">
             <div className="cat-img" style={{ height: 160, overflow: 'hidden', position: 'relative', background: 'var(--g100)' }}>
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '4rem', background: `linear-gradient(135deg, var(--primary) 0%, var(--primary-l) 100%)` }}>
-                {/* التعديل هنا: Recherche عن الإيموجي باستخدام اسم Catégorie */}
+                {/* Rechercher l'emoji en utilisant le nom de la catégorie */}
                 {catEmojis[cat.name] || '🏆'}
               </div>
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top,rgba(26,26,46,0.75),transparent)', display: 'flex', alignItems: 'flex-end', padding: 14 }}>
@@ -804,7 +802,7 @@ export function Home({ store, page }: any) {
             <h2 className="oswald" style={{ fontSize: 'clamp(1.8rem,3.5vw,2.5rem)', fontWeight: 700, color: 'var(--g900)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               Produits <span style={{ color: 'var(--accent)' }}>Spéciales</span>
             </h2>
-            <p style={{ color: 'var(--g500)', fontSize: '0.95rem', marginTop: 6 }}>{products.length} Produit sportif احترافي</p>
+            <p style={{ color: 'var(--g500)', fontSize: '0.95rem', marginTop: 6 }}>{products.length} Produit sportif professionnel</p>
           </div>
         </div>
 
@@ -842,31 +840,7 @@ export function Home({ store, page }: any) {
         )}
       </section>
 
-      {/* ── PROMO BANNER ── */}
-      <section style={{ padding: '0 1.5rem 6rem', maxWidth: 1400, margin: '0 auto' }}>
-        <div className="banner-inner">
-          <div style={{ padding: '3.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative', zIndex: 2 }}>
-            <span style={{ display: 'inline-block', background: 'var(--accent)', color: '#fff', padding: '5px 16px', borderRadius: 50, fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1.25rem', width: 'fit-content' }}>
-              Offre Limitée
-            </span>
-            <h2 className="oswald" style={{ fontSize: 'clamp(1.875rem,4vw,3rem)', fontWeight: 700, color: '#fff', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Collection des champions 2025
-            </h2>
-            <p style={{ color: 'var(--g400)', fontSize: '0.95rem', marginBottom: '2.5rem', maxWidth: 380, lineHeight: 1.7 }}>
-              تخفيضات تصل إلى 50% على Équipements Football والTennis. عروض لفترة Limitéة Pour sportifs sérieux.
-            </p>
-            <a href="#products" className="btn-gold" style={{ textDecoration: 'none', width: 'fit-content' }}>
-              Voir les Offres <ArrowLeft size={16} />
-            </a>
-          </div>
-          {store.hero?.imageUrl && (
-            <div style={{ position: 'relative', overflow: 'hidden', minHeight: 280 }}>
-              <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right,var(--primary),transparent)', width: 100 }} />
-            </div>
-          )}
-        </div>
-      </section>
+      
 
       {/* ── BRANDS ── */}
       <div style={{ background: '#fff', borderTop: '1px solid var(--g200)', borderBottom: '1px solid var(--g200)', padding: '3rem 1.5rem' }}>
@@ -984,7 +958,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                   {attr.variants.map((v: any) => {
                     const isSelected = selectedVariants[attr.name] === v.value;
 
-                    // حالة الألوان
+                    // Cas des couleurs
                     if (attr.displayMode === 'color') {
                       return (
                         <button
@@ -998,7 +972,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                       );
                     }
 
-                    // حالة الصور (Nouveau)
+                    // Cas des images
                     if (attr.displayMode === 'image') {
                       return (
                         <button
@@ -1014,7 +988,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                       );
                     }
 
-                    // الحالة الافتراضية (نصوص مثل المقاسات)
+                    // Cas par défaut (textes comme les tailles)
                     return (
                       <button
                         key={v.id}
@@ -1444,7 +1418,7 @@ const IB = ({ title, body, tag }: { title: string; body: string; tag?: string })
 export function Privacy() {
   return (
     <Shell title="Politique de confidentialité" sub="Légal">
-      <IB title="Les données que nous collectons" body="uniquement Votre nom et numéro de هاتفك et adresse de Livraison — ما هو ضروري pour traiter votre commande. Non بيانات إضافية." />
+      <IB title="Les données que nous collectons" body="Uniquement votre nom, numéro de téléphone et adresse de livraison — le strict nécessaire pour traiter votre commande." />
       <IB title="Sécurité et protection" body="Vos données sont protégées par un chiffrement standard et une infrastructure sécurisée. Nous utilisons des protocoles de protection avancés." />
       <IB title="Partage des données" body="Nous ne vendons pas vos données. Partagées avec les partenaires de livraison." tag="Garanti" />
     </Shell>
@@ -1541,7 +1515,7 @@ export function Contact({ store }: { store: any }) {
                     onFocus={e => { e.target.style.borderColor = 'var(--accent)'; }} onBlur={e => { e.target.style.borderColor = 'var(--g300)'; }} />
                 </div>
                 <button type="submit" disabled={loading} className="btn-pri" style={{ borderRadius: 50, padding: '0.9rem', opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}>
-                  {loading ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> En cours...</> : <>Envoyer le message <ArrowLeft size={15} /></>}
+                  {loading ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> En cours...</> : <>Envoyer le message <ArrowRight size={15} /></>}
                 </button>
               </form>
             )}

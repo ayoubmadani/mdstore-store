@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, AlertCircle, X, ToggleRight,
-  Shield, ArrowLeft, Plus, Minus, CheckCircle2, Lock,
+  Shield, ArrowRight, Plus, Minus, CheckCircle2, Lock,
   Menu, Zap, Package, Truck, RefreshCw, Phone, User,
   Search, ShoppingCart, Trash2, Loader2,
 } from 'lucide-react';
@@ -259,7 +259,7 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
           </Link>
         ))}
         <button onClick={doSearch} style={{width:'100%',padding:'12px',background:'rgba(58,134,255,0.07)',border:'none',borderTop:'1px solid rgba(58,134,255,0.2)',color:'var(--blue)',fontWeight:800,fontSize:'0.85rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px'}}>
-          Voir tous les résultats <ArrowLeft style={{width:'14px',height:'14px'}}/>
+          Voir tous les résultats <ArrowRight style={{width:'14px',height:'14px'}}/>
         </button>
       </>) : sq.length>=2 && <div style={{padding:'1rem',textAlign:'center',fontSize:'12px',color:'var(--dim)'}}>Aucun résultat</div>}
     </div>
@@ -285,7 +285,7 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
       <div style={{maxWidth:'1280px',margin:'0 auto',padding:'0 24px',height:'62px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'20px'}}>
         {/* Logo */}
         <Link href="/" style={{flexShrink:0,display:'flex',alignItems:'center',gap:'12px'}}>
-          {store?.design?.logoUrl
+          {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
             ? <img src={store.design.logoUrl} alt={store.name} style={{height:'36px',width:'auto'}}/>
             : <>
                 <div style={{width:'38px',height:'38px',borderRadius:'10px',backgroundColor:'var(--blue)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
@@ -358,7 +358,7 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
           {[{h:'/',l:'Accueil'},{h:'/contact',l:'Contactez-nous'}].map(lnk=>(
             <Link key={lnk.h} href={lnk.h} onClick={()=>setOpen(false)} className="bc"
               style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 0',fontSize:'16px',fontWeight:600,letterSpacing:'0.1em',color:'rgba(255,255,255,0.6)',borderBottom:'1px solid rgba(255,255,255,0.08)'}}>
-              {lnk.l} <ArrowLeft style={{width:'14px',height:'14px',color:'var(--blue)'}}/>
+              {lnk.l} <ArrowRight style={{width:'14px',height:'14px',color:'var(--blue)'}}/>
             </Link>
           ))}
         </div>
@@ -368,7 +368,7 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   FOOTER — 3 أقسام
+   FOOTER — 3 sections
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
   const yr = new Date().getFullYear();
@@ -377,10 +377,10 @@ export function Footer({ store }: any) {
       <div style={{maxWidth:'1280px',margin:'0 auto',padding:'64px 24px 32px'}}>
         <div className="footer-g" style={{paddingBottom:'48px',borderBottom:'1px solid rgba(255,255,255,0.05)'}}>
 
-          {/* قسم 1 */}
+          {/* Section 1 */}
           <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
             <Link href="/" style={{display:'inline-flex',alignItems:'center',gap:'12px'}}>
-              {store?.design?.logoUrl
+              {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
                 ? <img src={store.design.logoUrl} alt={store?.name} style={{height:'32px',filter:'brightness(0) invert(1)'}}/>
                 : <div style={{width:'36px',height:'36px',borderRadius:'8px',backgroundColor:'var(--blue)',display:'flex',alignItems:'center',justifyContent:'center'}}>
                     <Zap style={{width:'18px',height:'18px',color:'white'}}/>
@@ -389,12 +389,12 @@ export function Footer({ store }: any) {
               <span className="bc" style={{fontSize:'1.4rem',fontWeight:800,color:'white',letterSpacing:'0.05em'}}>{store?.name}</span>
             </Link>
             <p style={{fontSize:'13px',lineHeight:'1.8',color:'rgba(255,255,255,0.4)',maxWidth:'280px',fontWeight:300}}>
-              {store?.hero?.subtitle?.substring(0,90)||'ثيم polyvalent haute performance offrant Expérience shopping complète pour tous les types de Produits.'}
+              {store?.hero?.subtitle?.substring(0,90)||'Thème polyvalent haute performance offrant une expérience shopping complète pour tous types de produits.'}
             </p>
             <p style={{fontSize:'11px',color:'var(--blue)',letterSpacing:'0.1em',fontWeight:600}}>© {yr} {store?.name}. Tous droits réservés.</p>
           </div>
 
-          {/* قسم 2 — Liens */}
+          {/* Section 2 — Liens */}
           <div>
             <p className="bc" style={{fontSize:'14px',fontWeight:700,letterSpacing:'0.1em',color:'var(--blue)',marginBottom:'24px'}}>Liens Rapide</p>
             {[{h:'/',l:'Accueil'},{h:'/cart',l:'Panier'},{h:'/contact',l:'Appelez-nous'},{h:'/Privacy',l:'Politique de confidentialité'},{h:'/Terms',l:'Conditions de service'}].map(lnk=>(
@@ -406,7 +406,7 @@ export function Footer({ store }: any) {
             ))}
           </div>
 
-          {/* قسم 3 — Contact */}
+          {/* Section 3 — Contact */}
           <div>
             <p className="bc" style={{fontSize:'14px',fontWeight:700,letterSpacing:'0.1em',color:'var(--blue)',marginBottom:'24px'}}>Contactez-nous</p>
             {[
@@ -506,7 +506,7 @@ export function Home({ store, page }: any) {
           </h1>
 
           <p className="fu fu-3" style={{fontSize:'17px',lineHeight:'1.7',color:'rgba(255,255,255,0.7)',marginBottom:'40px',maxWidth:'520px',fontWeight:300}}>
-            {store.hero?.subtitle||'Découvrir notre collection الSélectionnés من Derniers Produits المصممة soigneusement pour toute vos besoins.'}
+            {store.hero?.subtitle||'Découvrir notre collection sélectionnée des derniers produits soigneusement conçus pour tous vos besoins.'}
           </p>
 
           <div className="fu fu-3" style={{display:'flex',gap:'16px',flexWrap:'wrap'}}>
@@ -578,7 +578,7 @@ export function Home({ store, page }: any) {
                   <div style={{position:'absolute',top:0,left:0,right:0,height:'3px',background:'linear-gradient(to right,var(--blue),var(--blue-3))'}}/>
                   <div style={{position:'absolute',bottom:0,left:0,right:0,padding:'20px',background:'linear-gradient(transparent,rgba(13,27,42,0.8))',display:'flex',alignItems:'center',justifyContent:'space-between',color:'white'}}>
                     <span style={{fontWeight:700,fontSize:'16px',letterSpacing:'0.05em'}}>{cat.name}</span>
-                    <ArrowLeft style={{width:'18px',height:'18px',color:'var(--blue)'}}/>
+                    <ArrowRight style={{width:'18px',height:'18px',color:'var(--blue)'}}/>
                   </div>
                 </Link>
               ))}
@@ -858,7 +858,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             {isAdded?<><CheckCircle2 size={14} className="anim-check"/>Ajouté au panier</>:<><ShoppingCart size={14}/>Ajouter au panier</>}
           </button>
           <button onClick={()=>setIsOrderNow(true)} className="btn-blue" style={{flex:1,padding:'12px'}}>
-            Commander maintenant <ArrowLeft style={{width:'14px',height:'14px'}}/>
+            Commander maintenant <ArrowRight style={{width:'14px',height:'14px'}}/>
           </button>
         </div>
       )}
@@ -967,7 +967,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
 
             <button type="submit" disabled={sub} className="btn-blue" style={{width:'100%',fontSize:'16px',padding:'13px',letterSpacing:'0.12em',cursor:sub?'not-allowed':'pointer',opacity:sub?0.7:1}}>
-              {sub?<><Loader2 style={{width:'15px',height:'15px',animation:'spin 1s linear infinite'}}/> En cours...</>:<>Confirmer la commande <ArrowLeft style={{width:'15px',height:'15px'}}/></>}
+              {sub?<><Loader2 style={{width:'15px',height:'15px',animation:'spin 1s linear infinite'}}/> En cours...</>:<>Confirmer la commande <ArrowRight style={{width:'15px',height:'15px'}}/></>}
             </button>
             <p style={{fontSize:'11px',fontWeight:600,letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--dim)',textAlign:'center',marginTop:'10px',display:'flex',alignItems:'center',justifyContent:'center',gap:'5px'}}>
               <Lock style={{width:'10px',height:'10px',color:'var(--blue)'}}/> Paiement Sécurisé et chiffré
@@ -1143,7 +1143,7 @@ export function Cart({ domain, store }: { domain:string; store:any }) {
               </div>
 
               <button type="submit" disabled={submitting} className="btn-blue" style={{width:'100%',fontSize:'16px',padding:'13px',cursor:submitting?'not-allowed':'pointer',opacity:submitting?0.7:1}}>
-                {submitting?<><Loader2 style={{width:'15px',height:'15px',animation:'spin 1s linear infinite'}}/> En cours...</>:<>Confirmer la commande <ArrowLeft style={{width:'15px',height:'15px'}}/></>}
+                {submitting?<><Loader2 style={{width:'15px',height:'15px',animation:'spin 1s linear infinite'}}/> En cours...</>:<>Confirmer la commande <ArrowRight style={{width:'15px',height:'15px'}}/></>}
               </button>
             </form>
           </div>
@@ -1199,7 +1199,7 @@ const IB = ({ title, body, tag }: { title:string; body:string; tag?:string }) =>
 export function Privacy() {
   return (
     <Shell title="Confidentialité" sub="// Légal">
-      <IB title="Les données que nous collectons" body="uniquement Votre nom et numéro de هاتفك et adresse de Livraison — le minimum nécessaire pour traiter votre commande."/>
+      <IB title="Les données que nous collectons" body="Uniquement votre nom, numéro de téléphone et adresse de livraison — le minimum nécessaire pour traiter votre commande."/>
       <IB title="Comment nous les utilisons"        body="Exclusivement pour traiter et livrer vos achats. Aucun usage commercial de vos données."/>
       <IB title="Sécurité"               body="Vos données sont protégées par un chiffrement standard et une infrastructure sécurisée en tout temps."/>
       <IB title="Partage des données"      body="Nous ne vendons pas vos données. Partagées avec les partenaires de livraison de confiance." tag="Garanti"/>
@@ -1250,7 +1250,7 @@ export function Contact({ store }: { store?:any }) {
         <div style={{maxWidth:'960px',margin:'0 auto',position:'relative',zIndex:2}}>
           <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.24em',color:'var(--blue)',marginBottom:'10px'}}>// Contact</p>
           <h1 className="bc" style={{fontSize:'clamp(2.5rem,7vw,6rem)',fontWeight:800,letterSpacing:'0.04em',color:'white',lineHeight:0.88,margin:'0 0 12px'}}>Contactez-nous</h1>
-          <p className="bc" style={{fontSize:'14px',fontWeight:600,letterSpacing:'0.14em',color:'rgba(255,255,255,0.4)'}}>نRéponse sous 24h</p>
+          <p className="bc" style={{fontSize:'14px',fontWeight:600,letterSpacing:'0.14em',color:'rgba(255,255,255,0.4)'}}>Réponse sous 24h</p>
         </div>
       </div>
 
@@ -1314,7 +1314,7 @@ export function Contact({ store }: { store?:any }) {
                   style={{...INP(),resize:'none'}} onFocus={onF} onBlur={onB}/>
               </div>
               <button type="submit" disabled={loading} className="btn-blue" style={{justifyContent:'center',width:'100%',fontSize:'15px',padding:'13px',opacity:loading?0.7:1,cursor:loading?'not-allowed':'pointer'}}>
-                {loading?<><Loader2 style={{width:'15px',height:'15px',animation:'spin 1s linear infinite'}}/> En cours...</>:<>Envoyer <ArrowLeft style={{width:'14px',height:'14px'}}/></>}
+                {loading?<><Loader2 style={{width:'15px',height:'15px',animation:'spin 1s linear infinite'}}/> En cours...</>:<>Envoyer <ArrowRight style={{width:'14px',height:'14px'}}/></>}
               </button>
             </form>
           )}

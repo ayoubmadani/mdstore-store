@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
-  AlertCircle, X, ToggleRight, ArrowLeft,
+  AlertCircle, X, ToggleRight, ArrowRight,
   Plus, Minus, CheckCircle2, Lock, Menu, Package,
   Truck, Shield, Search, ShoppingCart,
   Trash2, Loader2, Phone, MapPin, Mail, Activity, Zap, User,
@@ -204,7 +204,7 @@ function HerbLeaf({ size = 24, style }: { size?: number; style?: React.CSSProper
       strokeWidth="1.5" 
       strokeLinecap="round" 
       strokeLinejoin="round"
-      style={style} // تمرير الـ style هنا هو ما سيجعل اللون يتغير
+      style={style} // transmettre le style ici pour changer la couleur
     >
       <path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 19 2c1 2 2 4.5 2 8 0 5.5-4.78 10-10 10Z"/>
       <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
@@ -303,7 +303,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             fontSize:'12px', cursor:'pointer', fontFamily:"'Playfair Display',serif",
             display:'flex', alignItems:'center', justifyContent:'center', gap:'6px'
           }}>
-            Voir tous les résultats <ArrowLeft size={12} />
+            Voir tous les résultats <ArrowRight size={12} />
           </button>
         </div>
       ) : sq.length >= 2 && (
@@ -426,14 +426,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               fontSize:'14px', fontWeight:600, color:'var(--brown)',
               borderBottom:'1px solid var(--tan)'
             }}>
-              Accueil <ArrowLeft size={14} style={{ color:'var(--gold)' }} />
+              Accueil <ArrowRight size={14} style={{ color:'var(--gold)' }} />
             </Link>
             <Link href="/contact" onClick={() => setOpen(false)} style={{
               display:'flex', justifyContent:'space-between', padding:'12px 0',
               fontSize:'14px', fontWeight:600, color:'var(--brown)',
               borderBottom:'1px solid var(--tan)'
             }}>
-              Appelez-nous <ArrowLeft size={14} style={{ color:'var(--gold)' }} />
+              Appelez-nous <ArrowRight size={14} style={{ color:'var(--gold)' }} />
             </Link>
             <button onClick={() => { router.push('/#products'); setOpen(false); }}
               className="btn-primary" style={{ marginTop:'12px', width:'100%' }}>
@@ -453,7 +453,7 @@ export function Footer({ store }: any) {
         background:'var(--green)', padding:'10px 0', textAlign:'center'
       }}>
         <p className="pd" style={{ fontSize:'13px', fontWeight:600, color:'var(--cream)', letterSpacing:'0.04em' }}>
-          🌿 Guérison Naturelle — Herbes médicinales، Miel Naturel، et compléments Bio 100%
+          🌿 Guérison Naturelle — Herbes médicinales, Miel Naturel, et compléments Bio 100%
         </p>
       </div>
 
@@ -467,7 +467,7 @@ export function Footer({ store }: any) {
               </span>
             </div>
             <p style={{ fontSize:'13px', lineHeight:'1.7', color:'rgba(255,255,255,0.6)', maxWidth:'240px' }}>
-              {store?.hero?.subtitle?.substring(0, 80) || 'Votre boutique الDe confiance للأعشاب médicaux، الMiel الNaturel، والcompléments الBio. Produits authentiques de la Nature.'}
+              {store?.hero?.subtitle?.substring(0, 80) || 'Votre boutique de confiance pour les herbes médicinales, le miel naturel et les compléments bio. Produits authentiques de la nature.'}
             </p>
             <div style={{ marginTop:'14px', display:'flex', alignItems:'center', gap:'8px' }}>
               <Truck size={14} style={{ color:'var(--gold)' }} />
@@ -510,7 +510,7 @@ export function Footer({ store }: any) {
             ))}
             <div style={{ marginTop:'14px', padding:'12px 14px', borderRadius:'10px', border:'1px solid var(--gold)', background:'rgba(201,149,44,0.08)' }}>
               <p className="pd" style={{ fontSize:'0.95rem', color:'var(--gold)', marginBottom:2 }}>Équipe de thérapeutes en herboristerie</p>
-              <p style={{ fontSize:'11px', color:'rgba(255,255,255,0.5)' }}>نRéponse sous 24h</p>
+              <p style={{ fontSize:'11px', color:'rgba(255,255,255,0.5)' }}>Réponse sous 24h</p>
             </div>
           </div>
         </div>
@@ -853,7 +853,7 @@ export function Home({ store, page }: any) {
             }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(201,149,44,0.15)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
-              Consultez-nous <ArrowLeft size={14} />
+              Consultez-nous <ArrowRight size={14} />
             </Link>
           </div>
         </div>
@@ -1468,7 +1468,7 @@ const IB = ({ title, body, tag }: { title: string; body: string; tag?: string })
 export function Privacy() {
   return (
     <Shell title="Politique de confidentialité" sub="Affaires juridiques">
-      <IB title="Les données que nous collectons" body="uniquement Votre nom et numéro de هاتفك et adresse de Livraison — الحد الأدنى الrequis pour traiter votre commande."/>
+      <IB title="Les données que nous collectons" body="Uniquement votre nom, numéro de téléphone et adresse de livraison — le minimum nécessaire pour traiter votre commande."/>
       <IB title="Comment nous les utilisons" body="Exclusivement pour traiter et expédier votre commande. Aucun usage marketing ou vente de données."/>
       <IB title="Sécurité" body="Vos données sont protégées par un chiffrement haute sécurité et sécurisées en tout temps."/>
       <IB title="Partage des données" body="Nous ne vendons jamais vos données. Partagées avec les partenaires de livraison de confiance." tag="Garanti"/>
@@ -1580,7 +1580,7 @@ export function Contact({ store }: { store?: any }) {
                 <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="Comment pouvons-nous vous aider ?" rows={4} required className="inp" style={{ resize:'none' }}/>
               </div>
               <button type="submit" disabled={loading} className="btn-primary" style={{ justifyContent:'center', width:'100%', fontSize:'14px', padding:'13px', opacity:loading?0.7:1, cursor:loading?'not-allowed':'pointer' }}>
-                {loading?<><Loader2 size={15} style={{ animation:'spin 1s linear infinite' }}/> En cours...</>:<>Envoyer le message <ArrowLeft size={14}/></>}
+                {loading?<><Loader2 size={15} style={{ animation:'spin 1s linear infinite' }}/> En cours...</>:<>Envoyer le message <ArrowRight size={14}/></>}
               </button>
             </form>
           )}

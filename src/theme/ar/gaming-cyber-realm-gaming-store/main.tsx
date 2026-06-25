@@ -375,7 +375,7 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
   return (
     <>
       {store?.topBar?.enabled && store?.topBar?.text && (
-        <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+        <div style={{ background: 'linear-gradient(90deg, #0099CC 0%, #FF2D8A 100%)', color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
           {store.topBar.text}
         </div>
       )}
@@ -743,7 +743,7 @@ export function Home({ store, page }: any) {
             </div>
             : <div className="prod-grid">
               {products.map((p: any) => {
-                const img = p.productImage || p.imagesProduct?.[0]?.imageUrl || store?.design?.logoUrl || '/fallback-image.png';
+                const img = p.productImage || p.imagesProduct?.[0]?.imageUrl || store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' || '/fallback-image.png';
                 const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
                 return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="عرض المنتج" />;
               })}

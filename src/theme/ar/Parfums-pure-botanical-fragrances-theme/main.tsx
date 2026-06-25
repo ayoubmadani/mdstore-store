@@ -302,7 +302,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     return (
         <>
         {store?.topBar?.enabled && store?.topBar?.text && (
-          <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+          <div style={{ background: '#6B8F6B', color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
             {store.topBar.text}
           </div>
         )}
@@ -325,7 +325,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                     {/* اللوغو وسلة المشتريات */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
-                            {store?.design?.logoUrl
+                            {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
                                 ? <img src={store.design.logoUrl} alt={store?.name} style={{ height: '35px', width: 'auto' }} />
                                 : <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--char)' }}>{store?.name || 'عبير الطبيعة'}</span>
                             }
@@ -457,7 +457,7 @@ export function Footer({ store }: any) {
                     {/* قسم 1 — صنع في الجزائر */}
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '16px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                            {store?.design?.logoUrl
+                            {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
                                 ? <img src={store.design.logoUrl} alt={store?.name} style={{ height: '28px', filter: 'brightness(0) invert(1)', opacity: 0.8 }} />
                                 : <span style={{ fontSize: '1rem', fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>{store?.name}</span>
                             }

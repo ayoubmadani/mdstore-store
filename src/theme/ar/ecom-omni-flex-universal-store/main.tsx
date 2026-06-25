@@ -285,7 +285,7 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
       <div style={{maxWidth:'1280px',margin:'0 auto',padding:'0 24px',height:'62px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'20px'}}>
         {/* Logo */}
         <Link href="/" style={{flexShrink:0,display:'flex',alignItems:'center',gap:'12px'}}>
-          {store?.design?.logoUrl
+          {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
             ? <img src={store.design.logoUrl} alt={store.name} style={{height:'36px',width:'auto'}}/>
             : <>
                 <div style={{width:'38px',height:'38px',borderRadius:'10px',backgroundColor:'var(--blue)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
@@ -380,7 +380,7 @@ export function Footer({ store }: any) {
           {/* قسم 1 */}
           <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
             <Link href="/" style={{display:'inline-flex',alignItems:'center',gap:'12px'}}>
-              {store?.design?.logoUrl
+              {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
                 ? <img src={store.design.logoUrl} alt={store?.name} style={{height:'32px',filter:'brightness(0) invert(1)'}}/>
                 : <div style={{width:'36px',height:'36px',borderRadius:'8px',backgroundColor:'var(--blue)',display:'flex',alignItems:'center',justifyContent:'center'}}>
                     <Zap style={{width:'18px',height:'18px',color:'white'}}/>

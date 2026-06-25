@@ -353,6 +353,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 {/* Mobile */}
                 <div className="nav-mobile-btns">
                     <button onClick={() => setShowSearch(!showSearch)} style={{ width: 40, height: 40, borderRadius: 12, border: '2px solid var(--amber-lt)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--amber-dk)' }}><Search size={17} /></button>
+
+                    {store?.cart !== false && (
+                        <Link href="/cart" style={{ position: 'relative', width: 40, height: 40, borderRadius: 12, border: '2px solid var(--amber-lt)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--amber-dk)' }}>
+                            <ShoppingCart size={17} />
+                            {count > 0 && <span className="cart-badge">{count}</span>}
+                        </Link>
+                    )}
+
                     <button onClick={() => setOpen(!open)} style={{ width: 40, height: 40, borderRadius: 12, border: '2px solid var(--amber-lt)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--amber-dk)' }}>
                         {open ? <X size={17} /> : <Menu size={17} />}
                     </button>

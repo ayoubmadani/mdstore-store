@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
-  AlertCircle, X, Phone, CheckCircle2, ArrowLeft,
+  AlertCircle, X, Phone, CheckCircle2, ArrowRight,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Leaf, Sparkles, Droplets, Heart, Flower2,
   Mail,
@@ -326,7 +326,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div style={{ padding:'0.875rem 1.5rem 1.5rem' }}>
             {[{ h:'/', l:'Accueil' }, { h:'/contact', l:'Contactez-nous' }].map(lnk => (
               <Link key={lnk.h} href={lnk.h} onClick={() => setOpen(false)} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'0.8rem 0', borderBottom:`1px solid ${BD}`, fontSize:'0.9rem', fontWeight:500, color: INK }}>
-                {lnk.l} <ArrowLeft size={13} style={{ color: RO }} />
+                {lnk.l} <ArrowRight size={13} style={{ color: RO }} />
               </Link>
             ))}
           </div>
@@ -365,7 +365,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 ))}
               </div>
               <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: ROL, border: 'none', borderTop: `1px solid rgba(193,123,142,0.2)`, color: RO, fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                Voir tous les résultats <ArrowLeft size={14} />
+                Voir tous les résultats <ArrowRight size={14} />
               </button>
               </>
             )}
@@ -471,7 +471,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         </div>
       </div>
       <Link href={`/product/${product.slug||product.id}`} className="co-cta">
-        {viewDetails} <ArrowLeft size={11} />
+        {viewDetails} <ArrowRight size={11} />
       </Link>
     </div>
   );
@@ -491,7 +491,7 @@ export function Home({ store, page }: any) {
   return (
     <div dir="ltr">
 
-      {/* ══ HERO — صورة خلفية كاملة ══ */}
+      {/* ══ HERO — image de fond complète ══ */}
       <section style={{ position:'relative', minHeight:'clamp(580px,88vh,820px)', overflow:'hidden' }}>
         {/* Background image */}
         {store.hero?.imageUrl
@@ -533,7 +533,7 @@ export function Home({ store, page }: any) {
                 <a href="#products" style={{ display:'inline-flex', alignItems:'center', gap:8, background:`linear-gradient(135deg,${RO},${ROD})`, color:'#fff', fontWeight:600, fontSize:'0.875rem', padding:'0.95rem 2rem', borderRadius:12, letterSpacing:'0.06em', boxShadow:`0 8px 28px rgba(193,123,142,0.45)`, transition:'opacity 0.2s' }}
                   onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity='0.88')}
                   onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity='1')}>
-                  Découvrirي Produits <ArrowLeft size={15} />
+                  Découvrir les produits <ArrowRight size={15} />
                 </a>
                 {store?.cart !== false && (
                   <Link href="/cart" style={{ display:'inline-flex', alignItems:'center', gap:8, color:'#fff', fontWeight:500, fontSize:'0.875rem', padding:'0.95rem 1.75rem', borderRadius:12, border:'1.5px solid rgba(255,255,255,0.35)', backdropFilter:'blur(8px)', background:'rgba(255,255,255,0.08)', letterSpacing:'0.04em', transition:'all 0.2s' }}
@@ -625,7 +625,7 @@ export function Home({ store, page }: any) {
             {products.map((p:any) => {
               const img  = p.productImage || p.imagesProduct?.[0]?.imageUrl;
               const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
-              return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="Découvrirي" />;
+              return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="Découvrir" />;
             })}
           </div>
         )}
@@ -884,7 +884,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 <div style={{ position:'relative' }}>
                   <ChevronDown size={12} style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color: SUB, pointerEvents:'none' }} />
                   <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune:'' })} style={{ ...inp(!!errors.customerWelaya), paddingRight:32, fontFamily:'inherit' }}>
-                    <option value="">Choisirي</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                    <option value="">Choisir</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
@@ -892,7 +892,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 <div style={{ position:'relative' }}>
                   <ChevronDown size={12} style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color: SUB, pointerEvents:'none' }} />
                   <select value={fd.customerCommune} disabled={!fd.customerWelaya||loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inp(!!errors.customerCommune), paddingRight:32, opacity:(!fd.customerWelaya||loadingC)?0.5:1, fontFamily:'inherit' }}>
-                    <option value="">{loadingC?'...':'Choisirي'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                    <option value="">{loadingC?'...':'Choisir'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
@@ -1007,7 +1007,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         <ShoppingBag size={44} style={{ color: BD, display:'block', margin:'0 auto 1.5rem' }} />
         <p style={{ color: SUB, fontSize:'0.9rem', marginBottom:'2.25rem', fontWeight:300 }}>Votre panier est vide</p>
         <Link href="/" style={{ display:'inline-flex', alignItems:'center', gap:8, background:`linear-gradient(135deg,${RO},${ROD})`, color:'#fff', padding:'0.85rem 2rem', borderRadius:12, fontWeight:600, fontSize:'0.875rem' }}>
-          Découvrirي Produits
+          Découvrir les produits
         </Link>
       </div>
     </div>
@@ -1057,7 +1057,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <div style={{ position:'relative' }}>
                   <ChevronDown size={12} style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color: SUB, pointerEvents:'none' }} />
                   <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune:'' })} style={{ ...inp(!!errors.w), paddingRight:30, fontFamily:'inherit' }}>
-                    <option value="">Choisirي</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                    <option value="">Choisir</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
@@ -1065,7 +1065,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <div style={{ position:'relative' }}>
                   <ChevronDown size={12} style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color: SUB, pointerEvents:'none' }} />
                   <select value={fd.customerCommune} disabled={loadingC||!fd.customerWelaya} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inp(!!errors.c), paddingRight:30, opacity:(!fd.customerWelaya||loadingC)?0.5:1, fontFamily:'inherit' }}>
-                    <option value="">{loadingC?'...':'Choisirي'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                    <option value="">{loadingC?'...':'Choisir'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
@@ -1138,7 +1138,7 @@ export function Privacy() {
     <Shell title="Politique de confidentialité">
       <div style={{ background: CARD, padding:'1.5rem 2rem', borderRadius:18, border:`1px solid ${BD}` }}>
         <IB title="Les données que nous collectons" body="Nous collectons uniquement : Nom, Téléphone et adresse de Livraison." />
-        <IB title="Protection des données" body="Stockées Tous les données de manière chiffrée. Nous utilisons protocoles حماية Certifiée لGarantie la sécurité de vos informations." />
+        <IB title="Protection des données" body="Toutes les données sont chiffrées. Nous utilisons des protocoles de protection certifiés pour garantir la sécurité de vos informations." />
         <IB title="Partage des informations" body="Nous ne vendons ni ne partageons vos données, sauf avec les partenaires de livraison." />
       </div>
     </Shell>
@@ -1161,7 +1161,7 @@ export function Cookies() {
   return (
     <Shell title="Cookies">
       <div style={{ background: CARD, padding:'1.5rem 2rem', borderRadius:18, border:`1px solid ${BD}` }}>
-        <IB title="Fichiers essentiels" body="Nous utilisons Cookies الEssentiels pour garantir le fonctionnement du Panier et la sécurité de la session." />
+        <IB title="Fichiers essentiels" body="Nous utilisons des cookies essentiels pour garantir le fonctionnement du panier et la sécurité de la session." />
         <IB title="Amélioration de l’expérience" body="Nous utilisons certains fichiers pour comprendre l’utilisation du site et améliorer l’expérience." />
       </div>
     </Shell>
@@ -1233,7 +1233,7 @@ export function Contact({ store }: { store: any }) {
               <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading?0.7:1, background:`linear-gradient(135deg,${RO},${ROD})`, boxShadow:`0 8px 24px rgba(193,123,142,0.35)`, borderRadius:12 }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.opacity='0.88')}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.opacity='1')}>
-                {loading ? <><Loader2 size={15} style={{ animation:'spin 1s linear infinite' }}/>Envoi en cours...</> : <>Envoyer le message <ArrowLeft size={15}/></>}
+                {loading ? <><Loader2 size={15} style={{ animation:'spin 1s linear infinite' }}/>Envoi en cours...</> : <>Envoyer le message <ArrowRight size={15}/></>}
               </button>
             </form>
           )}

@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, AlertCircle, X, Share2,
-  CheckCircle2, ToggleRight, Shield, ArrowLeft,
+  CheckCircle2, ToggleRight, Shield, ArrowRight,
   Plus, Minus, ArrowUpRight, Search, ShoppingCart,
   Trash2, Loader2, Package, Heart,
 } from 'lucide-react';
@@ -60,21 +60,17 @@ const CSS = `
   .rise-3 { animation-delay:0.34s; }
   .anim-check { animation:check-in 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }
 
-  /* Zine grid */
-  .zs       { display:grid; }
-  .zs-half  { grid-template-columns:1fr 1fr; }
-  .zs-third { grid-template-columns:1fr 1fr 1fr; }
-  .zs-wide  { grid-template-columns:1fr; }
-  .zs-main  { grid-template-columns:58% 42%; }
-  .zs-flip  { grid-template-columns:42% 58%; }
-
-  .zc {
-    position:relative; overflow:hidden;
-    border:1px solid var(--ink); margin:-1px 0 0 -1px;
-    min-height:340px;
+  /* Products grid */
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--ink);
   }
-  .zc img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.6s cubic-bezier(0.22,1,0.36,1); }
-  .zc:hover img { transform:scale(1.05); }
+  @media (min-width: 768px)  { .products-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 1280px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
+
+  .zc { position:relative; overflow:hidden; background: var(--paper); }
 
   .issue-label {
     writing-mode:vertical-rl; text-orientation:mixed; transform:rotate(180deg);
@@ -292,15 +288,15 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
       top: 'calc(100% + 8px)',
       right: 0,
       left: 0,
-      background: '#FFFFFF', // خلفية بيضاء صلبة كما طلبت
-      border: '2px solid var(--ink)', // إطار سميك وواضح
+      background: '#FFFFFF', // fond blanc solide
+      border: '2px solid var(--ink)', // bordure épaisse et visible
       zIndex: 200,
-      borderTop: '4px solid var(--punch)', // تمييز علوي بلون الـ Punch (الأحمر)
-      boxShadow: '6px 6px 0 var(--ink)', // ظل حاد صلب غير شفاف
+      borderTop: '4px solid var(--punch)', // accent supérieur en couleur Punch
+      boxShadow: '6px 6px 0 var(--ink)', // ombre nette et solide
       overflow: 'hidden'
     }} className="anim-slide-down">
 
-      {/* زر إغلاق علوي Rapide - متماشٍ مع التصميم الحاد */}
+      {/* Bouton fermer en haut - aligné avec le design */}
       <div style={{
         display: 'flex',
         justifyContent: 'flex-end',
@@ -377,7 +373,7 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
             </Link>
           ))}
 
-          {/* زر Voir plus بأسلوب Neo-Brutalism */}
+          {/* Bouton Voir plus - style Neo-Brutalism */}
           <button
             onClick={() => doSearch()}
             style={{
@@ -397,7 +393,7 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
               gap: '8px'
             }}
           >
-            Voir tous les résultats <ArrowLeft size={12} />
+            Voir tous les résultats <ArrowRight size={12} />
           </button>
         </div>
       ) : sq.length >= 2 && (
@@ -410,32 +406,22 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
 
   return (
     <>
-      {store?.topBar?.enabled && store?.topBar?.text && (
-        <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
-          {store.topBar.text}
-        </div>
-      )}
       <header dir="ltr" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, height: '52px', backgroundColor: 'var(--paper)', borderBottom: '1px solid var(--ink)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', fontFamily: "'Space Mono',monospace" }}>
       {/* Logo */}
       <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-        {store?.design?.logoUrl
+        {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
           ? <img src={store.design.logoUrl} alt={store.name} style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />
           : <span className="ub" style={{ fontWeight: 900, fontSize: '1rem', color: 'var(--ink)', letterSpacing: '0.02em' }}>{store?.name?.toUpperCase()}</span>
         }
       </Link>
 
-      {/* Ticker */}
-      <div className="nav-ticker">
-        <div className="ticker-w" style={{ width: '100%' }}>
-          <div className="ticker-i" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--punch)' }}>
-            {['New Drop', 'streetwear', '100% authentique', 'Livraison 48 heures', 'Algérie', 'Nouvelle collection', 'Limité'].map((t, i) => (
-              <span key={i} style={{ margin: '0 28px' }}>★ {t}</span>
-            ))}
-            {['New Drop', 'streetwear', '100% authentique', 'Livraison 48 heures', 'Algérie', 'Nouvelle collection', 'Limité'].map((t, i) => (
-              <span key={`b${i}`} style={{ margin: '0 28px' }}>★ {t}</span>
-            ))}
-          </div>
-        </div>
+      {/* TopBar text in center */}
+      <div style={{ flex: 1, textAlign: 'center', overflow: 'hidden', padding: '0 16px' }}>
+        {store?.topBar?.text && (
+          <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.18em', color: 'var(--punch)', textTransform: 'uppercase', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+            {store.topBar.text}
+          </span>
+        )}
       </div>
 
       {/* Actions */}
@@ -478,7 +464,7 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
 }
 
 /* ══════════════════════════════════════════════════════════════
-   FOOTER — 3 أقسام
+   FOOTER — 3 sections
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
   const yr = new Date().getFullYear();
@@ -502,15 +488,15 @@ export function Footer({ store }: any) {
       {/* 3 columns */}
       <div style={{ position: 'relative', zIndex: 2, padding: '40px 24px', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '40px', borderBottom: '1px solid rgba(242,239,232,0.1)' }}>
 
-        {/* قسم 1 — الهوية */}
+        {/* Section 1 — Identité */}
         <div>
           <p style={{ fontSize: '13px', lineHeight: '1.8', letterSpacing: '0.05em', color: 'rgba(242,239,232,0.45)', maxWidth: '300px', marginBottom: '20px' }}>
-            {store?.hero?.subtitle?.substring(0, 90) || 'متجر le style الauthentique. chaque pièce raconte une histoire. Livraison rapide dans toutes les wilayas.'}
+            {store?.hero?.subtitle?.substring(0, 90) || 'Boutique de style authentique. Chaque pièce raconte une histoire. Livraison rapide dans toutes les wilayas.'}
           </p>
           <p style={{ fontSize: '10px', letterSpacing: '0.08em', color: 'rgba(242,239,232,0.2)' }}>© {yr} {store?.name}. Tous droits réservés.</p>
         </div>
 
-        {/* قسم 2 — Liens */}
+        {/* Section 2 — Liens */}
         <div>
           <p style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--punch)', marginBottom: '14px', textTransform: 'uppercase' }}>// Liens</p>
           {[{ h: '/', l: 'Accueil' }, { h: '/cart', l: 'Panier' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/Privacy', l: 'Confidentialité' }, { h: '/Terms', l: 'Conditions' }].map(lnk => (
@@ -522,7 +508,7 @@ export function Footer({ store }: any) {
           ))}
         </div>
 
-        {/* قسم 3 — Contact */}
+        {/* Section 3 — Contact */}
         <div>
           <p style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--punch)', marginBottom: '14px', textTransform: 'uppercase' }}>// Contact</p>
           {[
@@ -557,43 +543,45 @@ export function Footer({ store }: any) {
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
   const [hov, setHov] = useState(false);
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
+  const orig = product.originalPrice ? (typeof product.originalPrice === 'string' ? parseFloat(product.originalPrice) : product.originalPrice) : 0;
   return (
-    <div className="zc" onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}>
-      <Link href={`/product/${product.slug || product.id}`} style={{ display: 'block', width: '100%', height: '100%' }}>
-        <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: 'inherit', backgroundColor: 'var(--paper-dk)' }}>
-          {displayImage
-            ? <img src={displayImage} alt={product.name} style={{ width: '100%', height: '100%', minHeight: 'inherit', objectFit: 'cover', display: 'block', transition: 'transform 0.6s cubic-bezier(0.22,1,0.36,1)', transform: hov ? 'scale(1.05)' : 'scale(1)' }} />
-            : <div style={{ width: '100%', minHeight: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--paper-dk)' }}>
-              <span className="ub" style={{ fontWeight: 900, fontSize: '3rem', color: 'rgba(10,9,6,0.12)' }}>?</span>
+    <Link href={`/product/${product.slug || product.id}`} style={{ display: 'flex', flexDirection: 'column', textDecoration: 'none', background: 'var(--paper)', height: '100%' }}
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}>
+      {/* Image area */}
+      <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4', overflow: 'hidden', background: 'var(--paper-dk)', flexShrink: 0 }}>
+        {displayImage
+          ? <img src={displayImage} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.6s cubic-bezier(0.22,1,0.36,1)', transform: hov ? 'scale(1.04)' : 'scale(1)' }} />
+          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span className="ub" style={{ fontWeight: 900, fontSize: '3rem', color: 'rgba(10,9,6,0.08)' }}>?</span>
             </div>
-          }
-          {/* Gradient */}
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top,rgba(10,9,6,0.88) 0%,rgba(10,9,6,0.2) 45%,transparent 70%)', pointerEvents: 'none' }} />
-          {/* Discount */}
-          {discount > 0 && <div className="ub" style={{ position: 'absolute', top: 10, right: 10, background: 'var(--punch)', color: 'var(--paper)', fontWeight: 900, fontSize: '11px', padding: '3px 10px', transform: 'rotate(2.5deg)' }}>-{discount}%</div>}
-          {/* Side label */}
-          <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '26px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRight: '1px solid rgba(242,239,232,0.12)' }}>
-            <span className="issue-label">{product.name.slice(0, 14)}</span>
+        }
+        {discount > 0 && (
+          <div className="sm" style={{ position: 'absolute', top: 10, left: 10, background: 'var(--punch)', color: 'var(--paper)', fontWeight: 700, fontSize: '10px', padding: '3px 8px', letterSpacing: '0.06em' }}>
+            -{discount}%
           </div>
-          {/* Bottom */}
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px 14px 14px 34px' }}>
-            <h3 className="ub" style={{ fontWeight: 700, fontSize: 'clamp(0.7rem,1.4vw,1rem)', color: 'var(--paper)', letterSpacing: '-0.01em', lineHeight: 1.2, marginBottom: '8px', textTransform: 'uppercase' }}>
-              {product.name}
-            </h3>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div className="ub" style={{ background: 'var(--punch)', color: 'var(--paper)', fontWeight: 900, fontSize: 'clamp(1.2rem,2.5vw,1.8rem)', letterSpacing: '-0.03em', padding: '5px 12px', clipPath: 'polygon(0 0,100% 0,calc(100% - 7px) 100%,0 100%)' }}>
-                {price.toLocaleString()}
-                <span className="sm" style={{ fontWeight: 400, fontSize: '0.5em', marginLeft: '4px', opacity: 0.8 }}>DA</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '8px', letterSpacing: '0.14em', color: 'var(--paper)', opacity: hov ? 1 : 0.4, transition: 'opacity 0.3s' }}>
-                <span style={{ textDecoration: 'underline', textDecorationColor: 'var(--punch)' }}>{viewDetails || 'Voir l’article'}</span>
-                <ArrowUpRight style={{ width: '11px', height: '11px', color: 'var(--punch)' }} />
-              </div>
-            </div>
-          </div>
+        )}
+        {/* Quick view on hover */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'var(--ink)', color: 'var(--paper)', textAlign: 'center', padding: '10px', fontSize: '10px', letterSpacing: '0.2em', fontWeight: 700, fontFamily: 'inherit', transform: hov ? 'translateY(0)' : 'translateY(100%)', transition: 'transform 0.28s cubic-bezier(0.22,1,0.36,1)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          <span className="sm">{viewDetails || 'Voir le produit'}</span>
+          <ArrowUpRight size={11} />
         </div>
-      </Link>
-    </div>
+      </div>
+      {/* Info area */}
+      <div style={{ padding: '12px 12px 14px', borderTop: '1px solid rgba(10,9,6,0.07)', flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <h3 className="sm" style={{ fontWeight: 700, fontSize: '0.78rem', color: 'var(--ink)', letterSpacing: '0.03em', lineHeight: 1.35, margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any }}>
+          {product.name}
+        </h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 'auto' }}>
+          <span className="ub" style={{ fontWeight: 900, fontSize: '1rem', color: hov ? 'var(--punch)' : 'var(--ink)', letterSpacing: '-0.02em', transition: 'color 0.2s' }}>
+            {price.toLocaleString()}
+            <span style={{ fontWeight: 400, fontSize: '0.6em', marginLeft: 3, opacity: 0.6 }}>{store?.currency || 'DA'}</span>
+          </span>
+          {orig > price && (
+            <span className="sm" style={{ fontSize: '0.72rem', color: 'rgba(10,9,6,0.35)', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>
+          )}
+        </div>
+      </div>
+    </Link>
   );
 }
 
@@ -630,7 +618,7 @@ export function Home({ store, page }: any) {
           {/* Issue tag */}
           <div className="rise" style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '28px' }}>
             <div style={{ width: '36px', height: '1.5px', background: 'var(--punch)' }} />
-            <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.28em', color: 'var(--punch)' }}>الإصدار الأول · ملابس الشارع · {new Date().getFullYear()}</span>
+            <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.28em', color: 'var(--punch)' }}>Première édition · Vêtements de rue · {new Date().getFullYear()}</span>
           </div>
 
           <h1 className="ub rise rise-1" style={{ fontWeight: 900, fontSize: 'clamp(4rem,15vw,14rem)', letterSpacing: '-0.04em', lineHeight: 0.86, color: 'var(--paper)', textTransform: 'uppercase', marginBottom: 0 }}>
@@ -650,7 +638,7 @@ export function Home({ store, page }: any) {
                 <a href="#cats" className="sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '9px', letterSpacing: '0.18em', color: 'rgba(242,239,232,0.35)', border: '1px solid rgba(242,239,232,0.14)', padding: '14px 22px', transition: 'all 0.22s' }}
                   onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--paper)'; el.style.borderColor = 'rgba(242,239,232,0.4)'; }}
                   onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(242,239,232,0.35)'; el.style.borderColor = 'rgba(242,239,232,0.14)'; }}>
-                  Sections <ArrowLeft style={{ width: '12px', height: '12px' }} />
+                  Sections <ArrowRight style={{ width: '12px', height: '12px' }} />
                 </a>
               )}
             </div>
@@ -659,7 +647,7 @@ export function Home({ store, page }: any) {
 
         {/* Stats row */}
         <div className="stats-grid" style={{ position: 'relative', zIndex: 4, borderTop: '1px solid rgba(242,239,232,0.1)', marginTop: '40px' }}>
-          {[{ n: '100%', l: 'authentique' }, { n: `${products.length || '∞'}`, l: 'article' }, { n: '48H', l: 'Livraison' }, { n: 'DZ', l: 'محلي' }].map((s, i) => (
+          {[{ n: '100%', l: 'authentique' }, { n: `${products.length || '∞'}`, l: 'article' }, { n: '48H', l: 'Livraison' }, { n: 'DZ', l: 'local' }].map((s, i) => (
             <div key={i} style={{ padding: '16px 20px', borderRight: i < 3 ? '1px solid rgba(242,239,232,0.08)' : 'none' }}>
               <div className="ub" style={{ fontWeight: 900, fontSize: 'clamp(1.2rem,2.5vw,2.2rem)', color: i === 0 ? 'var(--punch)' : 'var(--paper)', letterSpacing: '-0.02em', lineHeight: 1 }}>{s.n}</div>
               <div className="sm" style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'rgba(242,239,232,0.28)', marginTop: '4px' }}>{s.l}</div>
@@ -700,27 +688,16 @@ export function Home({ store, page }: any) {
         {products.length === 0 ? (
           <div style={{ minHeight: '420px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--ink)', margin: '1px' }}>
             <span className="ub" style={{ fontWeight: 900, fontSize: 'clamp(4rem,12vw,10rem)', color: 'rgba(10,9,6,0.05)', letterSpacing: '-0.04em' }}>SOON</span>
-            <p className="sm" style={{ fontSize: '9px', letterSpacing: '0.2em', color: 'var(--mist)', marginTop: '16px' }}>Bient’t...</p>
+            <p className="sm" style={{ fontSize: '9px', letterSpacing: '0.2em', color: 'var(--mist)', marginTop: '16px' }}>Bient't...</p>
           </div>
         ) : (
-          (() => {
-            const groups: any[][] = [];
-            let i = 0;
-            while (i < products.length) { const c = COUNTS[groups.length % COUNTS.length]; groups.push(products.slice(i, i + c)); i += c; }
-            return groups.map((group, gi) => {
-              const cls = CLASSES[gi % CLASSES.length];
-              const featured = group.length === 1;
-              return (
-                <div key={gi} className={`zs ${cls}`} style={{ minHeight: featured ? '500px' : '340px' }}>
-                  {group.map((p: any) => {
-                    const img = p.productImage || p.imagesProduct?.[0]?.imageUrl;
-                    const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
-                    return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="Voir l’article" />;
-                  })}
-                </div>
-              );
-            });
-          })()
+          <div className="products-grid">
+            {products.map((p: any) => {
+              const img = p.productImage || p.imagesProduct?.[0]?.imageUrl;
+              const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
+              return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="Voir le produit" />;
+            })}
+          </div>
         )}
 
         {/* Pagination */}
@@ -839,7 +816,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
                     <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
                     <div>
                       <p className="sm" style={{ fontSize: '10px', fontWeight: 700, color: selectedOffer === o.id ? 'var(--paper)' : 'var(--ink)', letterSpacing: '0.08em' }}>{o.name}</p>
-                      <p className="sm" style={{ fontSize: '8px', color: selectedOffer === o.id ? 'rgba(242,239,232,0.5)' : 'var(--ash)', letterSpacing: '0.12em' }}>كمية: {o.quantity}</p>
+                      <p className="sm" style={{ fontSize: '8px', color: selectedOffer === o.id ? 'rgba(242,239,232,0.5)' : 'var(--ash)', letterSpacing: '0.12em' }}>Quantité: {o.quantity}</p>
                     </div>
                   </div>
                   <span className="ub" style={{ fontWeight: 900, fontSize: '1.1rem', color: selectedOffer === o.id ? 'var(--punch)' : 'var(--ink)', letterSpacing: '-0.02em' }}>{o.price.toLocaleString()}<span className="sm" style={{ fontWeight: 400, fontSize: '9px', marginLeft: '3px' }}>DA</span></span>
@@ -1103,7 +1080,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{ textAlign: 'center', padding: '4rem 2.5rem', border: '2px solid var(--ink)', borderTop: '4px solid var(--punch)', maxWidth: 460, width: '100%' }}>
         <CheckCircle2 style={{ width: '40px', height: '40px', color: 'var(--punch)', display: 'block', margin: '0 auto 1.25rem' }} />
         <h2 className="ub" style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--ink)', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>CONFIRMED.</h2>
-        <p style={{ fontSize: '10px', letterSpacing: '0.1em', color: 'var(--ash)', marginBottom: '2rem', lineHeight: 1.8 }}>Merci. Nous vous contacterons bient’t.</p>
+        <p style={{ fontSize: '10px', letterSpacing: '0.1em', color: 'var(--ash)', marginBottom: '2rem', lineHeight: 1.8 }}>Merci. Nous vous contacterons bient't.</p>
         <Link href="/" className="btn-z" style={{ display: 'inline-flex', clipPath: 'none', padding: '13px 28px' }}>Retour à la boutique</Link>
       </div>
     </div>
@@ -1285,7 +1262,7 @@ export function Terms() {
 export function Cookies() {
   return (
     <PageShell title="Cookies" code="DOC-003">
-      <IB title="Essentiels" body="requis pour les sessions et Panier وFinaliser la commande. Non désactivables." tag="toujours activé" tagColor="var(--ink)" />
+      <IB title="Essentiels" body="Requis pour les sessions, le panier et finaliser la commande. Non désactivables." tag="toujours activé" tagColor="var(--ink)" />
       <IB title="Préférences" body="Sauvegarde vos préférences pour une meilleure expérience." tag="Facultatif" />
       <IB title="Analytiques" body="Données agrégées pour améliorer la plateforme. Aucune donnée personnelle." tag="Facultatif" />
       <div style={{ marginTop: '20px', padding: '14px', border: '1px solid var(--ink)', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
@@ -1316,7 +1293,7 @@ export function Contact({ store }: { store?: any }) {
           <span className="ub" style={{ fontWeight: 900, fontSize: 'clamp(10rem,28vw,26rem)', color: 'var(--paper)', letterSpacing: '-0.05em', lineHeight: 1 }}>HIT</span>
         </div>
         <h1 className="ub" style={{ fontWeight: 900, fontSize: 'clamp(3rem,9vw,9rem)', color: 'var(--paper)', letterSpacing: '-0.04em', lineHeight: 0.88, position: 'relative', zIndex: 2 }}>Contactez-nous.</h1>
-        <p className="sm" style={{ fontSize: '9px', letterSpacing: '0.2em', color: 'rgba(242,239,232,0.55)', marginTop: '14px', position: 'relative', zIndex: 2 }}>نRéponse sous 24h</p>
+        <p className="sm" style={{ fontSize: '9px', letterSpacing: '0.2em', color: 'rgba(242,239,232,0.55)', marginTop: '14px', position: 'relative', zIndex: 2 }}>Réponse sous 24h</p>
       </div>
 
       <div className="contact-grid" style={{ maxWidth: '860px', margin: '0 auto', padding: '44px 24px 80px' }}>
@@ -1351,7 +1328,7 @@ export function Contact({ store }: { store?: any }) {
             <div style={{ minHeight: '260px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--ink)', textAlign: 'center' }}>
               <CheckCircle2 style={{ width: '32px', height: '32px', color: 'var(--punch)', marginBottom: '10px' }} />
               <p className="ub" style={{ fontWeight: 900, fontSize: '1.1rem', color: 'var(--ink)', letterSpacing: '-0.01em', marginBottom: '4px' }}>SENT.</p>
-              <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)' }}>سنRéponse sous 24h</p>
+              <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)' }}>Réponse sous 24h</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>

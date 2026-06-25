@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Phone,
-  CheckCircle2, ArrowLeft, Zap,
+  CheckCircle2, ArrowRight, Zap,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Shield, Truck,
   ZapIcon,
@@ -43,7 +43,7 @@ const THEME_CSS = `
   /* ── Scrollbar ── */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: #F8F8F6; }
-  /* تم تغيير اللون هنا إلى الأزرق */
+  /* couleur changée en bleu */
   ::-webkit-scrollbar-thumb { background: #1D4ED8; border-radius: 2px; }
 
   /* ── Keyframes ── */
@@ -58,7 +58,7 @@ const THEME_CSS = `
   .anim-check      { animation: checkPop 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }
 
   /* ── Ticker ── */
-  /* تم تغيير خلفية الشريط المتحرك إلى الأزرق */
+  /* fond du ticker changé en bleu */
   .ticker-wrap { overflow: hidden; background: #1D4ED8; color: #fff; height: 36px; display: flex; align-items: center; }
   .ticker-track { display: flex; white-space: nowrap; animation: ticker 28s linear infinite; }
   .ticker-item  { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; padding: 0 2.5rem; }
@@ -127,21 +127,21 @@ const THEME_CSS = `
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
-    padding: 0.5rem; /* تقليل البادينج الجانبي جداً للجوال */
+    padding: 0.5rem; /* padding réduit sur mobile */
   }
 
-  /* حاوية المVoir */
+  /* conteneur galerie */
   .gallery-container {
-    position: relative; /* عادٍ (Static/Relative) في الجوال */
+    position: relative; /* position normale sur mobile */
     top: 0;
     width: 100%;
   }
 
-  /* حاوية الinformations */
+  /* conteneur informations */
   .info-container {
     background: #fff;
     border-radius: 14px;
-    padding: 1.25rem; /* بادينج مريح للجوال */
+    padding: 1.25rem; /* padding confortable sur mobile */
     border: 1.5px solid #E8E8E8;
   }
 
@@ -153,7 +153,7 @@ const THEME_CSS = `
     }
 
     .gallery-container {
-      position: sticky; /* ثابت uniquement في الشاشات الكبيرة */
+      position: sticky; /* sticky uniquement sur grands écrans */
       top: 100px;
       z-index: 10;
     }
@@ -226,7 +226,7 @@ const THEME_CSS = `
   }
 
   /* ── Card stripe ── */
-  /* تم تغيير لون الخط العلوي للبطاقة إلى الأزرق */
+  /* couleur de la bordure supérieure de la carte changée en bleu */
   .card-stripe::before {
     content: '';
     position: absolute;
@@ -314,7 +314,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   const count = useCartStore((s) => s.count);
   const initCount = useCartStore((s) => s.initCount);
 
-  // 1. تعريف الTennisيقات (Styles) داخل الـ Component
+  // 1. Définition des styles dans le composant
   const cartBtnStyle: React.CSSProperties = {
     position: 'relative',
     background: '#111',
@@ -374,14 +374,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     if (searchQuery.trim()) { router.push(`/?search=${encodeURIComponent(searchQuery)}`); setListSearch([]); setShowSearch(false); }
   };
 
-  // 2. مكون Résultats de recherche مع خاصية التمرير (Overflow Max Height)
+  // 2. Composant résultats de recherche avec défilement
   const DropResults = () => (
     <div style={{
       paddingTop: 25,
       position: 'absolute', top: 'calc(100% + 6px)', right: 0, left: 0,
       background: '#fff', border: '1.5px solid #E0E0E0', borderRadius: 10,
       boxShadow: '0 12px 40px rgba(0,0,0,0.12)', zIndex: 60,
-      maxHeight: '300px', overflowY: 'auto' // Contrôle في الطول الزائد
+      maxHeight: '300px', overflowY: 'auto' // Contrôle de la hauteur maximale
     }} className="anim-slide-down">
       <button onClick={() => setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
         <X size={14} />
@@ -399,7 +399,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 </div>
               </Link>
             ))}
-            <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: 'rgba(29,78,216,0.07)', border: 'none', borderTop: '1px solid rgba(29,78,216,0.2)', color: '#1D4ED8', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>Voir tous les résultats <ArrowLeft size={14} /></button>
+            <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: 'rgba(29,78,216,0.07)', border: 'none', borderTop: '1px solid rgba(29,78,216,0.2)', color: '#1D4ED8', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>Voir tous les résultats <ArrowRight size={14} /></button>
           </>
         ) : searchQuery.length >= 2 && <div style={{ padding: '1rem', textAlign: 'center', color: '#aaa', fontSize: '0.85rem' }}>Aucun résultat</div>}
     </div>
@@ -428,7 +428,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
 
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
-            {/* إذا كان هناك رابط مخصص للصورة، نVoir الشعار */}
+            {/* Si un lien personnalisé existe, afficher le logo */}
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
               <img
                 src={store.design.logoUrl}
@@ -437,7 +437,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 onError={() => setImgError(true)}
               />
             ) : (
-              // وإذا لم يكن هناك رابط أو Une Erreur est survenue، نVoir اللوجو المستطيل بالتصميم الNouveau
+              // Sinon afficher le logo rectangulaire avec le nouveau design
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div style={{
                   padding: '0 12px',
@@ -480,7 +480,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 onMouseLeave={e => (e.currentTarget.style.color = '#444')}>{i.l}</Link>
             ))}
 
-            {/* 3. استخدام le styleات المعرفة مسبقاً */}
+            {/* 3. Utilisation des styles prédéfinis */}
             {store?.cart !== false && (
               <Link href="/cart" style={cartBtnStyle}
                 onMouseEnter={e => (e.currentTarget.style.background = '#1D4ED8')}
@@ -497,6 +497,13 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <button onClick={() => setShowSearch(!showSearch)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
               <Search size={16} />
             </button>
+            {store?.cart !== false && (
+              <Link href="/cart" style={{ position: 'relative', width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#333' }}>
+                <ShoppingCart size={16} />
+                {count > 0 && <span style={{ position: 'absolute', top: -4, right: -4, background: '#E63946', color: '#fff', fontSize: 9, fontWeight: 800, width: 15, height: 15, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
+              </Link>
+            )}
+
             <button onClick={() => setOpen(!open)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
               {open ? <X size={16} /> : <Menu size={16} />}
             </button>
@@ -520,7 +527,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div style={{ padding: '0.375rem 1.25rem 0.875rem' }}>
             {[{ h: '/', l: 'Accueil' }, { h: '/contact', l: 'Contactez-nous' }].map(i => (
               <Link key={i.h} href={i.h} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid #F0F0F0', fontSize: '0.9rem', fontWeight: 600, color: '#111' }}>
-                {i.l} <ArrowLeft size={14} style={{ color: '#1D4ED8' }} />
+                {i.l} <ArrowRight size={14} style={{ color: '#1D4ED8' }} />
               </Link>
             ))}
             
@@ -532,7 +539,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   FOOTER — 3 أقسام
+   FOOTER — 3 sections
 ═══════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
   return (
@@ -540,7 +547,7 @@ export function Footer({ store }: any) {
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div className="footer-inner">
 
-          {/* قسم 1 — العلامة */}
+          {/* Section 1 — Marque */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '1rem' }}>
               <div style={{ width: 32, height: 32, background: '#1D4ED8', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -549,14 +556,14 @@ export function Footer({ store }: any) {
               <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>{store?.name}</span>
             </div>
             <p style={{ fontSize: '0.875rem', lineHeight: 1.8, color: '#666', maxWidth: 320 }}>
-              {store?.hero?.subtitle?.substring(0, 100) || 'Expérience shopping moderne وRapide. Livraison dans toutes les wilayas d’Algérie.'}
+              {store?.hero?.subtitle?.substring(0, 100) || 'Expérience shopping moderne et rapide. Livraison dans toutes les wilayas d’Algérie.'}
             </p>
             <p style={{ marginTop: '2rem', fontSize: '0.75rem', color: '#333' }}>
               © {new Date().getFullYear()} {store?.name}. Tous droits réservés.
             </p>
           </div>
 
-          {/* قسم 2 — Liens */}
+          {/* Section 2 — Liens */}
           <div>
             <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1.25rem' }}>Pages</h4>
             {[{ h: '/', l: 'Accueil' }, { h: '/cart', l: 'Panier' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/Privacy', l: 'Confidentialité' }, { h: '/Terms', l: 'Conditions' }].map((lnk, i) => (
@@ -568,7 +575,7 @@ export function Footer({ store }: any) {
             ))}
           </div>
 
-          {/* قسم 3 — التواصل */}
+          {/* Section 3 — Contact */}
           <div>
             <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1.25rem' }}>Contact</h4>
             {[
@@ -665,7 +672,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
               el.style.color = '#1D4ED8';
             }}
           >
-            {viewDetails} <ArrowLeft size={13} />
+            {viewDetails} <ArrowRight size={13} />
           </Link>
         </div>
       </div>
@@ -695,16 +702,16 @@ export function Home({ store, page }: any) {
           </div>
         )}
 
-        {/* Geometric accent - تم تحديث التدرج للأزرق */}
+        {/* Geometric accent - dégradé mis à jour en bleu */}
         <div style={{ position: 'absolute', top: 0, left: 0, width: '40%', height: '100%', background: 'linear-gradient(135deg, #3B82F6 0%, transparent 60%)', opacity: 0.12, pointerEvents: 'none' }} />
 
-        {/* Circle accent - تم تحديث لون الدائرة الزخرفية */}
+        {/* Circle accent - couleur du cercle décoratif mise à jour */}
         <div style={{ position: 'absolute', bottom: -60, right: -60, width: 300, height: 300, border: '60px solid rgba(59, 130, 246, 0.07)', borderRadius: '50%', pointerEvents: 'none' }} />
 
         <div className="hero-inner" style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           {/* Text */}
           <div>
-            {/* Badge - تم تحديث الخلفية والحدود للأزرق */}
+            {/* Badge - fond et bordures mis à jour en bleu */}
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(59, 130, 246, 0.15)', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: 6, padding: '0.375rem 0.875rem', marginBottom: '1.5rem' }}>
               <Zap size={13} color="#3B82F6" fill="#3B82F6" />
               <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#3B82F6', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{store.name}</span>
@@ -721,7 +728,7 @@ export function Home({ store, page }: any) {
               <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#3B82F6', color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, transition: 'all 0.2s', boxShadow: '0 4px 20px rgba(59, 130, 246, 0.35)' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#2563EB')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#3B82F6')}>
-                Acheter maintenant <ArrowLeft size={16} />
+                Acheter maintenant <ArrowRight size={16} />
               </a>
               {store?.cart !== false && (
                 <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,0.08)', color: '#fff', fontWeight: 600, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, border: '1px solid rgba(255,255,255,0.15)', transition: 'background 0.2s' }}
@@ -833,7 +840,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
   const [sel, setSel] = useState(0);
   const [isDesktop, setIsDesktop] = useState(false);
 
-  // Contrôle في وضعية الـ Sticky بناءً على حجم الشاشة بشكل Sécurisé
+  // Contrôle de la position sticky selon la taille de l'écran
   useEffect(() => {
     const checkScreen = () => setIsDesktop(window.innerWidth > 768);
     checkScreen();
@@ -845,7 +852,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
     <div dir="ltr" style={{ background: '#F8F8F6', paddingBottom: '4rem' }}>
       <div className="details-inner" style={{ maxWidth: 1280, margin: '0 auto' }}>
 
-        {/* ── قسم المVoir (Gallery) ── */}
+        {/* ── Section Galerie ── */}
         <div style={{
           position: isDesktop ? 'sticky' : 'relative',
           top: isDesktop ? 100 : 0,
@@ -882,7 +889,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             )}
           </div>
 
-          {/* الصور المصغرة (Thumbnails) */}
+          {/* Miniatures (Thumbnails) */}
           {allImages.length > 1 && (
             <div className="thumb-row" style={{
               display: 'flex',
@@ -913,7 +920,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           )}
         </div>
 
-        {/* ── قسم الinformations (Info) ── */}
+        {/* ── Section Informations ── */}
         <div>
           <div style={{
             background: '#fff',
@@ -930,7 +937,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               {[...Array(5)].map((_, i) => <Star key={i} size={15} style={{ fill: i < 4 ? '#F59E0B' : 'none', color: '#F59E0B' }} />)}
             </div>
 
-            {/* صندوق Prix (Blue Theme) */}
+            {/* Bloc prix (thème bleu) */}
             <div style={{ background: '#EFF6FF', border: '1.5px solid #BFDBFE', borderRadius: 10, padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
               <p style={{ fontSize: '0.75rem', color: '#1D4ED8', fontWeight: 700, marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Prix actuel</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
@@ -960,7 +967,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               </div>
             )}
 
-            {/* الخيارات (Attributes) */}
+            {/* Options (attributs) */}
             {allAttrs.map((attr: any) => (
               <div key={attr.id} style={{ marginBottom: '1.125rem' }}>
                 <p style={{ fontSize: '0.825rem', fontWeight: 700, color: '#111', marginBottom: '0.625rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{attr.name}</p>
@@ -987,7 +994,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                           }
                         }
                       >
-                        {/* إظهار النص uniquement في الحالات غير المرئية (color/image) */}
+                        {/* Afficher le texte uniquement pour les types non-visuels */}
                         {attr.displayMode !== 'color' && attr.displayMode !== 'image' && v.name}
                       </button>
                     );
@@ -999,7 +1006,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             <ProductForm product={product} userId={product.store.userId} domain={domain}
               selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
 
-            {/* الوصف */}
+            {/* Description */}
             {product.desc && (
               <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #EBEBEB' }}>
                 <div style={{ fontSize: '0.95rem', lineHeight: 1.8, color: '#444' }}
@@ -1104,11 +1111,11 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             style={{
               flex: 1,
               ...S.btnPrimary,
-              background: '#3B82F6', // اللون الأزرق الأساسي
+              background: '#3B82F6', // couleur bleue principale
               width: 'auto',
               borderRadius: 10
             }}
-            onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = '#2563EB')} // درجة أزرق أغمق عند التمرير
+            onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = '#2563EB')} // bleu plus foncé au survol
             onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#3B82F6')}
           >
             Commander maintenant
@@ -1442,7 +1449,7 @@ export function Cookies() {
   return (
     <Shell title="Cookies">
       <div style={{ background: '#fff', padding: '2rem', borderRadius: 14, border: '1.5px solid #E8E8E8' }}>
-        <InfoBlock title="Fichiers essentiels" body="Nous utilisons Cookies الEssentiels pour garantir le fonctionnement du Panier correctement et sécuriser votre session de connexion." />
+        <InfoBlock title="Fichiers essentiels" body="Nous utilisons des cookies essentiels pour garantir le fonctionnement du panier et sécuriser votre session." />
         <InfoBlock title="Amélioration de l’expérience" body="Nous utilisons certains fichiers pour analyser les interactions afin d’améliorer nos services." />
       </div>
     </Shell>
@@ -1526,7 +1533,7 @@ export function Contact({ store }: { store: any }) {
                 disabled={loading}
                 style={{
                   ...S.btnPrimary,
-                  background: '#1D4ED8', // اللون الأزرق الأساسي
+                  background: '#1D4ED8', // couleur bleue principale
                   color: '#fff',
                   opacity: loading ? 0.7 : 1,
                   display: 'flex',
@@ -1535,7 +1542,7 @@ export function Contact({ store }: { store: any }) {
                   gap: '8px',
                   transition: 'background 0.2s ease'
                 }}
-                onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.background = '#1E40AF')} // أزرق داكن عند التحويم
+                onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.background = '#1E40AF')} // bleu foncé au survol
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#1D4ED8')}
               >
                 {loading ? (
@@ -1545,7 +1552,7 @@ export function Contact({ store }: { store: any }) {
                   </>
                 ) : (
                   <>
-                    Envoyer le message <ArrowLeft size={16} />
+                    Envoyer le message <ArrowRight size={16} />
                   </>
                 )}
               </button>

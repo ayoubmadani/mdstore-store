@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, Heart, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Share2, Phone, User, ToggleRight,
-  ArrowLeft, CheckCircle2, Lock,
+  ArrowRight, CheckCircle2, Lock,
   Menu, Zap, Flame, Dumbbell, Trophy, Shield, Truck,
   Package, Target, TrendingUp, Search,
   ShoppingCart, Trash2, Loader2, Minus, Plus, MapPin,
@@ -272,20 +272,20 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   const initCount = useCartStore(s => s.initCount);
   
 
-  // 1. مراقبة التمرير لتغيير خلفية الـ Header
+  // 1. Observer le défilement pour changer l'arrière-plan du header
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 10);
     window.addEventListener('scroll', h); return () => window.removeEventListener('scroll', h);
   }, []);
 
-  // 2. جلب عدد عناصر Panier من التخزين المحلي
+  // 2. Récupérer le nombre d'éléments du panier depuis le stockage local
   useEffect(() => {
     if (typeof window !== 'undefined' && domain) {
       try { initCount(JSON.parse(localStorage.getItem(domain)||'[]').length); } catch { initCount(0); }
     }
   }, [domain, initCount]);
 
-  // 3. منطق Recherche المباشر (Debounced Search)
+  // 3. Logique de recherche directe (recherche avec délai)
   useEffect(() => {
     if (sq.length < 2) { setLs([]); return; }
     const t = setTimeout(async () => {
@@ -305,7 +305,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     }
   };
 
-  // 4. قائمة Résultats de recherche المنEn confiance
+  // 4. Liste des résultats de recherche fiable
   const SearchDrop = () => (
   <div style={{
     position: 'absolute', 
@@ -320,7 +320,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     borderRadius: '4px'
   }} className="anim-slide-down">
     
-    {/* زر إغلاق القائمة */}
+    {/* Bouton fermer la liste */}
     <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '10px 14px 2px' }}>
       <button 
         onClick={() => setSq('')}
@@ -356,14 +356,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             </div>
           </Link>
         ))}
-        {/* زر Voir plus داخل القائمة */}
+        {/* Bouton Voir plus dans la liste */}
         <button onClick={() => doSearch()} style={{
           width:'100%', padding:'12px', background:'rgba(255,69,0,0.05)', border:'none', 
           borderTop:'1px solid var(--line)', color:'var(--fire)', fontWeight:800, 
           fontSize:'12px', cursor:'pointer', fontFamily:"'Barlow Condensed',sans-serif", letterSpacing:'0.1em',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
         }}>
-          Voir tous les résultats <ArrowLeft size={12} />
+          Voir tous les résultats <ArrowRight size={12} />
         </button>
       </div>
     ) : sq.length >= 2 && (
@@ -375,7 +375,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   return (
     <header dir="ltr" style={{position:'sticky', top:0, zIndex:100, fontFamily:"'Barlow',sans-serif"}}>
       
-      {/* Ticker - شريط الإعلانات المتحرك */}
+      {/* Ticker - barre d'annonces défilante */}
       {store?.topBar?.enabled && store?.topBar?.text && (
         <div className="ticker-stripe" style={{background:'var(--fire)', padding:'6px 0'}}>
           <div className="ticker-inner">
@@ -482,14 +482,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <div style={{padding:'15px 25px 25px'}}>
           <div style={{display:'flex', flexDirection:'column', gap:'10px'}}>
             <Link href="/" onClick={()=>setOpen(false)} style={{display:'flex', justifyContent:'space-between', padding:'12px 0', fontSize:'14px', fontWeight:800, color:'var(--white)', textDecoration:'none', borderBottom:'1px solid var(--line)', textTransform:'uppercase'}}>
-              Accueil <ArrowLeft size={14} style={{color:'var(--fire)'}}/>
+              Accueil <ArrowRight size={14} style={{color:'var(--fire)'}}/>
             </Link>
             <Link href="/contact" onClick={()=>setOpen(false)} style={{display:'flex', justifyContent:'space-between', padding:'12px 0', fontSize:'14px', fontWeight:800, color:'var(--white)', textDecoration:'none', borderBottom:'1px solid var(--line)', textTransform:'uppercase'}}>
-              Contactez-nous <ArrowLeft size={14} style={{color:'var(--fire)'}}/>
+              Contactez-nous <ArrowRight size={14} style={{color:'var(--fire)'}}/>
             </Link>
 
             <button onClick={()=>{router.push('/#products'); setOpen(false);}} className="btn-fire" style={{marginTop:'15px', width:'100%', clipPath:'none', borderRadius:'4px', fontWeight:800}}>
-              <Dumbbell size={16} style={{marginLeft:8}}/> Acheter الÉquipements maintenant
+              <Dumbbell size={16} style={{marginLeft:8}}/> Acheter les équipements maintenant
             </button>
           </div>
         </div>
@@ -499,7 +499,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   FOOTER — 3 أقسام
+   FOOTER — 3 sections
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
   return (
@@ -515,11 +515,11 @@ export function Footer({ store }: any) {
       <div style={{maxWidth:'1280px',margin:'0 auto',padding:'48px 20px 32px'}}>
         <div className="footer-g" style={{paddingBottom:'36px',borderBottom:'1px solid var(--line)'}}>
 
-          {/* قسم 1 */}
+          {/* Section 1 */}
           <div>
             <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'16px'}}>
               <FireIcon size={22}/>
-              {store?.design?.logoUrl
+              {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
                 ? <img src={store.design.logoUrl} alt={store?.name} style={{height:'26px',filter:'grayscale(1) brightness(2)',opacity:0.8}}/>
                 : <span className="bb" style={{fontSize:'1.4rem',color:'var(--white)'}}>{store?.name}</span>
               }
@@ -534,7 +534,7 @@ export function Footer({ store }: any) {
             <p style={{fontSize:'11px',color:'var(--dim)',marginTop:'24px'}}>© {new Date().getFullYear()} {store?.name}. Tous droits réservés.</p>
           </div>
 
-          {/* قسم 2 — Liens */}
+          {/* Section 2 — Liens */}
           <div>
             <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'16px'}}>// Liens</p>
             {[{h:'/',l:'Accueil'},{h:'/cart',l:'Panier'},{h:'/contact',l:'Contactez-nous'},{h:'/Privacy',l:'Politique de confidentialité'},{h:'/Terms',l:'Conditions d’utilisation'}].map(lnk=>(
@@ -546,7 +546,7 @@ export function Footer({ store }: any) {
             ))}
           </div>
 
-          {/* قسم 3 — Contact */}
+          {/* Section 3 — Contact */}
           <div>
             <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'16px'}}>// Contactez-nous</p>
             {[
@@ -652,7 +652,7 @@ export function Home({ store, page }: any) {
           </h1>
 
           <p style={{fontSize:'clamp(14px,1.8vw,17px)',lineHeight:'1.6',color:'rgba(255,255,255,0.7)',maxWidth:'520px',marginBottom:'28px',textShadow:'0 1px 3px rgba(0,0,0,0.5)'}}>
-            {store.hero?.subtitle||'Équipements Fitness premium، compléments alimentaires، et vêtements sportifs. Livraison rapide إلى Tous les wilayas الـ 58.'}
+            {store.hero?.subtitle||'Équipements Fitness premium, compléments alimentaires et vêtements sportifs. Livraison rapide dans toutes les 58 wilayas.'}
           </p>
 
           <div style={{display:'flex',gap:'12px',flexWrap:'wrap',justifyContent:'center',marginBottom:'36px'}}>
@@ -668,7 +668,7 @@ export function Home({ store, page }: any) {
 
           {/* Stats */}
           <div className="fu-3" style={{display:'flex',gap:'32px',paddingTop:'22px',borderTop:'1px solid rgba(255,255,255,0.08)',flexWrap:'wrap',justifyContent:'center',width:'100%',maxWidth:'700px'}}>
-            {[{v:`${products.length}+`,l:'Produit',c:'var(--gold)'},{v:'48h',l:'Livraison',c:'var(--fire)'},{v:'100%',l:'authentique',c:'var(--green)'},{v:'#1',l:'في Algérie',c:'var(--gold)'}].map((s,i)=>(
+            {[{v:`${products.length}+`,l:'Produit',c:'var(--gold)'},{v:'48h',l:'Livraison',c:'var(--fire)'},{v:'100%',l:'authentique',c:'var(--green)'},{v:'#1',l:'en Algérie',c:'var(--gold)'}].map((s,i)=>(
               <div key={i} style={{textAlign:'center'}}>
                 <p className="bb" style={{fontSize:'clamp(1.8rem,4vw,2.6rem)',color:s.c,lineHeight:1,margin:0}}>{s.v}</p>
                 <p className="bc" style={{fontSize:'10px',fontWeight:700,letterSpacing:'0.15em',textTransform:'uppercase',color:'rgba(255,255,255,0.45)',margin:'4px 0 0'}}>{s.l}</p>
@@ -744,10 +744,10 @@ export function Home({ store, page }: any) {
             <div>
               <p className="s-label" style={{marginBottom:'8px'}}>Produits</p>
               <h2 className="bb" style={{fontSize:'clamp(2rem,5vw,3.5rem)',color:'var(--white)',lineHeight:0.95,letterSpacing:'0.02em'}}>
-                Tous <span style={{color:'var(--fire)'}}>الÉquipements</span>
+                Tous les <span style={{color:'var(--fire)'}}>équipements</span>
               </h2>
             </div>
-            <p className="bc" style={{fontSize:'13px',fontWeight:600,color:'var(--dim)',letterSpacing:'0.1em',textTransform:'uppercase'}}>{products.length} عنصر</p>
+            <p className="bc" style={{fontSize:'13px',fontWeight:600,color:'var(--dim)',letterSpacing:'0.1em',textTransform:'uppercase'}}>{products.length} article</p>
           </div>
 
           {products.length === 0 ? (
@@ -792,17 +792,17 @@ export function Home({ store, page }: any) {
         <div style={{position:'relative',zIndex:2,maxWidth:'640px',margin:'0 auto',textAlign:'center'}}>
           <div style={{display:'flex',justifyContent:'center',marginBottom:'16px'}}><FireIcon size={48}/></div>
           <h2 className="bb" style={{fontSize:'clamp(2.5rem,7vw,5rem)',color:'var(--white)',lineHeight:0.9,marginBottom:'14px'}}>
-            Êtes-vous prêt <span style={{color:'var(--fire)'}}>Pour la transformation</span>؟
+            Êtes-vous prêt <span style={{color:'var(--fire)'}}>Pour la transformation</span> ?
           </h2>
           <p style={{fontSize:'15px',color:'var(--mid)',lineHeight:'1.7',marginBottom:'32px'}}>
-            انضم إلى آلاف الsportifين في Tous أنحاء Algérie. احصل على الÉquipements التي تحتاجها للوصول إلى قمة أدائك.
+            Rejoignez des milliers de sportifs dans toute l'Algérie. Obtenez les équipements dont vous avez besoin pour atteindre le sommet de vos performances.
           </p>
           <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap'}}>
             <a href="#products" className="btn-fire" style={{fontSize:'15px',padding:'14px 36px'}}>
-              <Dumbbell style={{width:'16px',height:'16px'}}/> Acheter Tous الÉquipements
+              <Dumbbell style={{width:'16px',height:'16px'}}/> Acheter tous les équipements
             </a>
             <Link href="/contact" className="btn-gold" style={{fontSize:'15px',padding:'14px 36px'}}>
-              Contactez-nous <ArrowLeft style={{width:'14px',height:'14px'}}/>
+              Contactez-nous <ArrowRight style={{width:'14px',height:'14px'}}/>
             </Link>
           </div>
         </div>
@@ -1375,7 +1375,7 @@ const IB = ({ title, body, tag }: { title: string; body: string; tag?: string })
 export function Privacy() {
   return (
     <Shell title="Politique de confidentialité" sub="Affaires juridiques">
-      <IB title="Les données que nous collectons" body="uniquement Votre nom et numéro de هاتفك et adresse de Livraison — الحد الأدنى الrequis pour traiter votre commande."/>
+      <IB title="Les données que nous collectons" body="Uniquement votre nom, numéro de téléphone et adresse de livraison — le minimum nécessaire pour traiter votre commande."/>
       <IB title="Comment nous les utilisons" body="Exclusivement pour traiter et expédier votre commande. Aucun usage marketing ou vente de données."/>
       <IB title="Sécurité" body="Vos données sont protégées par un chiffrement haute sécurité et sécurisées en tout temps."/>
       <IB title="Partage des données" body="Nous ne vendons jamais vos données. Partagées avec les partenaires de livraison de confiance." tag="Garanti"/>
@@ -1491,7 +1491,7 @@ export function Contact({ store }: { store?: any }) {
                   onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor='var(--dim)';}}/>
               </div>
               <button type="submit" disabled={loading} className="btn-fire" style={{justifyContent:'center',width:'100%',fontSize:'14px',padding:'13px',clipPath:'none',opacity:loading?0.7:1,cursor:loading?'not-allowed':'pointer'}}>
-                {loading?<><Loader2 style={{width:'15px',height:'15px',animation:'spin 1s linear infinite'}}/> En cours...</>:<>Envoyer le message <ArrowLeft style={{width:'14px',height:'14px'}}/></>}
+                {loading?<><Loader2 style={{width:'15px',height:'15px',animation:'spin 1s linear infinite'}}/> En cours...</>:<>Envoyer le message <ArrowRight style={{width:'14px',height:'14px'}}/></>}
               </button>
             </form>
           )}

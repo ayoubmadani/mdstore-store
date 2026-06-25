@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
     Star, Heart, ShoppingBag, ChevronDown, ChevronLeft, ChevronRight,
-    AlertCircle, Check, X, Phone, MapPin, CheckCircle2, ArrowLeft,
+    AlertCircle, Check, X, Phone, MapPin, CheckCircle2, ArrowRight,
     Menu, Search, ShoppingCart, Minus, Plus, Trash2, Loader2, Package,
     Shield, Truck, Sparkles, Lock, Mail,
 } from 'lucide-react';
@@ -348,7 +348,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                         ))}
 
                         <button onClick={doSearch} style={{ width: '100%', padding: '12px', background: 'var(--lavender-lt)', border: 'none', borderTop: '1px solid var(--lavender)', color: 'var(--lavender-dk)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                            Voir tous les résultats <ArrowLeft size={14} />
+                            Voir tous les résultats <ArrowRight size={14} />
                         </button>
                     </>
                 ) : searchQuery.length >= 2 && (
@@ -416,6 +416,13 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 <div className="nav-mobile-btns">
                     <button onClick={() => setShowSearch(!showSearch)} style={{ width: 40, height: 40, borderRadius: 12, border: '2px solid var(--lavender-lt)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--lavender-dk)' }}><Search size={17} /></button>
 
+                    {store?.cart !== false && (
+                        <Link href="/cart" style={{ position: 'relative', width: 40, height: 40, borderRadius: 12, border: '2px solid var(--lavender-lt)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--lavender-dk)' }}>
+                            <ShoppingCart size={17} />
+                            {count > 0 && <span className="cart-badge">{count}</span>}
+                        </Link>
+                    )}
+
                     <button onClick={() => setOpen(!open)} style={{ width: 40, height: 40, borderRadius: 12, border: '2px solid var(--lavender-lt)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--lavender-dk)' }}>
                         {open ? <X size={17} /> : <Menu size={17} />}
                     </button>
@@ -440,7 +447,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                     {[{ h: '/', l: '🏠 Accueil' }, { h: '/contact', l: '💌 Contactez-nous' }].map(i => (
                         <Link key={i.h} href={i.h} onClick={() => setOpen(false)}
                             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid var(--lavender-lt)', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)' }}>
-                            {i.l} <ArrowLeft size={14} style={{ color: 'var(--lavender-dk)' }} />
+                            {i.l} <ArrowRight size={14} style={{ color: 'var(--lavender-dk)' }} />
                         </Link>
                     ))}
 
@@ -452,7 +459,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   FOOTER — 3 أقسام
+   FOOTER — 3 sections
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
     return (
@@ -468,7 +475,7 @@ export function Footer({ store }: any) {
             </div>
             <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1 }}>
                 <div className="footer-cols">
-                    {/* قسم 1 */}
+                    {/* Section 1 */}
                     <div>
                         <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.75rem', fontWeight: 700, color: '#fff', marginBottom: '0.875rem' }}>{store?.name}</h3>
                         <p style={{ fontSize: '0.9rem', fontWeight: 600, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, maxWidth: 300 }}>
@@ -481,7 +488,7 @@ export function Footer({ store }: any) {
                         </div>
                         <p style={{ marginTop: '2rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)' }}>© {new Date().getFullYear()} {store?.name}. Tous droits réservés.</p>
                     </div>
-                    {/* قسم 2 */}
+                    {/* Section 2 */}
                     <div>
                         <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--peach)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>Liens Rapide</h4>
                         {[{ h: '/', l: 'Accueil' }, { h: '/cart', l: 'Panier' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/Privacy', l: 'Politique de confidentialité' }, { h: '/Terms', l: 'Conditions et clauses' }].map((lnk, i) => (
@@ -492,7 +499,7 @@ export function Footer({ store }: any) {
                             </a>
                         ))}
                     </div>
-                    {/* قسم 3 */}
+                    {/* Section 3 */}
                     <div>
                         <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--peach)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>Contactez-nous</h4>
                         {[
@@ -618,17 +625,17 @@ export function Home({ store, page }: any) {
                 <div style={{ maxWidth: 1280, margin: '0 auto', padding: '7rem 1.5rem 4rem', position: 'relative', zIndex: 1, width: '100%' }}>
                     <div className="anim-fade" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.5rem 1.25rem', borderRadius: 50, background: 'rgba(196,181,253,0.2)', border: '1.5px solid rgba(196,181,253,0.5)', marginBottom: '1.5rem' }}>
                         <Sparkles size={14} style={{ color: 'var(--lavender-dk)' }} />
-                        <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{store?.name} — العناية بطفلك بكل محبة</span>
+                        <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{store?.name} — Prendre soin de votre enfant avec amour</span>
                     </div>
                     <h1 className="anim-fade font-serif" style={{ fontSize: 'clamp(2.75rem, 7vw, 5.5rem)', fontWeight: 700, color: 'var(--text)', lineHeight: 1.1, marginBottom: '1.25rem', letterSpacing: '-0.02em' }}
                         dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'Tout ce dont<br/>votre enfant a besoin') }} />
                     <div style={{ height: 3, width: 80, borderRadius: 99, background: 'linear-gradient(90deg, var(--lavender), var(--rose), var(--peach))', marginBottom: '1.5rem' }} />
                     <p className="anim-fade" style={{ fontSize: '1.0625rem', fontWeight: 600, color: 'var(--text-mid)', maxWidth: 480, lineHeight: 1.75, marginBottom: '2.5rem' }}>
-                        {store.hero?.subtitle || '🌸 Produits Sécurisée وناعمة Sélectionnés soigneusement Pour le confort et la santé de votre bébé dès le premier jour.'}
+                        {store.hero?.subtitle || '🌸 Produits sécurisés et doux, sélectionnés soigneusement pour le confort et la santé de votre bébé dès le premier jour.'}
                     </p>
                     <div className="hero-actions">
                         <a href="#products" className="btn-soft" style={{ ...BTN_PRI, textDecoration: 'none' }}>
-                            Découvrirي Produits 🌸
+                            Découvrir les produits 🌸
                         </a>
                         {store?.cart !== false && (
                             <Link href="/cart" className="btn-soft" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.875rem 1.75rem', borderRadius: 50, border: '2px solid var(--lavender)', background: '#fff', color: 'var(--lavender-dk)', fontWeight: 700, fontSize: '0.925rem' }}>
@@ -647,8 +654,8 @@ export function Home({ store, page }: any) {
                         {[
                             { e: '🛡️', t: 'Totalement sécurisé', d: 'Sans substances nocives' },
                             { e: '🚀', t: 'Livraison rapide', d: 'dans toutes les wilayas' },
-                            { e: '🌸', t: 'Qualité ممتازة', d: 'Produits premium وCertifiée' },
-                            { e: '💝', t: 'بمحبة وعناية', d: 'لأطفالنا الأحبة' },
+                            { e: '🌸', t: 'Qualité excellente', d: 'Produits premium et certifiés' },
+                            { e: '💝', t: 'Avec amour et soin', d: 'Pour nos chers enfants' },
                         ].map((item, i) => (
                             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', padding: '0.875rem 1rem', borderLeft: i < 3 ? '1px solid var(--lavender-lt)' : 'none' }}>
                                 <span style={{ fontSize: '1.75rem' }}>{item.e}</span>
@@ -730,7 +737,7 @@ export function Home({ store, page }: any) {
                     Parce que votre enfant mérite le meilleur
                 </h2>
                 <p style={{ fontSize: '1.0625rem', fontWeight: 600, color: 'var(--text-mid)', maxWidth: 500, margin: '0 auto 2rem', lineHeight: 1.7 }}>
-                    Produits Sélectionnés soigneusement فائقة لتمنح طفلك أكبر قدر من الراحة وSécurité
+                    Produits sélectionnés soigneusement pour offrir à votre enfant un maximum de confort et de sécurité
                 </p>
                 <a href="#products" className="btn-soft" style={{ ...BTN_PRI, textDecoration: 'none' }}>
                     Acheter maintenant 🌸
@@ -822,7 +829,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                         {attr.variants.map((v: any) => {
                                             const isSelected = selectedVariants[attr.name] === v.value;
 
-                                            // حالة الألوان
+                                            // Cas des couleurs
                                             if (attr.displayMode === 'color') {
                                                 return (
                                                     <button
@@ -844,7 +851,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                                 );
                                             }
 
-                                            // حالة الصور (مثل صور القماش أو نقشات معينة)
+                                            // Cas des images (ex: motifs de tissu)
                                             if (attr.displayMode === 'image') {
                                                 return (
                                                     <button
@@ -853,7 +860,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                                         style={{
                                                             width: 40,
                                                             height: 40,
-                                                            borderRadius: 10, // حواف مربعة قليلاً تبدو أفضل للصور
+                                                            borderRadius: 10, // bords légèrement carrés, mieux pour les images
                                                             backgroundImage: `url(${v.value})`,
                                                             backgroundSize: 'cover',
                                                             backgroundPosition: 'center',
@@ -865,7 +872,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                                 );
                                             }
 
-                                            // الحالة الافتراضية (نصوص مثل المقاسات S, M, L)
+                                            // Cas par défaut (textes comme les tailles S, M, L)
                                             return (
                                                 <button
                                                     key={v.id}
@@ -1149,7 +1156,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     <div style={{ background: '#fff', borderRadius: 24, border: '2px solid var(--lavender-lt)', overflow: 'hidden', alignSelf: 'start' }}>
                         <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--lavender-lt)', display: 'flex', alignItems: 'center', gap: 8, background: 'var(--lavender-lt)' }}>
                             <Package size={17} style={{ color: 'var(--lavender-dk)' }} />
-                            <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 700, color: 'var(--lavender-dk)', fontSize: '1rem' }}>Produitsك ({items.length})</span>
+                            <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 700, color: 'var(--lavender-dk)', fontSize: '1rem' }}>Produits ({items.length})</span>
                         </div>
                         {items.map((item, i) => (
                             <div key={i} style={{ display: 'flex', gap: '1rem', padding: '1rem 1.25rem', borderBottom: '1px solid var(--lavender-lt)' }}>
@@ -1275,13 +1282,13 @@ const IB = ({ icon, title, desc }: { icon: React.ReactNode; title: string; desc:
 );
 
 export function Privacy() {
-    return <Shell emoji="🔒" title="Politique de confidentialité"><IB icon={<Shield size={18} />} title="Les données que nous collectons" desc="نجمع uniquement les données الEssentiels pour traiter votre commande — Nom، Numéro de Téléphone، وadresse." /><IB icon={<Lock size={18} />} title="حماية بياناتك" desc="Nous utilisons Derniers protocoles التشفير لGarantie أمان informationsك الشخصية." /><IB icon={<Shield size={18} />} title="Politique de partage" desc="Non نبيع أو نشارك بياناتك مع أطراف ثالثة. خصوصيتك أولويتنا." /></Shell>;
+    return <Shell emoji="🔒" title="Politique de confidentialité"><IB icon={<Shield size={18} />} title="Les données que nous collectons" desc="Nous collectons uniquement les données essentielles pour traiter votre commande — Nom, Numéro de téléphone et adresse." /><IB icon={<Lock size={18} />} title="Protection de vos données" desc="Nous utilisons les derniers protocoles de chiffrement pour garantir la sécurité de vos informations personnelles." /><IB icon={<Shield size={18} />} title="Politique de partage" desc="Nous ne vendons ni ne partageons vos données avec des tiers. Votre confidentialité est notre priorité." /></Shell>;
 }
 export function Terms() {
-    return <Shell emoji="📋" title="Conditions et clauses"><IB icon={<CheckCircle2 size={18} />} title="Commandes et paiements" desc="يتم Confirmations de commande عبر Téléphone قبل الشحن. الPaiement À la livraison." /><IB icon={<Truck size={18} />} title="Livraison" desc="نوفر service Livraison pour toutes les wilayas de Algérie بMeilleurs prix." /><IB icon={<Shield size={18} />} title="الGarantieات" desc="نلتزم بأعلى معايير la qualité والسلامة في Tous nos Produits." /></Shell>;
+    return <Shell emoji="📋" title="Conditions et clauses"><IB icon={<CheckCircle2 size={18} />} title="Commandes et paiements" desc="Les commandes sont confirmées par téléphone avant l'expédition. Paiement à la livraison." /><IB icon={<Truck size={18} />} title="Livraison" desc="Nous proposons la livraison dans toutes les wilayas d'Algérie aux meilleurs prix." /><IB icon={<Shield size={18} />} title="Garanties" desc="Nous nous engageons aux plus hauts standards de qualité et de sécurité pour tous nos produits." /></Shell>;
 }
 export function Cookies() {
-    return <Shell emoji="🍪" title="Cookies"><IB icon={<Shield size={18} />} title="Fichiers essentiels" desc="Essentiels لعمل Panier وحفظ بيانات جلستك." /><IB icon={<Sparkles size={18} />} title="Amélioration de l’expérience" desc="تساعدنا على تقديم Expérience shopping مخصصة وأفضل لك." /></Shell>;
+    return <Shell emoji="🍪" title="Cookies"><IB icon={<Shield size={18} />} title="Fichiers essentiels" desc="Essentiels pour le fonctionnement du panier et la conservation de vos données de session." /><IB icon={<Sparkles size={18} />} title="Amélioration de l’expérience" desc="Nous aident à offrir une expérience shopping personnalisée et meilleure pour vous." /></Shell>;
 }
 
 export function Contact({ store }: { store: any }) {

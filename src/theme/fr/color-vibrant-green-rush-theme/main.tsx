@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Phone,
-  CheckCircle2, ArrowLeft, Zap,
+  CheckCircle2, ArrowRight, Zap,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Shield, Truck,
   Mail,
@@ -42,7 +42,7 @@ const THEME_CSS = `
   /* ── Scrollbar ── */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: #F8F8F6; }
-  /* تم تغيير اللون إلى الأخضر */
+  /* couleur changée en vert */
   ::-webkit-scrollbar-thumb { background: #10B981; border-radius: 2px; }
 
   /* ── Keyframes ── */
@@ -57,7 +57,7 @@ const THEME_CSS = `
   .anim-check      { animation: checkPop 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }
 
   /* ── Ticker ── */
-  /* تم تغيير الخلفية إلى الأخضر */
+  /* fond changé en vert */
   .ticker-wrap { overflow: hidden; background: #10B981; color: #fff; height: 36px; display: flex; align-items: center; }
   .ticker-track { display: flex; white-space: nowrap; animation: ticker 28s linear infinite; }
   .ticker-item  { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; padding: 0 2.5rem; }
@@ -126,21 +126,21 @@ const THEME_CSS = `
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
-    padding: 0.5rem; /* تقليل البادينج الجانبي جداً للجوال */
+    padding: 0.5rem; /* padding réduit sur mobile */
   }
 
-  /* حاوية المVoir */
+  /* conteneur galerie */
   .gallery-container {
-    position: relative; /* عادٍ (Static/Relative) في الجوال */
+    position: relative; /* position normale sur mobile */
     top: 0;
     width: 100%;
   }
 
-  /* حاوية الinformations */
+  /* conteneur informations */
   .info-container {
     background: #fff;
     border-radius: 14px;
-    padding: 1.25rem; /* بادينج مريح للجوال */
+    padding: 1.25rem; /* padding confortable sur mobile */
     border: 1.5px solid #E8E8E8;
   }
 
@@ -152,7 +152,7 @@ const THEME_CSS = `
     }
 
     .gallery-container {
-      position: sticky; /* ثابت uniquement في الشاشات الكبيرة */
+      position: sticky; /* sticky uniquement sur grands écrans */
       top: 100px;
       z-index: 10;
     }
@@ -225,7 +225,7 @@ const THEME_CSS = `
   }
 
   /* ── Card stripe ── */
-  /* تم تغيير اللون إلى الأخضر */
+  /* couleur changée en vert */
   .card-stripe::before {
     content: '';
     position: absolute;
@@ -360,7 +360,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               </Link>
             ))}
 
-            {/* زر Voir plus - يتحرك مع القائمة (بدون Fixed) */}
+            {/* Bouton Voir plus - défile avec la liste */}
             <button
               onClick={handleSearch}
               style={{
@@ -369,7 +369,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 fontSize: '0.85rem', cursor: 'pointer', display: 'flex',
                 alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}>
-              Voir tous les résultats <ArrowLeft size={14} />
+              Voir tous les résultats <ArrowRight size={14} />
             </button>
           </div>
         ) : searchQuery.length >= 2 && <div style={{ padding: '1.5rem', textAlign: 'center', color: '#aaa', fontSize: '0.85rem' }}>Aucun résultat</div>}
@@ -401,7 +401,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
           {/* Logo */}
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
-            {/* إذا كان هناك رابط مخصص للصورة، نVoir الشعار */}
+            {/* Si un lien personnalisé existe, afficher le logo */}
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
               <img
                 src={store.design.logoUrl}
@@ -410,7 +410,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 onError={() => setImgError(true)}
               />
             ) : (
-              // وإذا لم يكن هناك رابط أو Une Erreur est survenue، نVoir اللوجو المستطيل بالتصميم الNouveau
+              // Sinon afficher le logo rectangulaire avec le nouveau design
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div style={{
                   padding: '0 12px',
@@ -467,6 +467,13 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <button onClick={() => setShowSearch(!showSearch)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
               <Search size={16} />
             </button>
+            {store?.cart !== false && (
+              <Link href="/cart" style={{ position: 'relative', width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#333' }}>
+                <ShoppingCart size={16} />
+                {count > 0 && <span style={{ position: 'absolute', top: -4, right: -4, background: '#E63946', color: '#fff', fontSize: 9, fontWeight: 800, width: 15, height: 15, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
+              </Link>
+            )}
+
             <button onClick={() => setOpen(!open)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
               {open ? <X size={16} /> : <Menu size={16} />}
             </button>
@@ -490,7 +497,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div style={{ padding: '0.375rem 1.25rem 0.875rem' }}>
             {[{ h: '/', l: 'Accueil' }, { h: '/contact', l: 'Contactez-nous' }].map(i => (
               <Link key={i.h} href={i.h} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid #F0F0F0', fontSize: '0.9rem', fontWeight: 600, color: '#111' }}>
-                {i.l} <ArrowLeft size={14} style={{ color: '#10B981' }} />
+                {i.l} <ArrowRight size={14} style={{ color: '#10B981' }} />
               </Link>
             ))}
             
@@ -502,7 +509,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   FOOTER — 3 أقسام
+   FOOTER — 3 sections
 ═══════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
   return (
@@ -510,7 +517,7 @@ export function Footer({ store }: any) {
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div className="footer-inner">
 
-          {/* قسم 1 — العلامة */}
+          {/* Section 1 — Marque */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '1rem' }}>
               <div style={{ width: 32, height: 32, background: '#10B981', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -519,14 +526,14 @@ export function Footer({ store }: any) {
               <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>{store?.name}</span>
             </div>
             <p style={{ fontSize: '0.875rem', lineHeight: 1.8, color: '#666', maxWidth: 320 }}>
-              {store?.hero?.subtitle?.substring(0, 100) || 'Expérience shopping moderne وRapide. Livraison dans toutes les wilayas d’Algérie.'}
+              {store?.hero?.subtitle?.substring(0, 100) || 'Expérience shopping moderne et rapide. Livraison dans toutes les wilayas d’Algérie.'}
             </p>
             <p style={{ marginTop: '2rem', fontSize: '0.75rem', color: '#333' }}>
               © {new Date().getFullYear()} {store?.name}. Tous droits réservés.
             </p>
           </div>
 
-          {/* قسم 2 — Liens */}
+          {/* Section 2 — Liens */}
           <div>
             <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1.25rem' }}>Pages</h4>
             {[{ h: '/', l: 'Accueil' }, { h: '/cart', l: 'Panier' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/Privacy', l: 'Confidentialité' }, { h: '/Terms', l: 'Conditions' }].map((lnk, i) => (
@@ -538,7 +545,7 @@ export function Footer({ store }: any) {
             ))}
           </div>
 
-          {/* قسم 3 — التواصل */}
+          {/* Section 3 — Contact */}
           <div>
             <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1.25rem' }}>Contact</h4>
             {[
@@ -635,7 +642,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
     el.style.color = '#10B981';
   }}
 >
-  {viewDetails} <ArrowLeft size= {13} />
+  {viewDetails} <ArrowRight size= {13} />
 </Link>
         </div>
       </div>
@@ -665,16 +672,16 @@ export function Home({ store, page }: any) {
           </div>
         )}
 
-        {/* Geometric accent - تدرج أخضر ناعم */}
+        {/* Geometric accent - dégradé vert doux */}
         <div style={{ position: 'absolute', top: 0, left: 0, width: '40%', height: '100%', background: 'linear-gradient(135deg, #10B981 0%, transparent 60%)', opacity: 0.12, pointerEvents: 'none' }} />
 
-        {/* Circle accent - تم تغيير لون الدائرة الزخرفية للأخضر الشفاف */}
+        {/* Circle accent - couleur changée en vert transparent */}
         <div style={{ position: 'absolute', bottom: -60, right: -60, width: 300, height: 300, border: '60px solid rgba(16, 185, 129, 0.07)', borderRadius: '50%', pointerEvents: 'none' }} />
 
         <div className="hero-inner" style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           {/* Text */}
           <div>
-            {/* Badge - تم تعديل الخلفية والحدود للون الأخضر */}
+            {/* Badge - fond et bordures modifiés en vert */}
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: 6, padding: '0.375rem 0.875rem', marginBottom: '1.5rem' }}>
               <Zap size={13} color="#10B981" fill="#10B981" />
               <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#10B981', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{store.name}</span>
@@ -688,11 +695,11 @@ export function Home({ store, page }: any) {
             </p>
 
             <div className="hero-actions">
-              {/* زر "Acheter maintenant" مع ظل أخضر وتأثير تحويم غامق */}
+              {/* Bouton Acheter maintenant avec ombre verte */}
               <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#10B981', color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, transition: 'all 0.2s', boxShadow: '0 4px 20px rgba(16, 185, 129, 0.35)' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#059669')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#10B981')}>
-                Acheter maintenant <ArrowLeft size={16} />
+                Acheter maintenant <ArrowRight size={16} />
               </a>
 
               {store?.cart !== false && (
@@ -809,7 +816,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
     <div dir="ltr" style={{ background: '#F8F8F6', paddingBottom: '4rem' }}>
       <div className="details-inner">
 
-        {/* 1. قسم المVoir (Gallery) */}
+        {/* 1. Section Galerie */}
         <div className="gallery-container">
           <div style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 14, overflow: 'hidden', background: '#fff', border: '1.5px solid #E8E8E8' }}>
             {allImages[sel]
@@ -841,7 +848,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           )}
         </div>
 
-        {/* 2. قسم الinformations (Info) */}
+        {/* 2. Section Informations */}
         <div>
           <div className="info-container">
             <h1 style={{ fontSize: 'clamp(1.5rem,4vw,2.25rem)', fontWeight: 800, color: '#111', marginBottom: '0.75rem', lineHeight: 1.2 }}>
@@ -890,7 +897,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                   {attr.variants.map((v: any) => {
                     const isSelected = selectedVariants[attr.name] === v.value;
 
-                    // تحديد الTennisيق بناءً على نوع الVoir
+                    // Déterminer le style selon le type
                     const getStyle = () => {
                       if (attr.displayMode === 'color') {
                         return {
@@ -906,7 +913,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                           transition: '0.2s all'
                         };
                       }
-                      // الTennisيق الافتراضي للنصوص (المقاسات وغيرها)
+                      // Style par défaut pour les textes (tailles, etc.)
                       return {
                         padding: '0.4rem 1rem', border: `1.5px solid ${isSelected ? '#10B981' : '#E8E8E8'}`,
                         borderRadius: 8, fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer',
@@ -921,7 +928,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                         onClick={() => handleVariantSelection(attr.name, v.value)}
                         style={getStyle()}
                       >
-                        {/* إظهار النص uniquement إذا لم يكن النوع لوناً أو صورة */}
+                        {/* Afficher le texte uniquement si ce n'est pas une couleur ou image */}
                         {attr.displayMode !== 'color' && attr.displayMode !== 'image' && v.name}
                       </button>
                     );
@@ -1037,11 +1044,11 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             style={{
               flex: 1,
               ...S.btnPrimary,
-              background: '#10B981', // اللون الأخضر الأساسي
+              background: '#10B981', // couleur verte principale
               width: 'auto',
               borderRadius: 10
             }}
-            onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = '#059669')} // درجة أخضر أعمق عند التمرير
+            onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = '#059669')} // vert plus foncé au survol
             onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#10B981')}
           >
             Commander maintenant
@@ -1374,7 +1381,7 @@ export function Cookies() {
   return (
     <Shell title="Cookies">
       <div style={{ background: '#fff', padding: '2rem', borderRadius: 14, border: '1.5px solid #E8E8E8' }}>
-        <InfoBlock title="Fichiers essentiels" body="Nous utilisons Cookies الEssentiels pour garantir le fonctionnement du Panier correctement et sécuriser votre session de connexion." />
+        <InfoBlock title="Fichiers essentiels" body="Nous utilisons des cookies essentiels pour garantir le fonctionnement du panier et sécuriser votre session." />
         <InfoBlock title="Amélioration de l’expérience" body="Nous utilisons certains fichiers pour analyser les interactions afin d’améliorer nos services." />
       </div>
     </Shell>
@@ -1458,7 +1465,7 @@ export function Contact({ store }: { store: any }) {
                 disabled={loading}
                 style={{
                   ...S.btnPrimary,
-                  background: '#10B981', // اللون الأخضر الأساسي (Emerald 500)
+                  background: '#10B981', // couleur verte principale (Emerald 500)
                   color: '#fff',
                   opacity: loading ? 0.7 : 1,
                   display: 'flex',
@@ -1470,7 +1477,7 @@ export function Contact({ store }: { store: any }) {
                   borderRadius: 10,
                   transition: 'all 0.3s ease'
                 }}
-                onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.background = '#059669')} // أخضر غامق عند التحويم
+                onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.background = '#059669')} // vert foncé au survol
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#10B981')}
               >
                 {loading ? (
@@ -1480,7 +1487,7 @@ export function Contact({ store }: { store: any }) {
                   </>
                 ) : (
                   <>
-                    Envoyer le message <ArrowLeft size={16} />
+                    Envoyer le message <ArrowRight size={16} />
                   </>
                 )}
               </button>

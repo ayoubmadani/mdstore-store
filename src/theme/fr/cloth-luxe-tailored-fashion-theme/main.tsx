@@ -5,7 +5,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
-import { Star, ChevronDown, AlertCircle, X, CheckCircle2, Shield, ArrowLeft, Plus, Minus, Search, ShoppingCart, Trash2, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, ChevronDown, AlertCircle, X, CheckCircle2, Shield, ArrowRight, Plus, Minus, Search, ShoppingCart, Trash2, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
@@ -151,7 +151,7 @@ export function Navbar({store,domain}:{store:any;domain:string}){
 
         {/* Logo */}
         <Link href="/" style={{flexShrink:0}}>
-          {store?.design?.logoUrl
+          {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
             ?<img src={store.design.logoUrl} alt={store.name} style={{height:'28px',objectFit:'contain'}}/>
             :<span className="bn" style={{fontSize:'1.5rem',color:'var(--tx)',letterSpacing:'0.08em'}}>{store?.name}</span>
           }
@@ -192,7 +192,7 @@ export function Navbar({store,domain}:{store:any;domain:string}){
                           </Link>
                         ))}
                         <button onClick={go} style={{width:'100%',padding:'11px',background:'none',border:'none',borderTop:'1px solid var(--br)',color:'var(--cp)',fontWeight:700,fontSize:'10px',letterSpacing:'0.18em',textTransform:'uppercase',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6,fontFamily:"'Raleway',sans-serif"}}>
-                          Voir tous les résultats <ArrowLeft size={11}/>
+                          Voir tous les résultats <ArrowRight size={11}/>
                         </button>
                       </>
                     ):<p style={{padding:'14px',fontSize:'11px',color:'var(--mu)',textAlign:'center',letterSpacing:'0.1em'}}>Aucun résultat</p>}
@@ -231,7 +231,7 @@ export function Navbar({store,domain}:{store:any;domain:string}){
               <Link key={lnk.h} href={lnk.h} onClick={()=>setMOpen(false)}
                 style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'20px 0',borderBottom:'1px solid var(--br)'}}>
                 <span className="bn" style={{fontSize:'clamp(2rem,7vw,4rem)',color:'var(--tx)',letterSpacing:'0.05em'}}>{lnk.l}</span>
-                <ArrowLeft style={{width:14,height:14,color:'var(--cp)'}}/>
+                <ArrowRight style={{width:14,height:14,color:'var(--cp)'}}/>
               </Link>
             ))}
           </div>
@@ -248,10 +248,10 @@ export function Footer({store}:any){
       <div style={{maxWidth:1200,margin:'0 auto',display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:40,paddingBottom:32,borderBottom:'1px solid var(--br)'}}>
         <div>
           <span className="bn" style={{fontSize:'1.8rem',color:'var(--tx)',letterSpacing:'0.06em',display:'block',marginBottom:12}}>{store?.name}</span>
-          <p style={{fontSize:'12px',lineHeight:1.8,color:'var(--mu)',letterSpacing:'0.04em'}}>{store?.hero?.subtitle?.slice(0,80)||'Mode راقية. Livraison dans toutes les wilayas.'}</p>
+          <p style={{fontSize:'12px',lineHeight:1.8,color:'var(--mu)',letterSpacing:'0.04em'}}>{store?.hero?.subtitle?.slice(0,80)||'Mode raffinée. Livraison dans toutes les wilayas.'}</p>
         </div>
         <div>
-          <p className="lbl" style={{marginBottom:14,color:'var(--cp)'}}>التنقل</p>
+          <p className="lbl" style={{marginBottom:14,color:'var(--cp)'}}>Navigation</p>
           {[{h:'/',l:'Accueil'},{h:'/cart',l:'Panier'},{h:'/contact',l:'Contactez-nous'},{h:'/Privacy',l:'Confidentialité'},{h:'/Terms',l:'Conditions'}].map(lnk=>(
             <a key={lnk.h} href={lnk.h} style={{display:'block',fontSize:'12px',color:'var(--mu)',marginBottom:9,letterSpacing:'0.06em',transition:'color .18s'}}
               onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--tx)'}}
@@ -323,7 +323,7 @@ export function Home({store,page}:any){
                 {store.hero?.title||<><span>LUXE</span><br/><span style={{color:'var(--cp)'}}>FASHION</span></>}
               </h1>
               <p style={{fontSize:'13px',color:'rgba(245,241,235,0.55)',letterSpacing:'0.06em',maxWidth:340,lineHeight:1.8}}>
-                {store.hero?.subtitle||'Mode راقية. Livraison rapide dans toutes les wilayas.'}
+                {store.hero?.subtitle||'Mode raffinée. Livraison rapide dans toutes les wilayas.'}
               </p>
             </div>
             <a href="#products" className="btn-dark" style={{textDecoration:'none',flexShrink:0}}>Acheter maintenant</a>
@@ -348,7 +348,7 @@ export function Home({store,page}:any){
       {/* PRODUCTS */}
       <section id="products" style={{padding:'32px 32px 64px'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:24}}>
-          <h2 style={{fontSize:'14px',fontWeight:700,letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--tx)'}}>Totalة</h2>
+          <h2 style={{fontSize:'14px',fontWeight:700,letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--tx)'}}>Total</h2>
           <span style={{fontSize:'11px',color:'var(--mu)',letterSpacing:'0.06em'}}>{products.length} Produit</span>
         </div>
 
@@ -420,7 +420,7 @@ export function Details({product,discount,allImages,allAttrs,finalPrice,inStock,
 
           {product.offers?.length>0&&(
             <div style={{marginBottom:24,paddingBottom:24,borderBottom:'1px solid var(--br)'}}>
-              <span className="lbl">Choisir الVoir</span>
+              <span className="lbl">Choisir la vue</span>
               {product.offers.map((o:any)=>(
                 <label key={o.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'11px 14px',border:`1px solid ${selectedOffer===o.id?'var(--cp)':'var(--br2)'}`,background:selectedOffer===o.id?'var(--cl)':'transparent',cursor:'pointer',marginBottom:6,transition:'all .18s'}}>
                   <div style={{display:'flex',alignItems:'center',gap:10}}>
@@ -526,7 +526,7 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
         <div style={{borderTop:'1px solid var(--br)',paddingTop:20,marginTop:8}}>
           {product.store?.cart&&(
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-              <span className="lbl" style={{margin:0}}>نموذج الطلب</span>
+              <span className="lbl" style={{margin:0}}>Formulaire de commande</span>
               <button onClick={()=>setON(false)} style={{background:'none',border:'none',cursor:'pointer',color:'var(--mu)',display:'flex',alignItems:'center',gap:4,fontSize:'10px',fontFamily:"'Raleway',sans-serif",letterSpacing:'0.14em'}}><X style={{width:10,height:10}}/>Annuler</button>
             </div>
           )}
@@ -594,7 +594,7 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
             </div>
 
             <button type="submit" disabled={sub} className="btn-dark" style={{width:'100%',opacity:sub?0.6:1,cursor:sub?'not-allowed':'pointer'}}>
-              {sub?<><Loader2 style={{width:13,height:13,animation:'sp 1s linear infinite'}}/>En cours...</>:<>Confirmer la commande <ArrowLeft style={{width:13,height:13}}/></>}
+              {sub?<><Loader2 style={{width:13,height:13,animation:'sp 1s linear infinite'}}/>En cours...</>:<>Confirmer la commande <ArrowRight style={{width:13,height:13}}/></>}
             </button>
             <p style={{fontSize:'10px',color:'var(--mu)',textAlign:'center',marginTop:10,display:'flex',alignItems:'center',justifyContent:'center',gap:5,letterSpacing:'0.1em'}}>
               <Shield style={{width:10,height:10}}/> Paiement À la livraison
@@ -647,7 +647,7 @@ export function Cart({domain,store}:{domain:string;store:any}){
     </div>
   );
 
-  if(done)return<Center><CheckCircle2 style={{width:40,height:40,color:'var(--cp)',display:'block',margin:'0 auto 16px'}}/><h2 className="bn" style={{fontSize:'2.5rem',color:'var(--tx)',letterSpacing:'0.06em',marginBottom:8}}>تم تأكيد طلبك</h2><p style={{fontSize:'12px',color:'var(--mu)',marginBottom:20,letterSpacing:'0.08em'}}>Nous vous contacterons Bient’t.</p><Link href="/" className="btn-dark" style={{display:'inline-flex',textDecoration:'none'}}>متابعة Shopping</Link></Center>;
+  if(done)return<Center><CheckCircle2 style={{width:40,height:40,color:’var(--cp)’,display:’block’,margin:’0 auto 16px’}}/><h2 className="bn" style={{fontSize:’2.5rem’,color:’var(--tx)’,letterSpacing:’0.06em’,marginBottom:8}}>Commande confirmée</h2><p style={{fontSize:’12px’,color:’var(--mu)’,marginBottom:20,letterSpacing:’0.08em’}}>Nous vous contacterons bientôt.</p><Link href="/" className="btn-dark" style={{display:’inline-flex’,textDecoration:’none’}}>Continuer les achats</Link></Center>;
   if(!items.length)return<Center><ShoppingCart style={{width:32,height:32,color:'var(--mu)',display:'block',margin:'0 auto 14px'}}/><h2 className="bn" style={{fontSize:'2rem',color:'var(--mu)',letterSpacing:'0.06em',marginBottom:16}}>Panier vide</h2><Link href="/" className="btn-dark" style={{display:'inline-flex',textDecoration:'none'}}>Acheter maintenant</Link></Center>;
 
   return(
@@ -687,7 +687,7 @@ export function Cart({domain,store}:{domain:string;store:any}){
 
         {/* Checkout */}
         <div style={{background:'var(--s1)',padding:'24px'}}>
-          <p style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.16em',textTransform:'uppercase',color:'var(--cp)',marginBottom:20}}>إتمام الشراء</p>
+          <p style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.16em',textTransform:'uppercase',color:'var(--cp)',marginBottom:20}}>Finaliser l'achat</p>
           <form onSubmit={submit}>
             <div className="f2">
               <FR label="Nom" error={errors.name}><input type="text" value={fd.customerName} onChange={e=>setFd({...fd,customerName:e.target.value})} style={IS(!!errors.name)} onFocus={onF} onBlur={e=>onBl(e,!!errors.name)}/></FR>
@@ -712,7 +712,7 @@ export function Cart({domain,store}:{domain:string;store:any}){
               <span style={{fontSize:'1.4rem',fontWeight:800,color:'var(--cp)'}}>{grand.toLocaleString()} DA</span>
             </div>
             <button type="submit" disabled={sub} className="btn-dark" style={{width:'100%',opacity:sub?0.6:1,cursor:sub?'not-allowed':'pointer'}}>
-              {sub?<><Loader2 style={{width:13,height:13,animation:'sp 1s linear infinite'}}/>En cours...</>:<>Confirmer la commande <ArrowLeft style={{width:13,height:13}}/></>}
+              {sub?<><Loader2 style={{width:13,height:13,animation:'sp 1s linear infinite'}}/>En cours...</>:<>Confirmer la commande <ArrowRight style={{width:13,height:13}}/></>}
             </button>
           </form>
         </div>
@@ -745,9 +745,9 @@ const Row=({title,body,tag}:{title:string;body:string;tag?:string})=>(
   </div>
 );
 
-export function Privacy(){return<PageWrap title="Politique de confidentialité"><Row title="Les données que nous collectons" body="Nom et numéro de Téléphone et adresse de Livraison uniquement — الحد الأدنى pour traiter votre commande."/><Row title="استخدام les données" body="تُستخدم حصرياً لمعالجة et Livraison طلبك. Non تسويق ولا بيع لأطراف ثالثة."/><Row title="Sécurité" body="Nous utilisons تشفيراً لحماية بياناتك في Tous الأوقات."/><Row title="Partage des données" body="Nous ne vendons pas vos données. Partagées avec les partenaires de Livraison." tag="Garanti"/></PageWrap>}
-export function Terms(){return<PageWrap title="Conditions d’utilisation"><Row title="Commandes وles prix" body="Aucuns frais cachés. Le prix affiché est le prix final."/><Row title="Qualité Produits" body="نضمن Qualité Tous nos Produits." tag="Garanti"/><Row title="Livraison" body="Livraison خلال 24-72 ساعة. الPaiement À la livraison."/><Row title="Loi" body="تخضع هذه Conditions لقوانين الجمهورية Algérienne."/></PageWrap>}
-export function Cookies(){return<PageWrap title="Politique de cookies"><Row title="ملفات Essentiels" body="requis pour faire fonctionner الجلسات et Panier." tag="toujours"/><Row title="ملفات Préférences" body="Sauvegarde vos préférences pour une meilleure expérience." tag="Facultatif"/><Row title="Fichiers analytiques" body="بيانات مجمعة لAmélioration de l’expérience." tag="Facultatif"/></PageWrap>}
+export function Privacy(){return<PageWrap title="Politique de confidentialité"><Row title="Les données que nous collectons" body="Nom, numéro de téléphone et adresse de livraison uniquement — le minimum pour traiter votre commande."/><Row title="Utilisation des données" body="Utilisées exclusivement pour traiter et livrer votre commande. Pas de marketing ni de vente à des tiers."/><Row title="Sécurité" body="Nous utilisons le chiffrement pour protéger vos données en tout temps."/><Row title="Partage des données" body="Nous ne vendons pas vos données. Partagées avec les partenaires de livraison." tag="Garanti"/></PageWrap>}
+export function Terms(){return<PageWrap title="Conditions d’utilisation"><Row title="Commandes et prix" body="Aucuns frais cachés. Le prix affiché est le prix final."/><Row title="Qualité des produits" body="Nous garantissons la qualité de tous nos produits." tag="Garanti"/><Row title="Livraison" body="Livraison sous 24-72 heures. Paiement à la livraison."/><Row title="Loi" body="Ces conditions sont soumises aux lois de la République Algérienne."/></PageWrap>}
+export function Cookies(){return<PageWrap title="Politique de cookies"><Row title="Fichiers essentiels" body="Requis pour faire fonctionner les sessions et le panier." tag="toujours"/><Row title="Fichiers préférences" body="Sauvegarde vos préférences pour une meilleure expérience." tag="Facultatif"/><Row title="Fichiers analytiques" body="Données agrégées pour l’amélioration de l’expérience." tag="Facultatif"/></PageWrap>}
 
 export function Contact({store}:{store?:any}){
   const [form,setForm]=useState({name:'',email:'',phone:'',message:''});

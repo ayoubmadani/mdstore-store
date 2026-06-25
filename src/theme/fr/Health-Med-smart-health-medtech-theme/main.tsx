@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
-  AlertCircle, X, ToggleRight, ArrowLeft,
+  AlertCircle, X, ToggleRight, ArrowRight,
   Plus, Minus, CheckCircle2, Lock, Menu, Package,
   Truck, Shield, Search, ShoppingCart,
   Trash2, Loader2, Phone, MapPin, Mail, Activity, Zap, User,
@@ -282,7 +282,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             fontSize:'12px', cursor:'pointer', fontFamily:"'Plus Jakarta Sans',sans-serif",
             display:'flex', alignItems:'center', justifyContent:'center', gap:'6px'
           }}>
-            Voir tous les résultats <ArrowLeft size={12} />
+            Voir tous les résultats <ArrowRight size={12} />
           </button>
         </div>
       ) : sq.length >= 2 && (
@@ -405,14 +405,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               fontSize:'14px', fontWeight:600, color:'var(--ink)',
               borderBottom:'1px solid var(--line)'
             }}>
-              Accueil <ArrowLeft size={14} style={{ color:'var(--sky)' }} />
+              Accueil <ArrowRight size={14} style={{ color:'var(--sky)' }} />
             </Link>
             <Link href="/contact" onClick={() => setOpen(false)} style={{
               display:'flex', justifyContent:'space-between', padding:'12px 0',
               fontSize:'14px', fontWeight:600, color:'var(--ink)',
               borderBottom:'1px solid var(--line)'
             }}>
-              Appelez-nous <ArrowLeft size={14} style={{ color:'var(--sky)' }} />
+              Appelez-nous <ArrowRight size={14} style={{ color:'var(--sky)' }} />
             </Link>
             <button onClick={() => { router.push('/#products'); setOpen(false); }}
               className="btn-primary" style={{ marginTop:'12px', width:'100%' }}>
@@ -433,7 +433,7 @@ export function Footer({ store }: any) {
         padding:'10px 0', textAlign:'center'
       }}>
         <p className="pjs" style={{ fontSize:'13px', fontWeight:700, color:'white', letterSpacing:'0.04em' }}>
-          🩺 Votre santé nous tient à cœur — Produits authentiques 100% مع Livraison rapide
+          🩺 Votre santé nous tient à cœur — Produits authentiques 100% avec Livraison rapide
         </p>
       </div>
 
@@ -447,7 +447,7 @@ export function Footer({ store }: any) {
               </span>
             </div>
             <p style={{ fontSize:'13px', lineHeight:'1.7', color:'var(--dim)', maxWidth:'240px' }}>
-              {store?.hero?.subtitle?.substring(0, 80) || 'Votre boutique الDe confiance للÉquipements médicaux، Produits Santé et soins. Authenticité et qualité garanties.'}
+              {store?.hero?.subtitle?.substring(0, 80) || 'Votre boutique de confiance pour les équipements médicaux, produits de santé et soins. Authenticité et qualité garanties.'}
             </p>
             <div style={{ marginTop:'14px', display:'flex', alignItems:'center', gap:'8px' }}>
               <Truck size={14} style={{ color:'var(--teal)' }} />
@@ -490,7 +490,7 @@ export function Footer({ store }: any) {
             ))}
             <div style={{ marginTop:'14px', padding:'12px 14px', border:'1px solid rgba(14,165,233,0.3)', background:'rgba(14,165,233,0.06)', borderRadius:'8px' }}>
               <p className="pjs" style={{ fontSize:'0.95rem', color:'var(--sky)', marginBottom:2 }}>Équipe médicale spécialisée</p>
-              <p style={{ fontSize:'11px', color:'var(--dim)' }}>نRéponse sous 24h</p>
+              <p style={{ fontSize:'11px', color:'var(--dim)' }}>Réponse sous 24h</p>
             </div>
           </div>
         </div>
@@ -605,7 +605,7 @@ export function Home({ store, page }: any) {
             fontSize:'clamp(14px, 1.6vw, 16px)', lineHeight:'1.7',
             color:'var(--mid)', maxWidth:'540px', marginBottom:'28px'
           }}>
-            {store.hero?.subtitle || 'الÉquipements médicaux، أجهزة التطبيب عن بعد، وProduits Santé الرقمية. Qualité De confiance، Livraison rapide.'}
+            {store.hero?.subtitle || 'Équipements médicaux, appareils de télémédecine et produits de santé numériques. Qualité de confiance, livraison rapide.'}
           </p>
 
           <div style={{ display:'flex', gap:'12px', flexWrap:'wrap', justifyContent:'center', marginBottom:'36px' }}>
@@ -779,7 +779,7 @@ export function Home({ store, page }: any) {
           <div className="why-grid">
             {[
               { icon:<Shield size={28} />, title:'Produits authentiques', desc:'Nous importons des marques médicales mondiales les plus reconnues' },
-              { icon:<Truck size={28} />, title:'Livraison rapide', desc:'Nous livrons dans toutes les wilayas في 48 heures' },
+              { icon:<Truck size={28} />, title:'Livraison rapide', desc:'Nous livrons dans toutes les wilayas en 48 heures' },
               { icon:<HeartPulse size={28} />, title:'Support médical', desc:'Équipe de pharmaciens pour les consultations' },
               { icon:<Ambulance size={28} />, title:'Service urgent', desc:'Pour les urgences Nous livrons immédiatement' },
             ].map((item, i) => (
@@ -803,14 +803,14 @@ export function Home({ store, page }: any) {
             S’abonner à <span style={{ color:'var(--sky)' }}>Notre newsletter</span> médicaux
           </h2>
           <p style={{ fontSize:'15px', color:'var(--mid)', lineHeight:'1.7', marginBottom:'28px' }}>
-            احصل على Derniers النصائح الde santéة وOffres الحصرية مباشرة على بريدك الإلكتروني.
+            Obtenez les derniers conseils santé et offres exclusives directement dans votre boîte mail.
           </p>
           <div style={{ display:'flex', gap:'10px', justifyContent:'center', flexWrap:'wrap' }}>
             <a href="#products" className="btn-primary" style={{ fontSize:'15px', padding:'14px 36px' }}>
               <Stethoscope size={16} /> Acheter maintenant
             </a>
             <Link href="/contact" className="btn-outline" style={{ fontSize:'15px', padding:'14px 36px' }}>
-              Consultation médicale <ArrowLeft size={14} />
+              Consultation médicale <ArrowRight size={14} />
             </Link>
           </div>
         </div>
@@ -1425,7 +1425,7 @@ const IB = ({ title, body, tag }: { title: string; body: string; tag?: string })
 export function Privacy() {
   return (
     <Shell title="Politique de confidentialité" sub="Affaires juridiques">
-      <IB title="Les données que nous collectons" body="uniquement Votre nom et numéro de هاتفك et adresse de Livraison — الحد الأدنى الrequis pour traiter votre commande."/>
+      <IB title="Les données que nous collectons" body="Uniquement votre nom, numéro de téléphone et adresse de livraison — le minimum nécessaire pour traiter votre commande."/>
       <IB title="Comment nous les utilisons" body="Exclusivement pour traiter et expédier votre commande. Aucun usage marketing ou vente de données."/>
       <IB title="Sécurité" body="Vos données sont protégées par un chiffrement haute sécurité et sécurisées en tout temps."/>
       <IB title="Partage des données" body="Nous ne vendons jamais vos données. Partagées avec les partenaires de livraison de confiance." tag="Garanti"/>
@@ -1537,7 +1537,7 @@ export function Contact({ store }: { store?: any }) {
                 <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="Comment pouvons-nous vous aider ?" rows={4} required className="inp" style={{ resize:'none' }}/>
               </div>
               <button type="submit" disabled={loading} className="btn-primary" style={{ justifyContent:'center', width:'100%', fontSize:'14px', padding:'13px', opacity:loading?0.7:1, cursor:loading?'not-allowed':'pointer' }}>
-                {loading?<><Loader2 size={15} style={{ animation:'spin 1s linear infinite' }}/> En cours...</>:<>Envoyer le message <ArrowLeft size={14}/></>}
+                {loading?<><Loader2 size={15} style={{ animation:'spin 1s linear infinite' }}/> En cours...</>:<>Envoyer le message <ArrowRight size={14}/></>}
               </button>
             </form>
           )}

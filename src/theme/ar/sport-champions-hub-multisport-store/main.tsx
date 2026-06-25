@@ -775,9 +775,7 @@ export function Home({ store, page }: any) {
 
       {/* ── CATEGORIES ── */}
       <div className="cats-grid">
-        <Link href="?" className="cat-card">
-                الكل
-              </Link>
+        
               {cats.map((cat: any) => (
           <Link key={cat.id} href={`?category=${cat.id}`} className="cat-card">
             <div className="cat-img" style={{ height: 160, overflow: 'hidden', position: 'relative', background: 'var(--g100)' }}>
@@ -840,32 +838,6 @@ export function Home({ store, page }: any) {
               style={{ width: 44, height: 44, border: '1px solid var(--g300)', background: '#fff', borderRadius: 'var(--radius-s)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, opacity: page >= countPage ? 0.5 : 1 }}>❯</Link>
           </div>
         )}
-      </section>
-
-      {/* ── PROMO BANNER ── */}
-      <section style={{ padding: '0 1.5rem 6rem', maxWidth: 1400, margin: '0 auto' }}>
-        <div className="banner-inner">
-          <div style={{ padding: '3.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative', zIndex: 2 }}>
-            <span style={{ display: 'inline-block', background: 'var(--accent)', color: '#fff', padding: '5px 16px', borderRadius: 50, fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1.25rem', width: 'fit-content' }}>
-              عرض محدود
-            </span>
-            <h2 className="oswald" style={{ fontSize: 'clamp(1.875rem,4vw,3rem)', fontWeight: 700, color: '#fff', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              تشكيلة الأبطال 2025
-            </h2>
-            <p style={{ color: 'var(--g400)', fontSize: '0.95rem', marginBottom: '2.5rem', maxWidth: 380, lineHeight: 1.7 }}>
-              تخفيضات تصل إلى 50% على معدات كرة القدم والتنس. عروض لفترة محدودة للرياضيين الجادين.
-            </p>
-            <a href="#products" className="btn-gold" style={{ textDecoration: 'none', width: 'fit-content' }}>
-              تسوق العروض <ArrowLeft size={16} />
-            </a>
-          </div>
-          {store.hero?.imageUrl && (
-            <div style={{ position: 'relative', overflow: 'hidden', minHeight: 280 }}>
-              <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right,var(--primary),transparent)', width: 100 }} />
-            </div>
-          )}
-        </div>
       </section>
 
       {/* ── BRANDS ── */}

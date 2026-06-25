@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Phone,
-  CheckCircle2, ArrowLeft, Ruler,
+  CheckCircle2, ArrowRight, Ruler,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Shield, Truck, Settings, HardHat,
   Mail,
@@ -222,7 +222,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   return (
     <>
       {store?.topBar?.enabled && store?.topBar?.text && (
-        <div style={{ background: store.topBar.color, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+        <div style={{ background: A, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
           {store.topBar.text}
         </div>
       )}
@@ -292,7 +292,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div style={{ padding: '0.375rem 1.5rem 1rem' }}>
             {[{ h: '/', l: 'Accueil' }, { h: '/contact', l: 'Contactez-nous' }].map(i => (
               <Link key={i.h} href={i.h} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: `1px solid ${BD}`, fontSize: '0.875rem', fontWeight: 500, color: '#374151' }}>
-                {i.l} <ArrowLeft size={14} style={{ color: A }} />
+                {i.l} <ArrowRight size={14} style={{ color: A }} />
               </Link>
             ))}
             
@@ -308,7 +308,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 <div style={{ width: 28, height: 28, background: AB, border: `1px solid rgba(245,158,11,0.3)`, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Search size={13} color={AD} />
                 </div>
-                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748B' }}>Recherche في Produits</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748B' }}>Rechercher des produits</span>
               </div>
               <button onClick={() => setShowSearch(false)} style={{ width: 34, height: 34, borderRadius: 8, border: `1px solid ${BD}`, background: CARD, color: '#94A3B8', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
                 <X size={15} />
@@ -336,7 +336,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 ))}
               </div>
               <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: AL, border: 'none', borderTop: `1px solid rgba(245,158,11,0.2)`, color: A, fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                Voir tous les résultats <ArrowLeft size={14} />
+                Voir tous les résultats <ArrowRight size={14} />
               </button>
               </>
             )}
@@ -363,7 +363,7 @@ export function Footer({ store }: any) {
               <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>{store?.name}</span>
             </div>
             <p style={{ fontSize: '0.875rem', lineHeight: 1.8, maxWidth: 300 }}>
-              {store?.hero?.subtitle?.substring(0, 100) || 'instruments de mesure et outillage professionnelle et Équipements protection individuelle بأعلى معايير la qualité.'}
+              {store?.hero?.subtitle?.substring(0, 100) || 'Instruments de mesure et outillage professionnel, équipements de protection individuelle aux meilleurs standards de qualité.'}
             </p>
             <p style={{ marginTop: '2rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.25)' }}>
               © {new Date().getFullYear()} {store?.name}. Tous droits réservés.
@@ -434,7 +434,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, width: '100%', padding: '0.6rem', borderRadius: 8, background: AB, color: AD, fontSize: '0.82rem', fontWeight: 600, transition: 'all 0.2s', border: `1px solid rgba(245,158,11,0.25)` }}
             onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = A; el.style.color = SL; el.style.borderColor = A; }}
             onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = AB; el.style.color = AD; el.style.borderColor = 'rgba(245,158,11,0.25)'; }}>
-            {viewDetails} <ArrowLeft size={12} />
+            {viewDetails} <ArrowRight size={12} />
           </Link>
         </div>
       </div>
@@ -468,15 +468,15 @@ export function Home({ store, page }: any) {
             <span style={{ fontSize: '0.72rem', fontWeight: 600, color: A }}>Outils d’ingénierie spécialisés</span>
           </div>
           <h1 style={{ fontSize: 'clamp(2rem,5.5vw,4rem)', fontWeight: 700, color: '#fff', lineHeight: 1.15, letterSpacing: '-0.025em', marginBottom: '1rem', maxWidth: 640 }}
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'Précision dans la mesure،<br/>Professionnalisme en <span style="color:#F59E0B">Travail</span>') }} />
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'Précision dans la mesure,<br/>Professionnalisme au <span style="color:#F59E0B">Travail</span>') }} />
           <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.68)', lineHeight: 1.75, marginBottom: '2.25rem', maxWidth: 480 }}>
-            {store.hero?.subtitle || 'instruments de mesure، outillage manuel et électrique، et Équipements protection individuelle Sélectionnés pour les professionnels du secteur Construction وl’ingénierie.'}
+            {store.hero?.subtitle || "Instruments de mesure, outillage manuel et électrique, et équipements de protection individuelle sélectionnés pour les professionnels de la construction et de l’ingénierie."}
           </p>
           <div className="hero-actions">
             <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: A, color: SL, fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.875rem', borderRadius: 8, transition: 'all 0.2s', boxShadow: `0 4px 24px rgba(245,158,11,0.4)` }}
               onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = AD; (e.currentTarget as HTMLAnchorElement).style.color = '#fff'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = A; (e.currentTarget as HTMLAnchorElement).style.color = SL; }}>
-              Parcourir les Produitss <ArrowLeft size={16} />
+              Parcourir les Produitss <ArrowRight size={16} />
             </a>
             {store?.cart !== false && (
               <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.8)', fontWeight: 500, fontSize: '0.9rem', padding: '0.875rem 1.25rem', borderRadius: 8, border: `1px solid rgba(255,255,255,0.25)`, transition: 'all 0.2s', background: 'rgba(255,255,255,0.06)' }}
@@ -1050,7 +1050,7 @@ export function Privacy() {
     <Shell title="Politique de confidentialité">
       <div style={{ background: CARD, padding: '1.75rem', borderRadius: 10, border: `1px solid ${BD}` }}>
         <InfoBlock title="Les données que nous collectons" body="Nous collectons uniquement : Nom, Téléphone et adresse de Livraison." />
-        <InfoBlock title="Protection des données" body="Stockées Tous les données de manière chiffrée وSécurisé. Nous utilisons des protocoles de protection avancés." />
+        <InfoBlock title="Protection des données" body="Toutes les données sont chiffrées et sécurisées. Nous utilisons des protocoles de protection avancés." />
         <InfoBlock title="Partage des informations" body="Nous ne vendons ni ne partageons vos données, sauf avec les partenaires de livraison." />
       </div>
     </Shell>
@@ -1062,7 +1062,7 @@ export function Terms() {
     <Shell title="Conditions d’utilisation">
       <div style={{ background: CARD, padding: '1.75rem', borderRadius: 10, border: `1px solid ${BD}` }}>
         <InfoBlock title="Compte et responsabilité" body="L’utilisateur est responsable de l’exactitude des données et de la confidentialité de son compte." />
-        <InfoBlock title="Commandes et paiements" body="يتم Confirmations de commande عبر Téléphone قبل الشحن. الLes prix affichés sont les prix définitifs الCertifiée." />
+        <InfoBlock title="Commandes et paiements" body="Les commandes sont confirmées par téléphone avant l'expédition. Les prix affichés sont les prix définitifs." />
         <InfoBlock title="Loi applicable" body="Toutes les transactions sont soumises aux lois de la République Algérienne Démocratique et Populaire." />
       </div>
     </Shell>
@@ -1073,7 +1073,7 @@ export function Cookies() {
   return (
     <Shell title="Cookies">
       <div style={{ background: CARD, padding: '1.75rem', borderRadius: 10, border: `1px solid ${BD}` }}>
-        <InfoBlock title="Fichiers essentiels" body="Nous utilisons Cookies الEssentiels pour garantir le fonctionnement du Panier et sécuriser la session de connexion." />
+        <InfoBlock title="Fichiers essentiels" body="Nous utilisons des cookies essentiels pour garantir le fonctionnement du panier et sécuriser la session de connexion." />
         <InfoBlock title="Amélioration de l’expérience" body="Nous utilisons certains fichiers pour analyser les interactions afin d’améliorer nos services." />
       </div>
     </Shell>
@@ -1152,7 +1152,7 @@ export function Contact({ store }: { store: any }) {
               <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }}
                 onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = AD; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = A; (e.currentTarget as HTMLButtonElement).style.color = SL; }}>
-                {loading ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />Envoi en cours...</> : <>Envoyer le message <ArrowLeft size={16} /></>}
+                {loading ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />Envoi en cours...</> : <>Envoyer le message <ArrowRight size={16} /></>}
               </button>
             </form>
           )}

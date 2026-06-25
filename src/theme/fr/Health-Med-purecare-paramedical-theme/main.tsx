@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
-  AlertCircle, X, ToggleRight, Shield, ArrowLeft,
+  AlertCircle, X, ToggleRight, Shield, ArrowRight,
   Plus, Minus, CheckCircle2, Lock, Menu, Package,
   Truck, BadgeCheck, ShieldCheck, HeartPulse,
   Pill, FlaskConical, Search, ShoppingCart, ShoppingBag,
@@ -267,18 +267,18 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         top: 'calc(100% + 8px)',
         right: 0,
         left: 0,
-        /* خلفية بيضاء صلبة */
+        /* fond blanc solide */
         background: '#FFFFFF',
         border: '1px solid #EEEEEE',
         borderRadius: '12px',
-        /* ظل ناعم واحترافي */
+        /* ombre douce et professionnelle */
         boxShadow: '0 15px 45px rgba(0,0,0,0.1)',
         zIndex: 210,
         overflow: 'hidden',
       }}
       className="anim-slide-down"
     >
-      {/* رأس القائمة بخلفية رمادية فاتحة جداً */}
+      {/* en-tête de la liste avec fond gris très clair */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -339,11 +339,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                   <div className="line-clamp-1" style={{ fontSize: '13px', fontWeight: 700, color: '#1A1A1A', marginBottom: '2px' }}>{p.name}</div>
                   <div style={{ fontSize: '14px', color: 'var(--fire)', fontWeight: 800 }}>{p.price} DA</div>
                 </div>
-                <ArrowLeft size={14} style={{ color: '#CCC' }} />
+                <ArrowRight size={14} style={{ color: '#CCC' }} />
               </Link>
             ))}
 
-            {/* زر Voir tout بلون أحمر sportif ثابت */}
+            {/* Bouton Voir tout en rouge */}
             <button
               onClick={() => doSearch()}
               style={{
@@ -362,12 +362,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 gap: '8px'
               }}
             >
-              Voir tous les résultats <ArrowLeft size={14} />
+              Voir tous les résultats <ArrowRight size={14} />
             </button>
           </div>
         ) : sq.length >= 2 && (
           <div style={{ padding: '2.5rem', textAlign: 'center', color: '#999', fontSize: '13px' }}>
-            Aucun résultat لـ "{sq}"
+            Aucun résultat pour "{sq}"
           </div>
         )}
       </div>
@@ -400,7 +400,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
           {/* Logo */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-            {store?.design?.logoUrl
+            {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
               ? <img src={store.design.logoUrl} alt={store.name} style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
               : <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'linear-gradient(135deg,var(--blue),var(--teal))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -441,7 +441,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {[{ h: '/', l: 'Accueil' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/cart', l: 'Panier' }].map((lnk, i) => (
             <Link key={i} href={lnk.h} onClick={() => setOpen(false)}
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 0', fontSize: '14px', fontWeight: 500, color: 'var(--mid)', borderBottom: '1px solid var(--line)' }}>
-              {lnk.l} <ArrowLeft style={{ width: '13px', height: '13px', color: 'var(--teal)' }} />
+              {lnk.l} <ArrowRight style={{ width: '13px', height: '13px', color: 'var(--teal)' }} />
             </Link>
           ))}
         </div>
@@ -451,7 +451,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   FOOTER — 3 أقسام حقيقية من store.contact
+   FOOTER — 3 sections depuis store.contact
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
   const yr = new Date().getFullYear();
@@ -460,10 +460,10 @@ export function Footer({ store }: any) {
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '48px 20px 32px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: '40px', paddingBottom: '36px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
 
-          {/* قسم 1 */}
+          {/* Section 1 */}
           <div>
             <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-              {store?.design?.logoUrl
+              {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
                 ? <img src={store.design.logoUrl} alt={store?.name} style={{ height: '28px', filter: 'brightness(0) invert(1)', opacity: 0.8 }} />
                 : <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <div style={{ width: '26px', height: '26px', borderRadius: '6px', background: 'linear-gradient(135deg,var(--blue),var(--teal))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -479,7 +479,7 @@ export function Footer({ store }: any) {
             <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.2)' }}>© {yr} {store?.name}. Tous droits réservés.</p>
           </div>
 
-          {/* قسم 2 — Liens */}
+          {/* Section 2 — Liens */}
           <div>
             <p style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Liens utiles</p>
             {[{ h: '/', l: 'Accueil' }, { h: '/cart', l: 'Panier' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/Privacy', l: 'Politique de confidentialité' }, { h: '/Terms', l: 'Conditions de service' }].map(lnk => (
@@ -491,7 +491,7 @@ export function Footer({ store }: any) {
             ))}
           </div>
 
-          {/* قسم 3 — Contact */}
+          {/* Section 3 — Contact */}
           <div>
             <p style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Contactez-nous</p>
             {[
@@ -529,7 +529,7 @@ export function Card({ product, displayImage, discount, store, viewDetails, isNe
     <div className="p-card" style={{ 
       display: 'flex', 
       flexDirection: 'column', 
-      height: '100%', // يضمن أن الكارت يملأ كامل طول الخلية في الشبكة
+      height: '100%', // garantit que la carte remplit toute la hauteur de la cellule
       backgroundColor: 'var(--white)',
       borderRadius: '8px',
       overflow: 'hidden',
@@ -550,7 +550,7 @@ export function Card({ product, displayImage, discount, store, viewDetails, isNe
       {/* Content Container */}
       <div style={{ 
         padding: '12px', 
-        flex: 1,           // هذا يجعل قسم المحتوى يتمدد لملء المساحة المتبقية
+        flex: 1, // permet à la section contenu de se développer pour remplir l'espace restant
         display: 'flex', 
         flexDirection: 'column', 
         gap: '8px' 
@@ -566,7 +566,7 @@ export function Card({ product, displayImage, discount, store, viewDetails, isNe
           WebkitBoxOrient: 'vertical', 
           overflow: 'hidden', 
           margin: 0,
-          minHeight: '2.8em' // يضمن حجز مساحة لسطرين حتى لو كان adresse قصيراً
+          minHeight: '2.8em' // réserve l'espace pour deux lignes même si l'adresse est courte
         }}>
           {product.name}
         </h3>
@@ -608,10 +608,10 @@ export function Home({ store, page }: any) {
   const scroll = (dir: 'left' | 'right') => { if (!scrollRef.current) return; scrollRef.current.scrollBy({ left: dir === 'left' ? 240 : -240, behavior: 'smooth' }); };
 
   const defaultCats = [
-    { id: '1', name: 'أجهزة médicaux', icon: <HeartPulse style={{ width: '28px', height: '28px' }} /> },
-    { id: '2', name: 'العناية الquotidiens', icon: <FlaskConical style={{ width: '28px', height: '28px' }} /> },
+    { id: '1', name: 'Appareils médicaux', icon: <HeartPulse style={{ width: '28px', height: '28px' }} /> },
+    { id: '2', name: 'Soins quotidiens', icon: <FlaskConical style={{ width: '28px', height: '28px' }} /> },
     { id: '3', name: 'compléments alimentaires', icon: <Pill style={{ width: '28px', height: '28px' }} /> },
-    { id: '4', name: 'أدوات تشخيص', icon: <Activity style={{ width: '28px', height: '28px' }} /> },
+    { id: '4', name: 'Outils de diagnostic', icon: <Activity style={{ width: '28px', height: '28px' }} /> },
   ];
   const displayCats = cats.length > 0 ? cats.slice(0, 4) : [];
 
@@ -627,12 +627,12 @@ export function Home({ store, page }: any) {
           }
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right,rgba(12,47,107,0.88) 0%,rgba(12,47,107,0.5) 55%,transparent 100%)', display: 'flex', alignItems: 'center' }}>
             <div className="fi" style={{ padding: '32px 5vw', zIndex: 2, maxWidth: 460 }}>
-              {store?.design?.logoUrl && <img src={store.design.logoUrl} alt="" style={{ height: '36px', filter: 'brightness(0) invert(1)', opacity: 0.9, marginBottom: '12px', display: 'block' }} />}
+              {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && <img src={store.design.logoUrl} alt="" style={{ height: '36px', filter: 'brightness(0) invert(1)', opacity: 0.9, marginBottom: '12px', display: 'block' }} />}
               <h1 className="pjs" style={{ fontSize: 'clamp(1.6rem,5vw,3.2rem)', fontWeight: 800, color: 'white', lineHeight: 1.05, marginBottom: '10px', letterSpacing: '-0.01em' }}>
                 {store.hero?.title || 'Votre partenaire médical De confiance'}
               </h1>
               <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.78)', marginBottom: '22px', lineHeight: '1.7' }}>
-                {store.hero?.subtitle || 'Les meilleurs Produits الpara-médicaux et les appareils médicaux de Qualité certifiée وCertifiée.'}
+                {store.hero?.subtitle || 'Les meilleurs produits paramédicaux et appareils médicaux de qualité certifiée.'}
               </p>
               <a href="#products" className="btn-blue" style={{ fontSize: '14px', padding: '11px 26px' }}>Acheter maintenant</a>
             </div>
@@ -758,11 +758,11 @@ export function Home({ store, page }: any) {
       <section style={{ padding: '48px 0', backgroundColor: 'var(--white)' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px' }}>
           <h2 className="pjs" style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--ink)', textAlign: 'center', marginBottom: '28px' }}>
-            Pourquoi choisir {store?.name}؟
+            Pourquoi choisir {store?.name} ?
           </h2>
           <div className="why-grid">
             {[
-              { icon: <BadgeCheck style={{ width: '36px', height: '36px' }} />, color: 'var(--teal)', title: 'Produits certifiée', desc: 'Produits Certifiée et Sélectionnés avec précision من sources médicaux De confiance.' },
+              { icon: <BadgeCheck style={{ width: '36px', height: '36px' }} />, color: 'var(--teal)', title: 'Produits certifiés', desc: 'Produits certifiés et sélectionnés avec précision depuis des sources médicales de confiance.' },
               { icon: <ShieldCheck style={{ width: '36px', height: '36px' }} />, color: 'var(--blue)', title: 'Paiement Sécurisé', desc: 'Transactions entièrement chiffrées pour garantir la sécurité de vos données.' },
               { icon: <Activity style={{ width: '36px', height: '36px' }} />, color: '#7C3AED', title: 'Support spécialisé', desc: 'Équipe spécialisée répond le plus rapidement possible à vos questions.' },
               { icon: <Truck style={{ width: '36px', height: '36px' }} />, color: 'var(--orange)', title: 'Livraison rapide', desc: 'Livraison de haute qualité pour toutes les wilayas de Algérie.' },
@@ -1098,10 +1098,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
 
             <button type="submit" disabled={sub} className="btn-blue" style={{ width: '100%', fontSize: '15px', padding: '13px', cursor: sub ? 'not-allowed' : 'pointer', opacity: sub ? 0.7 : 1, borderRadius: '7px', marginBottom: '10px' }}>
-              {sub ? <><Loader2 style={{ width: '15px', height: '15px', animation: 'spin 1s linear infinite' }} /> Traitement en cours...</> : <>Confirmer la commande <ArrowLeft style={{ width: '15px', height: '15px' }} /></>}
+              {sub ? <><Loader2 style={{ width: '15px', height: '15px', animation: 'spin 1s linear infinite' }} /> Traitement en cours...</> : <>Confirmer la commande <ArrowRight style={{ width: '15px', height: '15px' }} /></>}
             </button>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
-              {[{ icon: <Lock style={{ width: '11px', height: '11px' }} />, label: 'Paiement Sécurisé' }, { icon: <ShieldCheck style={{ width: '11px', height: '11px' }} />, label: 'Données chiffrées' }, { icon: <BadgeCheck style={{ width: '11px', height: '11px' }} />, label: 'certifié وCertifié' }].map((b, i) => (
+              {[{ icon: <Lock style={{ width: '11px', height: '11px' }} />, label: 'Paiement sécurisé' }, { icon: <ShieldCheck style={{ width: '11px', height: '11px' }} />, label: 'Données chiffrées' }, { icon: <BadgeCheck style={{ width: '11px', height: '11px' }} />, label: 'Certifié et garanti' }].map((b, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: 'var(--dim)', fontWeight: 500 }}>
                   <span style={{ color: 'var(--blue)' }}>{b.icon}</span> {b.label}
                 </div>
@@ -1180,7 +1180,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
           <div style={{ backgroundColor: 'var(--white)', borderRadius: '10px', border: '1px solid var(--line)', overflow: 'hidden' }}>
             <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--line)', backgroundColor: 'var(--slate)', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Package size={20} style={{ color: 'var(--blue)' }} />
-              <h3 className="pjs" style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--ink)' }}>Produitsك ({items.length})</h3>
+              <h3 className="pjs" style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: 'var(--ink)' }}>Produits ({items.length})</h3>
             </div>
             {items.map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: '15px', padding: '20px', borderBottom: '1px solid var(--line)', backgroundColor: i % 2 === 0 ? 'transparent' : 'rgba(241,245,249,0.5)' }}>
@@ -1286,7 +1286,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 }
               </button>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' }}>
-                {[{ icon: <Lock size={12} />, label: 'Paiement Sécurisé' }, { icon: <ShieldCheck size={12} />, label: 'Données chiffrées' }, { icon: <BadgeCheck size={12} />, label: 'certifié وCertifié' }].map((b, i) => (
+                {[{ icon: <Lock size={12} />, label: 'Paiement sécurisé' }, { icon: <ShieldCheck size={12} />, label: 'Données chiffrées' }, { icon: <BadgeCheck size={12} />, label: 'Certifié et garanti' }].map((b, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: 'var(--dim)' }}>
                     <span style={{ color: 'var(--blue)' }}>{b.icon}</span>{b.label}
                   </div>
@@ -1345,7 +1345,7 @@ const IB = ({ title, body, tag }: { title: string; body: string; tag?: string })
 export function Privacy() {
   return (
     <Shell title="Politique de confidentialité" sub="// Légal">
-      <IB title="Les données que nous collectons" body="uniquement Votre nom et numéro de هاتفك et adresse de Livraison — le minimum nécessaire pour traiter votre commande." />
+      <IB title="Les données que nous collectons" body="Uniquement votre nom, numéro de téléphone et adresse de livraison — le minimum nécessaire pour traiter votre commande." />
       <IB title="Comment nous les utilisons" body="Exclusivement pour traiter et livrer vos achats. Aucun usage commercial de vos données." />
       <IB title="Sécurité" body="Vos données sont protégées par un chiffrement de niveau entreprise et une infrastructure sécurisée." />
       <IB title="Partage des données" body="Nous ne vendons pas vos données. Partagées avec les partenaires de livraison de confiance." tag="Garanti" />
@@ -1382,7 +1382,7 @@ export function Contact({ store }: { store?: any }) {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Tennisيق الحقول الافتراضي
+  // Style par défaut des champs
   const INP = () => ({
     width: '100%',
     padding: '12px 14px',
@@ -1422,7 +1422,7 @@ export function Contact({ store }: { store?: any }) {
         <div style={{ maxWidth: '960px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
           <p className="bc" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.24em', color: 'var(--blue)', marginBottom: '10px' }}>// Contact</p>
           <h1 className="bc" style={{ fontSize: 'clamp(2.5rem,7vw,6rem)', fontWeight: 800, letterSpacing: '0.04em', color: 'white', lineHeight: 0.88, margin: '0 0 12px' }}>Contactez-nous</h1>
-          <p className="bc" style={{ fontSize: '14px', fontWeight: 600, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.4)' }}>نRéponse sous 24h</p>
+          <p className="bc" style={{ fontSize: '14px', fontWeight: 600, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.4)' }}>Réponse sous 24h</p>
         </div>
       </div>
 
@@ -1488,7 +1488,7 @@ export function Contact({ store }: { store?: any }) {
                   style={{ ...INP(), resize: 'none' }} onFocus={onF} onBlur={onB} />
               </div>
               <button type="submit" disabled={loading} className="btn-blue" style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', width: '100%', fontSize: '15px', padding: '13px', opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer', border: 'none', color: 'white', fontWeight: 600 }}>
-                {loading ? <><Loader2 style={{ width: '15px', height: '15px', animation: 'spin 1s linear infinite' }} /> Envoi en cours...</> : <>Envoyer le message <ArrowLeft style={{ width: '14px', height: '14px' }} /></>}
+                {loading ? <><Loader2 style={{ width: '15px', height: '15px', animation: 'spin 1s linear infinite' }} /> Envoi en cours...</> : <>Envoyer le message <ArrowRight style={{ width: '14px', height: '14px' }} /></>}
               </button>
             </form>
           )}

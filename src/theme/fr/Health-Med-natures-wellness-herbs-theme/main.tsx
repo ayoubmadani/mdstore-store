@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Phone,
-  CheckCircle2, ArrowLeft, Package,
+  CheckCircle2, ArrowRight, Package,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Shield, Truck, Leaf, Heart,
   Mail,
@@ -281,7 +281,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div style={{ padding: '0.5rem 1.5rem 1rem' }}>
             {[{ h: '/', l: 'Accueil' }, { h: '/contact', l: 'Contactez-nous' }].map(i => (
               <Link key={i.h} href={i.h} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: `1px solid ${BD}`, fontSize: '0.9rem', fontWeight: 500, color: INK }}>
-                {i.l} <ArrowLeft size={14} style={{ color: G }} />
+                {i.l} <ArrowRight size={14} style={{ color: G }} />
               </Link>
             ))}
 
@@ -317,7 +317,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 ))}
               </div>
               <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: GL, border: 'none', borderTop: `1px solid rgba(45,106,79,0.2)`, color: G, fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                Voir tous les résultats <ArrowLeft size={14} />
+                Voir tous les résultats <ArrowRight size={14} />
               </button>
               </>
             )}
@@ -407,7 +407,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <Link href={`/product/${product.slug || product.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: `linear-gradient(135deg, ${G}, ${GA})`, color: '#fff', fontSize: '0.82rem', fontWeight: 600, padding: '0.6rem', borderRadius: 24, transition: 'opacity 0.18s' }}
           onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.85')}
           onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}>
-          Voir le produit <ArrowLeft size={12} />
+          Voir le produit <ArrowRight size={12} />
         </Link>
       </div>
     </div>
@@ -449,7 +449,7 @@ export function Home({ store, page }: any) {
                 <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: `linear-gradient(135deg, ${G} 0%, ${GA} 100%)`, color: '#fff', fontWeight: 600, fontSize: '0.9rem', padding: '0.875rem 1.875rem', borderRadius: 12, transition: 'opacity 0.18s' }}
                   onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.88')}
                   onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}>
-                  Parcourir les Produitss <ArrowLeft size={15} />
+                  Parcourir les Produitss <ArrowRight size={15} />
                 </a>
                 {store?.cart !== false && (
                   <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, color: SUB, fontWeight: 500, fontSize: '0.9rem', padding: '0.875rem 1.5rem', borderRadius: 12, border: `1px solid ${BD}`, background: CARD, transition: 'all 0.18s' }}
@@ -1000,7 +1000,7 @@ export function Privacy() {
     <Shell title="Politique de confidentialité">
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 16, border: `1px solid ${BD}` }}>
         <InfoBlock title="Les données que nous collectons" body="Nous collectons uniquement : Nom, Téléphone et adresse de Livraison." />
-        <InfoBlock title="Protection des données" body="Stockées Tous les données de manière chiffrée. Nous utilisons protocoles حماية Certifiée لGarantie la sécurité de vos informations." />
+        <InfoBlock title="Protection des données" body="Toutes les données sont chiffrées. Nous utilisons des protocoles de protection certifiés pour garantir la sécurité de vos informations." />
         <InfoBlock title="Partage des informations" body="Nous ne vendons ni ne partageons vos données, sauf avec les partenaires de livraison." />
       </div>
     </Shell>
@@ -1023,7 +1023,7 @@ export function Cookies() {
   return (
     <Shell title="Cookies">
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 16, border: `1px solid ${BD}` }}>
-        <InfoBlock title="Fichiers essentiels" body="Nous utilisons Cookies الEssentiels pour garantir le fonctionnement du Panier et la sécurité de la session." />
+        <InfoBlock title="Fichiers essentiels" body="Nous utilisons des cookies essentiels pour garantir le fonctionnement du panier et la sécurité de la session." />
         <InfoBlock title="Amélioration de l’expérience" body="Nous utilisons certains fichiers pour comprendre l’utilisation du site et améliorer l’expérience." />
       </div>
     </Shell>
@@ -1095,7 +1095,7 @@ export function Contact({ store }: { store: any }) {
               <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = GD)}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = G)}>
-                {loading ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />Envoi en cours...</> : <>Envoyer le message <ArrowLeft size={15} /></>}
+                {loading ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />Envoi en cours...</> : <>Envoyer le message <ArrowRight size={15} /></>}
               </button>
             </form>
           )}

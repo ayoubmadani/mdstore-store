@@ -142,7 +142,7 @@ export function Navbar({ store }: { store: Store }) {
     <nav style={{ borderBottom: '1px solid #e5e5e5', background: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
       <div style={{ ...S.container, display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
         <Link href="/" style={{ fontWeight: 700, fontSize: '1rem', color: '#111', textDecoration: 'none' }}>
-          {store.design?.logoUrl
+          {store.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
             ? <img src={store.design.logoUrl} alt={store.name} style={{ height: 32, display: 'block' }} />
             : store.name}
         </Link>
@@ -430,7 +430,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                     <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.75rem', border: `1px solid ${selectedOffer === o.id ? '#111' : '#ddd'}`, borderRadius: 4, cursor: 'pointer', background: selectedOffer === o.id ? '#f8f8f8' : '#fff' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <input type="radio" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ accentColor: '#111' }} />
-                        <span style={{ fontSize: '0.85rem' }}>{o.name} <span style={{ color: '#888', fontSize: '0.8rem' }}>({o.quantity} قطع)</span></span>
+                        <span style={{ fontSize: '0.85rem' }}>{o.name} <span style={{ color: '#888', fontSize: '0.8rem' }}>({o.quantity} pcs)</span></span>
                       </div>
                       <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{o.price.toLocaleString()} DA</span>
                     </label>
@@ -733,7 +733,7 @@ function SimplePage({ title, children }: { title: string; children: React.ReactN
 export function Privacy() {
   return (
     <SimplePage title="Politique de confidentialité">
-      <p>نجمع uniquement les données الEssentiels pour traiter votre commande et Livraisonه (Nom، adresse، Numéro de Téléphone).</p>
+      <p>Nous collectons uniquement les données essentielles pour traiter votre commande et la livraison (Nom, adresse, Numéro de téléphone).</p>
       <br />
       <p>Vos données sont utilisées exclusivement pour traiter vos commandes. Nous ne les partageons pas à des fins marketing.</p>
     </SimplePage>
@@ -753,7 +753,7 @@ export function Terms() {
 export function Cookies() {
   return (
     <SimplePage title="Politique de cookies">
-      <p>Nous utilisons Cookies الEssentiels uniquement pour faire fonctionner les fonctions essentielles du site comme la connexion et le Panier.</p>
+      <p>Nous utilisons des cookies essentiels uniquement pour faire fonctionner les fonctions essentielles du site comme la connexion et le panier.</p>
     </SimplePage>
   );
 }

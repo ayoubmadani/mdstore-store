@@ -519,7 +519,7 @@ export function Footer({ store }: any) {
           <div>
             <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'16px'}}>
               <FireIcon size={22}/>
-              {store?.design?.logoUrl
+              {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
                 ? <img src={store.design.logoUrl} alt={store?.name} style={{height:'26px',filter:'grayscale(1) brightness(2)',opacity:0.8}}/>
                 : <span className="bb" style={{fontSize:'1.4rem',color:'var(--white)'}}>{store?.name}</span>
               }
