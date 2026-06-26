@@ -234,8 +234,11 @@ const GLOBAL_CSS = `
   }
   @media (max-width: 480px) {
     .gg-trust { grid-template-columns: 1fr 1fr; }
-    .gg-cards-grid { grid-template-columns: repeat(2, 1fr); }
+    .gg-cards-grid { grid-template-columns: 1fr; }
   }
+
+  .gg-form-2c{display:grid;grid-template-columns:1fr;gap:10px;}
+  @media(min-width:540px){.gg-form-2c{grid-template-columns:1fr 1fr;}}
 `;
 
 /* ══════════════════════════════════════════════════════════════
@@ -1284,7 +1287,7 @@ export function Contact({ store }: { store?: any }) {
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div className="gg-form-2c">
                 <FR label="الاسم"><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="اسمك الكامل" required style={INP()} /></FR>
                 <FR label="الهاتف"><input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="05XXXXXXXX" required style={INP()} /></FR>
               </div>

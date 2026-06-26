@@ -119,7 +119,7 @@ const THEME_CSS = `
   /* ── Grids ── */
   .products-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 1rem;
   }
   @media (min-width: 640px)  { .products-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -187,7 +187,7 @@ const THEME_CSS = `
 /* ─── Floating cloud deco ─── */
 const CloudDeco = ({ style = {} as any }) => (
     <svg viewBox="0 0 120 60" fill="currentColor" style={{ display: 'inline-block', ...style }}>
-        <ellipse cx="60" cy="50" rx="55" ry="18" />
+        <ellipse cx='60' cy="50" rx="55" ry="18" />
         <ellipse cx="35" cy="38" rx="28" ry="20" />
         <ellipse cx="70" cy="32" rx="32" ry="22" />
         <ellipse cx="95" cy="42" rx="22" ry="16" />
@@ -225,12 +225,12 @@ const INP = (err?: boolean): React.CSSProperties => ({
     width: '100%', padding: '0.75rem 1rem', fontSize: '0.9rem', fontWeight: 600,
     background: '#fff', border: `2px solid ${err ? '#FDA4AF' : 'var(--border)'}`,
     borderRadius: 14, color: 'var(--text)', outline: 'none',
-    fontFamily: "'Quicksand', sans-serif", transition: 'border-color 0.2s', appearance: 'none'
+    fontFamily: "'Cormorant Garamond', serif", transition: 'border-color 0.2s', appearance: 'none'
 });
 const BTN_PRI: React.CSSProperties = {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
     padding: '0.875rem 1.75rem', borderRadius: 50, border: 'none', cursor: 'pointer',
-    fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: '0.925rem',
+    fontFamily: "'Cormorant Garamond', serif", fontWeight: 700, fontSize: '0.925rem',
     background: 'linear-gradient(135deg, var(--lavender-dk), #6D28D9)',
     color: '#fff', boxShadow: '0 6px 24px rgba(124,58,237,0.3)', transition: 'all 0.25s'
 };
@@ -248,7 +248,7 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
 ══════════════════════════════════════════════════════════════ */
 export default function Main({ store, children, domain }: any) {
     return (
-        <div style={{ minHeight: '100vh', background: 'var(--bg)', fontFamily: "'Quicksand', sans-serif" }}>
+        <div style={{ minHeight: '100vh', background: 'var(--bg)', fontFamily: "'Cormorant Garamond', serif" }}>
             <style>{THEME_CSS}</style>
             <Navbar store={store} domain={domain} />
             <main>{children}</main>
@@ -387,7 +387,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 <div className="nav-desktop-search" style={{ flex: 1, maxWidth: 340, position: 'relative' }}>
                     <form onSubmit={doSearch}>
                         <input type="text" placeholder="Rechercher ici... 🌸" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                            style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.75rem', borderRadius: 50, border: '2px solid var(--lavender-lt)', background: '#fff', fontSize: '0.875rem', fontWeight: 600, outline: 'none', transition: 'border-color 0.2s', fontFamily: "'Quicksand', sans-serif" }}
+                            style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.75rem', borderRadius: 50, border: '2px solid var(--lavender-lt)', background: '#fff', fontSize: '0.875rem', fontWeight: 600, outline: 'none', transition: 'border-color 0.2s', fontFamily: "'Cormorant Garamond', serif" }}
                             onFocus={e => (e.target.style.borderColor = 'var(--lavender)')}
                             onBlur={e => (e.target.style.borderColor = 'var(--lavender-lt)')} />
                         <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--lavender)' }} />
@@ -623,7 +623,7 @@ export function Home({ store, page }: any) {
                 )}
 
                 <div style={{ maxWidth: 1280, margin: '0 auto', padding: '7rem 1.5rem 4rem', position: 'relative', zIndex: 1, width: '100%' }}>
-                    <div className="anim-fade" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.5rem 1.25rem', borderRadius: 50, background: 'rgba(196,181,253,0.2)', border: '1.5px solid rgba(196,181,253,0.5)', marginBottom: '1.5rem' }}>
+                    <div className='anim-fade' style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.5rem 1.25rem', borderRadius: 50, background: 'rgba(196,181,253,0.2)', border: '1.5px solid rgba(196,181,253,0.5)', marginBottom: '1.5rem' }}>
                         <Sparkles size={14} style={{ color: 'var(--lavender-dk)' }} />
                         <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{store?.name} — Prendre soin de votre enfant avec amour</span>
                     </div>
@@ -760,7 +760,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                     {/* Gallery */}
                     <div style={{top: 84 }}>
                         <div style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 24, overflow: 'hidden', background: 'var(--lavender-lt)', border: '2px solid var(--lavender-lt)' }}>
-                            {allImages[sel] ? <img src={allImages[sel]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            {allImages[sel] ? <img src={allImages[sel]} alt='' style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem' }}>🧸</div>}
                             {discount > 0 && <div style={{ position: 'absolute', top: 14, right: 14, background: 'var(--lavender-dk)', color: '#fff', padding: '4px 14px', borderRadius: 50, fontSize: 12, fontWeight: 700 }}>Réduction {discount}%</div>}
                             {allImages.length > 1 && (
@@ -805,7 +805,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                         <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1rem', border: `2px solid ${selectedOffer === o.id ? 'var(--lavender-dk)' : 'var(--border)'}`, borderRadius: 16, cursor: 'pointer', marginBottom: '0.5rem', background: selectedOffer === o.id ? 'var(--lavender-lt)' : 'transparent', transition: 'all 0.2s' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
                                                 <div style={{ width: 20, height: 20, borderRadius: '50%', border: `2px solid ${selectedOffer === o.id ? 'var(--lavender-dk)' : 'var(--border)'}`, background: selectedOffer === o.id ? 'var(--lavender-dk)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    {selectedOffer === o.id && <Check size={11} color="#fff" />}
+                                                    {selectedOffer === o.id && <Check size={11} color='#fff' />}
                                                 </div>
                                                 <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
                                                 <div>
@@ -954,7 +954,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const validate = () => {
         const e: Record<string, string> = {};
         if (!fd.customerName.trim()) e.customerName = 'requis';
-        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide (ex: 0550123456)';
+        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide (ex: 0550123456)";
         if (!fd.customerWelaya) e.customerWelaya = 'requis';
         if (!fd.customerCommune) e.customerCommune = 'requis';
         return e;
@@ -1009,7 +1009,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                     )}
                     <form onSubmit={handleSubmit}>
                         <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-                            <FR error={errors.customerName} label="Nom complet">
+                            <FR error={errors.customerName} label='Nom complet'>
                                 <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder="Nom" style={INP(!!errors.customerName)} />
                             </FR>
                             <FR error={errors.customerPhone} label="Numéro de Téléphone">
@@ -1017,7 +1017,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                             </FR>
                         </div>
                         <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-                            <FR error={errors.customerWelaya} label="Wilaya">
+                            <FR error={errors.customerWelaya} label='Wilaya'>
                                 <div style={{ position: 'relative' }}>
                                     <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--lavender)', pointerEvents: 'none' }} />
                                     <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP(!!errors.customerWelaya), paddingLeft: 32, fontFamily: 'inherit' }}>
@@ -1071,7 +1071,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                             ))}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', paddingTop: '0.375rem' }}>
                                 <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--lavender-dk)' }}>Total</span>
-                                <span className="font-serif" style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{total().toLocaleString()} <span style={{ fontSize: '0.85rem', fontFamily: "'Quicksand', sans-serif", fontWeight: 600 }}>DA</span></span>
+                                <span className="font-serif" style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{total().toLocaleString()} <span style={{ fontSize: '0.85rem', fontFamily: "'Cormorant Garamond', serif", fontWeight: 600 }}>DA</span></span>
                             </div>
                         </div>
 
@@ -1115,7 +1115,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         e.preventDefault();
         const er: Record<string, string> = {};
         if (!fd.customerName.trim()) er.name = 'requis';
-        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro invalide (ex: 0550123456)';
+        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro invalide (ex: 0550123456)";
         if (!fd.customerWelaya) er.w = 'requis';
         if (!fd.customerCommune) er.c = 'requis';
         if (Object.keys(er).length) { setErrors(er); return; }
@@ -1131,7 +1131,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             <div className="anim-fade" style={{ textAlign: 'center', background: '#fff', padding: '4rem 2.5rem', borderRadius: 28, border: '2px solid var(--lavender-lt)', maxWidth: 460, width: '100%', boxShadow: '0 12px 40px var(--shadow)' }}>
                 <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1.25rem', animation: 'gentle-float 3s ease-in-out infinite' }}>🌸</span>
                 <h2 className="font-serif" style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--lavender-dk)', marginBottom: '0.625rem' }}>Commande reçue !</h2>
-                <p style={{ color: 'var(--text-mid)', fontWeight: 600, marginBottom: '2rem', lineHeight: 1.7 }}>Merci de votre confiance. Nous vous contacterons bient’t 💝</p>
+                <p style={{ color: 'var(--text-mid)', fontWeight: 600, marginBottom: '2rem', lineHeight: 1.7 }}>Merci de votre confiance. Nous vous contacterons bient't 💝</p>
                 <Link href="/" className="btn-soft" style={{ ...BTN_PRI, textDecoration: 'none', display: 'inline-flex' }}>Retour à la boutique</Link>
             </div>
         </div>
@@ -1188,7 +1188,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                                 <FR error={errors.phone} label="Téléphone"><input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} style={INP(!!errors.phone)} /></FR>
                             </div>
                             <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-                                <FR error={errors.w} label="Wilaya">
+                                <FR error={errors.w} label='Wilaya'>
                                     <div style={{ position: 'relative' }}>
                                         <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--lavender)', pointerEvents: 'none' }} />
                                         <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP(!!errors.w), paddingLeft: 32, fontFamily: 'inherit' }}>
@@ -1245,7 +1245,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                                     <span style={{ fontWeight: 700, color: 'var(--lavender-dk)' }}>Total</span>
-                                    <span className="font-serif" style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.85rem', fontFamily: "'Quicksand', sans-serif" }}>DA</span></span>
+                                    <span className="font-serif" style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.85rem', fontFamily: "'Cormorant Garamond', serif" }}>DA</span></span>
                                 </div>
                             </div>
 
@@ -1288,7 +1288,7 @@ export function Terms() {
     return <Shell emoji="📋" title="Conditions et clauses"><IB icon={<CheckCircle2 size={18} />} title="Commandes et paiements" desc="Les commandes sont confirmées par téléphone avant l'expédition. Paiement à la livraison." /><IB icon={<Truck size={18} />} title="Livraison" desc="Nous proposons la livraison dans toutes les wilayas d'Algérie aux meilleurs prix." /><IB icon={<Shield size={18} />} title="Garanties" desc="Nous nous engageons aux plus hauts standards de qualité et de sécurité pour tous nos produits." /></Shell>;
 }
 export function Cookies() {
-    return <Shell emoji="🍪" title="Cookies"><IB icon={<Shield size={18} />} title="Fichiers essentiels" desc="Essentiels pour le fonctionnement du panier et la conservation de vos données de session." /><IB icon={<Sparkles size={18} />} title="Amélioration de l’expérience" desc="Nous aident à offrir une expérience shopping personnalisée et meilleure pour vous." /></Shell>;
+    return <Shell emoji="🍪" title="Cookies"><IB icon={<Shield size={18} />} title="Fichiers essentiels" desc="Essentiels pour le fonctionnement du panier et la conservation de vos données de session." /><IB icon={<Sparkles size={18} />} title="Amélioration de l'expérience" desc="Nous aident à offrir une expérience shopping personnalisée et meilleure pour vous." /></Shell>;
 }
 
 export function Contact({ store }: { store: any }) {
@@ -1308,11 +1308,11 @@ export function Contact({ store }: { store: any }) {
                 <p style={{ color: 'var(--text-mid)', fontWeight: 600, marginTop: '0.5rem' }}>Nous sommes toujours là pour vous aider 🌸</p>
             </div>
             <div style={{ maxWidth: 1000, margin: '0 auto', padding: '3rem 1.5rem 5rem' }}>
-                <div className="contact-layout">
+                <div className='contact-layout'>
                     <div>
                         {[{ e: '📞', l: 'Téléphone', v: store?.contact?.phone || 'Non disponible' }, { e: '📍', l: 'Adresse', v: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') || 'Algérie' }, { e: '📧', l: 'Email', v: store?.contact?.email || 'Non disponible' }].map((r, i) => (
                             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', padding: '1rem', borderRadius: 18, border: '2px solid var(--lavender-lt)', background: '#fff', marginBottom: '0.75rem', transition: 'all 0.25s' }}
-                                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--lavender)'; el.style.boxShadow = '0 8px 24px var(--shadow)'; }}
+                                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = "var(--lavender)"; el.style.boxShadow = '0 8px 24px var(--shadow)'; }}
                                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--lavender-lt)'; el.style.boxShadow = ''; }}>
                                 <span style={{ fontSize: '2rem' }}>{r.e}</span>
                                 <div><p style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '0.2rem' }}>{r.l}</p><p style={{ fontWeight: 700, color: 'var(--text)', fontSize: '0.9rem' }}>{r.v}</p></div>
@@ -1328,7 +1328,7 @@ export function Contact({ store }: { store: any }) {
                             </div>
                         ) : (
                             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-                                <div className="form-row-2">
+                                <div className='form-row-2'>
                                     <div><label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.375rem' }}>Nom</label><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={INP()} /></div>
                                     <div><label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.375rem' }}>Téléphone</label><input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required style={INP()} /></div>
                                 </div>

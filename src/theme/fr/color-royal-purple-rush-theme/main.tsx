@@ -98,9 +98,6 @@ const THEME_CSS = `
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  @media (min-width: 500px) {
-    .products-grid { grid-template-columns: repeat(2, 1fr); }
-  }
   @media (min-width: 1024px) {
     .products-grid { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
   }
@@ -557,12 +554,12 @@ export function Footer({ store }: any) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '1rem' }}>
               <div style={{ width: 32, height: 32, background: '#8B5CF6', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Zap size={18} color="#fff" fill="#fff" />
+                <Zap size={18} color='#fff' fill="#fff" />
               </div>
               <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>{store?.name}</span>
             </div>
             <p style={{ fontSize: '0.875rem', lineHeight: 1.8, color: '#666', maxWidth: 320 }}>
-              {store?.hero?.subtitle?.substring(0, 100) || 'Expérience shopping moderne et rapide. Livraison dans toutes les wilayas d’Algérie.'}
+              {store?.hero?.subtitle?.substring(0, 100) || "Expérience shopping moderne et rapide. Livraison dans toutes les wilayas d'Algérie."}
             </p>
             <p style={{ marginTop: '2rem', fontSize: '0.75rem', color: '#333' }}>
               © {new Date().getFullYear()} {store?.name}. Tous droits réservés.
@@ -715,7 +712,7 @@ export function Home({ store, page }: any) {
           {/* Text */}
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgb(136 57 230 / 15%)', border: '1px solid rgb(139 57 230 / 30%)', borderRadius: 6, padding: '0.375rem 0.875rem', marginBottom: '1.5rem' }}>
-              <Zap size={13} color="#8B5CF6" fill="#8B5CF6" />
+              <Zap size={13} color='#8B5CF6' fill="#8B5CF6" />
               <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#8B5CF6', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{store.name}</span>
             </div>
             <h1 style={{ fontSize: 'clamp(2.25rem,6vw,4.5rem)', fontWeight: 800, color: '#fff', lineHeight: 1.1, letterSpacing: '-0.03em', marginBottom: '1.25rem' }}
@@ -798,7 +795,7 @@ export function Home({ store, page }: any) {
 
         {products.length === 0 ? (
           <div style={{ padding: '5rem', textAlign: 'center', border: '2px dashed #EBEBEB', borderRadius: 16 }}>
-            <p style={{ color: '#ccc', fontSize: '1rem' }}>Aucun produit pour l’instant</p>
+            <p style={{ color: '#ccc', fontSize: "1rem" }}>Aucun produit pour l'instant</p>
           </div>
         ) : (
           <div className="products-grid">
@@ -904,7 +901,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                   padding: 0,
                   background: 'none'
                 }}>
-                  <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={img} alt='' style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
               ))}
             </div>
@@ -979,7 +976,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                           }
                         }
                       >
-                        {/* Afficher le texte uniquement si ce n'est pas une couleur ou image */}
+                        {/* Afficher le texte uniquement si ce n"est pas une couleur ou image */}
                         {attr.displayMode !== 'color' && attr.displayMode !== 'image' && v.name}
                       </button>
                     );
@@ -1051,7 +1048,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide (ex: 0550123456)";
     if (!fd.customerWelaya) e.customerWelaya = 'requis';
     if (!fd.customerCommune) e.customerCommune = 'requis';
     return e;
@@ -1221,7 +1218,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro invalide (ex: 0550123456)";
     if (!fd.customerWelaya) er.w = 'requis';
     if (!fd.customerCommune) er.c = 'requis';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -1241,7 +1238,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
           <CheckCircle2 size={32} style={{ color: '#22C55E' }} />
         </div>
         <h2 style={{ fontSize: '1.625rem', fontWeight: 800, color: '#111', marginBottom: '0.625rem' }}>Commande reçue !</h2>
-        <p style={{ color: '#888', lineHeight: 1.7, marginBottom: '2rem', fontSize: '0.9375rem' }}>Merci de votre confiance. Nous vous contacterons bient’t pour confirmer votre commande.</p>
+        <p style={{ color: '#888', lineHeight: 1.7, marginBottom: '2rem', fontSize: '0.9375rem' }}>Merci de votre confiance. Nous vous contacterons bient't pour confirmer votre commande.</p>
         <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#8B5CF6', color: '#fff', padding: '0.8rem 2rem', borderRadius: 10, fontWeight: 700, fontSize: '0.9rem' }}>Retour à la boutique</Link>
       </div>
     </div>
@@ -1397,7 +1394,7 @@ export function Privacy() {
       <div style={{ background: '#fff', padding: '2rem', borderRadius: 14, border: '1.5px solid #E8E8E8' }}>
         <InfoBlock title="Les données que nous collectons" body="Nous collectons uniquement les informations nécessaires : nom, téléphone et adresse de livraison." />
         <InfoBlock title="Protection des données" body="Toutes les données sont stockées de manière chiffrée et sécurisée." />
-        <InfoBlock title="Partage des informations" body="Nous respectons votre vie privée ; nous ne partageons vos données qu’avec les sociétés de livraison agréées." />
+        <InfoBlock title="Partage des informations" body="Nous respectons votre vie privée ; nous ne partageons vos données qu'avec les sociétés de livraison agréées." />
       </div>
     </Shell>
   );
@@ -1405,10 +1402,10 @@ export function Privacy() {
 
 export function Terms() {
   return (
-    <Shell title="Conditions d’utilisation">
+    <Shell title="Conditions d'utilisation">
       <div style={{ background: '#fff', padding: '2rem', borderRadius: 14, border: '1.5px solid #E8E8E8' }}>
-        <InfoBlock title="Compte et responsabilité" body="L’utilisateur est responsable de l’exactitude des données et de la confidentialité de son compte." />
-        <InfoBlock title="Commandes et paiements" body="Les commandes sont confirmées par téléphone avant l’expédition. Les prix affichés sont les prix finals." />
+        <InfoBlock title="Compte et responsabilité" body="L'utilisateur est responsable de l'exactitude des données et de la confidentialité de son compte." />
+        <InfoBlock title="Commandes et paiements" body="Les commandes sont confirmées par téléphone avant l'expédition. Les prix affichés sont les prix finals." />
         <InfoBlock title="Loi applicable" body="Toutes les transactions sont soumises aux lois en vigueur en République Algérienne Démocratique et Populaire." />
       </div>
     </Shell>
@@ -1420,7 +1417,7 @@ export function Cookies() {
     <Shell title="Cookies">
       <div style={{ background: '#fff', padding: '2rem', borderRadius: 14, border: '1.5px solid #E8E8E8' }}>
         <InfoBlock title="Fichiers essentiels" body="Nous utilisons des cookies essentiels pour garantir le fonctionnement du panier et sécuriser votre session." />
-        <InfoBlock title="Amélioration de l’expérience" body="Nous utilisons certains fichiers pour analyser les interactions afin d’améliorer nos services." />
+        <InfoBlock title="Amélioration de l'expérience" body="Nous utilisons certains fichiers pour analyser les interactions afin d'améliorer nos services." />
       </div>
     </Shell>
   );
@@ -1434,7 +1431,7 @@ export function Contact({ store }: { store: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-    catch { showError('Erreur lors de l’envoi'); } finally { setLoading(false); }
+    catch { showError("Erreur lors de l'envoi"); } finally { setLoading(false); }
   };
 
   return (

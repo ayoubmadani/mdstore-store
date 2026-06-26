@@ -296,7 +296,7 @@ export const Home = ({ store }: any) => {
     products:    isRTL ? 'Produits'      : 'Products',
     categories:  isRTL ? 'Sections'       : 'Categories',
     all:         isRTL ? 'Tout'           : 'All',
-    noProducts:  isRTL ? 'Aucun produit pour l’instant' : 'No products yet',
+    noProducts:  isRTL ? "Aucun produit pour l'instant" : 'No products yet',
   };
 
   return (
@@ -317,7 +317,7 @@ export const Home = ({ store }: any) => {
               {store.hero.subtitle}
             </p>
           )}
-          <a href="#products" style={{ ...S.btnBlack, background: '#fff', color: '#111', textDecoration: 'none', display: 'inline-flex' }}>
+          <a href='#products' style={{ ...S.btnBlack, background: '#fff', color: '#111', textDecoration: 'none', display: 'inline-flex' }}>
             {isRTL ? 'Acheter maintenant' : 'Shop Now'}
           </a>
         </div>
@@ -645,7 +645,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </button>
           {product.store.cart && (
             <button type="button" onClick={addToCart} disabled={isAdded} style={{ ...S.btnOutline, padding: '0.65rem 0.9rem' }}>
-              {isAdded ? <Check size={16} color="green" /> : <ShoppingCart size={16} />}
+              {isAdded ? <Check size={16} color='green' /> : <ShoppingCart size={16} />}
             </button>
           )}
         </div>
@@ -691,7 +691,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
           <h1 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '1.5rem' }}>{isRTL ? 'Panier' : 'Cart'}</h1>
           {items.map((item, i) => (
             <div key={i} style={{ display: 'flex', gap: '0.75rem', padding: '0.75rem', border: '1px solid #e5e5e5', borderRadius: 4, marginBottom: '0.75rem', background: '#fff' }}>
-              <img src={item.product?.productImage} alt="" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 3, background: '#f5f5f5' }} />
+              <img src={item.product?.productImage} alt='' style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 3, background: '#f5f5f5' }} />
               <div style={{ flex: 1 }}>
                 <p style={{ fontSize: '0.85rem', fontWeight: 500, marginBottom: 4 }}>{item.product?.name}</p>
                 <p style={{ fontSize: '0.9rem', fontWeight: 700 }}>{item.finalPrice} DA <span style={{ fontWeight: 400, color: '#888', fontSize: '0.8rem' }}>× {item.quantity}</span></p>
@@ -720,7 +720,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 
 function SimplePage({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ ...S.body, padding: '3rem 0', minHeight: '60vh' }} dir="ltr">
+    <div style={{ ...S.body, padding: '3rem 0', minHeight: '60vh' }} dir='ltr'>
       <div style={{ ...S.container, maxWidth: 700 }}>
         <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '0.5rem' }}>{title}</h1>
         <hr style={{ ...S.hr, marginBottom: '1.5rem' }} />

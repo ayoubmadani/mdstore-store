@@ -264,14 +264,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Logo */}
           <Link href="/" style={{ flexShrink:0, display:'flex', alignItems:'center', gap:10 }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <img src={store.design.logoUrl} style={{ height:36, objectFit:'contain' }} alt={store?.name||''} onError={() => setImgError(true)} />
+              <img src={store.design.logoUrl} style={{ height:36, objectFit:'contain' }} alt={store?.name||""} onError={() => setImgError(true)} />
             ) : (
               <>
                 <div style={{ width:34, height:34, borderRadius:'50%', background:`linear-gradient(135deg,${RO},${ROD})`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                   <Flower2 size={15} color="#fff" />
                 </div>
                 <div>
-                  <span style={{ fontSize:'1rem', fontWeight:700, color: INK, display:'block', lineHeight:1.1, letterSpacing:'-0.01em', fontFamily:"'Cormorant Garamond',serif" }}>{store?.name||'Pure Organics'}</span>
+                  <span style={{ fontSize:'1rem', fontWeight:700, color: INK, display:'block', lineHeight:1.1, letterSpacing:'-0.01em', fontFamily:"'Tajawal',sans-serif" }}>{store?.name||"Pure Organics"}</span>
                   <span style={{ fontSize:'0.5rem', color: RO, letterSpacing:'0.16em', textTransform:'uppercase', fontWeight:500 }}>Organic Beauty</span>
                 </div>
               </>
@@ -293,7 +293,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div className="nav-desktop" style={{ flexShrink:0, gap:'0.625rem' }}>
             <button onClick={() => setShowSearch(true)} style={{ width:38, height:38, borderRadius:'50%', border:`1px solid ${BD}`, background:'transparent', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color: SUB, transition:'all 0.18s' }}
               onMouseEnter={e => { const el=e.currentTarget as HTMLButtonElement; el.style.borderColor=RO; el.style.color=RO; el.style.background=ROL; }}
-              onMouseLeave={e => { const el=e.currentTarget as HTMLButtonElement; el.style.borderColor=BD; el.style.color=SUB; el.style.background='transparent'; }}>
+              onMouseLeave={e => { const el=e.currentTarget as HTMLButtonElement; el.style.borderColor=BD; el.style.color=SUB; el.style.background="transparent"; }}>
               <Search size={14} />
             </button>
             {store?.cart !== false && (
@@ -390,7 +390,7 @@ export function Footer({ store }: any) {
           <div>
             <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:'1.5rem' }}>
               <div style={{ width:30, height:30, borderRadius:'50%', background:`linear-gradient(135deg,${RO},${ROD})`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}><Flower2 size={13} color="#fff" /></div>
-              <span style={{ fontSize:'1.1rem', fontWeight:700, color:'#fff', fontFamily:"'Cormorant Garamond',serif", letterSpacing:'-0.01em' }}>{store?.name}</span>
+              <span style={{ fontSize:'1.1rem', fontWeight:700, color:'#fff', fontFamily:"'Tajawal',sans-serif", letterSpacing:'-0.01em' }}>{store?.name}</span>
             </div>
             <p style={{ fontSize:'0.875rem', lineHeight:1.95, maxWidth:260, fontWeight:300 }}>
               {store?.hero?.subtitle?.substring(0,110) || 'Cosmétiques Bio purs inspirés de la beauté de la nature.'}
@@ -503,13 +503,13 @@ export function Home({ store, page }: any) {
 
         {/* Decorative petal */}
         <div className="anim-petals" style={{ position:'absolute', bottom:'-40px', left:'-40px', zIndex:1, opacity:0.08, pointerEvents:'none' }}>
-          <Flower2 size={220} color="#fff" />
+          <Flower2 size={220} color='#fff' />
         </div>
 
         {/* Content */}
         <div style={{ position:'relative', zIndex:2, width:'100%', minHeight:'clamp(580px,88vh,820px)', display:'flex', alignItems:'center' }}>
           <div style={{ maxWidth:1320, margin:'0 auto', width:'100%', padding:'clamp(3rem,8vw,6rem) clamp(1.25rem,4vw,3rem)', display:'flex', justifyContent:'flex-start' }}>
-            <div className="anim-fade-up" style={{ maxWidth:540, width:'100%' }}>
+            <div className='anim-fade-up' style={{ maxWidth:540, width:'100%' }}>
               {/* Eyebrow */}
               <div style={{ display:'inline-flex', alignItems:'center', gap:10, marginBottom:'1.75rem', background:'rgba(255,255,255,0.1)', backdropFilter:'blur(8px)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:50, padding:'6px 16px' }}>
                 <Flower2 size={11} color={RO} />
@@ -517,8 +517,8 @@ export function Home({ store, page }: any) {
               </div>
 
               {/* Heading */}
-              <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(3rem,7vw,5.5rem)', fontWeight:600, color:'#fff', lineHeight:1.05, letterSpacing:'-0.02em', marginBottom:'1.25rem' }}
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'Votre beauté<br/><em style="color:' + RO + ';font-style:italic">de la Nature</em>') }} />
+              <h1 style={{ fontFamily:"'Tajawal',sans-serif", fontSize:'clamp(3rem,7vw,5.5rem)', fontWeight:600, color:'#fff', lineHeight:1.05, letterSpacing:'-0.02em', marginBottom:'1.25rem' }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || `Votre beauté<br/><em style="color:${RO};font-style:italic">de la Nature</em>`) }} />
 
               {/* Divider */}
               <div style={{ width:56, height:2, background:`linear-gradient(to left,${RO},transparent)`, marginBottom:'1.5rem' }} />
@@ -530,7 +530,7 @@ export function Home({ store, page }: any) {
 
               {/* CTAs */}
               <div style={{ display:'flex', gap:'0.875rem', flexWrap:'wrap', marginBottom:'3rem' }}>
-                <a href="#products" style={{ display:'inline-flex', alignItems:'center', gap:8, background:`linear-gradient(135deg,${RO},${ROD})`, color:'#fff', fontWeight:600, fontSize:'0.875rem', padding:'0.95rem 2rem', borderRadius:12, letterSpacing:'0.06em', boxShadow:`0 8px 28px rgba(193,123,142,0.45)`, transition:'opacity 0.2s' }}
+                <a href='#products' style={{ display:'inline-flex', alignItems:'center', gap:8, background:`linear-gradient(135deg,${RO},${ROD})`, color:'#fff', fontWeight:600, fontSize:'0.875rem', padding:'0.95rem 2rem', borderRadius:12, letterSpacing:'0.06em', boxShadow:`0 8px 28px rgba(193,123,142,0.45)`, transition:'opacity 0.2s' }}
                   onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity='0.88')}
                   onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity='1')}>
                   Découvrir les produits <ArrowRight size={15} />
@@ -548,7 +548,7 @@ export function Home({ store, page }: any) {
               <div style={{ display:'flex', gap:'2rem', paddingTop:'2rem', borderTop:'1px solid rgba(255,255,255,0.15)' }}>
                 {[{ n:'+500', l:'Produit Naturel' }, { n:'58', l:'Wilaya' }, { n:'100%', l:'Bio' }].map((s:{n:string;l:string},i:number) => (
                   <div key={i}>
-                    <p style={{ fontSize:'1.5rem', fontWeight:700, color:'#fff', lineHeight:1, fontFamily:"'Cormorant Garamond',serif" }}>{s.n}</p>
+                    <p style={{ fontSize:'1.5rem', fontWeight:700, color:'#fff', lineHeight:1, fontFamily:"'Tajawal',sans-serif" }}>{s.n}</p>
                     <p style={{ fontSize:'0.6rem', color:'rgba(255,255,255,0.55)', marginTop:4, letterSpacing:'0.1em', textTransform:'uppercase' }}>{s.l}</p>
                   </div>
                 ))}
@@ -607,7 +607,7 @@ export function Home({ store, page }: any) {
         <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:'2.25rem', paddingBottom:'1.25rem', borderBottom:`1px solid ${BD}` }}>
           <div>
             <p style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.18em', marginBottom:6 }}>Pure Organics</p>
-            <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(1.75rem,4vw,2.5rem)', fontWeight:600, color: INK, lineHeight:1, letterSpacing:'-0.02em' }}>Nos produits</h2>
+            <h2 style={{ fontFamily:"'Tajawal',sans-serif", fontSize:'clamp(1.75rem,4vw,2.5rem)', fontWeight:600, color: INK, lineHeight:1, letterSpacing:'-0.02em' }}>Nos produits</h2>
             {store.count > 0 && <p style={{ fontSize:'0.68rem', color: SUB, marginTop:5 }}>{store.count} Produit</p>}
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
@@ -618,7 +618,7 @@ export function Home({ store, page }: any) {
         {products.length === 0 ? (
           <div style={{ padding:'7rem 1.5rem', textAlign:'center', border:`1.5px dashed ${BD}`, borderRadius:16, background: CR }}>
             <Flower2 size={44} color={BD} style={{ display:'block', margin:'0 auto 1.25rem' }} />
-            <p style={{ color: SUB, fontSize:'0.9rem', fontWeight:300 }}>Aucun produit pour l’instant</p>
+            <p style={{ color: SUB, fontSize:'0.9rem', fontWeight:300 }}>Aucun produit pour l'instant</p>
           </div>
         ) : (
           <div className="products-grid">
@@ -647,7 +647,7 @@ export function Home({ store, page }: any) {
         <div style={{ maxWidth:1320, margin:'0 auto' }}>
           <div style={{ textAlign:'center', marginBottom:'3.5rem' }}>
             <p style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.2em', marginBottom:12 }}>Pourquoi nous</p>
-            <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(2rem,5vw,3rem)', fontWeight:600, color:'#fff', letterSpacing:'-0.02em' }}>La nature en chaque goutte</h2>
+            <h2 style={{ fontFamily:"'Tajawal',sans-serif", fontSize:'clamp(2rem,5vw,3rem)', fontWeight:600, color:'#fff', letterSpacing:'-0.02em' }}>La nature en chaque goutte</h2>
           </div>
           <div className="features-grid">
             {[
@@ -660,7 +660,7 @@ export function Home({ store, page }: any) {
                 onMouseEnter={e => { const el=e.currentTarget as HTMLDivElement; el.style.background='rgba(193,123,142,0.08)'; el.style.borderColor='rgba(193,123,142,0.25)'; }}
                 onMouseLeave={e => { const el=e.currentTarget as HTMLDivElement; el.style.background='rgba(255,255,255,0.04)'; el.style.borderColor='rgba(255,255,255,0.08)'; }}>
                 <div style={{ width:44, height:44, borderRadius:12, background: ROL, display:'flex', alignItems:'center', justifyContent:'center', color: RO, marginBottom:'1.25rem' }}>{f.icon}</div>
-                <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'#fff', marginBottom:'0.625rem', fontFamily:"'Cormorant Garamond',serif" }}>{f.t}</h3>
+                <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'#fff', marginBottom:'0.625rem', fontFamily:"'Tajawal',sans-serif" }}>{f.t}</h3>
                 <p style={{ fontSize:'0.82rem', color:'rgba(255,255,255,0.42)', lineHeight:1.85, fontWeight:300 }}>{f.d}</p>
               </div>
             ))}
@@ -710,13 +710,13 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             <div style={{ display:'inline-flex', alignItems:'center', gap:7, background: ROL, border:`1px solid ${ROB}`, borderRadius:50, padding:'5px 14px', marginBottom:'1.25rem' }}>
               <Leaf size={11} color={RO}/><span style={{ fontSize:'0.58rem', fontWeight:700, color: ROD, letterSpacing:'0.12em', textTransform:'uppercase' }}>Bio & naturel</span>
             </div>
-            <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(1.75rem,4vw,2.5rem)', fontWeight:600, color: INK, marginBottom:'0.5rem', lineHeight:1.15, letterSpacing:'-0.02em' }}>{product.name}</h1>
+            <h1 style={{ fontFamily:"'Tajawal',sans-serif", fontSize:'clamp(1.75rem,4vw,2.5rem)', fontWeight:600, color: INK, marginBottom:'0.5rem', lineHeight:1.15, letterSpacing:'-0.02em' }}>{product.name}</h1>
             <div style={{ display:'flex', gap:2, marginBottom:'1.5rem' }}>{[...Array(5)].map((_,i) => <Star key={i} size={13} style={{ fill:i<4?GD:'none', color:GD }} />)}</div>
 
             <div style={{ padding:'1.25rem 1.5rem', background: CR, borderRadius:14, border:`1px solid ${BD}`, marginBottom:'1.75rem' }}>
               <p style={{ fontSize:'0.58rem', fontWeight:700, color: SUB, marginBottom:'0.3rem', textTransform:'uppercase', letterSpacing:'0.1em' }}>Prix</p>
               <div style={{ display:'flex', alignItems:'baseline', gap:'0.4rem' }}>
-                <span className="price-mono" style={{ fontSize:'2.5rem', fontWeight:700, color: INK, fontFamily:"'Cormorant Garamond',serif" }}>{finalPrice.toLocaleString()}</span>
+                <span className="price-mono" style={{ fontSize:'2.5rem', fontWeight:700, color: INK, fontFamily:"'Tajawal',sans-serif" }}>{finalPrice.toLocaleString()}</span>
                 <span style={{ fontSize:'1rem', color: SUB, fontWeight:300 }}>DA</span>
               </div>
             </div>
@@ -820,7 +820,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string,string> = {};
     if (!fd.customerName.trim()) e.customerName='requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone='Numéro invalide';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone="Numéro invalide";
     if (!fd.customerWelaya) e.customerWelaya='requis';
     if (!fd.customerCommune) e.customerCommune='requis';
     return e;
@@ -928,7 +928,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               ))}
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline' }}>
                 <span style={{ fontWeight:700, fontSize:'0.875rem', color: INK }}>Total</span>
-                <span className="price-mono" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'2rem', fontWeight:700, color: INK }}>{total().toLocaleString()} <span style={{ fontSize:'0.75rem', fontWeight:300 }}>DA</span></span>
+                <span className="price-mono" style={{ fontFamily:"'Tajawal',sans-serif", fontSize:'2rem', fontWeight:700, color: INK }}>{total().toLocaleString()} <span style={{ fontSize:'0.75rem', fontWeight:300 }}>DA</span></span>
               </div>
             </div>
             <button type="submit" disabled={sub} style={{ ...S.btnPrimary, opacity: sub?0.7:1, background:`linear-gradient(135deg,${RO},${ROD})`, boxShadow:`0 8px 24px rgba(193,123,142,0.35)` }}
@@ -973,7 +973,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string,string> = {};
     if (!fd.customerName.trim()) er.name='requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone='Numéro invalide';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone="Numéro invalide";
     if (!fd.customerWelaya) er.w='requis';
     if (!fd.customerCommune) er.c='requis';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -990,10 +990,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     <div dir="ltr" style={{ minHeight:'70vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'1.5rem', background: BG }}>
       <div style={{ textAlign:'center', background: CARD, padding:'4rem 2.5rem', borderRadius:24, border:`1px solid ${BD}`, maxWidth:440, width:'100%', boxShadow:'0 24px 64px rgba(193,123,142,0.1)' }}>
         <div style={{ width:60, height:60, borderRadius:'50%', background:`linear-gradient(135deg,${RO},${ROD})`, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 1.75rem', boxShadow:`0 8px 24px rgba(193,123,142,0.4)` }}>
-          <CheckCircle2 size={28} color="#fff" />
+          <CheckCircle2 size={28} color='#fff' />
         </div>
-        <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'2rem', fontWeight:600, color: INK, marginBottom:'0.625rem', letterSpacing:'-0.02em' }}>Commande reçue !</h2>
-        <p style={{ color: SUB, lineHeight:1.9, marginBottom:'2.25rem', fontSize:'0.9rem', fontWeight:300 }}>Nous vous contacterons bient’t pour confirmer la commande.</p>
+        <h2 style={{ fontFamily:"'Tajawal',sans-serif", fontSize:'2rem', fontWeight:600, color: INK, marginBottom:'0.625rem', letterSpacing:'-0.02em' }}>Commande reçue !</h2>
+        <p style={{ color: SUB, lineHeight:1.9, marginBottom:'2.25rem', fontSize:'0.9rem', fontWeight:300 }}>Nous vous contacterons bient't pour confirmer la commande.</p>
         <Link href="/" style={{ display:'inline-flex', alignItems:'center', gap:8, background:`linear-gradient(135deg,${RO},${ROD})`, color:'#fff', padding:'0.9rem 2.25rem', borderRadius:12, fontWeight:600, fontSize:'0.875rem' }}>
           Retour à la boutique
         </Link>
@@ -1017,7 +1017,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     <div dir="ltr" style={{ padding:'2.5rem 1.5rem', maxWidth:1320, margin:'0 auto', minHeight:'100vh', background: BG }}>
       <div style={{ marginBottom:'2.25rem', paddingBottom:'1.25rem', borderBottom:`1px solid ${BD}` }}>
         <p style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.18em', marginBottom:8 }}>Pure Organics</p>
-        <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(1.75rem,4vw,2.5rem)', fontWeight:600, color: INK, letterSpacing:'-0.02em' }}>Panier</h1>
+        <h1 style={{ fontFamily:"'Tajawal',sans-serif", fontSize:'clamp(1.75rem,4vw,2.5rem)', fontWeight:600, color: INK, letterSpacing:'-0.02em' }}>Panier</h1>
         <p style={{ fontSize:'0.72rem', color: SUB, marginTop:4, fontWeight:300 }}>{items.length} Produits</p>
       </div>
       <div className="cart-inner">
@@ -1040,13 +1040,13 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
           ))}
           <div style={{ padding:'1.125rem 1.25rem', background: CR, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
             <span style={{ fontWeight:500, color: SUB, fontSize:'0.8rem' }}>Sous-total</span>
-            <span className="price-mono" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.5rem', fontWeight:700, color: INK }}>{cartTotal.toLocaleString()} DA</span>
+            <span className="price-mono" style={{ fontFamily:"'Tajawal',sans-serif", fontSize:'1.5rem', fontWeight:700, color: INK }}>{cartTotal.toLocaleString()} DA</span>
           </div>
         </div>
 
         {/* Form */}
         <div style={{ background: CARD, borderRadius:18, border:`1px solid ${BD}`, padding:'2rem' }}>
-          <h3 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:600, fontSize:'1.25rem', color: INK, marginBottom:'1.75rem', letterSpacing:'-0.01em' }}>Informations de livraison</h3>
+          <h3 style={{ fontFamily:"'Tajawal',sans-serif", fontWeight:600, fontSize:'1.25rem', color: INK, marginBottom:'1.75rem', letterSpacing:'-0.01em' }}>Informations de livraison</h3>
           <form onSubmit={handleSubmit}>
             <div className="form-row-2">
               <FR error={errors.name} label="Nom"><input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} style={inp(!!errors.name)} /></FR>
@@ -1090,7 +1090,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               ))}
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline' }}>
                 <span style={{ fontWeight:700, color: INK }}>Total</span>
-                <span className="price-mono" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'2.25rem', fontWeight:700, color: INK }}>{finalTotal.toLocaleString()} <span style={{ fontSize:'0.75rem', fontWeight:300 }}>DA</span></span>
+                <span className="price-mono" style={{ fontFamily:"'Tajawal',sans-serif", fontSize:'2.25rem', fontWeight:700, color: INK }}>{finalTotal.toLocaleString()} <span style={{ fontSize:'0.75rem', fontWeight:300 }}>DA</span></span>
               </div>
             </div>
             <button type="submit" disabled={submitting} style={{ ...S.btnPrimary, opacity: submitting?0.7:1, background:`linear-gradient(135deg,${RO},${ROD})`, boxShadow:`0 8px 24px rgba(193,123,142,0.35)`, borderRadius:12 }}
@@ -1116,7 +1116,7 @@ const Shell = ({ children, title }: { children: React.ReactNode; title: string }
           <Flower2 size={12} color={RO} />
           <span style={{ fontSize:'0.58rem', fontWeight:700, color: RO, letterSpacing:'0.18em', textTransform:'uppercase' }}>Pure Organics</span>
         </div>
-        <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(2rem,5vw,3.25rem)', fontWeight:600, color: INK, letterSpacing:'-0.03em' }}>{title}</h1>
+        <h1 style={{ fontFamily:"'Tajawal',sans-serif", fontSize:'clamp(2rem,5vw,3.25rem)', fontWeight:600, color: INK, letterSpacing:'-0.03em' }}>{title}</h1>
       </div>
     </div>
     <div style={{ maxWidth:860, margin:'0 auto', padding:'3rem 1.5rem 6rem' }}>{children}</div>
@@ -1147,10 +1147,10 @@ export function Privacy() {
 
 export function Terms() {
   return (
-    <Shell title="Conditions d’utilisation">
+    <Shell title="Conditions d'utilisation">
       <div style={{ background: CARD, padding:'1.5rem 2rem', borderRadius:18, border:`1px solid ${BD}` }}>
-        <IB title="Compte et responsabilité" body="L’utilisatrice est responsable de l’exactitude des données et de la confidentialité de son compte." />
-        <IB title="Commandes et paiements" body="Les commandes sont confirmées par Téléphone avant l’expédition. Les prix affichés sont définitifs." />
+        <IB title='Compte et responsabilité' body="L'utilisatrice est responsable de l'exactitude des données et de la confidentialité de son compte." />
+        <IB title="Commandes et paiements" body="Les commandes sont confirmées par Téléphone avant l'expédition. Les prix affichés sont définitifs." />
         <IB title="Loi applicable" body="Toutes les transactions sont soumises aux lois de la République Algérienne Démocratique et Populaire." />
       </div>
     </Shell>
@@ -1162,21 +1162,21 @@ export function Cookies() {
     <Shell title="Cookies">
       <div style={{ background: CARD, padding:'1.5rem 2rem', borderRadius:18, border:`1px solid ${BD}` }}>
         <IB title="Fichiers essentiels" body="Nous utilisons des cookies essentiels pour garantir le fonctionnement du panier et la sécurité de la session." />
-        <IB title="Amélioration de l’expérience" body="Nous utilisons certains fichiers pour comprendre l’utilisation du site et améliorer l’expérience." />
+        <IB title="Amélioration de l'expérience" body="Nous utilisons certains fichiers pour comprendre l'utilisation du site et améliorer l'expérience." />
       </div>
     </Shell>
   );
 }
 
 export function Contact({ store }: { store: any }) {
-  const [form, setForm]   = useState({ name:'', email:'', phone:'', message:'' });
+  const [form, setForm]   = useState({ name:'', email:'', phone:'', message: '' });
   const [sent, setSent]   = useState(false);
   const [loading, setL]   = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setL(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-    catch { showError('Erreur lors de l’envoi'); } finally { setL(false); }
+    catch { showError("Erreur lors de l'envoi"); } finally { setL(false); }
   };
 
   return (
@@ -1186,7 +1186,7 @@ export function Contact({ store }: { store: any }) {
           <div style={{ display:'inline-flex', alignItems:'center', gap:8, marginBottom:'1rem' }}>
             <Flower2 size={12} color={RO}/><span style={{ fontSize:'0.58rem', fontWeight:700, color: RO, letterSpacing:'0.18em', textTransform:'uppercase' }}>Pure Organics</span>
           </div>
-          <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(2rem,5vw,3.25rem)', fontWeight:600, color: INK, letterSpacing:'-0.03em' }}>Contactez-nous</h1>
+          <h1 style={{ fontFamily:"'Tajawal',sans-serif", fontSize:'clamp(2rem,5vw,3.25rem)', fontWeight:600, color: INK, letterSpacing:'-0.03em' }}>Contactez-nous</h1>
         </div>
       </div>
       <div className="contact-inner" style={{ maxWidth:1100, margin:'0 auto', padding:'3rem 1.5rem 6rem' }}>
@@ -1213,22 +1213,22 @@ export function Contact({ store }: { store: any }) {
         <div style={{ background: CARD, borderRadius:20, border:`1px solid ${BD}`, padding:'2.5rem', boxShadow:'0 8px 32px rgba(193,123,142,0.06)' }}>
           {sent ? (
             <div style={{ textAlign:'center', padding:'3.5rem 1rem' }}>
-              <div style={{ width:60, height:60, borderRadius:'50%', background:`linear-gradient(135deg,${RO},${ROD})`, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 1.75rem', boxShadow:`0 8px 24px rgba(193,123,142,0.4)` }}><CheckCircle2 size={28} color="#fff"/></div>
-              <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.75rem', fontWeight:600, color: INK, marginBottom:'0.5rem', letterSpacing:'-0.02em' }}>Envoyé !</h2>
+              <div style={{ width:60, height:60, borderRadius:'50%', background:`linear-gradient(135deg,${RO},${ROD})`, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 1.75rem', boxShadow:`0 8px 24px rgba(193,123,142,0.4)` }}><CheckCircle2 size={28} color='#fff'/></div>
+              <h2 style={{ fontFamily:"'Tajawal',sans-serif", fontSize:'1.75rem', fontWeight:600, color: INK, marginBottom:'0.5rem', letterSpacing:'-0.02em' }}>Envoyé !</h2>
               <p style={{ color: SUB, lineHeight:1.9, marginBottom:'2.25rem', fontSize:'0.9rem', fontWeight:300 }}>Nous vous répondrons dans les plus brefs délais.</p>
               <button onClick={() => setSent(false)} style={{ padding:'0.75rem 2.25rem', borderRadius:12, border:`1.5px solid ${RO}`, background: ROL, color: ROD, fontWeight:600, cursor:'pointer', fontSize:'0.875rem', fontFamily:'inherit' }}>Envoyer un autre message</button>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="form-row-2" style={{ marginBottom:'0.875rem' }}>
-                <FR label="Nom"><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={S.input} /></FR>
+                <FR label='Nom'><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={S.input} /></FR>
                 <FR label="Téléphone"><input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required style={S.input} /></FR>
               </div>
               <div style={{ marginBottom:'0.875rem' }}>
-                <FR label="Email"><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required style={S.input} /></FR>
+                <FR label='Email'><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required style={S.input} /></FR>
               </div>
               <div style={{ marginBottom:'1.5rem' }}>
-                <FR label="Message"><textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} style={{ ...S.input, resize:'none' }} /></FR>
+                <FR label='Message'><textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} style={{ ...S.input, resize:'none' }} /></FR>
               </div>
               <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading?0.7:1, background:`linear-gradient(135deg,${RO},${ROD})`, boxShadow:`0 8px 24px rgba(193,123,142,0.35)`, borderRadius:12 }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.opacity='0.88')}

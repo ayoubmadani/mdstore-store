@@ -150,7 +150,7 @@ const CSS = `
   @media (max-width:768px) {
     .nav-links { display:none; }
     .nav-mob   { display:flex; }
-    .prod-grid { grid-template-columns:repeat(2,1fr); gap:12px; }
+    .prod-grid { grid-template-columns:1fr; gap:12px; }
     .trust-bar { grid-template-columns:repeat(2,1fr); }
     .footer-g  { grid-template-columns:1fr; gap:28px; }
     .details-g { grid-template-columns:1fr; }
@@ -158,7 +158,7 @@ const CSS = `
     .cart-g    { grid-template-columns:1fr; }
   }
   @media (max-width:480px) {
-    .prod-grid { grid-template-columns:repeat(2,1fr); gap:8px; }
+    .prod-grid { grid-template-columns:1fr; gap:8px; }
     .form-2c   { grid-template-columns:1fr; }
     .dlv-2c    { grid-template-columns:1fr; }
   }
@@ -1628,7 +1628,7 @@ export function Contact({ store }: { store?: any }) {
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ }}>
                 <div>
                   <p style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--dim)', marginBottom: '6px' }}>الاسم</p>
                   <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="الاسم الكامل" required style={INP_ST()}

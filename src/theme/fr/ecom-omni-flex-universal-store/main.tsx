@@ -131,7 +131,7 @@ const CSS = `
     .footer-g  { grid-template-columns:1fr 1fr; gap:32px; }
   }
   @media (max-width:768px) {
-    .prod-grid  { grid-template-columns:repeat(2,1fr); }
+    .prod-grid  { grid-template-columns:1fr; }
     .trust-bar  { grid-template-columns:repeat(2,1fr); }
     .footer-g   { grid-template-columns:1fr 1fr; gap:24px; }
     .details-g  { grid-template-columns:1fr; }
@@ -141,7 +141,7 @@ const CSS = `
     .cart-layout{ grid-template-columns:1fr; }
   }
   @media (max-width:480px) {
-    .prod-grid { grid-template-columns:repeat(2,1fr); }
+    .prod-grid { grid-template-columns:1fr; }
     .footer-g  { grid-template-columns:1fr; }
     .form-2c   { grid-template-columns:1fr; }
     .dlv-2c    { grid-template-columns:1fr; }
@@ -442,7 +442,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
       <div className="c-img" style={{position:'relative',aspectRatio:'1/1',overflow:'hidden',backgroundColor:'var(--light)'}}>
         {displayImage
           ? <img src={displayImage} alt={product.name}/>
-          : <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}} className="dot-bg">
+          : <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}} className='dot-bg'>
               <Package style={{width:'40px',height:'40px',color:'var(--dim)',opacity:0.5}}/>
             </div>}
         {discount>0 && <div style={{position:'absolute',top:'10px',right:'10px',backgroundColor:'var(--blue)',color:'white',fontSize:'11px',fontWeight:700,padding:'3px 9px'}}>-{discount}%</div>}
@@ -492,7 +492,7 @@ export function Home({ store, page }: any) {
         {!store.hero?.imageUrl && <div style={{position:'absolute',inset:0,backgroundColor:'var(--navy-2)',opacity:0.5}} className="dot-bg"/>}
 
         <div style={{position:'relative',zIndex:2,width:'100%',maxWidth:'1280px',padding:'80px 6vw',display:'flex',flexDirection:'column',alignItems:'flex-start'}}>
-          <div className="fu" style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'20px'}}>
+          <div className='fu' style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'20px'}}>
             <span style={{width:'30px',height:'2px',backgroundColor:'var(--blue)'}}/>
             <span className="bc" style={{fontSize:'14px',fontWeight:800,color:'var(--white)',letterSpacing:'0.15em'}}>{store?.name}</span>
           </div>
@@ -509,8 +509,8 @@ export function Home({ store, page }: any) {
             {store.hero?.subtitle||'Découvrir notre collection sélectionnée des derniers produits soigneusement conçus pour tous vos besoins.'}
           </p>
 
-          <div className="fu fu-3" style={{display:'flex',gap:'16px',flexWrap:'wrap'}}>
-            <a href="#products" className="btn-blue" style={{padding:'16px 40px',borderRadius:'4px',fontSize:'15px'}}>Acheter maintenant</a>
+          <div className='fu fu-3' style={{display:'flex',gap:'16px',flexWrap:'wrap'}}>
+            <a href='#products' className="btn-blue" style={{padding:'16px 40px',borderRadius:'4px',fontSize:'15px'}}>Acheter maintenant</a>
             <a href="#categories" style={{border:'1px solid rgba(255,255,255,0.2)',color:'var(--white)',padding:'16px 40px',fontWeight:600,transition:'0.3s',fontSize:'15px',fontFamily:"'Inter',sans-serif"}}
               onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.backgroundColor='rgba(255,255,255,0.1)';}}
               onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.backgroundColor='transparent';}}>
@@ -534,7 +534,7 @@ export function Home({ store, page }: any) {
         <div style={{maxWidth:'1280px',margin:'0 auto'}}>
           <div className="trust-bar">
             {[
-              {icon:<Truck style={{width:'20px',height:'20px'}}/>,title:'Livraison rapide',desc:'48h pour toute l’Algérie'},
+              {icon:<Truck style={{width:'20px',height:'20px'}}/>,title:'Livraison rapide',desc:"48h pour toute l'Algérie"},
               {icon:<Shield style={{width:'20px',height:'20px'}}/>,title:'Produits authentique',desc:'100% qualité garantie'},
               {icon:<RefreshCw style={{width:'20px',height:'20px'}}/>,title:'Retour gratuit',desc:'30 jours de retour'},
               {icon:<Zap style={{width:'20px',height:'20px'}}/>,title:'Support rapide',desc:'Réponse sous 24h'},
@@ -571,7 +571,7 @@ export function Home({ store, page }: any) {
                     ? <img src={cat.imageUrl} alt={cat.name} style={{width:'100%',height:'100%',objectFit:'cover',transition:'transform 0.5s ease'}}
                         onMouseEnter={e=>{(e.target as HTMLImageElement).style.transform='scale(1.06)';}}
                         onMouseLeave={e=>{(e.target as HTMLImageElement).style.transform='scale(1)';;}}/>
-                    : <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}} className="dot-bg">
+                    : <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}} className='dot-bg'>
                         <Package style={{width:'40px',height:'40px',color:'var(--dim)',opacity:0.3}}/>
                       </div>
                   }
@@ -655,7 +655,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
           Accueil
         </Link>
         <span style={{color:'var(--blue)'}}>/</span>
-        <span style={{color:'white',fontFamily:"'Barlow Condensed',sans-serif"}}>{product.name.slice(0,40)}</span>
+        <span style={{color:'white',fontFamily:"'Inter',sans-serif"}}>{product.name.slice(0,40)}</span>
         <span style={{marginRight:'auto',padding:'5px 14px',backgroundColor:inStock||autoGen?'rgba(58,134,255,0.15)':'rgba(107,90,74,0.1)',color:inStock||autoGen?'var(--blue)':'var(--mid)',fontSize:'11px',fontWeight:700,border:`1.5px solid ${inStock||autoGen?'var(--blue)':'var(--mid)'}`}}>
           {autoGen?'∞ Disponible':inStock?'Disponible':'Épuisé'}
         </span>
@@ -667,7 +667,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
           <div style={{position:'relative',aspectRatio:'1/1',overflow:'hidden',backgroundColor:'var(--white)',border:'1px solid var(--line)'}}>
             {allImages.length>0
               ? <img src={allImages[sel]} alt={product.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
-              : <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}} className="dot-bg">
+              : <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}} className='dot-bg'>
                   <Package style={{width:'64px',height:'64px',color:'var(--dim)',opacity:0.3}}/>
                 </div>
             }
@@ -693,7 +693,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
             <div style={{display:'flex',gap:'8px',marginTop:'10px',flexWrap:'wrap'}}>
               {allImages.slice(0,5).map((img:string,idx:number)=>(
                 <button key={idx} onClick={()=>setSel(idx)} style={{width:'54px',height:'54px',overflow:'hidden',border:`2px solid ${sel===idx?'var(--blue)':'var(--line)'}`,cursor:'pointer',padding:0,background:'none',opacity:sel===idx?1:0.55}}>
-                  <img src={img} alt="" style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
+                  <img src={img} alt='' style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
                 </button>
               ))}
             </div>
@@ -818,9 +818,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = ()=>{
     const e:Record<string,string>={};
     if(!fd.customerName.trim())  e.customerName='Nom requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide (ex: 0550123456)";
     if(!fd.customerWelaya)       e.customerWelaya='Wilaya requis';
-    if(!fd.customerCommune)      e.customerCommune='Commune requis';
+    if(!fd.customerCommune)      e.customerCommune="Commune requis";
     return e;
   };
   const getVarId = useCallback(()=>{
@@ -1007,7 +1007,7 @@ export function Cart({ domain, store }: { domain:string; store:any }) {
     e.preventDefault();
     const er:Record<string,string>={};
     if(!fd.customerName.trim()) er.name='requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro invalide (ex: 0550123456)";
     if(!fd.customerWelaya) er.w='requis';
     if(!fd.customerCommune) er.c='requis';
     if(Object.keys(er).length){setErrors(er);return;}
@@ -1026,7 +1026,7 @@ export function Cart({ domain, store }: { domain:string; store:any }) {
       <div style={{textAlign:'center',background:'var(--white)',padding:'4rem 2.5rem',border:'1px solid var(--line)',borderTop:'3px solid var(--blue)',maxWidth:460,width:'100%'}}>
         <CheckCircle2 style={{width:'48px',height:'48px',color:'var(--blue)',display:'block',margin:'0 auto 1.25rem'}}/>
         <h2 className="bc" style={{fontSize:'2rem',fontWeight:800,color:'var(--navy)',marginBottom:'0.5rem',letterSpacing:'0.04em'}}>Commande reçue !</h2>
-        <p style={{color:'var(--mid)',marginBottom:'2rem',lineHeight:1.7,fontSize:'14px'}}>Merci de votre confiance. Nous vous contacterons bient’t pour confirmer votre commande.</p>
+        <p style={{color:'var(--mid)',marginBottom:'2rem',lineHeight:1.7,fontSize:'14px'}}>Merci de votre confiance. Nous vous contacterons bient't pour confirmer votre commande.</p>
         <Link href="/" className="btn-blue" style={{display:'inline-flex',padding:'12px 32px'}}>Retour à la boutique</Link>
       </div>
     </div>
@@ -1057,7 +1057,7 @@ export function Cart({ domain, store }: { domain:string; store:any }) {
             {items.map((item,i)=>(
               <div key={i} style={{display:'flex',gap:'1rem',padding:'14px',borderBottom:'1px solid var(--line)'}}>
                 <div style={{width:80,height:80,flexShrink:0,overflow:'hidden',border:'1px solid var(--line)',background:'var(--light)'}}>
-                  <img src={item.product?.imagesProduct?.[0]?.imageUrl||item.product?.productImage} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}} alt=""/>
+                  <img src={item.product?.imagesProduct?.[0]?.imageUrl||item.product?.productImage} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}} alt=''/>
                 </div>
                 <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:'space-between'}}>
                   <div>
@@ -1188,7 +1188,7 @@ const IB = ({ title, body, tag }: { title:string; body:string; tag?:string }) =>
   <div style={{paddingBottom:'20px',marginBottom:'20px',borderBottom:'1px solid var(--line)',display:'flex',justifyContent:'space-between',gap:'16px',alignItems:'flex-start'}}>
     <div style={{flex:1}}>
       <h3 style={{fontSize:'14px',fontWeight:700,color:'var(--ink)',margin:'0 0 7px',display:'flex',alignItems:'center',gap:'8px'}}>
-        <span style={{color:'var(--blue)',fontSize:'12px',fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700,textTransform:'uppercase'}}>//</span>{title}
+        <span style={{color:'var(--blue)',fontSize:'12px',fontFamily:"'Inter',sans-serif",fontWeight:700,textTransform:'uppercase'}}>//</span>{title}
       </h3>
       <p style={{fontSize:'13px',lineHeight:'1.85',color:'var(--mid)',fontWeight:400,margin:0}}>{body}</p>
     </div>

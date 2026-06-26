@@ -160,7 +160,7 @@ const S = {
     width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
     background: A, color: SL, fontWeight: 700, fontSize: '0.9rem',
     padding: '0.875rem 1.5rem', borderRadius: 8, border: 'none', cursor: 'pointer',
-    transition: 'all 0.2s', fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+    transition: 'all 0.2s', fontFamily: "'IBM Plex Sans Arabic',sans-serif",
   } as React.CSSProperties,
 };
 
@@ -354,7 +354,7 @@ export function Footer({ store }: any) {
   return (
     <footer dir="ltr" style={{ background: SL, color: 'rgba(255,255,255,0.5)', marginTop: 80, padding: '4rem 1.5rem 1.5rem' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-        <div className="footer-inner">
+        <div className='footer-inner'>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '1rem' }}>
               <div style={{ width: 30, height: 30, background: A, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -465,12 +465,12 @@ export function Home({ store, page }: any) {
         <div style={{ position: 'relative', maxWidth: 1280, margin: '0 auto', width: '100%', padding: 'clamp(5rem,10vw,8rem) 1.5rem clamp(3rem,6vw,5rem)' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(245,158,11,0.15)', border: `1px solid rgba(245,158,11,0.4)`, borderRadius: 6, padding: '0.35rem 0.875rem', marginBottom: '1.25rem' }}>
             <Ruler size={11} color={A} />
-            <span style={{ fontSize: '0.72rem', fontWeight: 600, color: A }}>Outils d’ingénierie spécialisés</span>
+            <span style={{ fontSize: '0.72rem', fontWeight: 600, color: A }}>Outils d'ingénierie spécialisés</span>
           </div>
           <h1 style={{ fontSize: 'clamp(2rem,5.5vw,4rem)', fontWeight: 700, color: '#fff', lineHeight: 1.15, letterSpacing: '-0.025em', marginBottom: '1rem', maxWidth: 640 }}
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'Précision dans la mesure,<br/>Professionnalisme au <span style="color:#F59E0B">Travail</span>') }} />
           <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.68)', lineHeight: 1.75, marginBottom: '2.25rem', maxWidth: 480 }}>
-            {store.hero?.subtitle || "Instruments de mesure, outillage manuel et électrique, et équipements de protection individuelle sélectionnés pour les professionnels de la construction et de l’ingénierie."}
+            {store.hero?.subtitle || "Instruments de mesure, outillage manuel et électrique, et équipements de protection individuelle sélectionnés pour les professionnels de la construction et de l'ingénierie."}
           </p>
           <div className="hero-actions">
             <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: A, color: SL, fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.875rem', borderRadius: 8, transition: 'all 0.2s', boxShadow: `0 4px 24px rgba(245,158,11,0.4)` }}
@@ -556,7 +556,7 @@ export function Home({ store, page }: any) {
         {products.length === 0 ? (
           <div style={{ padding: '5rem', textAlign: 'center', border: `1px dashed ${BD}`, borderRadius: 10, background: CARD }}>
             <Settings size={40} color={BD} style={{ margin: '0 auto 1rem' }} />
-            <p style={{ color: '#94A3B8', fontSize: '0.9rem' }}>Aucun produit pour l’instant</p>
+            <p style={{ color: '#94A3B8', fontSize: '0.9rem' }}>Aucun produit pour l'instant</p>
           </div>
         ) : (
           <div className="products-grid">
@@ -621,7 +621,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           <div className="info-container">
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: AB, border: `1px solid rgba(245,158,11,0.3)`, borderRadius: 6, padding: '0.25rem 0.625rem', marginBottom: '0.875rem' }}>
               <Settings size={10} color={AD} />
-              <span style={{ fontSize: '0.65rem', fontWeight: 700, color: AD }}>Outil d’ingénierie professionnelle</span>
+              <span style={{ fontSize: '0.65rem', fontWeight: 700, color: AD }}>Outil d'ingénierie professionnelle</span>
             </div>
             <h1 style={{ fontSize: 'clamp(1.375rem,4vw,2rem)', fontWeight: 700, color: SL, marginBottom: '0.625rem', lineHeight: 1.25 }}>{product.name}</h1>
             <div style={{ display: 'flex', gap: 2, marginBottom: '1.25rem' }}>
@@ -731,7 +731,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro de téléphone invalide';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro de téléphone invalide";
     if (!fd.customerWelaya) e.customerWelaya = 'requis';
     if (!fd.customerCommune) e.customerCommune = 'requis';
     return e;
@@ -885,7 +885,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro de téléphone invalide';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro de téléphone invalide";
     if (!fd.customerWelaya) er.w = 'requis';
     if (!fd.customerCommune) er.c = 'requis';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -910,7 +910,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{ textAlign: 'center', background: CARD, padding: '3.5rem 2rem', borderRadius: 12, border: `1px solid ${BD}`, borderTop: `3px solid ${A}`, maxWidth: 460, width: '100%' }}>
         <CheckCircle2 size={40} style={{ color: '#22C55E', display: 'block', margin: '0 auto 1.25rem' }} />
         <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: SL, marginBottom: '0.625rem' }}>Commande reçue !</h2>
-        <p style={{ color: '#64748B', lineHeight: 1.7, marginBottom: '2rem' }}>Nous vous contacterons bient’t pour confirmer la commande.</p>
+        <p style={{ color: '#64748B', lineHeight: 1.7, marginBottom: '2rem' }}>Nous vous contacterons bient't pour confirmer la commande.</p>
         <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: A, color: SL, padding: '0.8rem 2rem', borderRadius: 8, fontWeight: 700, fontSize: '0.9rem' }}>Retour à la boutique</Link>
       </div>
     </div>
@@ -1059,9 +1059,9 @@ export function Privacy() {
 
 export function Terms() {
   return (
-    <Shell title="Conditions d’utilisation">
+    <Shell title="Conditions d'utilisation">
       <div style={{ background: CARD, padding: '1.75rem', borderRadius: 10, border: `1px solid ${BD}` }}>
-        <InfoBlock title="Compte et responsabilité" body="L’utilisateur est responsable de l’exactitude des données et de la confidentialité de son compte." />
+        <InfoBlock title="Compte et responsabilité" body="L'utilisateur est responsable de l'exactitude des données et de la confidentialité de son compte." />
         <InfoBlock title="Commandes et paiements" body="Les commandes sont confirmées par téléphone avant l'expédition. Les prix affichés sont les prix définitifs." />
         <InfoBlock title="Loi applicable" body="Toutes les transactions sont soumises aux lois de la République Algérienne Démocratique et Populaire." />
       </div>
@@ -1074,7 +1074,7 @@ export function Cookies() {
     <Shell title="Cookies">
       <div style={{ background: CARD, padding: '1.75rem', borderRadius: 10, border: `1px solid ${BD}` }}>
         <InfoBlock title="Fichiers essentiels" body="Nous utilisons des cookies essentiels pour garantir le fonctionnement du panier et sécuriser la session de connexion." />
-        <InfoBlock title="Amélioration de l’expérience" body="Nous utilisons certains fichiers pour analyser les interactions afin d’améliorer nos services." />
+        <InfoBlock title="Amélioration de l'expérience" body="Nous utilisons certains fichiers pour analyser les interactions afin d'améliorer nos services." />
       </div>
     </Shell>
   );
@@ -1088,7 +1088,7 @@ export function Contact({ store }: { store: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-    catch { showError('Erreur lors de l’envoi'); } finally { setLoading(false); }
+    catch { showError("Erreur lors de l'envoi"); } finally { setLoading(false); }
   };
 
   return (

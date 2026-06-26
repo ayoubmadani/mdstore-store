@@ -110,6 +110,9 @@ const THEME_CSS = `
     height: 2px;
     width: 100%;
   }
+
+  .form-row-2{display:grid;grid-template-columns:1fr;gap:0.8rem;}
+  @media(min-width:540px){.form-row-2{grid-template-columns:1fr 1fr;}}
 `;
 
 const SimpleDivider = () => <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '2rem 0' }} />;
@@ -890,7 +893,7 @@ export function Contact({ store }: any) {
               placeholder="الاسم"
               required
             />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+            <div className="form-row-2">
               <input
                 value={form.phone}
                 onChange={e => setForm({ ...form, phone: e.target.value })}

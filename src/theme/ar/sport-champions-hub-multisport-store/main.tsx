@@ -191,7 +191,7 @@ const CSS = `
   /* ── Grids ── */
   .products-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 16px;
   }
   @media (min-width: 640px)  { .products-grid { grid-template-columns: repeat(3, 1fr); } }

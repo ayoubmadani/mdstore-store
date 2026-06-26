@@ -63,7 +63,7 @@ const CSS = `
   /* Products grid */
   .products-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 1px;
     background: var(--ink);
   }
@@ -124,7 +124,7 @@ const CSS = `
   /* Noise overlay */
   .noise-ov::after {
     content:''; position:absolute; inset:0; pointer-events:none; z-index:3;
-    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-image:url('data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E');
     mix-blend-mode:multiply; opacity:0.06;
   }
 
@@ -161,6 +161,9 @@ const CSS = `
     .cart-add-btns { flex-direction:column; }
     .zc { min-height:240px; }
   }
+
+  .footer-cols { display:grid; grid-template-columns:1fr; gap:2rem; }
+  @media(min-width:768px){.footer-cols{grid-template-columns:2fr 1fr 1fr;gap:40px;}}
 `;
 
 /* ─── TYPES ─── */
@@ -444,7 +447,7 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
         </div>
         {/* Cart */}
         <Link href="/cart" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', border: '1px solid var(--ink)', background: 'none', color: 'var(--ink)', transition: 'all 0.2s' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--ink)'; (e.currentTarget as HTMLElement).style.color = 'var(--paper)'; }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--ink)"; (e.currentTarget as HTMLElement).style.color = 'var(--paper)'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'none'; (e.currentTarget as HTMLElement).style.color = 'var(--ink)'; }}>
           <ShoppingCart style={{ width: '13px', height: '13px' }} />
           {count > 0 && <span style={{ position: 'absolute', top: -4, right: -4, background: 'var(--punch)', color: 'var(--paper)', fontSize: '8px', fontWeight: 700, minWidth: '16px', height: '16px', borderRadius: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px' }}>{count}</span>}
@@ -486,7 +489,7 @@ export function Footer({ store }: any) {
       </div>
 
       {/* 3 columns */}
-      <div style={{ position: 'relative', zIndex: 2, padding: '40px 24px', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '40px', borderBottom: '1px solid rgba(242,239,232,0.1)' }}>
+      <div className="footer-cols" style={{ position: 'relative', zIndex: 2, padding: '40px 24px', borderBottom: '1px solid rgba(242,239,232,0.1)' }}>
 
         {/* Section 1 — Identité */}
         <div>
@@ -604,7 +607,7 @@ export function Home({ store, page }: any) {
       <section className="noise-ov" style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--ink)', overflow: 'hidden' }}>
         {store.hero?.imageUrl && (
           <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.1, filter: 'grayscale(100%) contrast(1.5)' }} />
+            <img src={store.hero.imageUrl} alt='' style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.1, filter: 'grayscale(100%) contrast(1.5)' }} />
           </div>
         )}
         {/* Number watermark */}
@@ -632,8 +635,8 @@ export function Home({ store, page }: any) {
             <p className="sm" style={{ fontSize: '11px', lineHeight: '1.9', color: 'rgba(242,239,232,0.5)', maxWidth: '400px', letterSpacing: '0.05em' }}>
               {store.hero?.subtitle || 'Collection streetwear authentique. Chaque pièce raconte une histoire. Livraison rapide.'}
             </p>
-            <div className="rise rise-3" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              <a href="#drops" className="btn-z">↓ Voir la collection</a>
+            <div className='rise rise-3' style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <a href='#drops' className="btn-z">↓ Voir la collection</a>
               {cats.length > 0 && (
                 <a href="#cats" className="sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '9px', letterSpacing: '0.18em', color: 'rgba(242,239,232,0.35)', border: '1px solid rgba(242,239,232,0.14)', padding: '14px 22px', transition: 'all 0.22s' }}
                   onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--paper)'; el.style.borderColor = 'rgba(242,239,232,0.4)'; }}
@@ -670,7 +673,7 @@ export function Home({ store, page }: any) {
               </Link>
               {cats.map((cat: any) => (
             <Link key={cat.id} href={`?category=${cat.id}`} style={{ display: 'flex', alignItems: 'center', padding: '10px 22px', borderRight: '1px solid var(--ink)', fontSize: '8px', letterSpacing: '0.18em', color: 'var(--ink)', whiteSpace: 'nowrap', flexShrink: 0, textTransform: 'uppercase', transition: 'background 0.2s,color 0.2s' }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'var(--ink)'; el.style.color = 'var(--punch)'; }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = "var(--ink)"; el.style.color = 'var(--punch)'; }}
               onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.color = 'var(--ink)'; }}>
               {cat.name}
             </Link>
@@ -730,7 +733,7 @@ export function Home({ store, page }: any) {
             <span>Ce que vous portez</span><br /><span>Dit qui vous êtes.</span>
           </p>
           <a href="#drops" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '10px', letterSpacing: '0.18em', color: 'var(--punch)', background: 'var(--paper)', padding: '14px 28px', textTransform: 'uppercase', clipPath: 'polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%)', transition: 'background 0.2s' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--ink)'; (e.currentTarget as HTMLElement).style.color = 'var(--paper)'; }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--ink)"; (e.currentTarget as HTMLElement).style.color = 'var(--paper)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--paper)'; (e.currentTarget as HTMLElement).style.color = 'var(--punch)'; }}>
             Acheter maintenant <ArrowUpRight style={{ width: '14px', height: '14px' }} />
           </a>
@@ -771,7 +774,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
               <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', gap: '5px' }}>
                 {allImages.slice(0, 5).map((img: string, idx: number) => (
                   <button key={idx} onClick={() => setSel(idx)} style={{ width: '40px', height: '40px', overflow: 'hidden', border: `2px solid ${sel === idx ? 'var(--punch)' : 'rgba(255,255,255,0.3)'}`, cursor: 'pointer', opacity: sel === idx ? 1 : 0.5, padding: 0, background: 'none' }}>
-                    <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    <img src={img} alt='' style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   </button>
                 ))}
               </div>
@@ -894,9 +897,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'Nom requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide (ex: 0550123456)";
     if (!fd.customerWelaya) e.customerWelaya = 'Wilaya requis';
-    if (!fd.customerCommune) e.customerCommune = 'Commune requis';
+    if (!fd.customerCommune) e.customerCommune = "Commune requis";
     return e;
   };
   const getVarId = useCallback(() => {
@@ -991,13 +994,13 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <FR label="QUANTITY">
               <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid var(--ink)' }}>
                 <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderRight: '1px solid var(--ink)', background: 'transparent', cursor: 'pointer', color: 'var(--ink)', transition: 'all 0.18s' }}
-                  onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'var(--punch)'; el.style.color = 'var(--paper)'; }}
+                  onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = "var(--punch)"; el.style.color = 'var(--paper)'; }}
                   onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.color = 'var(--ink)'; }}>
                   <Minus style={{ width: '11px', height: '11px' }} />
                 </button>
                 <span className="ub" style={{ width: '44px', textAlign: 'center', fontWeight: 900, fontSize: '1.1rem', letterSpacing: '-0.02em', lineHeight: '38px', display: 'inline-block' }}>{fd.quantity}</span>
                 <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderLeft: '1px solid var(--ink)', background: 'transparent', cursor: 'pointer', color: 'var(--ink)', transition: 'all 0.18s' }}
-                  onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'var(--punch)'; el.style.color = 'var(--paper)'; }}
+                  onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = "var(--punch)"; el.style.color = 'var(--paper)'; }}
                   onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.color = 'var(--ink)'; }}>
                   <Plus style={{ width: '11px', height: '11px' }} />
                 </button>
@@ -1064,9 +1067,9 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'Nom requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro invalide (ex: 0550123456)";
     if (!fd.customerWelaya) er.w = 'Wilaya requis';
-    if (!fd.customerCommune) er.c = 'Commune requis';
+    if (!fd.customerCommune) er.c = "Commune requis";
     if (Object.keys(er).length) { setErrors(er); return; }
     setErrors({}); setSubmitting(true);
     try {
@@ -1103,13 +1106,13 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
           <h1 className="ub" style={{ fontSize: 'clamp(2rem,5vw,4rem)', fontWeight: 900, letterSpacing: '-0.03em', color: 'var(--ink)' }}>CART.</h1>
           <p style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)' }}>{items.length} PIECE{items.length !== 1 ? 'S' : ''}</p>
         </div>
-        <div className="cart-layout">
+        <div className='cart-layout'>
           {/* Items */}
           <div style={{ border: '1px solid var(--ink)', borderTop: '3px solid var(--punch)', alignSelf: 'start' }}>
             {items.map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: '1rem', padding: '14px', borderBottom: '1px solid var(--paper-dk)' }}>
                 <div style={{ width: 80, height: 80, flexShrink: 0, overflow: 'hidden', border: '1px solid var(--paper-dk)', background: 'var(--paper-dk)' }}>
-                  <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" />
+                  <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt='' />
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
@@ -1119,15 +1122,15 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '8px' }}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid var(--ink)' }}>
                       <button onClick={() => changeQty(i, -1)} style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: 'none', cursor: 'pointer', borderRight: '1px solid var(--ink)', transition: 'all 0.15s' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--punch)'; (e.currentTarget as HTMLElement).style.color = 'white'; }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--punch)"; (e.currentTarget as HTMLElement).style.color = 'white'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'inherit'; }}>-</button>
                       <span className="ub" style={{ width: 32, textAlign: 'center', fontWeight: 900, fontSize: '0.95rem', lineHeight: '28px' }}>{item.quantity}</span>
                       <button onClick={() => changeQty(i, 1)} style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: 'none', cursor: 'pointer', borderLeft: '1px solid var(--ink)', transition: 'all 0.15s' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--punch)'; (e.currentTarget as HTMLElement).style.color = 'white'; }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--punch)"; (e.currentTarget as HTMLElement).style.color = 'white'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'inherit'; }}>+</button>
                     </div>
                     <button onClick={() => update(items.filter((_, idx) => idx !== i))} className="sm" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', border: 'none', background: 'transparent', color: 'var(--mist)', fontSize: '8px', letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'inherit', transition: 'color 0.15s' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--punch)'; }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "var(--punch)"; }}
                       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--mist)'; }}>
                       <Trash2 size={11} /> Supprimer
                     </button>

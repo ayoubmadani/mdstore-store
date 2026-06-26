@@ -55,7 +55,7 @@ const THEME_CSS = `
   @media (min-width: 768px) { .cats-grid { grid-template-columns: repeat(4, 1fr); } }
   @media (min-width: 1100px) { .cats-grid { grid-template-columns: repeat(5, 1fr); } }
 
-  .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+  .products-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
   @media (min-width: 768px)  { .products-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (min-width: 1280px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
 
@@ -154,7 +154,7 @@ const fetchCommunes = async (wid: string): Promise<Commune[]> => { try { const {
 const S = {
   input: { width: '100%', padding: '0.7rem 0.875rem', background: '#fff', border: `1px solid ${BD}`, borderRadius: 10, fontSize: '0.9rem', color: INK, outline: 'none', transition: 'border-color 0.15s', appearance: 'none' } as React.CSSProperties,
   inputErr: { borderColor: '#DC2626' } as React.CSSProperties,
-  btnPrimary: { width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: W, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.5rem', borderRadius: 10, border: 'none', cursor: 'pointer', transition: 'background 0.2s', fontFamily: "'Cairo', sans-serif" } as React.CSSProperties,
+  btnPrimary: { width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: W, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.5rem', borderRadius: 10, border: 'none', cursor: 'pointer', transition: 'background 0.2s', fontFamily: "'Cairo',sans-serif" } as React.CSSProperties,
 };
 
 export default function Main({ store, children, domain }: any) {
@@ -241,7 +241,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             {[{ h: '/', l: 'Accueil' }, { h: '/contact', l: 'Contactez-nous' }].map(i => (
               <Link key={i.h} href={i.h} style={{ fontSize: '0.875rem', fontWeight: 500, color: SUB, padding: '0.3rem 0.875rem', borderRadius: 8, transition: 'all 0.15s' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = WD; (e.currentTarget as HTMLAnchorElement).style.background = WL; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = SUB; (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'; }}>
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = SUB; (e.currentTarget as HTMLAnchorElement).style.background = "transparent"; }}>
                 {i.l}
               </Link>
             ))}
@@ -334,7 +334,7 @@ export function Footer({ store }: any) {
   return (
     <footer dir="ltr" style={{ background: '#2C1810', color: 'rgba(255,255,255,0.4)', marginTop: 80, padding: '3.5rem 1.5rem 1.5rem' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-        <div className="footer-inner">
+        <div className='footer-inner'>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '1rem' }}>
               <div style={{ width: 30, height: 30, background: 'rgba(196,154,108,0.2)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -516,7 +516,7 @@ export function Home({ store, page }: any) {
         {products.length === 0 ? (
           <div style={{ padding: '5rem 1.5rem', textAlign: 'center', border: `1px dashed ${BD}`, borderRadius: 16, background: CARD }}>
             <Sofa size={36} color={WB} style={{ display: 'block', margin: '0 auto 1rem' }} />
-            <p style={{ color: SUB, fontSize: '0.875rem' }}>Aucun produit pour l’instant</p>
+            <p style={{ color: SUB, fontSize: '0.875rem' }}>Aucun produit pour l'instant</p>
           </div>
         ) : (
           <div className="products-grid">
@@ -675,7 +675,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide";
     if (!fd.customerWelaya) e.customerWelaya = 'requis';
     if (!fd.customerCommune) e.customerCommune = 'requis';
     return e;
@@ -825,7 +825,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro invalide';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro invalide";
     if (!fd.customerWelaya) er.w = 'requis';
     if (!fd.customerCommune) er.c = 'requis';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -843,7 +843,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{ textAlign: 'center', background: CARD, padding: '3rem 2rem', borderRadius: 20, border: `1px solid ${BD}`, maxWidth: 440, width: '100%' }}>
         <CheckCircle2 size={48} style={{ color: W, display: 'block', margin: '0 auto 1.25rem' }} />
         <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: INK, marginBottom: '0.5rem' }}>Commande reçue !</h2>
-        <p style={{ color: SUB, lineHeight: 1.75, marginBottom: '2rem', fontSize: '0.9rem' }}>Nous vous contacterons bient’t pour confirmer la commande et organiser la Livraison.</p>
+        <p style={{ color: SUB, lineHeight: 1.75, marginBottom: '2rem', fontSize: '0.9rem' }}>Nous vous contacterons bient't pour confirmer la commande et organiser la Livraison.</p>
         <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: W, color: '#fff', padding: '0.75rem 2rem', fontWeight: 700, fontSize: '0.875rem', borderRadius: 10 }}>Retour à la boutique</Link>
       </div>
     </div>
@@ -989,10 +989,10 @@ export function Privacy() {
 
 export function Terms() {
   return (
-    <Shell title="Conditions d’utilisation">
+    <Shell title="Conditions d'utilisation">
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 16, border: `1px solid ${BD}` }}>
-        <InfoBlock title="Compte et responsabilité" body="L’utilisateur est responsable de l’exactitude des données et de la confidentialité de son compte." />
-        <InfoBlock title="Commandes et paiements" body="Les commandes sont confirmées par Téléphone avant l’expédition. Les prix affichés sont définitifs." />
+        <InfoBlock title="Compte et responsabilité" body="L'utilisateur est responsable de l'exactitude des données et de la confidentialité de son compte." />
+        <InfoBlock title="Commandes et paiements" body="Les commandes sont confirmées par Téléphone avant l'expédition. Les prix affichés sont définitifs." />
         <InfoBlock title="Loi applicable" body="Toutes les transactions sont soumises aux lois de la République Algérienne Démocratique et Populaire." />
       </div>
     </Shell>
@@ -1004,7 +1004,7 @@ export function Cookies() {
     <Shell title="Cookies">
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 16, border: `1px solid ${BD}` }}>
         <InfoBlock title="Fichiers essentiels" body="Nous utilisons des cookies essentiels pour garantir le fonctionnement du panier et la sécurité de la session." />
-        <InfoBlock title="Amélioration de l’expérience" body="Nous utilisons certains fichiers pour comprendre l’utilisation du site et améliorer l’expérience." />
+        <InfoBlock title="Amélioration de l'expérience" body="Nous utilisons certains fichiers pour comprendre l'utilisation du site et améliorer l'expérience." />
       </div>
     </Shell>
   );
@@ -1018,7 +1018,7 @@ export function Contact({ store }: { store: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-    catch { showError('Erreur lors de l’envoi'); } finally { setLoading(false); }
+    catch { showError("Erreur lors de l'envoi"); } finally { setLoading(false); }
   };
 
   return (
@@ -1063,14 +1063,14 @@ export function Contact({ store }: { store: any }) {
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-                <FR label="Nom"><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={S.input} /></FR>
+                <FR label='Nom'><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={S.input} /></FR>
                 <FR label="Téléphone"><input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required style={S.input} /></FR>
               </div>
               <div style={{ marginBottom: '0.875rem' }}>
-                <FR label="Email"><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required style={S.input} /></FR>
+                <FR label='Email'><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required style={S.input} /></FR>
               </div>
               <div style={{ marginBottom: '1.25rem' }}>
-                <FR label="Message"><textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} style={{ ...S.input, resize: 'none' }} /></FR>
+                <FR label='Message'><textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} style={{ ...S.input, resize: 'none' }} /></FR>
               </div>
               <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = WD)}

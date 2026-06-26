@@ -145,7 +145,7 @@ const fetchCommunes = async (wid: string): Promise<Commune[]> => { try { const {
 const S = {
   input: { width: '100%', padding: '0.7rem 0.875rem', background: '#fff', border: `1px solid ${BD}`, borderRadius: 4, fontSize: '0.9rem', color: INK, outline: 'none', transition: 'border-color 0.15s', appearance: 'none' } as React.CSSProperties,
   inputErr: { borderColor: '#EF4444' } as React.CSSProperties,
-  btnPrimary: { width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: E, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.5rem', borderRadius: 4, border: 'none', cursor: 'pointer', transition: 'background 0.2s', fontFamily: "'Tajawal', sans-serif" } as React.CSSProperties,
+  btnPrimary: { width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: E, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.5rem', borderRadius: 4, border: 'none', cursor: 'pointer', transition: 'background 0.2s', fontFamily: "'Tajawal',sans-serif" } as React.CSSProperties,
 };
 
 export default function Main({ store, children, domain }: any) {
@@ -227,7 +227,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               onFocus={e => (e.currentTarget.style.borderColor = E)}
               onBlur={e => (e.currentTarget.style.borderColor = BD)}>
               <Search size={13} color={SUB} style={{ flexShrink: 0 }} />
-              <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Rechercher dans les Produits..." style={{ flex: 1, border: 'none', background: 'transparent', fontSize: '0.82rem', color: INK, outline: 'none', fontFamily: "'Tajawal', sans-serif", direction: 'rtl' as const }} />
+              <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Rechercher dans les Produits..." style={{ flex: 1, border: 'none', background: 'transparent', fontSize: '0.82rem', color: INK, outline: 'none', fontFamily: "'Tajawal',sans-serif", direction: 'rtl' as const }} />
               {searchQuery && <button type="button" onClick={() => setSearchQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: SUB, padding: 0, display: 'flex', alignItems: 'center' }}><X size={11} /></button>}
             </form>
           </div>
@@ -317,7 +317,7 @@ export function Footer({ store }: any) {
   return (
     <footer dir="ltr" style={{ background: INK, color: 'rgba(255,255,255,0.4)', marginTop: 80, padding: '3.5rem 1.5rem 1.25rem' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-        <div className="footer-inner">
+        <div className='footer-inner'>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '0.875rem' }}>
               <div style={{ width: 6, height: 24, background: E, borderRadius: 2 }} />
@@ -417,7 +417,7 @@ export function Home({ store, page }: any) {
               <span style={{ fontSize: '0.68rem', fontWeight: 700, color: ED, textTransform: 'uppercase' as const, letterSpacing: '0.12em' }}>Matériaux de Construction quotidiens</span>
             </div>
             <h1 style={{ fontSize: 'clamp(2rem,5vw,4rem)', fontWeight: 800, color: INK, lineHeight: 1.1, letterSpacing: '-0.02em', marginBottom: '1rem' }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'Tout ce dont vous avez besoin<br/>dans <span style="color:#059669">L’atelier</span>') }} />
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || "Tout ce dont vous avez besoin<br/>dans <span style='color:#059669'>L'atelier</span>") }} />
             <p style={{ fontSize: '1rem', color: SUB, lineHeight: 1.75, marginBottom: '2rem', maxWidth: 440 }}>
               {store.hero?.subtitle || 'Fixations, matériaux de construction, et outils quotidiens De confiance pour les entrepreneurs et professionnels.'}
             </p>
@@ -505,7 +505,7 @@ export function Home({ store, page }: any) {
           {products.length === 0 ? (
             <div style={{ padding: '5rem 1.5rem', textAlign: 'center', background: CARD }}>
               <Package size={36} color={BD} style={{ display: 'block', margin: '0 auto 1rem' }} />
-              <p style={{ color: '#9CA3AF', fontSize: '0.875rem' }}>Aucun produit pour l’instant</p>
+              <p style={{ color: '#9CA3AF', fontSize: '0.875rem' }}>Aucun produit pour l'instant</p>
             </div>
           ) : (
             <div className="products-grid">
@@ -663,7 +663,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro de téléphone invalide';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro de téléphone invalide";
     if (!fd.customerWelaya) e.customerWelaya = 'requis';
     if (!fd.customerCommune) e.customerCommune = 'requis';
     return e;
@@ -813,7 +813,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro de téléphone invalide';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro de téléphone invalide";
     if (!fd.customerWelaya) er.w = 'requis';
     if (!fd.customerCommune) er.c = 'requis';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -831,7 +831,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{ textAlign: 'center', background: CARD, padding: '3rem 2rem', border: `1px solid ${BD}`, borderTop: `3px solid ${E}`, maxWidth: 440, width: '100%' }}>
         <CheckCircle2 size={40} style={{ color: E, display: 'block', margin: '0 auto 1.25rem' }} />
         <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: INK, marginBottom: '0.5rem' }}>Commande reçue !</h2>
-        <p style={{ color: SUB, lineHeight: 1.7, marginBottom: '2rem', fontSize: '0.9rem' }}>Nous vous contacterons bient’t pour confirmer la commande.</p>
+        <p style={{ color: SUB, lineHeight: 1.7, marginBottom: '2rem', fontSize: '0.9rem' }}>Nous vous contacterons bient't pour confirmer la commande.</p>
         <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: E, color: '#fff', padding: '0.75rem 2rem', fontWeight: 700, fontSize: '0.875rem', borderRadius: 4 }}>Retour à la boutique</Link>
       </div>
     </div>
@@ -971,10 +971,10 @@ export function Privacy() {
 
 export function Terms() {
   return (
-    <Shell title="Conditions d’utilisation">
+    <Shell title="Conditions d'utilisation">
       <div style={{ background: CARD, padding: '1.5rem', border: `1px solid ${BD}` }}>
-        <InfoBlock title="Compte et responsabilité" body="L’utilisateur est responsable de l’exactitude des données et de la confidentialité de son compte." />
-        <InfoBlock title="Commandes et paiements" body="Les commandes sont confirmées par Téléphone avant l’expédition. Les prix affichés sont définitifs." />
+        <InfoBlock title="Compte et responsabilité" body="L'utilisateur est responsable de l'exactitude des données et de la confidentialité de son compte." />
+        <InfoBlock title="Commandes et paiements" body="Les commandes sont confirmées par Téléphone avant l'expédition. Les prix affichés sont définitifs." />
         <InfoBlock title="Loi applicable" body="Toutes les transactions sont soumises aux lois de la République Algérienne Démocratique et Populaire." />
       </div>
     </Shell>
@@ -986,7 +986,7 @@ export function Cookies() {
     <Shell title="Cookies">
       <div style={{ background: CARD, padding: '1.5rem', border: `1px solid ${BD}` }}>
         <InfoBlock title="Fichiers essentiels" body="Nous utilisons des cookies essentiels pour garantir le fonctionnement du panier et la sécurité de la session." />
-        <InfoBlock title="Amélioration de l’expérience" body="Nous utilisons certains fichiers pour comprendre l’utilisation du site et améliorer l’expérience." />
+        <InfoBlock title="Amélioration de l'expérience" body="Nous utilisons certains fichiers pour comprendre l'utilisation du site et améliorer l'expérience." />
       </div>
     </Shell>
   );
@@ -1000,7 +1000,7 @@ export function Contact({ store }: { store: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-    catch { showError('Erreur lors de l’envoi'); } finally { setLoading(false); }
+    catch { showError("Erreur lors de l'envoi"); } finally { setLoading(false); }
   };
 
   return (

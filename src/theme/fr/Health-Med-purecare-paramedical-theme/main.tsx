@@ -634,7 +634,7 @@ export function Home({ store, page }: any) {
               <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.78)', marginBottom: '22px', lineHeight: '1.7' }}>
                 {store.hero?.subtitle || 'Les meilleurs produits paramédicaux et appareils médicaux de qualité certifiée.'}
               </p>
-              <a href="#products" className="btn-blue" style={{ fontSize: '14px', padding: '11px 26px' }}>Acheter maintenant</a>
+              <a href='#products' className="btn-blue" style={{ fontSize: '14px', padding: '11px 26px' }}>Acheter maintenant</a>
             </div>
           </div>
         </div>
@@ -685,7 +685,7 @@ export function Home({ store, page }: any) {
           {products.length === 0 ? (
             <div style={{ padding: '80px 0', textAlign: 'center', backgroundColor: 'var(--white)', borderRadius: '12px', border: '1px solid var(--line)' }}>
               <FlaskConical style={{ width: '48px', height: '48px', color: 'var(--dim)', opacity: 0.3, margin: '0 auto 16px', display: 'block' }} />
-              <p className="pjs" style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--dim)' }}>Produits à venir Bient’t</p>
+              <p className="pjs" style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--dim)' }}>Produits à venir Bient't</p>
             </div>
           ) : (
             <>
@@ -767,7 +767,7 @@ export function Home({ store, page }: any) {
               { icon: <Activity style={{ width: '36px', height: '36px' }} />, color: '#7C3AED', title: 'Support spécialisé', desc: 'Équipe spécialisée répond le plus rapidement possible à vos questions.' },
               { icon: <Truck style={{ width: '36px', height: '36px' }} />, color: 'var(--orange)', title: 'Livraison rapide', desc: 'Livraison de haute qualité pour toutes les wilayas de Algérie.' },
             ].map((item, i) => (
-              <div key={i} className="why-card">
+              <div key={i} className='why-card'>
                 <div style={{ width: '72px', height: '72px', borderRadius: '18px', backgroundColor: `${item.color}12`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: item.color, marginBottom: '16px' }}>
                   {item.icon}
                 </div>
@@ -829,7 +829,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: '6px' }}>
                 {allImages.slice(0, 5).map((img: string, idx: number) => (
                   <button key={idx} onClick={() => setSel(idx)} style={{ aspectRatio: '1/1', overflow: 'hidden', border: `2px solid ${sel === idx ? 'var(--blue)' : 'var(--line)'}`, cursor: 'pointer', padding: 0, background: 'none', borderRadius: '6px', opacity: sel === idx ? 1 : 0.6 }}>
-                    <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    <img src={img} alt='' style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   </button>
                 ))}
               </div>
@@ -954,9 +954,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'Nom requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide (ex: 0550123456)";
     if (!fd.customerWelaya) e.customerWelaya = 'Wilaya requis';
-    if (!fd.customerCommune) e.customerCommune = 'Commune requis';
+    if (!fd.customerCommune) e.customerCommune = "Commune requis";
     return e;
   };
   const getVarId = useCallback(() => {
@@ -993,7 +993,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           <button onClick={addToCart} disabled={isAdded}
             style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', borderRadius: '8px', border: isAdded ? '2px solid var(--green)' : '2px solid var(--line-dk)', backgroundColor: isAdded ? 'rgba(22,197,94,0.05)' : 'var(--white)', color: isAdded ? 'var(--green)' : 'var(--ink)', cursor: isAdded ? 'default' : 'pointer', fontWeight: 700, transition: 'all 0.3s ease', fontFamily: 'inherit' }}>
             {isAdded
-              ? <><CheckCircle2 size={18} className="anim-check" style={{ color: 'var(--green)' }} /><span>Ajouté!</span></>
+              ? <><CheckCircle2 size={18} className='anim-check' style={{ color: 'var(--green)' }} /><span>Ajouté!</span></>
               : <><ShoppingCart size={18} /><span>Ajouter au panier</span></>
             }
           </button>
@@ -1142,9 +1142,9 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'Nom requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro invalide (ex: 0550123456)";
     if (!fd.customerWelaya) er.welaya = 'Wilaya requis';
-    if (!fd.customerCommune) er.commune = 'Commune requis';
+    if (!fd.customerCommune) er.commune = "Commune requis";
     if (Object.keys(er).length) { setErrors(er); return; }
     setErrors({}); setSubmitting(true);
     try {
@@ -1184,7 +1184,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             </div>
             {items.map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: '15px', padding: '20px', borderBottom: '1px solid var(--line)', backgroundColor: i % 2 === 0 ? 'transparent' : 'rgba(241,245,249,0.5)' }}>
-                <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} alt="" style={{ width: '80px', height: '80px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--line)', flexShrink: 0 }} />
+                <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} alt='' style={{ width: '80px', height: '80px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--line)', flexShrink: 0 }} />
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--ink)' }}>{item.product?.name}</h4>
                   <p className="pjs" style={{ fontSize: '16px', fontWeight: 700, color: 'var(--blue)', margin: 0 }}>{item.finalPrice?.toLocaleString()} DA</p>
@@ -1273,7 +1273,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     <span style={{ fontWeight: 600, color: 'var(--ink)' }}>{r.v}</span>
                   </div>
                 ))}
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: '20px', borderTop: '1px solid var(--line)', paddingTop: '14px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: '20px', borderTop: '1px solid var(--line)', paddingTop: '14px', fontFamily: "'Inter',sans-serif" }}>
                   <span style={{ color: 'var(--ink)' }}>Total:</span>
                   <span style={{ color: 'var(--blue)' }}>{finalTotal.toLocaleString()} DA</span>
                 </div>
@@ -1401,7 +1401,7 @@ export function Contact({ store }: { store?: any }) {
       await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store?.id });
       setSent(true);
     } catch {
-      showError('Erreur lors de l’envoi du message, veuillez réessayer ultérieurement');
+      showError("Erreur lors de l'envoi du message, veuillez réessayer ultérieurement");
     } finally {
       setLoading(false);
     }

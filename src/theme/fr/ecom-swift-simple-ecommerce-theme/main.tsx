@@ -91,6 +91,9 @@ const THEME_CSS = `
 
   a { text-decoration: none; color: inherit; transition: color 0.2s; }
   a:hover { color: var(--text-muted); }
+
+  .form-row-2{display:grid;grid-template-columns:1fr;gap:0.8rem;}
+  @media(min-width:540px){.form-row-2{grid-template-columns:1fr 1fr;}}
 `;
 
 const SimpleDivider = () => <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '2rem 0' }} />;
@@ -213,7 +216,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             onClick={() => { setSearchQuery(''); setOpen(false); }}
             style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.8rem', borderBottom: '1px solid #f5f5f5', transition: 'background 0.2s' }}
           >
-            <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: '4px' }} alt="" />
+            <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: '4px' }} alt='' />
             <div>
               <div className='line-clamp-1' style={{ fontSize: '0.85rem', fontWeight: 600, color: '#000' }}>{p.name}</div>
               <div style={{ fontSize: '0.8rem', color: '#666' }}>{p.price} DA</div>
@@ -409,7 +412,7 @@ export function Home({ store, page }: any) {
         borderBottom: '1px solid var(--border-color)',
         display: 'flex',
         alignItems: 'center',
-        minHeight: '400px' // pour garantir l'affichage de l'image
+        minHeight: '400px', // pour garantir l'affichage
       }}>
         <div className="container anim-fade-in" style={{ width: '100%' }}>
           <h1 style={{
@@ -435,7 +438,7 @@ export function Home({ store, page }: any) {
             {store.hero?.subtitle || 'Nous vous offrons les meilleurs Produits de haute qualité avec une Expérience shopping simple.'}
           </p>
 
-          <a href="#products"
+          <a href='#products'
             className="btn-primary"
             style={{
               backgroundColor: store.design.primaryColor,
@@ -531,7 +534,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
   const [sel, setSel] = useState(0);
   return (
     <div dir="ltr" className="container" style={{ padding: '3rem 1.5rem' }}>
-      <div className="grid-2" style={{ gap: '3rem', alignItems: 'start' }}>
+      <div className='grid-2' style={{ gap: '3rem', alignItems: 'start' }}>
 
         {/* Gallery */}
         <div>
@@ -649,7 +652,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, selectedVa
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide (ex: 0550123456)";
     if (!fd.customerWelaya) e.customerWelaya = 'requis';
     if (!fd.customerCommune) e.customerCommune = 'requis';
     return e;
@@ -768,7 +771,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         <div>
           {items.map((item, i) => (
             <div key={i} style={{ display: 'flex', gap: '1rem', padding: '1rem', border: '1px solid var(--border-color)', borderRadius: '8px', marginBottom: '1rem' }}>
-              <img src={item.product?.productImage} alt="" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: '4px' }} />
+              <img src={item.product?.productImage} alt='' style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: '4px' }} />
               <div style={{ flex: 1 }}>
                 <h4 style={{ fontWeight: 500, marginBottom: '0.5rem' }}>{item.product?.name}</h4>
                 <div style={{ fontWeight: 700 }}>{item.finalPrice} DA <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 400 }}>x {item.quantity}</span></div>
@@ -835,23 +838,23 @@ export function Contact({ store }: any) {
       await axios.post(`${API_URL}/user/contact-user/message`, {
         ...form,
         storeId: store.id,
-        userId: store.userId // ajouter l’identifiant utilisateur pour garantir la réception
+        userId: store.userId // ajouter l'identifiant utilisateur pour garantir la réception
       });
       setSent(true);
     } catch (err) {
-      showError(‘Erreur lors de l\’envoi, veuillez réessayer ultérieurement’);
+      showError("Erreur lors de l'envoi, veuillez réessayer ultérieurement");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container" style={{ padding: '5rem 1.5rem', maxWidth: '450px', margin: '0 auto' }} dir="ltr">
+    <div className="container" style={{ padding: '5rem 1.5rem', maxWidth: '450px', margin: '0 auto' }} dir='ltr'>
       {sent ? (
         /* Interface de succès */
-        <div style={{ textAlign: 'center', padding: '2rem 0' }} className="anim-fade-in">
+        <div style={{ textAlign: 'center', padding: '2rem 0' }} className='anim-fade-in'>
           <div style={{ display: 'inline-flex', padding: '1rem', background: '#f8f8f8', borderRadius: '50%', marginBottom: '1.5rem' }}>
-            <CheckCircle2 size={32} color="#000" />
+            <CheckCircle2 size={32} color='#000' />
           </div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase' }}>Envoyé</h2>
           <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '2rem' }}>Merci de nous avoir contactés. Nous vous répondrons dans les plus brefs délais.</p>
@@ -867,7 +870,7 @@ export function Contact({ store }: any) {
         <div>
           <div style={{ marginBottom: '2.5rem' }}>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '-0.5px' }}>Contactez-nous</h1>
-            <p style={{ color: '#666', fontSize: '0.85rem' }}>Remplissez le formulaire et Nous vous répondrons bient’t.</p>
+            <p style={{ color: '#666', fontSize: '0.85rem' }}>Remplissez le formulaire et Nous vous répondrons bient't.</p>
           </div>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
@@ -879,7 +882,7 @@ export function Contact({ store }: any) {
               placeholder="Nom"
               required
             />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+            <div className="form-row-2">
               <input
                 value={form.phone}
                 onChange={e => setForm({ ...form, phone: e.target.value })}
@@ -902,7 +905,7 @@ export function Contact({ store }: any) {
               onChange={e => setForm({ ...form, message: e.target.value })}
               style={{ ...minimalInputStyle, resize: 'none' }}
               rows={5}
-              placeholder="Votre message..."
+              placeholder='Votre message...'
               required
             ></textarea>
 

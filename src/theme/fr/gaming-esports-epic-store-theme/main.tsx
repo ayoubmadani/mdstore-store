@@ -110,6 +110,9 @@ const THEME_CSS = `
     height: 2px;
     width: 100%;
   }
+
+  .form-row-2{display:grid;grid-template-columns:1fr;gap:0.8rem;}
+  @media(min-width:540px){.form-row-2{grid-template-columns:1fr 1fr;}}
 `;
 
 const SimpleDivider = () => <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '2rem 0' }} />;
@@ -230,7 +233,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             onClick={() => { setSearchQuery(''); setOpen(false); }}
             style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.8rem', borderBottom: '1px solid #252040', transition: 'background 0.2s' }}
           >
-            <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: '4px' }} alt="" />
+            <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: '4px' }} alt='' />
             <div>
               <div className='line-clamp-1' style={{ fontSize: '0.85rem', fontWeight: 600, color: '#E8E0F0' }}>{p.name}</div>
               <div style={{ fontSize: '0.8rem', color: '#00D4FF' }}>{p.price} DA</div>
@@ -426,7 +429,7 @@ export function Home({ store, page }: any) {
         alignItems: 'center',
         minHeight: '400px'
       }}>
-        <div className="container anim-fade-in" style={{ width: '100%' }}>
+        <div className='container anim-fade-in' style={{ width: '100%' }}>
           <h1 style={{
             fontSize: 'clamp(2rem, 5vw, 3.5rem)',
             color: '#7B2FBE',
@@ -448,7 +451,7 @@ export function Home({ store, page }: any) {
             {store.hero?.subtitle || 'Équipements gaming professionnels pour une expérience e-sport incomparable.'}
           </p>
 
-          <a href="#products"
+          <a href='#products'
             className="btn-primary"
             style={{
               background: 'linear-gradient(90deg, #7B2FBE, #00D4FF)',
@@ -545,7 +548,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
   const [sel, setSel] = useState(0);
   return (
     <div dir="ltr" className="container" style={{ padding: '3rem 1.5rem' }}>
-      <div className="grid-2" style={{ gap: '3rem', alignItems: 'start' }}>
+      <div className='grid-2' style={{ gap: '3rem', alignItems: 'start' }}>
 
         {/* Gallery */}
         <div>
@@ -663,7 +666,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, selectedVa
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide (ex: 0550123456)";
     if (!fd.customerWelaya) e.customerWelaya = 'requis';
     if (!fd.customerCommune) e.customerCommune = 'requis';
     return e;
@@ -782,7 +785,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         <div>
           {items.map((item, i) => (
             <div key={i} style={{ display: 'flex', gap: '1rem', padding: '1rem', border: '1px solid #252040', borderRadius: '8px', marginBottom: '1rem', background: '#15152A' }}>
-              <img src={item.product?.productImage} alt="" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: '4px' }} />
+              <img src={item.product?.productImage} alt='' style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: '4px' }} />
               <div style={{ flex: 1 }}>
                 <h4 style={{ fontWeight: 500, marginBottom: '0.5rem', color: '#E8E0F0' }}>{item.product?.name}</h4>
                 <div style={{ fontWeight: 700, color: '#00D4FF' }}>{item.finalPrice} DA <span style={{ fontSize: '0.8rem', color: '#8A80A0', fontWeight: 400 }}>x {item.quantity}</span></div>
@@ -852,18 +855,18 @@ export function Contact({ store }: any) {
       });
       setSent(true);
     } catch (err) {
-      showError(‘Erreur lors de l\’envoi, veuillez réessayer ultérieurement’);
+      showError("Erreur lors de l'envoi, veuillez réessayer ultérieurement");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container" style={{ padding: '5rem 1.5rem', maxWidth: '450px', margin: '0 auto' }} dir="ltr">
+    <div className="container" style={{ padding: '5rem 1.5rem', maxWidth: '450px', margin: '0 auto' }} dir='ltr'>
       {sent ? (
-        <div style={{ textAlign: 'center', padding: '2rem 0' }} className="anim-fade-in">
+        <div style={{ textAlign: 'center', padding: '2rem 0' }} className='anim-fade-in'>
           <div style={{ display: 'inline-flex', padding: '1rem', background: '#15152A', borderRadius: '50%', marginBottom: '1.5rem', border: '1px solid #7B2FBE' }}>
-            <CheckCircle2 size={32} color="#00D4FF" />
+            <CheckCircle2 size={32} color='#00D4FF' />
           </div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 900, marginBottom: '0.5rem', color: '#E8E0F0' }}>Envoyé</h2>
           <p style={{ color: '#8A80A0', fontSize: '0.9rem', marginBottom: '2rem' }}>Merci de nous avoir contactés. Nous vous répondrons dans les plus brefs délais.</p>
@@ -878,7 +881,7 @@ export function Contact({ store }: any) {
         <div>
           <div style={{ marginBottom: '2.5rem' }}>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '0.5rem', color: '#E8E0F0', letterSpacing: '-0.5px' }}>Contactez-nous</h1>
-            <p style={{ color: '#8A80A0', fontSize: '0.85rem' }}>Remplissez le formulaire et Nous vous répondrons bient’t.</p>
+            <p style={{ color: '#8A80A0', fontSize: '0.85rem' }}>Remplissez le formulaire et Nous vous répondrons bient't.</p>
           </div>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
@@ -890,7 +893,7 @@ export function Contact({ store }: any) {
               placeholder="Nom"
               required
             />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+            <div className="form-row-2">
               <input
                 value={form.phone}
                 onChange={e => setForm({ ...form, phone: e.target.value })}
@@ -913,7 +916,7 @@ export function Contact({ store }: any) {
               onChange={e => setForm({ ...form, message: e.target.value })}
               style={{ ...epicInputStyle, resize: 'none' }}
               rows={5}
-              placeholder="Votre message..."
+              placeholder='Votre message...'
               required
             ></textarea>
 

@@ -61,7 +61,7 @@ const THEME_CSS = `
   .cats-grid { display: flex; gap: 0.75rem; overflow-x: auto; padding-bottom: 4px; }
   .cats-grid::-webkit-scrollbar { height: 0; }
 
-  .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+  .products-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
   @media (min-width: 768px)  { .products-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (min-width: 1280px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
 
@@ -156,7 +156,7 @@ const fetchCommunes = async (wid: string): Promise<Commune[]> => { try { const {
 const S = {
   input: { width: '100%', padding: '0.7rem 0.875rem', background: '#fff', border: `1px solid ${BD}`, borderRadius: 8, fontSize: '0.9rem', color: INK, outline: 'none', transition: 'border-color 0.15s', appearance: 'none' } as React.CSSProperties,
   inputErr: { borderColor: '#DC2626' } as React.CSSProperties,
-  btnPrimary: { width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: OR, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.5rem', borderRadius: 8, border: 'none', cursor: 'pointer', transition: 'background 0.2s', fontFamily: "'Cairo', sans-serif" } as React.CSSProperties,
+  btnPrimary: { width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: OR, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.5rem', borderRadius: 8, border: 'none', cursor: 'pointer', transition: 'background 0.2s', fontFamily: "'Cairo',sans-serif" } as React.CSSProperties,
 };
 
 export default function Main({ store, children, domain }: any) {
@@ -240,7 +240,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                   <Mountain size={16} color="#fff" />
                 </div>
                 <div>
-                  <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#fff', display: 'block', lineHeight: 1.15, fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.04em', textTransform: 'uppercase' }}>{store?.name || 'Outdoor Adventures'}</span>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#fff', display: 'block', lineHeight: 1.15, fontFamily: "'Cairo',sans-serif", letterSpacing: '0.04em', textTransform: 'uppercase' }}>{store?.name || 'Outdoor Adventures'}</span>
                   <span style={{ fontSize: '0.56rem', color: 'rgba(255,255,255,0.45)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Aventures en plein air</span>
                 </div>
               </>
@@ -354,10 +354,10 @@ export function Footer({ store }: any) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '1rem' }}>
               <div style={{ width: 30, height: 30, background: OR, borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Mountain size={14} color="#fff" /></div>
-              <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fff', fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase', letterSpacing: '0.05em' }}>{store?.name}</span>
+              <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fff', fontFamily: "'Cairo',sans-serif", textTransform: 'uppercase', letterSpacing: '0.05em' }}>{store?.name}</span>
             </div>
             <p style={{ fontSize: '0.875rem', lineHeight: 1.85, maxWidth: 280, color: 'rgba(255,255,255,0.4)' }}>
-              {store?.hero?.subtitle?.substring(0, 90) || 'Équipements et outils de camping et d’Aventures en plein air.'}
+              {store?.hero?.subtitle?.substring(0, 90) || "Équipements et outils de camping et d'Aventures en plein air."}
             </p>
             <p style={{ marginTop: '2rem', fontSize: '0.65rem', color: 'rgba(255,255,255,0.18)' }}>© {new Date().getFullYear()} {store?.name}</p>
           </div>
@@ -405,16 +405,16 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '45%', background: 'linear-gradient(to top, rgba(19,31,16,0.75) 0%, transparent 100%)' }} />
         {/* Price badge inside image */}
         <div style={{ position: 'absolute', bottom: 10, right: 10 }}>
-          <span className="price-mono" style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.5)', fontFamily: "'Barlow Condensed', sans-serif" }}>{price.toLocaleString()}</span>
+          <span className="price-mono" style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.5)', fontFamily: "'Cairo',sans-serif" }}>{price.toLocaleString()}</span>
           <span style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.75)', marginRight: 3 }}>{store.currency || 'DA'}</span>
         </div>
         {discount > 0 && (
-          <div style={{ position: 'absolute', top: 0, left: 0, background: OR, color: '#fff', fontSize: '0.68rem', fontWeight: 800, padding: '5px 10px', fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.04em' }}>-{discount}%</div>
+          <div style={{ position: 'absolute', top: 0, left: 0, background: OR, color: '#fff', fontSize: '0.68rem', fontWeight: 800, padding: '5px 10px', fontFamily: "'Cairo',sans-serif", letterSpacing: '0.04em' }}>-{discount}%</div>
         )}
       </div>
       {/* Info */}
       <div style={{ padding: '0.75rem 0.875rem 0', flex: 1, borderTop: `3px solid ${OR}` }}>
-        <p style={{ fontSize: '0.58rem', fontWeight: 700, color: OR, marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: "'Barlow Condensed', sans-serif" }}>{store?.name}</p>
+        <p style={{ fontSize: '0.58rem', fontWeight: 700, color: OR, marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: "'Cairo',sans-serif" }}>{store?.name}</p>
         <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: INK, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: '0.75rem' }}>{product.name}</h3>
         {orig > price && (
           <p className="price-mono" style={{ fontSize: '0.7rem', color: SUB, textDecoration: 'line-through', marginBottom: '0.5rem' }}>{orig.toLocaleString()} {store.currency || 'DA'}</p>
@@ -452,7 +452,7 @@ export function Home({ store, page }: any) {
           <div style={{ maxWidth: 620 }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(212,98,42,0.15)', border: '1px solid rgba(212,98,42,0.3)', borderRadius: 3, padding: '0.35rem 0.875rem', marginBottom: '1.5rem' }}>
               <Compass size={11} color={OR} />
-              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: OR, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: "'Barlow Condensed', sans-serif" }}>Aventures en plein air</span>
+              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: OR, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: "'Cairo',sans-serif" }}>Aventures en plein air</span>
             </div>
             <h1 style={{ fontFamily: "'Barlow Condensed', 'Cairo', sans-serif", fontSize: 'clamp(3.5rem,9vw,7rem)', fontWeight: 800, color: '#FAFAF8', lineHeight: 0.9, letterSpacing: '-0.02em', textTransform: 'uppercase', marginBottom: '1.25rem' }}
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || `Découvrir<br/><em style="color:${OR};font-style:normal">Inconnu</em>`) }} />
@@ -465,7 +465,7 @@ export function Home({ store, page }: any) {
               {store.hero?.subtitle || 'Équipements et outils de camping et aventures en plein air. Prêt pour tous les terrains et chaque voyage.'}
             </p>
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-              <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: OR, color: '#fff', fontWeight: 800, fontSize: '0.8rem', padding: '0.875rem 1.875rem', transition: 'background 0.18s', textDecoration: 'none', fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.1em', textTransform: 'uppercase' }}
+              <a href='#products' style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: OR, color: '#fff', fontWeight: 800, fontSize: '0.8rem', padding: '0.875rem 1.875rem', transition: 'background 0.18s', textDecoration: 'none', fontFamily: "'Cairo',sans-serif", letterSpacing: '0.1em', textTransform: 'uppercase' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = ORD)}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = OR)}>
                 Explorer Produits <ArrowRight size={14} />
@@ -481,7 +481,7 @@ export function Home({ store, page }: any) {
             <div style={{ display: 'flex', gap: 'clamp(1.5rem,5vw,4rem)', marginTop: '2.5rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
               {[{ n: '+300', l: 'Produit' }, { n: '58', l: 'Wilaya' }, { n: '100%', l: 'Garanti' }].map((s, i) => (
                 <div key={i}>
-                  <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, color: OR, lineHeight: 1 }}>{s.n}</p>
+                  <p style={{ fontFamily: "'Cairo',sans-serif", fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, color: OR, lineHeight: 1 }}>{s.n}</p>
                   <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', marginTop: 5, letterSpacing: '0.1em', textTransform: 'uppercase' }}>{s.l}</p>
                 </div>
               ))}
@@ -513,7 +513,7 @@ export function Home({ store, page }: any) {
       {/* CATEGORIES */}
       {cats.length > 0 && (
         <section style={{ padding: '2rem 1.5rem', maxWidth: 1280, margin: '0 auto' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 700, color: INK, marginBottom: '1rem', fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase', letterSpacing: '0.08em' }}>Catégories</h2>
+          <h2 style={{ fontSize: '1rem', fontWeight: 700, color: INK, marginBottom: '1rem', fontFamily: "'Cairo',sans-serif", textTransform: 'uppercase', letterSpacing: '0.08em' }}>Catégories</h2>
           <div className="cats-grid">
                           <Link href="?" style={{ display:'inline-flex', alignItems:'center', padding:'0.5rem 1.25rem', borderRadius:999, border:`1.5px solid ${!activeCategory ? OR : '#ccc'}`, background: !activeCategory ? OR : 'transparent', color: !activeCategory ? '#fff' : 'inherit', fontSize:'0.82rem', fontWeight:600, cursor:'pointer' }}>
                 Tout
@@ -537,14 +537,14 @@ export function Home({ store, page }: any) {
       <section id="products" style={{ padding: '0 1.5rem 5rem', maxWidth: 1280, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '1.5rem', paddingTop: cats.length > 0 ? 0 : '2rem', borderBottom: `2px solid ${OR}`, paddingBottom: '0.75rem' }}>
           <div>
-            <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(1.5rem,4vw,2.25rem)', fontWeight: 800, color: INK, textTransform: 'uppercase', letterSpacing: '0.04em', lineHeight: 1 }}>Tous les Produits</h2>
+            <h2 style={{ fontFamily: "'Cairo',sans-serif", fontSize: 'clamp(1.5rem,4vw,2.25rem)', fontWeight: 800, color: INK, textTransform: 'uppercase', letterSpacing: '0.04em', lineHeight: 1 }}>Tous les Produits</h2>
             {store.count > 0 && <p style={{ fontSize: '0.72rem', color: SUB, marginTop: 4 }}>{store.count} Produit</p>}
           </div>
         </div>
         {products.length === 0 ? (
           <div style={{ padding: '5rem 1.5rem', textAlign: 'center', border: `1px dashed ${BD}`, borderRadius: 10, background: CARD }}>
             <Tent size={40} color={BD} style={{ display: 'block', margin: '0 auto 1rem' }} />
-            <p style={{ color: SUB, fontSize: '0.875rem' }}>Aucun produit pour l’instant</p>
+            <p style={{ color: SUB, fontSize: '0.875rem' }}>Aucun produit pour l'instant</p>
           </div>
         ) : (
           <div className="products-grid">
@@ -703,7 +703,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide";
     if (!fd.customerWelaya) e.customerWelaya = 'requis';
     if (!fd.customerCommune) e.customerCommune = 'requis';
     return e;
@@ -853,7 +853,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro invalide';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro invalide";
     if (!fd.customerWelaya) er.w = 'requis';
     if (!fd.customerCommune) er.c = 'requis';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -871,7 +871,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{ textAlign: 'center', background: CARD, padding: '3rem 2rem', borderRadius: 12, border: `1px solid ${BD}`, maxWidth: 440, width: '100%' }}>
         <CheckCircle2 size={48} style={{ color: OR, display: 'block', margin: '0 auto 1.25rem' }} />
         <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: INK, marginBottom: '0.5rem' }}>Commande reçue !</h2>
-        <p style={{ color: SUB, lineHeight: 1.75, marginBottom: '2rem', fontSize: '0.9rem' }}>Nous vous contacterons bient’t pour confirmer la commande et organiser la Livraison.</p>
+        <p style={{ color: SUB, lineHeight: 1.75, marginBottom: '2rem', fontSize: '0.9rem' }}>Nous vous contacterons bient't pour confirmer la commande et organiser la Livraison.</p>
         <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: OR, color: '#fff', padding: '0.75rem 2rem', fontWeight: 700, fontSize: '0.875rem', borderRadius: 8 }}>Retour à la boutique</Link>
       </div>
     </div>
@@ -891,7 +891,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     <div dir="ltr" style={{ padding: '2.5rem 1.5rem', maxWidth: 1280, margin: '0 auto', minHeight: '100vh', background: BG }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
         <ShoppingCart size={18} style={{ color: OR }} />
-        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(1.75rem,5vw,2.5rem)', fontWeight: 800, color: INK, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Panier</h1>
+        <h1 style={{ fontFamily: "'Cairo',sans-serif", fontSize: 'clamp(1.75rem,5vw,2.5rem)', fontWeight: 800, color: INK, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Panier</h1>
       </div>
       <div className="cart-inner">
         <div style={{ background: CARD, borderRadius: 12, border: `1px solid ${BD}`, alignSelf: 'start', overflow: 'hidden' }}>
@@ -981,9 +981,9 @@ const Shell = ({ children, title }: { children: React.ReactNode; title: string }
       <div style={{ maxWidth: 860, margin: '0 auto' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, marginBottom: '0.75rem' }}>
           <Compass size={12} color={OR} />
-          <span style={{ fontSize: '0.62rem', fontWeight: 700, color: OR, textTransform: 'uppercase', letterSpacing: '0.12em', fontFamily: "'Barlow Condensed', sans-serif" }}>Outdoor Adventures</span>
+          <span style={{ fontSize: '0.62rem', fontWeight: 700, color: OR, textTransform: 'uppercase', letterSpacing: '0.12em', fontFamily: "'Cairo',sans-serif" }}>Outdoor Adventures</span>
         </div>
-        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(2rem,6vw,3.5rem)', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.02em' }}>{title}</h1>
+        <h1 style={{ fontFamily: "'Cairo',sans-serif", fontSize: 'clamp(2rem,6vw,3.5rem)', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.02em' }}>{title}</h1>
       </div>
     </div>
     <div style={{ maxWidth: 860, margin: '0 auto', padding: '3rem 1.5rem 6rem' }}>{children}</div>
@@ -1016,10 +1016,10 @@ export function Privacy() {
 
 export function Terms() {
   return (
-    <Shell title="Conditions d’utilisation">
+    <Shell title="Conditions d'utilisation">
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 10, border: `1px solid ${BD}` }}>
-        <InfoBlock title="Compte et responsabilité" body="L’utilisateur est responsable de l’exactitude des données et de la confidentialité de son compte." />
-        <InfoBlock title="Commandes et paiements" body="Les commandes sont confirmées par Téléphone avant l’expédition. Les prix affichés sont définitifs." />
+        <InfoBlock title="Compte et responsabilité" body="L'utilisateur est responsable de l'exactitude des données et de la confidentialité de son compte." />
+        <InfoBlock title="Commandes et paiements" body="Les commandes sont confirmées par Téléphone avant l'expédition. Les prix affichés sont définitifs." />
         <InfoBlock title="Loi applicable" body="Toutes les transactions sont soumises aux lois de la République Algérienne Démocratique et Populaire." />
       </div>
     </Shell>
@@ -1031,7 +1031,7 @@ export function Cookies() {
     <Shell title="Cookies">
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 10, border: `1px solid ${BD}` }}>
         <InfoBlock title="Fichiers essentiels" body="Nous utilisons des cookies essentiels pour garantir le fonctionnement du panier et la sécurité de la session." />
-        <InfoBlock title="Amélioration de l’expérience" body="Nous utilisons certains fichiers pour comprendre l’utilisation du site et améliorer l’expérience." />
+        <InfoBlock title="Amélioration de l'expérience" body="Nous utilisons certains fichiers pour comprendre l'utilisation du site et améliorer l'expérience." />
       </div>
     </Shell>
   );
@@ -1045,7 +1045,7 @@ export function Contact({ store }: { store: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-    catch { showError('Erreur lors de l’envoi'); } finally { setLoading(false); }
+    catch { showError("Erreur lors de l'envoi"); } finally { setLoading(false); }
   };
 
   return (
@@ -1056,7 +1056,7 @@ export function Contact({ store }: { store: any }) {
             <Compass size={12} color={OR} />
             <span style={{ fontSize: '0.62rem', fontWeight: 700, color: OR, textTransform: 'uppercase', letterSpacing: '0.12em' }}>Outdoor Adventures</span>
           </div>
-          <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(2rem,6vw,3.5rem)', fontWeight: 800, color: '#fff', textTransform: 'uppercase' }}>Contactez-nous</h1>
+          <h1 style={{ fontFamily: "'Cairo',sans-serif", fontSize: 'clamp(2rem,6vw,3.5rem)', fontWeight: 800, color: '#fff', textTransform: 'uppercase' }}>Contactez-nous</h1>
         </div>
       </div>
       <div className="contact-inner" style={{ maxWidth: 1100, margin: '0 auto', padding: '3rem 1.5rem 6rem' }}>
@@ -1091,14 +1091,14 @@ export function Contact({ store }: { store: any }) {
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-                <FR label="Nom"><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={S.input} /></FR>
+                <FR label='Nom'><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={S.input} /></FR>
                 <FR label="Téléphone"><input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required style={S.input} /></FR>
               </div>
               <div style={{ marginBottom: '0.875rem' }}>
-                <FR label="Email"><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required style={S.input} /></FR>
+                <FR label='Email'><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required style={S.input} /></FR>
               </div>
               <div style={{ marginBottom: '1.25rem' }}>
-                <FR label="Message"><textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} style={{ ...S.input, resize: 'none' }} /></FR>
+                <FR label='Message'><textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} style={{ ...S.input, resize: 'none' }} /></FR>
               </div>
               <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = ORD)}

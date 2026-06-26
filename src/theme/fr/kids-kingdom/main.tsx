@@ -128,7 +128,7 @@ const THEME_CSS = `
   /* ── Responsive: Products grid ── */
   .products-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 1rem;
   }
   @media (min-width: 768px)  { .products-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -244,7 +244,7 @@ const Star5 = ({ color = '#FFD93D', size = 20, delay = '0s', style = {} as any }
 const WavyDivider = ({ top = '#fff', bottom = '#FFFBF0' }) => (
   <div style={{ position: 'relative', height: 60, overflow: 'hidden', background: bottom }}>
     <svg viewBox="0 0 1440 60" preserveAspectRatio="none" style={{ position: 'absolute', bottom: 0, width: '100%', height: '100%' }}>
-      <path d="M0,30 C180,60 360,0 540,30 C720,60 900,0 1080,30 C1260,60 1380,15 1440,30 L1440,60 L0,60 Z" fill={top} />
+      <path d='M0,30 C180,60 360,0 540,30 C720,60 900,0 1080,30 C1260,60 1380,15 1440,30 L1440,60 L0,60 Z' fill={top} />
     </svg>
   </div>
 );
@@ -280,7 +280,7 @@ const inp = (err?: boolean): React.CSSProperties => ({
   width: '100%', padding: '0.75rem 1rem', fontSize: '0.9rem', fontWeight: 600,
   background: '#fff', border: `2px solid ${err ? 'var(--coral)' : 'var(--border)'}`,
   borderRadius: 14, color: 'var(--text)', outline: 'none',
-  fontFamily: "'Nunito', sans-serif", transition: 'border-color 0.2s', appearance: 'none'
+  fontFamily: "'Nunito',sans-serif", transition: 'border-color 0.2s', appearance: 'none'
 });
 
 const FR = ({ error, label, children }: { error?: string; label?: string; children: React.ReactNode }) => (
@@ -296,7 +296,7 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
 ═══════════════════════════════════════════════════════════ */
 export default function Main({ store, children, domain }: any) {
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', fontFamily: "'Nunito', sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', fontFamily: "'Nunito',sans-serif" }}>
       <style>{THEME_CSS}</style>
       {/* Ticker */}
       {store.topBar?.enabled && store.topBar?.text && (
@@ -364,7 +364,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   };
 
   const SearchDrop = () => (
-    <div style={{ maxHeight: "300px", overflow: 'auto', paddingTop: "25px", position: 'absolute', top: 'calc(100% + 8px)', right: 0, left: 0, background: '#fff', border: '3px solid var(--border)', borderRadius: 20, boxShadow: '0 16px 48px rgba(0,0,0,0.1)', zIndex: 200, }}>
+    <div style={{ maxHeight: '300px', overflow: 'auto', paddingTop: "25px", position: 'absolute', top: 'calc(100% + 8px)', right: 0, left: 0, background: '#fff', border: '3px solid var(--border)', borderRadius: 20, boxShadow: '0 16px 48px rgba(0,0,0,0.1)', zIndex: 200, }}>
 
       {/* Bouton fermer Recherche */}
       <button
@@ -437,16 +437,16 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             onMouseLeave={e => (e.currentTarget.style.transform = '')}>
             {(store.design.logoUrl && store.design.logoUrl !== '/default-logo.png')
               ? <img src={store.design.logoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
-              : <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: '#fff' }}>{initials}</span>}
+              : <span style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.1rem', color: '#fff' }}>{initials}</span>}
           </div>
-          <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.3rem', color: 'var(--text)' }}>{store?.name}</span>
+          <span style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.3rem', color: 'var(--text)' }}>{store?.name}</span>
         </Link>
 
         {/* Desktop search */}
         <div className="nav-desktop-search" style={{ flex: 1, maxWidth: 340, position: 'relative' }}>
           <form onSubmit={doSearch}>
             <input type="text" placeholder="Rechercher vos jeux... 🎮" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.75rem', borderRadius: 50, border: '2.5px solid var(--border)', background: '#fff', fontSize: '0.85rem', fontWeight: 700, outline: 'none', fontFamily: "'Nunito', sans-serif" }} />
+              style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.75rem', borderRadius: 50, border: '2.5px solid var(--border)', background: '#fff', fontSize: '0.85rem', fontWeight: 700, outline: 'none', fontFamily: "'Nunito',sans-serif" }} />
             <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)' }} />
           </form>
           {searchQuery.length >= 2 && <SearchDrop />}
@@ -533,9 +533,9 @@ export function Footer({ store }: any) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg, var(--coral), var(--grape))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: '#fff' }}>{(store?.name || 'K')[0]}</span>
+                <span style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1rem', color: '#fff' }}>{(store?.name || 'K')[0]}</span>
               </div>
-              <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.375rem', color: '#fff' }}>{store?.name}</span>
+              <span style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.375rem', color: '#fff' }}>{store?.name}</span>
             </div>
             <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, maxWidth: 300 }}>
               🎁 {store?.hero?.subtitle?.substring(0, 90) || 'Jeux et vêtements pour enfants de haute qualité à prix abordables !'}
@@ -550,7 +550,7 @@ export function Footer({ store }: any) {
 
           {/* Section 2 — Liens */}
           <div>
-            <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--sun)', marginBottom: '1.25rem' }}>🗺️ Liens Rapide</h4>
+            <h4 style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1rem', color: 'var(--sun)', marginBottom: '1.25rem' }}>🗺️ Liens Rapide</h4>
             {[{ h: '/', l: 'Accueil', e: '🏠' }, { h: '/cart', l: 'Panier', e: '🛒' }, { h: '/contact', l: 'Contactez-nous', e: '📞' }, { h: '/Privacy', l: 'Confidentialité', e: '🔒' }, { h: '/Terms', l: 'Conditions', e: '📋' }].map((lnk, i) => (
               <a key={i} href={lnk.h} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--sky)'; el.style.transform = 'translateX(-4px)'; }}
@@ -562,7 +562,7 @@ export function Footer({ store }: any) {
 
           {/* Section 3 — Contact */}
           <div>
-            <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--sun)', marginBottom: '1.25rem' }}>📡 Contactez-nous</h4>
+            <h4 style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1rem', color: 'var(--sun)', marginBottom: '1.25rem' }}>📡 Contactez-nous</h4>
             {[
               { e: '📞', val: store?.contact?.phone },
               { e: '📍', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
@@ -573,7 +573,7 @@ export function Footer({ store }: any) {
               </div>
             ))}
             <div style={{ marginTop: '1.5rem', padding: '1rem 1.25rem', borderRadius: 16, background: 'linear-gradient(135deg, rgba(255,107,107,0.15), rgba(168,85,247,0.15))', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <p style={{ fontFamily: "'Fredoka One', cursive", color: '#fff', fontSize: '0.95rem', marginBottom: '0.25rem' }}>Parce que chaque enfant mérite le meilleur !</p>
+              <p style={{ fontFamily: "'Nunito',sans-serif", color: '#fff', fontSize: '0.95rem', marginBottom: '0.25rem' }}>Parce que chaque enfant mérite le meilleur !</p>
               <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)' }}>Produits Sécurisés et amusants ✅</p>
             </div>
           </div>
@@ -603,7 +603,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
           ? <img src={displayImage} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s', transform: hov ? 'scale(1.1)' : 'scale(1)' }} />
           : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>🧸</div>}
         {discount > 0 && (
-          <div style={{ position: 'absolute', top: 10, right: 10, width: 48, height: 48, borderRadius: '50%', background: 'var(--coral)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '0.8rem', boxShadow: '0 4px 12px rgba(255,107,107,0.5)', transform: 'rotate(12deg)' }}>
+          <div style={{ position: 'absolute', top: 10, right: 10, width: 48, height: 48, borderRadius: '50%', background: 'var(--coral)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Nunito',sans-serif", fontSize: '0.8rem', boxShadow: '0 4px 12px rgba(255,107,107,0.5)', transform: 'rotate(12deg)' }}>
             -{discount}%
           </div>
         )}
@@ -614,12 +614,12 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div style={{ display: 'flex', gap: 2, marginBottom: '0.5rem' }}>
           {[...Array(5)].map((_, i) => <Star key={i} size={12} style={{ fill: i < 4 ? 'var(--sun-dk)' : 'none', color: 'var(--sun-dk)' }} />)}
         </div>
-        <h3 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--text)', marginBottom: '0.5rem', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+        <h3 style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1rem', color: 'var(--text)', marginBottom: '0.5rem', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
           {product.name}
         </h3>
         <div style={{ marginTop: 'auto' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', marginBottom: '0.75rem' }}>
-            <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.4rem', color: 'var(--coral)' }}>{price.toLocaleString()}</span>
+            <span style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.4rem', color: 'var(--coral)' }}>{price.toLocaleString()}</span>
             <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-soft)' }}>{store?.currency || 'DA'}</span>
             {orig > price && <span style={{ fontSize: '0.75rem', color: 'var(--text-soft)', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
           </div>
@@ -672,13 +672,13 @@ export function Home({ store, page }: any) {
           <span key={e} style={{ position: 'absolute', top: `${15 + i * 15}%`, left: i % 2 === 0 ? `${3 + i * 2}%` : undefined, right: i % 2 !== 0 ? `${3 + i * 1.5}%` : undefined, fontSize: '2.5rem', animation: `float-up ${2.5 + i * 0.4}s ${i * 0.5}s ease-in-out infinite`, opacity: 0.6, pointerEvents: 'none' }}>{e}</span>
         ))}
         <Star5 color="var(--sun)" size={26} delay="0s" style={{ position: 'absolute', top: '12%', right: '10%' }} />
-        <Star5 color="var(--coral)" size={18} delay="0.8s" style={{ position: 'absolute', top: '22%', left: '8%' }} />
+        <Star5 color='var(--coral)' size={18} delay="0.8s" style={{ position: 'absolute', top: '22%', left: '8%' }} />
 
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '7rem 1.5rem 4rem', position: 'relative', zIndex: 1, width: '100%' }}>
-          <div className="anim-pop-in" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.5rem 1.25rem', borderRadius: 50, background: 'rgba(255,107,107,0.12)', border: '2px solid rgba(255,107,107,0.25)', marginBottom: '1.5rem' }}>
+          <div className='anim-pop-in' style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.5rem 1.25rem', borderRadius: 50, background: 'rgba(255,107,107,0.12)', border: '2px solid rgba(255,107,107,0.25)', marginBottom: '1.5rem' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--coral)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>🎪 Le monde magique des enfants</span>
           </div>
-          <h1 className="anim-pop-in" style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(3rem, 8vw, 6rem)', color: 'var(--text)', lineHeight: 1.1, marginBottom: '1.25rem' }}
+          <h1 className="anim-pop-in" style={{ fontFamily: "'Nunito',sans-serif", fontSize: 'clamp(3rem, 8vw, 6rem)', color: 'var(--text)', lineHeight: 1.1, marginBottom: '1.25rem' }}
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'Tout ce que<br/>vos enfants adorent ! 🎉') }} />
           <p className="anim-pop-in" style={{ fontSize: '1.0625rem', fontWeight: 600, color: 'var(--text-mid)', maxWidth: 460, lineHeight: 1.7, marginBottom: '2.5rem' }}>
             {store.hero?.subtitle || 'Jeux, vêtements et outils de divertissement Sécurisés pour vos enfants heureux 🌈'}
@@ -699,7 +699,7 @@ export function Home({ store, page }: any) {
       {/* ── FEATURES ── */}
       <section style={{ background: '#fff', paddingBottom: '3rem' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
-          <div className="features-grid">
+          <div className='features-grid'>
             {[
               { e: '🛡️', t: 'Sécurisé Pour enfants', d: 'Tous les Produits répondent aux normes de sécurité' },
               { e: '🚀', t: 'Livraison rapide', d: 'Livré chez vous en un temps record' },
@@ -710,7 +710,7 @@ export function Home({ store, page }: any) {
                 onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-4px)')}
                 onMouseLeave={e => (e.currentTarget.style.transform = '')}>
                 <span style={{ fontSize: '2.25rem', marginBottom: '0.625rem', animation: `float-up ${2 + i * 0.3}s ${i * 0.2}s ease-in-out infinite`, display: 'block' }}>{f.e}</span>
-                <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '0.95rem', color: 'var(--text)', marginBottom: '0.25rem' }}>{f.t}</p>
+                <p style={{ fontFamily: "'Nunito',sans-serif", fontSize: '0.95rem', color: 'var(--text)', marginBottom: '0.25rem' }}>{f.t}</p>
                 <p style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-soft)' }}>{f.d}</p>
               </div>
             ))}
@@ -723,7 +723,7 @@ export function Home({ store, page }: any) {
       {/* ── CATEGORIES ── */}
       {cats.length > 0 && (
         <section style={{ padding: '4rem 1.5rem', maxWidth: 1280, margin: '0 auto' }}>
-          <h2 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', textAlign: 'center', color: 'var(--text)', marginBottom: '2rem' }}>
+          <h2 style={{ fontFamily: "'Nunito',sans-serif", fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', textAlign: 'center', color: 'var(--text)', marginBottom: '2rem' }}>
             🎡 Acheter par Catégorie
           </h2>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.625rem' }}>
@@ -744,7 +744,7 @@ export function Home({ store, page }: any) {
 
       {/* ── PRODUCTS ── */}
       <section id="products" style={{ padding: '1rem 1.5rem 6rem', maxWidth: 1280, margin: '0 auto' }}>
-        <h2 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', textAlign: 'center', color: 'var(--text)', marginBottom: '0.5rem' }}>
+        <h2 style={{ fontFamily: "'Nunito',sans-serif", fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', textAlign: 'center', color: 'var(--text)', marginBottom: '0.5rem' }}>
           🎁 Nos produits Spéciales
         </h2>
         <p style={{ textAlign: 'center', color: 'var(--text-soft)', fontSize: '0.9rem', fontWeight: 600, marginBottom: '2.5rem' }}>
@@ -754,7 +754,7 @@ export function Home({ store, page }: any) {
         {products.length === 0 ? (
           <div className="polka-dots" style={{ padding: '5rem', textAlign: 'center', border: '3px dashed var(--border)', borderRadius: 24 }}>
             <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1rem', animation: 'bounce-loop 2s ease-in-out infinite' }}>🧸</span>
-            <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.25rem', color: 'var(--text-mid)' }}>Aucun produit pour l’instant</p>
+            <p style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.25rem', color: 'var(--text-mid)' }}>Aucun produit pour l'instant</p>
           </div>
         ) : (
           <div className="products-grid">
@@ -774,7 +774,7 @@ export function Home({ store, page }: any) {
             {Array.from({ length: countPage }).map((_, i) => {
               const pn = i + 1; const isA = Number(page) === pn;
               return (
-                <Link key={pn} href={{ query: { page: pn } }} scroll={false} style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '1rem', border: `2.5px solid ${isA ? 'var(--coral)' : 'var(--border)'}`, background: isA ? 'var(--coral)' : '#fff', color: isA ? '#fff' : 'var(--text-mid)', boxShadow: isA ? '0 4px 16px rgba(255,107,107,0.35)' : 'none' }}>
+                <Link key={pn} href={{ query: { page: pn } }} scroll={false} style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Nunito',sans-serif", fontSize: '1rem', border: `2.5px solid ${isA ? 'var(--coral)' : 'var(--border)'}`, background: isA ? 'var(--coral)' : '#fff', color: isA ? '#fff' : 'var(--text-mid)', boxShadow: isA ? '0 4px 16px rgba(255,107,107,0.35)' : 'none' }}>
                   {pn}
                 </Link>
               );
@@ -792,7 +792,7 @@ export function Home({ store, page }: any) {
           <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '1.5rem', fontSize: '2.5rem' }}>
             {['🚀', '⭐', '🎉', '✨'].map((e, i) => <span key={i} style={{ animation: `float-up ${2 + i * 0.3}s ${i * 0.2}s ease-in-out infinite`, display: 'inline-block' }}>{e}</span>)}
           </div>
-          <h2 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(2rem, 6vw, 4.5rem)', color: '#fff', marginBottom: '1rem' }}>La joie ne s’arrête jamais !</h2>
+          <h2 style={{ fontFamily: "'Nunito',sans-serif", fontSize: 'clamp(2rem, 6vw, 4.5rem)', color: '#fff', marginBottom: '1rem' }}>La joie ne s'arrête jamais !</h2>
           <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '1rem', fontWeight: 600, marginBottom: '2rem' }}>Des milliers de Produits amusants et Sécurisés pour vos enfants</p>
           <a href="#products" className="btn-bouncy" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.875rem 2rem', borderRadius: 18, background: 'linear-gradient(135deg, var(--coral), var(--orange), var(--sun))', color: '#fff', fontWeight: 900, fontSize: '0.95rem', boxShadow: '0 8px 30px rgba(255,107,107,0.5)' }}>
             🎪 Explorer maintenant!
@@ -822,7 +822,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
               {allImages[sel]
                 ? <img src={allImages[sel]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem' }}>🧸</div>}
-              {discount > 0 && <div style={{ position: 'absolute', top: 14, right: 14, width: 52, height: 52, borderRadius: '50%', background: 'var(--coral)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '0.85rem', transform: 'rotate(12deg)', boxShadow: '0 4px 16px rgba(255,107,107,0.5)' }}>{discount}%</div>}
+              {discount > 0 && <div style={{ position: 'absolute', top: 14, right: 14, width: 52, height: 52, borderRadius: '50%', background: 'var(--coral)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Nunito',sans-serif", fontSize: '0.85rem', transform: 'rotate(12deg)', boxShadow: '0 4px 16px rgba(255,107,107,0.5)' }}>{discount}%</div>}
               {allImages.length > 1 && (
                 <>
                   <button onClick={() => setSel(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.9)', border: '2px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={18} /></button>
@@ -831,7 +831,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
               )}
               {!inStock && !autoGen && (
                 <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,251,240,0.88)', backdropFilter: 'blur(4px)' }}>
-                  <div style={{ padding: '0.75rem 1.5rem', borderRadius: 16, border: '3px solid var(--coral)', color: 'var(--coral)', fontFamily: "'Fredoka One', cursive", fontSize: '1rem', background: '#fff' }}>😢 Rupture de stock</div>
+                  <div style={{ padding: '0.75rem 1.5rem', borderRadius: 16, border: '3px solid var(--coral)', color: 'var(--coral)', fontFamily: "'Nunito',sans-serif", fontSize: '1rem', background: '#fff' }}>😢 Rupture de stock</div>
                 </div>
               )}
             </div>
@@ -849,7 +849,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
           {/* Info */}
           <div>
             <div style={{ background: '#fff', borderRadius: 24, padding: '2rem', border: '3px solid var(--border)' }}>
-              <h1 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.5rem, 4vw, 2.25rem)', color: 'var(--text)', marginBottom: '0.625rem', lineHeight: 1.2 }}>
+              <h1 style={{ fontFamily: "'Nunito',sans-serif", fontSize: 'clamp(1.5rem, 4vw, 2.25rem)', color: 'var(--text)', marginBottom: '0.625rem', lineHeight: 1.2 }}>
                 {product.name}
               </h1>
               <div style={{ display: 'flex', gap: 3, marginBottom: '1.25rem' }}>
@@ -861,7 +861,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                 <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 5, background: accent, borderRadius: '0 0 0 4px' }} />
                 <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--text-soft)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem' }}>💰 Prix</p>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
-                  <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2.75rem', color: accent }}>{finalPrice.toLocaleString()}</span>
+                  <span style={{ fontFamily: "'Nunito',sans-serif", fontSize: '2.75rem', color: accent }}>{finalPrice.toLocaleString()}</span>
                   <span style={{ fontWeight: 700, color: 'var(--text-mid)', fontSize: '1rem' }}>DA</span>
                 </div>
               </div>
@@ -879,7 +879,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                     <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1rem', border: `3px solid ${selectedOffer === o.id ? accent : 'var(--border)'}`, borderRadius: 16, cursor: 'pointer', marginBottom: '0.5rem', background: selectedOffer === o.id ? `${accent}08` : 'transparent', transition: 'all 0.2s' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
                         <div style={{ width: 20, height: 20, borderRadius: '50%', border: `2.5px solid ${selectedOffer === o.id ? accent : 'var(--border)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', background: selectedOffer === o.id ? accent : 'transparent' }}>
-                          {selectedOffer === o.id && <Check size={10} color="#fff" />}
+                          {selectedOffer === o.id && <Check size={10} color='#fff' />}
                         </div>
                         <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
                         <div>
@@ -887,7 +887,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                           <p style={{ fontSize: '0.72rem', color: 'var(--text-soft)', fontWeight: 600 }}>Quantité: {o.quantity}</p>
                         </div>
                       </div>
-                      <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.2rem', color: accent }}>{o.price.toLocaleString()} DA</span>
+                      <span style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.2rem', color: accent }}>{o.price.toLocaleString()} DA</span>
                     </label>
                   ))}
                 </div>
@@ -920,7 +920,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
 
               {product.desc && (
                 <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '3px dashed var(--border)' }}>
-                  <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: 'var(--text)', marginBottom: '0.875rem' }}>📖 Détails du Produit</p>
+                  <p style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.1rem', color: 'var(--text)', marginBottom: '0.875rem' }}>📖 Détails du Produit</p>
                   <div style={{ fontSize: '0.9rem', fontWeight: 600, lineHeight: 1.8, color: 'var(--text-mid)' }}
                     dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc, { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'span'], ALLOWED_ATTR: ['class', 'style'] }) }} />
                 </div>
@@ -972,9 +972,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'Nom requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide (ex: 0550123456)";
     if (!fd.customerWelaya) e.customerWelaya = 'Wilaya requis';
-    if (!fd.customerCommune) e.customerCommune = 'Commune requis';
+    if (!fd.customerCommune) e.customerCommune = "Commune requis";
     return e;
   };
   const getVarId = useCallback(() => {
@@ -1004,14 +1004,14 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   return (
     <div style={{ paddingTop: '1.5rem', borderTop: '3px dashed var(--border)', marginTop: '1.5rem' }}>
-      <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.15rem', color: 'var(--text)', marginBottom: '1rem' }}>📦 Commander maintenant</p>
+      <p style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.15rem', color: 'var(--text)', marginBottom: '1rem' }}>📦 Commander maintenant</p>
 
       {product.store?.cart && (
         <div className="cart-add-btns" style={{ marginBottom: '1.25rem' }}>
-          <button onClick={addToCart} disabled={isAdded} className={isAdded ? 'anim-cart-pop' : ''} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '0.875rem', borderRadius: 16, cursor: isAdded ? 'default' : 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: '0.875rem', transition: 'all 0.3s', border: isAdded ? '2.5px solid var(--mint-dk)' : '2.5px solid var(--sky)', background: isAdded ? 'rgba(110,231,183,0.12)' : '#fff', color: isAdded ? 'var(--mint-dk)' : 'var(--sky-dk)' }}>
+          <button onClick={addToCart} disabled={isAdded} className={isAdded ? 'anim-cart-pop' : ''} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '0.875rem', borderRadius: 16, cursor: isAdded ? 'default' : 'pointer', fontFamily: "'Nunito',sans-serif", fontWeight: 800, fontSize: '0.875rem', transition: 'all 0.3s', border: isAdded ? '2.5px solid var(--mint-dk)' : '2.5px solid var(--sky)', background: isAdded ? 'rgba(110,231,183,0.12)' : '#fff', color: isAdded ? 'var(--mint-dk)' : 'var(--sky-dk)' }}>
             {isAdded ? <><CheckCircle2 size={16} className="anim-check-in" /> Ajouté!</> : <><ShoppingCart size={16} /> Ajouter au panier</>}
           </button>
-          <button onClick={() => setIsOrderNow(true)} className="btn-bouncy" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '0.875rem', borderRadius: 16, border: 'none', cursor: 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: '0.875rem', background: 'linear-gradient(135deg, var(--coral), var(--grape))', color: '#fff', boxShadow: '0 4px 20px rgba(255,107,107,0.4)' }}>
+          <button onClick={() => setIsOrderNow(true)} className="btn-bouncy" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '0.875rem', borderRadius: 16, border: 'none', cursor: 'pointer', fontFamily: "'Nunito',sans-serif", fontWeight: 800, fontSize: '0.875rem', background: 'linear-gradient(135deg, var(--coral), var(--grape))', color: '#fff', boxShadow: '0 4px 20px rgba(255,107,107,0.4)' }}>
             <Zap size={16} /> Commander maintenant
           </button>
         </div>
@@ -1029,7 +1029,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           )}
           <form onSubmit={handleSubmit}>
             <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-              <FR error={errors.customerName} label="👤 Nom">
+              <FR error={errors.customerName} label='👤 Nom'>
                 <div style={{ position: 'relative' }}>
                   <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder="Nom complet" style={inp(!!errors.customerName)} />
                 </div>
@@ -1039,7 +1039,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               </FR>
             </div>
             <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-              <FR error={errors.customerWelaya} label="📍 Wilaya">
+              <FR error={errors.customerWelaya} label='📍 Wilaya'>
                 <div style={{ position: 'relative' }}>
                   <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)', pointerEvents: 'none' }} />
                   <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...inp(!!errors.customerWelaya), paddingLeft: 32, fontFamily: 'inherit' }}>
@@ -1064,7 +1064,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                   <button key={t} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: t }))} style={{ padding: '0.875rem', border: `3px solid ${fd.typeLivraison === t ? 'var(--sky)' : 'var(--border)'}`, borderRadius: 16, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === t ? 'rgba(78,205,196,0.1)' : '#fff', fontFamily: 'inherit', transition: 'all 0.2s' }}>
                     <span style={{ display: 'block', fontSize: '1.5rem', marginBottom: 4 }}>{t === 'home' ? '🏠' : '🏢'}</span>
                     <p style={{ fontWeight: 800, fontSize: '0.8rem', color: fd.typeLivraison === t ? 'var(--sky-dk)' : 'var(--text-soft)' }}>{t === 'home' ? 'À domicile' : 'Au bureau'}</p>
-                    {selW && <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: fd.typeLivraison === t ? 'var(--text)' : 'var(--text-soft)' }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} DA</p>}
+                    {selW && <p style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1rem', color: fd.typeLivraison === t ? 'var(--text)' : 'var(--text-soft)' }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} DA</p>}
                   </button>
                 ))}
               </div>
@@ -1074,7 +1074,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <p style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--text-mid)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>🔢 Quantité</p>
               <div style={{ display: 'inline-flex', alignItems: 'center', border: '2.5px solid var(--border)', borderRadius: 16, overflow: 'hidden', background: '#fff' }}>
                 <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--coral)' }}><Minus size={16} /></button>
-                <span style={{ width: 46, textAlign: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '1.25rem', color: 'var(--text)' }}>{fd.quantity}</span>
+                <span style={{ width: 46, textAlign: 'center', fontFamily: "'Nunito',sans-serif", fontSize: '1.25rem', color: 'var(--text)' }}>{fd.quantity}</span>
                 <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--coral)' }}><Plus size={16} /></button>
               </div>
             </div>
@@ -1095,11 +1095,11 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', paddingTop: '0.5rem' }}>
                 <span style={{ fontWeight: 900, fontSize: '0.875rem', color: 'var(--coral)' }}>💰 Total</span>
-                <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2rem', color: 'var(--coral)' }}>{total().toLocaleString()} <span style={{ fontSize: '0.9rem', fontFamily: 'inherit' }}>DA</span></span>
+                <span style={{ fontFamily: "'Nunito',sans-serif", fontSize: '2rem', color: 'var(--coral)' }}>{total().toLocaleString()} <span style={{ fontSize: '0.9rem', fontFamily: 'inherit' }}>DA</span></span>
               </div>
             </div>
 
-            <button type="submit" disabled={sub} className="btn-bouncy" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '1rem', borderRadius: 18, border: 'none', cursor: sub ? 'not-allowed' : 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 900, fontSize: '1rem', color: '#fff', background: sub ? 'var(--text-soft)' : 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: sub ? 'none' : '0 8px 28px rgba(255,107,107,0.4)', opacity: sub ? 0.8 : 1 }}>
+            <button type="submit" disabled={sub} className="btn-bouncy" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '1rem', borderRadius: 18, border: 'none', cursor: sub ? 'not-allowed' : 'pointer', fontFamily: "'Nunito',sans-serif", fontWeight: 900, fontSize: '1rem', color: '#fff', background: sub ? 'var(--text-soft)' : 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: sub ? 'none' : '0 8px 28px rgba(255,107,107,0.4)', opacity: sub ? 0.8 : 1 }}>
               {sub ? <><Loader2 size={18} style={{ animation: 'spin-slow 1s linear infinite' }} /> ⏳ Traitement en cours...</> : '🎉 Confirmer la commande'}
             </button>
             <p style={{ textAlign: 'center', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-soft)', marginTop: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
@@ -1140,9 +1140,9 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'Nom requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro invalide (ex: 0550123456)";
     if (!fd.customerWelaya) er.w = 'Wilaya requis';
-    if (!fd.customerCommune) er.c = 'Commune requis';
+    if (!fd.customerCommune) er.c = "Commune requis";
     if (Object.keys(er).length) { setErrors(er); return; }
     setErrors({}); setSubmitting(true);
     try {
@@ -1157,8 +1157,8 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'rgba(110,231,183,0.15)', border: '3px solid var(--mint-dk)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
           <CheckCircle2 size={36} style={{ color: 'var(--mint-dk)' }} />
         </div>
-        <h2 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.875rem', color: 'var(--text)', marginBottom: '0.625rem' }}>Commande reçue ! 🎉</h2>
-        <p style={{ color: 'var(--text-mid)', fontWeight: 600, marginBottom: '2rem', lineHeight: 1.7 }}>Merci ! Nous vous contacterons bient’t pour confirmer votre commande.</p>
+        <h2 style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.875rem', color: 'var(--text)', marginBottom: '0.625rem' }}>Commande reçue ! 🎉</h2>
+        <p style={{ color: 'var(--text-mid)', fontWeight: 600, marginBottom: '2rem', lineHeight: 1.7 }}>Merci ! Nous vous contacterons bient't pour confirmer votre commande.</p>
         <Link href="/" className="btn-bouncy" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.875rem 2rem', borderRadius: 18, background: 'linear-gradient(135deg, var(--coral), var(--grape))', color: '#fff', fontWeight: 900, fontSize: '0.9rem', boxShadow: '0 8px 28px rgba(255,107,107,0.4)' }}>
           🛍️ Retour à la boutique
         </Link>
@@ -1170,7 +1170,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     <div dir="ltr" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
       <div className="polka-dots" style={{ textAlign: 'center', padding: '4rem 2rem', border: '3px dashed var(--border)', borderRadius: 28, maxWidth: 400, width: '100%', background: '#fff' }}>
         <ShoppingBag size={52} style={{ color: 'var(--text-soft)', display: 'block', margin: '0 auto 1.25rem', opacity: 0.4 }} />
-        <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.25rem', color: 'var(--text-mid)', marginBottom: '1.75rem' }}>Panier vide 🧸</p>
+        <p style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.25rem', color: 'var(--text-mid)', marginBottom: '1.75rem' }}>Panier vide 🧸</p>
         <Link href="/" className="btn-bouncy" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.875rem 2rem', borderRadius: 18, background: 'linear-gradient(135deg, var(--coral), var(--grape))', color: '#fff', fontWeight: 900, fontSize: '0.9rem', boxShadow: '0 8px 28px rgba(255,107,107,0.4)' }}>
           🛒 Acheter maintenant
         </Link>
@@ -1181,25 +1181,25 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   return (
     <div dir="ltr" style={{ minHeight: '100vh', background: 'var(--bg)', padding: '2.5rem 1.5rem 5rem' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <h1 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(2rem, 5vw, 3rem)', color: 'var(--text)', marginBottom: '2rem' }}>🛒 Panier</h1>
+        <h1 style={{ fontFamily: "'Nunito',sans-serif", fontSize: 'clamp(2rem, 5vw, 3rem)', color: 'var(--text)', marginBottom: '2rem' }}>🛒 Panier</h1>
         <div className="cart-layout">
 
           {/* Items */}
           <div style={{ background: '#fff', borderRadius: 24, border: '3px solid var(--border)', overflow: 'hidden', alignSelf: 'start' }}>
             <div style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '3px dashed var(--border)', background: 'rgba(255,107,107,0.04)' }}>
               <Package size={18} style={{ color: 'var(--coral)' }} />
-              <span style={{ fontFamily: "'Fredoka One', cursive", color: 'var(--coral)', fontSize: '0.95rem' }}>Produits ({items.length})</span>
+              <span style={{ fontFamily: "'Nunito',sans-serif", color: 'var(--coral)', fontSize: '0.95rem' }}>Produits ({items.length})</span>
             </div>
             {items.map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: '1rem', padding: '1rem', borderBottom: '2px dashed var(--border)' }}>
                 <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: 78, height: 78, borderRadius: 16, objectFit: 'cover', border: '2px solid var(--border)', flexShrink: 0 }} alt="" />
                 <div style={{ flex: 1 }}>
-                  <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '0.95rem', color: 'var(--text)', marginBottom: '0.25rem' }}>{item.product?.name}</h4>
-                  <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: 'var(--coral)', marginBottom: '0.5rem' }}>{item.finalPrice?.toLocaleString()} DA</p>
+                  <h4 style={{ fontFamily: "'Nunito',sans-serif", fontSize: '0.95rem', color: 'var(--text)', marginBottom: '0.25rem' }}>{item.product?.name}</h4>
+                  <p style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.1rem', color: 'var(--coral)', marginBottom: '0.5rem' }}>{item.finalPrice?.toLocaleString()} DA</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', border: '2px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
                       <button onClick={() => changeQty(i, -1)} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--coral)' }}><Minus size={12} /></button>
-                      <span style={{ width: 36, textAlign: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '1rem', background: 'var(--bg)' }}>{item.quantity}</span>
+                      <span style={{ width: 36, textAlign: 'center', fontFamily: "'Nunito',sans-serif", fontSize: '1rem', background: 'var(--bg)' }}>{item.quantity}</span>
                       <button onClick={() => changeQty(i, 1)} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--coral)' }}><Plus size={12} /></button>
                     </div>
                     <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0.375rem 0.75rem', borderRadius: 10, border: '2px solid rgba(255,107,107,0.3)', background: 'transparent', color: 'var(--coral)', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -1211,7 +1211,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             ))}
             <div style={{ padding: '1rem', background: 'rgba(255,107,107,0.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontWeight: 800, fontSize: '0.875rem', color: 'var(--text-soft)' }}>Sous-total</span>
-              <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.5rem', color: 'var(--coral)' }}>{cartTotal.toLocaleString()} DA</span>
+              <span style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.5rem', color: 'var(--coral)' }}>{cartTotal.toLocaleString()} DA</span>
             </div>
           </div>
 
@@ -1219,7 +1219,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
           <div style={{ background: '#fff', borderRadius: 24, border: '3px solid var(--border)', padding: '1.75rem', alignSelf: 'start' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '1.25rem' }}>
               <Truck size={18} style={{ color: 'var(--sky)' }} />
-              <span style={{ fontFamily: "'Fredoka One', cursive", color: 'var(--sky)', fontSize: '0.95rem' }}>Informations de livraison</span>
+              <span style={{ fontFamily: "'Nunito',sans-serif", color: 'var(--sky)', fontSize: '0.95rem' }}>Informations de livraison</span>
             </div>
             <form onSubmit={handleSubmit}>
               <div className="form-row-2" style={{ marginBottom: '0.75rem' }}>
@@ -1227,7 +1227,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <FR error={errors.phone} label="📞 Téléphone"><input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} style={inp(!!errors.phone)} /></FR>
               </div>
               <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-                <FR error={errors.w} label="📍 Wilaya">
+                <FR error={errors.w} label='📍 Wilaya'>
                   <div style={{ position: 'relative' }}>
                     <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)', pointerEvents: 'none' }} />
                     <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...inp(!!errors.w), paddingLeft: 32, fontFamily: 'inherit' }}>
@@ -1252,7 +1252,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     <button key={t} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: t }))} style={{ padding: '0.75rem', border: `3px solid ${fd.typeLivraison === t ? 'var(--sky)' : 'var(--border)'}`, borderRadius: 14, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === t ? 'rgba(78,205,196,0.08)' : '#fff', fontFamily: 'inherit', transition: 'all 0.2s' }}>
                       <span style={{ display: 'block', fontSize: '1.25rem', marginBottom: 3 }}>{t === 'home' ? '🏠' : '🏢'}</span>
                       <p style={{ fontWeight: 800, fontSize: '0.78rem', color: fd.typeLivraison === t ? 'var(--sky-dk)' : 'var(--text-soft)' }}>{t === 'home' ? 'À domicile' : 'Au bureau'}</p>
-                      {selW && <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '0.9rem', color: fd.typeLivraison === t ? 'var(--text)' : 'var(--text-soft)' }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} DA</p>}
+                      {selW && <p style={{ fontFamily: "'Nunito',sans-serif", fontSize: '0.9rem', color: fd.typeLivraison === t ? 'var(--text)' : 'var(--text-soft)' }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} DA</p>}
                     </button>
                   ))}
                 </div>
@@ -1271,11 +1271,11 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 ))}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', paddingTop: '0.375rem' }}>
                   <span style={{ fontWeight: 900, fontSize: '0.875rem', color: 'var(--coral)' }}>💰 Total</span>
-                  <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2rem', color: 'var(--coral)' }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.85rem', fontFamily: 'inherit' }}>DA</span></span>
+                  <span style={{ fontFamily: "'Nunito',sans-serif", fontSize: '2rem', color: 'var(--coral)' }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.85rem', fontFamily: 'inherit' }}>DA</span></span>
                 </div>
               </div>
 
-              <button type="submit" disabled={submitting} className="btn-bouncy" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '1rem', borderRadius: 18, border: 'none', cursor: submitting ? 'not-allowed' : 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 900, fontSize: '1rem', color: '#fff', background: submitting ? 'var(--text-soft)' : 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: submitting ? 'none' : '0 8px 28px rgba(255,107,107,0.4)' }}>
+              <button type="submit" disabled={submitting} className="btn-bouncy" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '1rem', borderRadius: 18, border: 'none', cursor: submitting ? 'not-allowed' : 'pointer', fontFamily: "'Nunito',sans-serif", fontWeight: 900, fontSize: '1rem', color: '#fff', background: submitting ? 'var(--text-soft)' : 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: submitting ? 'none' : '0 8px 28px rgba(255,107,107,0.4)' }}>
                 {submitting ? <><Loader2 size={18} style={{ animation: 'spin-slow 1s linear infinite' }} /> ⏳ En cours...</> : '🎉 Confirmer la commande'}
               </button>
             </form>
@@ -1295,9 +1295,9 @@ const PageShell = ({ title, emoji, children }: { title: string; emoji: string; c
       <Confetti />
       <div style={{ position: 'relative', zIndex: 1 }}>
         <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1rem', animation: 'bounce-loop 2s ease-in-out infinite' }}>{emoji}</span>
-        <h1 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(2rem, 5vw, 3.5rem)', color: 'var(--text)' }}>{title}</h1>
+        <h1 style={{ fontFamily: "'Nunito',sans-serif", fontSize: 'clamp(2rem, 5vw, 3.5rem)', color: 'var(--text)' }}>{title}</h1>
       </div>
-      <WavyDivider top="var(--bg)" bottom="#fff" />
+      <WavyDivider top='var(--bg)' bottom="#fff" />
     </div>
     <div style={{ maxWidth: 860, margin: '0 auto', padding: '2rem 1.5rem 5rem' }}>{children}</div>
   </div>
@@ -1309,7 +1309,7 @@ const InfoCard = ({ icon, title, desc }: { icon: React.ReactNode; title: string;
     onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--border)'; el.style.transform = ''; el.style.boxShadow = ''; }}>
     <div style={{ width: 44, height: 44, borderRadius: 14, background: 'linear-gradient(135deg, var(--sky), var(--mint-dk))', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{icon}</div>
     <div>
-      <h3 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--text)', marginBottom: '0.375rem' }}>{title}</h3>
+      <h3 style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1rem', color: 'var(--text)', marginBottom: '0.375rem' }}>{title}</h3>
       <p style={{ fontSize: '0.9rem', fontWeight: 600, lineHeight: 1.7, color: 'var(--text-mid)' }}>{desc}</p>
     </div>
   </div>
@@ -1328,8 +1328,8 @@ export function Privacy() {
 export function Terms() {
   return (
     <PageShell emoji="📋" title="Conditions et clauses">
-      <InfoCard icon={<CheckCircle2 size={18} />} title="Votre compte et votre responsabilité" desc="Vous êtes responsable de l’exactitude des informations. Gardez vos données de compte en sécurité." />
-      <InfoCard icon={<Truck size={18} />} title="Commandes et paiements" desc="Toutes les commandes sont confirmées par Téléphone avant l’expédition. Paiement À la livraison." />
+      <InfoCard icon={<CheckCircle2 size={18} />} title="Votre compte et votre responsabilité" desc="Vous êtes responsable de l'exactitude des informations. Gardez vos données de compte en sécurité." />
+      <InfoCard icon={<Truck size={18} />} title="Commandes et paiements" desc="Toutes les commandes sont confirmées par Téléphone avant l'expédition. Paiement À la livraison." />
       <InfoCard icon={<ShieldCheck size={18} />} title="Loi réglementaire" desc="Toutes les transactions sont soumises aux lois algériennes en vigueur." />
     </PageShell>
   );
@@ -1352,7 +1352,7 @@ export function Contact({ store }: { store: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-    catch { showError('Erreur lors de l’envoi'); } finally { setLoading(false); }
+    catch { showError("Erreur lors de l'envoi"); } finally { setLoading(false); }
   };
 
   return (
@@ -1361,7 +1361,7 @@ export function Contact({ store }: { store: any }) {
         <Confetti />
         <div style={{ position: 'relative', zIndex: 1 }}>
           <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1rem', animation: 'bounce-loop 2s ease-in-out infinite' }}>💌</span>
-          <h1 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(2rem, 5vw, 3.5rem)', color: 'var(--text)', marginBottom: '0.5rem' }}>Contactez-nous</h1>
+          <h1 style={{ fontFamily: "'Nunito',sans-serif", fontSize: 'clamp(2rem, 5vw, 3.5rem)', color: 'var(--text)', marginBottom: '0.5rem' }}>Contactez-nous</h1>
           <p style={{ color: 'var(--text-mid)', fontWeight: 600 }}>Nous aimons avoir de vos nouvelles ! 🌟</p>
         </div>
         <WavyDivider top="var(--bg)" bottom="#fff" />
@@ -1388,23 +1388,23 @@ export function Contact({ store }: { store: any }) {
             ))}
             <div style={{ marginTop: '1rem', padding: '1.25rem', borderRadius: 20, background: 'linear-gradient(135deg, var(--coral), var(--grape))', color: '#fff', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', bottom: -20, left: -20, fontSize: '6rem', opacity: 0.15 }}>🎪</div>
-              <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', marginBottom: '0.25rem' }}>Réponse rapide ! ⚡</p>
+              <p style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.1rem', marginBottom: '0.25rem' }}>Réponse rapide ! ⚡</p>
               <p style={{ fontSize: '0.82rem', fontWeight: 600, opacity: 0.82 }}>Généralement en quelques heures</p>
             </div>
           </div>
 
           {/* Form */}
           <div style={{ background: '#fff', borderRadius: 24, border: '3px solid var(--border)', padding: '2rem' }}>
-            <h2 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.5rem', color: 'var(--text)', marginBottom: '1.5rem' }}>✉️ Envoyer un message</h2>
+            <h2 style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.5rem', color: 'var(--text)', marginBottom: '1.5rem' }}>✉️ Envoyer un message</h2>
             {sent ? (
               <div style={{ textAlign: 'center', padding: '3rem 1rem' }} className="anim-pop-in">
                 <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1rem', animation: 'bounce-loop 1.5s ease-in-out infinite' }}>🎉</span>
-                <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.5rem', color: 'var(--text)', marginBottom: '0.5rem' }}>Message envoyé !</p>
-                <p style={{ color: 'var(--text-mid)', fontWeight: 600, lineHeight: 1.7 }}>Nous vous répondrons bient’t ! 🌟</p>
+                <p style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.5rem', color: 'var(--text)', marginBottom: '0.5rem' }}>Message envoyé !</p>
+                <p style={{ color: 'var(--text-mid)', fontWeight: 600, lineHeight: 1.7 }}>Nous vous répondrons bient't ! 🌟</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-                <div className="form-row-2">
+                <div className='form-row-2'>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 900, color: 'var(--text-mid)', marginBottom: '0.375rem', textTransform: 'uppercase' }}>👤 Nom</label>
                     <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required placeholder="Votre nom complet" style={inp()} />
@@ -1422,7 +1422,7 @@ export function Contact({ store }: { store: any }) {
                   <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 900, color: 'var(--text-mid)', marginBottom: '0.375rem', textTransform: 'uppercase' }}>💬 Votre message</label>
                   <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} placeholder="Comment pouvons-nous vous aider ? 😊" style={{ ...inp(), resize: 'none' }} />
                 </div>
-                <button type="submit" disabled={loading} className="btn-bouncy" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '1rem', borderRadius: 18, border: 'none', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 900, fontSize: '1rem', color: '#fff', background: 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: '0 8px 28px rgba(255,107,107,0.4)', opacity: loading ? 0.7 : 1 }}>
+                <button type="submit" disabled={loading} className="btn-bouncy" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '1rem', borderRadius: 18, border: 'none', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: "'Nunito',sans-serif", fontWeight: 900, fontSize: '1rem', color: '#fff', background: 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: '0 8px 28px rgba(255,107,107,0.4)', opacity: loading ? 0.7 : 1 }}>
                   {loading ? <><Loader2 size={18} style={{ animation: 'spin-slow 1s linear infinite' }} /> Envoi en cours...</> : <>🚀 Envoyer le message</>}
                 </button>
               </form>

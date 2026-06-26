@@ -233,7 +233,7 @@ const CSS = `
     .cart-g     { grid-template-columns:1fr; }
   }
   @media (max-width:480px) {
-    .prod-grid  { grid-template-columns:repeat(2,1fr); gap:8px; }
+    .prod-grid  { grid-template-columns:1fr; gap:8px; }
     .footer-g   { grid-template-columns:1fr; }
     .form-2c    { grid-template-columns:1fr; }
     .dlv-2c     { grid-template-columns:1fr; }

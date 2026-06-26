@@ -69,8 +69,14 @@ a{text-decoration:none;color:inherit}
 .lbl{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--mu);display:block;margin-bottom:7px;font-family:'Raleway',sans-serif}
 .pag{display:flex;justify-content:center;align-items:center;gap:3px;padding:48px 0}
 
-@media(max-width:900px){.det-grid{grid-template-columns:1fr}.det-sticky{position:static;height:70vw;min-height:300px}.cart-grid{grid-template-columns:1fr}.g3,.g4{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.g3,.g4{grid-template-columns:repeat(2,1fr)}.f2{grid-template-columns:1fr}}
+@media(max-width:900px){.det-grid{grid-template-columns:1fr}.det-sticky{position:static;height:70vw;min-height:300px}.cart-grid{grid-template-columns:1fr}.g3,.g4{grid-template-columns:1fr}}
+@media(max-width:600px){.g3,.g4{grid-template-columns:1fr}.f2{grid-template-columns:1fr}}
+
+  .footer-grid { display:grid; grid-template-columns:1fr; gap:2rem; }
+  @media(min-width:768px){.footer-grid{grid-template-columns:1fr 1fr 1fr;gap:40px;}}
+
+  .contact-layout{display:grid;grid-template-columns:1fr;gap:32px;}
+  @media(min-width:768px){.contact-layout{grid-template-columns:1fr 1.5fr;gap:48px;}}
 `;
 
 /* types */
@@ -107,7 +113,7 @@ export default function Main({store,children,domain}:any){
     <div style={{minHeight:'100vh',background:'var(--bg)',color:'var(--tx)',fontFamily:"'Raleway',sans-serif"}}>
       <style>{CSS}</style>
       {store?.topBar?.enabled&&store?.topBar?.text&&(
-        <div style={{background:store.topBar.color,color:'#fff',textAlign:'center',padding:'7px 16px',fontSize:'11px',letterSpacing:'0.16em',fontWeight:600,fontFamily:"'Raleway',sans-serif",textTransform:'uppercase'}}>{store.topBar.text}</div>
+        <div style={{background:'#C88B6A',color:'#0E0C0A',textAlign:'center',padding:'7px 16px',fontSize:'11px',letterSpacing:'0.16em',fontWeight:600,fontFamily:"'Raleway',sans-serif",textTransform:'uppercase'}}>{store.topBar.text}</div>
       )}
       <Navbar store={store} domain={domain}/>
       <main>{children}</main>
@@ -146,7 +152,7 @@ export function Navbar({store,domain}:{store:any;domain:string}){
 
   return(
     <>
-      <header dir="ltr" style={{position:'sticky',top:0,zIndex:50,background:'var(--bg)',borderBottom:'1px solid var(--br)'}}>
+      <header dir="ltr" style={{position:'sticky',top:0,zIndex:50,background:'#161310',borderBottom:'1px solid var(--br)'}}>
         <div style={{height:'60px',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 24px'}}>
 
         {/* Logo */}
@@ -245,7 +251,7 @@ export function Navbar({store,domain}:{store:any;domain:string}){
 export function Footer({store}:any){
   return(
     <footer dir="ltr" style={{background:'var(--s1)',borderTop:'1px solid var(--br)',padding:'48px 24px 24px',fontFamily:"'Raleway',sans-serif"}}>
-      <div style={{maxWidth:1200,margin:'0 auto',display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:40,paddingBottom:32,borderBottom:'1px solid var(--br)'}}>
+      <div className="footer-grid" style={{maxWidth:1200,margin:'0 auto',paddingBottom:32,borderBottom:'1px solid var(--br)'}}>
         <div>
           <span className="bn" style={{fontSize:'1.8rem',color:'var(--tx)',letterSpacing:'0.06em',display:'block',marginBottom:12}}>{store?.name}</span>
           <p style={{fontSize:'12px',lineHeight:1.8,color:'var(--mu)',letterSpacing:'0.04em'}}>{store?.hero?.subtitle?.slice(0,80)||'Mode raffinée. Livraison dans toutes les wilayas.'}</p>
@@ -317,7 +323,7 @@ export function Home({store,page}:any){
         ):<div style={{position:'absolute',inset:0,background:'var(--s1)'}}/>}
 
         <div style={{position:'relative',zIndex:2,padding:'0 32px 48px',width:'100%'}}>
-          <div className="fu" style={{display:'flex',alignItems:'flex-end',justifyContent:'space-between',gap:24,flexWrap:'wrap'}}>
+          <div className='fu' style={{display:'flex',alignItems:'flex-end',justifyContent:'space-between',gap:24,flexWrap:'wrap'}}>
             <div>
               <h1 className="bn" style={{fontSize:'clamp(4rem,12vw,10rem)',color:'var(--tx)',lineHeight:.88,letterSpacing:'0.03em',marginBottom:16}}>
                 {store.hero?.title||<><span>LUXE</span><br/><span style={{color:'var(--cp)'}}>FASHION</span></>}
@@ -326,7 +332,7 @@ export function Home({store,page}:any){
                 {store.hero?.subtitle||'Mode raffinée. Livraison rapide dans toutes les wilayas.'}
               </p>
             </div>
-            <a href="#products" className="btn-dark" style={{textDecoration:'none',flexShrink:0}}>Acheter maintenant</a>
+            <a href='#products' className="btn-dark" style={{textDecoration:'none',flexShrink:0}}>Acheter maintenant</a>
           </div>
         </div>
       </section>
@@ -496,7 +502,7 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
   const getLiv=useCallback(():number=>{if(!selW)return 0;return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice},[selW,fd.typeLivraison]);
   const fp=getFP();const total=()=>fp*fd.quantity+getLiv();
   const getVarId=useCallback(()=>{if(!product.variantDetails?.length||!Object.keys(selectedVariants).length)return undefined;return product.variantDetails.find((v:any)=>vm(v,selectedVariants))?.id},[product.variantDetails,selectedVariants]);
-  const validate=()=>{const e:Record<string,string>={};if(!fd.customerName.trim())e.name='Nom requis';if(!fd.customerPhone.trim()||!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim()))e.phone='Numéro invalide';if(!fd.customerWelaya)e.w='Wilaya requis';if(!fd.customerCommune)e.c='Commune requis';return e};
+  const validate=()=>{const e:Record<string,string>={};if(!fd.customerName.trim())e.name='Nom requis';if(!fd.customerPhone.trim()||!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim()))e.phone="Numéro invalide";if(!fd.customerWelaya)e.w='Wilaya requis';if(!fd.customerCommune)e.c="Commune requis";return e};
 
   const addCart=()=>{
     setAdded(true);
@@ -632,9 +638,9 @@ export function Cart({domain,store}:{domain:string;store:any}){
     e.preventDefault();
     const er:Record<string,string>={};
     if(!fd.customerName.trim())er.name='Nom requis';
-    if(!fd.customerPhone.trim()||!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim()))er.phone='Numéro invalide';
+    if(!fd.customerPhone.trim()||!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim()))er.phone="Numéro invalide";
     if(!fd.customerWelaya)er.w='Wilaya requis';
-    if(!fd.customerCommune)er.c='Commune requis';
+    if(!fd.customerCommune)er.c="Commune requis";
     if(Object.keys(er).length){setE(er);return}
     setE({});setSub(true);
     try{await axios.post(`${API}/orders/create`,items.map(i=>({...fd,productId:i.productId,storeId:i.storeId,userId:i.userId,selectedOffer:i.selectedOffer,variantDetailId:i.variantDetailId,selectedVariants:i.selectedVariants,platform:i.platform||'store',finalPrice:i.finalPrice,totalPrice:grand,priceLivraison:getLiv(),quantity:i.quantity,customerId:i.customerId||'',priceLoss:selW?.livraisonReturn??0})));
@@ -647,7 +653,7 @@ export function Cart({domain,store}:{domain:string;store:any}){
     </div>
   );
 
-  if(done)return<Center><CheckCircle2 style={{width:40,height:40,color:’var(--cp)’,display:’block’,margin:’0 auto 16px’}}/><h2 className="bn" style={{fontSize:’2.5rem’,color:’var(--tx)’,letterSpacing:’0.06em’,marginBottom:8}}>Commande confirmée</h2><p style={{fontSize:’12px’,color:’var(--mu)’,marginBottom:20,letterSpacing:’0.08em’}}>Nous vous contacterons bientôt.</p><Link href="/" className="btn-dark" style={{display:’inline-flex’,textDecoration:’none’}}>Continuer les achats</Link></Center>;
+  if(done)return<Center><CheckCircle2 style={{width:40,height:40,color:'var(--cp)',display:'block',margin:'0 auto 16px'}}/><h2 className="bn" style={{fontSize:'2.5rem',color:'var(--tx)',letterSpacing:'0.06em',marginBottom:8}}>Commande confirmée</h2><p style={{fontSize:'12px',color:'var(--mu)',marginBottom:20,letterSpacing:'0.08em'}}>Nous vous contacterons bientôt.</p><Link href="/" className="btn-dark" style={{display:'inline-flex',textDecoration:'none'}}>Continuer les achats</Link></Center>;
   if(!items.length)return<Center><ShoppingCart style={{width:32,height:32,color:'var(--mu)',display:'block',margin:'0 auto 14px'}}/><h2 className="bn" style={{fontSize:'2rem',color:'var(--mu)',letterSpacing:'0.06em',marginBottom:16}}>Panier vide</h2><Link href="/" className="btn-dark" style={{display:'inline-flex',textDecoration:'none'}}>Acheter maintenant</Link></Center>;
 
   return(
@@ -670,7 +676,7 @@ export function Cart({domain,store}:{domain:string;store:any}){
                     <span style={{width:28,textAlign:'center',fontSize:'13px',fontWeight:700,lineHeight:'28px'}}>{item.quantity}</span>
                     <button onClick={()=>{const n=[...items];n[i].quantity+=1;upd(n)}} style={{width:28,height:28,display:'flex',alignItems:'center',justifyContent:'center',background:'transparent',border:'none',cursor:'pointer',color:'var(--mu)'}}>+</button>
                   </div>
-                  <button onClick={()=>upd(items.filter((_,idx)=>idx!==i))} style={{background:'none',border:'none',cursor:'pointer',color:'var(--mu)',display:'flex',alignItems:'center',gap:4,fontSize:'10px',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Raleway',sans-serif',transition:'color .15s"}}
+                  <button onClick={()=>upd(items.filter((_,idx)=>idx!==i))} style={{background:'none',border:'none',cursor:'pointer',color:'var(--mu)',display:'flex',alignItems:'center',gap:4,fontSize:'10px',letterSpacing:'0.12em',textTransform:'uppercase',fontFamily:"'Raleway',sans-serif",transition:'color .15s'}}
                     onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='#c14040'}}
                     onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mu)'}}>
                     <Trash2 size={11}/> Supprimer
@@ -746,8 +752,8 @@ const Row=({title,body,tag}:{title:string;body:string;tag?:string})=>(
 );
 
 export function Privacy(){return<PageWrap title="Politique de confidentialité"><Row title="Les données que nous collectons" body="Nom, numéro de téléphone et adresse de livraison uniquement — le minimum pour traiter votre commande."/><Row title="Utilisation des données" body="Utilisées exclusivement pour traiter et livrer votre commande. Pas de marketing ni de vente à des tiers."/><Row title="Sécurité" body="Nous utilisons le chiffrement pour protéger vos données en tout temps."/><Row title="Partage des données" body="Nous ne vendons pas vos données. Partagées avec les partenaires de livraison." tag="Garanti"/></PageWrap>}
-export function Terms(){return<PageWrap title="Conditions d’utilisation"><Row title="Commandes et prix" body="Aucuns frais cachés. Le prix affiché est le prix final."/><Row title="Qualité des produits" body="Nous garantissons la qualité de tous nos produits." tag="Garanti"/><Row title="Livraison" body="Livraison sous 24-72 heures. Paiement à la livraison."/><Row title="Loi" body="Ces conditions sont soumises aux lois de la République Algérienne."/></PageWrap>}
-export function Cookies(){return<PageWrap title="Politique de cookies"><Row title="Fichiers essentiels" body="Requis pour faire fonctionner les sessions et le panier." tag="toujours"/><Row title="Fichiers préférences" body="Sauvegarde vos préférences pour une meilleure expérience." tag="Facultatif"/><Row title="Fichiers analytiques" body="Données agrégées pour l’amélioration de l’expérience." tag="Facultatif"/></PageWrap>}
+export function Terms(){return<PageWrap title="Conditions d'utilisation"><Row title="Commandes et prix" body="Aucuns frais cachés. Le prix affiché est le prix final."/><Row title="Qualité des produits" body="Nous garantissons la qualité de tous nos produits." tag="Garanti"/><Row title="Livraison" body="Livraison sous 24-72 heures. Paiement à la livraison."/><Row title="Loi" body="Ces conditions sont soumises aux lois de la République Algérienne."/></PageWrap>}
+export function Cookies(){return<PageWrap title="Politique de cookies"><Row title="Fichiers essentiels" body="Requis pour faire fonctionner les sessions et le panier." tag="toujours"/><Row title="Fichiers préférences" body="Sauvegarde vos préférences pour une meilleure expérience." tag="Facultatif"/><Row title="Fichiers analytiques" body="Données agrégées pour l'amélioration de l'expérience." tag="Facultatif"/></PageWrap>}
 
 export function Contact({store}:{store?:any}){
   const [form,setForm]=useState({name:'',email:'',phone:'',message:''});
@@ -757,7 +763,7 @@ export function Contact({store}:{store?:any}){
   return(
     <div dir="ltr" style={{background:'var(--bg)',fontFamily:"'Raleway',sans-serif",minHeight:'100vh',padding:'40px 32px 80px'}}>
       <h1 style={{fontSize:'clamp(1.8rem,4vw,2.5rem)',fontWeight:800,color:'var(--tx)',letterSpacing:'0.03em',marginBottom:32,paddingBottom:16,borderBottom:'1px solid var(--br)'}}>Contactez-nous</h1>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1.5fr',gap:48}}>
+      <div className="contact-layout">
         <div>
           {[{e:'📞',l:'Téléphone',v:store?.contact?.phone},{e:'📍',l:'adresse',v:[store?.contact?.wilaya,store?.contact?.address].filter(Boolean).join(' / ')},{e:'✉️',l:'Email',v:store?.contact?.email}].filter(r=>r.v).map(item=>(
             <div key={item.l} style={{padding:'14px 0',borderBottom:'1px solid var(--br)'}}>
@@ -766,10 +772,10 @@ export function Contact({store}:{store?:any}){
             </div>
           ))}
         </div>
-        {sent?(<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:240,textAlign:'center'}}><CheckCircle2 style={{width:36,height:36,color:'var(--cp)',marginBottom:12}}/><h2 style={{fontWeight:800,fontSize:'1.2rem',color:'var(--tx)',marginBottom:6}}>Envoyé</h2><p style={{fontSize:'12px',color:'var(--mu)'}}>Nous vous contacterons Bient’t</p></div>):(
+        {sent?(<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:240,textAlign:'center'}}><CheckCircle2 style={{width:36,height:36,color:'var(--cp)',marginBottom:12}}/><h2 style={{fontWeight:800,fontSize:'1.2rem',color:'var(--tx)',marginBottom:6}}>Envoyé</h2><p style={{fontSize:'12px',color:'var(--mu)'}}>Nous vous contacterons Bient't</p></div>):(
           <form onSubmit={submit} style={{display:'flex',flexDirection:'column',gap:4}}>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
-              <FR label="Nom"><input type="text" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} required style={IS()} onFocus={onF} onBlur={e=>onBl(e)}/></FR>
+            <div className="f2">
+              <FR label='Nom'><input type="text" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} required style={IS()} onFocus={onF} onBlur={e=>onBl(e)}/></FR>
               <FR label="Téléphone"><input type="tel" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} required style={IS()} onFocus={onF} onBlur={e=>onBl(e)}/></FR>
             </div>
             <FR label="Email"><input type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} required style={IS()} onFocus={onF} onBlur={e=>onBl(e)}/></FR>

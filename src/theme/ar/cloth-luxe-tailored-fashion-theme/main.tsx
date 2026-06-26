@@ -69,8 +69,14 @@ a{text-decoration:none;color:inherit}
 .lbl{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--mu);display:block;margin-bottom:7px;font-family:'Raleway',sans-serif}
 .pag{display:flex;justify-content:center;align-items:center;gap:3px;padding:48px 0}
 
-@media(max-width:900px){.det-grid{grid-template-columns:1fr}.det-sticky{position:static;height:70vw;min-height:300px}.cart-grid{grid-template-columns:1fr}.g3,.g4{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.g3,.g4{grid-template-columns:repeat(2,1fr)}.f2{grid-template-columns:1fr}}
+@media(max-width:900px){.det-grid{grid-template-columns:1fr}.det-sticky{position:static;height:70vw;min-height:300px}.cart-grid{grid-template-columns:1fr}.g3,.g4{grid-template-columns:1fr}}
+@media(max-width:600px){.g3,.g4{grid-template-columns:1fr}.f2{grid-template-columns:1fr}}
+
+  .footer-grid { display:grid; grid-template-columns:1fr; gap:2rem; }
+  @media(min-width:768px){.footer-grid{grid-template-columns:1fr 1fr 1fr;gap:40px;}}
+
+  .contact-layout{display:grid;grid-template-columns:1fr;gap:32px;}
+  @media(min-width:768px){.contact-layout{grid-template-columns:1fr 1.5fr;gap:48px;}}
 `;
 
 /* types */
@@ -107,7 +113,7 @@ export default function Main({store,children,domain}:any){
     <div style={{minHeight:'100vh',background:'var(--bg)',color:'var(--tx)',fontFamily:"'Raleway',sans-serif"}}>
       <style>{CSS}</style>
       {store?.topBar?.enabled&&store?.topBar?.text&&(
-        <div style={{background:store.topBar.color,color:'#fff',textAlign:'center',padding:'7px 16px',fontSize:'11px',letterSpacing:'0.16em',fontWeight:600,fontFamily:"'Raleway',sans-serif",textTransform:'uppercase'}}>{store.topBar.text}</div>
+        <div style={{background:'#C88B6A',color:'#0E0C0A',textAlign:'center',padding:'7px 16px',fontSize:'11px',letterSpacing:'0.16em',fontWeight:600,fontFamily:"'Raleway',sans-serif",textTransform:'uppercase'}}>{store.topBar.text}</div>
       )}
       <Navbar store={store} domain={domain}/>
       <main>{children}</main>
@@ -146,7 +152,7 @@ export function Navbar({store,domain}:{store:any;domain:string}){
 
   return(
     <>
-      <header dir="rtl" style={{position:'sticky',top:0,zIndex:50,background:'var(--bg)',borderBottom:'1px solid var(--br)'}}>
+      <header dir="rtl" style={{position:'sticky',top:0,zIndex:50,background:'#161310',borderBottom:'1px solid var(--br)'}}>
         <div style={{height:'60px',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 24px'}}>
 
         {/* Logo */}
@@ -245,7 +251,7 @@ export function Navbar({store,domain}:{store:any;domain:string}){
 export function Footer({store}:any){
   return(
     <footer dir="rtl" style={{background:'var(--s1)',borderTop:'1px solid var(--br)',padding:'48px 24px 24px',fontFamily:"'Raleway',sans-serif"}}>
-      <div style={{maxWidth:1200,margin:'0 auto',display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:40,paddingBottom:32,borderBottom:'1px solid var(--br)'}}>
+      <div className="footer-grid" style={{maxWidth:1200,margin:'0 auto',paddingBottom:32,borderBottom:'1px solid var(--br)'}}>
         <div>
           <span className="bn" style={{fontSize:'1.8rem',color:'var(--tx)',letterSpacing:'0.06em',display:'block',marginBottom:12}}>{store?.name}</span>
           <p style={{fontSize:'12px',lineHeight:1.8,color:'var(--mu)',letterSpacing:'0.04em'}}>{store?.hero?.subtitle?.slice(0,80)||'أزياء راقية. توصيل لجميع الولايات.'}</p>
@@ -757,7 +763,7 @@ export function Contact({store}:{store?:any}){
   return(
     <div dir="rtl" style={{background:'var(--bg)',fontFamily:"'Raleway',sans-serif",minHeight:'100vh',padding:'40px 32px 80px'}}>
       <h1 style={{fontSize:'clamp(1.8rem,4vw,2.5rem)',fontWeight:800,color:'var(--tx)',letterSpacing:'0.03em',marginBottom:32,paddingBottom:16,borderBottom:'1px solid var(--br)'}}>تواصل معنا</h1>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1.5fr',gap:48}}>
+      <div className="contact-layout">
         <div>
           {[{e:'📞',l:'الهاتف',v:store?.contact?.phone},{e:'📍',l:'العنوان',v:[store?.contact?.wilaya,store?.contact?.address].filter(Boolean).join(' / ')},{e:'✉️',l:'البريد',v:store?.contact?.email}].filter(r=>r.v).map(item=>(
             <div key={item.l} style={{padding:'14px 0',borderBottom:'1px solid var(--br)'}}>
@@ -768,7 +774,7 @@ export function Contact({store}:{store?:any}){
         </div>
         {sent?(<div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:240,textAlign:'center'}}><CheckCircle2 style={{width:36,height:36,color:'var(--cp)',marginBottom:12}}/><h2 style={{fontWeight:800,fontSize:'1.2rem',color:'var(--tx)',marginBottom:6}}>تم الإرسال</h2><p style={{fontSize:'12px',color:'var(--mu)'}}>سنتواصل معك قريباً</p></div>):(
           <form onSubmit={submit} style={{display:'flex',flexDirection:'column',gap:4}}>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+            <div className="f2">
               <FR label="الاسم"><input type="text" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} required style={IS()} onFocus={onF} onBlur={e=>onBl(e)}/></FR>
               <FR label="الهاتف"><input type="tel" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} required style={IS()} onFocus={onF} onBlur={e=>onBl(e)}/></FR>
             </div>

@@ -148,7 +148,7 @@ const fetchCommunes = async (wid: string): Promise<Commune[]> => { try { const {
 const S = {
   input: { width: '100%', padding: '0.7rem 0.875rem', background: '#fff', border: `1px solid ${BD}`, borderRadius: 2, fontSize: '0.9rem', color: INK, outline: 'none', transition: 'border-color 0.15s', appearance: 'none' } as React.CSSProperties,
   inputErr: { borderColor: '#E20015' } as React.CSSProperties,
-  btnPrimary: { width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: R, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.5rem', borderRadius: 2, border: 'none', cursor: 'pointer', transition: 'background 0.2s', fontFamily: "'Barlow', sans-serif", textTransform: 'uppercase' as const, letterSpacing: '0.04em' } as React.CSSProperties,
+  btnPrimary: { width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: R, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.5rem', borderRadius: 2, border: 'none', cursor: 'pointer', transition: 'background 0.2s', fontFamily: "'Barlow',sans-serif", textTransform: 'uppercase' as const, letterSpacing: '0.04em' } as React.CSSProperties,
 };
 
 export default function Main({ store, children, domain }: any) {
@@ -236,7 +236,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ width: 4, height: 28, background: R }} />
                 <div>
-                  <span style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', lineHeight: 1 }}>{store?.name || 'POWER TOOLS'}</span>
+                  <span style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', fontFamily: "'Barlow',sans-serif", textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', lineHeight: 1 }}>{store?.name || 'POWER TOOLS'}</span>
                   <span style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Industrial & Pro</span>
                 </div>
               </div>
@@ -338,11 +338,11 @@ export function Footer({ store }: any) {
   return (
     <footer dir="ltr" style={{ background: INK, borderTop: `4px solid ${R}`, color: 'rgba(255,255,255,0.4)', marginTop: 80, padding: '3.5rem 1.5rem 1.25rem' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-        <div className="footer-inner">
+        <div className='footer-inner'>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '0.875rem' }}>
               <div style={{ width: 4, height: 24, background: R }} />
-              <span style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase', letterSpacing: '0.06em' }}>{store?.name}</span>
+              <span style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', fontFamily: "'Barlow',sans-serif", textTransform: 'uppercase', letterSpacing: '0.06em' }}>{store?.name}</span>
             </div>
             <p style={{ fontSize: '0.875rem', lineHeight: 1.8, maxWidth: 280 }}>
               {store?.hero?.subtitle?.substring(0, 90) || 'Machines électriques, outils professionnels et Équipements industriels Certifiés.'}
@@ -393,7 +393,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, transparent 55%)' }} />
         <div style={{ position: 'absolute', bottom: 0, right: 0, left: 0, padding: '0.625rem 0.875rem' }}>
           <p style={{ fontSize: '0.55rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.2rem' }}>{store?.name}</p>
-          <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff', lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase' }}>{product.name}</h3>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff', lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', fontFamily: "'Barlow',sans-serif", textTransform: 'uppercase' }}>{product.name}</h3>
         </div>
         {discount > 0 && (
           <div style={{ position: 'absolute', top: 0, right: 0, background: R, color: '#fff', fontSize: 10, fontWeight: 800, padding: '4px 10px', letterSpacing: '0.04em' }}>-{discount}%</div>
@@ -402,7 +402,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
     <div style={{ padding: '0.625rem 0.875rem 0.875rem', background: CARD, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-          <span className="price-mono" style={{ fontSize: '1.375rem', fontWeight: 800, color: R, fontFamily: "'Barlow Condensed', sans-serif" }}>{price.toLocaleString()}</span>
+          <span className="price-mono" style={{ fontSize: '1.375rem', fontWeight: 800, color: R, fontFamily: "'Barlow',sans-serif" }}>{price.toLocaleString()}</span>
           <span style={{ fontSize: '0.68rem', color: SUB }}>{store.currency || 'DA'}</span>
         </div>
         {orig > price && <span style={{ fontSize: '0.65rem', color: '#B0BEC5', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
@@ -445,7 +445,7 @@ export function Home({ store, page }: any) {
             <Zap size={11} style={{ color: R }} />
             <span style={{ fontSize: '0.65rem', fontWeight: 700, color: R, textTransform: 'uppercase', letterSpacing: '0.12em' }}>Outils industriels professionnels</span>
           </div>
-          <h1 style={{ fontSize: 'clamp(3rem,8vw,7rem)', fontWeight: 800, color: '#fff', lineHeight: 0.95, letterSpacing: '-0.01em', marginBottom: '1.25rem', fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase' }}
+          <h1 style={{ fontSize: 'clamp(3rem,8vw,7rem)', fontWeight: 800, color: '#fff', lineHeight: 0.95, letterSpacing: '-0.01em', marginBottom: '1.25rem', fontFamily: "'Barlow',sans-serif", textTransform: 'uppercase' }}
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'Outils de puissance<br/><span style="color:#E20015">Industriels</span>') }} />
           <div style={{ width: 80, height: 4, background: R, margin: '0 auto 1.5rem' }} />
           <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, marginBottom: '2.5rem', maxWidth: 480, margin: '0 auto 2.5rem' }}>
@@ -468,7 +468,7 @@ export function Home({ store, page }: any) {
           <div style={{ display: 'flex', justifyContent: 'center', gap: '3rem', marginTop: '3.5rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
             {[{ n: '+500', l: 'Produit' }, { n: '58', l: 'Wilaya' }, { n: '100%', l: 'Garantie' }].map((s, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
-                <p style={{ fontSize: '1.75rem', fontWeight: 800, color: R, fontFamily: "'Barlow Condensed', sans-serif", lineHeight: 1 }}>{s.n}</p>
+                <p style={{ fontSize: '1.75rem', fontWeight: 800, color: R, fontFamily: "'Barlow',sans-serif", lineHeight: 1 }}>{s.n}</p>
                 <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 3 }}>{s.l}</p>
               </div>
             ))}
@@ -596,12 +596,12 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               <div style={{ width: 3, height: 14, background: R }} />
               <p style={{ fontSize: '0.65rem', fontWeight: 700, color: B, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Outils industriels</p>
             </div>
-            <h1 style={{ fontSize: 'clamp(1.5rem,4vw,2.25rem)', fontWeight: 800, color: INK, marginBottom: '0.5rem', lineHeight: 1.2, fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase' }}>{product.name}</h1>
+            <h1 style={{ fontSize: 'clamp(1.5rem,4vw,2.25rem)', fontWeight: 800, color: INK, marginBottom: '0.5rem', lineHeight: 1.2, fontFamily: "'Barlow',sans-serif", textTransform: 'uppercase' }}>{product.name}</h1>
             <div style={{ display: 'flex', gap: 2, marginBottom: '1.25rem' }}>{[...Array(5)].map((_, i) => <Star key={i} size={12} style={{ fill: i < 4 ? R : 'none', color: R }} />)}</div>
             <div style={{ padding: '1rem', background: BL, borderLeft: `3px solid ${R}`, marginBottom: '1.5rem' }}>
               <p style={{ fontSize: '0.6rem', fontWeight: 700, color: SUB, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.2rem' }}>Prix</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
-                <span className="price-mono" style={{ fontSize: '2.5rem', fontWeight: 800, color: R, fontFamily: "'Barlow Condensed', sans-serif" }}>{finalPrice.toLocaleString()}</span>
+                <span className="price-mono" style={{ fontSize: '2.5rem', fontWeight: 800, color: R, fontFamily: "'Barlow',sans-serif" }}>{finalPrice.toLocaleString()}</span>
                 <span style={{ fontSize: '0.9rem', fontWeight: 700, color: SUB }}>DA</span>
               </div>
             </div>
@@ -698,7 +698,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide";
     if (!fd.customerWelaya) e.customerWelaya = 'requis';
     if (!fd.customerCommune) e.customerCommune = 'requis';
     return e;
@@ -806,7 +806,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontWeight: 700, fontSize: '0.75rem', color: INK, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Total</span>
-                <span className="price-mono" style={{ fontSize: '1.75rem', fontWeight: 800, color: R, fontFamily: "'Barlow Condensed', sans-serif" }}>{total().toLocaleString()} <span style={{ fontSize: '0.75rem' }}>DA</span></span>
+                <span className="price-mono" style={{ fontSize: '1.75rem', fontWeight: 800, color: R, fontFamily: "'Barlow',sans-serif" }}>{total().toLocaleString()} <span style={{ fontSize: '0.75rem' }}>DA</span></span>
               </div>
             </div>
             <button type="submit" disabled={sub} style={{ ...S.btnPrimary, opacity: sub ? 0.7 : 1 }}
@@ -848,7 +848,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro invalide';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro invalide";
     if (!fd.customerWelaya) er.w = 'requis';
     if (!fd.customerCommune) er.c = 'requis';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -865,8 +865,8 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     <div dir="ltr" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: BG }}>
       <div style={{ textAlign: 'center', background: CARD, padding: '3rem 2rem', borderTop: `3px solid ${R}`, border: `1px solid ${BD}`, maxWidth: 440, width: '100%' }}>
         <CheckCircle2 size={44} style={{ color: R, display: 'block', margin: '0 auto 1.25rem' }} />
-        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: INK, marginBottom: '0.5rem', fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase' }}>Commande reçue !</h2>
-        <p style={{ color: SUB, lineHeight: 1.7, marginBottom: '2rem', fontSize: '0.9rem' }}>Nous vous contacterons bient’t pour confirmer la commande.</p>
+        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: INK, marginBottom: '0.5rem', fontFamily: "'Barlow',sans-serif", textTransform: 'uppercase' }}>Commande reçue !</h2>
+        <p style={{ color: SUB, lineHeight: 1.7, marginBottom: '2rem', fontSize: '0.9rem' }}>Nous vous contacterons bient't pour confirmer la commande.</p>
         <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: R, color: '#fff', padding: '0.75rem 2rem', fontWeight: 700, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Retour à la boutique</Link>
       </div>
     </div>
@@ -886,7 +886,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     <div dir="ltr" style={{ padding: '2rem 1.5rem', maxWidth: 1280, margin: '0 auto', minHeight: '100vh', background: BG }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
         <div style={{ width: 4, height: 20, background: R }} />
-        <h1 style={{ fontSize: 'clamp(1.75rem,5vw,2.5rem)', fontWeight: 800, color: INK, fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase' }}>Panier</h1>
+        <h1 style={{ fontSize: 'clamp(1.75rem,5vw,2.5rem)', fontWeight: 800, color: INK, fontFamily: "'Barlow',sans-serif", textTransform: 'uppercase' }}>Panier</h1>
       </div>
       <div className="cart-inner">
         <div style={{ background: CARD, border: `1px solid ${BD}`, borderTop: `3px solid ${R}`, alignSelf: 'start' }}>
@@ -955,7 +955,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontWeight: 700, color: INK, textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '0.78rem' }}>Total</span>
-                <span className="price-mono" style={{ fontSize: '2rem', fontWeight: 800, color: R, fontFamily: "'Barlow Condensed', sans-serif" }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.75rem' }}>DA</span></span>
+                <span className="price-mono" style={{ fontSize: '2rem', fontWeight: 800, color: R, fontFamily: "'Barlow',sans-serif" }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.75rem' }}>DA</span></span>
               </div>
             </div>
             <button type="submit" disabled={submitting} style={{ ...S.btnPrimary, opacity: submitting ? 0.7 : 1 }}
@@ -975,7 +975,7 @@ const Shell = ({ children, title }: { children: React.ReactNode; title: string }
     <div style={{ background: B, borderBottom: `4px solid ${R}`, paddingTop: 72, paddingBottom: 36, paddingLeft: 24, paddingRight: 24 }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }}>
         <p style={{ fontSize: '0.62rem', fontWeight: 700, color: R, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '0.625rem' }}>Power Tools Pro</p>
-        <h1 style={{ fontSize: 'clamp(2rem,6vw,3.5rem)', fontWeight: 800, color: '#fff', fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase' }}>{title}</h1>
+        <h1 style={{ fontSize: 'clamp(2rem,6vw,3.5rem)', fontWeight: 800, color: '#fff', fontFamily: "'Barlow',sans-serif", textTransform: 'uppercase' }}>{title}</h1>
       </div>
     </div>
     <div style={{ maxWidth: 860, margin: '0 auto', padding: '3rem 1.5rem 6rem' }}>{children}</div>
@@ -986,7 +986,7 @@ const InfoBlock = ({ title, body }: { title: string; body: string }) => (
   <div style={{ padding: '1rem 0', borderBottom: `1px solid ${BD}`, display: 'flex', gap: '0.875rem' }}>
     <div style={{ width: 4, height: 14, background: R, flexShrink: 0, marginTop: 5 }} />
     <div>
-      <h3 style={{ fontWeight: 700, fontSize: '0.9375rem', color: INK, marginBottom: '0.3rem', textTransform: 'uppercase', letterSpacing: '0.04em', fontFamily: "'Barlow Condensed', sans-serif" }}>{title}</h3>
+      <h3 style={{ fontWeight: 700, fontSize: '0.9375rem', color: INK, marginBottom: '0.3rem', textTransform: 'uppercase', letterSpacing: '0.04em', fontFamily: "'Barlow',sans-serif" }}>{title}</h3>
       <p style={{ fontSize: '0.9rem', lineHeight: 1.75, color: SUB }}>{body}</p>
     </div>
   </div>
@@ -1006,10 +1006,10 @@ export function Privacy() {
 
 export function Terms() {
   return (
-    <Shell title="Conditions d’utilisation">
+    <Shell title="Conditions d'utilisation">
       <div style={{ background: CARD, padding: '1.5rem', border: `1px solid ${BD}`, borderTop: `2px solid ${B}` }}>
-        <InfoBlock title="Compte et responsabilité" body="L’utilisateur est responsable de l’exactitude des données et de la confidentialité de son compte." />
-        <InfoBlock title="Commandes et paiements" body="Les commandes sont confirmées par Téléphone avant l’expédition. Les prix affichés sont définitifs." />
+        <InfoBlock title="Compte et responsabilité" body="L'utilisateur est responsable de l'exactitude des données et de la confidentialité de son compte." />
+        <InfoBlock title="Commandes et paiements" body="Les commandes sont confirmées par Téléphone avant l'expédition. Les prix affichés sont définitifs." />
         <InfoBlock title="Loi applicable" body="Toutes les transactions sont soumises aux lois de la République Algérienne Démocratique et Populaire." />
       </div>
     </Shell>
@@ -1021,7 +1021,7 @@ export function Cookies() {
     <Shell title="Cookies">
       <div style={{ background: CARD, padding: '1.5rem', border: `1px solid ${BD}`, borderTop: `2px solid ${B}` }}>
         <InfoBlock title="Fichiers essentiels" body="Nous utilisons des cookies essentiels pour garantir le fonctionnement du panier et la sécurité de la session." />
-        <InfoBlock title="Amélioration de l’expérience" body="Nous utilisons certains fichiers pour comprendre l’utilisation du site et améliorer l’expérience." />
+        <InfoBlock title="Amélioration de l'expérience" body="Nous utilisons certains fichiers pour comprendre l'utilisation du site et améliorer l'expérience." />
       </div>
     </Shell>
   );
@@ -1035,7 +1035,7 @@ export function Contact({ store }: { store: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-    catch { showError('Erreur lors de l’envoi'); } finally { setLoading(false); }
+    catch { showError("Erreur lors de l'envoi"); } finally { setLoading(false); }
   };
 
   return (
@@ -1043,7 +1043,7 @@ export function Contact({ store }: { store: any }) {
       <div style={{ background: B, borderBottom: `4px solid ${R}`, paddingTop: 72, paddingBottom: 36, paddingLeft: 24, paddingRight: 24 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <p style={{ fontSize: '0.62rem', fontWeight: 700, color: R, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '0.625rem' }}>Power Tools Pro</p>
-          <h1 style={{ fontSize: 'clamp(2rem,6vw,3.5rem)', fontWeight: 800, color: '#fff', fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase' }}>Contactez-nous</h1>
+          <h1 style={{ fontSize: 'clamp(2rem,6vw,3.5rem)', fontWeight: 800, color: '#fff', fontFamily: "'Barlow',sans-serif", textTransform: 'uppercase' }}>Contactez-nous</h1>
         </div>
       </div>
       <div className="contact-inner" style={{ maxWidth: 1100, margin: '0 auto', padding: '3rem 1.5rem 6rem' }}>
@@ -1067,21 +1067,21 @@ export function Contact({ store }: { store: any }) {
           {sent ? (
             <div style={{ textAlign: 'center', padding: '3.5rem 1rem' }}>
               <CheckCircle2 size={44} style={{ color: R, display: 'block', margin: '0 auto 1.25rem' }} />
-              <h2 style={{ fontSize: '2rem', fontWeight: 800, color: INK, marginBottom: '0.5rem', fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase' }}>Envoyé !</h2>
+              <h2 style={{ fontSize: '2rem', fontWeight: 800, color: INK, marginBottom: '0.5rem', fontFamily: "'Barlow',sans-serif", textTransform: 'uppercase' }}>Envoyé !</h2>
               <p style={{ color: SUB, lineHeight: 1.7, marginBottom: '2rem', fontSize: '0.9rem' }}>Nous vous répondrons dans les plus brefs délais.</p>
               <button onClick={() => setSent(false)} style={{ padding: '0.7rem 1.75rem', border: `1px solid ${B}`, background: BL, color: BD2, fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem', fontFamily: 'inherit', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Envoyer un autre message</button>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-                <FR label="Nom"><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={S.input} /></FR>
+                <FR label='Nom'><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={S.input} /></FR>
                 <FR label="Téléphone"><input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required style={S.input} /></FR>
               </div>
               <div style={{ marginBottom: '0.875rem' }}>
-                <FR label="Email"><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required style={S.input} /></FR>
+                <FR label='Email'><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required style={S.input} /></FR>
               </div>
               <div style={{ marginBottom: '1.25rem' }}>
-                <FR label="Message"><textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} style={{ ...S.input, resize: 'none' }} /></FR>
+                <FR label='Message'><textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} style={{ ...S.input, resize: 'none' }} /></FR>
               </div>
               <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = RD)}

@@ -129,7 +129,7 @@ const CSS = `
     .why-grid  { grid-template-columns:repeat(2,1fr); }
   }
   @media (max-width:768px) {
-    .prod-grid { grid-template-columns:repeat(2,1fr); gap:10px; }
+    .prod-grid { grid-template-columns:1fr; gap:10px; }
     .cat-grid  { grid-template-columns:repeat(2,1fr); }
     .trust-row { grid-template-columns:repeat(2,1fr); }
     .footer-g  { grid-template-columns:1fr; gap:28px; }
@@ -251,7 +251,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       position:'absolute', top:'calc(100% + 4px)', right:0, left:0,
       background:'var(--white)', border:'1px solid var(--sky)', borderRadius:'10px',
       zIndex:200, overflow:'hidden', boxShadow:'0 12px 40px rgba(14,165,233,0.15)'
-    }} className="fi">
+    }} className='fi'>
       <div style={{ display:'flex', justifyContent:'flex-end', padding:'8px 12px 2px' }}>
         <button onClick={() => setSq('')} style={{
           background:'var(--sky-lt)', border:'none', borderRadius:'50%',
@@ -260,7 +260,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         }}><X size={12} /></button>
       </div>
       {loading ? (
-        <div style={{ padding:'1.5rem', textAlign:'center', color:'var(--sky)', fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700 }}>Recherche en cours...</div>
+        <div style={{ padding:'1.5rem', textAlign:'center', color:'var(--sky)', fontFamily:"'Inter',sans-serif", fontWeight:700 }}>Recherche en cours...</div>
       ) : ls.length > 0 ? (
         <div style={{ maxHeight:'320px', overflowY:'auto' }}>
           {ls.map((p: any) => (
@@ -279,7 +279,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <button onClick={() => doSearch()} style={{
             width:'100%', padding:'10px', background:'var(--sky-lt)', border:'none',
             borderTop:'1px solid var(--line)', color:'var(--sky)', fontWeight:700,
-            fontSize:'12px', cursor:'pointer', fontFamily:"'Plus Jakarta Sans',sans-serif",
+            fontSize:'12px', cursor:'pointer', fontFamily:"'Inter',sans-serif",
             display:'flex', alignItems:'center', justifyContent:'center', gap:'6px'
           }}>
             Voir tous les résultats <ArrowRight size={12} />
@@ -462,7 +462,7 @@ export function Footer({ store }: any) {
             <p className="pjs" style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.04em', color:'var(--sky)', marginBottom:'16px' }}>
               Liens Rapide
             </p>
-            {[{ h:'/', l:'Accueil' }, { h:'/cart', l:'Panier' }, { h:'/contact', l:'Appelez-nous' }, { h:'/Privacy', l:'Politique de confidentialité' }, { h:'/Terms', l:'Conditions d’utilisation' }].map(lnk => (
+            {[{ h:'/', l:'Accueil' }, { h:'/cart', l:'Panier' }, { h:'/contact', l:'Appelez-nous' }, { h:'/Privacy', l:'Politique de confidentialité' }, { h:'/Terms', l:"Conditions d'utilisation" }].map(lnk => (
               <a key={lnk.h} href={lnk.h} style={{
                 display:'block', fontSize:'13px', color:'var(--dim)',
                 marginBottom:'8px', transition:'color 0.2s'
@@ -555,7 +555,7 @@ export function Home({ store, page }: any) {
   return (
     <div dir="ltr">
       <section style={{
-        position:'relative', overflow:'hidden', background:'linear-gradient(135deg, var(--sky-lt) 0%, var(--off) 50%, white 100%)',
+        position:'relative', overflow:'hidden', background:"linear-gradient(135deg, var(--sky-lt) 0%, var(--off) 50%, white 100%)",
         minHeight:'80vh', display:'flex', alignItems:'center', justifyContent:'center', paddingTop:30, paddingBottom:25
       }}>
         {store.hero?.imageUrl && (
@@ -577,7 +577,7 @@ export function Home({ store, page }: any) {
           position:'relative', zIndex:4, padding:'0 5vw', width:'100%',
           maxWidth:'1100px', margin:'0 auto', textAlign:'center',
           display:'flex', flexDirection:'column', alignItems:'center'
-        }} className="fi">
+        }} className='fi'>
           <div style={{
             display:'inline-flex', alignItems:'center', gap:'6px',
             border:'1px solid var(--sky)', padding:'4px 14px', borderRadius:'20px',
@@ -609,7 +609,7 @@ export function Home({ store, page }: any) {
           </p>
 
           <div style={{ display:'flex', gap:'12px', flexWrap:'wrap', justifyContent:'center', marginBottom:'36px' }}>
-            <a href="#products" className="btn-primary" style={{ fontSize:'14px', padding:'12px 34px' }}>
+            <a href='#products' className="btn-primary" style={{ fontSize:'14px', padding:'12px 34px' }}>
               <Stethoscope size={16} /> Acheter maintenant
             </a>
             {cats.length > 0 && (
@@ -647,7 +647,7 @@ export function Home({ store, page }: any) {
         <div style={{ maxWidth:'1280px', margin:'0 auto' }}>
           <div className="trust-row">
             {[
-              { icon:<Truck size={20} />, color:'var(--sky)', title:'Livraison rapide', desc:'48h à travers l’Algérie' },
+              { icon:<Truck size={20} />, color:'var(--sky)', title:'Livraison rapide', desc:"48h à travers l'Algérie" },
               { icon:<Shield size={20} />, color:'var(--green)', title:'Produits authentiques', desc:'100% garantis' },
               { icon:<HeartPulse size={20} />, color:'var(--sky)', title:'Consultation médicale', desc:'Équipe spécialisée' },
               { icon:<Ambulance size={20} />, color:'var(--teal)', title:'Livraison urgente', desc:'Pour les urgences' },
@@ -734,7 +734,7 @@ export function Home({ store, page }: any) {
           {products.length === 0 ? (
             <div style={{ padding:'80px 0', textAlign:'center', border:'1px dashed var(--line)', borderRadius:'12px' }}>
               <HeartPulse size={48} style={{ color:'var(--dim)', margin:'0 auto 16px', opacity:0.4, display:'block' }} />
-              <p className="pjs" style={{ fontSize:'1.8rem', color:'var(--dim)' }}>Bient’t</p>
+              <p className="pjs" style={{ fontSize:'1.8rem', color:'var(--dim)' }}>Bient't</p>
             </div>
           ) : (
             <div className="prod-grid">
@@ -754,7 +754,7 @@ export function Home({ store, page }: any) {
                 const pn = i + 1; const isA = Number(page) === pn;
                 return (
                   <Link key={pn} href={{ query:{ page:pn } }} scroll={false}
-                    style={{ width:40, height:40, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700, fontSize:'14px', borderRadius:'8px', border:`1px solid ${isA?'var(--sky)':'var(--line)'}`, background:isA?'var(--sky)':'transparent', color:isA?'white':'var(--dim)' }}>
+                    style={{ width:40, height:40, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Inter',sans-serif", fontWeight:700, fontSize:'14px', borderRadius:'8px', border:`1px solid ${isA?'var(--sky)':'var(--line)'}`, background:isA?'var(--sky)':'transparent', color:isA?'white':'var(--dim)' }}>
                     {pn}
                   </Link>
                 );
@@ -773,7 +773,7 @@ export function Home({ store, page }: any) {
               Pourquoi nous
             </p>
             <h2 className="pjs" style={{ fontSize:'clamp(1.8rem, 4vw, 2.8rem)', color:'var(--ink)' }}>
-              {" "}<span style={{ color:'var(--sky)' }}>Votre santé</span> est notre priorité
+              {' '}<span style={{ color:'var(--sky)' }}>Votre santé</span> est notre priorité
             </h2>
           </div>
           <div className="why-grid">
@@ -783,7 +783,7 @@ export function Home({ store, page }: any) {
               { icon:<HeartPulse size={28} />, title:'Support médical', desc:'Équipe de pharmaciens pour les consultations' },
               { icon:<Ambulance size={28} />, title:'Service urgent', desc:'Pour les urgences Nous livrons immédiatement' },
             ].map((item, i) => (
-              <div key={i} className="why-card">
+              <div key={i} className='why-card'>
                 <div style={{ color:'var(--sky)', marginBottom:'12px' }}>{item.icon}</div>
                 <h3 className="pjs" style={{ fontSize:'15px', fontWeight:700, color:'var(--ink)', marginBottom:'6px' }}>{item.title}</h3>
                 <p style={{ fontSize:'13px', color:'var(--mid)', lineHeight:'1.6', margin:0 }}>{item.desc}</p>
@@ -800,13 +800,13 @@ export function Home({ store, page }: any) {
         <div style={{ position:'relative', zIndex:2, maxWidth:'640px', margin:'0 auto', textAlign:'center' }}>
           <HeartPulse size={48} style={{ color:'var(--sky)', margin:'0 auto 16px', display:'block' }} />
           <h2 className="pjs" style={{ fontSize:'clamp(2rem, 5vw, 3.8rem)', color:'var(--ink)', lineHeight:1.05, marginBottom:'14px' }}>
-            S’abonner à <span style={{ color:'var(--sky)' }}>Notre newsletter</span> médicaux
+            S'abonner à <span style={{ color:'var(--sky)' }}>Notre newsletter</span> médicaux
           </h2>
           <p style={{ fontSize:'15px', color:'var(--mid)', lineHeight:'1.7', marginBottom:'28px' }}>
             Obtenez les derniers conseils santé et offres exclusives directement dans votre boîte mail.
           </p>
           <div style={{ display:'flex', gap:'10px', justifyContent:'center', flexWrap:'wrap' }}>
-            <a href="#products" className="btn-primary" style={{ fontSize:'15px', padding:'14px 36px' }}>
+            <a href='#products' className="btn-primary" style={{ fontSize:'15px', padding:'14px 36px' }}>
               <Stethoscope size={16} /> Acheter maintenant
             </a>
             <Link href="/contact" className="btn-outline" style={{ fontSize:'15px', padding:'14px 36px' }}>
@@ -876,7 +876,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                     border:`2px solid ${sel===idx?'var(--sky)':'var(--line)'}`,
                     cursor:'pointer', padding:0, background:'none', opacity:sel===idx?1:0.6
                   }}>
-                    <img src={img} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
+                    <img src={img} alt='' style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
                   </button>
                 ))}
               </div>
@@ -896,7 +896,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                 marginRight:'auto', padding:'4px 14px', borderRadius:'6px',
                 background:inStock||autoGen?'rgba(22,163,74,0.1)':'rgba(220,38,38,0.1)',
                 color:inStock||autoGen?'var(--green)':'var(--red)',
-                fontSize:'11px', fontWeight:700, fontFamily:"'Plus Jakarta Sans',sans-serif",
+                fontSize:'11px', fontWeight:700, fontFamily:"'Inter',sans-serif",
                 border:`1px solid ${inStock||autoGen?'rgba(22,163,74,0.3)':'rgba(220,38,38,0.3)'}`
               }}>
                 {autoGen?'Disponible':inStock?'Disponible':'Non disponible'}
@@ -1048,9 +1048,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = ()=>{
     const e:Record<string,string>={};
     if(!fd.customerName.trim()) e.customerName='Nom requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide (ex: 0550123456)";
     if(!fd.customerWelaya) e.customerWelaya='Wilaya requis';
-    if(!fd.customerCommune) e.customerCommune='Commune requis';
+    if(!fd.customerCommune) e.customerCommune="Commune requis";
     return e;
   };
 
@@ -1195,7 +1195,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </button>
             <div style={{ display:'flex', justifyContent:'center', gap:'16px', marginTop:'10px' }}>
               {[{icon:<Lock size={11}/>,label:'Sécurisé'},{icon:<Truck size={11}/>,label:'Livraison rapide'},{icon:<Shield size={11}/>,label:'authentique'}].map((b,i)=>(
-                <div key={i} className="pjs" style={{ display:'flex', alignItems:'center', gap:'4px', fontSize:'11px', color:'var(--dim)', fontWeight:600 }}>
+                <div key={i} className='pjs' style={{ display:'flex', alignItems:'center', gap:'4px', fontSize:'11px', color:'var(--dim)', fontWeight:600 }}>
                   <span style={{ color:'var(--sky)' }}>{b.icon}</span> {b.label}
                 </div>
               ))}
@@ -1232,7 +1232,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er:Record<string,string>={};
     if(!fd.customerName.trim()) er.name='requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro invalide (ex: 0550123456)";
     if(!fd.customerWelaya) er.w='requis';
     if(!fd.customerCommune) er.c='requis';
     if(Object.keys(er).length){setErrors(er);return;}
@@ -1248,7 +1248,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{ textAlign:'center', background:'var(--white)', padding:'4rem 2.5rem', borderRadius:'12px', border:'1px solid var(--sky)', maxWidth:460, width:'100%', boxShadow:'0 8px 30px rgba(14,165,233,0.08)' }}>
         <CheckCircle2 size={48} style={{ color:'var(--green)', display:'block', margin:'0 auto 1.25rem' }}/>
         <h2 className="pjs" style={{ fontSize:'2.5rem', color:'var(--ink)', marginBottom:'0.625rem' }}>Commande reçue !</h2>
-        <p style={{ color:'var(--mid)', marginBottom:'2rem', lineHeight:1.7 }}>Merci de votre confiance. Nous vous contacterons bient’t.</p>
+        <p style={{ color:'var(--mid)', marginBottom:'2rem', lineHeight:1.7 }}>Merci de votre confiance. Nous vous contacterons bient't.</p>
         <Link href="/" className="btn-primary" style={{ display:'inline-flex', padding:'13px 28px' }}>Retour à la boutique</Link>
       </div>
     </div>
@@ -1276,7 +1276,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             {items.map((item,i)=>(
               <div key={i} style={{ display:'flex', gap:'1rem', padding:'14px', borderBottom:'1px solid var(--line)' }}>
                 <div style={{ width:80, height:80, flexShrink:0, overflow:'hidden', borderRadius:'8px', border:'1px solid var(--line)', background:'var(--off)' }}>
-                  <img src={item.product?.imagesProduct?.[0]?.imageUrl||item.product?.productImage} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} alt=""/>
+                  <img src={item.product?.imagesProduct?.[0]?.imageUrl||item.product?.productImage} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} alt=''/>
                 </div>
                 <div style={{ flex:1, display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
                   <div>
@@ -1446,7 +1446,7 @@ export function Terms() {
 export function Cookies() {
   return (
     <Shell title="Politique de cookies" sub="Affaires juridiques">
-      <IB title="Cookies essentiels" body="Requis pour les sessions, le Panier et compléter l’achat. Non désactivables." tag="requis"/>
+      <IB title="Cookies essentiels" body="Requis pour les sessions, le Panier et compléter l'achat. Non désactivables." tag="requis"/>
       <IB title="Cookies analytiques" body="Données agrégées pour améliorer la plateforme. Aucune donnée personnelle incluse." tag="Facultatif"/>
       <div style={{ marginTop:'16px', padding:'14px', borderRadius:'8px', border:'1px solid var(--sky)', display:'flex', gap:'10px', alignItems:'flex-start', background:'var(--sky-lt)' }}>
         <ToggleRight size={17} style={{ color:'var(--sky)', flexShrink:0, marginTop:'1px' }}/>

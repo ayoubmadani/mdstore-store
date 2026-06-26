@@ -167,7 +167,7 @@ const CSS = `
     .footer-g   { grid-template-columns: 1fr 1fr; gap: 32px; }
   }
   @media (max-width: 768px) {
-    .prod-grid  { grid-template-columns: repeat(2,1fr); gap: 10px; }
+    .prod-grid  { grid-template-columns: 1fr; gap: 10px; }
     .cat-row    { grid-template-columns: repeat(2,1fr); }
     .trust-row  { grid-template-columns: repeat(2,1fr); }
     .footer-g   { grid-template-columns: 1fr; gap: 28px; }

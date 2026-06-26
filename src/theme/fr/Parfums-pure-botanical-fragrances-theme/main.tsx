@@ -164,7 +164,7 @@ const CSS = `
 
   @media (max-width:700px) {
     .main-card { margin:0; box-shadow:none; }
-    .prod-grid { grid-template-columns:repeat(2,1fr); gap:10px; }
+    .prod-grid { grid-template-columns:1fr; gap:10px; }
     .cat-grid  { grid-template-columns:repeat(4,1fr); gap:8px; }
     .footer-g  { grid-template-columns:1fr; gap:20px; }
     .cart-g    { grid-template-columns:1fr; }
@@ -180,11 +180,11 @@ const CSS = `
 `;
 
 /* ─── FRAGRANCE CATEGORY ICONS ─── */
-const IconFloral = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--sage)' }}><circle cx="12" cy="12" r="3" /><path d="M12 2a4 4 0 0 1 0 8" /><path d="M12 2a4 4 0 0 0 0 8" /><path d="M12 14a4 4 0 0 1 0 8" /><path d="M12 14a4 4 0 0 0 0 8" /><path d="M2 12a4 4 0 0 1 8 0" /><path d="M2 12a4 4 0 0 0 8 0" /><path d="M14 12a4 4 0 0 1 8 0" /><path d="M14 12a4 4 0 0 0 8 0" /></svg>;
-const IconWood = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--sage)' }}><path d="M17 8C8 10 5.9 16.17 3.82 22" /><path d="M9.5 9.5c.5 3.5 5 5.5 6.5 8.5" /><path d="M3 9c4-2 7-2.5 10-1.5" /></svg>;
-const IconCitrus = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--sage)' }}><circle cx="12" cy="12" r="9" /><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4" /></svg>;
-const IconSpray = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--sage)' }}><path d="M3 9h14v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" /><path d="M17 9V6h2a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1h-2z" /><path d="M10 9V5" /><path d="M10 5a2 2 0 0 0-2-2" /><path d="M21 4l-2 2" /><path d="M19 4l2 2" /></svg>;
-const IconOud = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--sage)' }}><path d="M12 22V8" /><path d="M5 12H2a10 10 0 0 0 20 0h-3" /><path d="M8 5.3C8 4 9.8 3 12 3s4 1 4 2.3c0 2.1-2 3.7-4 5.7-2-2-4-3.6-4-5.7Z" /></svg>;
+const IconFloral = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--sage)' }}><circle cx='12' cy="12" r="3" /><path d="M12 2a4 4 0 0 1 0 8" /><path d="M12 2a4 4 0 0 0 0 8" /><path d="M12 14a4 4 0 0 1 0 8" /><path d="M12 14a4 4 0 0 0 0 8" /><path d="M2 12a4 4 0 0 1 8 0" /><path d="M2 12a4 4 0 0 0 8 0" /><path d="M14 12a4 4 0 0 1 8 0" /><path d="M14 12a4 4 0 0 0 8 0" /></svg>;
+const IconWood = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--sage)' }}><path d='M17 8C8 10 5.9 16.17 3.82 22' /><path d="M9.5 9.5c.5 3.5 5 5.5 6.5 8.5" /><path d="M3 9c4-2 7-2.5 10-1.5" /></svg>;
+const IconCitrus = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--sage)' }}><circle cx='12' cy="12" r="9" /><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4" /></svg>;
+const IconSpray = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--sage)' }}><path d='M3 9h14v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z' /><path d="M17 9V6h2a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1h-2z" /><path d="M10 9V5" /><path d="M10 5a2 2 0 0 0-2-2" /><path d="M21 4l-2 2" /><path d="M19 4l2 2" /></svg>;
+const IconOud = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--sage)' }}><path d='M12 22V8' /><path d="M5 12H2a10 10 0 0 0 20 0h-3" /><path d="M8 5.3C8 4 9.8 3 12 3s4 1 4 2.3c0 2.1-2 3.7-4 5.7-2-2-4-3.6-4-5.7Z" /></svg>;
 
 /* ─── TYPES ─── */
 interface Offer { id: string; name: string; quantity: number; price: number; }
@@ -429,7 +429,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                                                 gap: '8px'
                                             }}
                                         >
-                                            Voir tous les résultats pour "{sq}"
+                                            Voir tous les résultats pour '{sq}'
                                         </button>
                                     </>
                                 ) : (
@@ -485,7 +485,7 @@ export function Footer({ store }: any) {
                     {/* Section 2 — Liens */}
                     <div>
                         <p style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.6)', marginBottom: '16px', textTransform: 'uppercase' }}>Produits</p>
-                        {[{ h: '/', l: 'La Nature' }, { h: '/Privacy', l: 'Politique de confidentialité' }, { h: '/contact', l: 'Contact' }, { h: '/Terms', l: 'Conditions d\'utilisation' }].map(lnk => (
+                        {[{ h: '/', l: 'La Nature' }, { h: '/Privacy', l: 'Politique de confidentialité' }, { h: '/contact', l: 'Contact' }, { h: '/Terms', l: "Conditions d'utilisation" }].map(lnk => (
                             <a key={lnk.h} href={lnk.h} style={{ display: 'block', fontSize: '12px', color: 'rgba(255,255,255,0.7)', marginBottom: '10px', transition: 'color 0.2s' }}
                                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'white'; }}
                                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)'; }}>
@@ -518,7 +518,7 @@ export function Footer({ store }: any) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   CARD — with "Ajouter au panier" button
+   CARD — with 'Ajouter au panier' button
 ══════════════════════════════════════════════════════════════ */
 export function Card({ product, displayImage, discount, domain, userId }: any) {
     const [added, setAdded] = useState(false);
@@ -631,7 +631,7 @@ export function Home({ store, page }: any) {
                         <p className="fu fu1" style={{ fontSize: '13px', color: store.hero?.imageUrl ? 'rgba(255,255,255,0.85)' : 'var(--mid)', marginBottom: '20px', lineHeight: 1.6 }}>
                             {store.hero?.subtitle || 'Parfums Bio inspirés de la beauté des fleurs'}
                         </p>
-                        <a href="#products" className="fu fu2 btn-sage" style={{ padding: '11px 24px', fontSize: '13px', borderRadius: '8px', display: 'inline-flex', boxShadow: '0 4px 12px rgba(107,143,107,0.3)' }}>
+                        <a href='#products' className="fu fu2 btn-sage" style={{ padding: '11px 24px', fontSize: '13px', borderRadius: '8px', display: 'inline-flex', boxShadow: '0 4px 12px rgba(107,143,107,0.3)' }}>
                             Acheter maintenant
                         </a>
                     </div>
@@ -678,7 +678,7 @@ export function Home({ store, page }: any) {
                 {filtered.length === 0 ? (
                     <div style={{ padding: '60px 0', textAlign: 'center' }}>
                         <Droplets style={{ width: '48px', height: '48px', color: 'var(--sage)', opacity: 0.3, display: 'block', margin: '0 auto 12px' }} />
-                        <p style={{ color: 'var(--mist)', fontSize: '14px' }}>Aucun produit pour l’instant</p>
+                        <p style={{ color: 'var(--mist)', fontSize: '14px' }}>Aucun produit pour l'instant</p>
                     </div>
                 ) : (
                     <div className="prod-grid">
@@ -687,7 +687,7 @@ export function Home({ store, page }: any) {
                             const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
                             return (
                                 <div key={p.id} className="sr" style={{ transitionDelay: `${(i % 4) * 0.06}s` }}>
-                                    <Card product={p} displayImage={img} discount={disc} domain={store?.subdomain || ''} userId={p.store?.userId} />
+                                    <Card product={p} displayImage={img} discount={disc} domain={store?.subdomain || ""} userId={p.store?.userId} />
                                 </div>
                             );
                         })}
@@ -728,7 +728,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
 
 
             <div style={{ padding: '20px' }}>
-                <div className="details-g" style={{ gap: '24px' }}>
+                <div className='details-g' style={{ gap: '24px' }}>
                     {/* Gallery */}
                     <div>
                         <div style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', background: 'var(--cream)', aspectRatio: '1/1' }}>
@@ -876,7 +876,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const validate = () => {
         const e: Record<string, string> = {};
         if (!fd.customerName.trim() || fd.customerName.length < 3) e.customerName = 'Nom requis';
-        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide (ex: 0550123456)';
+        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide (ex: 0550123456)";
         if (!fd.customerWelaya) e.customerWelaya = 'Choisir Wilaya';
         if (!fd.customerCommune) e.customerCommune = 'Choisir Commune';
         return e;
@@ -1053,9 +1053,9 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         e.preventDefault();
         const er: Record<string, string> = {};
         if (!fd.customerName.trim() || fd.customerName.length < 3) er.n = 'Nom requis';
-        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.p = 'Numéro invalide (ex: 0550123456)';
+        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.p = "Numéro invalide (ex: 0550123456)";
         if (!fd.customerWelaya) er.w = 'Wilaya requis';
-        if (!fd.customerCommune) er.c = 'Commune requis';
+        if (!fd.customerCommune) er.c = "Commune requis";
         if (Object.keys(er).length) { setErrors(er); return; }
         setErrors({}); setSubmitting(true);
         try {
@@ -1074,7 +1074,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     <CheckCircle2 size={28} style={{ color: 'var(--sage)' }} />
                 </div>
                 <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--char)', marginBottom: 8 }}>Commande reçue 🌿</h2>
-                <p style={{ fontSize: '13px', color: 'var(--mid)', marginBottom: 24, lineHeight: 1.7 }}>Merci pour votre choix. Nous vous contacterons bient’t.</p>
+                <p style={{ fontSize: '13px', color: 'var(--mid)', marginBottom: 24, lineHeight: 1.7 }}>Merci pour votre choix. Nous vous contacterons bient't.</p>
                 <Link href="/" className="btn-sage" style={{ display: 'inline-flex', padding: '12px 32px', fontSize: '13px', borderRadius: '8px' }}>Retour à la boutique</Link>
             </div>
         </div>
@@ -1109,7 +1109,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(107,143,107,0.1)'; }}
                                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}>
                                 <div style={{ width: 72, height: 90, flexShrink: 0, overflow: 'hidden', borderRadius: '8px', background: 'var(--cream)' }}>
-                                    <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" />
+                                    <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt='' />
                                 </div>
                                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                                     <div>
@@ -1306,7 +1306,7 @@ export function Contact({ store }: { store?: any }) {
                     <div style={{ textAlign: 'center', padding: '32px 20px' }}>
                         <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '12px' }}>✅</span>
                         <p style={{ fontWeight: 700, color: 'var(--char)', marginBottom: '4px' }}>Envoyé</p>
-                        <p style={{ fontSize: '12px', color: 'var(--mist)' }}>Nous vous répondrons bient’t</p>
+                        <p style={{ fontSize: '12px', color: 'var(--mist)' }}>Nous vous répondrons bient't</p>
                     </div>
                 ) : (
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -1321,6 +1321,10 @@ export function Contact({ store }: { store?: any }) {
                             </div>
                         </div>
                         <div>
+                            <p style={{ fontSize: '11px', fontWeight: 600, color: 'var(--mid)', marginBottom: 5 }}>Email</p>
+                            <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="votre@email.com" style={INP()} onFocus={onF} onBlur={onB} />
+                        </div>
+                                                <div>
                             <p style={{ fontSize: '11px', fontWeight: 600, color: 'var(--mid)', marginBottom: 5 }}>Votre message</p>
                             <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder="Comment pouvons-nous vous aider ?" rows={4} required
                                 style={{ ...INP(), resize: 'none' }} onFocus={onF} onBlur={onB} />

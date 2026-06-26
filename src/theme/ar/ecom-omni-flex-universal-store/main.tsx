@@ -131,7 +131,7 @@ const CSS = `
     .footer-g  { grid-template-columns:1fr 1fr; gap:32px; }
   }
   @media (max-width:768px) {
-    .prod-grid  { grid-template-columns:repeat(2,1fr); }
+    .prod-grid  { grid-template-columns:1fr; }
     .trust-bar  { grid-template-columns:repeat(2,1fr); }
     .footer-g   { grid-template-columns:1fr 1fr; gap:24px; }
     .details-g  { grid-template-columns:1fr; }
@@ -141,7 +141,7 @@ const CSS = `
     .cart-layout{ grid-template-columns:1fr; }
   }
   @media (max-width:480px) {
-    .prod-grid { grid-template-columns:repeat(2,1fr); }
+    .prod-grid { grid-template-columns:1fr; }
     .footer-g  { grid-template-columns:1fr; }
     .form-2c   { grid-template-columns:1fr; }
     .dlv-2c    { grid-template-columns:1fr; }

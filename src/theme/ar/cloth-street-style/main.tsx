@@ -63,7 +63,7 @@ const CSS = `
   /* Products grid */
   .products-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 1px;
     background: var(--ink);
   }
@@ -161,6 +161,9 @@ const CSS = `
     .cart-add-btns { flex-direction:column; }
     .zc { min-height:240px; }
   }
+
+  .footer-cols { display:grid; grid-template-columns:1fr; gap:2rem; }
+  @media(min-width:768px){.footer-cols{grid-template-columns:2fr 1fr 1fr;gap:40px;}}
 `;
 
 /* ─── TYPES ─── */
@@ -486,7 +489,7 @@ export function Footer({ store }: any) {
       </div>
 
       {/* 3 columns */}
-      <div style={{ position: 'relative', zIndex: 2, padding: '40px 24px', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '40px', borderBottom: '1px solid rgba(242,239,232,0.1)' }}>
+      <div className="footer-cols" style={{ position: 'relative', zIndex: 2, padding: '40px 24px', borderBottom: '1px solid rgba(242,239,232,0.1)' }}>
 
         {/* قسم 1 — الهوية */}
         <div>

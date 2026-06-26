@@ -131,7 +131,7 @@ const CSS = `
     .how-grid  { grid-template-columns:repeat(2,1fr); }
   }
   @media (max-width:768px) {
-    .prod-grid { grid-template-columns:repeat(2,1fr); gap:12px; }
+    .prod-grid { grid-template-columns:1fr; gap:12px; }
     .cat-grid  { grid-template-columns:repeat(2,1fr); }
     .trust-row { grid-template-columns:repeat(2,1fr); }
     .footer-g  { grid-template-columns:1fr; gap:28px; }
@@ -272,7 +272,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       position:'absolute', top:'calc(100% + 4px)', right:0, left:0,
       background:'var(--white)', border:'1px solid var(--gold)', borderRadius:'12px',
       zIndex:200, overflow:'hidden', boxShadow:'0 12px 40px rgba(201,149,44,0.12)'
-    }} className="fi">
+    }} className='fi'>
       <div style={{ display:'flex', justifyContent:'flex-end', padding:'8px 12px 2px' }}>
         <button onClick={() => setSq('')} style={{
           background:'var(--gold-lt)', border:'none', borderRadius:'50%',
@@ -281,7 +281,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         }}><X size={12} /></button>
       </div>
       {loading ? (
-        <div style={{ padding:'1.5rem', textAlign:'center', color:'var(--green)', fontFamily:"'Playfair Display',serif", fontWeight:600 }}>Recherche en cours...</div>
+        <div style={{ padding:'1.5rem', textAlign:'center', color:'var(--green)', fontFamily:"'Inter',sans-serif", fontWeight:600 }}>Recherche en cours...</div>
       ) : ls.length > 0 ? (
         <div style={{ maxHeight:'320px', overflowY:'auto' }}>
           {ls.map((p: any) => (
@@ -300,7 +300,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <button onClick={() => doSearch()} style={{
             width:'100%', padding:'10px', background:'var(--green-lt)', border:'none',
             borderTop:'1px solid var(--tan)', color:'var(--green)', fontWeight:700,
-            fontSize:'12px', cursor:'pointer', fontFamily:"'Playfair Display',serif",
+            fontSize:'12px', cursor:'pointer', fontFamily:"'Inter',sans-serif",
             display:'flex', alignItems:'center', justifyContent:'center', gap:'6px'
           }}>
             Voir tous les résultats <ArrowRight size={12} />
@@ -482,7 +482,7 @@ export function Footer({ store }: any) {
             <p className="pd" style={{ fontSize:'12px', fontWeight:600, color:'var(--gold)', marginBottom:'16px' }}>
               Liens Rapide
             </p>
-            {[{ h:'/', l:'Accueil' }, { h:'/cart', l:'Panier' }, { h:'/contact', l:'Appelez-nous' }, { h:'/Privacy', l:'Politique de confidentialité' }, { h:'/Terms', l:'Conditions d’utilisation' }].map(lnk => (
+            {[{ h:'/', l:'Accueil' }, { h:'/cart', l:'Panier' }, { h:'/contact', l:'Appelez-nous' }, { h:'/Privacy', l:'Politique de confidentialité' }, { h:'/Terms', l:"Conditions d'utilisation" }].map(lnk => (
               <a key={lnk.h} href={lnk.h} style={{
                 display:'block', fontSize:'13px', color:'rgba(255,255,255,0.6)',
                 marginBottom:'8px', transition:'color 0.2s'
@@ -580,7 +580,7 @@ export function Home({ store, page }: any) {
     <div dir="ltr">
       <section style={{
         position:'relative', overflow:'hidden',
-        background:'linear-gradient(180deg, var(--green-lt) 0%, var(--cream) 100%)',
+        background:"linear-gradient(180deg, var(--green-lt) 0%, var(--cream) 100%)",
         minHeight:'80vh', display:'flex', alignItems:'center', justifyContent:'center', paddingTop:30, paddingBottom:25
       }}>
         {store.hero?.imageUrl && (
@@ -606,7 +606,7 @@ export function Home({ store, page }: any) {
           position:'relative', zIndex:5, padding:'0 5vw', width:'100%',
           maxWidth:'1100px', margin:'0 auto', textAlign:'center',
           display:'flex', flexDirection:'column', alignItems:'center'
-        }} className="fi">
+        }} className='fi'>
           <div style={{
             display:'inline-flex', alignItems:'center', gap:'6px',
             border:'1px solid var(--gold)', padding:'4px 14px', borderRadius:'20px',
@@ -634,11 +634,11 @@ export function Home({ store, page }: any) {
             fontSize:'clamp(14px, 1.6vw, 16px)', lineHeight:'1.7',
             color:'var(--warm)', maxWidth:'540px', marginBottom:'28px'
           }}>
-            {store.hero?.subtitle || 'Les meilleurs types d’Herbes médicinales, Miel Naturel et compléments Bio. Produits authentiques de la Nature.'}
+            {store.hero?.subtitle || "Les meilleurs types d'Herbes médicinales, Miel Naturel et compléments Bio. Produits authentiques de la Nature."}
           </p>
 
           <div style={{ display:'flex', gap:'12px', flexWrap:'wrap', justifyContent:'center', marginBottom:'36px' }}>
-            <a href="#products" className="btn-primary" style={{ fontSize:'14px', padding:'12px 34px' }}>
+            <a href='#products' className="btn-primary" style={{ fontSize:'14px', padding:'12px 34px' }}>
               <HerbLeaf size={16} /> Acheter maintenant
             </a>
             {cats.length > 0 && (
@@ -763,7 +763,7 @@ export function Home({ store, page }: any) {
           {products.length === 0 ? (
             <div style={{ padding:'80px 0', textAlign:'center', border:'1px dashed var(--tan)', borderRadius:'16px' }}>
               <HerbLeaf size={48} style={{ color:'var(--dim)', margin:'0 auto 16px', opacity:0.4, display:'block' }} />
-              <p className="pd" style={{ fontSize:'1.8rem', color:'var(--dim)' }}>Bient’t</p>
+              <p className="pd" style={{ fontSize:'1.8rem', color:'var(--dim)' }}>Bient't</p>
             </div>
           ) : (
             <div className="prod-grid">
@@ -783,7 +783,7 @@ export function Home({ store, page }: any) {
                 const pn = i + 1; const isA = Number(page) === pn;
                 return (
                   <Link key={pn} href={{ query:{ page:pn } }} scroll={false}
-                    style={{ width:40, height:40, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Playfair Display',serif", fontWeight:700, fontSize:'14px', borderRadius:'8px', border:`1px solid ${isA?'var(--gold)':'var(--tan)'}`, background:isA?'var(--gold)':'transparent', color:isA?'white':'var(--warm)' }}>
+                    style={{ width:40, height:40, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Inter',sans-serif", fontWeight:700, fontSize:'14px', borderRadius:'8px', border:`1px solid ${isA?'var(--gold)':'var(--tan)'}`, background:isA?'var(--gold)':'transparent', color:isA?'white':'var(--warm)' }}>
                     {pn}
                   </Link>
                 );
@@ -802,7 +802,7 @@ export function Home({ store, page }: any) {
               Pourquoi nous
             </p>
             <h2 className="pd" style={{ fontSize:'clamp(1.8rem, 4vw, 2.8rem)', color:'var(--brown)' }}>
-              {" "}<span style={{ color:'var(--green)' }}>Nature</span> Pures, haute qualité
+              {' '}<span style={{ color:'var(--green)' }}>Nature</span> Pures, haute qualité
             </h2>
           </div>
           <div className="how-grid">
@@ -840,7 +840,7 @@ export function Home({ store, page }: any) {
             Découvrez le pouvoir du traitement naturel. Herbes médicinales, Miel pur et compléments Bio.
           </p>
           <div style={{ display:'flex', gap:'12px', justifyContent:'center', flexWrap:'wrap' }}>
-            <a href="#products" className="btn-primary" style={{ fontSize:'15px', padding:'14px 36px', background:'var(--gold)', color:'var(--brown)' }}
+            <a href='#products' className="btn-primary" style={{ fontSize:'15px', padding:'14px 36px', background:'var(--gold)', color:'var(--brown)' }}
               onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#B8860B'}
               onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'var(--gold)'}>
               <HerbLeaf size={16} /> Acheter maintenant
@@ -848,7 +848,7 @@ export function Home({ store, page }: any) {
             <Link href="/contact" style={{
               display:'inline-flex', alignItems:'center', justifyContent:'center', gap:'8px',
               border:'1.5px solid var(--gold)', color:'var(--gold)',
-              fontFamily:"'Playfair Display',serif", fontSize:'15px', fontWeight:700,
+              fontFamily:"'Inter',sans-serif", fontSize:'15px', fontWeight:700,
               padding:'14px 36px', borderRadius:'12px', cursor:'pointer', transition:'all 0.2s'
             }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(201,149,44,0.15)'; }}
@@ -919,7 +919,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                     border:`2px solid ${sel===idx?'var(--gold)':'var(--tan)'}`,
                     cursor:'pointer', padding:0, background:'none', opacity:sel===idx?1:0.6
                   }}>
-                    <img src={img} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
+                    <img src={img} alt='' style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
                   </button>
                 ))}
               </div>
@@ -939,7 +939,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                 marginRight:'auto', padding:'4px 14px', borderRadius:'6px',
                 background:inStock||autoGen?'rgba(45,90,39,0.08)':'rgba(192,57,43,0.08)',
                 color:inStock||autoGen?'var(--green)':'var(--red)',
-                fontSize:'11px', fontWeight:600, fontFamily:"'Playfair Display',serif",
+                fontSize:'11px', fontWeight:600, fontFamily:"'Inter',sans-serif",
                 border:`1px solid ${inStock||autoGen?'rgba(45,90,39,0.2)':'rgba(192,57,43,0.2)'}`
               }}>
                 {autoGen?'Disponible':inStock?'Disponible':'Non disponible'}
@@ -1091,9 +1091,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = ()=>{
     const e:Record<string,string>={};
     if(!fd.customerName.trim()) e.customerName='Nom requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide (ex: 0550123456)";
     if(!fd.customerWelaya) e.customerWelaya='Wilaya requis';
-    if(!fd.customerCommune) e.customerCommune='Commune requis';
+    if(!fd.customerCommune) e.customerCommune="Commune requis";
     return e;
   };
 
@@ -1275,7 +1275,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er:Record<string,string>={};
     if(!fd.customerName.trim()) er.name='requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro invalide (ex: 0550123456)";
     if(!fd.customerWelaya) er.w='requis';
     if(!fd.customerCommune) er.c='requis';
     if(Object.keys(er).length){setErrors(er);return;}
@@ -1291,7 +1291,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{ textAlign:'center', background:'var(--white)', padding:'4rem 2.5rem', borderRadius:'16px', border:'1px solid var(--gold)', maxWidth:460, width:'100%', boxShadow:'0 8px 30px rgba(201,149,44,0.08)' }}>
         <CheckCircle2 size={48} style={{ color:'var(--emerald)', display:'block', margin:'0 auto 1.25rem' }}/>
         <h2 className="pd" style={{ fontSize:'2.5rem', color:'var(--brown)', marginBottom:'0.625rem' }}>Commande reçue !</h2>
-        <p style={{ color:'var(--warm)', marginBottom:'2rem', lineHeight:1.7 }}>Merci de votre confiance. Nous vous contacterons bient’t.</p>
+        <p style={{ color:'var(--warm)', marginBottom:'2rem', lineHeight:1.7 }}>Merci de votre confiance. Nous vous contacterons bient't.</p>
         <Link href="/" className="btn-primary" style={{ display:'inline-flex', padding:'13px 28px' }}>Retour à la boutique</Link>
       </div>
     </div>
@@ -1319,7 +1319,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             {items.map((item,i)=>(
               <div key={i} style={{ display:'flex', gap:'1rem', padding:'14px', borderBottom:'1px solid var(--tan)' }}>
                 <div style={{ width:80, height:80, flexShrink:0, overflow:'hidden', borderRadius:'10px', border:'1px solid var(--tan)', background:'var(--beige)' }}>
-                  <img src={item.product?.imagesProduct?.[0]?.imageUrl||item.product?.productImage} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} alt=""/>
+                  <img src={item.product?.imagesProduct?.[0]?.imageUrl||item.product?.productImage} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} alt=''/>
                 </div>
                 <div style={{ flex:1, display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
                   <div>
@@ -1489,7 +1489,7 @@ export function Terms() {
 export function Cookies() {
   return (
     <Shell title="Politique de cookies" sub="Affaires juridiques">
-      <IB title="Cookies essentiels" body="Requis pour les sessions, le Panier et compléter l’achat. Non désactivables." tag="requis"/>
+      <IB title="Cookies essentiels" body="Requis pour les sessions, le Panier et compléter l'achat. Non désactivables." tag="requis"/>
       <IB title="Cookies analytiques" body="Données agrégées pour améliorer la plateforme. Aucune donnée personnelle incluse." tag="Facultatif"/>
       <div style={{ marginTop:'16px', padding:'14px', borderRadius:'10px', border:'1px solid var(--gold)', display:'flex', gap:'10px', alignItems:'flex-start', background:'var(--gold-lt)' }}>
         <ToggleRight size={17} style={{ color:'var(--gold)', flexShrink:0, marginTop:'1px' }}/>
@@ -1523,7 +1523,7 @@ export function Contact({ store }: { store?: any }) {
           <h1 className="pd" style={{ fontSize:'clamp(2.2rem, 5vw, 4rem)', color:'var(--brown)', lineHeight:1.05, marginBottom:'8px' }}>
             Contact <span style={{ color:'var(--green)' }}>avec nous</span>
           </h1>
-          <p style={{ fontSize:'14px', color:'var(--warm)' }}>L’équipe support répond sous 24h</p>
+          <p style={{ fontSize:'14px', color:'var(--warm)' }}>L'équipe support répond sous 24h</p>
         </div>
       </div>
 

@@ -167,7 +167,7 @@ const CSS = `
     .footer-g   { grid-template-columns: 1fr 1fr; gap: 32px; }
   }
   @media (max-width: 768px) {
-    .prod-grid  { grid-template-columns: repeat(2,1fr); gap: 10px; }
+    .prod-grid  { grid-template-columns: 1fr; gap: 10px; }
     .cat-row    { grid-template-columns: repeat(2,1fr); }
     .trust-row  { grid-template-columns: repeat(2,1fr); }
     .footer-g   { grid-template-columns: 1fr; gap: 28px; }
@@ -185,7 +185,7 @@ const CSS = `
 function FireIcon({ size = 32 }: { size?: number }) {
   return (
     <svg width={size} height={size * 1.3} viewBox="0 0 32 42" fill="none" style={{ animation: 'flicker 1.8s ease-in-out infinite' }}>
-      <path d="M16 2C16 2 22 10 20 18C24 14 26 8 24 2C30 8 32 18 28 26C32 22 34 14 30 6C36 14 36 28 28 36C24 40 20 42 16 42C12 42 8 40 4 36C-4 28 -4 14 2 6C0 14 2 22 6 26C2 18 4 8 10 2C8 8 10 14 14 18C12 10 16 2 16 2Z" fill="url(#fg)" opacity="0.95"/>
+      <path d='M16 2C16 2 22 10 20 18C24 14 26 8 24 2C30 8 32 18 28 26C32 22 34 14 30 6C36 14 36 28 28 36C24 40 20 42 16 42C12 42 8 40 4 36C-4 28 -4 14 2 6C0 14 2 22 6 26C2 18 4 8 10 2C8 8 10 14 14 18C12 10 16 2 16 2Z' fill="url(#fg)" opacity="0.95"/>
       <path d="M16 18C16 18 19 22 18 26C20 24 21 20 20 16C22 20 22 26 20 30C21 28 22 24 21 20C24 24 24 32 20 36C18 38 17 39 16 39C15 39 14 38 12 36C8 32 8 24 11 20C10 24 11 28 12 30C10 26 10 20 12 16C11 20 12 24 14 26C13 22 16 18 16 18Z" fill="url(#fg2)" opacity="0.9"/>
       <defs>
         <linearGradient id="fg" x1="16" y1="2" x2="16" y2="42" gradientUnits="userSpaceOnUse">
@@ -343,7 +343,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     </div>
 
     {loading ? (
-      <div style={{padding:'1.5rem', textAlign:'center', color:'var(--fire)', fontFamily:"'Barlow Condensed',sans-serif", fontWeight:700, letterSpacing:'0.1em'}}>Recherche en cours...</div>
+      <div style={{padding:'1.5rem', textAlign:'center', color:'var(--fire)', fontFamily:"'Barlow',sans-serif", fontWeight:700, letterSpacing:'0.1em'}}>Recherche en cours...</div>
     ) : ls.length > 0 ? (
       <div style={{maxHeight:'320px', overflowY:'auto'}}>
         {ls.map((p:any) => (
@@ -351,7 +351,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             style={{display:'flex', alignItems:'center', gap:'0.75rem', padding:'12px 14px', borderBottom:'1px solid var(--line)', textDecoration:'none'}}>
             <img src={p.productImage||p.imagesProduct?.[0]?.imageUrl} style={{width:40, height:40, objectFit:'cover', flexShrink:0, borderRadius:'4px'}} alt=""/>
             <div style={{flex:1}}>
-              <div style={{fontSize:'13px', fontWeight:700, color:'var(--white)', fontFamily:"'Barlow Condensed',sans-serif", textTransform:'uppercase'}}>{p.name}</div>
+              <div style={{fontSize:'13px', fontWeight:700, color:'var(--white)', fontFamily:"'Barlow',sans-serif", textTransform:'uppercase'}}>{p.name}</div>
               <div style={{fontSize:'14px', color:'var(--fire)', fontWeight:700}}>{p.price} DA</div>
             </div>
           </Link>
@@ -360,7 +360,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <button onClick={() => doSearch()} style={{
           width:'100%', padding:'12px', background:'rgba(255,69,0,0.05)', border:'none', 
           borderTop:'1px solid var(--line)', color:'var(--fire)', fontWeight:800, 
-          fontSize:'12px', cursor:'pointer', fontFamily:"'Barlow Condensed',sans-serif", letterSpacing:'0.1em',
+          fontSize:'12px', cursor:'pointer', fontFamily:"'Barlow',sans-serif", letterSpacing:'0.1em',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
         }}>
           Voir tous les résultats <ArrowRight size={12} />
@@ -401,7 +401,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <Link href="/" style={{display:'flex', alignItems:'center', gap:'10px', flexShrink:0, textDecoration:'none'}}>
             {(store.design.logoUrl && store.design.logoUrl !== '/default-logo.png')
               ? <img src={store.design.logoUrl} alt={store.name} style={{height:'32px', width:'auto', objectFit:'contain'}}/>
-              : <span style={{fontSize:'1.4rem', fontWeight:900, color:'var(--white)', letterSpacing:'-0.02em', fontFamily:"'Barlow Condensed',sans-serif" , textTransform : 'uppercase'}}>
+              : <span style={{fontSize:'1.4rem', fontWeight:900, color:'var(--white)', letterSpacing:'-0.02em', fontFamily:"'Barlow',sans-serif" , textTransform : 'uppercase'}}>
                   {(store?.name||'').split(' ')[0]}<span style={{color:'var(--fire)'}}>{' '}{(store?.name||'').split(' ').slice(1).join(' ')}</span>
                 </span>
             }
@@ -421,7 +421,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div style={{display:'flex', alignItems:'center', gap:'20px'}}>
             
             {/* Desktop Links */}
-            <div  style={{ alignItems:'center', gap:'24px'}} className="hidden lg:flex">
+            <div  style={{ alignItems:'center', gap:'24px'}} className='hidden lg:flex'>
               {[{h:'/',l:'Accueil'}, {h:'/contact',l:'Contactez-nous'}].map(i=>(
                 <Link key={i.h} href={i.h} style={{fontSize:'13px', fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--mid)', textDecoration:'none', transition:'0.2s'}}
                   onMouseEnter={e=>(e.currentTarget.style.color='var(--fire)')}
@@ -454,7 +454,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             )}
 
             {/* Menu Toggle */}
-            <button  onClick={()=>setOpen(!open)} className='lg:hidden' style={{background:'var(--fire)', border:'none', color:'white', padding:'6px', borderRadius:'4px', cursor:'pointer'}}>
+            <button  onClick={()=>setOpen(!open)} className="lg:hidden" style={{background:'var(--fire)', border:'none', color:'white', padding:'6px', borderRadius:'4px', cursor:'pointer'}}>
               {open ? <X size={20}/> : <Menu size={20}/>}
             </button>
           </div>
@@ -474,7 +474,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       )}
 
       {/* Mobile Menu Content */}
-      <div className='block lg:hidden' style={{
+      <div className="block lg:hidden" style={{
         maxHeight: open ? '300px' : '0', 
         overflow:'hidden', transition:'all 0.4s ease', 
         backgroundColor:'var(--dark)', borderBottom: open ? '2px solid var(--fire)' : 'none'
@@ -537,7 +537,7 @@ export function Footer({ store }: any) {
           {/* Section 2 — Liens */}
           <div>
             <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'16px'}}>// Liens</p>
-            {[{h:'/',l:'Accueil'},{h:'/cart',l:'Panier'},{h:'/contact',l:'Contactez-nous'},{h:'/Privacy',l:'Politique de confidentialité'},{h:'/Terms',l:'Conditions d’utilisation'}].map(lnk=>(
+            {[{h:'/',l:'Accueil'},{h:'/cart',l:'Panier'},{h:'/contact',l:'Contactez-nous'},{h:'/Privacy',l:'Politique de confidentialité'},{h:'/Terms',l:"Conditions d'utilisation"}].map(lnk=>(
               <a key={lnk.h} href={lnk.h} style={{display:'block',fontSize:'13px',color:'var(--mid)',marginBottom:'8px',transition:'color 0.2s'}}
                 onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--fire)';}}
                 onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mid)';}}>
@@ -617,7 +617,7 @@ export function Home({ store, page }: any) {
   if (!page) page = 1;
   const countPage = Math.ceil((store.count||products.length)/48);
 
-  const mottos = ['No pain, no gain','Dépassez vos limites','Entraînez-vous à fond','Restez concentré','Mode bête activé'];
+  const mottos = ["No pain, no gain",'Dépassez vos limites','Entraînez-vous à fond','Restez concentré','Mode bête activé'];
   const [mIdx, setMIdx] = useState(0);
   useEffect(() => { const t = setInterval(() => setMIdx(p=>(p+1)%mottos.length), 2500); return () => clearInterval(t); }, []);
 
@@ -636,7 +636,7 @@ export function Home({ store, page }: any) {
         <div style={{position:'absolute',inset:0,backgroundImage:'linear-gradient(rgba(255,69,0,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,69,0,0.05) 1px,transparent 1px)',backgroundSize:'35px 35px',zIndex:3,opacity:0.4,pointerEvents:'none'}}/>
         <div style={{position:'absolute',bottom:0,left:0,right:0,height:'3px',background:'linear-gradient(90deg,transparent,var(--fire),var(--gold),transparent)',zIndex:4}}/>
 
-        <div style={{position:'relative',zIndex:5,padding:'0 5vw',width:'100%',maxWidth:'1100px',margin:'0 auto',textAlign:'center',display:'flex',flexDirection:'column',alignItems:'center'}} className="fu-1">
+        <div style={{position:'relative',zIndex:5,padding:'0 5vw',width:'100%',maxWidth:'1100px',margin:'0 auto',textAlign:'center',display:'flex',flexDirection:'column',alignItems:'center'}} className='fu-1'>
           {/* Badge */}
           <div style={{display:'inline-flex',alignItems:'center',gap:'6px',border:'1px solid var(--fire)',padding:'4px 12px',marginBottom:'16px',backgroundColor:'rgba(255,69,0,0.12)'}}>
             <Flame style={{width:'12px',height:'12px',color:'var(--fire)',animation:'flicker 1.2s ease-in-out infinite'}}/>
@@ -656,7 +656,7 @@ export function Home({ store, page }: any) {
           </p>
 
           <div style={{display:'flex',gap:'12px',flexWrap:'wrap',justifyContent:'center',marginBottom:'36px'}}>
-            <a href="#products" className="btn-fire" style={{fontSize:'14px',padding:'12px 34px'}}>
+            <a href='#products' className="btn-fire" style={{fontSize:'14px',padding:'12px 34px'}}>
               <Dumbbell style={{width:'16px',height:'16px'}}/> Acheter maintenant
             </a>
             {cats.length > 0 && (
@@ -667,7 +667,7 @@ export function Home({ store, page }: any) {
           </div>
 
           {/* Stats */}
-          <div className="fu-3" style={{display:'flex',gap:'32px',paddingTop:'22px',borderTop:'1px solid rgba(255,255,255,0.08)',flexWrap:'wrap',justifyContent:'center',width:'100%',maxWidth:'700px'}}>
+          <div className='fu-3' style={{display:'flex',gap:'32px',paddingTop:'22px',borderTop:'1px solid rgba(255,255,255,0.08)',flexWrap:'wrap',justifyContent:'center',width:'100%',maxWidth:'700px'}}>
             {[{v:`${products.length}+`,l:'Produit',c:'var(--gold)'},{v:'48h',l:'Livraison',c:'var(--fire)'},{v:'100%',l:'authentique',c:'var(--green)'},{v:'#1',l:'en Algérie',c:'var(--gold)'}].map((s,i)=>(
               <div key={i} style={{textAlign:'center'}}>
                 <p className="bb" style={{fontSize:'clamp(1.8rem,4vw,2.6rem)',color:s.c,lineHeight:1,margin:0}}>{s.v}</p>
@@ -683,7 +683,7 @@ export function Home({ store, page }: any) {
         <div style={{maxWidth:'1280px',margin:'0 auto'}}>
           <div className="trust-row">
             {[
-              {icon:<Truck style={{width:'20px',height:'20px'}}/>,color:'var(--fire)',title:'Livraison rapide',desc:'48h à travers l’Algérie'},
+              {icon:<Truck style={{width:'20px',height:'20px'}}/>,color:'var(--fire)',title:'Livraison rapide',desc:"48h à travers l'Algérie"},
               {icon:<Shield style={{width:'20px',height:'20px'}}/>,color:'var(--gold)',title:'Équipements authentique',desc:'Produits authentiques 100%'},
               {icon:<Trophy style={{width:'20px',height:'20px'}}/>,color:'var(--fire)',title:'Meilleurs prix',desc:'Valeur inégalée'},
               {icon:<TrendingUp style={{width:'20px',height:'20px'}}/>,color:'var(--green)',title:'Performance professionnelle',desc:'Équipements professionnelle'},
@@ -753,7 +753,7 @@ export function Home({ store, page }: any) {
           {products.length === 0 ? (
             <div style={{padding:'80px 0',textAlign:'center',border:'1px dashed var(--dim)'}}>
               <Dumbbell style={{width:'48px',height:'48px',color:'var(--dim)',margin:'0 auto 16px',opacity:0.4,display:'block'}}/>
-              <p className="bb" style={{fontSize:'1.8rem',color:'var(--dim)'}}>Bient’t</p>
+              <p className="bb" style={{fontSize:'1.8rem',color:'var(--dim)'}}>Bient't</p>
             </div>
           ) : (
             <div className="prod-grid">
@@ -774,7 +774,7 @@ export function Home({ store, page }: any) {
                 const pn=i+1; const isA=Number(page)===pn;
                 return (
                   <Link key={pn} href={{query:{page:pn}}} scroll={false}
-                    style={{width:40,height:40,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700,fontSize:'14px',border:`1px solid ${isA?'var(--fire)':'var(--dim)'}`,background:isA?'var(--fire)':'transparent',color:isA?'white':'var(--mid)'}}>
+                    style={{width:40,height:40,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Barlow',sans-serif",fontWeight:700,fontSize:'14px',border:`1px solid ${isA?'var(--fire)':'var(--dim)'}`,background:isA?'var(--fire)':'transparent',color:isA?'white':'var(--mid)'}}>
                     {pn}
                   </Link>
                 );
@@ -798,7 +798,7 @@ export function Home({ store, page }: any) {
             Rejoignez des milliers de sportifs dans toute l'Algérie. Obtenez les équipements dont vous avez besoin pour atteindre le sommet de vos performances.
           </p>
           <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap'}}>
-            <a href="#products" className="btn-fire" style={{fontSize:'15px',padding:'14px 36px'}}>
+            <a href='#products' className="btn-fire" style={{fontSize:'15px',padding:'14px 36px'}}>
               <Dumbbell style={{width:'16px',height:'16px'}}/> Acheter tous les équipements
             </a>
             <Link href="/contact" className="btn-gold" style={{fontSize:'15px',padding:'14px 36px'}}>
@@ -855,7 +855,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
               <div className="thumb-row">
                 {allImages.slice(0,5).map((img:string,idx:number)=>(
                   <button key={idx} onClick={()=>setSel(idx)} style={{width:'54px',height:'54px',overflow:'hidden',border:`2px solid ${sel===idx?'var(--fire)':'var(--line)'}`,cursor:'pointer',padding:0,background:'none',opacity:sel===idx?1:0.55}}>
-                    <img src={img} alt="" style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
+                    <img src={img} alt='' style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
                   </button>
                 ))}
               </div>
@@ -870,7 +870,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
               <div style={{display:'flex',gap:'2px'}}>
                 {[...Array(5)].map((_,i)=><Star key={i} style={{width:'13px',height:'13px',fill:i<4?'var(--gold)':'none',color:'var(--gold)'}}/>)}
               </div>
-              <span style={{marginRight:'auto',padding:'4px 14px',backgroundColor:inStock||autoGen?'rgba(57,255,20,0.1)':'rgba(255,69,0,0.1)',color:inStock||autoGen?'var(--green)':'var(--fire)',fontSize:'11px',fontWeight:700,fontFamily:"'Barlow Condensed',sans-serif",letterSpacing:'0.12em',textTransform:'uppercase',border:`1px solid ${inStock||autoGen?'rgba(57,255,20,0.3)':'var(--fire)'}`}}>
+              <span style={{marginRight:'auto',padding:'4px 14px',backgroundColor:inStock||autoGen?'rgba(57,255,20,0.1)':'rgba(255,69,0,0.1)',color:inStock||autoGen?'var(--green)':'var(--fire)',fontSize:'11px',fontWeight:700,fontFamily:"'Barlow',sans-serif",letterSpacing:'0.12em',textTransform:'uppercase',border:`1px solid ${inStock||autoGen?'rgba(57,255,20,0.3)':'var(--fire)'}`}}>
                 {autoGen?'∞ Disponible':inStock?'Disponible':'Non disponible'}
               </span>
             </div>
@@ -992,9 +992,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = ()=>{
     const e:Record<string,string>={};
     if(!fd.customerName.trim())  e.customerName='Nom requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide (ex: 0550123456)";
     if(!fd.customerWelaya)       e.customerWelaya='Wilaya requis';
-    if(!fd.customerCommune)      e.customerCommune='Commune requis';
+    if(!fd.customerCommune)      e.customerCommune="Commune requis";
     return e;
   };
   const getVarId = useCallback(()=>{
@@ -1125,7 +1125,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </button>
             <div style={{display:'flex',justifyContent:'center',gap:'16px'}}>
               {[{icon:<Lock style={{width:'11px',height:'11px'}}/>,label:'Sécurisé'},{icon:<Truck style={{width:'11px',height:'11px'}}/>,label:'Livraison rapide'},{icon:<Shield style={{width:'11px',height:'11px'}}/>,label:'authentique'}].map((b,i)=>(
-                <div key={i} className="bc" style={{display:'flex',alignItems:'center',gap:'4px',fontSize:'11px',color:'var(--dim)',fontWeight:600,letterSpacing:'0.06em'}}>
+                <div key={i} className='bc' style={{display:'flex',alignItems:'center',gap:'4px',fontSize:'11px',color:'var(--dim)',fontWeight:600,letterSpacing:'0.06em'}}>
                   <span style={{color:'var(--fire)'}}>{b.icon}</span> {b.label}
                 </div>
               ))}
@@ -1165,7 +1165,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er:Record<string,string>={};
     if(!fd.customerName.trim()) er.name='requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro invalide (ex: 0550123456)";
     if(!fd.customerWelaya) er.w='requis';
     if(!fd.customerCommune) er.c='requis';
     if(Object.keys(er).length){setErrors(er);return;}
@@ -1181,7 +1181,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{textAlign:'center',background:'var(--panel)',padding:'4rem 2.5rem',border:'2px solid var(--fire)',maxWidth:460,width:'100%'}}>
         <CheckCircle2 style={{width:'48px',height:'48px',color:'var(--green)',display:'block',margin:'0 auto 1.25rem'}}/>
         <h2 className="bb" style={{fontSize:'2.5rem',color:'var(--white)',marginBottom:'0.625rem'}}>Commande reçue !</h2>
-        <p style={{color:'var(--mid)',marginBottom:'2rem',lineHeight:1.7}}>Merci de votre confiance. Nous vous contacterons bient’t. 💪</p>
+        <p style={{color:'var(--mid)',marginBottom:'2rem',lineHeight:1.7}}>Merci de votre confiance. Nous vous contacterons bient't. 💪</p>
         <Link href="/" className="btn-fire" style={{display:'inline-flex',clipPath:'none',padding:'13px 28px'}}>Retour à la boutique</Link>
       </div>
     </div>
@@ -1210,7 +1210,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             {items.map((item,i)=>(
               <div key={i} style={{display:'flex',gap:'1rem',padding:'14px',borderBottom:'1px solid var(--line)'}}>
                 <div style={{width:80,height:80,flexShrink:0,overflow:'hidden',border:'1px solid var(--line)',background:'var(--panel-2)'}}>
-                  <img src={item.product?.imagesProduct?.[0]?.imageUrl||item.product?.productImage} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}} alt=""/>
+                  <img src={item.product?.imagesProduct?.[0]?.imageUrl||item.product?.productImage} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}} alt=''/>
                 </div>
                 <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:'space-between'}}>
                   <div>
@@ -1396,7 +1396,7 @@ export function Terms() {
 export function Cookies() {
   return (
     <Shell title="Politique de cookies" sub="Affaires juridiques">
-      <IB title="Cookies essentiels" body="Requis pour les sessions, le Panier et compléter l’achat. Non désactivables." tag="requis"/>
+      <IB title="Cookies essentiels" body="Requis pour les sessions, le Panier et compléter l'achat. Non désactivables." tag="requis"/>
       <IB title="Cookies analytiques" body="Données agrégées pour améliorer la plateforme. Aucune donnée personnelle incluse." tag="Facultatif"/>
       <div style={{marginTop:'16px',padding:'14px',border:'1px solid var(--fire)',display:'flex',gap:'10px',alignItems:'flex-start',backgroundColor:'rgba(255,69,0,0.05)'}}>
         <ToggleRight style={{width:'17px',height:'17px',color:'var(--fire)',flexShrink:0,marginTop:'1px'}}/>

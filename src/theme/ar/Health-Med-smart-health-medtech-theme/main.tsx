@@ -129,7 +129,7 @@ const CSS = `
     .why-grid  { grid-template-columns:repeat(2,1fr); }
   }
   @media (max-width:768px) {
-    .prod-grid { grid-template-columns:repeat(2,1fr); gap:10px; }
+    .prod-grid { grid-template-columns:1fr; gap:10px; }
     .cat-grid  { grid-template-columns:repeat(2,1fr); }
     .trust-row { grid-template-columns:repeat(2,1fr); }
     .footer-g  { grid-template-columns:1fr; gap:28px; }

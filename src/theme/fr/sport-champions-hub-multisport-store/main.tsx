@@ -191,7 +191,7 @@ const CSS = `
   /* ── Grids ── */
   .products-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 16px;
   }
   @media (min-width: 640px)  { .products-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -487,7 +487,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <Link key={i.h} href={i.h} className="nav-link">{i.l}</Link>
           ))}
           <Link href="/cart" style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', color: '#fff', fontSize: '1.2rem', cursor: 'pointer', padding: '8px', transition: 'color 0.2s' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent)'; }}
+            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--accent)"; }}
             onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#fff'; }}>
             <ShoppingCart size={22} />
             {count > 0 && <span className="cart-badge">{count}</span>}
@@ -529,7 +529,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {[{ h: '/', l: 'Accueil' }, { h: '/contact', l: 'Contactez-nous' }].map(i => (
             <Link key={i.h} href={i.h} onClick={() => setOpen(false)}
               style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '0.95rem', fontWeight: 500, color: 'var(--g300)', transition: 'color 0.2s' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent)'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--accent)"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--g300)'; }}>
               {i.l} <ArrowRight size={14} style={{ color: 'var(--accent)' }} />
             </Link>
@@ -577,7 +577,7 @@ export function Footer({ store }: any) {
             <h4 className="oswald" style={{ fontSize: '1rem', fontWeight: 600, color: '#fff', marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Liens Rapide</h4>
             {[{ h: '/', l: 'Accueil' }, { h: '/cart', l: 'Panier' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/Privacy', l: 'Politique de confidentialité' }, { h: '/Terms', l: 'Conditions de service' }].map((lnk, i) => (
               <a key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', fontWeight: 400, color: 'var(--g500)', marginBottom: '0.75rem', transition: 'all 0.2s' }}
-                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--accent)'; el.style.paddingRight = '5px'; }}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = "var(--accent)"; el.style.paddingRight = '5px'; }}
                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--g500)'; el.style.paddingRight = '0'; }}>
                 {lnk.l}
               </a>
@@ -706,7 +706,7 @@ export function Home({ store, page }: any) {
         <div className="hero-layout" style={{ maxWidth: 1400, margin: '0 auto', position: 'relative', zIndex: 1, width: '100%' }}>
           {/* Text */}
           <div>
-            <div className="anim-fade-up" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
+            <div className='anim-fade-up' style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
               {['✅ Expédition rapide', '✅ Produits authentique', '✅ Garantie qualité'].map((b, i) => (
                 <span key={i} className="hero-badge">{b}</span>
               ))}
@@ -717,11 +717,11 @@ export function Home({ store, page }: any) {
             </h1>
 
             <p className="anim-fade-up d2" style={{ fontSize: '1.0625rem', color: 'var(--g400)', maxWidth: 480, lineHeight: 1.75, marginBottom: '2.5rem' }}>
-              {store.hero?.subtitle || 'Les meilleurs équipements sportifs pour les champions — du Football au Tennis, tout ce qu\'il vous faut pour exceller.'}
+              {store.hero?.subtitle || "Les meilleurs équipements sportifs pour les champions — du Football au Tennis, tout ce qu'il vous faut pour exceller."}
             </p>
 
             {/* Stats */}
-            <div className="anim-fade-up d2" style={{ display: 'flex', gap: '2.5rem', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
+            <div className='anim-fade-up d2' style={{ display: 'flex', gap: '2.5rem', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
               {[{ v: `${products.length}+`, l: 'Produit Disponible' }, { v: '4.9', l: 'Note moyenne' }, { v: '48h', l: 'Livraison rapide' }].map((s, i) => (
                 <div key={i}>
                   <p className="oswald" style={{ fontSize: '2rem', fontWeight: 700, color: '#fff', lineHeight: 1 }}>{s.v}</p>
@@ -876,7 +876,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
           <div style={{top: 88 }}>
             <div style={{ position: 'relative', height: 420, overflow: 'hidden', background: 'var(--g100)', borderRadius: 'var(--radius)', border: '1px solid var(--g200)' }}>
               {allImages[sel]
-                ? <img src={allImages[sel]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ? <img src={allImages[sel]} alt='' style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem' }}>🏆</div>}
               {discount > 0 && <span className="badge-sale" style={{ position: 'absolute', top: 14, right: 14, padding: '6px 14px', borderRadius: 50, fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase' }}>-{discount}%</span>}
               {!inStock && !autoGen && (
@@ -1059,7 +1059,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide (ex: 0550123456)";
     if (!fd.customerWelaya) e.customerWelaya = 'requis';
     if (!fd.customerCommune) e.customerCommune = 'requis';
     return e;
@@ -1124,7 +1124,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
 
             <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-              <FR error={errors.customerName} label="Nom">
+              <FR error={errors.customerName} label='Nom'>
                 <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder="Nom complet" style={INP(!!errors.customerName)}
                   onFocus={e => { e.target.style.borderColor = 'var(--accent)'; }} onBlur={e => { e.target.style.borderColor = errors.customerName ? 'var(--danger)' : 'var(--g300)'; }} />
               </FR>
@@ -1134,7 +1134,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               </FR>
             </div>
             <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-              <FR error={errors.customerWelaya} label="Wilaya">
+              <FR error={errors.customerWelaya} label='Wilaya'>
                 <div style={{ position: 'relative' }}>
                   <ChevronDown size={13} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--g400)', pointerEvents: 'none' }} />
                   <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP(!!errors.customerWelaya), paddingRight: 34, fontFamily: 'inherit' }}
@@ -1225,7 +1225,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro invalide (ex: 0550123456)";
     if (!fd.customerWelaya) er.w = 'requis';
     if (!fd.customerCommune) er.c = 'requis';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -1241,7 +1241,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div className="anim-fade-up" style={{ textAlign: 'center', background: '#fff', padding: '4rem 2.5rem', borderRadius: 'var(--radius)', border: '1px solid var(--g200)', maxWidth: 460, width: '100%', boxShadow: 'var(--shadow-m)' }}>
         <CheckCircle2 size={52} style={{ color: 'var(--success)', display: 'block', margin: '0 auto 1.5rem' }} />
         <h2 className="oswald" style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--g900)', marginBottom: '0.625rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Commande reçue !</h2>
-        <p style={{ color: 'var(--g600)', fontWeight: 400, marginBottom: '2rem', lineHeight: 1.7 }}>Merci de votre confiance. Nous vous contacterons bient’t pour confirmer votre commande.</p>
+        <p style={{ color: 'var(--g600)', fontWeight: 400, marginBottom: '2rem', lineHeight: 1.7 }}>Merci de votre confiance. Nous vous contacterons bient't pour confirmer votre commande.</p>
         <Link href="/" className="btn-pri" style={{ display: 'inline-flex', padding: '12px 32px', borderRadius: 50 }}>Retour à la boutique</Link>
       </div>
     </div>
@@ -1272,7 +1272,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             {items.map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: '1rem', padding: '1.125rem', borderBottom: '1px solid var(--g100)' }}>
                 <div style={{ width: 80, height: 80, flexShrink: 0, overflow: 'hidden', borderRadius: 'var(--radius-s)', border: '1px solid var(--g200)', background: 'var(--g50)' }}>
-                  <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" />
+                  <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt='' />
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
@@ -1315,7 +1315,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   onFocus={e => { e.target.style.borderColor = 'var(--accent)'; }} onBlur={e => { e.target.style.borderColor = errors.phone ? 'var(--danger)' : 'var(--g300)'; }} /></FR>
               </div>
               <div className="form-row-2" style={{ marginBottom: '1.25rem' }}>
-                <FR error={errors.w} label="Wilaya">
+                <FR error={errors.w} label='Wilaya'>
                   <div style={{ position: 'relative' }}>
                     <ChevronDown size={13} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--g400)', pointerEvents: 'none' }} />
                     <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP(!!errors.w), paddingRight: 34, fontFamily: 'inherit' }}
@@ -1427,7 +1427,7 @@ export function Privacy() {
 export function Terms() {
   return (
     <Shell title="Conditions de service" sub="Légal">
-      <IB title="Commandes et paiement" body="Les commandes sont confirmées par Téléphone avant l’expédition. Aucuns frais cachés. Paiement À la livraison." />
+      <IB title="Commandes et paiement" body="Les commandes sont confirmées par Téléphone avant l'expédition. Aucuns frais cachés. Paiement À la livraison." />
       <IB title="Produits authentiques" body="Nous garantissons 100% l{A}authenticité de tous les produits proposés." tag="Strict" />
       <IB title="Loi applicable" body="Ces Conditions sont soumises aux lois de la République Algérienne Démocratique et Populaire." />
     </Shell>
@@ -1485,14 +1485,14 @@ export function Contact({ store }: { store: any }) {
           {/* Form */}
           <div style={{ background: '#fff', border: '1px solid var(--g200)', borderRadius: 'var(--radius)', padding: '2rem' }}>
             {sent ? (
-              <div style={{ textAlign: 'center', padding: '3.5rem 1rem' }} className="anim-fade-up">
+              <div style={{ textAlign: 'center', padding: '3.5rem 1rem' }} className='anim-fade-up'>
                 <CheckCircle2 size={52} style={{ color: 'var(--success)', display: 'block', margin: '0 auto 1.25rem' }} />
                 <h2 className="oswald" style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--g900)', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Envoyé !</h2>
-                <p style={{ color: 'var(--g500)', lineHeight: 1.7 }}>Nous vous répondrons bient’t.</p>
+                <p style={{ color: 'var(--g500)', lineHeight: 1.7 }}>Nous vous répondrons bient't.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div className="form-row-2">
+                <div className='form-row-2'>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--g600)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Nom</label>
                     <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={INP()}

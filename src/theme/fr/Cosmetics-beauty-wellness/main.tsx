@@ -150,7 +150,7 @@ const CSS = `
   @media (max-width:768px) {
     .nav-links { display:none; }
     .nav-mob   { display:flex; }
-    .prod-grid { grid-template-columns:repeat(2,1fr); gap:12px; }
+    .prod-grid { grid-template-columns:1fr; gap:12px; }
     .trust-bar { grid-template-columns:repeat(2,1fr); }
     .footer-g  { grid-template-columns:1fr; gap:28px; }
     .details-g { grid-template-columns:1fr; }
@@ -158,7 +158,7 @@ const CSS = `
     .cart-g    { grid-template-columns:1fr; }
   }
   @media (max-width:480px) {
-    .prod-grid { grid-template-columns:repeat(2,1fr); gap:8px; }
+    .prod-grid { grid-template-columns:1fr; gap:8px; }
     .form-2c   { grid-template-columns:1fr; }
     .dlv-2c    { grid-template-columns:1fr; }
   }
@@ -431,7 +431,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       {/* Ticker */}
       {store.topBar?.enabled && store.topBar?.text && (
         <div className="ticker-wrap" style={{ backgroundColor: 'var(--plum)', overflow: 'hidden', whiteSpace: 'nowrap', padding: '7px 0' }}>
-          <div className="ticker-track" style={{ display: 'inline-block', animation: 'ticker 24s linear infinite' }}>
+          <div className='ticker-track' style={{ display: 'inline-block', animation: 'ticker 24s linear infinite' }}>
             {Array(12).fill(null).map((_, i) => (
               <span key={i} style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.88)', margin: '0 40px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                 <Sparkles style={{ width: '11px', height: '11px' }} /> {store.topBar.text}
@@ -840,7 +840,7 @@ export function Home({ store, page }: any) {
       <section style={{ position: 'relative', overflow: 'hidden', borderBottom: '1px solid var(--line)' }}>
         {store.hero?.imageUrl ? (
           <div style={{ position: 'relative', minHeight: '320px' }}>
-            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', maxHeight: '400px' }} />
+            <img src={store.hero.imageUrl} alt='' style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', maxHeight: '400px' }} />
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to left, rgba(107,45,139,0.65), rgba(26,18,40,0.4))', display: 'flex', alignItems: 'center', padding: '0 8vw' }}>
               <div>
                 <h1 className="fu serif" style={{ fontSize: 'clamp(1.6rem,4vw,3rem)', fontWeight: 700, fontStyle: 'italic', color: '#fff', lineHeight: 1.15, marginBottom: '10px' }}>
@@ -849,7 +849,7 @@ export function Home({ store, page }: any) {
                 <p className="fu fu-1" style={{ fontSize: '14px', color: 'rgba(255,255,255,0.82)', marginBottom: '20px', maxWidth: '380px', lineHeight: '1.7' }}>
                   {store.hero.subtitle || 'Les meilleurs Produits de soin et beauté.'}
                 </p>
-                <a href="#products" className="btn-plum fu fu-2" style={{ fontSize: '14px', padding: '12px 28px' }}>
+                <a href='#products' className="btn-plum fu fu-2" style={{ fontSize: '14px', padding: '12px 28px' }}>
                   Voir tout
                 </a>
               </div>
@@ -865,13 +865,13 @@ export function Home({ store, page }: any) {
               <p className="fu fu-1" style={{ fontSize: '14px', color: 'var(--mid)', marginBottom: '20px', maxWidth: '340px', lineHeight: '1.7' }}>
                 {store.hero?.subtitle || 'Les meilleurs Produits de soin et beauté Sélectionnés soigneusement.'}
               </p>
-              <a href="#products" className="btn-plum fu fu-2" style={{ fontSize: '14px', padding: '12px 28px' }}>
+              <a href='#products' className="btn-plum fu fu-2" style={{ fontSize: '14px', padding: '12px 28px' }}>
                 Voir tout
               </a>
             </div>
             {products[0] && (products[0].productImage || products[0].imagesProduct?.[0]?.imageUrl) && (
               <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', maxHeight: '240px' }}>
-                <img src={products[0].productImage || products[0].imagesProduct?.[0]?.imageUrl} alt="" style={{ maxHeight: '220px', maxWidth: '100%', objectFit: 'contain', display: 'block' }} />
+                <img src={products[0].productImage || products[0].imagesProduct?.[0]?.imageUrl} alt='' style={{ maxHeight: '220px', maxWidth: '100%', objectFit: 'contain', display: 'block' }} />
               </div>
             )}
           </div>
@@ -921,7 +921,7 @@ export function Home({ store, page }: any) {
 
           {/* Pagination */}
           {countPage > 1 && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '40px', flexWrap: 'wrap' }} dir="ltr">
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '40px', flexWrap: 'wrap' }} dir='ltr'>
               <Link href={{ query: { page: Math.max(1, page - 1) } }} scroll={false}
                 style={{ width: 36, height: 36, borderRadius: '4px', border: '1px solid var(--line-dk)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--white)', color: 'var(--plum)', opacity: page <= 1 ? 0.3 : 1 }}>❮</Link>
               {Array.from({ length: countPage }).map((_, i) => {
@@ -945,7 +945,7 @@ export function Home({ store, page }: any) {
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
           <div className="trust-bar">
             {[
-              { icon: <Truck style={{ width: '20px', height: '20px' }} />, title: 'Livraison rapide', desc: '48h jusqu’à votre porte' },
+              { icon: <Truck style={{ width: '20px', height: '20px' }} />, title: 'Livraison rapide', desc: "48h jusqu'à votre porte" },
               { icon: <RefreshCw style={{ width: '20px', height: '20px' }} />, title: 'Retour gratuit', desc: '30 jours de retour' },
               { icon: <Shield style={{ width: '20px', height: '20px' }} />, title: 'Produits authentique', desc: '100% qualité garantie' },
               { icon: <Phone style={{ width: '20px', height: '20px' }} />, title: 'Support continu', desc: 'Nous sommes là pour vous aider' },
@@ -1151,9 +1151,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'Nom requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide (ex: 0550123456)";
     if (!fd.customerWelaya) e.customerWelaya = 'Wilaya requis';
-    if (!fd.customerCommune) e.customerCommune = 'Commune requis';
+    if (!fd.customerCommune) e.customerCommune = "Commune requis";
     return e;
   };
   const getVarId = useCallback(() => {
@@ -1337,7 +1337,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro invalide (ex: 0550123456)';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro invalide (ex: 0550123456)";
     if (!fd.customerWelaya) er.w = 'requis';
     if (!fd.customerCommune) er.c = 'requis';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -1353,7 +1353,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{ textAlign: 'center', background: 'var(--white)', padding: '4rem 2.5rem', border: '1px solid var(--line)', borderRadius: '8px', maxWidth: 460, width: '100%', boxShadow: '0 8px 32px rgba(107,45,139,0.1)' }}>
         <CheckCircle2 style={{ width: '48px', height: '48px', color: 'var(--plum)', margin: '0 auto 20px', display: 'block' }} />
         <h2 className="serif" style={{ fontSize: '1.8rem', fontStyle: 'italic', color: 'var(--ink)', marginBottom: '8px' }}>Commande reçue !</h2>
-        <p style={{ fontSize: '14px', color: 'var(--dim)', marginBottom: '28px', lineHeight: 1.7 }}>Merci de votre confiance. Nous vous contacterons bient’t pour confirmer votre commande.</p>
+        <p style={{ fontSize: '14px', color: 'var(--dim)', marginBottom: '28px', lineHeight: 1.7 }}>Merci de votre confiance. Nous vous contacterons bient't pour confirmer votre commande.</p>
         <Link href="/" className="btn-plum" style={{ display: 'inline-flex', padding: '12px 28px' }}>Retour à la boutique</Link>
       </div>
     </div>
@@ -1382,7 +1382,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
           {items.map((item, i) => (
             <div key={i} style={{ display: 'flex', gap: '16px', padding: '20px 0', borderBottom: '1px solid var(--line)' }}>
               <div style={{ width: 96, height: 96, flexShrink: 0, overflow: 'hidden', borderRadius: '4px', border: '1px solid var(--line)', background: 'var(--soft)' }}>
-                <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" />
+                <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt='' />
               </div>
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div>
@@ -1577,7 +1577,7 @@ export function Contact({ store }: { store?: any }) {
     try {
       await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store?.id });
       setSent(true);
-    } catch { showError('Erreur lors de l’envoi'); } finally { setLoading(false); }
+    } catch { showError("Erreur lors de l'envoi"); } finally { setLoading(false); }
   };
 
   const contactItems = [
@@ -1628,7 +1628,7 @@ export function Contact({ store }: { store?: any }) {
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ }}>
                 <div>
                   <p style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--dim)', marginBottom: '6px' }}>Nom</p>
                   <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Nom complet" required style={INP_ST()}

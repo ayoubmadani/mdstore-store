@@ -55,7 +55,7 @@ const THEME_CSS = `
   @media (min-width: 768px) { .cats-grid { grid-template-columns: repeat(4, 1fr); } }
   @media (min-width: 1100px) { .cats-grid { grid-template-columns: repeat(5, 1fr); } }
 
-  .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+  .products-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
   @media (min-width: 768px)  { .products-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (min-width: 1280px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
 

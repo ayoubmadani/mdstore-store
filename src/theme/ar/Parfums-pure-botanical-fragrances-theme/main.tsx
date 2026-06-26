@@ -164,7 +164,7 @@ const CSS = `
 
   @media (max-width:700px) {
     .main-card { margin:0; box-shadow:none; }
-    .prod-grid { grid-template-columns:repeat(2,1fr); gap:10px; }
+    .prod-grid { grid-template-columns:1fr; gap:10px; }
     .cat-grid  { grid-template-columns:repeat(4,1fr); gap:8px; }
     .footer-g  { grid-template-columns:1fr; gap:20px; }
     .cart-g    { grid-template-columns:1fr; }
@@ -1321,6 +1321,10 @@ export function Contact({ store }: { store?: any }) {
                             </div>
                         </div>
                         <div>
+                            <p style={{ fontSize: '11px', fontWeight: 600, color: 'var(--mid)', marginBottom: 5 }}>البريد الإلكتروني</p>
+                            <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="example@email.com" style={INP()} onFocus={onF} onBlur={onB} />
+                        </div>
+                                                <div>
                             <p style={{ fontSize: '11px', fontWeight: 600, color: 'var(--mid)', marginBottom: 5 }}>رسالتك</p>
                             <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder="كيف يمكننا مساعدتك؟" rows={4} required
                                 style={{ ...INP(), resize: 'none' }} onFocus={onF} onBlur={onB} />

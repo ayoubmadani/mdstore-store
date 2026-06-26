@@ -128,7 +128,7 @@ const CSS = `
   /* ══ Grids ══ */
   .products-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 1rem;
   }
   @media (min-width: 640px)  { .products-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -264,7 +264,7 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
 const Zigzag = ({ color = '#F5F7FF', flip = false }) => (
     <div style={{ lineHeight: 0, transform: flip ? 'rotate(180deg)' : 'none', marginBottom: -1 }}>
         <svg viewBox="0 0 1200 40" preserveAspectRatio="none" style={{ width: '100%', height: 40, display: 'block' }}>
-            <path d="M0,40 L0,20 L60,0 L120,20 L180,0 L240,20 L300,0 L360,20 L420,0 L480,20 L540,0 L600,20 L660,0 L720,20 L780,0 L840,20 L900,0 L960,20 L1020,0 L1080,20 L1140,0 L1200,20 L1200,40 Z" fill={color} />
+            <path d='M0,40 L0,20 L60,0 L120,20 L180,0 L240,20 L300,0 L360,20 L420,0 L480,20 L540,0 L600,20 L660,0 L720,20 L780,0 L840,20 L900,0 L960,20 L1020,0 L1080,20 L1140,0 L1200,20 L1200,40 Z' fill={color} />
         </svg>
     </div>
 );
@@ -282,12 +282,12 @@ export default function Main({ store, children, domain }: any) {
               <div className="ticker-wrap" style={{ height: 36, display: 'flex', alignItems: 'center' }}>
                 <div className="ticker-inner">
                   {Array(10).fill(null).map((_, i) => (
-                    <span key={i} style={{ margin: '0 2.5rem', color: '#fff', fontWeight: 900, fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: "'Boogaloo',cursive" }}>
+                    <span key={i} style={{ margin: '0 2.5rem', color: '#fff', fontWeight: 900, fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: "'Nunito',sans-serif" }}>
                       ⭐ {store.topBar.text}
                     </span>
                   ))}
                   {Array(10).fill(null).map((_, i) => (
-                    <span key={`b${i}`} style={{ margin: '0 2.5rem', color: '#fff', fontWeight: 900, fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: "'Boogaloo',cursive" }}>
+                    <span key={`b${i}`} style={{ margin: '0 2.5rem', color: '#fff', fontWeight: 900, fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: "'Nunito',sans-serif" }}>
                       ⭐ {store.topBar.text}
                     </span>
                   ))}
@@ -529,7 +529,7 @@ export function Footer({ store }: any) {
 
                     {/* Section 2 */}
                     <div>
-                        <h4 style={{ fontFamily: "'Boogaloo',cursive", fontSize: '1.1rem', color: 'var(--yellow)', marginBottom: '1.25rem' }}>🗺️ Liens Rapide</h4>
+                        <h4 style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.1rem', color: 'var(--yellow)', marginBottom: '1.25rem' }}>🗺️ Liens Rapide</h4>
                         {[{ h: '/', l: 'Accueil', e: '🏠' }, { h: '/cart', l: 'Panier', e: '🛒' }, { h: '/contact', l: 'Contactez-nous', e: '📞' }, { h: '/Privacy', l: 'Confidentialité', e: '🔒' }, { h: '/Terms', l: 'Conditions', e: '📋' }].map((lnk, i) => (
                             <a key={i} href={lnk.h} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
                                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--yellow)'; el.style.transform = 'translateX(-4px)'; }}
@@ -541,7 +541,7 @@ export function Footer({ store }: any) {
 
                     {/* Section 3 */}
                     <div>
-                        <h4 style={{ fontFamily: "'Boogaloo',cursive", fontSize: '1.1rem', color: 'var(--yellow)', marginBottom: '1.25rem' }}>📡 Contactez-nous</h4>
+                        <h4 style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.1rem', color: 'var(--yellow)', marginBottom: '1.25rem' }}>📡 Contactez-nous</h4>
                         {[{ e: '📞', v: store?.contact?.phone }, { e: '📍', v: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') }, { e: '📧', v: store?.contact?.email }].filter(r => r.v).map((r, i) => (
                             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginBottom: '0.625rem' }}>
                                 <span>{r.e}</span>{r.v}
@@ -577,7 +577,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
     const [hov, setHov] = useState(false);
 
     // 1. Convertir les prix en s'assurant des valeurs
-    const price = typeof product.price === 'string' ? parseFloat(product.price) : (product.price || 0);
+    const price = typeof product.price === "string" ? parseFloat(product.price) : (product.price || 0);
     const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
 
     // 2. Définir les couleurs localement si non importées (PALETTES)
@@ -605,7 +605,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
                     ? <img src={displayImage} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s', transform: hov ? 'scale(1.07)' : 'scale(1)' }} />
                     : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3.5rem' }}>🎮</div>}
                 {discount > 0 && (
-                    <div style={{ position: 'absolute', top: 10, right: 10, background: pal.accent, color: '#fff', fontWeight: 900, padding: '3px 10px', borderRadius: 6, fontFamily: "'Boogaloo',cursive", fontSize: '0.85rem' }}>
+                    <div style={{ position: 'absolute', top: 10, right: 10, background: pal.accent, color: '#fff', fontWeight: 900, padding: '3px 10px', borderRadius: 6, fontFamily: "'Nunito',sans-serif", fontSize: '0.85rem' }}>
                         -{discount}%
                     </div>
                 )}
@@ -660,7 +660,7 @@ export function Home({ store, page }: any) {
                 style={{
                     position: 'relative',
                     // Fusionner une couche de dégradé sombre avec l'image de fond pour garantir la lisibilité des textes
-                    background: `linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.7) 100%), url(${store.hero?.imageUrl || 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=2070'})`,
+                    background: `linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.7) 100%), url(${store.hero?.imageUrl || "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=2070"})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundAttachment: 'fixed', // effet parallaxe au défilement
@@ -700,7 +700,7 @@ export function Home({ store, page }: any) {
 
                             {/* Boutons d'action (CTAs) */}
                             <div className="hero-actions" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                                <a href="#products" className="btn-adv" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '1rem 2.5rem', borderRadius: 16, background: 'var(--yellow)', color: 'var(--dark)', fontWeight: 900, fontSize: '1.1rem', textShadow: 'none', boxShadow: '0 10px 25px rgba(255,224,0,0.4)', transition: '0.3s', textDecoration: 'none' }}>
+                                <a href='#products' className="btn-adv" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '1rem 2.5rem', borderRadius: 16, background: 'var(--yellow)', color: 'var(--dark)', fontWeight: 900, fontSize: '1.1rem', textShadow: 'none', boxShadow: '0 10px 25px rgba(255,224,0,0.4)', transition: '0.3s', textDecoration: 'none' }}>
                                     🛍️ Acheter maintenant
                                 </a>
                                 {store?.cart !== false && (
@@ -724,7 +724,7 @@ export function Home({ store, page }: any) {
                         { icon: <Trophy size={22} />, color: 'var(--purple)', bg: '#F3E8FD', t: 'Les plus vendus', d: 'Des milliers de clients satisfaits' },
                     ].map((f, i) => (
                         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', padding: '1.25rem', borderRadius: 16, border: '2.5px solid var(--border)', background: '#fff', transition: 'all 0.28s' }}
-                            onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = f.color; el.style.transform = 'translateY(-4px)'; el.style.boxShadow = `0 8px 28px ${f.color}22`; }}
+                            onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = f.color; el.style.transform = "translateY(-4px)"; el.style.boxShadow = `0 8px 28px ${f.color}22`; }}
                             onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--border)'; el.style.transform = ''; el.style.boxShadow = ''; }}>
                             <div style={{ width: 46, height: 46, borderRadius: 12, background: f.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: f.color }}>
                                 {f.icon}
@@ -775,7 +775,7 @@ export function Home({ store, page }: any) {
                 {products.length === 0 ? (
                     <div className="dot-bg" style={{ padding: '5rem', textAlign: 'center', border: '3px dashed var(--border)', borderRadius: 20, background: '#fff' }}>
                         <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1rem', animation: 'bounce-up 2s ease-in-out infinite' }}>🎮</span>
-                        <p className="font-boogaloo" style={{ fontSize: '1.5rem', color: 'var(--soft)' }}>Aucun produit pour l’instant</p>
+                        <p className="font-boogaloo" style={{ fontSize: '1.5rem', color: 'var(--soft)' }}>Aucun produit pour l'instant</p>
                     </div>
                 ) : (
                     <div className="products-grid">
@@ -805,7 +805,7 @@ export function Home({ store, page }: any) {
 
             {/* ── ADVENTURE BANNER ── */}
             <section style={{ position: 'relative', overflow: 'hidden' }}>
-                <Zigzag color="var(--bg)" flip={false} />
+                <Zigzag color='var(--bg)' flip={false} />
                 <div className="dot-bg" style={{ background: 'var(--dark-mid)', padding: '5rem 1.5rem', textAlign: 'center' }}>
                     <div style={{ maxWidth: 700, margin: '0 auto' }}>
                         <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '1.5rem', fontSize: '2.5rem' }}>
@@ -813,7 +813,7 @@ export function Home({ store, page }: any) {
                                 <span key={i} style={{ animation: `bounce-up ${1.8 + i * 0.3}s ${i * 0.2}s ease-in-out infinite`, display: 'inline-block' }}>{e}</span>
                             ))}
                         </div>
-                        <h2 className="font-boogaloo" style={{ fontSize: 'clamp(2.25rem,6vw,4.5rem)', color: '#fff', marginBottom: '1rem' }}>L’aventure commence ici !</h2>
+                        <h2 className="font-boogaloo" style={{ fontSize: 'clamp(2.25rem,6vw,4.5rem)', color: '#fff', marginBottom: '1rem' }}>L'aventure commence ici !</h2>
                         <p style={{ fontSize: '1rem', fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginBottom: '2.5rem', lineHeight: 1.7 }}>Des milliers de Produits éducatifs et amusants pour votre enfant</p>
                         <a href="#products" className="btn-adv" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.9rem 2.5rem', borderRadius: 12, background: 'var(--yellow)', color: 'var(--dark)', fontWeight: 900, fontSize: '1rem', boxShadow: '0 8px 30px rgba(255,224,0,0.4)', textDecoration: 'none' }}>
                             🎯 Explorer maintenant!
@@ -850,7 +850,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                             {allImages[sel]
                                 ? <img src={allImages[sel]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem' }}>🎮</div>}
-                            {discount > 0 && <div style={{ position: 'absolute', top: 14, right: 14, background: pal.accent, color: '#fff', padding: '4px 14px', borderRadius: 8, fontFamily: "'Boogaloo',cursive", fontSize: '1rem' }}>{discount}% Réduction</div>}
+                            {discount > 0 && <div style={{ position: 'absolute', top: 14, right: 14, background: pal.accent, color: '#fff', padding: '4px 14px', borderRadius: 8, fontFamily: "'Nunito',sans-serif", fontSize: '1rem' }}>{discount}% Réduction</div>}
                             {allImages.length > 1 && (
                                 <>
                                     <button onClick={() => setSel(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,0.9)', border: `2px solid ${pal.border}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={18} /></button>
@@ -900,7 +900,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                         <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1rem', border: `3px solid ${selectedOffer === o.id ? pal.border : 'var(--border)'}`, borderRadius: 14, cursor: 'pointer', marginBottom: '0.5rem', background: selectedOffer === o.id ? pal.bg : 'transparent', transition: 'all 0.2s' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
                                                 <div style={{ width: 20, height: 20, borderRadius: 5, border: `2.5px solid ${selectedOffer === o.id ? pal.border : 'var(--border)'}`, background: selectedOffer === o.id ? pal.border : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    {selectedOffer === o.id && <Check size={11} color="#fff" />}
+                                                    {selectedOffer === o.id && <Check size={11} color='#fff' />}
                                                 </div>
                                                 <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
                                                 <div>
@@ -1013,7 +1013,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const validate = () => {
         const e: Record<string, string> = {};
         if (!fd.customerName.trim()) e.customerName = 'requis';
-        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro invalide (ex: 0550123456)';
+        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro invalide (ex: 0550123456)";
         if (!fd.customerWelaya) e.customerWelaya = 'requis';
         if (!fd.customerCommune) e.customerCommune = 'requis';
         return e;
@@ -1076,7 +1076,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                     )}
                     <form onSubmit={handleSubmit}>
                         <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-                            <FR error={errors.customerName} label="Nom">
+                            <FR error={errors.customerName} label='Nom'>
                                 <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder="Nom complet" style={INP(!!errors.customerName)} />
                             </FR>
                             <FR error={errors.customerPhone} label="Téléphone">
@@ -1084,7 +1084,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                             </FR>
                         </div>
                         <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-                            <FR error={errors.customerWelaya} label="Wilaya">
+                            <FR error={errors.customerWelaya} label='Wilaya'>
                                 <div style={{ position: 'relative' }}>
                                     <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--blue)', pointerEvents: 'none' }} />
                                     <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP(!!errors.customerWelaya), paddingLeft: 32, fontFamily: 'inherit' }}>
@@ -1204,7 +1204,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         e.preventDefault();
         const er: Record<string, string> = {};
         if (!fd.customerName.trim()) er.name = 'requis';
-        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro invalide (ex: 0550123456)';
+        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro invalide (ex: 0550123456)";
         if (!fd.customerWelaya) er.w = 'requis';
         if (!fd.customerCommune) er.c = 'requis';
         if (Object.keys(er).length) { setErrors(er); return; }
@@ -1235,7 +1235,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             <div className="anim-zoom-in" style={{ textAlign: 'center', background: '#fff', padding: '4rem 2.5rem', borderRadius: 24, border: '3px solid var(--yellow)', maxWidth: 460, width: '100%', boxShadow: '0 12px 40px rgba(255,224,0,0.2)' }}>
                 <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1.25rem', animation: 'bounce-up 2s ease-in-out infinite' }}>🎉</span>
                 <h2 className="font-boogaloo" style={{ fontSize: '2rem', color: 'var(--blue)', marginBottom: '0.625rem' }}>Commande reçue !</h2>
-                <p style={{ color: 'var(--mid)', fontWeight: 700, marginBottom: '2rem', lineHeight: 1.7 }}>Merci ! Nous vous contacterons bient’t pour confirmer votre commande.</p>
+                <p style={{ color: 'var(--mid)', fontWeight: 700, marginBottom: '2rem', lineHeight: 1.7 }}>Merci ! Nous vous contacterons bient't pour confirmer votre commande.</p>
                 <Link href="/" className="btn-adv" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.875rem 2rem', borderRadius: 12, background: 'var(--yellow)', color: 'var(--dark)', fontWeight: 900, fontSize: '0.95rem', boxShadow: '0 6px 24px rgba(255,224,0,0.4)' }}>
                     🛍️ Retour à la boutique
                 </Link>
@@ -1308,7 +1308,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                                 <FR error={errors.phone} label="Téléphone"><input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} style={INP(!!errors.phone)} /></FR>
                             </div>
                             <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-                                <FR error={errors.w} label="Wilaya">
+                                <FR error={errors.w} label='Wilaya'>
                                     <div style={{ position: 'relative' }}>
                                         <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--blue)', pointerEvents: 'none' }} />
                                         <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP(!!errors.w), paddingLeft: 32, fontFamily: 'inherit' }}>
@@ -1389,7 +1389,7 @@ const Shell = ({ title, emoji, children }: { title: string; emoji: string; child
         <div className="dot-bg" style={{ background: 'var(--dark)', padding: '5rem 1.5rem 4rem', textAlign: 'center', position: 'relative' }}>
             <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1.25rem', animation: 'bounce-up 2s ease-in-out infinite' }}>{emoji}</span>
             <h1 className="font-boogaloo" style={{ fontSize: 'clamp(2rem,5vw,3.5rem)', color: '#fff' }}>{title}</h1>
-            <Zigzag color="var(--bg)" flip={true} />
+            <Zigzag color='var(--bg)' flip={true} />
         </div>
         <div style={{ maxWidth: 860, margin: '0 auto', padding: '3rem 1.5rem 5rem' }}>{children}</div>
     </div>
@@ -1414,7 +1414,7 @@ export function Terms() {
     return <Shell emoji="📋" title="Conditions et clauses"><IB color="var(--blue)" bg="var(--blue-lt)" icon={<CheckCircle2 size={18} />} title="Commandes" desc="Les commandes sont confirmées par téléphone avant l'expédition. Paiement à la livraison." /><IB color="var(--green)" bg="var(--green-lt)" icon={<Truck size={18} />} title="Livraison" desc="Nous proposons la livraison dans toutes les wilayas d'Algérie." /><IB color="var(--orange)" bg="var(--orange-lt)" icon={<Shield size={18} />} title="Garanties" desc="Nous nous engageons aux plus hauts standards de qualité et de sécurité pour tous nos produits." /></Shell>;
 }
 export function Cookies() {
-    return <Shell emoji="🍪" title="Cookies"><IB color="var(--blue)" bg="var(--blue-lt)" icon={<Shield size={18} />} title="Fichiers essentiels" desc="Essentiels pour le fonctionnement du panier et la conservation de vos données de session." /><IB color="var(--green)" bg="var(--green-lt)" icon={<Sparkles size={18} />} title="Amélioration de l’expérience" desc="Nous aident à offrir une expérience personnalisée et meilleure pour vous." /></Shell>;
+    return <Shell emoji="🍪" title="Cookies"><IB color="var(--blue)" bg="var(--blue-lt)" icon={<Shield size={18} />} title="Fichiers essentiels" desc="Essentiels pour le fonctionnement du panier et la conservation de vos données de session." /><IB color="var(--green)" bg="var(--green-lt)" icon={<Sparkles size={18} />} title="Amélioration de l'expérience" desc="Nous aident à offrir une expérience personnalisée et meilleure pour vous." /></Shell>;
 }
 
 export function Contact({ store }: { store: any }) {
@@ -1435,11 +1435,11 @@ export function Contact({ store }: { store: any }) {
                 <Zigzag color="var(--bg)" flip={true} />
             </div>
             <div style={{ maxWidth: 1000, margin: '0 auto', padding: '3rem 1.5rem 5rem' }}>
-                <div className="contact-layout">
+                <div className='contact-layout'>
                     <div>
                         {[{ e: '📞', l: 'Téléphone', v: store?.contact?.phone, c: 'var(--blue)' }, { e: '📍', l: 'Adresse', v: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / '), c: 'var(--green)' }, { e: '📧', l: 'Email', v: store?.contact?.email, c: 'var(--orange)' }].filter(r => r.v).map((r, i) => (
                             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', padding: '1.125rem', borderRadius: 16, border: `2.5px solid var(--border)`, background: '#fff', marginBottom: '0.75rem', transition: 'all 0.25s' }}
-                                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = r.c; el.style.transform = 'translateX(-4px)'; }}
+                                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = r.c; el.style.transform = "translateX(-4px)"; }}
                                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--border)'; el.style.transform = ''; }}>
                                 <span style={{ fontSize: '2rem' }}>{r.e}</span>
                                 <div><p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--soft)', textTransform: 'uppercase', marginBottom: '0.2rem' }}>{r.l}</p><p style={{ fontWeight: 800, color: 'var(--text)', fontSize: '0.9rem' }}>{r.v}</p></div>
@@ -1463,7 +1463,7 @@ export function Contact({ store }: { store: any }) {
                             </div>
                         ) : (
                             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-                                <div className="form-row-2">
+                                <div className='form-row-2'>
                                     <div><label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 900, color: 'var(--mid)', marginBottom: '0.35rem', textTransform: 'uppercase' }}>Nom</label><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={INP()} /></div>
                                     <div><label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 900, color: 'var(--mid)', marginBottom: '0.35rem', textTransform: 'uppercase' }}>Téléphone</label><input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required style={INP()} /></div>
                                 </div>

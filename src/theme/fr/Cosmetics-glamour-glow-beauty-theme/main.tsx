@@ -234,8 +234,11 @@ const GLOBAL_CSS = `
   }
   @media (max-width: 480px) {
     .gg-trust { grid-template-columns: 1fr 1fr; }
-    .gg-cards-grid { grid-template-columns: repeat(2, 1fr); }
+    .gg-cards-grid { grid-template-columns: 1fr; }
   }
+
+  .gg-form-2c{display:grid;grid-template-columns:1fr;gap:10px;}
+  @media(min-width:540px){.gg-form-2c{grid-template-columns:1fr 1fr;}}
 `;
 
 /* ══════════════════════════════════════════════════════════════
@@ -244,7 +247,7 @@ const GLOBAL_CSS = `
 export default function Main({ children, store, domain }: { children: React.ReactNode; store: any; domain: string }) {
   if (!store) return null;
   return (
-    <div dir="ltr" style={{ fontFamily: "'Nunito Sans',sans-serif", background: 'var(--soft)', minHeight: '100vh', color: 'var(--ink)' }}>
+    <div dir="ltr" style={{ fontFamily: "'Cormorant Garamond',serif", background: 'var(--soft)', minHeight: '100vh', color: 'var(--ink)' }}>
       <style dangerouslySetInnerHTML={{ __html: GLOBAL_CSS }} />
       <Navbar store={store} domain={domain} />
       <main>{children}</main>
@@ -297,9 +300,9 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       <nav className="gg-nav">
         <div className="gg-nav-inner">
           {/* Mobile menu btn */}
-          <button className="gg-icon-btn" style={{ display: 'none' }} id="gg-menu-btn"
+          <button className="gg-icon-btn" style={{ display: 'none' }} id='gg-menu-btn'
             onClick={() => setMenuOpen(true)}
-            onMouseEnter={() => { const b = document.getElementById('gg-menu-btn'); if (b) b.style.display = 'flex'; }}
+            onMouseEnter={() => { const b = document.getElementById("gg-menu-btn"); if (b) b.style.display = 'flex'; }}
           >
             <Menu size={20} />
           </button>
@@ -359,7 +362,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 ))}
                 <button
                   onClick={() => { closeSearch(); window.location.href = `/?search=${encodeURIComponent(search)}`; }}
-                  style={{ width: '100%', padding: '12px', background: 'var(--blush-2)', border: 'none', borderTop: '1px solid var(--line)', color: 'var(--pink)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontFamily: "'Nunito Sans',sans-serif" }}>
+                  style={{ width: '100%', padding: '12px', background: 'var(--blush-2)', border: 'none', borderTop: '1px solid var(--line)', color: 'var(--pink)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontFamily: "'Cormorant Garamond',serif" }}>
                   Voir tous les résultats <ArrowRight size={14} />
                 </button>
               </div>
@@ -380,7 +383,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <div style={{ padding: '24px' }}>
               {[['/', 'Accueil'], ['/products', 'Produits'], ['/contact', 'Contact']].map(([href, label]) => (
                 <Link key={href} href={href} onClick={() => setMenuOpen(false)}
-                  style={{ display: 'block', padding: '14px 0', borderBottom: '1px solid var(--line)', fontFamily: "'Nunito Sans',sans-serif", fontSize: '15px', fontWeight: 600, color: 'var(--ink)', textDecoration: 'none' }}>
+                  style={{ display: 'block', padding: '14px 0', borderBottom: '1px solid var(--line)', fontFamily: "'Cormorant Garamond',serif", fontSize: '15px', fontWeight: 600, color: 'var(--ink)', textDecoration: 'none' }}>
                   {label}
                 </Link>
               ))}
@@ -492,7 +495,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div className="gg-card-footer">
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
             {orig > price && <span className="gg-card-old">{orig.toLocaleString()} DA</span>}
-            <span className="gg-card-price">{price.toLocaleString()} <span style={{ fontSize: '0.75rem', fontFamily: "'Nunito Sans',sans-serif", fontWeight: 600, color: 'var(--dim)' }}>DA</span></span>
+            <span className="gg-card-price">{price.toLocaleString()} <span style={{ fontSize: '0.75rem', fontFamily: "'Cormorant Garamond',serif", fontWeight: 600, color: 'var(--dim)' }}>DA</span></span>
           </div>
           
         </div>
@@ -530,11 +533,11 @@ export function Home({ store, domain, page }: { store: any; domain: string; page
               <h1 className="gg-hero-h1" style={{ color: '#fff' }}>
                 {store.hero.title?.replace(/<[^>]+>/g, '') || 'Révélez votre vraie beauté'}
               </h1>
-              <p className="gg-hero-sub" style={{ color: 'rgba(255,255,255,0.82)' }}>
+              <p className='gg-hero-sub' style={{ color: 'rgba(255,255,255,0.82)' }}>
                 {store.hero.subtitle || 'Découvrez les meilleurs produits de beauté et soins de la peau.'}
               </p>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                <a href="#products" className="gg-btn gg-btn-pink">Acheter maintenant</a>
+                <a href='#products' className="gg-btn gg-btn-pink">Acheter maintenant</a>
                 <Link href="/contact" className="gg-btn" style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1.5px solid rgba(255,255,255,0.4)', backdropFilter: 'blur(4px)' }}>En savoir plus</Link>
               </div>
             </div>
@@ -550,11 +553,11 @@ export function Home({ store, domain, page }: { store: any; domain: string; page
               <h1 className="gg-hero-h1">
                 {store?.hero?.title?.replace(/<[^>]+>/g, '') || 'Révélez votre vraie beauté'}
               </h1>
-              <p className="gg-hero-sub">
+              <p className='gg-hero-sub'>
                 {store?.hero?.subtitle || 'Découvrez les meilleurs produits de beauté et soins de la peau. Des formules premium qui redonnent éclat et jeunesse à votre peau.'}
               </p>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                <a href="#products" className="gg-btn gg-btn-pink">Acheter maintenant</a>
+                <a href='#products' className="gg-btn gg-btn-pink">Acheter maintenant</a>
                 <Link href="/contact" className="gg-btn gg-btn-outline">En savoir plus</Link>
               </div>
             </div>
@@ -573,8 +576,8 @@ export function Home({ store, domain, page }: { store: any; domain: string; page
           ].map(item => (
             <div key={item.title} className="gg-trust-item">
               <div className="gg-trust-icon">{item.icon}</div>
-              <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: '13px', fontWeight: 700, color: 'var(--ink)', margin: '0 0 4px' }}>{item.title}</p>
-              <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: '12px', color: 'var(--dim)', margin: 0, textAlign: 'center' }}>{item.desc}</p>
+              <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '13px', fontWeight: 700, color: 'var(--ink)', margin: '0 0 4px' }}>{item.title}</p>
+              <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '12px', color: 'var(--dim)', margin: 0, textAlign: 'center' }}>{item.desc}</p>
             </div>
           ))}
         </div>
@@ -621,7 +624,7 @@ export function Home({ store, domain, page }: { store: any; domain: string; page
           <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 40 }}>
             {[...Array(countPage)].map((_, i) => (
               <a key={i} href={`?page=${i + 1}`}
-                style={{ width: 36, height: 36, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1.5px solid ${(page || 1) === i + 1 ? 'var(--pink)' : 'var(--line-dk)'}`, background: (page || 1) === i + 1 ? 'var(--pink)' : 'var(--white)', color: (page || 1) === i + 1 ? '#fff' : 'var(--mid)', fontFamily: "'Nunito Sans',sans-serif", fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
+                style={{ width: 36, height: 36, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1.5px solid ${(page || 1) === i + 1 ? 'var(--pink)' : 'var(--line-dk)'}`, background: (page || 1) === i + 1 ? 'var(--pink)' : 'var(--white)', color: (page || 1) === i + 1 ? '#fff' : 'var(--mid)', fontFamily: "'Cormorant Garamond',serif", fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
                 {i + 1}
               </a>
             ))}
@@ -661,7 +664,7 @@ export function Details({ product, discount, allImages, domain, allAttrs, finalP
                 </div>
             }
             {discount > 0 && (
-              <div style={{ position: 'absolute', top: 12, right: 12, background: 'var(--pink)', color: '#fff', fontFamily: "'Nunito Sans',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '5px 12px', borderRadius: 999 }}>
+              <div style={{ position: 'absolute', top: 12, right: 12, background: 'var(--pink)', color: '#fff', fontFamily: "'Cormorant Garamond',serif", fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '5px 12px', borderRadius: 999 }}>
                 -{discount}%
               </div>
             )}
@@ -713,7 +716,7 @@ export function Details({ product, discount, allImages, domain, allAttrs, finalP
           </div>
 
           {/* Stock badge */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '5px 14px', borderRadius: 20, background: inStock || autoGen ? 'rgba(255,31,142,0.08)' : 'rgba(100,80,80,0.08)', color: inStock || autoGen ? 'var(--pink)' : 'var(--mid)', fontSize: 12, fontWeight: 600, border: `1px solid ${inStock || autoGen ? 'var(--pink-lt)' : 'var(--mid)'}`, marginBottom: 20, fontFamily: "'Nunito Sans',sans-serif" }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '5px 14px', borderRadius: 20, background: inStock || autoGen ? 'rgba(255,31,142,0.08)' : 'rgba(100,80,80,0.08)', color: inStock || autoGen ? 'var(--pink)' : 'var(--mid)', fontSize: 12, fontWeight: 600, border: `1px solid ${inStock || autoGen ? 'var(--pink-lt)' : 'var(--mid)'}`, marginBottom: 20, fontFamily: "'Cormorant Garamond',serif" }}>
             <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'currentColor' }} />
             {autoGen ? '∞ Disponible' : inStock ? 'Disponible' : 'Rupture de stock'}
           </div>
@@ -723,7 +726,7 @@ export function Details({ product, discount, allImages, domain, allAttrs, finalP
           {/* Attributes */}
           {allAttrs?.map((attr: any) => (
             <div key={attr.id} style={{ marginBottom: 18 }}>
-              <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--dim)', marginBottom: 10 }}>
+              <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--dim)', marginBottom: 10 }}>
                 {attr.name}: <span style={{ color: 'var(--pink)' }}>{selectedVariants?.[attr.name] || '—'}</span>
               </p>
               {attr.displayMode === 'color' ? (
@@ -758,7 +761,7 @@ export function Details({ product, discount, allImages, domain, allAttrs, finalP
           {/* Offers */}
           {product.offers?.length > 0 && (
             <div style={{ marginBottom: 20 }}>
-              <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--dim)', marginBottom: 10 }}>Forfaits</p>
+              <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--dim)', marginBottom: 10 }}>Forfaits</p>
               {product.offers.map((offer: any) => (
                 <label key={offer.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', border: `1.5px solid ${selectedOffer === offer.id ? 'var(--pink)' : 'var(--line-dk)'}`, cursor: 'pointer', marginBottom: 8, borderRadius: 8, transition: 'all 0.2s', background: selectedOffer === offer.id ? 'var(--blush)' : 'transparent' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -766,7 +769,7 @@ export function Details({ product, discount, allImages, domain, allAttrs, finalP
                       {selectedOffer === offer.id && <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--pink)' }} />}
                     </div>
                     <div>
-                      <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 13, fontWeight: 700, color: 'var(--ink)', margin: '0 0 2px' }}>{offer.name} × {offer.quantity}</p>
+                      <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 13, fontWeight: 700, color: 'var(--ink)', margin: '0 0 2px' }}>{offer.name} × {offer.quantity}</p>
                       <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.1rem', fontWeight: 600, color: 'var(--pink)', margin: 0 }}>{offer.price.toLocaleString()} DA</p>
                     </div>
                   </div>
@@ -780,7 +783,7 @@ export function Details({ product, discount, allImages, domain, allAttrs, finalP
 
           {product.desc && (
             <div style={{ marginTop: 28, paddingTop: 22, borderTop: '1px solid var(--line)' }}>
-              <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 14, lineHeight: 1.85, color: 'var(--mid)' }}>{product.desc}</p>
+              <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 14, lineHeight: 1.85, color: 'var(--mid)' }}>{product.desc}</p>
             </div>
           )}
         </div>
@@ -831,9 +834,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'Nom requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'Numéro de téléphone invalide';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = "Numéro de téléphone invalide";
     if (!fd.customerWelaya) e.customerWelaya = 'Wilaya requis';
-    if (!fd.customerCommune) e.customerCommune = 'Commune requis';
+    if (!fd.customerCommune) e.customerCommune = "Commune requis";
     return e;
   };
 
@@ -868,7 +871,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       {product.store?.cart && (
         <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
           <button onClick={addToCart} disabled={isAdded}
-            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '11px', border: `1.5px solid ${isAdded ? 'var(--pink)' : 'var(--line-dk)'}`, background: isAdded ? 'var(--blush)' : 'transparent', color: isAdded ? 'var(--pink)' : 'var(--mid)', fontFamily: "'Nunito Sans',sans-serif", fontWeight: 600, fontSize: 13, cursor: 'pointer', borderRadius: 8, transition: 'all 0.2s' }}>
+            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '11px', border: `1.5px solid ${isAdded ? 'var(--pink)' : 'var(--line-dk)'}`, background: isAdded ? 'var(--blush)' : 'transparent', color: isAdded ? 'var(--pink)' : 'var(--mid)', fontFamily: "'Cormorant Garamond',serif", fontWeight: 600, fontSize: 13, cursor: 'pointer', borderRadius: 8, transition: 'all 0.2s' }}>
             {isAdded ? <><CheckCircle2 size={14} /> Ajouté</> : <><ShoppingBag size={14} /> Ajouter au panier</>}
           </button>
           <button onClick={() => setIsOrderNow(true)} className="gg-btn gg-btn-pink" style={{ flex: 1, padding: '11px' }}>
@@ -881,7 +884,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         <div>
           {product.store?.cart && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 12, fontWeight: 700, color: 'var(--mid)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Informations de livraison</p>
+              <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 12, fontWeight: 700, color: 'var(--mid)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Informations de livraison</p>
               <button onClick={() => setIsOrderNow(false)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', border: '1px solid var(--line-dk)', background: 'transparent', color: 'var(--dim)', fontFamily: 'inherit', fontSize: 12, cursor: 'pointer', borderRadius: 6 }}>
                 <X size={11} /> Annuler
               </button>
@@ -891,12 +894,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <FR label="Quantité">
               <div style={{ display: 'inline-flex', alignItems: 'center', border: '1.5px solid var(--line-dk)', borderRadius: 8, overflow: 'hidden' }}>
                 <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', background: 'var(--soft)', cursor: 'pointer', color: 'var(--ink)', fontSize: 18 }}>-</button>
-                <span style={{ width: 48, textAlign: 'center', fontSize: 14, fontWeight: 700, color: 'var(--ink)', fontFamily: "'Nunito Sans',sans-serif" }}>{fd.quantity}</span>
+                <span style={{ width: 48, textAlign: 'center', fontSize: 14, fontWeight: 700, color: 'var(--ink)', fontFamily: "'Cormorant Garamond',serif" }}>{fd.quantity}</span>
                 <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', background: 'var(--soft)', cursor: 'pointer', color: 'var(--ink)', fontSize: 18 }}>+</button>
               </div>
             </FR>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <FR label="Nom" error={errors.customerName}>
+              <FR label='Nom' error={errors.customerName}>
                 <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder="Nom complet" style={INP(!!errors.customerName)} />
               </FR>
               <FR label="Téléphone" error={errors.customerPhone}>
@@ -904,7 +907,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               </FR>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <FR label="Wilaya" error={errors.customerWelaya}>
+              <FR label='Wilaya' error={errors.customerWelaya}>
                 <div style={{ position: 'relative' }}>
                   <ChevronDown size={13} style={{ position: 'absolute', right: 11, top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
                   <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP(!!errors.customerWelaya), paddingRight: 32, fontFamily: 'inherit' }}>
@@ -928,7 +931,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 {(['home', 'office'] as const).map(type => (
                   <button key={type} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: type }))}
                     style={{ padding: '12px 10px', border: `1.5px solid ${fd.typeLivraison === type ? 'var(--pink)' : 'var(--line-dk)'}`, background: fd.typeLivraison === type ? 'var(--blush)' : 'transparent', cursor: 'pointer', textAlign: 'center', borderRadius: 8, transition: 'all 0.2s', fontFamily: 'inherit' }}>
-                    <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 13, fontWeight: 700, color: fd.typeLivraison === type ? 'var(--pink)' : 'var(--mid)', margin: '0 0 4px' }}>{type === 'home' ? 'À domicile' : 'Au bureau'}</p>
+                    <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 13, fontWeight: 700, color: fd.typeLivraison === type ? 'var(--pink)' : 'var(--mid)', margin: '0 0 4px' }}>{type === 'home' ? 'À domicile' : 'Au bureau'}</p>
                     {selW && <p style={{ fontSize: '1rem', fontWeight: 700, color: fd.typeLivraison === type ? 'var(--pink)' : 'var(--dim)', margin: 0, fontFamily: "'Cormorant Garamond',serif" }}>{(type === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} <span style={{ fontSize: 11, fontWeight: 400 }}>DA</span></p>}
                   </button>
                 ))}
@@ -938,7 +941,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             {/* Summary */}
             <div style={{ border: '1px solid var(--line-dk)', borderRadius: 8, marginBottom: 14, overflow: 'hidden' }}>
               <div style={{ padding: '10px 14px', background: 'var(--blush)', borderBottom: '1px solid var(--line)' }}>
-                <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 13, fontWeight: 600, color: 'var(--mid)', margin: 0 }}>Résumé de la commande</p>
+                <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 13, fontWeight: 600, color: 'var(--mid)', margin: 0 }}>Résumé de la commande</p>
               </div>
               {[
                 { l: 'Produit', v: product.name.slice(0, 22) },
@@ -947,13 +950,13 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 { l: 'Livraison', v: selW ? `${getLiv().toLocaleString()} DA` : '—' },
               ].map(row => (
                 <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 14px', borderBottom: '1px solid var(--line)', background: 'var(--white)' }}>
-                  <span style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 13, color: 'var(--dim)' }}>{row.l}</span>
-                  <span style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 13, fontWeight: 500, color: 'var(--ink)' }}>{row.v}</span>
+                  <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 13, color: 'var(--dim)' }}>{row.l}</span>
+                  <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 13, fontWeight: 500, color: 'var(--ink)' }}>{row.v}</span>
                 </div>
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '12px 14px', background: 'var(--blush)' }}>
-                <span style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 13, color: 'var(--mid)' }}>Total</span>
-                <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.6rem', fontWeight: 700, color: 'var(--pink)' }}>{total().toLocaleString()} <span style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 13, fontWeight: 400, color: 'var(--dim)' }}>DA</span></span>
+                <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 13, color: 'var(--mid)' }}>Total</span>
+                <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.6rem', fontWeight: 700, color: 'var(--pink)' }}>{total().toLocaleString()} <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 13, fontWeight: 400, color: 'var(--dim)' }}>DA</span></span>
               </div>
             </div>
 
@@ -1001,7 +1004,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'requis';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'Numéro invalide';
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = "Numéro invalide";
     if (!fd.customerWelaya) er.w = 'requis';
     if (!fd.customerCommune) er.c = 'requis';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -1022,7 +1025,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{ textAlign: 'center', background: 'var(--white)', padding: '4rem 2.5rem', border: '1px solid var(--line)', borderRadius: 16, maxWidth: 460, width: '100%', boxShadow: '0 8px 40px rgba(255,31,142,0.1)' }}>
         <CheckCircle2 size={48} style={{ color: 'var(--pink)', margin: '0 auto 20px', display: 'block' }} />
         <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.9rem', fontStyle: 'italic', color: 'var(--ink)', marginBottom: 8 }}>Commande reçue ! ✨</h2>
-        <p style={{ fontFamily: "’Nunito Sans’,sans-serif", fontSize: 14, color: ‘var(--dim)’, marginBottom: 28, lineHeight: 1.7 }}>Merci de nous avoir choisis. Nous vous contacterons bientôt.</p>
+        <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 14, color: 'var(--dim)', marginBottom: 28, lineHeight: 1.7 }}>Merci de nous avoir choisis. Nous vous contacterons bientôt.</p>
         <Link href="/" className="gg-btn gg-btn-pink">Retour à la boutique</Link>
       </div>
     </div>
@@ -1043,7 +1046,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, paddingBottom: 16, borderBottom: '1.5px solid var(--line)', flexWrap: 'wrap', gap: 12 }}>
         <div>
           <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '2rem', fontWeight: 600, fontStyle: 'italic', color: 'var(--ink)', margin: 0 }}>Panier</h1>
-          <span style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 13, color: 'var(--dim)' }}>{items.length} Produit</span>
+          <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 13, color: 'var(--dim)' }}>{items.length} Produit</span>
         </div>
         <Link href="/" className="gg-btn gg-btn-outline" style={{ fontSize: 13, padding: '9px 18px' }}>
           <ShoppingBag size={14} /> Continuer les achats
@@ -1056,21 +1059,21 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
           {items.map((item, i) => (
             <div key={i} style={{ display: 'flex', gap: 16, padding: '20px 0', borderBottom: '1px solid var(--line)' }}>
               <div style={{ width: 88, height: 110, flexShrink: 0, overflow: 'hidden', borderRadius: 10, border: '1px solid var(--line)', background: 'var(--blush)' }}>
-                <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+                <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt='' />
               </div>
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div>
-                  <h4 style={{ fontFamily: "'Nunito Sans',sans-serif", fontWeight: 600, color: 'var(--ink)', fontSize: 14, lineHeight: 1.45, marginBottom: 6 }}>{item.product?.name}</h4>
+                  <h4 style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 600, color: 'var(--ink)', fontSize: 14, lineHeight: 1.45, marginBottom: 6 }}>{item.product?.name}</h4>
                   <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.2rem', fontWeight: 700, color: 'var(--pink)', margin: 0 }}>{item.finalPrice?.toLocaleString()} DA</p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
                   <div style={{ display: 'inline-flex', alignItems: 'center', border: '1.5px solid var(--line-dk)', borderRadius: 8, overflow: 'hidden' }}>
                     <button onClick={() => update(items.map((it, idx) => idx === i ? { ...it, quantity: Math.max(1, it.quantity - 1) } : it))} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--soft)', border: 'none', cursor: 'pointer', color: 'var(--ink)', fontSize: 16, fontFamily: 'inherit' }}>-</button>
-                    <span style={{ width: 38, textAlign: 'center', fontWeight: 700, fontSize: 13, lineHeight: '32px', fontFamily: "'Nunito Sans',sans-serif" }}>{item.quantity}</span>
+                    <span style={{ width: 38, textAlign: 'center', fontWeight: 700, fontSize: 13, lineHeight: '32px', fontFamily: "'Cormorant Garamond',serif" }}>{item.quantity}</span>
                     <button onClick={() => update(items.map((it, idx) => idx === i ? { ...it, quantity: it.quantity + 1 } : it))} style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--soft)', border: 'none', cursor: 'pointer', color: 'var(--ink)', fontSize: 16, fontFamily: 'inherit' }}>+</button>
                   </div>
                   <button onClick={() => update(items.filter((_, idx) => idx !== i))}
-                    style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', border: '1px solid var(--line-dk)', borderRadius: 7, background: 'var(--white)', color: 'var(--dim)', fontFamily: "'Nunito Sans',sans-serif", fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
+                    style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', border: '1px solid var(--line-dk)', borderRadius: 7, background: 'var(--white)', color: 'var(--dim)', fontFamily: "'Cormorant Garamond',serif", fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
                     onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'var(--pink)'; e.currentTarget.style.borderColor = 'var(--pink)'; }}
                     onMouseLeave={e => { e.currentTarget.style.color = 'var(--dim)'; e.currentTarget.style.background = 'var(--white)'; e.currentTarget.style.borderColor = 'var(--line-dk)'; }}>
                     <Trash2 size={12} /> Supprimer
@@ -1083,7 +1086,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 
         {/* Checkout */}
         <div style={{ background: 'var(--white)', border: '1px solid var(--line)', borderRadius: 12, padding: 28, alignSelf: 'start' }}>
-          <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--pink)', marginBottom: 20 }}>Informations de livraison</p>
+          <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--pink)', marginBottom: 20 }}>Informations de livraison</p>
           <form onSubmit={handleSubmit}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
               <FR label="Nom" error={errors.name}><input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} style={INP(!!errors.name)} /></FR>
@@ -1109,7 +1112,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             </div>
 
             <div style={{ margin: '20px 0' }}>
-              <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pink)', marginBottom: 12 }}>Type de livraison</p>
+              <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pink)', marginBottom: 12 }}>Type de livraison</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 {(['home', 'office'] as const).map(t => (
                   <button key={t} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: t }))}
@@ -1125,16 +1128,16 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             <div style={{ height: 1, background: 'var(--line)', margin: '16px 0' }} />
 
             <div style={{ marginBottom: 16 }}>
-              {[['Sous-total', `${cartTotal.toLocaleString()} DA`], ['Livraison', getLiv() ? `${getLiv().toLocaleString()} DA` : '—']].map(([k, v]) => (
+              {[['Sous-total', `${cartTotal.toLocaleString()} DA`], ["Livraison", getLiv() ? `${getLiv().toLocaleString()} DA` : '—']].map(([k, v]) => (
                 <div key={k} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <span style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 13, color: 'var(--dim)' }}>{k}</span>
-                  <span style={{ fontFamily: "'Nunito Sans',sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink)' }}>{v}</span>
+                  <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 13, color: 'var(--dim)' }}>{k}</span>
+                  <span style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 600, fontSize: 13, color: 'var(--ink)' }}>{v}</span>
                 </div>
               ))}
               <div style={{ height: 1, background: 'var(--line)', margin: '12px 0' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <span style={{ fontFamily: "'Nunito Sans',sans-serif", fontWeight: 700, color: 'var(--ink)' }}>Total</span>
-                <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.7rem', fontWeight: 700, color: 'var(--pink)' }}>{finalTotal.toLocaleString()} <span style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 13, fontWeight: 400, color: 'var(--dim)' }}>DA</span></span>
+                <span style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 700, color: 'var(--ink)' }}>Total</span>
+                <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.7rem', fontWeight: 700, color: 'var(--pink)' }}>{finalTotal.toLocaleString()} <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 13, fontWeight: 400, color: 'var(--dim)' }}>DA</span></span>
               </div>
             </div>
 
@@ -1167,7 +1170,7 @@ const Shell = ({ children, title, sub }: { children: React.ReactNode; title: str
   <div dir="ltr" style={{ backgroundColor: 'var(--soft)', minHeight: '100vh' }}>
     <div style={{ background: 'linear-gradient(135deg,var(--blush) 0%,var(--blush-2) 100%)', padding: '56px 24px 40px', borderBottom: '1px solid var(--line)' }}>
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        {sub && <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 8 }}>{sub}</p>}
+        {sub && <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 8 }}>{sub}</p>}
         <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 'clamp(1.8rem,4vw,3rem)', fontWeight: 600, fontStyle: 'italic', color: 'var(--ink)', margin: 0 }}>{title}</h1>
       </div>
     </div>
@@ -1180,10 +1183,10 @@ const Shell = ({ children, title, sub }: { children: React.ReactNode; title: str
 const InfoBlock = ({ title, body, tag }: { title: string; body: string; tag?: string }) => (
   <div style={{ paddingBottom: 18, marginBottom: 18, borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'flex-start' }}>
     <div style={{ flex: 1 }}>
-      <h3 style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 14, fontWeight: 700, color: 'var(--ink)', margin: '0 0 7px' }}>{title}</h3>
-      <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 13, lineHeight: 1.85, color: 'var(--mid)', fontWeight: 400, margin: 0 }}>{body}</p>
+      <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 14, fontWeight: 700, color: 'var(--ink)', margin: '0 0 7px' }}>{title}</h3>
+      <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 13, lineHeight: 1.85, color: 'var(--mid)', fontWeight: 400, margin: 0 }}>{body}</p>
     </div>
-    {tag && <span style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '4px 10px', border: '1px solid var(--line-dk)', color: 'var(--pink)', borderRadius: 20, flexShrink: 0 }}>{tag}</span>}
+    {tag && <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '4px 10px', border: '1px solid var(--line-dk)', color: 'var(--pink)', borderRadius: 20, flexShrink: 0 }}>{tag}</span>}
   </div>
 );
 
@@ -1217,7 +1220,7 @@ export function Cookies() {
       <InfoBlock title="Cookies analytiques" body="Données agrégées pour améliorer la plateforme." tag="Facultatif" />
       <div style={{ marginTop: 16, padding: 14, border: '1px solid var(--line)', borderRadius: 8, display: 'flex', gap: 12, alignItems: 'flex-start', background: 'var(--blush)' }}>
         <ToggleRight size={18} style={{ color: 'var(--pink)', flexShrink: 0, marginTop: 1 }} />
-        <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 13, color: 'var(--mid)', lineHeight: 1.8, margin: 0 }}>Vous pouvez gérer vos préférences de cookies depuis les paramètres du navigateur.</p>
+        <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 13, color: 'var(--mid)', lineHeight: 1.8, margin: 0 }}>Vous pouvez gérer vos préférences de cookies depuis les paramètres du navigateur.</p>
       </div>
     </Shell>
   );
@@ -1233,7 +1236,7 @@ export function Contact({ store }: { store?: any }) {
     try {
       await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store?.id });
       setSent(true);
-    } catch { showError('Erreur lors de l’envoi'); } finally { setLoading(false); }
+    } catch { showError("Erreur lors de l'envoi"); } finally { setLoading(false); }
   };
 
   const contactItems = [
@@ -1246,9 +1249,9 @@ export function Contact({ store }: { store?: any }) {
     <div dir="ltr" style={{ background: 'var(--soft)', minHeight: '100vh' }}>
       <div style={{ background: 'linear-gradient(135deg,var(--blush) 0%,var(--blush-2) 100%)', padding: '56px 24px 40px', borderBottom: '1px solid var(--line)' }}>
         <div style={{ maxWidth: 960, margin: '0 auto' }}>
-          <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 8 }}>Contact</p>
+          <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 11, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 8 }}>Contact</p>
           <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 'clamp(1.8rem,4vw,3rem)', fontWeight: 600, fontStyle: 'italic', color: 'var(--ink)', margin: '0 0 8px' }}>Ravi de vous aider 💄</h1>
-          <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 14, color: 'var(--dim)' }}>Réponse sous 24h</p>
+          <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 14, color: 'var(--dim)' }}>Réponse sous 24h</p>
         </div>
       </div>
 
@@ -1256,36 +1259,36 @@ export function Contact({ store }: { store?: any }) {
         {/* Info */}
         <div>
           <div style={{ background: 'var(--white)', border: '1px solid var(--line)', borderRadius: 12, padding: 24, marginBottom: 12 }}>
-            <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--pink)', marginBottom: 16 }}>Moyens de contact</p>
+            <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--pink)', marginBottom: 16 }}>Moyens de contact</p>
             {contactItems.map(item => (
               <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 0', borderBottom: '1px solid var(--line)' }}>
                 <div style={{ width: 36, height: 36, borderRadius: 8, background: 'var(--blush)', border: '1px solid var(--line)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--pink)', flexShrink: 0 }}>{item.icon}</div>
                 <div>
-                  <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)', margin: '0 0 2px' }}>{item.label}</p>
-                  <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 13, fontWeight: 600, color: 'var(--ink)', margin: 0 }}>{item.val}</p>
+                  <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)', margin: '0 0 2px' }}>{item.label}</p>
+                  <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 13, fontWeight: 600, color: 'var(--ink)', margin: 0 }}>{item.val}</p>
                 </div>
               </div>
             ))}
           </div>
           <div style={{ padding: 14, border: '1px solid var(--line)', borderRadius: 8, background: 'var(--blush)', display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--pink)', display: 'inline-block', animation: 'gg-glimmer 2s ease-in-out infinite' }} />
-            <span style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 13, fontWeight: 600, color: 'var(--mid)' }}>Disponibles maintenant</span>
+            <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 13, fontWeight: 600, color: 'var(--mid)' }}>Disponibles maintenant</span>
           </div>
         </div>
 
         {/* Form */}
         <div style={{ background: 'var(--white)', border: '1px solid var(--line)', borderRadius: 12, padding: 28 }}>
-          <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--pink)', marginBottom: 20 }}>Envoyer un message</p>
+          <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--pink)', marginBottom: 20 }}>Envoyer un message</p>
           {sent ? (
             <div style={{ minHeight: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--line)', borderRadius: 8, textAlign: 'center', background: 'var(--blush)', padding: 32 }}>
               <CheckCircle2 size={32} style={{ color: 'var(--pink)', marginBottom: 12 }} />
               <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.4rem', fontStyle: 'italic', color: 'var(--ink)', margin: '0 0 6px' }}>Message envoyé ! ✨</h3>
-              <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 13, color: 'var(--dim)' }}>Nous vous répondrons sous 24h.</p>
+              <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 13, color: 'var(--dim)' }}>Nous vous répondrons sous 24h.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <FR label="Nom"><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Votre nom complet" required style={INP()} /></FR>
+              <div className="gg-form-2c">
+                <FR label='Nom'><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Votre nom complet" required style={INP()} /></FR>
                 <FR label="Téléphone"><input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="05XXXXXXXX" required style={INP()} /></FR>
               </div>
               <FR label="Email"><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="votre@email.com" required style={INP()} /></FR>
