@@ -3,11 +3,11 @@ import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import { getStoreByDomain } from '@/lib/api';
 import { StoreProvider } from '@/Hook/store-provider';
-import dynamic from 'next/dynamic';
 import CustomerTracker from '@/components/CustomerTracker';
 import Landing from '@/components/landing';
 import AddShow from '@/components/addShow';
 import { Metadata } from 'next';
+import { loadTheme } from '@/lib/theme-loader';
 
 // ✅ كاش يعتمد على الـ domain فقط لضمان استقرار الـ Layout
 const getStoreCached = cache(async (domain: string) => {
@@ -64,16 +64,8 @@ export default async function StoreLayout({ children, params }: LayoutProps) {
   const currentThemeSlug = store?.theme?.slug || 'default';
   const language = store?.language || 'ar';
 
-  const Main = dynamic<any>(
-    () =>
-      import(`@/theme/${language}/${currentThemeSlug}/main`).catch(() =>
-        import(`@/theme/${language}/default/main`)
-      ),
-    {
-      loading: () => <Landing />,
-      ssr: true,
-    }
-  );
+  const themeModule = await loadTheme(language, currentThemeSlug);
+  const Main = themeModule.default ?? themeModule.Main;
 
   const direction = language === 'ar' ? 'rtl' : 'ltr';
 

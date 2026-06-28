@@ -1,6 +1,6 @@
 import { cache } from 'react';
-import { default as nextDynamic } from 'next/dynamic';
 import { getStoreByDomain } from '@/lib/api';
+import { loadTheme } from '@/lib/theme-loader';
 
 // ✅ 1. إجبار الصفحة على التحقق من البيانات في كل طلب (حل مشكلة Production)
 export const dynamic = 'force-dynamic';
@@ -57,19 +57,8 @@ export default async function StorePage(props: {
   const activeTheme = store.theme?.slug || 'default';
   const language = store.language || 'ar';
 
-  const SelectedTheme = nextDynamic<{ store: typeof store; page: number; domain: string }>(
-    () =>
-      import(`@/theme/${language}/${activeTheme}/main`)
-        .then((mod) => mod.Home || mod.default)
-        .catch(async (err) => {
-          const fallback = await import(`@/theme/${language}/default/main`);
-          return fallback.Home || fallback.default;
-        }),
-    {
-      loading: () => <p className="text-center py-20 text-gray-500">جاري التحميل...</p>,
-      ssr: true,
-    }
-  );
+  const themeModule = await loadTheme(language, activeTheme);
+  const Home = themeModule.Home ?? themeModule.default;
 
-  return <SelectedTheme store={store} page={+page} domain={domain} />;
+  return <Home store={store} page={+page} domain={domain} />;
 }
