@@ -609,16 +609,6 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             >
               {open ? <X size={16} /> : <Menu size={16} />}
             </button>
-            <Link
-              href="/cart"
-              style={{
-                ...cartBtnStyle,
-                transition: 'background 0.3s ease, color 0.3s ease',
-              }}
-            >
-              <ShoppingBag size={17} />
-              {count > 0 && <span style={badgeStyle}>{count}</span>}
-            </Link>
           </div>
         </div>
 
@@ -669,7 +659,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           }}
         >
           <div style={{ padding: '0.375rem 1.25rem 0.875rem' }}>
-            {[...navLinks, { href: '/cart', label: 'السلة' }].map(i => (
+            {navLinks.map(i => (
               <Link
                 key={i.href}
                 href={i.href}

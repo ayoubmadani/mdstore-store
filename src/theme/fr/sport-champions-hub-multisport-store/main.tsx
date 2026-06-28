@@ -476,7 +476,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               style={{ width: '100%', padding: '9px 40px 9px 14px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 50, color: '#fff', fontSize: '0.85rem', outline: 'none', fontFamily: "'Inter',sans-serif", transition: 'all 0.3s' }}
               onFocus={e => { e.target.style.width = '300px'; e.target.style.background = 'rgba(255,255,255,0.15)'; e.target.style.borderColor = 'var(--accent)'; }}
               onBlur={e => { e.target.style.width = '100%'; e.target.style.background = 'rgba(255,255,255,0.1)'; e.target.style.borderColor = 'rgba(255,255,255,0.12)'; }} />
-            <Search size={15} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--g400)' }} />
+            <Search size={15} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--g400)' }} />
           </form>
           {sq.length >= 2 && <Drop />}
         </div>
@@ -517,7 +517,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <form onSubmit={doSearch} style={{ position: 'relative' }}>
             <input autoFocus type="text" placeholder="Rechercher ici..." value={sq} onChange={e => setSq(e.target.value)}
               style={{ ...INP(), background: 'rgba(255,255,255,0.1)', color: '#fff', borderColor: 'rgba(255,255,255,0.15)', padding: '0.75rem 2.5rem 0.75rem 1rem' }} />
-            <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--g500)' }} />
+            <Search size={15} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--g500)' }} />
           </form>
           {sq.length >= 2 && <Drop />}
         </div>

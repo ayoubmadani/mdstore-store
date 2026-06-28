@@ -505,7 +505,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 onChange={e => setSearchQuery(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '0.625rem 1rem 0.625rem 2.75rem',
+                  padding: '0.625rem 2.75rem 0.625rem 1rem',
                   borderRadius: 20,
                   border: '1.5px solid var(--line-dk)',
                   background: 'var(--white)',
@@ -517,7 +517,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 onFocus={e => (e.currentTarget.style.borderColor = 'var(--plum)')}
                 onBlur={e => (e.currentTarget.style.borderColor = 'var(--line-dk)')}
               />
-              <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)' }} />
+              <Search size={15} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)' }} />
             </form>
             {searchQuery.length >= 2 && <DropResults />}
           </div>
@@ -609,16 +609,6 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             >
               {open ? <X size={16} /> : <Menu size={16} />}
             </button>
-            <Link
-              href="/cart"
-              style={{
-                ...cartBtnStyle,
-                transition: 'background 0.3s ease, color 0.3s ease',
-              }}
-            >
-              <ShoppingBag size={17} />
-              {count > 0 && <span style={badgeStyle}>{count}</span>}
-            </Link>
           </div>
         </div>
 
@@ -643,7 +633,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 onChange={e => setSearchQuery(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '0.75rem 1rem 0.75rem 2.75rem',
+                  padding: '0.75rem 2.75rem 0.75rem 1rem',
                   border: '1.5px solid var(--plum)',
                   borderRadius: 8,
                   background: 'var(--soft)',
@@ -652,7 +642,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                   fontFamily: "'DM Sans',sans-serif"
                 }}
               />
-              <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--plum)' }} />
+              <Search size={15} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--plum)' }} />
             </form>
             {searchQuery.length >= 2 && <DropResults />}
           </div>
@@ -669,7 +659,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           }}
         >
           <div style={{ padding: '0.375rem 1.25rem 0.875rem' }}>
-            {[...navLinks, { href: '/cart', label: 'Panier' }].map(i => (
+            {navLinks.map(i => (
               <Link
                 key={i.href}
                 href={i.href}

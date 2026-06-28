@@ -446,8 +446,8 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <div className="nav-desktop-search" style={{ flex: 1, maxWidth: 340, position: 'relative' }}>
           <form onSubmit={doSearch}>
             <input type="text" placeholder="Rechercher vos jeux... 🎮" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.75rem', borderRadius: 50, border: '2.5px solid var(--border)', background: '#fff', fontSize: '0.85rem', fontWeight: 700, outline: 'none', fontFamily: "'Nunito',sans-serif" }} />
-            <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)' }} />
+              style={{ width: '100%', padding: '0.6rem 2.75rem 0.6rem 1rem', borderRadius: 50, border: '2.5px solid var(--border)', background: '#fff', fontSize: '0.85rem', fontWeight: 700, outline: 'none', fontFamily: "'Nunito',sans-serif" }} />
+            <Search size={16} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)' }} />
           </form>
           {searchQuery.length >= 2 && <SearchDrop />}
         </div>
@@ -493,8 +493,8 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <div style={{ padding: '0.75rem 1.25rem', background: '#fff', borderTop: '2px solid var(--border)', position: 'relative' }}>
           <form onSubmit={doSearch} style={{ position: 'relative' }}>
             <input autoFocus type="text" placeholder="Rechercher ici... 🎯" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.75rem', borderRadius: 50, border: '2.5px solid var(--border)', outline: 'none' }} />
-            <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--coral)' }} />
+              style={{ width: '100%', padding: '0.75rem 2.75rem 0.75rem 1rem', borderRadius: 50, border: '2.5px solid var(--border)', outline: 'none' }} />
+            <Search size={16} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--coral)' }} />
           </form>
           {searchQuery.length >= 2 && <SearchDrop />}
         </div>
@@ -817,7 +817,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
         <div className="details-layout">
 
           {/* Gallery */}
-          <div style={{top: 84 }}>
+          <div style={{ position: 'sticky', top: 84, alignSelf: 'start' }}>
             <div style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 24, overflow: 'hidden', background: `${accent}12`, border: `3px solid ${accent}40` }}>
               {allImages[sel]
                 ? <img src={allImages[sel]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -1041,7 +1041,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
               <FR error={errors.customerWelaya} label='📍 Wilaya'>
                 <div style={{ position: 'relative' }}>
-                  <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)', pointerEvents: 'none' }} />
+                  <ChevronDown size={13} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)', pointerEvents: 'none' }} />
                   <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...inp(!!errors.customerWelaya), paddingLeft: 32, fontFamily: 'inherit' }}>
                     <option value="">Choisir Wilaya</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                   </select>
@@ -1049,7 +1049,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               </FR>
               <FR error={errors.customerCommune} label="🏘️ Commune">
                 <div style={{ position: 'relative' }}>
-                  <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)', pointerEvents: 'none' }} />
+                  <ChevronDown size={13} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)', pointerEvents: 'none' }} />
                   <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inp(!!errors.customerCommune), paddingLeft: 32, opacity: !fd.customerWelaya ? 0.5 : 1, fontFamily: 'inherit' }}>
                     <option value="">{loadingC ? '⏳...' : 'Choisir Commune'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                   </select>
@@ -1229,7 +1229,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
                 <FR error={errors.w} label='📍 Wilaya'>
                   <div style={{ position: 'relative' }}>
-                    <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)', pointerEvents: 'none' }} />
+                    <ChevronDown size={13} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)', pointerEvents: 'none' }} />
                     <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...inp(!!errors.w), paddingLeft: 32, fontFamily: 'inherit' }}>
                       <option value="">Choisir</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                     </select>
@@ -1237,7 +1237,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 </FR>
                 <FR error={errors.c} label="🏘️ Commune">
                   <div style={{ position: 'relative' }}>
-                    <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)', pointerEvents: 'none' }} />
+                    <ChevronDown size={13} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-soft)', pointerEvents: 'none' }} />
                     <select value={fd.customerCommune} disabled={loadingC || !fd.customerWelaya} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inp(!!errors.c), paddingLeft: 32, opacity: !fd.customerWelaya ? 0.5 : 1, fontFamily: 'inherit' }}>
                       <option value="">{loadingC ? '⏳...' : 'Choisir'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                     </select>

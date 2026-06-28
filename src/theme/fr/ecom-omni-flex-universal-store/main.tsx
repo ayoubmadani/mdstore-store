@@ -242,22 +242,28 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
   const doSearch=(e?:React.FormEvent)=>{ if(e) e.preventDefault(); if(sq.trim()){ router.push(`/?search=${encodeURIComponent(sq)}`); setSq(''); setShowSearch(false); }};
 
   const Drop=()=>(
-    <div style={{position:'absolute',top:'calc(100% + 6px)',right:0,left:0,background:'var(--white)',border:'1px solid var(--line)',boxShadow:'0 12px 36px rgba(13,27,42,0.12)',zIndex:200,overflow:'hidden',borderTop:'2px solid var(--blue)',paddingTop:25}}>
-      <button onClick={()=>setSq('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
-        <X style={{width:'14px',height:'14px'}}/>
-      </button>
+    <div style={{position:'absolute',top:'calc(100% + 6px)',right:0,left:0,background:'var(--white)',border:'1px solid var(--line)',boxShadow:'0 12px 36px rgba(13,27,42,0.12)',zIndex:200,borderRadius:'10px',overflow:'hidden',borderTop:'2px solid var(--blue)'}}>
+      {/* Header */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 14px',borderBottom:'1px solid var(--line)',background:'rgba(58,134,255,0.04)'}}>
+        <span style={{fontSize:'11px',fontWeight:700,color:'var(--blue)',letterSpacing:'0.05em',textTransform:'uppercase'}}>Résultats de recherche</span>
+        <button onClick={()=>setSq('')} style={{background:'none',border:'none',cursor:'pointer',color:'var(--dim)',padding:'2px',display:'flex',borderRadius:4}} >
+          <X style={{width:'14px',height:'14px'}}/>
+        </button>
+      </div>
       {loading ? <div style={{padding:'1rem',textAlign:'center',fontSize:'12px',color:'var(--blue)'}}>Recherche en cours...</div>
       : ls.length>0 ? (<>
-        {ls.map((p:any)=>(
-          <Link href={`/product/${p.id}`} key={p.id} onClick={()=>setSq('')}
-            style={{display:'flex',alignItems:'center',gap:'0.75rem',padding:'10px 14px',borderBottom:'1px solid var(--line)'}}>
-            <img src={p.productImage||p.imagesProduct?.[0]?.imageUrl} style={{width:40,height:40,objectFit:'cover',flexShrink:0,border:'1px solid var(--line)'}} alt=""/>
-            <div>
-              <div style={{fontSize:'13px',fontWeight:600,color:'var(--ink)'}}>{p.name}</div>
-              <div style={{fontSize:'13px',fontWeight:700,color:'var(--blue)'}}>{p.price} DA</div>
-            </div>
-          </Link>
-        ))}
+        <div style={{maxHeight:'260px',overflowY:'auto'}}>
+          {ls.slice(0,5).map((p:any)=>(
+            <Link href={`/product/${p.id}`} key={p.id} onClick={()=>setSq('')}
+              style={{display:'flex',alignItems:'center',gap:'0.75rem',padding:'10px 14px',borderBottom:'1px solid var(--line)'}}>
+              <img src={p.productImage||p.imagesProduct?.[0]?.imageUrl} style={{width:40,height:40,objectFit:'cover',flexShrink:0,border:'1px solid var(--line)'}} alt=""/>
+              <div>
+                <div style={{fontSize:'13px',fontWeight:600,color:'var(--ink)'}}>{p.name}</div>
+                <div style={{fontSize:'13px',fontWeight:700,color:'var(--blue)'}}>{p.price} DA</div>
+              </div>
+            </Link>
+          ))}
+        </div>
         <button onClick={doSearch} style={{width:'100%',padding:'12px',background:'rgba(58,134,255,0.07)',border:'none',borderTop:'1px solid rgba(58,134,255,0.2)',color:'var(--blue)',fontWeight:800,fontSize:'0.85rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:'8px'}}>
           Voir tous les résultats <ArrowRight style={{width:'14px',height:'14px'}}/>
         </button>
@@ -306,7 +312,7 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
               style={{...INP(),padding:'9px 36px 9px 12px',background:'rgba(255,255,255,0.08)',borderColor:'rgba(255,255,255,0.15)',color:'white',fontSize:'13px'}}
               onFocus={e=>{e.target.style.borderColor='var(--blue)';e.target.style.background='rgba(255,255,255,0.12)';}}
               onBlur={e=>{e.target.style.borderColor='rgba(255,255,255,0.15)';e.target.style.background='rgba(255,255,255,0.08)';}}/>
-            <Search size={14} style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',color:'rgba(255,255,255,0.4)'}}/>
+            <Search size={14} style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',color:'rgba(255,255,255,0.4)'}}/>
           </form>
           {sq.length>=2 && <Drop/>}
         </div>
@@ -345,7 +351,7 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
               <input autoFocus type="text" placeholder="Rechercher des Produits..." value={sq} onChange={e=>setSq(e.target.value)}
                 style={{...INP(),background:'rgba(255,255,255,0.08)',borderColor:'rgba(255,255,255,0.15)',color:'white',padding:'10px 36px 10px 12px'}}
                 onFocus={e=>{e.target.style.borderColor='var(--blue)';}} onBlur={e=>{e.target.style.borderColor='rgba(255,255,255,0.15)';}}/>
-              <Search size={14} style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',color:'rgba(255,255,255,0.4)'}}/>
+              <Search size={14} style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',color:'rgba(255,255,255,0.4)'}}/>
             </form>
             {sq.length>=2 && <Drop/>}
           </div>

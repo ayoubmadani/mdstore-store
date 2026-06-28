@@ -168,6 +168,9 @@ const CSS = `
     .form-2c   { grid-template-columns:1fr; }
     .dlv-2c    { grid-template-columns:1fr; }
   }
+  .desk-srch  { display:flex; align-items:center; flex:1; justify-content:flex-end; gap:10px; }
+  .mob-icons  { display:none; align-items:center; gap:4px; }
+  @media (max-width:640px) { .desk-srch { display:none; } .mob-icons { display:flex; } }
 `;
 
 /* ─── TYPES ─── */
@@ -232,6 +235,7 @@ export default function Main({ store, children, domain }: any) {
 ══════════════════════════════════════════════════════════════ */
 export function Navbar({ store, domain }: { store: any; domain: string }) {
   const [open, setOpen] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [sq, setSq] = useState('');
   const [ls, setLs] = useState<any[]>([]);
@@ -414,8 +418,8 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             }
           </Link>
 
-          {/* Search + cart */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, justifyContent: 'flex-end' }}>
+          {/* Search + cart — desktop */}
+          <div className="desk-srch">
             <div style={{ position: 'relative', flex: '0 1 280px' }}>
               <form onSubmit={doSearch} style={{ position: 'relative' }}>
                 <Search style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', width: '15px', height: '15px', color: 'var(--dim)' }} />
@@ -432,9 +436,31 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               {count > 0 && <span style={{ position: 'absolute', top: 2, right: 2, width: '15px', height: '15px', backgroundColor: 'var(--blue)', color: 'white', fontSize: '9px', fontWeight: 700, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
             </Link>
           </div>
+          {/* Search + Cart icons — mobile only */}
+          <div className="mob-icons">
+            <button onClick={() => { setShowSearch(p => !p); setOpen(false); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--mid)', padding: '6px', display: 'flex' }}>
+              {showSearch ? <X style={{ width: '20px', height: '20px' }} /> : <Search style={{ width: '20px', height: '20px' }} />}
+            </button>
+            <Link href="/cart" style={{ position: 'relative', color: 'var(--mid)', display: 'flex', padding: '6px' }}>
+              <ShoppingCart style={{ width: '20px', height: '20px' }} />
+              {count > 0 && <span style={{ position: 'absolute', top: 2, right: 2, width: '15px', height: '15px', backgroundColor: 'var(--blue)', color: 'white', fontSize: '9px', fontWeight: 700, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
+            </Link>
+          </div>
         </div>
       </div>
 
+      {/* Mobile search bar — slides down when search icon clicked */}
+      <div style={{ maxHeight: showSearch ? '70px' : '0', overflow: showSearch ? 'visible' : 'hidden', transition: 'max-height 0.25s ease', backgroundColor: 'var(--white)', borderBottom: showSearch ? '1px solid var(--line)' : 'none' }}>
+        <div style={{ padding: '10px 16px', position: 'relative' }}>
+          <form onSubmit={e => { doSearch(e); setShowSearch(false); }} style={{ position: 'relative' }}>
+            <Search style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', width: '15px', height: '15px', color: 'var(--dim)' }} />
+            <input autoFocus={showSearch} type="text" placeholder="Rechercher un produit..." value={sq} onChange={e => setSq(e.target.value)}
+              style={{ width: '100%', padding: '9px 34px 9px 12px', border: '1.5px solid var(--line-dk)', borderRadius: '6px', fontFamily: "'Inter',sans-serif", fontSize: '13px', color: 'var(--ink)', outline: 'none', backgroundColor: 'var(--off)', boxSizing: 'border-box' }}
+              onFocus={e => { e.target.style.borderColor = 'var(--blue)'; }} onBlur={e => { e.target.style.borderColor = 'var(--line-dk)'; }} />
+          </form>
+          {sq.length >= 2 && <Drop />}
+        </div>
+      </div>
       {/* Mobile menu */}
       <div style={{ maxHeight: open ? '280px' : '0', overflow: 'hidden', transition: 'max-height 0.3s ease', backgroundColor: 'var(--white)', borderBottom: open ? '1px solid var(--line)' : 'none' }}>
         <div style={{ padding: '8px 20px 16px' }}>

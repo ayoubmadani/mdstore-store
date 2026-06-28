@@ -438,7 +438,7 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
             <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '260px', zIndex: 100 }}>
               <form onSubmit={doSearch} style={{ position: 'relative' }}>
                 <input autoFocus type="text" placeholder="Rechercher..." value={sq} onChange={e => setSq(e.target.value)}
-                  style={IS()} onFocus={onF} onBlur={e => onB(e)} />
+                  style={{ ...IS(), padding: '11px 32px 11px 13px' }} onFocus={onF} onBlur={e => onB(e)} />
                 <Search size={12} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--mist)' }} />
               </form>
               {sq.length >= 2 && <Drop />}

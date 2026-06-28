@@ -353,7 +353,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <form onSubmit={doSearch} style={{ position:'relative' }}>
               <input type="text" placeholder="Rechercher une herbe..." value={sq} onChange={e => setSq(e.target.value)}
                 className="inp" style={{ padding:'9px 40px 9px 14px', fontSize:'13px' }} />
-              <Search size={14} style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', color:'var(--dim)' }} />
+              <Search size={14} style={{ position:'absolute', right:14, top:'50%', transform:'translateY(-50%)', color:'var(--dim)' }} />
             </form>
             {sq.length >= 2 && <SearchDrop />}
           </div>
@@ -408,7 +408,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <form onSubmit={doSearch} style={{ position:'relative' }}>
             <input autoFocus type="text" placeholder="Rechercher ici..." value={sq} onChange={e => setSq(e.target.value)}
               className="inp" style={{ padding:'12px 40px 12px 14px' }} />
-            <Search size={16} style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', color:'var(--gold)' }} />
+            <Search size={16} style={{ position:'absolute', right:14, top:'50%', transform:'translateY(-50%)', color:'var(--gold)' }} />
           </form>
           {sq.length >= 2 && <SearchDrop />}
         </div>

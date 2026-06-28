@@ -400,7 +400,7 @@ export function Details({product,discount,allImages,allAttrs,finalPrice,inStock,
             {allImages.length>0?<img src={allImages[sel]} alt={product.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
               :<div style={{width:'100%',height:'100%',background:'var(--s2)',display:'flex',alignItems:'center',justifyContent:'center'}}><ShoppingCart style={{width:32,height:32,color:'var(--mu)'}}/></div>}
             {discount>0&&<span style={{position:'absolute',top:16,right:16,background:'var(--cp)',color:'var(--bg)',fontSize:'9px',fontWeight:800,padding:'5px 10px',letterSpacing:'0.12em',fontFamily:"'Raleway',sans-serif"}}>-{discount}%</span>}
-            {!inStock&&!autoGen&&<div style={{position:'absolute',inset:0,background:'rgba(14,12,10,.65)',display:'flex',alignItems:'center',justifyContent:'center'}}><span className="bn" style={{fontSize:'2.5rem',color:'var(--mu)',letterSpacing:'0.06em'}}>نفذت الكمية</span></div>}
+            
             {allImages.length>1&&(
               <>
                 <button onClick={()=>setSel(p=>p===0?allImages.length-1:p-1)} style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',width:34,height:34,background:'rgba(14,12,10,.6)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--tx)'}}><ChevronRight size={14}/></button>

@@ -263,9 +263,9 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 placeholder="Rechercher ici..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.5rem', border: '1px solid #eee', background: '#f8f8f8', borderRadius: '50px', outline: 'none', fontSize: '0.8rem' }}
+                style={{ width: '100%', padding: '0.6rem 2.5rem 0.6rem 1rem', border: '1px solid #eee', background: '#f8f8f8', borderRadius: '50px', outline: 'none', fontSize: '0.8rem' }}
               />
-              <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} />
+              <Search size={14} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} />
             </form>
             {searchQuery.length >= 2 && <SearchResults />}
           </div>
