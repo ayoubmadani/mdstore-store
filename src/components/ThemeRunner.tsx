@@ -96,8 +96,8 @@ export default function ThemeRunner({
       });
   }, [bundleUrl, exportName]);
 
-  if (error) return <>{fallback}</>;
-  if (!Component) return <>{fallback}</>;
+  if (error) return <>{children ?? fallback}</>;
+  if (!Component) return <>{children ?? fallback}</>;
 
   return <Component {...themeProps}>{children}</Component>;
 }
