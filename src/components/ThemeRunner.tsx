@@ -16,9 +16,19 @@ import * as NextNavigation from 'next/navigation';
 
 const esm = (obj: Record<string, any>) => ({ ...obj, __esModule: true });
 
+// Strip Styled JSX props (jsx, global) from <style> elements so App Router doesn't warn
+const patchedCreateElement: typeof React.createElement = (type: any, props: any, ...children: any[]) => {
+  if (type === 'style' && props && (props.jsx !== undefined || props.global !== undefined)) {
+    const { jsx: _jsx, global: _global, ...rest } = props;
+    return (React.createElement as any)(type, rest, ...children);
+  }
+  return (React.createElement as any)(type, props, ...children);
+};
+const patchedReact = { ...React, createElement: patchedCreateElement };
+
 function makeRequire() {
   const mods: Record<string, any> = {
-    'react':                esm({ default: React, ...React }),
+    'react':                esm({ default: patchedReact, ...patchedReact }),
     'react-dom':            esm({ default: ReactDOM, ...ReactDOM }),
     'react/jsx-runtime':    esm({ ...ReactJSX }),
     'zustand':              esm({ ...Zustand }),
@@ -78,7 +88,7 @@ export default function ThemeRunner({
           const mod = { exports: {} as Record<string, any> };
           // eslint-disable-next-line no-new-func
           const fn = new Function('module', 'exports', 'require', 'React', 'console', 'process', code);
-          fn(mod, mod.exports, makeRequire(), React, console, {
+          fn(mod, mod.exports, makeRequire(), patchedReact, console, {
             env: {
               NEXT_PUBLIC_API_URL:      process.env.NEXT_PUBLIC_API_URL      ?? '',
               NEXT_PUBLIC_ROOT_DOMAIN:  process.env.NEXT_PUBLIC_ROOT_DOMAIN  ?? '',
