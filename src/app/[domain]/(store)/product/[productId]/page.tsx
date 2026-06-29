@@ -16,8 +16,8 @@ import {
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 //import Details from '@/theme/tech-innovation/page/details';
-import dynamic from 'next/dynamic';
 import AddShow from '@/components/addShow';
+import ThemeRunner from '@/components/ThemeRunner';
 import { useStore } from '@/Hook/store-provider';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
@@ -376,29 +376,7 @@ export default function ProductPage({ params }: { params: Promise<{ domain: stri
 
   // 1. استخراج الـ slug بأمان (خارج الـ useMemo أو بداخلها)
 
-  // 2. استخدام useMemo لتغليف الاستيراد الديناميكي
-  const Details = useMemo(() => {
-    return dynamic<any>(
-      async () => {
-        try {
-          // التحميل بناءً على السلوج المستخرج
-          const mod = await import(`@/theme/${language}/${currentThemeSlug}/main`);
-
-          // التأكد من استخراج المكون الصحيح (Details أو default)
-          return mod.Details || mod.default;
-        } catch (error) {
-          console.error("خطأ في تحميل الثيم:", currentThemeSlug, error);
-          // Fallback للثيم الافتراضي إذا فشل التحميل
-          const defaultMod = await import(`@/theme/${language}/default/main`);
-          return defaultMod.Details || defaultMod.default;
-        }
-      },
-      {
-        loading: () => <p className="p-5 text-center">Loading Theme...</p>,
-        ssr: true,
-      }
-    );
-  }, [currentThemeSlug, language]);
+  const bundleUrl = `/api/themes-controller?lang=${language}&slug=${currentThemeSlug}`;
 
   // 3. Replace your entire handleSubmit with this:
   const handleSubmit = async (e: React.FormEvent) => {
@@ -488,23 +466,27 @@ export default function ProductPage({ params }: { params: Promise<{ domain: stri
   return (
     <>
       <AddShow productId={product.id} />
-      <Details
-        product={product}
-        toggleWishlist={toggleWishlist}
-        isWishlisted={isWishlisted}
-        handleShare={handleShare}
-        discount={discount}
-        allImages={allImages}
-        domain={resolvedParams?.domain}
-        allAttrs={allAttrs}
-        finalPrice={finalPrice}
-        inStock={inStock}
-        autoGen={autoGen}
-        selectedVariants={selectedVariants}
-        setSelectedOffer={(id: any) => setSelectedOffer(id)}
-        selectedOffer={selectedOffer}
-        resolvedParams={resolvedParams}
-        handleVariantSelection={(name: any, value: any) => handleVariantSelection(name, value)}
+      <ThemeRunner
+        bundleUrl={bundleUrl}
+        exportName="Details"
+        themeProps={{
+          product,
+          toggleWishlist,
+          isWishlisted,
+          handleShare,
+          discount,
+          allImages,
+          domain: resolvedParams?.domain,
+          allAttrs,
+          finalPrice,
+          inStock,
+          autoGen,
+          selectedVariants,
+          setSelectedOffer: (id: any) => setSelectedOffer(id),
+          selectedOffer,
+          resolvedParams,
+          handleVariantSelection: (name: any, value: any) => handleVariantSelection(name, value),
+        }}
       />
     </>
   );

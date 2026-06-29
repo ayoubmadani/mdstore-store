@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { getStoreByDomain } from '@/lib/api';
-import { loadTheme } from '@/lib/theme-loader';
+import ThemeRunner from '@/components/ThemeRunner';
 
 // ✅ 1. إجبار الصفحة على التحقق من البيانات في كل طلب (حل مشكلة Production)
 export const dynamic = 'force-dynamic';
@@ -57,8 +57,13 @@ export default async function StorePage(props: {
   const activeTheme = store.theme?.slug || 'default';
   const language = store.language || 'ar';
 
-  const themeModule = await loadTheme(language, activeTheme);
-  const Home = themeModule.Home ?? themeModule.default;
+  const bundleUrl = `/api/themes-controller?lang=${language}&slug=${activeTheme}`;
 
-  return <Home store={store} page={+page} domain={domain} />;
+  return (
+    <ThemeRunner
+      bundleUrl={bundleUrl}
+      exportName="Home"
+      themeProps={{ store, page: +page, domain }}
+    />
+  );
 }

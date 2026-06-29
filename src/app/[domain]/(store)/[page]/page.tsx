@@ -1,7 +1,7 @@
 'use client';
 
 import { useStore } from '@/Hook/store-provider';
-import dynamic from 'next/dynamic';
+import ThemeRunner from '@/components/ThemeRunner';
 import { useMemo, Suspense } from 'react';
 import { useParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
@@ -28,24 +28,11 @@ export default function DynamicPage() {
   const pageSlug = (params?.page as string) || '';
   const language = store?.language || 'ar';
 
-  const DynamicStaticPage = useMemo(() => {
-    return dynamic<StaticPageProps>(
-      async () => {
-        try {
-          const mod = await import(`@/theme/${language}/${currentThemeSlug}/main`);
-          return (mod.StaticPage || mod.default) as ComponentType<StaticPageProps>;
-        } catch {
-          const fallback = await import(`@/theme/${language}/default/main`);
-          return (fallback.StaticPage || fallback.default) as ComponentType<StaticPageProps>;
-        }
-      },
-      { loading: () => <PageLoading />, ssr: false }
-    );
-  }, [currentThemeSlug, language]);
+  const bundleUrl = `/api/themes-controller?lang=${language}&slug=${currentThemeSlug}`;
 
   return (
     <Suspense fallback={<PageLoading />}>
-      <DynamicStaticPage store={store} page={pageSlug} staticPage={pageSlug} />
+      <ThemeRunner bundleUrl={bundleUrl} exportName="StaticPage" themeProps={{ store, page: pageSlug, staticPage: pageSlug }} />
     </Suspense>
   );
 }

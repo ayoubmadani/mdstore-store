@@ -4,10 +4,9 @@ import { notFound } from 'next/navigation';
 import { getStoreByDomain } from '@/lib/api';
 import { StoreProvider } from '@/Hook/store-provider';
 import CustomerTracker from '@/components/CustomerTracker';
-import Landing from '@/components/landing';
 import AddShow from '@/components/addShow';
 import { Metadata } from 'next';
-import { loadTheme } from '@/lib/theme-loader';
+import ThemeRunner from '@/components/ThemeRunner';
 
 // ✅ كاش يعتمد على الـ domain فقط لضمان استقرار الـ Layout
 const getStoreCached = cache(async (domain: string) => {
@@ -64,8 +63,7 @@ export default async function StoreLayout({ children, params }: LayoutProps) {
   const currentThemeSlug = store?.theme?.slug || 'default';
   const language = store?.language || 'ar';
 
-  const themeModule = await loadTheme(language, currentThemeSlug);
-  const Main = themeModule.default ?? themeModule.Main;
+  const bundleUrl = `/api/themes-controller?lang=${language}&slug=${currentThemeSlug}`;
 
   const direction = language === 'ar' ? 'rtl' : 'ltr';
 
@@ -74,9 +72,13 @@ export default async function StoreLayout({ children, params }: LayoutProps) {
       <AddShow storeId={store.id} />
       <div dir={direction}>
         <CustomerTracker pixels={store.pixels ?? []} />
-        <Main store={store} domain={domain}>
+        <ThemeRunner
+          bundleUrl={bundleUrl}
+          exportName="default"
+          themeProps={{ store, domain }}
+        >
           {children}
-        </Main>
+        </ThemeRunner>
       </div>
     </StoreProvider>
   );

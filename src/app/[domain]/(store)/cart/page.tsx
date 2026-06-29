@@ -1,7 +1,7 @@
 "use client"
 
 import { useStore } from '@/Hook/store-provider';
-import dynamic from 'next/dynamic';
+import ThemeRunner from '@/components/ThemeRunner';
 import { useMemo, Suspense, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { ShoppingCart, Loader2, Package, MapPin, CreditCard, ShoppingBag, ArrowLeft } from 'lucide-react';
@@ -41,20 +41,7 @@ export default function CheckoutPage() {
   const language = store?.language || "ar";
   const isRTL = language === "ar";
 
-  const DynamicCart = useMemo(() => {
-    return dynamic<CartProps>(
-      async () => {
-        try {
-          const mod = await import(`@/theme/${language}/${currentThemeSlug}/main`);
-          return (mod.Cart || mod.default) as ComponentType<CartProps>;
-        } catch (error) {
-          const defaultMod = await import(`@/theme/${language}/default/main`);
-          return (defaultMod.Cart || defaultMod.default) as ComponentType<CartProps>;
-        }
-      },
-      { loading: () => <CartLoading />, ssr: false }
-    );
-  }, [currentThemeSlug, language]);
+  const bundleUrl = `/api/themes-controller?lang=${language}&slug=${currentThemeSlug}`;
 
   if (!cleanDomain || !store) {
     return (
@@ -103,7 +90,7 @@ export default function CheckoutPage() {
 
         {/* ==================== MAIN CONTENT ==================== */}
         <Suspense fallback={<div className="py-8"><CartLoading /></div>}>
-          <DynamicCart domain={cleanDomain} store={store} />
+          <ThemeRunner bundleUrl={bundleUrl} exportName="Cart" themeProps={{ domain: cleanDomain, store }} />
         </Suspense>
       </div>
     </main>

@@ -6,6 +6,7 @@ import { StoreProvider } from '@/Hook/store-provider';
 import dynamic from 'next/dynamic';
 import CustomerTracker from '@/components/CustomerTracker';
 import Landing from '@/components/landing';
+import { loadTheme } from '@/lib/theme-loader';
 import AddShow from '@/components/addShow';
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
@@ -64,17 +65,6 @@ export default async function StoreLayout({ children, params }: LayoutProps) {
 
   const currentThemeSlug = store?.theme?.slug || 'default';
   const language = store?.language || 'ar';
-
-  const Main = dynamic<any>(
-    () =>
-      import(`@/theme/${language}/${currentThemeSlug}/main`).catch(() =>
-        import(`@/theme/${language}/default/main`)
-      ),
-    {
-      loading: () => <Landing />,
-      ssr: true,
-    }
-  );
 
   const direction = language === 'ar' ? 'rtl' : 'ltr';
 
