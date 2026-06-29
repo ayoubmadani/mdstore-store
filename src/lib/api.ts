@@ -3,6 +3,19 @@ import { Store } from '@/types/store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+export async function getProduct(domain: string, productId: string): Promise<any | null> {
+  if (!API_URL || !domain || !productId) return null
+  try {
+    const { data } = await axios.get(
+      `${API_URL}/products/public/${encodeURIComponent(domain)}/${productId}`,
+      { timeout: 10000 },
+    )
+    return data || null
+  } catch {
+    return null
+  }
+}
+
 export async function getStoreByDomain(
   domain: string,
   categoryId?: string,
