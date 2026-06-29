@@ -15,6 +15,7 @@ import type { Pixel } from '@/types/store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
+
 /* ─── Types ──────────────────────────────────────────── */
 interface Offer { id: string; name: string; quantity: number; price: number; }
 interface Variant { id: string; name: string; value: string; }

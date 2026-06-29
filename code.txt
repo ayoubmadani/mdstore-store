@@ -1,0 +1,1 @@
+node scripts/bundle-themes.mjs --lang=ar --slug={slug}

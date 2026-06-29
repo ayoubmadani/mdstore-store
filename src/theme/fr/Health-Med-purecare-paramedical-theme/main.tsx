@@ -464,7 +464,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       {/* Mobile menu */}
       <div style={{ maxHeight: open ? '280px' : '0', overflow: 'hidden', transition: 'max-height 0.3s ease', backgroundColor: 'var(--white)', borderBottom: open ? '1px solid var(--line)' : 'none' }}>
         <div style={{ padding: '8px 20px 16px' }}>
-          {[{ h: '/', l: 'Accueil' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/cart', l: 'Panier' }].map((lnk, i) => (
+          {[{ h: '/', l: 'Accueil' }, { h: '/contact', l: 'Contactez-nous' }].map((lnk, i) => (
             <Link key={i} href={lnk.h} onClick={() => setOpen(false)}
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 0', fontSize: '14px', fontWeight: 500, color: 'var(--mid)', borderBottom: '1px solid var(--line)' }}>
               {lnk.l} <ArrowRight style={{ width: '13px', height: '13px', color: 'var(--teal)' }} />
