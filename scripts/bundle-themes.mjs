@@ -7,14 +7,21 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
 
-// قراءة متغيرات البيئة من .env.local
+// قراءة متغيرات البيئة من .env ثم .env.local (الأخير يُلغي الأول)
 function loadEnv() {
-  const envPath = path.join(ROOT, '.env.local')
-  if (!fs.existsSync(envPath)) return
-  const lines = fs.readFileSync(envPath, 'utf-8').split('\n')
-  for (const line of lines) {
-    const [key, ...rest] = line.split('=')
-    if (key && rest.length) process.env[key.trim()] = rest.join('=').trim()
+  for (const name of ['.env', '.env.local']) {
+    const envPath = path.join(ROOT, name)
+    if (!fs.existsSync(envPath)) continue
+    const lines = fs.readFileSync(envPath, 'utf-8').split('\n')
+    for (const line of lines) {
+      const trimmed = line.trim()
+      if (!trimmed || trimmed.startsWith('#')) continue
+      const idx = trimmed.indexOf('=')
+      if (idx < 0) continue
+      const key = trimmed.slice(0, idx).trim()
+      const val = trimmed.slice(idx + 1).trim()
+      if (key) process.env[key] = val
+    }
   }
 }
 loadEnv()

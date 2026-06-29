@@ -3,15 +3,21 @@ import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 
 export const runtime = 'nodejs'
 
-const s3 = new S3Client({
-  region:         process.env.AWS_REGION || 'auto',
-  endpoint:       process.env.AWS_ENDPOINT,
-  forcePathStyle: process.env.AWS_FORCE_PATH_STYLE === 'true',
-  credentials: {
-    accessKeyId:     process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-})
+let s3: S3Client | null = null
+function getS3() {
+  if (!s3) {
+    s3 = new S3Client({
+      region:         process.env.AWS_REGION || 'auto',
+      endpoint:       process.env.AWS_ENDPOINT,
+      forcePathStyle: process.env.AWS_FORCE_PATH_STYLE === 'true',
+      credentials: {
+        accessKeyId:     process.env.AWS_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+      },
+    })
+  }
+  return s3
+}
 
 export async function GET(req: NextRequest) {
   const lang = req.nextUrl.searchParams.get('lang')
@@ -21,7 +27,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Missing params: lang, slug' }, { status: 400 })
 
   try {
-    const obj = await s3.send(new GetObjectCommand({
+    const obj = await getS3().send(new GetObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET_NAME!,
       Key:    `themes/${lang}/${slug}.js`,
     }))
@@ -31,7 +37,7 @@ export async function GET(req: NextRequest) {
     return new NextResponse(code, {
       headers: {
         'Content-Type':  'text/javascript; charset=utf-8',
-        'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+        'Cache-Control': 'no-store',
       },
     })
   } catch {
