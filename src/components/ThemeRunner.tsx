@@ -36,6 +36,8 @@ function makeRequire() {
   return (id: string) => mods[id] ?? {};
 }
 
+// module-level cache: one eval per bundle URL → shared Zustand stores across exports
+const moduleCache = new Map<string, Promise<Record<string, any>>>();
 const bundleCache = new Map<string, React.ComponentType<any>>();
 
 interface ThemeRunnerProps {
@@ -65,25 +67,33 @@ export default function ThemeRunner({
       return;
     }
 
-    fetch(bundleUrl)
-      .then((r) => {
-        if (!r.ok) throw new Error(`R2 ${r.status}`);
-        return r.text();
-      })
-      .then((code) => {
-        const mod = { exports: {} as Record<string, any> };
-        // eslint-disable-next-line no-new-func
-        const fn = new Function('module', 'exports', 'require', 'React', 'console', 'process', code);
-        fn(mod, mod.exports, makeRequire(), React, console, {
-          env: {
-            NEXT_PUBLIC_API_URL:      process.env.NEXT_PUBLIC_API_URL      ?? '',
-            NEXT_PUBLIC_ROOT_DOMAIN:  process.env.NEXT_PUBLIC_ROOT_DOMAIN  ?? '',
-            NODE_ENV:                 process.env.NODE_ENV                  ?? 'production',
-          },
+    let modPromise = moduleCache.get(bundleUrl);
+    if (!modPromise) {
+      modPromise = fetch(bundleUrl)
+        .then((r) => {
+          if (!r.ok) throw new Error(`R2 ${r.status}`);
+          return r.text();
+        })
+        .then((code) => {
+          const mod = { exports: {} as Record<string, any> };
+          // eslint-disable-next-line no-new-func
+          const fn = new Function('module', 'exports', 'require', 'React', 'console', 'process', code);
+          fn(mod, mod.exports, makeRequire(), React, console, {
+            env: {
+              NEXT_PUBLIC_API_URL:      process.env.NEXT_PUBLIC_API_URL      ?? '',
+              NEXT_PUBLIC_ROOT_DOMAIN:  process.env.NEXT_PUBLIC_ROOT_DOMAIN  ?? '',
+              NODE_ENV:                 process.env.NODE_ENV                  ?? 'production',
+            },
+          });
+          return mod.exports;
         });
+      moduleCache.set(bundleUrl, modPromise);
+    }
 
+    modPromise
+      .then((exports) => {
         const comp: React.ComponentType<any> =
-          mod.exports[exportName] ?? mod.exports['default'] ?? mod.exports['Main'];
+          exports[exportName] ?? exports['default'] ?? exports['Main'];
 
         if (typeof comp !== 'function') throw new Error(`export "${exportName}" not found`);
 
