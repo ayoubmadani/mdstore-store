@@ -71,6 +71,7 @@ a{text-decoration:none;color:inherit}
 
 @media(max-width:900px){.det-grid{grid-template-columns:1fr}.det-sticky{position:static;height:70vw;min-height:300px}.cart-grid{grid-template-columns:1fr}.g3,.g4{grid-template-columns:1fr}}
 @media(max-width:600px){.g3,.g4{grid-template-columns:1fr}.f2{grid-template-columns:1fr}}
+@media(max-width:480px){.srch-drop{position:fixed!important;top:60px!important;left:12px!important;right:12px!important;width:auto!important}}
 
   .footer-grid { display:grid; grid-template-columns:1fr; gap:2rem; }
   @media(min-width:768px){.footer-grid{grid-template-columns:1fr 1fr 1fr;gap:40px;}}
@@ -173,7 +174,7 @@ export function Navbar({store,domain}:{store:any;domain:string}){
               <Search style={{width:16,height:16}}/>
             </button>
             {showS&&(
-              <div style={{position:'absolute',top:'calc(100% + 4px)',left:0,width:'300px',zIndex:200,background:'var(--s1)',border:'1px solid var(--br2)'}} className="sd">
+              <div style={{position:'absolute',top:'calc(100% + 4px)',right:0,width:'300px',zIndex:200,background:'var(--s1)',border:'1px solid var(--br2)'}} className="sd srch-drop">
                 <form onSubmit={go} style={{display:'flex',alignItems:'center',borderBottom:'1px solid var(--br)'}}>
                   <input autoFocus type="text" value={sq} onChange={e=>setSq(e.target.value)} placeholder="Rechercher un produit..." style={{flex:1,padding:'11px 14px',background:'transparent',border:'none',color:'var(--tx)',fontSize:'13px',fontFamily:"'Raleway',sans-serif",outline:'none'}}/>
                   {sq&&<button type="button" onClick={()=>setSq('')} style={{background:'none',border:'none',cursor:'pointer',color:'var(--mu)',padding:'0 10px',display:'flex',alignItems:'center'}}><X size={13}/></button>}
@@ -209,12 +210,14 @@ export function Navbar({store,domain}:{store:any;domain:string}){
           </div>
 
           {/* Cart */}
+          {store?.cart !== false && (
           <Link href="/cart" style={{width:40,height:40,display:'flex',alignItems:'center',justifyContent:'center',position:'relative',color:'var(--mu)',transition:'color .18s'}}
             onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--tx)'}}
             onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mu)'}}>
             <ShoppingCart style={{width:16,height:16}}/>
             {count>0&&<span style={{position:'absolute',top:6,right:4,background:'var(--cp)',color:'var(--bg)',fontSize:'9px',fontWeight:800,minWidth:15,height:15,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center'}}>{count}</span>}
           </Link>
+          )}
 
           {/* Hamburger */}
           <button onClick={()=>setMOpen(p=>!p)} style={{width:40,height:40,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'5px',background:'none',border:'none',cursor:'pointer'}}>
@@ -233,7 +236,7 @@ export function Navbar({store,domain}:{store:any;domain:string}){
             <X style={{width:20,height:20}}/>
           </button>
           <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:'center',padding:'0 32px'}}>
-            {[{h:'/',l:'Accueil'},{h:'/cart',l:'Panier'},{h:'/contact',l:'Contact'},{h:'/Privacy',l:'Confidentialité'},{h:'/Terms',l:'Conditions'}].map(lnk=>(
+            {[{h:'/',l:'Accueil'},{h:'/cart',l:'Panier'},{h:'/contact',l:'Contact'},{h:'/Privacy',l:'Confidentialité'},{h:'/Terms',l:'Conditions'}].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk=>(
               <Link key={lnk.h} href={lnk.h} onClick={()=>setMOpen(false)}
                 style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'20px 0',borderBottom:'1px solid var(--br)'}}>
                 <span className="bn" style={{fontSize:'clamp(2rem,7vw,4rem)',color:'var(--tx)',letterSpacing:'0.05em'}}>{lnk.l}</span>
@@ -258,7 +261,7 @@ export function Footer({store}:any){
         </div>
         <div>
           <p className="lbl" style={{marginBottom:14,color:'var(--cp)'}}>Navigation</p>
-          {[{h:'/',l:'Accueil'},{h:'/cart',l:'Panier'},{h:'/contact',l:'Contactez-nous'},{h:'/Privacy',l:'Confidentialité'},{h:'/Terms',l:'Conditions'}].map(lnk=>(
+          {[{h:'/',l:'Accueil'},{h:'/cart',l:'Panier'},{h:'/contact',l:'Contactez-nous'},{h:'/Privacy',l:'Confidentialité'},{h:'/Terms',l:'Conditions'}].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk=>(
             <a key={lnk.h} href={lnk.h} style={{display:'block',fontSize:'12px',color:'var(--mu)',marginBottom:9,letterSpacing:'0.06em',transition:'color .18s'}}
               onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--tx)'}}
               onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mu)'}}>

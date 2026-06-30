@@ -491,7 +491,7 @@ export function Footer({ store }: any) {
                     {/* Section 2 */}
                     <div>
                         <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--peach)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>Liens Rapide</h4>
-                        {[{ h: '/', l: 'Accueil' }, { h: '/cart', l: 'Panier' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/Privacy', l: 'Politique de confidentialité' }, { h: '/Terms', l: 'Conditions et clauses' }].map((lnk, i) => (
+                        {[{ h: '/', l: 'Accueil' }, { h: '/cart', l: 'Panier' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/Privacy', l: 'Politique de confidentialité' }, { h: '/Terms', l: 'Conditions et clauses' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
                             <a key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
                                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = '#fff'; el.style.paddingRight = '8px'; }}
                                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(255,255,255,0.6)'; el.style.paddingRight = '0'; }}>
@@ -796,7 +796,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                 </div>
                             </div>
                             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '0.4rem 1rem', borderRadius: 50, fontWeight: 700, fontSize: '0.82rem', marginBottom: '1.5rem', background: autoGen ? 'var(--peach-lt)' : inStock ? 'var(--mint-lt)' : 'var(--rose-lt)', color: autoGen ? '#D97706' : inStock ? 'var(--mint-dk)' : '#E11D48' }}>
-                                {autoGen ? '♾️ Stock illimité' : inStock ? '✅ Disponible' : '❌ Rupture de stock'}
+                                {autoGen ? '♾️ Stock illimité' : inStock ? '✅ Disponible' : ''}
                             </div>
 
                             {product.offers?.length > 0 && (

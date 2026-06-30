@@ -462,7 +462,7 @@ export function Footer({ store }: any) {
             <p className="pjs" style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.04em', color:'var(--sky)', marginBottom:'16px' }}>
               روابط سريعة
             </p>
-            {[{ h:'/', l:'الرئيسية' }, { h:'/cart', l:'سلة التسوق' }, { h:'/contact', l:'اتصل بنا' }, { h:'/Privacy', l:'سياسة الخصوصية' }, { h:'/Terms', l:'شروط الاستخدام' }].map(lnk => (
+            {[{ h:'/', l:'الرئيسية' }, { h:'/cart', l:'سلة التسوق' }, { h:'/contact', l:'اتصل بنا' }, { h:'/Privacy', l:'سياسة الخصوصية' }, { h:'/Terms', l:'شروط الاستخدام' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk => (
               <a key={lnk.h} href={lnk.h} style={{
                 display:'block', fontSize:'13px', color:'var(--dim)',
                 marginBottom:'8px', transition:'color 0.2s'

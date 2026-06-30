@@ -429,22 +429,26 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               </form>
               {sq.length >= 2 && <Drop />}
             </div>
+            {store?.cart !== false && (
             <Link href="/cart" style={{ position: 'relative', color: 'var(--mid)', display: 'flex', padding: '6px', transition: 'color 0.2s' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--blue)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--mid)'; }}>
               <ShoppingCart style={{ width: '20px', height: '20px' }} />
               {count > 0 && <span style={{ position: 'absolute', top: 2, right: 2, width: '15px', height: '15px', backgroundColor: 'var(--blue)', color: 'white', fontSize: '9px', fontWeight: 700, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
             </Link>
+            )}
           </div>
           {/* Search + Cart icons — mobile only */}
           <div className="mob-icons">
             <button onClick={() => { setShowSearch(p => !p); setOpen(false); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--mid)', padding: '6px', display: 'flex' }}>
               {showSearch ? <X style={{ width: '20px', height: '20px' }} /> : <Search style={{ width: '20px', height: '20px' }} />}
             </button>
+            {store?.cart !== false && (
             <Link href="/cart" style={{ position: 'relative', color: 'var(--mid)', display: 'flex', padding: '6px' }}>
               <ShoppingCart style={{ width: '20px', height: '20px' }} />
               {count > 0 && <span style={{ position: 'absolute', top: 2, right: 2, width: '15px', height: '15px', backgroundColor: 'var(--blue)', color: 'white', fontSize: '9px', fontWeight: 700, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
             </Link>
+            )}
           </div>
         </div>
       </div>
@@ -508,7 +512,7 @@ export function Footer({ store }: any) {
           {/* قسم 2 — روابط */}
           <div>
             <p style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>روابط مفيدة</p>
-            {[{ h: '/', l: 'الرئيسية' }, { h: '/cart', l: 'سلة التسوق' }, { h: '/contact', l: 'تواصل معنا' }, { h: '/Privacy', l: 'سياسة الخصوصية' }, { h: '/Terms', l: 'شروط الخدمة' }].map(lnk => (
+            {[{ h: '/', l: 'الرئيسية' }, { h: '/cart', l: 'سلة التسوق' }, { h: '/contact', l: 'تواصل معنا' }, { h: '/Privacy', l: 'سياسة الخصوصية' }, { h: '/Terms', l: 'شروط الخدمة' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk => (
               <a key={lnk.h} href={lnk.h} style={{ display: 'block', fontSize: '13px', color: 'rgba(255,255,255,0.45)', marginBottom: '8px', transition: 'color 0.2s' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'white'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.45)'; }}>

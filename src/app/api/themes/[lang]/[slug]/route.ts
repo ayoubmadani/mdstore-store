@@ -25,11 +25,21 @@ export async function GET(
 ) {
   const { lang, slug } = await params
 
-  try {
-    const obj = await getS3().send(new GetObjectCommand({
+  const fetchTheme = (themeSlug: string) =>
+    getS3().send(new GetObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET_NAME!,
-      Key:    `themes/${lang}/${slug}.js`,
+      Key:    `themes/${lang}/${themeSlug}.js`,
     }))
+
+  try {
+    let obj
+    try {
+      obj = await fetchTheme(slug)
+    } catch {
+      if (slug === 'default') throw new Error('not found')
+      console.error(`[themes] ${lang}/${slug} R2 404 — falling back to default`)
+      obj = await fetchTheme('default')
+    }
 
     const code = await (obj.Body as any).transformToString()
 

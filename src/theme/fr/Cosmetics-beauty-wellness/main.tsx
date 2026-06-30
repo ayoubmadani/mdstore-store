@@ -977,11 +977,6 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                 }
               </div>
               {discount > 0 && <div style={{ position: 'absolute', top: '12px', right: '12px', backgroundColor: 'var(--rose)', color: 'white', fontSize: '12px', fontWeight: 700, padding: '4px 10px', borderRadius: '3px' }}>-{discount}%</div>}
-              {!inStock && !autoGen && (
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(4px)' }}>
-                  <span className="serif" style={{ fontSize: '1.5rem', fontStyle: 'italic', color: 'var(--mid)' }}>Rupture de stock</span>
-                </div>
-              )}
               {allImages.length > 1 && (
                 <>
                   <button onClick={() => setSel(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', width: '32px', height: '32px', border: '1px solid var(--line)', backgroundColor: 'rgba(255,255,255,0.9)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
@@ -1023,7 +1018,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             </div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '5px 14px', borderRadius: '20px', backgroundColor: inStock || autoGen ? 'rgba(107,45,139,0.08)' : 'rgba(100,80,80,0.08)', color: inStock || autoGen ? 'var(--plum)' : 'var(--mid)', fontSize: '12px', fontWeight: 600, border: `1px solid ${inStock || autoGen ? 'var(--plum-lt)' : 'var(--mid)'}`, marginBottom: '22px' }}>
               <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: 'currentColor' }} />
-              {autoGen ? '∞ Disponible' : inStock ? 'Disponible' : 'Rupture de stock'}
+              {autoGen ? '∞ Disponible' : inStock ? 'Disponible' : ''}
             </div>
             <div style={{ height: '1px', backgroundColor: 'var(--line)', marginBottom: '20px' }} />
 

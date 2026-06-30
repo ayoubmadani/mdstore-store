@@ -486,12 +486,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {[{ h: '/', l: 'الرئيسية' }, { h: '/contact', l: 'تواصل' }].map(i => (
             <Link key={i.h} href={i.h} className="nav-link">{i.l}</Link>
           ))}
+          {store?.cart !== false && (
           <Link href="/cart" style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', color: '#fff', fontSize: '1.2rem', cursor: 'pointer', padding: '8px', transition: 'color 0.2s' }}
             onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#fff'; }}>
             <ShoppingCart size={22} />
             {count > 0 && <span className="cart-badge">{count}</span>}
           </Link>
+          )}
         </div>
 
         {/* Mobile */}
@@ -575,7 +577,7 @@ export function Footer({ store }: any) {
           {/* قسم 2 — الروابط */}
           <div>
             <h4 className="oswald" style={{ fontSize: '1rem', fontWeight: 600, color: '#fff', marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>روابط سريعة</h4>
-            {[{ h: '/', l: 'الرئيسية' }, { h: '/cart', l: 'سلة التسوق' }, { h: '/contact', l: 'تواصل معنا' }, { h: '/Privacy', l: 'سياسة الخصوصية' }, { h: '/Terms', l: 'شروط الخدمة' }].map((lnk, i) => (
+            {[{ h: '/', l: 'الرئيسية' }, { h: '/cart', l: 'سلة التسوق' }, { h: '/contact', l: 'تواصل معنا' }, { h: '/Privacy', l: 'سياسة الخصوصية' }, { h: '/Terms', l: 'شروط الخدمة' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
               <a key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', fontWeight: 400, color: 'var(--g500)', marginBottom: '0.75rem', transition: 'all 0.2s' }}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--accent)'; el.style.paddingRight = '5px'; }}
                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--g500)'; el.style.paddingRight = '0'; }}>
@@ -732,7 +734,7 @@ export function Home({ store, page }: any) {
 
             <div className="hero-actions anim-fade-up d3">
               <a href="#products" className="btn-pri" style={{ textDecoration: 'none' }}>تسوق الآن <ArrowLeft size={16} /></a>
-              {store?.cart !== false && (<Link href="/cart" className="btn-out">السلة</Link>)}
+                            {store?.cart !== false && (<Link href="/cart" className="btn-out">السلة</Link>)}
             </div>
           </div>
 

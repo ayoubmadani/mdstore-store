@@ -486,12 +486,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {[{ h: '/', l: 'Accueil' }, { h: '/contact', l: 'Contact' }].map(i => (
             <Link key={i.h} href={i.h} className="nav-link">{i.l}</Link>
           ))}
+          {store?.cart !== false && (
           <Link href="/cart" style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', color: '#fff', fontSize: '1.2rem', cursor: 'pointer', padding: '8px', transition: 'color 0.2s' }}
             onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--accent)"; }}
             onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#fff'; }}>
             <ShoppingCart size={22} />
             {count > 0 && <span className="cart-badge">{count}</span>}
           </Link>
+          )}
         </div>
 
         {/* Mobile */}
@@ -575,7 +577,7 @@ export function Footer({ store }: any) {
           {/* Section 2 — Liens */}
           <div>
             <h4 className="oswald" style={{ fontSize: '1rem', fontWeight: 600, color: '#fff', marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Liens Rapide</h4>
-            {[{ h: '/', l: 'Accueil' }, { h: '/cart', l: 'Panier' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/Privacy', l: 'Politique de confidentialité' }, { h: '/Terms', l: 'Conditions de service' }].map((lnk, i) => (
+            {[{ h: '/', l: 'Accueil' }, { h: '/cart', l: 'Panier' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/Privacy', l: 'Politique de confidentialité' }, { h: '/Terms', l: 'Conditions de service' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
               <a key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', fontWeight: 400, color: 'var(--g500)', marginBottom: '0.75rem', transition: 'all 0.2s' }}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = "var(--accent)"; el.style.paddingRight = '5px'; }}
                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--g500)'; el.style.paddingRight = '0'; }}>
@@ -732,7 +734,7 @@ export function Home({ store, page }: any) {
 
             <div className="hero-actions anim-fade-up d3">
               <a href="#products" className="btn-pri" style={{ textDecoration: 'none' }}>Acheter maintenant <ArrowRight size={16} /></a>
-              {store?.cart !== false && (<Link href="/cart" className="btn-out">Panier</Link>)}
+                            {store?.cart !== false && (<Link href="/cart" className="btn-out">Panier</Link>)}
             </div>
           </div>
 
@@ -879,11 +881,6 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                 ? <img src={allImages[sel]} alt='' style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem' }}>🏆</div>}
               {discount > 0 && <span className="badge-sale" style={{ position: 'absolute', top: 14, right: 14, padding: '6px 14px', borderRadius: 50, fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase' }}>-{discount}%</span>}
-              {!inStock && !autoGen && (
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(4px)' }}>
-                  <span className="oswald" style={{ fontSize: '1.5rem', color: 'var(--g500)' }}>Rupture de stock</span>
-                </div>
-              )}
               {allImages.length > 1 && (
                 <>
                   <button onClick={() => setSel(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 34, height: 34, borderRadius: '50%', background: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-s)' }}><ChevronRight size={16} /></button>
@@ -922,7 +919,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
             {/* Stock */}
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '5px 14px', borderRadius: 50, marginBottom: '1.5rem', fontWeight: 600, fontSize: '0.82rem', background: inStock || autoGen ? 'rgba(46,204,113,0.1)' : 'rgba(231,76,60,0.08)', color: inStock || autoGen ? 'var(--success)' : 'var(--danger)', border: `1px solid ${inStock || autoGen ? 'rgba(46,204,113,0.25)' : 'rgba(231,76,60,0.2)'}` }}>
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'currentColor', display: 'inline-block' }} />
-              {autoGen ? '∞ Disponible' : inStock ? 'Disponible' : 'Rupture de stock'}
+              {autoGen ? '∞ Disponible' : inStock ? 'Disponible' : ''}
             </div>
 
             <div style={{ height: 1, background: 'var(--g200)', marginBottom: '1.5rem' }} />

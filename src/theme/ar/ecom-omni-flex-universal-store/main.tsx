@@ -323,12 +323,14 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
           </button>
 
           {/* Cart */}
+          {store?.cart !== false && (
           <Link href="/cart" style={{position:'relative',width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.15)',color:'rgba(255,255,255,0.7)',transition:'all 0.2s'}}
             onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.borderColor='var(--blue)';el.style.color='var(--blue)';}}
             onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.borderColor='rgba(255,255,255,0.15)';el.style.color='rgba(255,255,255,0.7)';}}>
             <ShoppingCart style={{width:'15px',height:'15px'}}/>
             {count>0 && <span style={{position:'absolute',top:-4,right:-4,background:'var(--blue)',color:'white',fontSize:'9px',fontWeight:700,minWidth:'16px',height:'16px',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center',padding:'0 3px'}}>{count}</span>}
           </Link>
+          )}
 
           {/* Burger */}
           <button onClick={()=>setOpen(p=>!p)} style={{background:'none',border:'1px solid rgba(255,255,255,0.2)',cursor:'pointer',color:'white',padding:'7px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
@@ -397,7 +399,7 @@ export function Footer({ store }: any) {
           {/* قسم 2 — روابط */}
           <div>
             <p className="bc" style={{fontSize:'14px',fontWeight:700,letterSpacing:'0.1em',color:'var(--blue)',marginBottom:'24px'}}>روابط سريعة</p>
-            {[{h:'/',l:'الرئيسية'},{h:'/cart',l:'سلة التسوق'},{h:'/contact',l:'اتصل بنا'},{h:'/Privacy',l:'سياسة الخصوصية'},{h:'/Terms',l:'شروط الخدمة'}].map(lnk=>(
+            {[{h:'/',l:'الرئيسية'},{h:'/cart',l:'سلة التسوق'},{h:'/contact',l:'اتصل بنا'},{h:'/Privacy',l:'سياسة الخصوصية'},{h:'/Terms',l:'شروط الخدمة'}].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk=>(
               <a key={lnk.h} href={lnk.h} style={{display:'block',fontSize:'13px',color:'rgba(255,255,255,0.5)',marginBottom:'12px',transition:'all 0.2s'}}
                 onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.color='var(--white)';el.style.paddingRight='5px';}}
                 onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.color='rgba(255,255,255,0.5)';el.style.paddingRight='0';}}>

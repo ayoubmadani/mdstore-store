@@ -482,7 +482,7 @@ export function Footer({ store }: any) {
             <p className="pd" style={{ fontSize:'12px', fontWeight:600, color:'var(--gold)', marginBottom:'16px' }}>
               روابط سريعة
             </p>
-            {[{ h:'/', l:'الرئيسية' }, { h:'/cart', l:'سلة التسوق' }, { h:'/contact', l:'اتصل بنا' }, { h:'/Privacy', l:'سياسة الخصوصية' }, { h:'/Terms', l:'شروط الاستخدام' }].map(lnk => (
+            {[{ h:'/', l:'الرئيسية' }, { h:'/cart', l:'سلة التسوق' }, { h:'/contact', l:'اتصل بنا' }, { h:'/Privacy', l:'سياسة الخصوصية' }, { h:'/Terms', l:'شروط الاستخدام' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk => (
               <a key={lnk.h} href={lnk.h} style={{
                 display:'block', fontSize:'13px', color:'rgba(255,255,255,0.6)',
                 marginBottom:'8px', transition:'color 0.2s'

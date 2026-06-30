@@ -405,22 +405,26 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
           <Link href="/" style={{ color: 'var(--mid)', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>المتجر</Link>
           <Link href="/contact" style={{ color: 'var(--mid)', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>تواصل معنا</Link>
           {/* Cart Icon */}
+          {store?.cart !== false && (
           <Link href="/cart" style={{ position: 'relative', color: 'var(--mid)', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '38px', height: '38px', border: '1px solid var(--line)', borderRadius: '6px', transition: 'all 0.2s' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--cyan)'; (e.currentTarget as HTMLElement).style.color = 'var(--cyan)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--line)'; (e.currentTarget as HTMLElement).style.color = 'var(--mid)'; }}>
             <ShoppingCart size={18} />
             {itemsCartCount > 0 && <span className="cart-badge">{itemsCartCount}</span>}
           </Link>
+          )}
           <a href="#products" className="btn-cyan" style={{ padding: '8px 18px', fontSize: '12px' }}>تسوق الآن</a>
         </div>
 
         {/* Mobile Toggle */}
         <div style={{ display: 'none', gap: '10px' }} className="mobile-only-flex">
           {/* Mobile Cart */}
+          {store?.cart !== false && (
           <Link href="/cart" style={{ position: 'relative', background: 'none', border: '1px solid var(--line)', borderRadius: '6px', color: 'var(--cyan)', width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
             <ShoppingCart size={20} />
             {itemsCartCount > 0 && <span className="cart-badge">{itemsCartCount}</span>}
           </Link>
+          )}
           <button onClick={() => setShowSearch(!showSearch)} style={{ background: 'none', border: 'none', color: 'var(--cyan)', cursor: 'pointer' }}><Search size={22} /></button>
           <button onClick={() => setOpen(!open)} style={{ background: 'none', border: 'none', color: 'var(--cyan)', cursor: 'pointer' }}>{open ? <X size={24} /> : <Menu size={24} />}</button>
         </div>
@@ -648,9 +652,11 @@ export function Home({ store, page }: any) {
             <a href="#products" className="btn-cyan" style={{ fontSize: '15px', padding: '14px 32px', textDecoration: 'none' }}>
               <Gamepad2 style={{ width: '16px', height: '16px' }} /> تسوق الآن
             </a>
+            {store?.cart !== false && (
             <Link href="/cart" className="btn-ghost-c" style={{ fontSize: '14px', padding: '13px 28px', textDecoration: 'none' }}>
               <ShoppingCart style={{ width: '15px', height: '15px' }} /> السلة
             </Link>
+            )}
           </div>
           <div style={{ display: 'flex', gap: '32px', marginTop: '48px', paddingTop: '32px', borderTop: '1px solid var(--line)', flexWrap: 'wrap' }}>
             {[{ n: `${products.length}+`, l: 'منتج متاح', c: 'var(--cyan)' }, { n: '58', l: 'ولاية توصيل', c: 'var(--pink)' }, { n: '100%', l: 'منتجات أصيلة', c: 'var(--gold)' }].map((s, i) => (

@@ -537,7 +537,7 @@ export function Footer({ store }: any) {
           {/* قسم 2 — الروابط */}
           <div>
             <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'16px'}}>// الروابط</p>
-            {[{h:'/',l:'الرئيسية'},{h:'/cart',l:'سلة التسوق'},{h:'/contact',l:'تواصل معنا'},{h:'/Privacy',l:'سياسة الخصوصية'},{h:'/Terms',l:'شروط الاستخدام'}].map(lnk=>(
+            {[{h:'/',l:'الرئيسية'},{h:'/cart',l:'سلة التسوق'},{h:'/contact',l:'تواصل معنا'},{h:'/Privacy',l:'سياسة الخصوصية'},{h:'/Terms',l:'شروط الاستخدام'}].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk=>(
               <a key={lnk.h} href={lnk.h} style={{display:'block',fontSize:'13px',color:'var(--mid)',marginBottom:'8px',transition:'color 0.2s'}}
                 onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--fire)';}}
                 onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mid)';}}>

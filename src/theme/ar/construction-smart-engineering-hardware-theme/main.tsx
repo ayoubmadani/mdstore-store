@@ -371,7 +371,7 @@ export function Footer({ store }: any) {
           </div>
           <div>
             <h4 style={{ fontSize: '0.7rem', fontWeight: 700, color: A, textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: '1.25rem' }}>الصفحات</h4>
-            {[{ h: '/', l: 'الرئيسية' }, { h: '/cart', l: 'السلة' }, { h: '/contact', l: 'تواصل معنا' }, { h: '/Privacy', l: 'الخصوصية' }, { h: '/Terms', l: 'الشروط' }].map((lnk, i) => (
+            {[{ h: '/', l: 'الرئيسية' }, { h: '/cart', l: 'السلة' }, { h: '/contact', l: 'تواصل معنا' }, { h: '/Privacy', l: 'الخصوصية' }, { h: '/Terms', l: 'الشروط' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
               <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'rgba(255,255,255,0.45)', marginBottom: '0.625rem', transition: 'color 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = A)}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.45)')}>

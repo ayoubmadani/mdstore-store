@@ -394,11 +394,6 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                   -{discount}%
                 </span>
               )}
-              {!inStock && !autoGen && (
-                <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ background: '#111', color: '#fff', padding: '0.5rem 1rem', fontSize: '0.85rem', fontWeight: 600 }}>Rupture de stock</span>
-                </div>
-              )}
             </div>
             {allImages.length > 1 && (
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', overflowX: 'auto' }}>

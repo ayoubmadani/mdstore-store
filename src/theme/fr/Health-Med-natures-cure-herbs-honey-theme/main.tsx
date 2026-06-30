@@ -482,7 +482,7 @@ export function Footer({ store }: any) {
             <p className="pd" style={{ fontSize:'12px', fontWeight:600, color:'var(--gold)', marginBottom:'16px' }}>
               Liens Rapide
             </p>
-            {[{ h:'/', l:'Accueil' }, { h:'/cart', l:'Panier' }, { h:'/contact', l:'Appelez-nous' }, { h:'/Privacy', l:'Politique de confidentialité' }, { h:'/Terms', l:"Conditions d'utilisation" }].map(lnk => (
+            {[{ h:'/', l:'Accueil' }, { h:'/cart', l:'Panier' }, { h:'/contact', l:'Appelez-nous' }, { h:'/Privacy', l:'Politique de confidentialité' }, { h:'/Terms', l:"Conditions d'utilisation" }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk => (
               <a key={lnk.h} href={lnk.h} style={{
                 display:'block', fontSize:'13px', color:'rgba(255,255,255,0.6)',
                 marginBottom:'8px', transition:'color 0.2s'

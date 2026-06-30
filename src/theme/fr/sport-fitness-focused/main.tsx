@@ -537,7 +537,7 @@ export function Footer({ store }: any) {
           {/* Section 2 — Liens */}
           <div>
             <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'16px'}}>// Liens</p>
-            {[{h:'/',l:'Accueil'},{h:'/cart',l:'Panier'},{h:'/contact',l:'Contactez-nous'},{h:'/Privacy',l:'Politique de confidentialité'},{h:'/Terms',l:"Conditions d'utilisation"}].map(lnk=>(
+            {[{h:'/',l:'Accueil'},{h:'/cart',l:'Panier'},{h:'/contact',l:'Contactez-nous'},{h:'/Privacy',l:'Politique de confidentialité'},{h:'/Terms',l:"Conditions d'utilisation"}].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk=>(
               <a key={lnk.h} href={lnk.h} style={{display:'block',fontSize:'13px',color:'var(--mid)',marginBottom:'8px',transition:'color 0.2s'}}
                 onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--fire)';}}
                 onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mid)';}}>

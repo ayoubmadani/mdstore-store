@@ -4,15 +4,15 @@ import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
     Star, ChevronDown, AlertCircle, X, ToggleRight,
     ArrowRight, Plus, Minus, CheckCircle2, Lock, Shield,
     Package, ShieldCheck, Phone, User, Search, ShoppingBag,
     Trash2, Loader2, ChevronLeft, ChevronRight, Heart,
-    ShoppingCart, Leaf, Sparkles, Droplets, Home as HomeIcon, Building2,
-    
+    ShoppingCart, Leaf, Sparkles, Droplets, Home as HomeIcon, Building2, Menu,
+
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
@@ -152,6 +152,13 @@ const CSS = `
   .cat-icon.active svg { color:var(--white)!important; }
 
   /* GRIDS */
+  .nav-links  { display:flex; align-items:center; gap:24px; flex:1; justify-content:center; }
+  .nav-burger { display:none; }
+  @media (max-width:700px) {
+    .nav-links { display:none; }
+    .nav-burger { display:flex; }
+  }
+
   .prod-grid  { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
   .cat-grid   { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
   .footer-g   { display:grid; grid-template-columns:1fr 1fr 1fr; gap:32px; }
@@ -311,13 +318,20 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 {/* Barre supérieure principale */}
                 <div style={{ height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
 
-                    {/* Icône Recherche et activation de la barre */}
-                    <button onClick={() => setShowS(!showS)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--char)', display: 'flex', padding: '8px' }}>
-                        {showS ? <X style={{ width: '20px', height: '20px' }} /> : <Search style={{ width: '20px', height: '20px' }} />}
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        {/* Bouton menu - Mobile uniquement */}
+                        <button onClick={() => { setOpen(!open); setShowS(false); }} className="nav-burger" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--char)', padding: '8px' }}>
+                            {open ? <X style={{ width: '20px', height: '20px' }} /> : <Menu style={{ width: '20px', height: '20px' }} />}
+                        </button>
 
-                    {/* Liens de navigation - Desktop */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1, justifyContent: 'center' }}>
+                        {/* Icône Recherche et activation de la barre */}
+                        <button onClick={() => { setShowS(!showS); setOpen(false); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--char)', display: 'flex', padding: '8px' }}>
+                            {showS ? <X style={{ width: '20px', height: '20px' }} /> : <Search style={{ width: '20px', height: '20px' }} />}
+                        </button>
+                    </div>
+
+                    {/* Liens de navigation - Desktop uniquement */}
+                    <div className="nav-links">
                         <Link href="/" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--sage)', borderBottom: '2px solid var(--sage)', paddingBottom: '4px' }}>Accueil</Link>
                         <Link href="/contact" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--char)' }}>Contactez-nous</Link>
                     </div>
@@ -331,6 +345,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                             }
                         </Link>
 
+                        {store?.cart !== false && (
                         <Link href="/cart" style={{ position: 'relative', color: 'var(--char)', display: 'flex', padding: '6px' }}>
                             <ShoppingBag style={{ width: '20px', height: '20px' }} />
                             {count > 0 && (
@@ -339,8 +354,17 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                                 </span>
                             )}
                         </Link>
+                        )}
                     </div>
                 </div>
+
+                {/* Menu déroulant - Mobile uniquement */}
+                {open && (
+                    <div style={{ padding: '8px 0 16px', borderTop: '1px solid var(--line)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <Link href="/" onClick={() => setOpen(false)} style={{ fontSize: '14px', fontWeight: 600, color: 'var(--char)', padding: '10px 4px' }}>Accueil</Link>
+                        <Link href="/contact" onClick={() => setOpen(false)} style={{ fontSize: '14px', fontWeight: 600, color: 'var(--char)', padding: '10px 4px' }}>Contactez-nous</Link>
+                    </div>
+                )}
 
                 {/* Barre Recherche déroulante au clic sur l'icône */}
                 {showS && (
@@ -588,22 +612,20 @@ export function Home({ store, page }: any) {
     const cats: any[] = store.categories || [];
     if (!page) page = 1;
     const countPage = Math.ceil((store.count || products.length) / 48);
-    const [activeCat, setActiveCat] = useState<string | null>(null);
+    const searchParams = useSearchParams();
+    const activeCategory = searchParams.get('category');
 
     const [hoveredId, setHoveredId] = useState(null);
-    const filtered = useMemo(() => {
-        if (!activeCat) return products;
-        return products.filter((p: any) => p.categoryId === activeCat);
-    }, [products, activeCat]);
 
-    /* Default fragrance categories if none from store */
+    /* Default fragrance categories if none from store (decorative only) */
     const fragranceCats = [
         { id: 'floral', name: 'Rose', icon: <IconFloral /> },
         { id: 'wood', name: 'Bois', icon: <IconWood /> },
         { id: 'citrus', name: 'Acidulé', icon: <IconCitrus /> },
         { id: 'spray', name: 'Spray Bio', icon: <IconSpray /> },
     ];
-    const displayCats = cats.length > 0
+    const hasRealCats = cats.length > 0;
+    const displayCats = hasRealCats
         ? cats.slice(0, 8).map((c: any, i: number) => ({ ...c, icon: fragranceCats[i % 4].icon }))
         : fragranceCats;
 
@@ -641,33 +663,52 @@ export function Home({ store, page }: any) {
             {/* ── CATEGORY CIRCLES — "Catégories" ── */}
             <section style={{ padding: '32px 20px', background: 'var(--white)' }}>
                 <h2 className="sr" style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--char)', textAlign: 'center', marginBottom: '24px' }}>Catégories</h2>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 15, justifyItems: 'center' }}>
-                    {displayCats.map((cat, i) => (
-                        <button
-                            key={cat.id || i}
-                            onClick={() => setActiveCat(activeCat === cat.id ? null : cat.id)}
-                            onMouseEnter={() => setHoveredId(cat.id)}
-                            onMouseLeave={() => setHoveredId(null)}
-                            style={{ background: 'none', border: 'none' }}
-                        >
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 15, justifyItems: 'center', justifyContent: 'center' }}>
+                    {hasRealCats && (
+                        <Link href="?" style={{ background: 'none', border: 'none', textDecoration: 'none' }}>
                             <span style={{
-                                fontSize: '12px',
-                                fontWeight: 600,
-                                // Changer la couleur du texte et du fond selon l'état de sélection
-                                color: hoveredId === cat.id ? 'var(--white)' : 'var(--char)',
-                                backgroundColor: hoveredId === cat.id ? 'var(--sage)' : 'transparent',
-                                textAlign: 'center',
-                                lineHeight: 1.3,
-                                border: "1px solid var(--sage)",
-                                padding: '8px 20px',
-                                borderRadius: '20px', // pour des bords arrondis (forme Pill)
-                                transition: 'all 0.3s ease', // animation douce au clic
-                                display: 'inline-block'
+                                fontSize: '12px', fontWeight: 600,
+                                color: !activeCategory ? 'var(--white)' : 'var(--char)',
+                                backgroundColor: !activeCategory ? 'var(--sage)' : 'transparent',
+                                textAlign: 'center', lineHeight: 1.3, border: '1px solid var(--sage)',
+                                padding: '8px 20px', borderRadius: '20px', transition: 'all 0.3s ease', display: 'inline-block'
                             }}>
-                                {cat.name}
+                                Tous
                             </span>
-                        </button>
-                    ))}
+                        </Link>
+                    )}
+                    {displayCats.map((cat, i) => {
+                        const isActive = hasRealCats && activeCategory === String(cat.id);
+                        const Tag: any = hasRealCats ? Link : 'button';
+                        const tagProps: any = hasRealCats
+                            ? { href: `?category=${cat.id}` }
+                            : { type: 'button', style: { background: 'none', border: 'none', cursor: 'default' } };
+                        return (
+                            <Tag
+                                key={cat.id || i}
+                                {...tagProps}
+                                onMouseEnter={() => setHoveredId(cat.id)}
+                                onMouseLeave={() => setHoveredId(null)}
+                                style={{ background: 'none', border: 'none', textDecoration: 'none', ...(tagProps.style || {}) }}
+                            >
+                                <span style={{
+                                    fontSize: '12px',
+                                    fontWeight: 600,
+                                    color: isActive || hoveredId === cat.id ? 'var(--white)' : 'var(--char)',
+                                    backgroundColor: isActive || hoveredId === cat.id ? 'var(--sage)' : 'transparent',
+                                    textAlign: 'center',
+                                    lineHeight: 1.3,
+                                    border: "1px solid var(--sage)",
+                                    padding: '8px 20px',
+                                    borderRadius: '20px',
+                                    transition: 'all 0.3s ease',
+                                    display: 'inline-block'
+                                }}>
+                                    {cat.name}
+                                </span>
+                            </Tag>
+                        );
+                    })}
                 </div>
             </section>
 
@@ -675,14 +716,14 @@ export function Home({ store, page }: any) {
             <section id="products" style={{ padding: '8px 16px 32px', background: 'var(--white)' }}>
                 <h2 className="sr" style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--char)', textAlign: 'center', marginBottom: '20px' }}>Cosmétiques</h2>
 
-                {filtered.length === 0 ? (
+                {products.length === 0 ? (
                     <div style={{ padding: '60px 0', textAlign: 'center' }}>
                         <Droplets style={{ width: '48px', height: '48px', color: 'var(--sage)', opacity: 0.3, display: 'block', margin: '0 auto 12px' }} />
                         <p style={{ color: 'var(--mist)', fontSize: '14px' }}>Aucun produit pour l'instant</p>
                     </div>
                 ) : (
                     <div className="prod-grid">
-                        {filtered.map((p: any, i: number) => {
+                        {products.map((p: any, i: number) => {
                             const img = p.productImage || p.imagesProduct?.[0]?.imageUrl;
                             const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
                             return (

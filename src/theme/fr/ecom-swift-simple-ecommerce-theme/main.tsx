@@ -271,6 +271,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+            {store?.cart !== false && (
             <Link href="/cart" style={{ position: 'relative', color: '#000' }}>
               <ShoppingBag size={22} />
               {itemsCartCount > 0 && (
@@ -279,6 +280,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 </span>
               )}
             </Link>
+            )}
 
             <button onClick={() => setOpen(!open)} style={{ background: 'none', border: 'none', cursor: 'pointer' }} className="lg-hidden">
               {open ? <X size={24} /> : <Menu size={24} />}

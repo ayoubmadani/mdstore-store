@@ -462,7 +462,7 @@ export function Footer({ store }: any) {
             <p className="pjs" style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.04em', color:'var(--sky)', marginBottom:'16px' }}>
               Liens Rapide
             </p>
-            {[{ h:'/', l:'Accueil' }, { h:'/cart', l:'Panier' }, { h:'/contact', l:'Appelez-nous' }, { h:'/Privacy', l:'Politique de confidentialité' }, { h:'/Terms', l:"Conditions d'utilisation" }].map(lnk => (
+            {[{ h:'/', l:'Accueil' }, { h:'/cart', l:'Panier' }, { h:'/contact', l:'Appelez-nous' }, { h:'/Privacy', l:'Politique de confidentialité' }, { h:'/Terms', l:"Conditions d'utilisation" }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk => (
               <a key={lnk.h} href={lnk.h} style={{
                 display:'block', fontSize:'13px', color:'var(--dim)',
                 marginBottom:'8px', transition:'color 0.2s'

@@ -551,7 +551,7 @@ export function Footer({ store }: any) {
           {/* Section 2 — Liens */}
           <div>
             <h4 style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1rem', color: 'var(--sun)', marginBottom: '1.25rem' }}>🗺️ Liens Rapide</h4>
-            {[{ h: '/', l: 'Accueil', e: '🏠' }, { h: '/cart', l: 'Panier', e: '🛒' }, { h: '/contact', l: 'Contactez-nous', e: '📞' }, { h: '/Privacy', l: 'Confidentialité', e: '🔒' }, { h: '/Terms', l: 'Conditions', e: '📋' }].map((lnk, i) => (
+            {[{ h: '/', l: 'Accueil', e: '🏠' }, { h: '/cart', l: 'Panier', e: '🛒' }, { h: '/contact', l: 'Contactez-nous', e: '📞' }, { h: '/Privacy', l: 'Confidentialité', e: '🔒' }, { h: '/Terms', l: 'Conditions', e: '📋' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
               <a key={i} href={lnk.h} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--sky)'; el.style.transform = 'translateX(-4px)'; }}
                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(255,255,255,0.5)'; el.style.transform = ''; }}>
@@ -687,9 +687,11 @@ export function Home({ store, page }: any) {
             <a href="#products" className="btn-bouncy" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.9rem 2rem', borderRadius: 18, background: 'linear-gradient(135deg, var(--coral), var(--grape))', color: '#fff', fontWeight: 900, fontSize: '0.95rem', boxShadow: '0 8px 28px rgba(255,107,107,0.4)' }}>
               🛍️ Acheter maintenant
             </a>
+            {store?.cart !== false && (
             <Link href="/cart" className="btn-bouncy" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.9rem 2rem', borderRadius: 18, border: '3px solid var(--sun)', background: '#fff', color: 'var(--text)', fontWeight: 900, fontSize: '0.95rem', boxShadow: '0 4px 16px rgba(255,217,61,0.3)' }}>
               🎁 Panier
             </Link>
+            )}
           </div>
         </div>
       </section>
@@ -829,11 +831,6 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                   <button onClick={() => setSel(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.9)', border: '2px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={18} /></button>
                 </>
               )}
-              {!inStock && !autoGen && (
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,251,240,0.88)', backdropFilter: 'blur(4px)' }}>
-                  <div style={{ padding: '0.75rem 1.5rem', borderRadius: 16, border: '3px solid var(--coral)', color: 'var(--coral)', fontFamily: "'Nunito',sans-serif", fontSize: '1rem', background: '#fff' }}>😢 Rupture de stock</div>
-                </div>
-              )}
             </div>
             {allImages.length > 1 && (
               <div className="thumb-row">
@@ -868,7 +865,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
 
               {/* Stock */}
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '0.4rem 1rem', borderRadius: 50, fontWeight: 800, fontSize: '0.8rem', marginBottom: '1.5rem', background: autoGen ? 'rgba(255,217,61,0.15)' : inStock ? 'rgba(110,231,183,0.15)' : 'rgba(255,107,107,0.1)', border: `2px solid ${autoGen ? 'var(--sun-dk)' : inStock ? 'var(--mint-dk)' : 'var(--coral)'}`, color: autoGen ? 'var(--sun-dk)' : inStock ? 'var(--mint-dk)' : 'var(--coral)' }}>
-                {autoGen ? '♾️ Stock illimité' : inStock ? '✅ Disponible' : '❌ Rupture de stock'}
+                {autoGen ? '♾️ Stock illimité' : inStock ? '✅ Disponible' : ''}
               </div>
 
               {/* Offers */}

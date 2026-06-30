@@ -530,7 +530,7 @@ export function Footer({ store }: any) {
                     {/* Section 2 */}
                     <div>
                         <h4 style={{ fontFamily: "'Nunito',sans-serif", fontSize: '1.1rem', color: 'var(--yellow)', marginBottom: '1.25rem' }}>🗺️ Liens Rapide</h4>
-                        {[{ h: '/', l: 'Accueil', e: '🏠' }, { h: '/cart', l: 'Panier', e: '🛒' }, { h: '/contact', l: 'Contactez-nous', e: '📞' }, { h: '/Privacy', l: 'Confidentialité', e: '🔒' }, { h: '/Terms', l: 'Conditions', e: '📋' }].map((lnk, i) => (
+                        {[{ h: '/', l: 'Accueil', e: '🏠' }, { h: '/cart', l: 'Panier', e: '🛒' }, { h: '/contact', l: 'Contactez-nous', e: '📞' }, { h: '/Privacy', l: 'Confidentialité', e: '🔒' }, { h: '/Terms', l: 'Conditions', e: '📋' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
                             <a key={i} href={lnk.h} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
                                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--yellow)'; el.style.transform = 'translateX(-4px)'; }}
                                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(255,255,255,0.5)'; el.style.transform = ''; }}>
@@ -889,7 +889,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
 
                             {/* Stock */}
                             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '0.4rem 1rem', borderRadius: 8, fontWeight: 800, fontSize: '0.82rem', marginBottom: '1.5rem', background: autoGen ? 'var(--yellow-lt)' : inStock ? 'var(--green-lt)' : '#FEE2E2', color: autoGen ? 'var(--yellow-dk)' : inStock ? 'var(--green-dk)' : 'var(--red)' }}>
-                                {autoGen ? '♾️ Stock illimité' : inStock ? '✅ Disponible' : '❌ Rupture de stock'}
+                                {autoGen ? '♾️ Stock illimité' : inStock ? '✅ Disponible' : ''}
                             </div>
 
                             {/* Offers */}

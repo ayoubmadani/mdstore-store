@@ -530,7 +530,7 @@ export function Footer({ store }: any) {
                     {/* قسم 2 */}
                     <div>
                         <h4 style={{ fontFamily: "'Boogaloo',cursive", fontSize: '1.1rem', color: 'var(--yellow)', marginBottom: '1.25rem' }}>🗺️ روابط سريعة</h4>
-                        {[{ h: '/', l: 'الرئيسية', e: '🏠' }, { h: '/cart', l: 'سلة التسوق', e: '🛒' }, { h: '/contact', l: 'تواصل معنا', e: '📞' }, { h: '/Privacy', l: 'الخصوصية', e: '🔒' }, { h: '/Terms', l: 'الشروط', e: '📋' }].map((lnk, i) => (
+                        {[{ h: '/', l: 'الرئيسية', e: '🏠' }, { h: '/cart', l: 'سلة التسوق', e: '🛒' }, { h: '/contact', l: 'تواصل معنا', e: '📞' }, { h: '/Privacy', l: 'الخصوصية', e: '🔒' }, { h: '/Terms', l: 'الشروط', e: '📋' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
                             <a key={i} href={lnk.h} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
                                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--yellow)'; el.style.transform = 'translateX(-4px)'; }}
                                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(255,255,255,0.5)'; el.style.transform = ''; }}>

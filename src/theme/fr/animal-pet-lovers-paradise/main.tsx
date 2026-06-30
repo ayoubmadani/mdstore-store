@@ -423,7 +423,7 @@ export function Footer({ store }: any) {
                     </div>
                     <div>
                         <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--amber)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>Liens rapides</h4>
-                        {[{ h: '/', l: 'Accueil' }, { h: '/cart', l: 'Panier' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/Privacy', l: 'Confidentialité' }, { h: '/Terms', l: 'Conditions' }].map((lnk, i) => (
+                        {[{ h: '/', l: 'Accueil' }, { h: '/cart', l: 'Panier' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/Privacy', l: 'Confidentialité' }, { h: '/Terms', l: 'Conditions' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
                             <a key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
                                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = '#fff'; el.style.paddingLeft = '8px'; }}
                                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(255,255,255,0.6)'; el.style.paddingLeft = '0'; }}>
@@ -714,7 +714,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                 </div>
                             </div>
                             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '0.4rem 1rem', borderRadius: 50, fontWeight: 700, fontSize: '0.82rem', marginBottom: '1.5rem', background: autoGen ? 'var(--amber-lt)' : inStock ? 'var(--green-lt)' : '#FFE4E6', color: autoGen ? 'var(--amber-dk)' : inStock ? 'var(--green-dk)' : '#E11D48' }}>
-                                {autoGen ? '♾️ Stock illimité' : inStock ? '✅ En stock' : '❌ Rupture de stock'}
+                                {autoGen ? '♾️ Stock illimité' : inStock ? '✅ En stock' : ''}
                             </div>
 
                             {product.offers?.length > 0 && (

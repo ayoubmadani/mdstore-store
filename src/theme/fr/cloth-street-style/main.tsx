@@ -446,12 +446,14 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
           )}
         </div>
         {/* Cart */}
+        {store?.cart !== false && (
         <Link href="/cart" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', border: '1px solid var(--ink)', background: 'none', color: 'var(--ink)', transition: 'all 0.2s' }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--ink)"; (e.currentTarget as HTMLElement).style.color = 'var(--paper)'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'none'; (e.currentTarget as HTMLElement).style.color = 'var(--ink)'; }}>
           <ShoppingCart style={{ width: '13px', height: '13px' }} />
           {count > 0 && <span style={{ position: 'absolute', top: -4, right: -4, background: 'var(--punch)', color: 'var(--paper)', fontSize: '8px', fontWeight: 700, minWidth: '16px', height: '16px', borderRadius: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px' }}>{count}</span>}
         </Link>
+        )}
         {/* Menu */}
         <button onClick={onMenuOpen} style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '8px', letterSpacing: '0.22em', color: 'var(--ink)' }}>
           MENU
@@ -502,7 +504,7 @@ export function Footer({ store }: any) {
         {/* Section 2 — Liens */}
         <div>
           <p style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--punch)', marginBottom: '14px', textTransform: 'uppercase' }}>// Liens</p>
-          {[{ h: '/', l: 'Accueil' }, { h: '/cart', l: 'Panier' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/Privacy', l: 'Confidentialité' }, { h: '/Terms', l: 'Conditions' }].map(lnk => (
+          {[{ h: '/', l: 'Accueil' }, { h: '/cart', l: 'Panier' }, { h: '/contact', l: 'Contactez-nous' }, { h: '/Privacy', l: 'Confidentialité' }, { h: '/Terms', l: 'Conditions' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk => (
             <a key={lnk.h} href={lnk.h} style={{ display: 'block', fontSize: '10px', color: 'rgba(242,239,232,0.35)', marginBottom: '8px', transition: 'color 0.2s', letterSpacing: '0.08em' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--punch)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(242,239,232,0.35)'; }}>

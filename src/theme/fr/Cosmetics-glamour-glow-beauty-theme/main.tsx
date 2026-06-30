@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import {
   ShoppingBag, Search, X, ChevronDown, Heart, Star, Sparkles,
@@ -151,7 +152,7 @@ const GLOBAL_CSS = `
   /* Categories */
   .gg-cats { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
   .gg-cats::-webkit-scrollbar { display: none; }
-  .gg-cat-chip { flex-shrink: 0; padding: 8px 18px; border-radius: 999px; border: 1.5px solid var(--line-dk); background: var(--white); color: var(--mid); font-family: 'Nunito Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .gg-cat-chip { flex-shrink: 0; padding: 8px 18px; border-radius: 999px; border: 1.5px solid var(--line-dk); background: var(--white); color: var(--mid); font-family: 'Nunito Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; }
   .gg-cat-chip.active, .gg-cat-chip:hover { background: var(--pink); border-color: var(--pink); color: #fff; }
 
   /* Card */
@@ -321,10 +322,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Actions */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <button className="gg-icon-btn" onClick={openSearch}><Search size={18} /></button>
+            {store?.cart !== false && (
             <Link href="/cart" style={{ position: 'relative', display: 'inline-flex' }}>
               <button className="gg-icon-btn"><ShoppingBag size={18} /></button>
               {count > 0 && <span className="gg-cart-badge">{count}</span>}
             </Link>
+            )}
           </div>
         </div>
       </nav>
@@ -513,12 +516,8 @@ export function Home({ store, domain, page }: { store: any; domain: string; page
   const cats: any[] = store.categories || [];
   const countPage = Math.ceil((store.count || products.length) / 48);
 
-  const [activeCat, setActiveCat] = useState<string | null>(null);
-
-  const visible = useMemo(
-    () => activeCat ? products.filter((p: any) => p.categoryId === activeCat) : products,
-    [products, activeCat]
-  );
+  const searchParams = useSearchParams();
+  const activeCat = searchParams.get('category');
 
   return (
     <>
@@ -594,24 +593,24 @@ export function Home({ store, domain, page }: { store: any; domain: string; page
         {cats.length > 0 && (
           <div style={{ marginBottom: 28 }}>
             <div className="gg-cats">
-              <button className={`gg-cat-chip${!activeCat ? ' active' : ''}`} onClick={() => setActiveCat(null)}>Tout</button>
+              <Link href="?" className={`gg-cat-chip${!activeCat ? ' active' : ''}`}>Tout</Link>
               {cats.map((cat: any) => (
-                <button key={cat.id} className={`gg-cat-chip${activeCat === cat.id ? ' active' : ''}`} onClick={() => setActiveCat(cat.id)}>
+                <Link key={cat.id} href={`?category=${cat.id}`} className={`gg-cat-chip${activeCat === String(cat.id) ? ' active' : ''}`}>
                   {cat.name}
-                </button>
+                </Link>
               ))}
             </div>
           </div>
         )}
 
-        {visible.length === 0 ? (
+        {products.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--dim)' }}>
             <Sparkles size={36} style={{ opacity: 0.3, margin: '0 auto 12px', display: 'block' }} />
             <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.3rem', fontStyle: 'italic' }}>Aucun produit</p>
           </div>
         ) : (
           <div className="gg-cards-grid">
-            {visible.map((p: any) => {
+            {products.map((p: any) => {
               const img = p.productImage || p.imagesProduct?.[0]?.imageUrl;
               const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
               return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="Voir les détails" />;
@@ -668,11 +667,6 @@ export function Details({ product, discount, allImages, domain, allAttrs, finalP
                 -{discount}%
               </div>
             )}
-            {!inStock && !autoGen && (
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(4px)' }}>
-                <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.4rem', fontStyle: 'italic', color: 'var(--mid)' }}>Rupture de stock</span>
-              </div>
-            )}
             {allImages?.length > 1 && (
               <>
                 <button onClick={() => setSel(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, border: '1px solid var(--line)', background: 'rgba(255,255,255,0.9)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
@@ -718,7 +712,7 @@ export function Details({ product, discount, allImages, domain, allAttrs, finalP
           {/* Stock badge */}
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '5px 14px', borderRadius: 20, background: inStock || autoGen ? 'rgba(255,31,142,0.08)' : 'rgba(100,80,80,0.08)', color: inStock || autoGen ? 'var(--pink)' : 'var(--mid)', fontSize: 12, fontWeight: 600, border: `1px solid ${inStock || autoGen ? 'var(--pink-lt)' : 'var(--mid)'}`, marginBottom: 20, fontFamily: "'Cormorant Garamond',serif" }}>
             <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'currentColor' }} />
-            {autoGen ? '∞ Disponible' : inStock ? 'Disponible' : 'Rupture de stock'}
+            {autoGen ? '∞ Disponible' : inStock ? 'Disponible' : ''}
           </div>
 
           <div style={{ height: 1, background: 'var(--line)', marginBottom: 20 }} />

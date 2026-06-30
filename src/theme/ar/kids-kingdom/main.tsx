@@ -551,7 +551,7 @@ export function Footer({ store }: any) {
           {/* قسم 2 — الروابط */}
           <div>
             <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--sun)', marginBottom: '1.25rem' }}>🗺️ روابط سريعة</h4>
-            {[{ h: '/', l: 'الرئيسية', e: '🏠' }, { h: '/cart', l: 'سلة التسوق', e: '🛒' }, { h: '/contact', l: 'تواصل معنا', e: '📞' }, { h: '/Privacy', l: 'الخصوصية', e: '🔒' }, { h: '/Terms', l: 'الشروط', e: '📋' }].map((lnk, i) => (
+            {[{ h: '/', l: 'الرئيسية', e: '🏠' }, { h: '/cart', l: 'سلة التسوق', e: '🛒' }, { h: '/contact', l: 'تواصل معنا', e: '📞' }, { h: '/Privacy', l: 'الخصوصية', e: '🔒' }, { h: '/Terms', l: 'الشروط', e: '📋' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
               <a key={i} href={lnk.h} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--sky)'; el.style.transform = 'translateX(-4px)'; }}
                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(255,255,255,0.5)'; el.style.transform = ''; }}>
@@ -687,9 +687,11 @@ export function Home({ store, page }: any) {
             <a href="#products" className="btn-bouncy" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.9rem 2rem', borderRadius: 18, background: 'linear-gradient(135deg, var(--coral), var(--grape))', color: '#fff', fontWeight: 900, fontSize: '0.95rem', boxShadow: '0 8px 28px rgba(255,107,107,0.4)' }}>
               🛍️ تسوق الآن
             </a>
+            {store?.cart !== false && (
             <Link href="/cart" className="btn-bouncy" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.9rem 2rem', borderRadius: 18, border: '3px solid var(--sun)', background: '#fff', color: 'var(--text)', fontWeight: 900, fontSize: '0.95rem', boxShadow: '0 4px 16px rgba(255,217,61,0.3)' }}>
               🎁 السلة
             </Link>
+            )}
           </div>
         </div>
       </section>
