@@ -4,7 +4,7 @@ import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
@@ -282,6 +282,8 @@ const S = {
    MAIN
 ═══════════════════════════════════════════════════════════ */
 export default function Main({ store, children, domain }: any) {
+  const pathname = usePathname();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
     <div style={{ minHeight: '100vh', background: '#F8F8F6' }}>
       <style>{THEME_CSS}</style>

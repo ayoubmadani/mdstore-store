@@ -4,7 +4,7 @@ import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
@@ -213,6 +213,8 @@ function HerbLeaf({ size = 24, style }: { size?: number; style?: React.CSSProper
 }
 
 export default function Main({ store, children, domain }: any) {
+  const pathname = usePathname();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
     <div style={{ minHeight:'100vh', backgroundColor:'var(--cream)' }}>
       <style>{CSS}</style>

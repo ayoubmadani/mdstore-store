@@ -4,7 +4,7 @@ import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, AlertCircle, X, Share2,
@@ -243,6 +243,8 @@ function MenuOverlay({ store, onClose }: { store: any; onClose: () => void }) {
    MAIN
 ══════════════════════════════════════════════════════════════ */
 export default function Main({ store, children, domain }: any) {
+  const pathname = usePathname();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--paper)', fontFamily: "'Space Mono',monospace", color: 'var(--ink)' }}>

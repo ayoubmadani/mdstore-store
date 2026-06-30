@@ -4,7 +4,7 @@ import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
     Star, ChevronDown, AlertCircle, X, ToggleRight,
@@ -251,6 +251,8 @@ function useScrollReveal() {
    MAIN
 ══════════════════════════════════════════════════════════════ */
 export default function Main({ store, children, domain }: any) {
+  const pathname = usePathname();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
     return (
         <div style={{ minHeight: '100vh', padding: '0', fontFamily: "'Cairo',sans-serif" }}>
             <style>{CSS}</style>

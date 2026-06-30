@@ -1,0 +1,385 @@
+# MdStore Storefront Theme — Structural Reference
+
+> This file is a **structural reference** for creating new MdStore themes. All CSS has been intentionally removed — the goal is to document the **structure, Props, components, and logic** that every new theme must follow. Design (colors, fonts, CSS) is entirely free as long as the structure and logic are preserved. Section 15 documents real bugs found in production themes — treat those as hard rules, not suggestions.
+
+---
+
+## 0. General Rules (Hard Rules)
+
+- No Tailwind — raw CSS only (inline styles or a `<style>` tag with media queries).
+- Direction `dir="rtl"` on every page (Arabic themes), or `dir="ltr"` (English themes).
+- Cart always imported from: `import { useCartStore } from '@/store/useCartStore';`
+- Pass `domain` as a prop to `Navbar`.
+- When adding to cart/order: `variantDetailId: getVarId()` must be sent in the payload.
+- The `Cart` component must contain a wilaya/commune form linked to the shipping API.
+- **Delivery price is never optional or implicit.** Every place that shows a price total (`ProductForm` order summary, `Cart` order summary) must compute `getLiv()` from the selected wilaya's `livraisonHome`/`livraisonOfice` and render it as its own labeled line, and every payload sent to `/orders/create` must include `priceLivraison: getLiv()` as a separate field from `totalPrice`. See §10 for the full contract — this has shipped missing before.
+- Live search with debounce (~380ms) in `Navbar`.
+- `Home` must support pagination.
+- **Category filtering is server-side, always.** `Home` never filters `store.products` locally with `useState`/`onClick`. The page that renders `Home` re-fetches products from the server based on `?category=`, so the only valid UI is `<Link href={`?category=${cat.id}`}>` (see §8). Local-state filtering looks correct in dev and silently does nothing in production.
+- **If nav links are hidden on mobile via CSS (`display:none` in a media query), a hamburger menu exposing the same links must ship in the same change.** Never hide navigation without an equivalent mobile entry point — there is no acceptable transitional state where mobile users lose access to Contact/static pages.
+- Every theme must be **structurally and aesthetically distinct** from the others — not just a color swap. See §16 for concrete differentiation levers.
+- **`Main` must reset scroll position on every route change.** Next.js App Router does not automatically scroll to top when navigating between pages inside a client-rendered theme shell. Add to `Main`:
+  ```tsx
+  import { usePathname } from 'next/navigation';
+  // inside Main:
+  const pathname = usePathname();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  ```
+  Without this, navigating to a new page can leave the viewport scrolled down near the footer — the new page renders correctly but looks blank/empty until the user scrolls up manually. See §15.7.
+
+---
+
+## 1. Required Files and Exports
+
+Every theme file (`Theme.tsx`) must export exactly these components:
+
+```
+export default function Main({ store, children, domain })
+export function Navbar({ store, domain })
+export function Footer({ store })
+export function Card({ product, displayImage, discount, store, viewDetails })
+export function Home({ store, page })
+export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain })
+export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform })
+export function Cart({ domain, store })
+export function Privacy()
+export function Terms()
+export function Cookies()
+export function Contact({ store })
+export function StaticPage({ staticPage, page, store })
+```
+
+---
+
+## 2. Types (must be preserved as-is)
+
+```ts
+interface Offer { id: string; name: string; quantity: number; price: number; }
+interface Variant { id: string; name: string; value: string; }
+interface Attribute { id: string; type: string; name: string; displayMode?: 'color' | 'image' | 'text' | null; variants: Variant[]; }
+interface ProductImage { id: string; imageUrl: string; }
+interface VariantAttributeEntry { attrId: string; attrName: string; displayMode: 'color' | 'image' | 'text'; value: string; }
+interface VariantDetail { id: string | number; name: VariantAttributeEntry[]; price: number; stock: number; autoGenerate: boolean; }
+interface Wilaya { id: string; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
+interface Commune { id: string; name: string; ar_name: string; wilayaId: string; }
+
+interface Product {
+  id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
+  productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
+  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
+}
+
+interface ProductFormProps {
+  product: Product; userId: string; domain: string; redirectPath?: string;
+  selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
+  selectedVariants: Record<string, string>; platform?: string; priceLoss?: number;
+}
+```
+
+---
+
+## 3. Helpers / Fixed API
+
+```ts
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
+
+// Match the selected variant against variantDetails
+function variantMatches(d: VariantDetail, sel: Record<string, string>) {
+  return Object.entries(sel).every(([n, v]) => d.name.some(e => e.attrName === n && e.value === v));
+}
+
+// Fetch wilayas (provinces): GET /shipping/public/get-shipping/{userId}
+const fetchWilayas = async (uid: string): Promise<Wilaya[]> => { ... };
+
+// Fetch communes: GET /shipping/get-communes/{wilayaId}
+const fetchCommunes = async (wid: string): Promise<Commune[]> => { ... };
+```
+
+---
+
+## 4. Main (the Wrapper)
+
+- Wraps the page with `Navbar` + `<main>{children}</main>` + `Footer`.
+- props: `{ store, children, domain }`.
+
+---
+
+## 5. Navbar — Required Logic
+
+**State:**
+- `scrolled` — tracks `window.scrollY` to change the navbar's appearance on scroll.
+- `open` — mobile menu (hamburger menu).
+- `showSearch` — shows the search field on mobile.
+- `searchQuery`, `listSearch`, `loading` — live search logic.
+- `imgError` — fallback if the store logo fails to load.
+
+**Cart:**
+```ts
+const count = useCartStore((s) => s.count);
+const initCount = useCartStore((s) => s.initCount);
+```
+On mount: read `localStorage.getItem(domain)` and pass its length to `initCount`.
+
+**Live search:**
+- When `searchQuery.length >= 2` → after a ~380ms debounce → `GET /products/public/{domain}?search=...`
+- Results are shown in a dropdown, with a "View all results" link pointing to `/?search=...`.
+- The submit button also redirects to `/?search=...`.
+- **The results dropdown must stay inside the viewport on mobile.** A dropdown anchored with `position:absolute` and a fixed pixel `width` (e.g. `300px`) next to an icon near the screen edge *will* overflow off-screen on narrow viewports — this happened in production. Add a `@media (max-width:480px)` override that switches the dropdown to `position:fixed` with `left`/`right` margins (e.g. `left:12px;right:12px;width:auto`) instead of a fixed width anchored to a small button.
+
+**Required elements:**
+- Store logo (`store.design.logoUrl`) with a text fallback (store name).
+- Links: Home `/`, Contact `/contact`.
+- Cart icon with a count badge — shown only if `store?.cart !== false`.
+- Optional top ticker/bar if `store?.topBar?.enabled && store?.topBar?.text`.
+- Separate Desktop and Mobile versions with the same functionality, built like this — never collapse the nav links into a single inline-styled `<div>` that gets crowded at small widths:
+  ```css
+  .nav-links  { display:flex; align-items:center; gap:24px; }
+  .nav-burger { display:none; }
+  @media (max-width:700px) {
+    .nav-links { display:none; }
+    .nav-burger { display:flex; }
+  }
+  ```
+  The `.nav-burger` button toggles a full mobile dropdown/overlay that repeats every link from `.nav-links` (Home, Contact, and any others) — plus Cart only if `store?.cart !== false`. The mobile link array should be declared once and filtered, not hand-duplicated:
+  ```ts
+  [{h:'/',l:'Home'},{h:'/cart',l:'Cart'},{h:'/contact',l:'Contact'}]
+    .filter(lnk => lnk.h !== '/cart' || store?.cart !== false)
+  ```
+
+---
+
+## 6. Footer — Required Logic
+
+3 sections:
+1. **Brand**: store name + short description (`store.hero.subtitle`) + copyright year.
+2. **Page links**: Home, Cart (only if `store?.cart !== false`), Contact, Privacy, Terms. Use the same `.filter(lnk => lnk.h !== '/cart' || store?.cart !== false)` pattern as the mobile nav (§5) — don't re-derive the condition differently in two places.
+3. **Contact**: phone (`store.contact.phone`), email (`store.contact.email`), address (`store.contact.wilaya` + `store.contact.address`). All three are optional — render each line only if its value is truthy, ordered Phone → Mail → MapPin.
+
+---
+
+## 7. Card — Product Card
+
+Props: `{ product, displayImage, discount, store, viewDetails }`
+
+- Product image (or a placeholder icon if unavailable).
+- Discount badge if `discount > 0`.
+- Product name (2-line clamp).
+- Rating stars (visually static).
+- Current price + store currency (`store.currency`) + original price struck through if higher.
+- Link to the details page: `/product/${product.slug || product.id}`.
+
+---
+
+## 8. Home — Home Page
+
+Props: `{ store, page }`
+
+**Mandatory sections:**
+1. **Hero** — title (`store.hero.title`, supports HTML via `DOMPurify.sanitize`), subtitle (`store.hero.subtitle`), optional background image (`store.hero.imageUrl`), CTA buttons (Shop Now + Cart if enabled). Hero background images must use `position:absolute` via **inline styles only** (no CSS classes) — this keeps the layering predictable regardless of what utility classes a theme defines elsewhere.
+2. **Trust bar** — a row of 4 trust elements (shipping, quality, secure payment, support).
+3. **Categories** — a grid/row of categories from `store.categories`, with an "All" entry. This is the part most themes get wrong — the only correct implementation is URL navigation, because `store.products` is already filtered server-side by the time `Home` receives it:
+   ```tsx
+   const searchParams = useSearchParams();
+   const activeCategory = searchParams.get('category');
+
+   <Link href="/" className={!activeCategory ? 'active' : ''}>All</Link>
+   {cats.map(cat => (
+     <Link key={cat.id} href={`?category=${cat.id}`}
+       className={activeCategory === String(cat.id) ? 'active' : ''}>
+       {cat.name}
+     </Link>
+   ))}
+   ```
+   Do **not** introduce `const [activeCat, setActiveCat] = useState(...)` + `onClick` + a local `.filter()`/`useMemo` over `products` — it compiles, looks right, and never actually filters anything because the server already returned the unfiltered (or differently-filtered) list before the click happened.
+4. **Products grid** — displays `store.products` directly (already server-filtered/paginated), discount calculation: `Math.round(((priceOriginal - price) / priceOriginal) * 100)`.
+5. **Pagination** — `countPage = Math.ceil((store.count || products.length) / 48)`, page buttons use `Link href={{ query: { page } }} scroll={false}`.
+
+---
+
+## 9. Details — Product Details Page
+
+Props: `{ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }`
+
+**Contains:**
+- Image gallery: main image + navigation buttons (left/right) + clickable thumbnails, local state `sel` for the current image index.
+- Product name + rating stars.
+- Final price box (`finalPrice`).
+- Offers list (`product.offers`) — radio selection, updates `selectedOffer`.
+- Attributes (`allAttrs`) — supports 3 display modes: `color` (color circle), `image` (thumbnail), `text` (text button) — calls `handleVariantSelection(attr.name, v.value)` on selection.
+- Embeds `<ProductForm />` with the same passed props.
+- Product description (`product.desc`) via `dangerouslySetInnerHTML` with `DOMPurify.sanitize`.
+
+---
+
+## 10. ProductForm — Order/Add-to-Cart Form
+
+**Core state:**
+```ts
+const [fd, setFd] = useState({
+  customerId: '', customerName: '', customerPhone: '',
+  customerWelaya: '', customerCommune: '',
+  quantity: 1, priceLoss: 0,
+  typeLivraison: 'home' as 'home' | 'office'
+});
+```
+
+**Price calculation logic:**
+```ts
+const getFP = (): number => {
+  // 1) If an offer is selected → offer price
+  // 2) If a matching variant exists (variantMatches) and its price !== -1 → variant price
+  // 3) Otherwise → base product price
+};
+const getLiv = (): number => {
+  // Shipping cost based on selected wilaya and delivery type (home/office)
+};
+const total = () => fp * fd.quantity + getLiv();
+```
+
+**Delivery price (`getLiv`) — exact contract, not optional:**
+
+This is the one piece of logic that has gone missing from generated themes before, so it is spelled out fully here. The shipping cost is **per-wilaya, per-delivery-type** — it is never a flat number and never something the theme invents.
+
+1. `fetchWilayas(userId)` (§3) returns the store's configured `Wilaya[]`, each with `livraisonHome` (price for home delivery) and `livraisonOfice` (price for office/pickup delivery) already set per wilaya by the merchant. Load this list once (e.g. on mount) and store it in state.
+2. When the customer picks a wilaya in the form (`fd.customerWelaya`), resolve the matching `Wilaya` object — don't just store the id, keep the selected object (`selW`) so its prices are available without re-searching the array on every render:
+   ```ts
+   const selW = wilayas.find(w => w.id === fd.customerWelaya);
+   ```
+3. `getLiv()` reads the price off `selW` based on `fd.typeLivraison`, and returns `0` until a wilaya is actually selected — it must never throw or return `NaN` before that point:
+   ```ts
+   const getLiv = useCallback((): number => {
+     if (!selW) return 0;
+     return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice;
+   }, [selW, fd.typeLivraison]);
+   ```
+4. **It must be visibly displayed**, not just folded silently into the grand total. Every order summary (in `ProductForm` *and* `Cart`, §11) needs its own labeled line for it, with an explicit "not yet known" state before a wilaya is picked — never show `0 دج` as if delivery were free when it's actually just unselected:
+   ```tsx
+   {[
+     { l: 'السعر',   v: `${fp.toLocaleString()} دج` },
+     { l: 'الكمية',  v: `× ${fd.quantity}` },
+     { l: 'التوصيل', v: selW ? `${getLiv().toLocaleString()} دج` : '—' },
+   ].map(row => <SummaryRow key={row.l} {...row} />)}
+   ```
+5. Both the cart-add payload and the order-create payload must send the delivery price as its own field, `priceLivraison: getLiv()`, **separately** from `totalPrice` — the backend needs to know how much of the total was shipping vs. product price, it does not recompute it server-side from the wilaya id:
+   ```ts
+   { ...fd, product, totalPrice: total(), priceLivraison: getLiv(), ... }
+   ```
+6. Switching `fd.typeLivraison` between `'home'` and `'office'` must immediately recompute the displayed delivery line and the grand total — this is why `getLiv`/`total` should be plain functions or `useCallback`s reading current state, not values memoized once on wilaya selection.
+
+**Validation:**
+- `customerName` required.
+- `customerPhone` regex: `/^(0|\+213)[5-7]\d{8}$/`
+- `customerWelaya`, `customerCommune` required.
+
+**Two main buttons:**
+1. **Add to Cart** (`addToCart`) — only if `product.store.cart === true`:
+   - Reads `localStorage.getItem(domain)`, adds a new item containing: all form data + `product` + `variantDetailId: getVarId()` + `productId` + `storeId` + `userId` + `selectedOffer` + `selectedVariants` + `platform` + `finalPrice` + `totalPrice` + `priceLivraison` + `addedAt`.
+   - Updates `localStorage` and `initCount`.
+2. **Order Now** (`isOrderNow` → opens the full form):
+   - On submit: `POST /orders/create` with the same data above.
+   - On success: saves `customerId` to localStorage, then `router.push('/successfully?productId=...')`.
+
+**Form fields:** name, phone, wilaya (select), commune (select dependent on wilaya), delivery type (home/office toggle), quantity (+/-), order summary (product name, shipping cost, grand total).
+
+---
+
+## 11. Cart — Full Cart Page
+
+Props: `{ domain, store }`
+
+- Reads all cart items from `localStorage.getItem(domain)`.
+- Calculates: `cartTotal = sum(finalPrice * quantity)`, `finalTotal = cartTotal + getLiv()`.
+- Same shipping form (name, phone, wilaya, commune, delivery type) — and the **same delivery-price contract as §10**: `getLiv()` is computed once from the wilaya/delivery-type selected in this form (cart delivery is a single shared shipment, not per-item), shown as its own labeled summary line (`'—'` until a wilaya is picked), and recomputed live whenever the wilaya or `typeLivraison` changes.
+- On submit: `POST /orders/create` with an **array** of items (one order per product in the cart, with the same customer data) — each item still carries `priceLivraison: getLiv()` so the backend has it per order line, even though the displayed shipping line in the UI is shown once for the whole cart.
+- On success: clears `localStorage`, `initCount(0)`, shows a success screen.
+- Empty cart state: message + "Shop Now" link.
+- Ability to delete an individual item from the cart (`Trash2` icon).
+- If `store?.cart === false`, the entire cart route is unreachable from the UI — every cart link (navbar, mobile menu, footer, hero CTA) must already be filtered out per §5/§6 rather than left dangling.
+
+---
+
+## 12. Static Pages
+
+### `Privacy`, `Terms`, `Cookies`
+- Same structure: `Shell` (dark header with title + background) containing 3 `InfoBlock { title, body }` blocks.
+
+### `Contact({ store })`
+- State: `{ name, email, phone, message }`.
+- Two columns: contact info (phone, location) + message form.
+- Submit: `POST /user/contact-user/message` with `{ ...form, storeId: store.id }`.
+- Success screen after submission + "Send another message" button.
+
+### `StaticPage({ staticPage, page, store })`
+A simple router:
+```ts
+const p = (staticPage || page || '').toLowerCase();
+// 'privacy' → <Privacy/>
+// 'terms' → <Terms/>
+// 'cookies' → <Cookies/>
+// 'contact' → <Contact store={store}/>
+```
+
+---
+
+## 13. API Endpoints Used
+
+| Action | Method | Endpoint |
+|---|---|---|
+| Fetch wilayas | GET | `/shipping/public/get-shipping/{userId}` |
+| Fetch communes | GET | `/shipping/get-communes/{wilayaId}` |
+| Search products | GET | `/products/public/{domain}?search=...` |
+| Create order | POST | `/orders/create` |
+| Send contact message | POST | `/user/contact-user/message` |
+
+---
+
+## 14. Theme Resolution Fallback (informational, not theme-authoring)
+
+The app fetches a theme bundle from `/api/themes/{lang}/{slug}`. If the requested `slug` 404s on storage, the API transparently serves the `default` theme bundle for that language instead of failing the page. This means a missing/unbundled theme degrades to `default`, not a blank page — but it also means a typo in a store's `theme.slug` will silently render the wrong (default) theme rather than erroring loudly. Always verify the slug after creating a new theme by checking the network response, not just "the page rendered something."
+
+---
+
+## 15. Common Pitfalls (Do Not Repeat)
+
+These are bugs that shipped to production themes and had to be patched after the fact. Each one is now a hard rule elsewhere in this doc — this section exists so the *failure mode* is recognizable, not just the rule.
+
+1. **Cart UI left visible on no-cart stores.** A theme rendered the navbar cart icon and the `/cart` mobile-menu/footer link unconditionally, even when `store.cart === false`. Fix: every cart entry point must be wrapped in `store?.cart !== false &&`, in all four places it can appear (navbar icon, mobile dropdown, footer links, hero CTA).
+2. **Mobile nav links hidden with no replacement.** A theme hid `.nav-links` at `max-width:700px` to stop the navbar from wrapping/stacking, without adding a hamburger fallback in the same pass — mobile users lost the only way to reach `/contact`. Fix: hamburger + dropdown shipped together, never sequentially (§0, §5).
+3. **Category clicks that do nothing.** Multiple themes filtered `store.products` client-side with `useState`/`onClick`, which can't work because `Home` already receives server-filtered data based on `searchParams.category`. Fix: category UI is always `<Link href="?category=...">`, never local state (§8).
+4. **Search dropdown overflowing off-screen on mobile.** A dropdown with `width:300px` anchored `right:0` to a 40px icon near the screen edge pushed ~150px past the viewport edge on narrow phones. Fix: `@media (max-width:480px)` switches it to `position:fixed` with viewport margins instead of a fixed width (§5).
+5. **Double-wrapping conditional guards in bulk edits.** A scripted find-and-replace across many theme files wrapped an already-guarded `{store?.cart !== false && (<Link .../>)}` a second time when the guard was on the same line rather than a preceding one, breaking the build. Lesson for anyone scripting cross-theme edits: check whether the guard already exists on the *same* line, not just nearby lines, before wrapping.
+6. **Order summary missing the delivery price entirely.** Generated themes have shipped `ProductForm`/`Cart` order summaries that show only product price × quantity → grand total, with no `getLiv()` line at all, or with `getLiv()` computed but never rendered. The customer sees a total that silently includes shipping with no breakdown, or a total that excludes shipping and is wrong at checkout. Fix: the labeled "التوصيل" / delivery row in the summary, and the `priceLivraison` field in the API payload, are both mandatory — see the full contract in §10.
+7. **Page opens scrolled to the footer after navigation.** Themes shipped without any scroll-reset logic in `Main`. The browser keeps the previous page's scroll offset on client-side navigation, so a long page followed by a short one can open already scrolled past all visible content — it looks like a blank/broken page until the user manually scrolls up. Fix: `usePathname()` + `useEffect(() => window.scrollTo(0,0), [pathname])` in `Main`, see §0.
+
+---
+
+## 16. Creative Direction — Differentiation Levers
+
+CSS, colors, and fonts are free, but "free" has produced near-identical themes before. Use these levers to make a theme *actually* feel different, not just re-skinned. Pick a distinct combination per theme — don't reuse the same Hero/Card/typography pairing across themes in the same category.
+
+**Hero layout** — choose one structural pattern, not just a new background image:
+- Full-bleed image with bottom-anchored text overlay (gradient scrim).
+- Split-screen: text block on one half, product/image collage on the other.
+- Asymmetric grid: oversized headline typography overlapping a smaller image tile.
+- Marquee/ticker strip above a centered, image-free headline (good for minimal/luxury themes).
+
+**Card shape** — the product card silhouette should match the theme's personality:
+- Sharp rectangular, no radius (editorial/luxury).
+- Soft rounded with floating shadow (playful/kids/beauty).
+- Borderless, image-only with text reveal on hover (gallery/fashion).
+- Bordered with a visible SKU/category eyebrow label (technical/sport/outdoor).
+
+**Typography pairing** — pick a deliberate contrast, not a single default font at different sizes:
+- Display serif headline + grotesk sans body (luxury/fragrance/cosmetics).
+- Condensed uppercase headline + monospace price/labels (sport/gaming/streetwear).
+- Rounded friendly headline + simple sans body (kids/home/pets).
+
+**Motion** — optional, but should be consistent with the theme's pace, not decorative noise:
+- Luxury/cosmetics: slow fades, subtle scale on hover.
+- Sport/gaming: snappy transitions, sharp easing, no fade-ins.
+- Kids/playful: bounce/spring easing on interactive elements only.
+
+**Category/nav chrome** — vary the shape, not just the color, of active states: underline vs. filled pill vs. bordered chip vs. uppercase letter-spacing shift. A theme that only swaps `background-color` on the active category against an otherwise identical layout will read as a re-skin, not a new theme.
+
+The test for "distinct enough": if you remove the color palette and font names from two themes in the same category, could you still tell them apart from layout alone? If not, the structure needs to change, not just the design tokens.

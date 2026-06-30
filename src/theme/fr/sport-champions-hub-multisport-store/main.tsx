@@ -4,7 +4,7 @@ import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ShoppingBag, ChevronDown, ChevronLeft, ChevronRight,
@@ -325,6 +325,8 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
    MAIN
 ══════════════════════════════════════════════════════════════ */
 export default function Main({ store, children, domain }: any) {
+  const pathname = usePathname();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
     <div style={{ minHeight: '100vh', background: 'var(--g50)', fontFamily: "'Inter',sans-serif" }}>
       <style>{CSS}</style>

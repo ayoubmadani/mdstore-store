@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 import axios from 'axios';
 import {
   ShoppingBag, Search, X, ChevronDown, Heart, Star, Sparkles,
@@ -246,6 +246,8 @@ const GLOBAL_CSS = `
    MAIN (layout shell)
 ══════════════════════════════════════════════════════════════ */
 export default function Main({ children, store, domain }: { children: React.ReactNode; store: any; domain: string }) {
+  const pathname = usePathname();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   if (!store) return null;
   return (
     <div dir="ltr" style={{ fontFamily: "'Cormorant Garamond',serif", background: 'var(--soft)', minHeight: '100vh', color: 'var(--ink)' }}>

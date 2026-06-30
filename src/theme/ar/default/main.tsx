@@ -4,7 +4,7 @@ import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   ShoppingCart, MapPin, Phone, Mail, User,
@@ -102,6 +102,8 @@ const FR = ({ label, error, children }: { label?: string; error?: string; childr
 // ─────────────────────────────────────────────────────────────
 
 export default function Main({ store, children }: any) {
+  const pathname = usePathname();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   const isRTL = (store?.language || 'ar') === 'ar';
   return (
     <div style={{ ...S.body, minHeight: '100vh', display: 'flex', flexDirection: 'column' }} dir={isRTL ? 'rtl' : 'ltr'}>
