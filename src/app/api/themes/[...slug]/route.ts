@@ -19,25 +19,38 @@ function getS3() {
   return s3
 }
 
+const fetchKey = (key: string) =>
+  getS3().send(new GetObjectCommand({
+    Bucket: process.env.AWS_S3_BUCKET_NAME!,
+    Key:    key,
+  }))
+
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> },
+  { params }: { params: Promise<{ slug: string[] }> },
 ) {
   const { slug } = await params
-
-  const fetchTheme = (themeSlug: string) =>
-    getS3().send(new GetObjectCommand({
-      Bucket: process.env.AWS_S3_BUCKET_NAME!,
-      Key:    `themes/${themeSlug}.js`,
-    }))
+  const fullSlug = slug.join('/')
+  // Last segment is the theme name — used as flat fallback (strips lang prefix)
+  const flatSlug = slug[slug.length - 1]
 
   try {
     let obj
     try {
-      obj = await fetchTheme(slug)
+      // 1. Try exact path: themes/{lang}/{name}.js or themes/{name}.js
+      obj = await fetchKey(`themes/${fullSlug}.js`)
     } catch {
-      if (slug === 'default') throw new Error('not found')
-      obj = await fetchTheme('default')
+      try {
+        // 2. Flat fallback: themes/{name}.js (trilingual single-file themes)
+        if (flatSlug !== fullSlug) {
+          obj = await fetchKey(`themes/${flatSlug}.js`)
+        } else {
+          throw new Error('skip')
+        }
+      } catch {
+        // 3. Default theme
+        obj = await fetchKey('themes/default.js')
+      }
     }
 
     const code = await (obj.Body as any).transformToString()
@@ -50,7 +63,7 @@ export async function GET(
     })
   } catch {
     return NextResponse.json(
-      { error: `Theme not found: ${slug}` },
+      { error: `Theme not found: ${fullSlug}` },
       { status: 404 },
     )
   }
