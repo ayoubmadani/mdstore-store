@@ -1,2 +1,4 @@
 node scripts/bundle-themes.mjs --lang=ar --slug={slug}
-node scripts/bundle-themes.mjs --lang=fr --slug=cloth-pure-cotton-basics-theme
+node scripts/bundle-themes.mjs --lang=ar --slug=lighting-everyday-decor-lighting-theme
+node scripts/bundle-themes.mjs --lang=fr --slug=lighting-everyday-decor-lighting-theme
+
