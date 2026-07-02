@@ -71,8 +71,7 @@ export default function ProductClient({
   })
 
   const slug     = contextThemeSlug || store?.theme?.slug || 'default'
-  const language = store?.language  || 'ar'
-  const bundleUrl = `/api/themes/${language}/${slug}`
+  const bundleUrl = `/api/themes/${slug}`
 
   /* ── Init ── */
   useEffect(() => {

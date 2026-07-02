@@ -43,7 +43,7 @@ export default async function DomainLayout({ children, params }: LayoutProps) {
   const slug     = store.theme?.slug || 'default'
   const language = store.language    || 'ar'
   const dir      = language === 'ar' ? 'rtl' : 'ltr'
-  const bundleUrl = `/api/themes/${language}/${slug}`
+  const bundleUrl = `/api/themes/${slug}`
 
   return (
     <StoreProvider store={store} theme={slug}>

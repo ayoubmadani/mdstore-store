@@ -33,8 +33,7 @@ export default function DynamicPage() {
   const { store, theme: slug } = useStore()
 
   const pageSlug  = (params?.page as string) || ''
-  const language  = store?.language || 'ar'
-  const bundleUrl = `/api/themes/${language}/${slug}`
+  const bundleUrl = `/api/themes/${slug}`
   const domain   = (params?.domain as string) || ''
 
   if (!store) return <StoreNotFound domain={domain} />

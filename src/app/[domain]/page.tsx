@@ -45,8 +45,7 @@ export default async function StorePage(props: {
   if (!store.isActive) return <StoreInactive store={store} />
 
   const slug     = store.theme?.slug || 'default'
-  const language = store.language    || 'ar'
-  const bundleUrl = `/api/themes/${language}/${slug}`
+  const bundleUrl = `/api/themes/${slug}`
 
   return (
     <ThemeRunner

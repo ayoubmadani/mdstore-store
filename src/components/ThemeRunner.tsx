@@ -96,6 +96,10 @@ export default function ThemeRunner({
             },
           });
           return mod.exports;
+        })
+        .catch((err) => {
+          moduleCache.delete(bundleUrl);
+          throw err;
         });
       moduleCache.set(bundleUrl, modPromise);
     }

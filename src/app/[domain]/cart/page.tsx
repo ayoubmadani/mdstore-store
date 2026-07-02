@@ -39,7 +39,7 @@ export default function CartPage() {
   const domain   = (params?.domain as string) || ''
   const language = store?.language || 'ar'
   const isRTL    = language === 'ar'
-  const bundleUrl = `/api/themes/${language}/${slug}`
+  const bundleUrl = `/api/themes/${slug}`
 
   if (!store) return <StoreNotFound domain={domain} />
   if (!store.isActive) return <StoreInactive store={store} />
