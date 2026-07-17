@@ -80,13 +80,13 @@ interface BuilderPageData {
 // builder-pages own this exact same "domain.tld/lp/slug" URL shape — tried
 // first (see load() below) since it's the newer, actively-developed tool;
 // the older landing-page module is the fallback for domains it doesn't know.
+// The API resolves the published R2 JSON server-side and returns it inline
+// (the R2 bucket has no CORS headers, so fetching it directly from the
+// browser fails silently — see builder-pages.service.ts's findByDomain).
 async function getBuilderPage(fullPath: string): Promise<BuilderPageData | null> {
   try {
     const found = await axios.get(`${API_URL}/builder-pages/find`, { params: { domain: fullPath } });
-    const publishedUrl = found.data?.publishedUrl;
-    if (!publishedUrl) return null;
-    const published = await axios.get(publishedUrl);
-    return published.data;
+    return found.data ?? null;
   } catch {
     return null;
   }

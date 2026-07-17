@@ -42,8 +42,30 @@ export interface ProductFormProps {
   platform?:        string;       // LP only
   priceLoss?:       number;       // LP only
   lpId?:string
+  builderPageId?:   string;       // builder-pages productForm block only — same role as lpId
   title?:           string;       // builder-pages productForm block only — overrides the header text
   buttonText?:      string;       // builder-pages productForm block only — overrides the submit button text
+  // builder-pages productForm block only — its own product image/name/price
+  // + offers/attributes picker (ProductFormBlockRenderer.tsx), rendered
+  // *inside* this component's own card instead of ProductFormBlockRenderer
+  // wrapping this whole component in a second, redundant card of its own —
+  // that double-nesting was exactly the "shape doesn't match the editor"
+  // mismatch, since the dashboard's own block preview is a single card.
+  renderBefore?:    React.ReactNode;
+  // builder-pages productForm block only — mirrors dashboard/src/pages/editor/
+  // blocks/ProductFormBlock.jsx's own color props exactly, so a merchant's
+  // customization actually survives publishing instead of being silently
+  // dropped in favor of this component's normal fixed gray/white palette.
+  // All optional and default to that same fixed palette when unset, so every
+  // other caller (regular product pages, old landing pages) is unaffected.
+  backgroundColor?:      string;
+  textColor?:            string;
+  buttonBackgroundColor?: string;
+  buttonTextColor?:      string;
+  buttonBorderColor?:    string;
+  inputBackgroundColor?: string;
+  inputBorderColor?:     string;
+  inputTextColor?:       string;
 }
 
 /* ─── Helpers ────────────────────────────────────────── */
@@ -65,11 +87,15 @@ const fetchCommunes = async (wilayaId: string): Promise<Commune[]> => {
 };
 
 /* ─── Small UI ───────────────────────────────────────── */
-const FieldWrapper = ({ error, children, label }: {
-  error?: string; children: React.ReactNode; label?: string;
+const FieldWrapper = ({ error, children, label, labelColor }: {
+  error?: string; children: React.ReactNode; label?: string; labelColor?: string;
 }) => (
   <div className="space-y-1.5">
-    {label && <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{label}</label>}
+    {label && (
+      <label className="text-xs font-semibold uppercase tracking-wider" style={{ color: labelColor, opacity: 0.65 }}>
+        {label}
+      </label>
+    )}
     {children}
     {error && (
       <p className="text-xs text-red-500 font-medium flex items-center gap-1">
@@ -80,10 +106,8 @@ const FieldWrapper = ({ error, children, label }: {
 );
 
 const inputCls = (err?: boolean) =>
-  `w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all bg-gray-50 text-gray-900 placeholder-gray-400
-   ${err
-     ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100'
-     : 'border-gray-200 focus:border-gray-900 focus:ring-2 focus:ring-gray-100'}`;
+  `w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all placeholder-gray-400
+   ${err ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100' : 'focus:ring-2 focus:ring-gray-100'}`;
 
 /* ══════════════════════════════════════════════════════
    MAIN COMPONENT
@@ -91,9 +115,30 @@ const inputCls = (err?: boolean) =>
 export default function ProductForm({
   product, userId, domain,
   selectedOffer, setSelectedOffer, selectedVariants,
-  platform, priceLoss = 0, lpId, title, buttonText,
+  platform, priceLoss = 0, lpId, builderPageId, title, buttonText, renderBefore,
+  backgroundColor, textColor, buttonBackgroundColor, buttonTextColor,
+  buttonBorderColor, inputBackgroundColor, inputBorderColor, inputTextColor,
 }: ProductFormProps) {
   const router = useRouter();
+
+  // Defaults match this component's existing hardcoded Tailwind palette
+  // exactly (gray-900 #111827, gray-50 #f9fafb, gray-200 #e5e7eb, white),
+  // so any caller that doesn't pass these (every page except a builder-pages
+  // productForm block) renders pixel-identical to before.
+  const cardBg     = backgroundColor      || '#ffffff';
+  const cardText   = textColor            || '#111827';
+  const accent     = buttonBackgroundColor || '#111827';
+  const btnText    = buttonTextColor      || '#ffffff';
+  const fieldBg    = inputBackgroundColor || '#f9fafb';
+  const fieldBorder = inputBorderColor    || '#e5e7eb';
+  const fieldText  = inputTextColor       || '#111827';
+  // Error state keeps its own red border (set via className) — the inline
+  // style only supplies borderColor when there's no error to override.
+  const fieldStyle = (hasError?: boolean): React.CSSProperties => ({
+    backgroundColor: fieldBg,
+    color: fieldText,
+    ...(hasError ? {} : { borderColor: fieldBorder }),
+  });
 
   /* ── Shipping state ── */
   const [wilayas,         setWilayas]         = useState<Wilaya[]>([]);
@@ -210,7 +255,8 @@ export default function ProductForm({
         customerPhone:     formData.customerPhone,
         customerWilayaId:  formData.customerWelaya,
         customerCommuneId: formData.customerCommune,
-        lpId
+        lpId,
+        builderPageId,
       }
       
       setSubmitting(true);
@@ -239,62 +285,67 @@ export default function ProductForm({
 
   /* ── Render ── */
   return (
-    <div className="bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-xl shadow-gray-900/5">
+    <div className="rounded-3xl overflow-hidden shadow-xl shadow-gray-900/5 border" style={{ backgroundColor: cardBg, borderColor: fieldBorder, color: cardText }}>
 
       {/* Header */}
-      <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+      <div className="px-6 py-5 border-b" style={{ borderColor: fieldBorder }}>
         <div className="flex items-center gap-2">
-          <ShoppingCart className="w-5 h-5 text-gray-700" />
-          <p className="font-bold text-gray-900">{title || 'أدخل بيانات التسليم'}</p>
+          <ShoppingCart className="w-5 h-5" style={{ opacity: 0.75 }} />
+          <p className="font-bold">{title || 'أدخل بيانات التسليم'}</p>
         </div>
-        <p className="text-xs text-gray-500 mt-1">سنتواصل معك خلال 24 ساعة لتأكيد طلبك</p>
+        <p className="text-xs mt-1" style={{ opacity: 0.55 }}>سنتواصل معك خلال 24 ساعة لتأكيد طلبك</p>
       </div>
 
       <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        {renderBefore}
 
         {/* Name + Phone */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FieldWrapper error={formErrors.customerName} label="الاسم الكامل">
+        <div className="grid grid-cols-1 gap-4">
+          <FieldWrapper error={formErrors.customerName} label="الاسم الكامل" labelColor={cardText}>
             <div className="relative">
-              <User className="absolute right-3 top-3.5 w-4 h-4 text-gray-400" />
+              <User className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
               <input type="text" value={formData.customerName} placeholder="محمد أحمد"
                 onChange={e => setFormData({ ...formData, customerName: e.target.value })}
-                className={`${inputCls(!!formErrors.customerName)} pr-10`} />
+                className={`${inputCls(!!formErrors.customerName)} pr-10`}
+                style={fieldStyle(!!formErrors.customerName)} />
             </div>
           </FieldWrapper>
 
-          <FieldWrapper error={formErrors.customerPhone} label="رقم الهاتف">
+          <FieldWrapper error={formErrors.customerPhone} label="رقم الهاتف" labelColor={cardText}>
             <div className="relative">
-              <Phone className="absolute right-3 top-3.5 w-4 h-4 text-gray-400" />
+              <Phone className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
               <input type="tel" dir="ltr" value={formData.customerPhone} placeholder="0550 123 456"
                 onChange={e => setFormData({ ...formData, customerPhone: e.target.value })}
-                className={`${inputCls(!!formErrors.customerPhone)} pr-10 font-mono`} />
+                className={`${inputCls(!!formErrors.customerPhone)} pr-10 font-mono`}
+                style={fieldStyle(!!formErrors.customerPhone)} />
             </div>
           </FieldWrapper>
         </div>
 
         {/* Wilaya + Commune */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FieldWrapper error={formErrors.customerWelaya} label="الولاية">
+          <FieldWrapper error={formErrors.customerWelaya} label="الولاية" labelColor={cardText}>
             <div className="relative">
-              <MapPin className="absolute right-3 top-3.5 w-4 h-4 text-gray-400" />
+              <MapPin className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
               <select value={formData.customerWelaya}
                 onChange={e => setFormData({ ...formData, customerWelaya: e.target.value, customerCommune: '' })}
-                className={`${inputCls(!!formErrors.customerWelaya)} pr-10 appearance-none cursor-pointer`}>
+                className={`${inputCls(!!formErrors.customerWelaya)} pr-10 appearance-none cursor-pointer`}
+                style={fieldStyle(!!formErrors.customerWelaya)}>
                 <option value="">اختر الولاية</option>
                 {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
               </select>
-              <ChevronDown className="absolute left-3 top-3.5 w-4 h-4 text-gray-400 pointer-events-none" />
+              <ChevronDown className="absolute left-3 top-3.5 w-4 h-4 pointer-events-none" style={{ opacity: 0.4 }} />
             </div>
           </FieldWrapper>
 
-          <FieldWrapper error={formErrors.customerCommune} label="البلدية">
+          <FieldWrapper error={formErrors.customerCommune} label="البلدية" labelColor={cardText}>
             <div className="relative">
-              <MapPin className="absolute right-3 top-3.5 w-4 h-4 text-gray-400" />
+              <MapPin className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
               <select value={formData.customerCommune}
                 disabled={!formData.customerWelaya || loadingCommunes}
                 onChange={e => setFormData({ ...formData, customerCommune: e.target.value })}
-                className={`${inputCls(!!formErrors.customerCommune)} pr-10 appearance-none cursor-pointer disabled:opacity-50`}>
+                className={`${inputCls(!!formErrors.customerCommune)} pr-10 appearance-none cursor-pointer disabled:opacity-50`}
+                style={fieldStyle(!!formErrors.customerCommune)}>
                 <option value="">
                   {loadingCommunes ? 'جاري التحميل...'
                     : formData.customerWelaya ? 'اختر البلدية'
@@ -302,65 +353,73 @@ export default function ProductForm({
                 </option>
                 {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
-              <ChevronDown className="absolute left-3 top-3.5 w-4 h-4 text-gray-400 pointer-events-none" />
+              <ChevronDown className="absolute left-3 top-3.5 w-4 h-4 pointer-events-none" style={{ opacity: 0.4 }} />
             </div>
           </FieldWrapper>
         </div>
 
         {/* Delivery type */}
         <div>
-          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">نوع التوصيل</p>
+          <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: cardText, opacity: 0.6 }}>نوع التوصيل</p>
           <div className="grid grid-cols-2 gap-3">
-            {(['home', 'office'] as const).map(type => (
-              <button key={type} type="button"
-                onClick={() => setFormData(p => ({ ...p, typeLivraison: type }))}
-                className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-200
-                  ${formData.typeLivraison === type
-                    ? 'border-gray-900 bg-gray-900 text-white shadow-lg'
-                    : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'}`}>
-                {type === 'home'
-                  ? <Home      className={`w-6 h-6 ${formData.typeLivraison === type ? 'text-white' : 'text-gray-400'}`} />
-                  : <Building2 className={`w-6 h-6 ${formData.typeLivraison === type ? 'text-white' : 'text-gray-400'}`} />}
-                <div className="text-center">
-                  <p className="text-sm font-bold">{type === 'home' ? 'توصيل للمنزل' : 'استلام من المكتب'}</p>
-                  {selectedWilayaData && (
-                    <p className={`text-xs mt-0.5 ${formData.typeLivraison === type ? 'text-gray-300' : 'text-gray-400'}`}>
-                      {(type === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice).toLocaleString('ar-DZ')} د.ج
-                    </p>
-                  )}
-                </div>
-              </button>
-            ))}
+            {(['home', 'office'] as const).map(type => {
+              const isSelected = formData.typeLivraison === type;
+              return (
+                <button key={type} type="button"
+                  onClick={() => setFormData(p => ({ ...p, typeLivraison: type }))}
+                  className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-200"
+                  style={{
+                    borderColor: isSelected ? accent : fieldBorder,
+                    backgroundColor: isSelected ? accent : cardBg,
+                    color: isSelected ? btnText : cardText,
+                    boxShadow: isSelected ? '0 10px 15px -3px rgba(0,0,0,0.1)' : undefined,
+                  }}>
+                  {type === 'home'
+                    ? <Home      className="w-6 h-6" style={{ opacity: isSelected ? 1 : 0.4 }} />
+                    : <Building2 className="w-6 h-6" style={{ opacity: isSelected ? 1 : 0.4 }} />}
+                  <div className="text-center">
+                    <p className="text-sm font-bold">{type === 'home' ? 'توصيل للمنزل' : 'استلام من المكتب'}</p>
+                    {selectedWilayaData && (
+                      <p className="text-xs mt-0.5" style={{ opacity: isSelected ? 0.75 : 0.5 }}>
+                        {(type === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice).toLocaleString('ar-DZ')} د.ج
+                      </p>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
           {!selectedWilayaData && (
-            <p className="text-xs text-gray-400 mt-2 text-center">اختر الولاية لعرض تكلفة التوصيل</p>
+            <p className="text-xs mt-2 text-center" style={{ color: cardText, opacity: 0.4 }}>اختر الولاية لعرض تكلفة التوصيل</p>
           )}
         </div>
 
         {/* Quantity */}
-        <FieldWrapper error={formErrors.quantity} label="الكمية">
+        <FieldWrapper error={formErrors.quantity} label="الكمية" labelColor={cardText}>
           <div className="flex items-center gap-4">
             <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
-              className="w-12 h-12 rounded-xl border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-gray-900 hover:bg-gray-900 hover:text-white transition-all font-bold text-xl active:scale-95">−</button>
-            <span className="w-16 text-center text-2xl font-black text-gray-900">{formData.quantity}</span>
+              className="w-12 h-12 rounded-xl border-2 flex items-center justify-center transition-all font-bold text-xl active:scale-95"
+              style={{ borderColor: fieldBorder, color: cardText }}>−</button>
+            <span className="w-16 text-center text-2xl font-black" style={{ color: cardText }}>{formData.quantity}</span>
             <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: p.quantity + 1 }))}
-              className="w-12 h-12 rounded-xl border-2 border-gray-200 flex items-center justify-center text-gray-600 hover:border-gray-900 hover:bg-gray-900 hover:text-white transition-all font-bold text-xl active:scale-95">+</button>
-            <span className="text-sm text-gray-400 font-medium">قطعة</span>
+              className="w-12 h-12 rounded-xl border-2 flex items-center justify-center transition-all font-bold text-xl active:scale-95"
+              style={{ borderColor: fieldBorder, color: cardText }}>+</button>
+            <span className="text-sm font-medium" style={{ color: cardText, opacity: 0.45 }}>قطعة</span>
           </div>
         </FieldWrapper>
 
         {/* Order summary */}
-        <div className="bg-gray-50 rounded-2xl p-5 space-y-3 text-sm border border-gray-100">
-          <div className="flex justify-between text-gray-600">
+        <div className="rounded-2xl p-5 space-y-3 text-sm border" style={{ backgroundColor: fieldBg, borderColor: fieldBorder, color: cardText }}>
+          <div className="flex justify-between" style={{ opacity: 0.75 }}>
             <span className="flex items-center gap-1"><Package className="w-4 h-4" /> المنتج</span>
-            <span className="text-gray-900 font-bold truncate max-w-[50%]">{product.name}</span>
+            <span className="font-bold truncate max-w-[50%]" style={{ opacity: 1 }}>{product.name}</span>
           </div>
 
           {selectedOffer && (() => {
             const offer = product.offers?.find(o => o.id === selectedOffer);
             if (!offer) return null;
             return (
-              <div className="flex justify-between items-center text-gray-600">
+              <div className="flex justify-between items-center" style={{ opacity: 0.75 }}>
                 <span className="flex items-center gap-1"><Tag className="w-3.5 h-3.5 text-amber-500" /> العرض</span>
                 <span className="text-amber-600 font-bold bg-amber-50 px-2.5 py-1 rounded-lg text-xs border border-amber-100">{offer.name}</span>
               </div>
@@ -372,9 +431,9 @@ export default function ProductForm({
             const variant = attr?.variants?.find(v => v.value === val);
             if (!variant) return null;
             return (
-              <div key={attrName} className="flex justify-between items-center text-gray-600">
+              <div key={attrName} className="flex justify-between items-center" style={{ opacity: 0.75 }}>
                 <span>{attrName}</span>
-                <span className="text-gray-900 font-medium flex items-center gap-2">
+                <span className="font-medium flex items-center gap-2" style={{ opacity: 1 }}>
                   {attr?.displayMode === 'color' && <span className="w-4 h-4 rounded-full border border-gray-300 shrink-0" style={{ backgroundColor: val }} />}
                   {attr?.displayMode === 'image' && <span className="w-10 h-10 rounded-md border border-gray-300 shrink-0 bg-cover bg-center" style={{ backgroundImage: `url(${val})` }} />}
                   {!attr?.displayMode && <span className="truncate max-w-[120px] border px-1 rounded-md">{variant.name || val}</span>}
@@ -383,46 +442,50 @@ export default function ProductForm({
             );
           })}
 
-          <div className="flex justify-between text-gray-600">
+          <div className="flex justify-between" style={{ opacity: 0.75 }}>
             <span className="flex items-center gap-1"><Truck className="w-4 h-4" /> التوصيل</span>
-            <span className="text-gray-900 font-medium">
+            <span className="font-medium" style={{ opacity: 1 }}>
               {formData.typeLivraison === 'home' ? 'المنزل' : 'المكتب'}
-              {selectedWilayaData && <span className="text-gray-500 mr-1">({getPriceLivraison().toLocaleString('ar-DZ')} د.ج)</span>}
+              {selectedWilayaData && <span className="mr-1" style={{ opacity: 0.7 }}>({getPriceLivraison().toLocaleString('ar-DZ')} د.ج)</span>}
             </span>
           </div>
 
-          <div className="flex justify-between text-gray-600">
+          <div className="flex justify-between" style={{ opacity: 0.75 }}>
             <span>سعر القطعة</span>
-            <span className="text-gray-900 font-bold">{finalPrice.toLocaleString('ar-DZ')} د.ج</span>
+            <span className="font-bold" style={{ opacity: 1 }}>{finalPrice.toLocaleString('ar-DZ')} د.ج</span>
           </div>
-          <div className="flex justify-between text-gray-600">
+          <div className="flex justify-between" style={{ opacity: 0.75 }}>
             <span>الكمية</span>
-            <span className="text-gray-900 font-bold">× {formData.quantity}</span>
+            <span className="font-bold" style={{ opacity: 1 }}>× {formData.quantity}</span>
           </div>
 
-          <div className="flex justify-between items-center pt-3 border-t-2 border-dashed border-gray-200">
-            <span className="font-bold text-gray-900 text-base">الإجمالي الكلي</span>
-            <span className="text-2xl font-black text-gray-900">
+          <div className="flex justify-between items-center pt-3 border-t-2 border-dashed" style={{ borderColor: fieldBorder }}>
+            <span className="font-bold text-base">الإجمالي الكلي</span>
+            <span className="text-2xl font-black">
               {getTotalPrice().toLocaleString('ar-DZ')}
-              <span className="text-sm font-bold text-gray-500 mr-1">د.ج</span>
+              <span className="text-sm font-bold mr-1" style={{ opacity: 0.6 }}>د.ج</span>
             </span>
           </div>
         </div>
 
         {/* Submit */}
         <button type="submit" disabled={submitting}
-          className={`w-full py-4 rounded-2xl font-bold text-base transition-all flex items-center justify-center gap-2 shadow-lg
-            ${submitting
-              ? 'bg-gray-900 text-white opacity-90 cursor-not-allowed'
-              : 'bg-gray-900 text-white hover:bg-gray-800 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0'}`}>
+          className="w-full py-4 rounded-2xl font-bold text-base transition-all flex items-center justify-center gap-2 shadow-lg"
+          style={{
+            backgroundColor: accent,
+            color: btnText,
+            border: buttonBorderColor ? `2px solid ${buttonBorderColor}` : undefined,
+            opacity: submitting ? 0.9 : 1,
+            cursor: submitting ? 'not-allowed' : 'pointer',
+          }}>
           {submitting ? (
-            <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />جاري إرسال الطلب...</>
+            <><div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${btnText}55`, borderTopColor: 'transparent' }} />جاري إرسال الطلب...</>
           ) : (
             <><ShoppingCart className="w-5 h-5" />{buttonText || 'تأكيد الطلب الآن'}</>
           )}
         </button>
 
-        <p className="text-xs text-center text-gray-400 flex items-center justify-center gap-1">
+        <p className="text-xs text-center flex items-center justify-center gap-1" style={{ color: cardText, opacity: 0.4 }}>
           <Shield className="w-3 h-3" />بياناتك آمنة ومشفرة 100%
         </p>
       </form>

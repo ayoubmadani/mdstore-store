@@ -1,6 +1,7 @@
 'use client';
 
 import ProductFormBlockRenderer from './ProductFormBlockRenderer';
+import AddShow from '@/components/addShow';
 
 interface FloatingElement {
   id: string;
@@ -172,8 +173,18 @@ function ImageBlockRenderer({ props }: { props: Record<string, unknown> }) {
 // Mirrors dashboard/src/pages/editor/blocks/SpacerBlock.jsx — unlike the
 // editor (which can't safely let this go position:fixed inside the canvas,
 // see Canvas.jsx's isPinned handling), this is the real published page, so a
-// pinned spacer genuinely sticks to the real viewport edge here.
-function SpacerBlockRenderer({ props }: { props: Record<string, unknown> }) {
+// pinned spacer genuinely sticks to the real viewport edge here. Its floating
+// elements are rendered *inside* this same fixed box rather than as a sibling
+// in the tree-map loop below — a pinned spacer is taken out of normal flow,
+// which collapses the shared position:relative wrapper to 0 height, so any
+// FloatingElements positioned by percentage against that wrapper would
+// compute against zero and effectively vanish.
+// `left:0, right:0` would stretch this across the full browser viewport —
+// spanning past the page's own centered maxWidth column entirely, unlike the
+// editor's simulated preview, which always stays inside the page card's own
+// width. Centering it at the same maxWidth instead keeps it visually locked
+// to the page column at any viewport size, matching that preview.
+function SpacerBlockRenderer({ props, elements, maxWidth }: { props: Record<string, unknown>; elements: unknown; maxWidth: number }) {
   const { height, backgroundColor, position } = props as SpacerBlockProps;
   const isPinned = position === 'top' || position === 'bottom';
   return (
@@ -186,13 +197,17 @@ function SpacerBlockRenderer({ props }: { props: Record<string, unknown> }) {
               position: 'fixed' as const,
               top: position === 'top' ? 0 : undefined,
               bottom: position === 'bottom' ? 0 : undefined,
-              left: 0,
-              right: 0,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '100%',
+              maxWidth: `${maxWidth}px`,
               zIndex: 30,
             }
-          : {}),
+          : { position: 'relative' as const }),
       }}
-    />
+    >
+      {isPinned && <FloatingElements elements={elements} />}
+    </div>
   );
 }
 
@@ -203,31 +218,51 @@ function SpacerBlockRenderer({ props }: { props: Record<string, unknown> }) {
 export default function BuilderPageRenderer({ page, lpDomain }: { page: BuilderPageData; lpDomain: string }) {
   const settings = page.settings || {};
   const pagePadding = settings.padding || 0;
+  const pageMaxWidth = settings.maxWidth || 720;
+
+  // Pinned spacers render position:fixed and are taken out of document flow
+  // entirely, so nothing below would otherwise know to leave room for them —
+  // real content would start at the very top of the page and render right
+  // underneath (visually covered by) the fixed bar, unlike the editor's own
+  // preview, which always keeps it in-flow and thus never overlaps anything.
+  const pinnedTopHeight = page.tree
+    .filter((b) => b.type === 'spacer' && b.props?.position === 'top')
+    .reduce((sum, b) => sum + (Number(b.props?.height) || 60), 0);
+  const pinnedBottomHeight = page.tree
+    .filter((b) => b.type === 'spacer' && b.props?.position === 'bottom')
+    .reduce((sum, b) => sum + (Number(b.props?.height) || 60), 0);
 
   return (
     <div
       dir="rtl"
       style={{
         backgroundColor: settings.backgroundColor || '#ffffff',
-        maxWidth: settings.maxWidth ? `${settings.maxWidth}px` : undefined,
+        maxWidth: `${pageMaxWidth}px`,
         marginInline: 'auto',
         padding: pagePadding || undefined,
+        paddingTop: pinnedTopHeight ? pinnedTopHeight + pagePadding : undefined,
+        paddingBottom: pinnedBottomHeight ? pinnedBottomHeight + pagePadding : undefined,
       }}
     >
-      {page.tree.map((block, index) => (
-        <div key={block.id ?? index} style={{ position: 'relative' }} id={block.type === 'productForm' ? 'md-product-form' : undefined}>
-          {block.type === 'image' && <ImageBlockRenderer props={block.props} />}
-          {block.type === 'spacer' && <SpacerBlockRenderer props={block.props} />}
-          {block.type === 'productForm' && (
-            <ProductFormBlockRenderer
-              productId={page.productId || (block.props?.productId as string | undefined)}
-              props={block.props}
-              lpDomain={lpDomain}
-            />
-          )}
-          <FloatingElements elements={block.props?.elements} />
-        </div>
-      ))}
+      <AddShow storeId={page.storeId} productId={page.productId} builderPageId={page.id} />
+      {page.tree.map((block, index) => {
+        const isPinnedSpacer = block.type === 'spacer' && (block.props?.position === 'top' || block.props?.position === 'bottom');
+        return (
+          <div key={block.id ?? index} style={{ position: 'relative' }} id={block.type === 'productForm' ? 'md-product-form' : undefined}>
+            {block.type === 'image' && <ImageBlockRenderer props={block.props} />}
+            {block.type === 'spacer' && <SpacerBlockRenderer props={block.props} elements={isPinnedSpacer ? block.props?.elements : undefined} maxWidth={pageMaxWidth} />}
+            {block.type === 'productForm' && (
+              <ProductFormBlockRenderer
+                productId={page.productId || (block.props?.productId as string | undefined)}
+                props={block.props}
+                lpDomain={lpDomain}
+                builderPageId={page.id}
+              />
+            )}
+            {!isPinnedSpacer && <FloatingElements elements={block.props?.elements} />}
+          </div>
+        );
+      })}
     </div>
   );
 }
