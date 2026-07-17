@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Phone,
-  CheckCircle2, ArrowLeft, Package,
+  CheckCircle2, ArrowLeft, ArrowRight, Package,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Shield, Truck,
   Compass, Mountain, Tent, Wind,
@@ -225,6 +225,32 @@ const jsonAr = {
   privacy: 'الخصوصية',
   terms: 'الشروط',
   rightsReserved: 'جميع الحقوق محفوظة',
+  heroBadge: 'مغامرات في الهواء الطلق',
+  heroTitle: 'اكتشف<br/><em style="color:#D4622A;font-style:normal">المجهول</em>',
+  heroSubtitle: 'معدات وأدوات التخييم والمغامرات الخارجية. جاهز لكل تضاريس وكل رحلة.',
+  exploreBtn: 'استكشف المنتجات',
+  stat1L: 'منتج', stat2L: 'ولاية', stat3L: 'مضمون',
+  trust1T: 'توصيل لـ 58 ولاية', trust1S: 'سريع وآمن',
+  trust2T: 'دفع عند الاستلام', trust2S: 'بدون مخاطرة',
+  trust3T: 'معدات احترافية', trust3S: 'لكل المغامرات',
+  trust4T: 'مقاومة للطقس', trust4S: 'جودة عالية',
+  categories: 'الفئات', allProducts: 'جميع المنتجات', productUnit: 'منتج', viewDetails: 'استكشف',
+  outdoorBadge: 'معدات خارجية',
+  pagesTitle: 'الصفحات',
+  contactReply: 'نرد في غضون ساعة',
+  contactPhone: 'الهاتف', contactLocation: 'الموقع',
+  contactSentTitle: 'تم الإرسال!', contactSentDesc: 'سنرد عليك في أقرب وقت.', contactSendAnother: 'إرسال رسالة أخرى',
+  contactNameLabel: 'الاسم', contactPhoneLabel: 'الهاتف', contactEmailLabel: 'البريد الإلكتروني', contactMsgLabel: 'الرسالة',
+  contactSendBtn: 'إرسال الرسالة', contactSending: 'جاري الإرسال...',
+  privacyTitle: 'سياسة الخصوصية', termsTitle: 'شروط الاستخدام', cookiesTitle: 'ملفات الارتباط',
+  privacy1T: 'البيانات التي نجمعها', privacy1D: 'نجمع فقط المعلومات الضرورية لمعالجة طلباتكم، مثل الاسم، رقم الهاتف، وعنوان التوصيل.',
+  privacy2T: 'حماية البيانات', privacy2D: 'تُخزن جميع البيانات بشكل مشفر. نستخدم بروتوكولات حماية معتمدة لضمان أمان معلوماتكم.',
+  privacy3T: 'مشاركة المعلومات', privacy3D: 'لا نقوم ببيع أو مشاركة بياناتكم مع أي جهات خارجية باستثناء شركاء التوصيل.',
+  terms1T: 'الحساب والمسؤولية', terms1D: 'المستخدم مسؤول عن دقة البيانات المدخلة وعن الحفاظ على سرية حسابه.',
+  terms2T: 'الطلبات والمدفوعات', terms2D: 'يتم تأكيد الطلبات عبر الهاتف قبل الشحن. الأسعار المعلنة هي الأسعار النهائية.',
+  terms3T: 'القانون الحاكم', terms3D: 'تخضع كافة التعاملات للقوانين المعمول بها في جمهورية الجزائر الديمقراطية الشعبية.',
+  cookies1T: 'الملفات الأساسية', cookies1D: 'نستخدم ملفات تعريف الارتباط الضرورية لضمان عمل سلة المشتريات وأمان جلسة الدخول.',
+  cookies2T: 'تحسين التجربة', cookies2D: 'نستخدم بعض الملفات لفهم كيفية استخدام الموقع وتطوير تجربة التصفح.',
 };
 
 const jsonFr = {
@@ -291,7 +317,86 @@ const jsonFr = {
   privacy: 'Confidentialité',
   terms: 'Conditions',
   rightsReserved: 'Tous droits réservés.',
+  heroBadge: 'Aventures en plein air',
+  heroTitle: 'Explore<br/><em style="color:#D4622A;font-style:normal">l\'Inconnu</em>',
+  heroSubtitle: 'Équipements de camping et d\'aventure en plein air. Prêt pour tout terrain et toute expédition.',
+  exploreBtn: 'Explorer les produits',
+  stat1L: 'produits', stat2L: 'wilayas', stat3L: 'garanti',
+  trust1T: 'Livraison 58 wilayas', trust1S: 'Rapide et sûr',
+  trust2T: 'Paiement à la livraison', trust2S: 'Sans risque',
+  trust3T: 'Équipements pro', trust3S: 'Pour toutes aventures',
+  trust4T: 'Résistant aux intempéries', trust4S: 'Haute qualité',
+  categories: 'Catégories', allProducts: 'Tous les produits', productUnit: 'produit', viewDetails: 'Explorer',
+  outdoorBadge: 'Équipement extérieur',
+  pagesTitle: 'Pages',
+  contactReply: 'Réponse sous une heure',
+  contactPhone: 'Téléphone', contactLocation: 'Localisation',
+  contactSentTitle: 'Envoyé !', contactSentDesc: 'Nous vous répondrons dans les plus brefs délais.', contactSendAnother: 'Envoyer un autre message',
+  contactNameLabel: 'Nom', contactPhoneLabel: 'Téléphone', contactEmailLabel: 'E-mail', contactMsgLabel: 'Message',
+  contactSendBtn: 'Envoyer le message', contactSending: 'Envoi en cours...',
+  privacyTitle: 'Politique de confidentialité', termsTitle: 'Conditions d\'utilisation', cookiesTitle: 'Cookies',
+  privacy1T: 'Données collectées', privacy1D: 'Nous collectons uniquement les informations nécessaires au traitement de vos commandes, telles que votre nom, numéro de téléphone et adresse de livraison.',
+  privacy2T: 'Protection des données', privacy2D: 'Toutes les données sont stockées sous forme chiffrée. Nous utilisons des protocoles de protection certifiés pour assurer la sécurité de vos informations.',
+  privacy3T: 'Partage des informations', privacy3D: 'Nous ne vendons ni ne partageons vos données avec des tiers, à l\'exception des partenaires de livraison.',
+  terms1T: 'Compte et responsabilité', terms1D: 'L\'utilisateur est responsable de l\'exactitude des données saisies et de la confidentialité de son compte.',
+  terms2T: 'Commandes et paiements', terms2D: 'Les commandes sont confirmées par téléphone avant expédition. Les prix affichés sont les prix finaux.',
+  terms3T: 'Droit applicable', terms3D: 'Toutes les transactions sont soumises aux lois en vigueur en République Algérienne Démocratique et Populaire.',
+  cookies1T: 'Cookies essentiels', cookies1D: 'Nous utilisons des cookies nécessaires pour assurer le bon fonctionnement du panier et la sécurité de la session.',
+  cookies2T: 'Amélioration de l\'expérience', cookies2D: 'Nous utilisons certains cookies pour comprendre l\'utilisation du site et améliorer l\'expérience de navigation.',
 };
+
+const jsonEn = {
+  dir: 'ltr',
+  home: 'Home', contact: 'Contact', cart: 'Cart',
+  search: 'Search...', searching: 'Searching...', noResults: 'No results', showAll: 'View all results →',
+  all: 'All', noProducts: 'No products available', shopNow: 'Shop Now', searchResultsFor: 'Search results for:',
+  fullName: 'Full Name', fullNamePh: 'Enter your name', errName: 'Name is required',
+  phone: 'Phone Number', phonePh: '05xxxxxxxx', errPhone: 'Phone number is required', errPhoneInvalid: 'Invalid phone number',
+  wilaya: 'Wilaya', errWilaya: 'Wilaya is required', wilayaPh: 'Choose Wilaya', wilayaNA: 'Delivery not available',
+  commune: 'Commune', errCommune: 'Commune is required', communePh: 'Choose Commune', communeLoading: 'Loading...',
+  deliveryType: 'Delivery Type', deliveryHome: 'Home Delivery', deliveryOffice: 'Post Office',
+  qty: 'Quantity', price: 'Price', delivery: 'Delivery', total: 'Total',
+  subtotal: 'Subtotal', orderInfo: 'Order Info',
+  addToCart: 'Add to Cart', orderNow: 'Order Now', confirmOrder: 'Confirm Order',
+  sending: 'Sending...', back: 'Back', addedMsg: 'Added to cart!', errSubmit: 'An error occurred',
+  myCart: 'My Cart', cartEmpty: 'Cart is empty', cartEmptyDesc: 'You have not added any products yet',
+  successTitle: 'Order sent!', successDesc: 'We will contact you soon',
+  backToShop: 'Back to Shopping', checkoutTitle: 'Complete Order',
+  offersTitle: 'Available Offers', descTitle: 'Description',
+  quickLinks: 'Quick Links', contactSect: 'Contact Us', privacy: 'Privacy', terms: 'Terms', rightsReserved: 'All rights reserved',
+  heroBadge: 'Outdoor Adventures', heroTitle: 'Explore<br/><em style="color:#D4622A;font-style:normal">The Unknown</em>',
+  heroSubtitle: 'Camping gear and outdoor adventure equipment. Ready for every terrain and every journey.',
+  exploreBtn: 'Explore Products', stat1L: 'products', stat2L: 'wilayas', stat3L: 'guaranteed',
+  trust1T: 'Delivery to 58 wilayas', trust1S: 'Fast and safe',
+  trust2T: 'Cash on delivery', trust2S: 'No risk',
+  trust3T: 'Pro equipment', trust3S: 'For all adventures',
+  trust4T: 'Weather resistant', trust4S: 'High quality',
+  categories: 'Categories', allProducts: 'All Products', productUnit: 'product', viewDetails: 'Explore',
+  outdoorBadge: 'Outdoor Equipment',
+  pagesTitle: 'Pages',
+  contactReply: 'We reply within an hour',
+  contactPhone: 'Phone', contactLocation: 'Location',
+  contactSentTitle: 'Sent!', contactSentDesc: 'We will reply as soon as possible.', contactSendAnother: 'Send another message',
+  contactNameLabel: 'Name', contactPhoneLabel: 'Phone', contactEmailLabel: 'Email', contactMsgLabel: 'Message',
+  contactSendBtn: 'Send Message', contactSending: 'Sending...',
+  privacyTitle: 'Privacy Policy', termsTitle: 'Terms of Use', cookiesTitle: 'Cookies',
+  privacy1T: 'Data We Collect', privacy1D: 'We only collect information necessary to process your orders, such as your name, phone number, and delivery address.',
+  privacy2T: 'Data Protection', privacy2D: 'All data is stored in encrypted form. We use certified protection protocols to ensure the security of your information.',
+  privacy3T: 'Information Sharing', privacy3D: 'We do not sell or share your data with any third parties except delivery partners.',
+  terms1T: 'Account & Responsibility', terms1D: 'The user is responsible for the accuracy of the data entered and for maintaining the confidentiality of their account.',
+  terms2T: 'Orders & Payments', terms2D: 'Orders are confirmed by phone before shipping. Advertised prices are final prices.',
+  terms3T: 'Governing Law', terms3D: 'All transactions are subject to the laws in force in the People\'s Democratic Republic of Algeria.',
+  cookies1T: 'Essential Cookies', cookies1D: 'We use necessary cookies to ensure the shopping cart and login session security work properly.',
+  cookies2T: 'Experience Improvement', cookies2D: 'We use some cookies to understand how the site is used and improve the browsing experience.',
+};
+
+type Lang = 'ar' | 'fr' | 'en';
+const getLang = (store?: any): Lang => {
+  if (store?.language === 'fr') return 'fr';
+  if (store?.language === 'en') return 'en';
+  return 'ar';
+};
+const T: Record<Lang, typeof jsonAr> = { ar: jsonAr, fr: jsonFr, en: jsonEn };
 
 export default function Main({ store, children, domain }: any) {
   const pathname = usePathname();
@@ -307,6 +412,7 @@ export default function Main({ store, children, domain }: any) {
 }
 
 export function Navbar({ store, domain }: { store: any; domain: string }) {
+  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -332,12 +438,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
   useEffect(() => {
     if (searchQuery.length < 2) { setListSearch([]); return; }
-    const t = setTimeout(async () => {
+    const timer = setTimeout(async () => {
       setLoading(true);
       try { const { data } = await axios.get(`${API_URL}/products/public/${domain}`, { params: { search: searchQuery } }); setListSearch(data.products || []); }
       catch { } finally { setLoading(false); }
     }, 380);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [searchQuery, domain]);
 
   useEffect(() => {
@@ -385,7 +491,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
           {/* Desktop links */}
           <div className="nav-desktop" style={{ flex: 1, justifyContent: 'center' }}>
-            {[{ h: '/', l: 'الرئيسية' }, { h: '/contact', l: 'تواصل معنا' }].map(i => (
+            {[{ h: '/', l: t.home }, { h: '/contact', l: t.contact }].map(i => (
               <Link key={i.h} href={i.h} style={{ fontSize: '0.82rem', fontWeight: 600, color: 'rgba(255,255,255,0.6)', padding: '0.3rem 0.875rem', borderRadius: 6, transition: 'all 0.15s', letterSpacing: '0.04em' }}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.color = '#fff'; el.style.background = 'rgba(255,255,255,0.08)'; }}
                 onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.color = 'rgba(255,255,255,0.6)'; el.style.background = 'transparent'; }}>
@@ -405,7 +511,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               <Link href="/cart" style={{ position: 'relative', background: OR, color: '#fff', height: 36, padding: '0 1rem', borderRadius: 8, display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.82rem', fontWeight: 700, transition: 'background 0.18s', letterSpacing: '0.03em' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = ORD)}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = OR)}>
-                <ShoppingCart size={14} /> السلة
+                <ShoppingCart size={14} /> {t.cart}
                 {count > 0 && <span style={{ background: '#fff', color: OR, fontSize: 9, fontWeight: 800, width: 16, height: 16, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
               </Link>
             )}
@@ -429,7 +535,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         {/* Mobile menu */}
         <div style={{ overflow: 'hidden', maxHeight: open ? 220 : 0, transition: 'max-height 0.25s ease', background: '#1a2b18', borderTop: open ? '1px solid rgba(255,255,255,0.07)' : 'none' }}>
           <div style={{ padding: '0.5rem 1.5rem 1rem' }}>
-            {[{ h: '/', l: 'الرئيسية' }, { h: '/contact', l: 'تواصل معنا' }].map(i => (
+            {[{ h: '/', l: t.home }, { h: '/contact', l: t.contact }].map(i => (
               <Link key={i.h} href={i.h} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid rgba(255,255,255,0.06)', fontSize: '0.875rem', fontWeight: 600, color: 'rgba(255,255,255,0.75)' }}>
                 {i.l} <ArrowLeft size={13} style={{ color: OR }} />
               </Link>
@@ -442,19 +548,19 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       {/* Search overlay */}
       {showSearch && (
         <div className="glb-search-ov" onClick={e => { if (e.target === e.currentTarget) setShowSearch(false); }}>
-          <div className="glb-search-panel">
+          <div className="glb-search-panel" dir={isRTL ? 'rtl' : 'ltr'}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>البحث</span>
+              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{t.search}</span>
               <button onClick={() => setShowSearch(false)} style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><X size={14} /></button>
             </div>
             <form className="glb-search-form" onSubmit={handleSearch}>
               <Search size={18} style={{ color: OR, flexShrink: 0, marginLeft: 10 }} />
-              <input ref={searchInputRef} className="glb-search-input" type="text" placeholder="ابحث عن معدات التخييم..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+              <input ref={searchInputRef} className="glb-search-input" type="text" placeholder={t.search} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
             </form>
-            {loading && <p style={{ textAlign: 'center', color: OR, fontSize: '0.82rem', padding: '2rem' }}>جاري البحث...</p>}
+            {loading && <p style={{ textAlign: 'center', color: OR, fontSize: '0.82rem', padding: '2rem' }}>{t.searching}</p>}
             {!loading && listSearch.length > 0 && (
               <>
-              <div className="glb-search-grid">
+              <div className="glb-search-grid" dir={isRTL ? 'rtl' : 'ltr'}>
                 {listSearch.map((p: any) => (
                   <Link key={p.id} href={`/product/${p.slug || p.id}`} className="glb-search-card" onClick={() => setShowSearch(false)}>
                     {(p.productImage || p.imagesProduct?.[0]?.imageUrl) && (
@@ -468,12 +574,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 ))}
               </div>
               <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: 'rgba(212,98,42,0.08)', border: 'none', borderTop: '1px solid rgba(212,98,42,0.2)', color: OR, fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                عرض جميع النتائج <ArrowLeft size={14} />
+                {t.showAll} <ArrowLeft size={14} />
               </button>
               </>
             )}
             {!loading && searchQuery.length >= 2 && listSearch.length === 0 && (
-              <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.25)', fontSize: '0.875rem', padding: '3rem' }}>لا توجد نتائج</p>
+              <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.25)', fontSize: '0.875rem', padding: '3rem' }}>{t.noResults}</p>
             )}
           </div>
         </div>
@@ -483,8 +589,9 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 }
 
 export function Footer({ store }: any) {
+  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
   return (
-    <footer dir="rtl" style={{ background: DARK, borderTop: `3px solid ${OR}`, marginTop: 80, padding: '3.5rem 1.5rem 2rem' }}>
+    <footer dir={isRTL ? 'rtl' : 'ltr'} style={{ background: DARK, borderTop: `3px solid ${OR}`, marginTop: 80, padding: '3.5rem 1.5rem 2rem' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div className="footer-cols" style={{ paddingBottom: '2.5rem', marginBottom: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
           <div>
@@ -493,13 +600,13 @@ export function Footer({ store }: any) {
               <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#fff', fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase', letterSpacing: '0.05em' }}>{store?.name}</span>
             </div>
             <p style={{ fontSize: '0.875rem', lineHeight: 1.85, maxWidth: 280, color: 'rgba(255,255,255,0.4)' }}>
-              {store?.hero?.subtitle?.substring(0, 90) || 'معدات وأدوات التخييم والمغامرات في الهواء الطلق.'}
+              {store?.hero?.subtitle?.substring(0, 90) || t.heroSubtitle}
             </p>
             <p style={{ marginTop: '2rem', fontSize: '0.65rem', color: 'rgba(255,255,255,0.18)' }}>© {new Date().getFullYear()} {store?.name}</p>
           </div>
           <div>
-            <h4 style={{ fontSize: '0.65rem', fontWeight: 700, color: OR, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1rem' }}>الصفحات</h4>
-            {[{ h: '/', l: 'الرئيسية' }, { h: '/cart', l: 'السلة' }, { h: '/contact', l: 'تواصل معنا' }, { h: '/Privacy', l: 'الخصوصية' }, { h: '/Terms', l: 'الشروط' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
+            <h4 style={{ fontSize: '0.65rem', fontWeight: 700, color: OR, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1rem' }}>{t.pagesTitle}</h4>
+            {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }, { h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
               <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'rgba(255,255,255,0.4)', marginBottom: '0.55rem', transition: 'color 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = OR)}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
@@ -508,7 +615,7 @@ export function Footer({ store }: any) {
             ))}
           </div>
           <div>
-            <h4 style={{ fontSize: '0.65rem', fontWeight: 700, color: OR, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1rem' }}>تواصل</h4>
+            <h4 style={{ fontSize: '0.65rem', fontWeight: 700, color: OR, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1rem' }}>{t.contactSect}</h4>
             {[
               { icon: <Phone size={12} />, val: store?.contact?.phone },
               { icon: <Mail size={12} />, val: store?.contact?.email },
@@ -527,6 +634,7 @@ export function Footer({ store }: any) {
 }
 
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
+  const cardLang = getLang(store); const cardRTL = cardLang === 'ar';
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
   const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
   return (
@@ -557,13 +665,14 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         )}
       </div>
       <Link href={`/product/${product.slug || product.id}`} className="oa-cta">
-        {viewDetails} <ArrowLeft size={13} />
+        {viewDetails} {cardRTL ? <ArrowLeft size={13} /> : <ArrowRight size={13} />}
       </Link>
     </div>
   );
 }
 
 export function Home({ store, page }: any) {
+  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
   const products: any[] = store.products || [];
   const cats: any[] = store.categories || [];
   const searchParams = useSearchParams();
@@ -572,7 +681,7 @@ export function Home({ store, page }: any) {
   const countPage = Math.ceil((store.count || products.length) / 48);
 
   return (
-    <div dir="rtl">
+    <div dir={isRTL ? 'rtl' : 'ltr'}>
       {/* HERO */}
       <section style={{ position: 'relative', overflow: 'hidden', minHeight: 'clamp(520px,75vh,760px)', display: 'flex', alignItems: 'center' }}>
         {/* Background image - always visible */}
@@ -588,34 +697,34 @@ export function Home({ store, page }: any) {
           <div style={{ maxWidth: 620 }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(212,98,42,0.15)', border: '1px solid rgba(212,98,42,0.3)', borderRadius: 3, padding: '0.35rem 0.875rem', marginBottom: '1.5rem' }}>
               <Compass size={11} color={OR} />
-              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: OR, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: "'Barlow Condensed', sans-serif" }}>مغامرات في الهواء الطلق</span>
+              <span style={{ fontSize: '0.62rem', fontWeight: 700, color: OR, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: "'Barlow Condensed', sans-serif" }}>{t.heroBadge}</span>
             </div>
             <h1 style={{ fontFamily: "'Barlow Condensed', 'Cairo', sans-serif", fontSize: 'clamp(3.5rem,9vw,7rem)', fontWeight: 800, color: '#FAFAF8', lineHeight: 0.9, letterSpacing: '-0.02em', textTransform: 'uppercase', marginBottom: '1.25rem' }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || `اكتشف<br/><em style="color:${OR};font-style:normal">المجهول</em>`) }} />
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || t.heroTitle) }} />
             <div style={{ display: 'flex', gap: 6, marginBottom: '1.5rem' }}>
               <div style={{ width: 40, height: 3, background: OR }} />
               <div style={{ width: 12, height: 3, background: G }} />
               <div style={{ width: 6, height: 3, background: 'rgba(255,255,255,0.2)' }} />
             </div>
             <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.55)', lineHeight: 1.85, marginBottom: '2rem', maxWidth: 440 }}>
-              {store.hero?.subtitle || 'معدات وأدوات التخييم والمغامرات الخارجية. جاهز لكل تضاريس وكل رحلة.'}
+              {store.hero?.subtitle || t.heroSubtitle}
             </p>
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
               <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: OR, color: '#fff', fontWeight: 800, fontSize: '0.8rem', padding: '0.875rem 1.875rem', transition: 'background 0.18s', textDecoration: 'none', fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.1em', textTransform: 'uppercase' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = ORD)}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = OR)}>
-                استكشف المنتجات <ArrowLeft size={14} />
+                {t.exploreBtn} {isRTL ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}
               </a>
               {store?.cart !== false && (
                 <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, color: 'rgba(255,255,255,0.6)', fontWeight: 600, fontSize: '0.8rem', padding: '0.875rem 1.5rem', border: '1px solid rgba(255,255,255,0.15)', letterSpacing: '0.06em', transition: 'all 0.18s' }}
                   onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = G; el.style.color = '#fff'; }}
                   onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = 'rgba(255,255,255,0.15)'; el.style.color = 'rgba(255,255,255,0.6)'; }}>
-                  <ShoppingCart size={14} /> السلة
+                  <ShoppingCart size={14} /> {t.cart}
                 </Link>
               )}
             </div>
             <div style={{ display: 'flex', gap: 'clamp(1.5rem,5vw,4rem)', marginTop: '2.5rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-              {[{ n: '+300', l: 'منتج' }, { n: '58', l: 'ولاية' }, { n: '100%', l: 'مضمون' }].map((s, i) => (
+              {[{ n: '+300', l: t.stat1L }, { n: '58', l: t.stat2L }, { n: '100%', l: t.stat3L }].map((s, i) => (
                 <div key={i}>
                   <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, color: OR, lineHeight: 1 }}>{s.n}</p>
                   <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.35)', marginTop: 5, letterSpacing: '0.1em', textTransform: 'uppercase' }}>{s.l}</p>
@@ -630,10 +739,10 @@ export function Home({ store, page }: any) {
       <section style={{ background: '#0E1A0C' }}>
         <div className="trust-bar" style={{ maxWidth: 1280, margin: '0 auto' }}>
           {[
-            { icon: <Truck size={14} />, t: 'توصيل لـ 58 ولاية', s: 'سريع وآمن' },
-            { icon: <Shield size={14} />, t: 'دفع عند الاستلام', s: 'بدون مخاطرة' },
-            { icon: <Tent size={14} />, t: 'معدات احترافية', s: 'لكل المغامرات' },
-            { icon: <Wind size={14} />, t: 'مقاومة للطقس', s: 'جودة عالية' },
+            { icon: <Truck size={14} />, t: t.trust1T, s: t.trust1S },
+            { icon: <Shield size={14} />, t: t.trust2T, s: t.trust2S },
+            { icon: <Tent size={14} />, t: t.trust3T, s: t.trust3S },
+            { icon: <Wind size={14} />, t: t.trust4T, s: t.trust4S },
           ].map((item, i) => (
             <div key={i} style={{ padding: '0.875rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', borderLeft: i % 2 !== 0 ? '1px solid rgba(255,255,255,0.05)' : 'none', borderTop: i >= 2 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
               <div style={{ width: 30, height: 30, background: 'rgba(212,98,42,0.2)', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', color: OR, flexShrink: 0 }}>{item.icon}</div>
@@ -649,10 +758,10 @@ export function Home({ store, page }: any) {
       {/* CATEGORIES */}
       {cats.length > 0 && (
         <section style={{ padding: '2rem 1.5rem', maxWidth: 1280, margin: '0 auto' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 700, color: INK, marginBottom: '1rem', fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase', letterSpacing: '0.08em' }}>الفئات</h2>
+          <h2 style={{ fontSize: '1rem', fontWeight: 700, color: INK, marginBottom: '1rem', fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.categories}</h2>
           <div className="cats-grid">
                           <Link href="?" style={{ display:'inline-flex', alignItems:'center', padding:'0.5rem 1.25rem', borderRadius:999, border:`1.5px solid ${!activeCategory ? OR : '#ccc'}`, background: !activeCategory ? OR : 'transparent', color: !activeCategory ? '#fff' : 'inherit', fontSize:'0.82rem', fontWeight:600, cursor:'pointer' }}>
-                الكل
+                {t.all}
               </Link>
               {cats.map((cat: any) => {
               const isActive = activeCategory === String(cat.id);
@@ -673,26 +782,26 @@ export function Home({ store, page }: any) {
       <section id="products" style={{ padding: '0 1.5rem 5rem', maxWidth: 1280, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '1.5rem', paddingTop: cats.length > 0 ? 0 : '2rem', borderBottom: `2px solid ${OR}`, paddingBottom: '0.75rem' }}>
           <div>
-            <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(1.5rem,4vw,2.25rem)', fontWeight: 800, color: INK, textTransform: 'uppercase', letterSpacing: '0.04em', lineHeight: 1 }}>جميع المنتجات</h2>
-            {store.count > 0 && <p style={{ fontSize: '0.72rem', color: SUB, marginTop: 4 }}>{store.count} منتج</p>}
+            <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(1.5rem,4vw,2.25rem)', fontWeight: 800, color: INK, textTransform: 'uppercase', letterSpacing: '0.04em', lineHeight: 1 }}>{t.allProducts}</h2>
+            {store.count > 0 && <p style={{ fontSize: '0.72rem', color: SUB, marginTop: 4 }}>{store.count} {t.productUnit}</p>}
           </div>
         </div>
         {products.length === 0 ? (
           <div style={{ padding: '5rem 1.5rem', textAlign: 'center', border: `1px dashed ${BD}`, borderRadius: 10, background: CARD }}>
             <Tent size={40} color={BD} style={{ display: 'block', margin: '0 auto 1rem' }} />
-            <p style={{ color: SUB, fontSize: '0.875rem' }}>لا توجد منتجات بعد</p>
+            <p style={{ color: SUB, fontSize: '0.875rem' }}>{t.noProducts}</p>
           </div>
         ) : (
           <div className="products-grid">
             {products.map((p: any) => {
               const img = p.productImage || p.imagesProduct?.[0]?.imageUrl;
               const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
-              return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="استكشف" />;
+              return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails={t.viewDetails} />;
             })}
           </div>
         )}
         {countPage > 1 && (
-          <div className="pagination" dir="rtl">
+          <div className="pagination" dir={isRTL ? 'rtl' : 'ltr'}>
             <Link href={{ query: { page: Math.max(1, page - 1) } }} scroll={false} style={{ height: 36, padding: '0 0.875rem', borderRadius: 6, border: `1px solid ${BD}`, display: 'flex', alignItems: 'center', background: CARD, color: SUB, fontSize: '0.8rem' }}>❮</Link>
             {Array.from({ length: countPage }).map((_, i) => {
               const pn = i + 1; const isA = Number(page) === pn;
@@ -706,10 +815,11 @@ export function Home({ store, page }: any) {
   );
 }
 
-export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
+export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
+  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
   const [sel, setSel] = useState(0);
   return (
-    <div dir="rtl" style={{ background: BG, paddingBottom: '4rem' }}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: BG, paddingBottom: '4rem' }}>
       <div className="details-inner" style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div className="gallery-container">
           <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden', background: GL, borderRadius: 10, border: `1px solid ${BD}` }}>
@@ -735,15 +845,15 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
         <div>
           <div className="info-container">
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: GL, borderRadius: 4, padding: '0.3rem 0.75rem', marginBottom: '0.75rem', border: `1px solid rgba(61,107,53,0.2)` }}>
-              <Compass size={11} color={G} /><span style={{ fontSize: '0.62rem', fontWeight: 700, color: GD, letterSpacing: '0.08em', textTransform: 'uppercase' }}>معدات خارجية</span>
+              <Compass size={11} color={G} /><span style={{ fontSize: '0.62rem', fontWeight: 700, color: GD, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{t.outdoorBadge}</span>
             </div>
             <h1 style={{ fontSize: 'clamp(1.5rem,4vw,2.25rem)', fontWeight: 700, color: INK, marginBottom: '0.5rem', lineHeight: 1.2 }}>{product.name}</h1>
             <div style={{ display: 'flex', gap: 2, marginBottom: '1.25rem' }}>{[...Array(5)].map((_, i) => <Star key={i} size={13} style={{ fill: i < 4 ? OR : 'none', color: OR }} />)}</div>
             <div style={{ padding: '1rem 1.25rem', background: GL, borderRadius: 10, border: `1px solid rgba(61,107,53,0.15)`, marginBottom: '1.5rem' }}>
-              <p style={{ fontSize: '0.62rem', fontWeight: 700, color: SUB, marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>السعر</p>
+              <p style={{ fontSize: '0.62rem', fontWeight: 700, color: SUB, marginBottom: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.price}</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
                 <span className="price-mono" style={{ fontSize: '2.5rem', fontWeight: 700, color: GD }}>{finalPrice.toLocaleString()}</span>
-                <span style={{ fontSize: '0.9rem', fontWeight: 600, color: SUB }}>دج</span>
+                <span style={{ fontSize: '0.9rem', fontWeight: 600, color: SUB }}>{store?.currency || 'DZD'}</span>
               </div>
             </div>
             {product.offers?.length > 0 && (
@@ -757,7 +867,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                       <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
                       <div>
                         <p style={{ fontWeight: 600, color: INK, fontSize: '0.875rem' }}>{o.name}</p>
-                        <p style={{ fontSize: '0.7rem', color: SUB }}>الكمية: {o.quantity}</p>
+                        <p style={{ fontSize: '0.7rem', color: SUB }}>{t.qty}: {o.quantity}</p>
                       </div>
                     </div>
                     <span className="price-mono" style={{ fontWeight: 700, color: GD }}>{o.price.toLocaleString()} دج</span>
@@ -782,7 +892,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                 </div>
               </div>
             ))}
-            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
+            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store} />
             {product.desc && (
               <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: `1px solid ${BD}` }}>
                 <div style={{ fontSize: '0.9rem', lineHeight: 1.85, color: SUB }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc) }} />
@@ -1111,8 +1221,8 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 }
 
-const Shell = ({ children, title }: { children: React.ReactNode; title: string }) => (
-  <div dir="rtl" style={{ minHeight: '100vh', background: BG }}>
+const Shell = ({ children, title, dir }: { children: React.ReactNode; title: string; dir?: string }) => (
+  <div dir={dir || 'rtl'} style={{ minHeight: '100vh', background: BG }}>
     <div style={{ background: DARK, borderBottom: `3px solid ${OR}`, paddingTop: 72, paddingBottom: 40, paddingLeft: 24, paddingRight: 24 }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, marginBottom: '0.75rem' }}>
@@ -1138,13 +1248,14 @@ const InfoBlock = ({ title, body }: { title: string; body: string }) => (
   </div>
 );
 
-export function Privacy() {
+export function Privacy({ store }: { store?: any }) {
+  const lang = getLang(store); const t = T[lang];
   return (
-    <Shell title="سياسة الخصوصية">
+    <Shell title={t.privacyTitle} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 10, border: `1px solid ${BD}` }}>
-        <InfoBlock title="البيانات التي نجمعها" body="نجمع فقط المعلومات الضرورية لمعالجة طلباتكم، مثل الاسم، رقم الهاتف، وعنوان التوصيل." />
-        <InfoBlock title="حماية البيانات" body="تُخزن جميع البيانات بشكل مشفر. نستخدم بروتوكولات حماية معتمدة لضمان أمان معلوماتكم." />
-        <InfoBlock title="مشاركة المعلومات" body="لا نقوم ببيع أو مشاركة بياناتكم مع أي جهات خارجية باستثناء شركاء التوصيل." />
+        <InfoBlock title={t.privacy1T} body={t.privacy1D} />
+        <InfoBlock title={t.privacy2T} body={t.privacy2D} />
+        <InfoBlock title={t.privacy3T} body={t.privacy3D} />
       </div>
     </Shell>
   );

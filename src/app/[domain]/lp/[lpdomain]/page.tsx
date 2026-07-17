@@ -11,6 +11,7 @@ import { notFound } from 'next/navigation';
 import ProductForm from '@/components/productForm/productForm';
 import AddShow from '@/components/addShow';
 import CustomerTracker from '@/components/CustomerTracker';
+import BuilderPageRenderer from '@/components/builderPages/BuilderPageRenderer';
 import type { Pixel } from '@/types/store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
@@ -67,6 +68,30 @@ async function getLandingPage(lpdomain: string): Promise<LandingPage | null> {
   }
 }
 
+interface BuilderPageData {
+  id: string;
+  name: string;
+  storeId: string;
+  productId?: string;
+  settings?: Record<string, unknown>;
+  tree: Array<{ id?: string; type: string; props: Record<string, unknown> }>;
+}
+
+// builder-pages own this exact same "domain.tld/lp/slug" URL shape — tried
+// first (see load() below) since it's the newer, actively-developed tool;
+// the older landing-page module is the fallback for domains it doesn't know.
+async function getBuilderPage(fullPath: string): Promise<BuilderPageData | null> {
+  try {
+    const found = await axios.get(`${API_URL}/builder-pages/find`, { params: { domain: fullPath } });
+    const publishedUrl = found.data?.publishedUrl;
+    if (!publishedUrl) return null;
+    const published = await axios.get(publishedUrl);
+    return published.data;
+  } catch {
+    return null;
+  }
+}
+
 function cleanDomain(url: string) {
   if (!url) return { domain: '', pathname: '', fullPath: '' };
 
@@ -117,6 +142,7 @@ export default function LandingPageView({
   params: Promise<{ lpdomain: string }>;
 }) {
   const [lp, setLp] = useState<LandingPage | null>(null);
+  const [builderPage, setBuilderPage] = useState<BuilderPageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [lpDomain, setLpDomain] = useState('');
   const [selectedImage, setSelectedImage] = useState(0);
@@ -135,6 +161,13 @@ export default function LandingPageView({
 
         const { lpdomain } = await params;
         setLpDomain(lpdomain);
+
+        const builderData = await getBuilderPage(url.fullPath);
+        if (builderData) {
+          setBuilderPage(builderData);
+          return;
+        }
+
         const data = await getLandingPage(url.fullPath);
         if (data) {
           setLp(data);
@@ -201,6 +234,8 @@ export default function LandingPageView({
       </div>
     );
   }
+
+  if (builderPage) return <BuilderPageRenderer page={builderPage} lpDomain={lpDomain} />;
 
   if (!lp || !product || !product.isActive) return notFound();
 

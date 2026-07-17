@@ -1,1 +1,1 @@
-node scripts/bundle-themes.mjs --slug=--coustom-sidou-box
+node scripts/bundle-themes.mjs --slug=color-bold-red-rush-ecommerce-theme

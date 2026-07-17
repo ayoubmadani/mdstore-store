@@ -755,7 +755,7 @@ This is the one piece of logic that has gone missing from generated themes befor
 - `customerWelaya`, `customerCommune` required.
 
 **Two main buttons:**
-1. **Add to Cart** (`addToCart`) — only if `product.store.cart === true`:
+1. **Add to Cart** (`addToCart`) — only if `store?.cart !== false` (never `=== true` — see §15.27):
    - Reads `localStorage.getItem(domain)`, adds a new item containing: all form data + `product` + `variantDetailId: getVarId()` + `productId` + `storeId` + `userId` + `selectedOffer` + `selectedVariants` + `platform` + `finalPrice` + `totalPrice` + `priceLivraison` + `addedAt`.
    - Updates `localStorage` and `initCount`.
 2. **Order Now** (`isOrderNow` → opens the full form):
@@ -940,6 +940,68 @@ These are bugs that shipped to production themes and had to be patched after the
     ```
     Found in `ar/lighting-everyday-decor-lighting-theme` (2026-07-02).
 24. **Order form price summary appears below customer fields instead of above them.** When `isOrderNow` is true, the summary box (السعر، الكمية، التوصيل، الإجمالي) was rendered after the name/phone/wilaya/commune inputs and the delivery-type toggle, so the customer had to scroll past all fields to see the total. Fix: place the summary block immediately after the customer fields and delivery toggle, just before the submit/cancel buttons — the correct order is: customer fields → delivery toggle → **summary** → buttons. Found in `ar/lighting-everyday-decor-lighting-theme` (2026-07-02).
+25. **`Details` and `ProductForm` read language from `product.store` instead of the `store` prop — always show Arabic.** `product.store` is a nested object from the product API and often does not include the `language` field. The `store` prop (fetched separately via `getStoreByDomain`) always has `language`. When `Details`/`ProductForm` only check `getLang(product?.store)`, they always default to `'ar'` on French/English stores. Fix: add `store` to the `Details` signature, use `getLang(store || product?.store)`, and pass it through to the inner `ProductForm` call:
+    ```tsx
+    // Details — accept store as a separate prop
+    export function Details({ product, store: storeprop, ... }: any) {
+      const t = T[getLang(storeprop || product?.store)];
+      ...
+      <ProductForm product={product} store={storeprop} ... />
+    }
+
+    // ProductForm — same pattern
+    export function ProductForm({ product, store: storeprop, ... }: any) {
+      const store = storeprop || product?.store;
+      const t = T[getLang(store)];
+      ...
+    }
+    ```
+    Found in `sport-urban-fitness-running-theme` and `animal-pet-lovers-paradise` (2026-07-03).
+
+26. **`domain={undefined}` hardcoded in `ProductForm` call inside `Details` — addToCart silently does nothing.** The `addToCart` function reads `localStorage.getItem(domain)`. If `domain` is `undefined` (because `Details` passes `domain={undefined}` instead of the received `domain` prop), the key is `null` and the function returns early without saving anything. The user clicks the button and nothing happens. Fix: always forward the actual `domain` prop:
+    ```tsx
+    // WRONG
+    <ProductForm product={product} domain={undefined} ... />
+
+    // CORRECT
+    <ProductForm product={product} domain={domain} ... />
+    ```
+    Found in `sport-urban-fitness-running-theme` (2026-07-03).
+
+27. **`store?.cart === true` strict boolean check hides the Add-to-Cart button.** If `store.cart` is `1` (number) or any other truthy non-`true` value, the strict equality fails and the button never renders. The correct guard throughout the codebase is `store?.cart !== false` — show the button unless the store has explicitly disabled the cart. Using `=== true` has the same problem in navbar/footer/hero cart links. Fix everywhere:
+    ```tsx
+    // WRONG — hides button when cart = 1 or any non-boolean truthy value
+    {store?.cart === true && <button>{t.addToCart}</button>}
+
+    // CORRECT
+    {store?.cart !== false && <button>{t.addToCart}</button>}
+    ```
+    Found in `sport-urban-fitness-running-theme` (2026-07-03).
+
+28. **Search dropdown positioned off-screen in RTL.** Using `right: 0` on an absolutely-positioned dropdown with `width: 340px` anchors its right edge to the right edge of the search button. In RTL layout the search button is on the LEFT side of the header — the 340px dropdown then extends 340px to the LEFT, going off the left viewport edge. Conversely, `left: 0` in LTR pushes the dropdown off the right edge. Fix: use the CSS logical property `inset-inline-end: 0`, which resolves to `left: 0` in RTL (extends right ✓) and `right: 0` in LTR (extends left ✓):
+    ```css
+    /* WRONG */
+    .search-dropdown { position: absolute; right: 0; width: 340px; }
+
+    /* CORRECT — direction-aware */
+    .search-dropdown { position: absolute; inset-inline-end: 0; width: 340px; }
+
+    /* Mobile: switch to fixed positioning to avoid overflow entirely */
+    @media (max-width: 480px) {
+      .search-dropdown { position: fixed; left: 12px; right: 12px; width: auto; top: 64px; }
+    }
+    ```
+    Found in `--coustom-sidou-box` (2026-07-03).
+
+29. **Hero text block stays on the physical LEFT in RTL desktop layouts.** CSS `direction: rtl` does NOT move block-level boxes — it only changes text alignment and inline content direction. A `<h1>` with `maxWidth: 720px` on a 1280px container always renders at the left edge physically, leaving 560px of empty space on the right in RTL (where the text should be). Fix: add `marginInlineEnd: 'auto'` to constrained-width block elements. This resolves to `margin-left: auto` in RTL (pushes block to the right ✓) and `margin-right: auto` in LTR (leaves block at the left ✓):
+    ```tsx
+    // WRONG — h1 stays at physical left edge even in RTL
+    <h1 style={{ maxWidth: 720 }}>...</h1>
+
+    // CORRECT — moves to right in RTL, stays left in LTR
+    <h1 style={{ maxWidth: 720, marginInlineEnd: 'auto' }}>...</h1>
+    ```
+    Only needed on elements that have a `maxWidth` smaller than the container. Full-width block elements are unaffected. Found in `--coustom-sidou-box` (2026-07-03).
 
 ---
 

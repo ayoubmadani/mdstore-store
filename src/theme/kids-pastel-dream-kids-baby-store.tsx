@@ -312,6 +312,44 @@ const jsonAr = {
   privacy: 'الخصوصية',
   terms: 'الشروط',
   rightsReserved: 'جميع الحقوق محفوظة',
+  // Hero & Home sections
+  heroBadge: 'العناية بطفلك بكل محبة',
+  heroDefaultTitle: 'كل ما يحتاجه<br/>طفلك الصغير',
+  heroDefaultSubtitle: '🌸 منتجات آمنة وناعمة مختارة بعناية لراحة طفلك وصحته منذ اليوم الأول.',
+  footerDefaultSubtitle: '🌸 كل ما يحتاجه طفلك بأمان ومحبة. منتجات ناعمة لبداية حياة هانئة.',
+  categoriesTitle: 'تسوقي بحسب الفئة',
+  productsTitle: 'منتجاتنا المختارة',
+  productsSubtitle: 'كل شيء يحتاجه طفلك 💫',
+  bannerTitle: 'لأن طفلك يستحق الأفضل',
+  bannerSubtitle: 'منتجات مختارة بعناية فائقة لتمنح طفلك أكبر قدر من الراحة والأمان',
+  trustSafe: 'آمن تماماً', trustSafeDesc: 'خالٍ من المواد الضارة',
+  trustFast: 'توصيل سريع', trustFastDesc: 'لجميع الولايات',
+  trustQuality: 'جودة ممتازة', trustQualityDesc: 'منتجات فاخرة ومعتمدة',
+  trustCare: 'بمحبة وعناية', trustCareDesc: 'لأطفالنا الأحبة',
+  footerReplyMsg: 'نرد بكل محبة 🌸', footerReplyTime: 'خلال 24 ساعة',
+  // Contact page
+  contactPageTitle: 'تواصلي معنا',
+  contactPageSubtitle: 'نحن هنا دائماً لمساعدتك 🌸',
+  contactPhone: 'الهاتف', contactPhoneNA: 'غير متوفر',
+  contactLocation: 'الموقع', contactLocationNA: 'الجزائر',
+  contactEmail: 'البريد', contactEmailNA: 'غير متوفر',
+  contactSentTitle: 'تم الإرسال!', contactSentDesc: 'سنرد عليك في أقرب وقت.',
+  contactNameLabel: 'الاسم', contactPhoneLabel: 'الهاتف',
+  contactEmailLabel: 'البريد الإلكتروني', contactMessageLabel: 'رسالتك',
+  contactSendBtn: 'إرسال الرسالة', contactSending: 'جاري...',
+  contactError: 'حدث خطأ',
+  // Static pages
+  privacyTitle: 'سياسة الخصوصية',
+  termsTitle: 'الشروط والأحكام',
+  cookiesTitle: 'ملفات الارتباط',
+  privacy1T: 'البيانات التي نجمعها', privacy1D: 'نجمع فقط البيانات الضرورية لإتمام طلبك — الاسم، رقم الهاتف، والعنوان.',
+  privacy2T: 'حماية بياناتك', privacy2D: 'نستخدم أحدث بروتوكولات التشفير لضمان أمان معلوماتك الشخصية.',
+  privacy3T: 'سياسة المشاركة', privacy3D: 'لا نبيع أو نشارك بياناتك مع أطراف ثالثة. خصوصيتك أولويتنا.',
+  terms1T: 'الطلبات والمدفوعات', terms1D: 'يتم تأكيد الطلبات عبر الهاتف قبل الشحن. الدفع عند الاستلام.',
+  terms2T: 'التوصيل', terms2D: 'نوفر خدمة التوصيل لجميع ولايات الجزائر بأفضل الأسعار.',
+  terms3T: 'الضمانات', terms3D: 'نلتزم بأعلى معايير الجودة والسلامة في جميع منتجاتنا.',
+  cookies1T: 'الملفات الأساسية', cookies1D: 'ضرورية لعمل سلة التسوق وحفظ بيانات جلستك.',
+  cookies2T: 'تحسين التجربة', cookies2D: 'تساعدنا على تقديم تجربة تسوق مخصصة وأفضل لك.',
 };
 
 const jsonFr = {
@@ -378,7 +416,112 @@ const jsonFr = {
   privacy: 'Confidentialité',
   terms: 'Conditions',
   rightsReserved: 'Tous droits réservés.',
+  // Hero & Home sections
+  heroBadge: 'Prendre soin de votre bébé avec amour',
+  heroDefaultTitle: 'Tout ce dont<br/>votre bébé a besoin',
+  heroDefaultSubtitle: '🌸 Des produits sûrs et doux, soigneusement sélectionnés pour le confort et la santé de votre bébé.',
+  footerDefaultSubtitle: '🌸 Tout ce dont votre bébé a besoin, avec sécurité et amour.',
+  categoriesTitle: 'Parcourir par catégorie',
+  productsTitle: 'Nos produits sélectionnés',
+  productsSubtitle: 'Tout ce dont votre bébé a besoin 💫',
+  bannerTitle: 'Parce que votre bébé mérite le meilleur',
+  bannerSubtitle: 'Des produits choisis avec le plus grand soin pour offrir à votre bébé confort et sécurité',
+  trustSafe: 'Totalement sûr', trustSafeDesc: 'Sans substances nocives',
+  trustFast: 'Livraison rapide', trustFastDesc: 'Vers toutes les wilayas',
+  trustQuality: 'Qualité premium', trustQualityDesc: 'Produits certifiés de luxe',
+  trustCare: 'Avec amour', trustCareDesc: 'Pour nos chers enfants',
+  footerReplyMsg: 'Nous répondons avec amour 🌸', footerReplyTime: 'Dans les 24h',
+  // Contact page
+  contactPageTitle: 'Contactez-nous',
+  contactPageSubtitle: 'Nous sommes toujours là pour vous aider 🌸',
+  contactPhone: 'Téléphone', contactPhoneNA: 'Non disponible',
+  contactLocation: 'Adresse', contactLocationNA: 'Algérie',
+  contactEmail: 'E-mail', contactEmailNA: 'Non disponible',
+  contactSentTitle: 'Message envoyé !', contactSentDesc: 'Nous vous répondrons dans les plus brefs délais.',
+  contactNameLabel: 'Nom', contactPhoneLabel: 'Téléphone',
+  contactEmailLabel: 'Adresse e-mail', contactMessageLabel: 'Votre message',
+  contactSendBtn: 'Envoyer le message', contactSending: 'Envoi...',
+  contactError: 'Une erreur est survenue',
+  // Static pages
+  privacyTitle: 'Politique de confidentialité',
+  termsTitle: "Conditions d'utilisation",
+  cookiesTitle: 'Cookies',
+  privacy1T: 'Données collectées', privacy1D: 'Nous collectons uniquement les données nécessaires à votre commande — nom, téléphone et adresse.',
+  privacy2T: 'Protection de vos données', privacy2D: 'Nous utilisons les derniers protocoles de chiffrement pour sécuriser vos informations.',
+  privacy3T: 'Politique de partage', privacy3D: 'Nous ne vendons ni ne partageons vos données avec des tiers. Votre vie privée est notre priorité.',
+  terms1T: 'Commandes et paiements', terms1D: 'Les commandes sont confirmées par téléphone avant expédition. Paiement à la livraison.',
+  terms2T: 'Livraison', terms2D: 'Nous livrons dans toutes les wilayas d\'Algérie aux meilleurs prix.',
+  terms3T: 'Garanties', terms3D: 'Nous respectons les plus hauts standards de qualité et de sécurité pour tous nos produits.',
+  cookies1T: 'Cookies essentiels', cookies1D: 'Nécessaires au fonctionnement du panier et à la sauvegarde de votre session.',
+  cookies2T: 'Amélioration de l\'expérience', cookies2D: 'Nous aident à offrir une expérience d\'achat personnalisée et améliorée.',
 };
+
+const jsonEn = {
+  dir: 'ltr',
+  home: 'Home', contact: 'Contact', cart: 'Cart',
+  search: 'Search...', searching: 'Searching...', noResults: 'No results', showAll: 'View all results →',
+  all: 'All', noProducts: 'No products available', shopNow: 'Shop Now', searchResultsFor: 'Search results for:',
+  fullName: 'Full Name', fullNamePh: 'Enter your name', errName: 'Name is required',
+  phone: 'Phone Number', phonePh: '05xxxxxxxx', errPhone: 'Phone number is required', errPhoneInvalid: 'Invalid phone number',
+  wilaya: 'Wilaya', errWilaya: 'Wilaya is required', wilayaPh: 'Choose Wilaya', wilayaNA: 'Delivery not available',
+  commune: 'Commune', errCommune: 'Commune is required', communePh: 'Choose Commune', communeLoading: 'Loading...',
+  deliveryType: 'Delivery Type', deliveryHome: 'Home Delivery', deliveryOffice: 'Post Office',
+  qty: 'Quantity', price: 'Price', delivery: 'Delivery', total: 'Total',
+  subtotal: 'Subtotal', orderInfo: 'Order Info',
+  addToCart: 'Add to Cart', orderNow: 'Order Now', confirmOrder: 'Confirm Order',
+  sending: 'Sending...', back: 'Back', addedMsg: 'Added to cart successfully!', errSubmit: 'An error occurred while submitting',
+  myCart: 'My Cart', cartEmpty: 'Cart is empty', cartEmptyDesc: 'You have not added any products yet',
+  successTitle: 'Order sent successfully!', successDesc: 'We will contact you soon to confirm the details',
+  backToShop: 'Back to Shopping', checkoutTitle: 'Complete Order',
+  offersTitle: 'Available Offers', descTitle: 'Description',
+  quickLinks: 'Quick Links', contactSect: 'Contact Us', privacy: 'Privacy', terms: 'Terms', rightsReserved: 'All rights reserved',
+  // Hero & Home sections
+  heroBadge: 'Caring for your baby with love',
+  heroDefaultTitle: 'Everything your<br/>little one needs',
+  heroDefaultSubtitle: '🌸 Safe and gentle products carefully selected for your baby\'s comfort and health.',
+  footerDefaultSubtitle: '🌸 Everything your baby needs, safely and lovingly.',
+  categoriesTitle: 'Browse by Category',
+  productsTitle: 'Our Selected Products',
+  productsSubtitle: 'Everything your baby needs 💫',
+  bannerTitle: 'Because your baby deserves the best',
+  bannerSubtitle: 'Products chosen with the utmost care to give your baby maximum comfort and safety',
+  trustSafe: 'Totally Safe', trustSafeDesc: 'Free from harmful substances',
+  trustFast: 'Fast Delivery', trustFastDesc: 'To all wilayas',
+  trustQuality: 'Premium Quality', trustQualityDesc: 'Luxury certified products',
+  trustCare: 'With Love', trustCareDesc: 'For our beloved children',
+  footerReplyMsg: 'We reply with love 🌸', footerReplyTime: 'Within 24 hours',
+  // Contact page
+  contactPageTitle: 'Contact Us',
+  contactPageSubtitle: 'We are always here to help you 🌸',
+  contactPhone: 'Phone', contactPhoneNA: 'Not available',
+  contactLocation: 'Location', contactLocationNA: 'Algeria',
+  contactEmail: 'Email', contactEmailNA: 'Not available',
+  contactSentTitle: 'Message sent!', contactSentDesc: 'We will get back to you as soon as possible.',
+  contactNameLabel: 'Name', contactPhoneLabel: 'Phone',
+  contactEmailLabel: 'Email Address', contactMessageLabel: 'Your message',
+  contactSendBtn: 'Send Message', contactSending: 'Sending...',
+  contactError: 'An error occurred',
+  // Static pages
+  privacyTitle: 'Privacy Policy',
+  termsTitle: 'Terms & Conditions',
+  cookiesTitle: 'Cookies',
+  privacy1T: 'Data We Collect', privacy1D: 'We only collect data necessary to complete your order — name, phone number, and address.',
+  privacy2T: 'Protecting Your Data', privacy2D: 'We use the latest encryption protocols to keep your personal information secure.',
+  privacy3T: 'Sharing Policy', privacy3D: 'We never sell or share your data with third parties. Your privacy is our priority.',
+  terms1T: 'Orders & Payments', terms1D: 'Orders are confirmed by phone before shipping. Cash on delivery.',
+  terms2T: 'Delivery', terms2D: 'We deliver to all Algerian wilayas at the best prices.',
+  terms3T: 'Guarantees', terms3D: 'We uphold the highest quality and safety standards across all our products.',
+  cookies1T: 'Essential Cookies', cookies1D: 'Required for the shopping cart and session data to work.',
+  cookies2T: 'Experience Improvement', cookies2D: 'Help us provide a personalized and better shopping experience.',
+};
+
+type Lang = 'ar' | 'fr' | 'en';
+const getLang = (store?: any): Lang => {
+  if (store?.language === 'fr') return 'fr';
+  if (store?.language === 'en') return 'en';
+  return 'ar';
+};
+const T: Record<Lang, typeof jsonAr> = { ar: jsonAr, fr: jsonFr, en: jsonEn };
 
 export default function Main({ store, children, domain }: any) {
   const pathname = usePathname();
@@ -397,6 +540,9 @@ export default function Main({ store, children, domain }: any) {
    NAVBAR
 ══════════════════════════════════════════════════════════════ */
 export function Navbar({ store, domain }: { store: any; domain: string }) {
+    const lang = getLang(store);
+    const t = T[lang];
+    const isRTL = lang === 'ar';
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -450,7 +596,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
             <div style={{ maxHeight: 300, overflowY: 'auto', }}>
                 {loading ? (
-                    <div style={{ padding: '1.25rem', textAlign: 'center', color: 'var(--lavender-dk)', fontSize: '0.875rem', fontWeight: 700 }}>🌸 جاري البحث...</div>
+                    <div style={{ padding: '1.25rem', textAlign: 'center', color: 'var(--lavender-dk)', fontSize: '0.875rem', fontWeight: 700 }}>🌸 {t.searching}</div>
                 ) : listSearch.length > 0 ? (
                     <>
                         {listSearch.map((p: any) => (
@@ -476,17 +622,17 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                                     }}>
                                         {p.name}
                                     </div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--lavender-dk)', fontWeight: 700 }}>{p.price} دج</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--lavender-dk)', fontWeight: 700 }}>{p.price} {store?.currency || 'DZD'}</div>
                                 </div>
                             </Link>
                         ))}
 
                         <button onClick={doSearch} style={{ width: '100%', padding: '12px', background: 'var(--lavender-lt)', border: 'none', borderTop: '1px solid var(--lavender)', color: 'var(--lavender-dk)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                            عرض جميع النتائج <ArrowLeft size={14} />
+                            {t.showAll} <ArrowLeft size={14} />
                         </button>
                     </>
                 ) : searchQuery.length >= 2 && (
-                    <div style={{ padding: '1.25rem', textAlign: 'center', color: 'var(--text-soft)', fontSize: '0.875rem' }}>لا توجد نتائج 🌷</div>
+                    <div style={{ padding: '1.25rem', textAlign: 'center', color: 'var(--text-soft)', fontSize: '0.875rem' }}>{t.noResults} 🌷</div>
                 )}
             </div>
         </div>
@@ -499,7 +645,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             {store.topBar.text}
           </div>
         )}
-        <nav dir="rtl" style={{
+        <nav dir={isRTL ? 'rtl' : 'ltr'} style={{
             position: 'sticky', top: 0, zIndex: 100,
             background: scrolled ? 'rgba(250,249,247,0.95)' : 'var(--bg)',
             backdropFilter: scrolled ? 'blur(20px)' : 'none',
@@ -520,7 +666,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 {/* Desktop search */}
                 <div className="nav-desktop-search" style={{ flex: 1, maxWidth: 340, position: 'relative' }}>
                     <form onSubmit={doSearch}>
-                        <input type="text" placeholder="ابحثي هنا... 🌸" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                        <input type="text" placeholder={`${t.search} 🌸`} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
                             style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.75rem', borderRadius: 50, border: '2px solid var(--lavender-lt)', background: '#fff', fontSize: '0.875rem', fontWeight: 600, outline: 'none', transition: 'border-color 0.2s', fontFamily: "'Quicksand', sans-serif" }}
                             onFocus={e => (e.target.style.borderColor = 'var(--lavender)')}
                             onBlur={e => (e.target.style.borderColor = 'var(--lavender-lt)')} />
@@ -531,7 +677,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
                 {/* Desktop links */}
                 <div className="nav-desktop-links">
-                    {[{ h: '/', l: 'الرئيسية' }, { h: '/contact', l: 'تواصلي معنا' }].map(i => (
+                    {[{ h: '/', l: t.home }, { h: '/contact', l: t.contact }].map(i => (
                         <Link key={i.h} href={i.h} style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-mid)', transition: 'color 0.2s', padding: '0.375rem 0.875rem', borderRadius: 50 }}
                             onMouseEnter={e => { const el = e.currentTarget; el.style.color = 'var(--lavender-dk)'; el.style.background = 'var(--lavender-lt)'; }}
                             onMouseLeave={e => { const el = e.currentTarget; el.style.color = 'var(--text-mid)'; el.style.background = 'transparent'; }}>
@@ -567,7 +713,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             {showSearch && (
                 <div style={{ padding: '0.625rem 1.25rem', background: '#fff', borderTop: '1px solid var(--lavender-lt)', position: 'relative' }}>
                     <form onSubmit={doSearch} style={{ position: 'relative' }}>
-                        <input autoFocus type="text" placeholder="ابحثي هنا..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                        <input autoFocus type="text" placeholder={t.search} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
                             style={{ ...INP(), padding: '0.75rem 1rem 0.75rem 2.75rem' }} />
                         <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--lavender)' }} />
                     </form>
@@ -578,7 +724,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             {/* Mobile nav */}
             <div style={{ overflow: 'hidden', maxHeight: open ? 180 : 0, transition: 'max-height 0.3s ease', background: '#fff', borderTop: open ? '1px solid var(--lavender-lt)' : 'none' }}>
                 <div style={{ padding: '0.5rem 1.25rem 1rem' }}>
-                    {[{ h: '/', l: '🏠 الرئيسية' }, { h: '/contact', l: '💌 تواصلي معنا' }].map(i => (
+                    {[{ h: '/', l: `🏠 ${t.home}` }, { h: '/contact', l: `💌 ${t.contact}` }].map(i => (
                         <Link key={i.h} href={i.h} onClick={() => setOpen(false)}
                             style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid var(--lavender-lt)', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)' }}>
                             {i.l} <ArrowLeft size={14} style={{ color: 'var(--lavender-dk)' }} />
@@ -596,8 +742,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
    FOOTER — 3 أقسام
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
+    const lang = getLang(store);
+    const t = T[lang];
+    const isRTL = lang === 'ar';
     return (
-        <footer dir="rtl" style={{ background: 'linear-gradient(135deg, #4C1D95 0%, #7C3AED 50%, #5B21B6 100%)', color: '#fff', padding: '4rem 1.5rem 2rem', position: 'relative', overflow: 'hidden' }}>
+        <footer dir={isRTL ? 'rtl' : 'ltr'} style={{ background: 'linear-gradient(135deg, #4C1D95 0%, #7C3AED 50%, #5B21B6 100%)', color: '#fff', padding: '4rem 1.5rem 2rem', position: 'relative', overflow: 'hidden' }}>
             {/* Cloud deco */}
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, opacity: 0.08, pointerEvents: 'none' }}>
                 <div className="cloud-wrap">
@@ -613,19 +762,19 @@ export function Footer({ store }: any) {
                     <div>
                         <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.75rem', fontWeight: 700, color: '#fff', marginBottom: '0.875rem' }}>{store?.name}</h3>
                         <p style={{ fontSize: '0.9rem', fontWeight: 600, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, maxWidth: 300 }}>
-                            {store?.hero?.subtitle?.substring(0, 90) || '🌸 كل ما يحتاجه طفلك بأمان ومحبة. منتجات ناعمة لبداية حياة هانئة.'}
+                            {store?.hero?.subtitle?.substring(0, 90) || t.footerDefaultSubtitle}
                         </p>
                         <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.25rem', fontSize: '1.5rem' }}>
                             {['👶', '🌸', '🧸', '🌙', '⭐'].map((e, i) => (
                                 <span key={i} style={{ animation: `gentle-float ${3 + i * 0.5}s ${i * 0.3}s ease-in-out infinite`, display: 'inline-block' }}>{e}</span>
                             ))}
                         </div>
-                        <p style={{ marginTop: '2rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)' }}>© {new Date().getFullYear()} {store?.name}. جميع الحقوق محفوظة.</p>
+                        <p style={{ marginTop: '2rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)' }}>© {new Date().getFullYear()} {store?.name}. {t.rightsReserved}</p>
                     </div>
                     {/* قسم 2 */}
                     <div>
-                        <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--peach)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>روابط سريعة</h4>
-                        {[{ h: '/', l: 'الرئيسية' }, { h: '/cart', l: 'سلة التسوق' }, { h: '/contact', l: 'تواصلي معنا' }, { h: '/Privacy', l: 'سياسة الخصوصية' }, { h: '/Terms', l: 'الشروط والأحكام' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
+                        <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--peach)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>{t.quickLinks}</h4>
+                        {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }, { h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
                             <a key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
                                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = '#fff'; el.style.paddingRight = '8px'; }}
                                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(255,255,255,0.6)'; el.style.paddingRight = '0'; }}>
@@ -635,7 +784,7 @@ export function Footer({ store }: any) {
                     </div>
                     {/* قسم 3 */}
                     <div>
-                        <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--peach)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>تواصلي معنا</h4>
+                        <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--peach)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>{t.contactSect}</h4>
                         {[
                             { e: '📞', v: store?.contact?.phone },
                             { e: '📍', v: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
@@ -648,9 +797,9 @@ export function Footer({ store }: any) {
                         <div style={{ marginTop: '1.5rem', padding: '1.125rem', borderRadius: 18, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
                                 <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--mint)', boxShadow: '0 0 8px var(--mint)', display: 'inline-block' }} />
-                                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#fff' }}>نرد بكل محبة 🌸</span>
+                                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#fff' }}>{t.footerReplyMsg}</span>
                             </div>
-                            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>خلال 24 ساعة</p>
+                            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', fontWeight: 600 }}>{t.footerReplyTime}</p>
                         </div>
                     </div>
                 </div>
@@ -704,7 +853,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
                 <div style={{ marginTop: 'auto' }}>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', marginBottom: '0.75rem' }}>
                         <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.5rem', fontWeight: 700, color: pal.accent }}>{price.toLocaleString()}</span>
-                        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-soft)' }}>{store?.currency || 'دج'}</span>
+                        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-soft)' }}>{store?.currency || 'DZD'}</span>
                         {orig > price && <span style={{ fontSize: '0.72rem', color: 'var(--text-soft)', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
                     </div>
                     <Link href={`/product/${product.slug || product.id}`} className="btn-soft" style={{
@@ -727,13 +876,16 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
    HOME
 ══════════════════════════════════════════════════════════════ */
 export function Home({ store, page }: any) {
+    const lang = getLang(store);
+    const t = T[lang];
+    const isRTL = lang === 'ar';
     const products: any[] = store.products || [];
     const cats: any[] = store.categories || [];
     if (!page) page = 1;
     const countPage = Math.ceil((store.count || products.length) / 48);
 
     return (
-        <div dir="rtl">
+        <div dir={isRTL ? 'rtl' : 'ltr'}>
             {/* ── HERO ── */}
             <section className="pastel-dots" style={{ position: 'relative', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
                 {/* Cloud decoration */}
@@ -759,21 +911,21 @@ export function Home({ store, page }: any) {
                 <div style={{ maxWidth: 1280, margin: '0 auto', padding: '7rem 1.5rem 4rem', position: 'relative', zIndex: 1, width: '100%' }}>
                     <div className="anim-fade" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.5rem 1.25rem', borderRadius: 50, background: 'rgba(196,181,253,0.2)', border: '1.5px solid rgba(196,181,253,0.5)', marginBottom: '1.5rem' }}>
                         <Sparkles size={14} style={{ color: 'var(--lavender-dk)' }} />
-                        <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{store?.name} — العناية بطفلك بكل محبة</span>
+                        <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{store?.name} — {t.heroBadge}</span>
                     </div>
                     <h1 className="anim-fade font-serif" style={{ fontSize: 'clamp(2.75rem, 7vw, 5.5rem)', fontWeight: 700, color: 'var(--text)', lineHeight: 1.1, marginBottom: '1.25rem', letterSpacing: '-0.02em' }}
-                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'كل ما يحتاجه<br/>طفلك الصغير') }} />
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || t.heroDefaultTitle) }} />
                     <div style={{ height: 3, width: 80, borderRadius: 99, background: 'linear-gradient(90deg, var(--lavender), var(--rose), var(--peach))', marginBottom: '1.5rem' }} />
                     <p className="anim-fade" style={{ fontSize: '1.0625rem', fontWeight: 600, color: 'var(--text-mid)', maxWidth: 480, lineHeight: 1.75, marginBottom: '2.5rem' }}>
-                        {store.hero?.subtitle || '🌸 منتجات آمنة وناعمة مختارة بعناية لراحة طفلك وصحته منذ اليوم الأول.'}
+                        {store.hero?.subtitle || t.heroDefaultSubtitle}
                     </p>
                     <div className="hero-actions">
                         <a href="#products" className="btn-soft" style={{ ...BTN_PRI, textDecoration: 'none' }}>
-                            اكتشفي المنتجات 🌸
+                            {t.shopNow} 🌸
                         </a>
                         {store?.cart !== false && (
                             <Link href="/cart" className="btn-soft" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.875rem 1.75rem', borderRadius: 50, border: '2px solid var(--lavender)', background: '#fff', color: 'var(--lavender-dk)', fontWeight: 700, fontSize: '0.925rem' }}>
-                                السلة
+                                {t.cart}
                             </Link>
                         )}
 
@@ -786,15 +938,15 @@ export function Home({ store, page }: any) {
                 <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
                     <div className="trust-grid" style={{ padding: '1.5rem 0' }}>
                         {[
-                            { e: '🛡️', t: 'آمن تماماً', d: 'خالٍ من المواد الضارة' },
-                            { e: '🚀', t: 'توصيل سريع', d: 'لجميع الولايات' },
-                            { e: '🌸', t: 'جودة ممتازة', d: 'منتجات فاخرة ومعتمدة' },
-                            { e: '💝', t: 'بمحبة وعناية', d: 'لأطفالنا الأحبة' },
+                            { e: '🛡️', tl: t.trustSafe, d: t.trustSafeDesc },
+                            { e: '🚀', tl: t.trustFast, d: t.trustFastDesc },
+                            { e: '🌸', tl: t.trustQuality, d: t.trustQualityDesc },
+                            { e: '💝', tl: t.trustCare, d: t.trustCareDesc },
                         ].map((item, i) => (
                             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', padding: '0.875rem 1rem', borderLeft: i < 3 ? '1px solid var(--lavender-lt)' : 'none' }}>
                                 <span style={{ fontSize: '1.75rem' }}>{item.e}</span>
                                 <div>
-                                    <p style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--text)', marginBottom: '0.2rem' }}>{item.t}</p>
+                                    <p style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--text)', marginBottom: '0.2rem' }}>{item.tl}</p>
                                     <p style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-soft)' }}>{item.d}</p>
                                 </div>
                             </div>
@@ -807,7 +959,7 @@ export function Home({ store, page }: any) {
             {cats.length > 0 && (
                 <section style={{ padding: '4rem 1.5rem', maxWidth: 1280, margin: '0 auto' }}>
                     <h2 className="font-serif" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 700, textAlign: 'center', color: 'var(--text)', marginBottom: '2rem' }}>
-                        تسوقي بحسب الفئة
+                        {t.categoriesTitle}
                     </h2>
                     <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.625rem' }}>
                         {cats.map((cat: any, idx: number) => {
@@ -829,21 +981,21 @@ export function Home({ store, page }: any) {
             {/* ── PRODUCTS ── */}
             <section id="products" style={{ padding: '1rem 1.5rem 6rem', maxWidth: 1280, margin: '0 auto' }}>
                 <h2 className="font-serif" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 700, textAlign: 'center', color: 'var(--text)', marginBottom: '0.5rem' }}>
-                    منتجاتنا المختارة
+                    {t.productsTitle}
                 </h2>
-                <p style={{ textAlign: 'center', color: 'var(--text-soft)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '2.5rem' }}>كل شيء يحتاجه طفلك 💫</p>
+                <p style={{ textAlign: 'center', color: 'var(--text-soft)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '2.5rem' }}>{t.productsSubtitle}</p>
 
                 {products.length === 0 ? (
                     <div className="pastel-dots" style={{ padding: '5rem', textAlign: 'center', border: '2px dashed var(--lavender)', borderRadius: 24, background: 'var(--lavender-lt)' }}>
                         <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1rem' }}>🧸</span>
-                        <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.25rem', color: 'var(--lavender-dk)' }}>لا توجد منتجات حالياً</p>
+                        <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.25rem', color: 'var(--lavender-dk)' }}>{t.noProducts}</p>
                     </div>
                 ) : (
                     <div className="products-grid">
                         {products.map((p: any) => {
                             const img = p.productImage || p.imagesProduct?.[0]?.imageUrl;
                             const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
-                            return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="عرض المنتج" />;
+                            return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails={t.shopNow} />;
                         })}
                     </div>
                 )}
@@ -868,13 +1020,13 @@ export function Home({ store, page }: any) {
             <section style={{ background: 'linear-gradient(135deg, var(--lavender-lt), var(--rose-lt), var(--peach-lt))', padding: '5rem 1.5rem', textAlign: 'center' }}>
                 <span style={{ fontSize: '3.5rem', display: 'block', marginBottom: '1.25rem', animation: 'gentle-float 4s ease-in-out infinite' }}>👶</span>
                 <h2 className="font-serif" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 700, color: 'var(--lavender-dk)', marginBottom: '1rem' }}>
-                    لأن طفلك يستحق الأفضل
+                    {t.bannerTitle}
                 </h2>
                 <p style={{ fontSize: '1.0625rem', fontWeight: 600, color: 'var(--text-mid)', maxWidth: 500, margin: '0 auto 2rem', lineHeight: 1.7 }}>
-                    منتجات مختارة بعناية فائقة لتمنح طفلك أكبر قدر من الراحة والأمان
+                    {t.bannerSubtitle}
                 </p>
                 <a href="#products" className="btn-soft" style={{ ...BTN_PRI, textDecoration: 'none' }}>
-                    تسوقي الآن 🌸
+                    {t.shopNow} 🌸
                 </a>
             </section>
         </div>
@@ -884,11 +1036,14 @@ export function Home({ store, page }: any) {
 /* ══════════════════════════════════════════════════════════════
    DETAILS
 ══════════════════════════════════════════════════════════════ */
-export function Details({ product, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
+export function Details({ product, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
+    const lang = getLang(store || product?.store);
+    const t = T[lang];
+    const isRTL = lang === 'ar';
     const [sel, setSel] = useState(0);
 
     return (
-        <div dir="rtl" style={{ background: 'var(--bg)', paddingBottom: '4rem' }}>
+        <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: 'var(--bg)', paddingBottom: '4rem' }}>
             <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2.5rem 1.5rem' }}>
                 <div className="details-layout">
                     {/* Gallery */}
@@ -896,7 +1051,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                         <div style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 24, overflow: 'hidden', background: 'var(--lavender-lt)', border: '2px solid var(--lavender-lt)' }}>
                             {allImages[sel] ? <img src={allImages[sel]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem' }}>🧸</div>}
-                            {discount > 0 && <div style={{ position: 'absolute', top: 14, right: 14, background: 'var(--lavender-dk)', color: '#fff', padding: '4px 14px', borderRadius: 50, fontSize: 12, fontWeight: 700 }}>خصم {discount}%</div>}
+                            {discount > 0 && <div style={{ position: 'absolute', top: 14, right: 14, background: 'var(--lavender-dk)', color: '#fff', padding: '4px 14px', borderRadius: 50, fontSize: 12, fontWeight: 700 }}>-{discount}%</div>}
                             {allImages.length > 1 && (
                                 <>
                                     <button onClick={() => setSel(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={18} /></button>
@@ -923,10 +1078,10 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                 {[...Array(5)].map((_, i) => <Star key={i} size={16} style={{ fill: i < 4 ? '#FBBF24' : 'none', color: '#FBBF24' }} />)}
                             </div>
                             <div style={{ background: 'var(--lavender-lt)', borderRadius: 18, padding: '1.125rem', marginBottom: '1.5rem' }}>
-                                <p style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--lavender-dk)', marginBottom: '0.375rem' }}>السعر</p>
+                                <p style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--lavender-dk)', marginBottom: '0.375rem' }}>{t.price}</p>
                                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
                                     <span className="font-serif" style={{ fontSize: '2.5rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{finalPrice.toLocaleString()}</span>
-                                    <span style={{ fontWeight: 700, color: 'var(--text-mid)' }}>دج</span>
+                                    <span style={{ fontWeight: 700, color: 'var(--text-mid)' }}>{store?.currency || 'DZD'}</span>
                                 </div>
                             </div>
                             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '0.4rem 1rem', borderRadius: 50, fontWeight: 700, fontSize: '0.82rem', marginBottom: '1.5rem', background: autoGen ? 'var(--peach-lt)' : inStock ? 'var(--mint-lt)' : 'var(--rose-lt)', color: autoGen ? '#D97706' : inStock ? 'var(--mint-dk)' : '#E11D48' }}>
@@ -944,10 +1099,10 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                                 <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
                                                 <div>
                                                     <p style={{ fontWeight: 700, fontSize: '0.9rem' }}>{o.name}</p>
-                                                    <p style={{ fontSize: '0.72rem', color: 'var(--text-soft)', fontWeight: 600 }}>الكمية: {o.quantity}</p>
+                                                    <p style={{ fontSize: '0.72rem', color: 'var(--text-soft)', fontWeight: 600 }}>{t.qty}: {o.quantity}</p>
                                                 </div>
                                             </div>
-                                            <span className="font-serif" style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{o.price.toLocaleString()} دج</span>
+                                            <span className="font-serif" style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{o.price.toLocaleString()} {store?.currency || 'DZD'}</span>
                                         </label>
                                     ))}
                                 </div>
@@ -1032,11 +1187,11 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                 </div>
                             ))}
 
-                            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
+                            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store} />
 
                             {product.desc && (
                                 <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '2px solid var(--lavender-lt)' }}>
-                                    <h3 className="font-serif" style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text)', marginBottom: '0.875rem' }}>وصف المنتج</h3>
+                                    <h3 className="font-serif" style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text)', marginBottom: '0.875rem' }}>{t.descTitle}</h3>
                                     <div style={{ fontSize: '0.9rem', fontWeight: 600, lineHeight: 1.8, color: 'var(--text-mid)' }}
                                         dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc, { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'span'], ALLOWED_ATTR: ['class', 'style'] }) }} />
                                 </div>
@@ -1052,7 +1207,10 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
 /* ══════════════════════════════════════════════════════════════
    PRODUCT FORM
 ══════════════════════════════════════════════════════════════ */
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: ProductFormProps) {
+export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: ProductFormProps & { store?: any }) {
+    const lang = getLang(store || product?.store);
+    const t = T[lang];
+    const isRTL = lang === 'ar';
     const router = useRouter();
     const [wilayas, setWilayas] = useState<Wilaya[]>([]);
     const [communes, setCommunes] = useState<Commune[]>([]);
@@ -1087,10 +1245,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const total = () => fp * fd.quantity + +getLiv();
     const validate = () => {
         const e: Record<string, string> = {};
-        if (!fd.customerName.trim()) e.customerName = 'مطلوب';
-        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
-        if (!fd.customerWelaya) e.customerWelaya = 'مطلوب';
-        if (!fd.customerCommune) e.customerCommune = 'مطلوب';
+        if (!fd.customerName.trim()) e.customerName = t.errName;
+        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
+        if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
+        if (!fd.customerCommune) e.customerCommune = t.errCommune;
         return e;
     };
     const getVarId = useCallback(() => {
@@ -1123,10 +1281,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         {product.store?.cart && (
                 <div className="cart-add-btns" style={{ marginBottom: '1.25rem' }}>
                     <button onClick={addToCart} disabled={isAdded} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '0.875rem', borderRadius: 50, cursor: isAdded ? 'default' : 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: '0.9rem', border: `2px solid ${isAdded ? 'var(--mint-dk)' : 'var(--lavender)'}`, background: isAdded ? 'var(--mint-lt)' : '#fff', color: isAdded ? 'var(--mint-dk)' : 'var(--lavender-dk)', transition: 'all 0.25s' }}>
-                        {isAdded ? <><CheckCircle2 size={15} className="anim-check" /> تمت الإضافة 🌸</> : <><ShoppingCart size={15} /> أضف للسلة</>}
+                        {isAdded ? <><CheckCircle2 size={15} className="anim-check" /> {t.addedMsg}</> : <><ShoppingCart size={15} /> {t.addToCart}</>}
                     </button>
                     <button onClick={() => setIsOrderNow(true)} className="btn-soft" style={{ flex: 1, ...BTN_PRI, width: 'auto', borderRadius: 50 }}>
-                        اطلبي الآن 🌸
+                        {t.orderNow} 🌸
                     </button>
                 </div>
             )}
@@ -1135,55 +1293,55 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 <div className="anim-fade">
                     {product.store?.cart && (
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                            <p style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>بيانات التوصيل</p>
+                            <p style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{t.orderInfo}</p>
                             <button onClick={() => setIsOrderNow(false)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0.375rem 0.75rem', borderRadius: 50, border: '1.5px solid var(--border)', background: '#fff', color: 'var(--text-soft)', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-                                <X size={11} /> إلغاء
+                                <X size={11} /> {t.back}
                             </button>
                         </div>
                     )}
                     <form onSubmit={handleSubmit}>
                         <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-                            <FR error={errors.customerName} label="الاسم الكامل">
-                                <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder="الاسم" style={INP(!!errors.customerName)} />
+                            <FR error={errors.customerName} label={t.fullName}>
+                                <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder={t.fullNamePh} style={INP(!!errors.customerName)} />
                             </FR>
-                            <FR error={errors.customerPhone} label="رقم الهاتف">
-                                <input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} placeholder="0XXXXXXXXX" style={INP(!!errors.customerPhone)} />
+                            <FR error={errors.customerPhone} label={t.phone}>
+                                <input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} placeholder={t.phonePh} style={INP(!!errors.customerPhone)} />
                             </FR>
                         </div>
                         <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-                            <FR error={errors.customerWelaya} label="الولاية">
+                            <FR error={errors.customerWelaya} label={t.wilaya}>
                                 <div style={{ position: 'relative' }}>
                                     <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--lavender)', pointerEvents: 'none' }} />
                                     <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP(!!errors.customerWelaya), paddingLeft: 32, fontFamily: 'inherit' }}>
-                                        <option value="">اختر</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                                        <option value="">{t.wilayaPh}</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                                     </select>
                                 </div>
                             </FR>
-                            <FR error={errors.customerCommune} label="البلدية">
+                            <FR error={errors.customerCommune} label={t.commune}>
                                 <div style={{ position: 'relative' }}>
                                     <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--lavender)', pointerEvents: 'none' }} />
                                     <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...INP(!!errors.customerCommune), paddingLeft: 32, opacity: !fd.customerWelaya ? 0.5 : 1, fontFamily: 'inherit' }}>
-                                        <option value="">{loadingC ? '...' : 'اختر'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                                        <option value="">{loadingC ? t.communeLoading : t.communePh}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                                     </select>
                                 </div>
                             </FR>
                         </div>
 
                         <div style={{ marginBottom: '0.875rem' }}>
-                            <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.5rem' }}>نوع التوصيل</p>
+                            <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.5rem' }}>{t.deliveryType}</p>
                             <div className="delivery-grid">
-                                {(['home', 'office'] as const).map(t => (
-                                    <button key={t} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: t }))} style={{ padding: '0.875rem', border: `2px solid ${fd.typeLivraison === t ? 'var(--lavender-dk)' : 'var(--border)'}`, borderRadius: 16, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === t ? 'var(--lavender-lt)' : '#fff', fontFamily: 'inherit', transition: 'all 0.2s' }}>
-                                        <span style={{ display: 'block', fontSize: '1.375rem', marginBottom: 4 }}>{t === 'home' ? '🏠' : '🏢'}</span>
-                                        <p style={{ fontWeight: 700, fontSize: '0.82rem', color: fd.typeLivraison === t ? 'var(--lavender-dk)' : 'var(--text-soft)' }}>{t === 'home' ? 'للبيت' : 'للمكتب'}</p>
-                                        {selW && <p className="font-serif" style={{ fontSize: '1rem', fontWeight: 700, color: fd.typeLivraison === t ? 'var(--lavender-dk)' : 'var(--text-soft)' }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج</p>}
+                                {(['home', 'office'] as const).map(dlvType => (
+                                    <button key={dlvType} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: dlvType }))} style={{ padding: '0.875rem', border: `2px solid ${fd.typeLivraison === dlvType ? 'var(--lavender-dk)' : 'var(--border)'}`, borderRadius: 16, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === dlvType ? 'var(--lavender-lt)' : '#fff', fontFamily: 'inherit', transition: 'all 0.2s' }}>
+                                        <span style={{ display: 'block', fontSize: '1.375rem', marginBottom: 4 }}>{dlvType === 'home' ? '🏠' : '🏢'}</span>
+                                        <p style={{ fontWeight: 700, fontSize: '0.82rem', color: fd.typeLivraison === dlvType ? 'var(--lavender-dk)' : 'var(--text-soft)' }}>{dlvType === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
+                                        {selW && <p className="font-serif" style={{ fontSize: '1rem', fontWeight: 700, color: fd.typeLivraison === dlvType ? 'var(--lavender-dk)' : 'var(--text-soft)' }}>{(dlvType === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} {store?.currency || 'DZD'}</p>}
                                     </button>
                                 ))}
                             </div>
                         </div>
 
                         <div style={{ marginBottom: '0.875rem' }}>
-                            <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.5rem' }}>الكمية</p>
+                            <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.5rem' }}>{t.qty}</p>
                             <div style={{ display: 'inline-flex', alignItems: 'center', border: '2px solid var(--lavender-lt)', borderRadius: 50, overflow: 'hidden', background: '#fff' }}>
                                 <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--lavender-dk)' }}><Minus size={14} /></button>
                                 <span style={{ width: 44, textAlign: 'center', fontFamily: "'Cormorant Garamond', serif", fontSize: '1.25rem', fontWeight: 700 }}>{fd.quantity}</span>
@@ -1193,10 +1351,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
                         {/* Summary */}
                         <div style={{ background: 'var(--lavender-lt)', borderRadius: 20, padding: '1.125rem', marginBottom: '1.25rem' }}>
-                            <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--lavender-dk)', marginBottom: '0.75rem' }}>ملخص الطلب</p>
+                            <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--lavender-dk)', marginBottom: '0.75rem' }}>{t.orderInfo}</p>
                             {[
-                                { l: 'المنتج', v: product.name.slice(0, 26) + (product.name.length > 26 ? '...' : '') },
-                                { l: 'التوصيل', v: selW ? `${getLiv().toLocaleString()} دج` : '—' },
+                                { l: t.price, v: product.name.slice(0, 26) + (product.name.length > 26 ? '...' : '') },
+                                { l: t.delivery, v: selW ? `${getLiv().toLocaleString()} ${store?.currency || 'DZD'}` : '—' },
                             ].map(r => (
                                 <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px solid rgba(196,181,253,0.3)' }}>
                                     <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-mid)' }}>{r.l}</span>
@@ -1204,16 +1362,16 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                                 </div>
                             ))}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', paddingTop: '0.375rem' }}>
-                                <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--lavender-dk)' }}>المجموع</span>
-                                <span className="font-serif" style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{total().toLocaleString()} <span style={{ fontSize: '0.85rem', fontFamily: "'Quicksand', sans-serif", fontWeight: 600 }}>دج</span></span>
+                                <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--lavender-dk)' }}>{t.total}</span>
+                                <span className="font-serif" style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{total().toLocaleString()} <span style={{ fontSize: '0.85rem', fontFamily: "'Quicksand', sans-serif", fontWeight: 600 }}>{store?.currency || 'DZD'}</span></span>
                             </div>
                         </div>
 
                         <button type="submit" disabled={sub} className="btn-soft" style={{ ...BTN_PRI, width: '100%', opacity: sub ? 0.7 : 1, cursor: sub ? 'not-allowed' : 'pointer' }}>
-                            {sub ? <><Loader2 size={16} style={{ animation: 'spin-gentle 1s linear infinite' }} /> جاري المعالجة...</> : '🌸 تأكيدي الطلب'}
+                            {sub ? <><Loader2 size={16} style={{ animation: 'spin-gentle 1s linear infinite' }} /> {t.sending}</> : `🌸 ${t.confirmOrder}`}
                         </button>
                         <p style={{ textAlign: 'center', fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-soft)', marginTop: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
-                            <Lock size={11} style={{ color: 'var(--lavender)' }} /> دفع آمن ومشفر
+                            <Lock size={11} style={{ color: 'var(--lavender)' }} />
                         </p>
                     </form>
                 </div>
@@ -1226,6 +1384,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
    CART
 ══════════════════════════════════════════════════════════════ */
 export function Cart({ domain, store }: { domain: string; store: any }) {
+    const lang = getLang(store);
+    const t = T[lang];
+    const isRTL = lang === 'ar';
     const [items, setItems] = useState<any[]>([]);
     const [wilayas, setWilayas] = useState<Wilaya[]>([]);
     const [communes, setCommunes] = useState<Commune[]>([]);
@@ -1248,10 +1409,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const er: Record<string, string> = {};
-        if (!fd.customerName.trim()) er.name = 'مطلوب';
-        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم هاتف غير صالح (مثال: 0550123456)';
-        if (!fd.customerWelaya) er.w = 'مطلوب';
-        if (!fd.customerCommune) er.c = 'مطلوب';
+        if (!fd.customerName.trim()) er.name = t.errName;
+        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = t.errPhoneInvalid;
+        if (!fd.customerWelaya) er.w = t.errWilaya;
+        if (!fd.customerCommune) er.c = t.errCommune;
         if (Object.keys(er).length) { setErrors(er); return; }
         setErrors({}); setSubmitting(true);
         try {
@@ -1261,44 +1422,44 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     };
 
     if (success) return (
-        <div dir="rtl" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
+        <div dir={isRTL ? 'rtl' : 'ltr'} style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
             <div className="anim-fade" style={{ textAlign: 'center', background: '#fff', padding: '4rem 2.5rem', borderRadius: 28, border: '2px solid var(--lavender-lt)', maxWidth: 460, width: '100%', boxShadow: '0 12px 40px var(--shadow)' }}>
                 <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1.25rem', animation: 'gentle-float 3s ease-in-out infinite' }}>🌸</span>
-                <h2 className="font-serif" style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--lavender-dk)', marginBottom: '0.625rem' }}>تم استلام طلبك!</h2>
-                <p style={{ color: 'var(--text-mid)', fontWeight: 600, marginBottom: '2rem', lineHeight: 1.7 }}>شكراً لثقتك بنا. سنتواصل معك قريباً لتأكيد الطلب 💝</p>
-                <Link href="/" className="btn-soft" style={{ ...BTN_PRI, textDecoration: 'none', display: 'inline-flex' }}>العودة للمتجر</Link>
+                <h2 className="font-serif" style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--lavender-dk)', marginBottom: '0.625rem' }}>{t.successTitle}</h2>
+                <p style={{ color: 'var(--text-mid)', fontWeight: 600, marginBottom: '2rem', lineHeight: 1.7 }}>{t.successDesc} 💝</p>
+                <Link href="/" className="btn-soft" style={{ ...BTN_PRI, textDecoration: 'none', display: 'inline-flex' }}>{t.backToShop}</Link>
             </div>
         </div>
     );
 
     if (!items.length) return (
-        <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
+        <div dir={isRTL ? 'rtl' : 'ltr'} style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--bg)' }}>
             <div className="pastel-dots" style={{ textAlign: 'center', padding: '4rem 2rem', border: '2px dashed var(--lavender)', borderRadius: 28, maxWidth: 400, width: '100%', background: 'var(--lavender-lt)' }}>
                 <ShoppingBag size={52} style={{ color: 'var(--lavender)', display: 'block', margin: '0 auto 1.25rem', opacity: 0.5 }} />
-                <p className="font-serif" style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--lavender-dk)', marginBottom: '1.75rem' }}>السلة فارغة 🌸</p>
-                <Link href="/" className="btn-soft" style={{ ...BTN_PRI, textDecoration: 'none', display: 'inline-flex' }}>تسوقي الآن</Link>
+                <p className="font-serif" style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--lavender-dk)', marginBottom: '1.75rem' }}>{t.cartEmpty} 🌸</p>
+                <Link href="/" className="btn-soft" style={{ ...BTN_PRI, textDecoration: 'none', display: 'inline-flex' }}>{t.shopNow}</Link>
             </div>
         </div>
     );
 
     return (
-        <div dir="rtl" style={{ minHeight: '100vh', background: 'var(--bg)', padding: '2.5rem 1.5rem 5rem' }}>
+        <div dir={isRTL ? 'rtl' : 'ltr'} style={{ minHeight: '100vh', background: 'var(--bg)', padding: '2.5rem 1.5rem 5rem' }}>
             <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-                <h1 className="font-serif" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, color: 'var(--text)', marginBottom: '2rem' }}>🛒 سلة التسوق</h1>
+                <h1 className="font-serif" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, color: 'var(--text)', marginBottom: '2rem' }}>🛒 {t.myCart}</h1>
                 <div className="cart-layout">
                     {/* Items */}
                     <div style={{ background: '#fff', borderRadius: 24, border: '2px solid var(--lavender-lt)', overflow: 'hidden', alignSelf: 'start' }}>
                         <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--lavender-lt)', display: 'flex', alignItems: 'center', gap: 8, background: 'var(--lavender-lt)' }}>
                             <Package size={17} style={{ color: 'var(--lavender-dk)' }} />
-                            <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 700, color: 'var(--lavender-dk)', fontSize: '1rem' }}>منتجاتك ({items.length})</span>
+                            <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 700, color: 'var(--lavender-dk)', fontSize: '1rem' }}>{t.myCart} ({items.length})</span>
                         </div>
                         {items.map((item, i) => (
                             <div key={i} style={{ display: 'flex', gap: '1rem', padding: '1rem 1.25rem', borderBottom: '1px solid var(--lavender-lt)' }}>
                                 <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: 76, height: 76, borderRadius: 16, objectFit: 'cover', border: '2px solid var(--lavender-lt)', flexShrink: 0 }} alt="" />
                                 <div style={{ flex: 1 }}>
                                     <h4 style={{ fontWeight: 700, color: 'var(--text)', marginBottom: '0.25rem', fontSize: '0.9rem' }}>{item.product?.name}</h4>
-                                    <p className="font-serif" style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{item.finalPrice?.toLocaleString()} دج</p>
-                                    <p style={{ fontSize: '0.75rem', color: 'var(--text-soft)', fontWeight: 600, marginTop: '0.2rem' }}>الكمية: {item.quantity}</p>
+                                    <p className="font-serif" style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{item.finalPrice?.toLocaleString()} {store?.currency || 'DZD'}</p>
+                                    <p style={{ fontSize: '0.75rem', color: 'var(--text-soft)', fontWeight: 600, marginTop: '0.2rem' }}>{t.qty}: {item.quantity}</p>
                                 </div>
                                 <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ background: 'none', border: 'none', color: 'var(--border)', cursor: 'pointer', alignSelf: 'center', display: 'flex', padding: '0.375rem', borderRadius: 8, transition: 'color 0.2s' }}
                                     onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = 'var(--rose)')}
@@ -1308,61 +1469,60 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                             </div>
                         ))}
                         <div style={{ padding: '1rem 1.25rem', background: 'var(--lavender-lt)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--lavender-dk)' }}>المجموع الفرعي</span>
-                            <span className="font-serif" style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{cartTotal.toLocaleString()} دج</span>
+                            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--lavender-dk)' }}>{t.subtotal}</span>
+                            <span className="font-serif" style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{cartTotal.toLocaleString()} {store?.currency || 'DZD'}</span>
                         </div>
                     </div>
 
                     {/* Checkout */}
                     <div style={{ background: '#fff', borderRadius: 24, border: '2px solid var(--lavender-lt)', padding: '1.75rem', alignSelf: 'start' }}>
-                        <h3 className="font-serif" style={{ fontWeight: 700, fontSize: '1.25rem', color: 'var(--lavender-dk)', marginBottom: '1.5rem' }}>معلومات التوصيل</h3>
+                        <h3 className="font-serif" style={{ fontWeight: 700, fontSize: '1.25rem', color: 'var(--lavender-dk)', marginBottom: '1.5rem' }}>{t.checkoutTitle}</h3>
                         <form onSubmit={handleSubmit}>
                             <div className="form-row-2" style={{ marginBottom: '0.75rem' }}>
-                                <FR error={errors.name} label="الاسم"><input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} style={INP(!!errors.name)} /></FR>
-                                <FR error={errors.phone} label="الهاتف"><input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} style={INP(!!errors.phone)} /></FR>
+                                <FR error={errors.name} label={t.fullName}><input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} style={INP(!!errors.name)} /></FR>
+                                <FR error={errors.phone} label={t.phone}><input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} style={INP(!!errors.phone)} /></FR>
                             </div>
                             <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-                                <FR error={errors.w} label="الولاية">
+                                <FR error={errors.w} label={t.wilaya}>
                                     <div style={{ position: 'relative' }}>
                                         <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--lavender)', pointerEvents: 'none' }} />
                                         <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP(!!errors.w), paddingLeft: 32, fontFamily: 'inherit' }}>
-                                            <option value="">اختر</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                                            <option value="">{t.wilayaPh}</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                                         </select>
                                     </div>
                                 </FR>
-                                <FR error={errors.c} label="البلدية">
+                                <FR error={errors.c} label={t.commune}>
                                     <div style={{ position: 'relative' }}>
                                         <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--lavender)', pointerEvents: 'none' }} />
                                         <select value={fd.customerCommune} disabled={loadingC || !fd.customerWelaya} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...INP(!!errors.c), paddingLeft: 32, opacity: !fd.customerWelaya ? 0.5 : 1, fontFamily: 'inherit' }}>
-                                            <option value="">{loadingC ? '...' : 'اختر'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                                            <option value="">{loadingC ? t.communeLoading : t.communePh}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                                         </select>
                                     </div>
                                 </FR>
                             </div>
 
-                            {/* نوع التوصيل — جديد */}
                             <div style={{ marginBottom: '1rem' }}>
-                                <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--lavender-dk)', textTransform: 'uppercase', marginBottom: '0.625rem', letterSpacing: '0.04em' }}>🚚 نوع التوصيل</p>
+                                <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--lavender-dk)', textTransform: 'uppercase', marginBottom: '0.625rem', letterSpacing: '0.04em' }}>🚚 {t.deliveryType}</p>
                                 <div className="delivery-grid">
-                                    {(['home', 'office'] as const).map(t => (
+                                    {(['home', 'office'] as const).map(dlvType => (
                                         <button
-                                            key={t}
+                                            key={dlvType}
                                             type="button"
-                                            onClick={() => setFd(p => ({ ...p, typeLivraison: t }))}
+                                            onClick={() => setFd(p => ({ ...p, typeLivraison: dlvType }))}
                                             style={{
                                                 padding: '0.875rem',
-                                                border: `2px solid ${fd.typeLivraison === t ? 'var(--lavender)' : 'var(--lavender-lt)'}`,
+                                                border: `2px solid ${fd.typeLivraison === dlvType ? 'var(--lavender)' : 'var(--lavender-lt)'}`,
                                                 borderRadius: 16,
                                                 textAlign: 'center',
                                                 cursor: 'pointer',
-                                                background: fd.typeLivraison === t ? 'var(--lavender-lt)' : '#fff',
+                                                background: fd.typeLivraison === dlvType ? 'var(--lavender-lt)' : '#fff',
                                                 fontFamily: 'inherit',
                                                 transition: 'all 0.2s'
                                             }}
                                         >
-                                            <span style={{ display: 'block', fontSize: '1.5rem', marginBottom: 4 }}>{t === 'home' ? '🏠' : '🏢'}</span>
-                                            <p style={{ fontWeight: 700, fontSize: '0.8rem', color: fd.typeLivraison === t ? 'var(--lavender-dk)' : 'var(--text-soft)' }}>{t === 'home' ? 'للبيت' : 'للمكتب'}</p>
-                                            {selW && <p className="font-serif" style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--lavender-dk)', marginTop: 3 }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج</p>}
+                                            <span style={{ display: 'block', fontSize: '1.5rem', marginBottom: 4 }}>{dlvType === 'home' ? '🏠' : '🏢'}</span>
+                                            <p style={{ fontWeight: 700, fontSize: '0.8rem', color: fd.typeLivraison === dlvType ? 'var(--lavender-dk)' : 'var(--text-soft)' }}>{dlvType === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
+                                            {selW && <p className="font-serif" style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--lavender-dk)', marginTop: 3 }}>{(dlvType === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} {store?.currency || 'DZD'}</p>}
                                         </button>
                                     ))}
                                 </div>
@@ -1370,21 +1530,21 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 
                             <div style={{ background: 'var(--lavender-lt)', borderRadius: 18, padding: '1rem', marginBottom: '1rem' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px solid rgba(196,181,253,0.35)' }}>
-                                    <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-mid)' }}>المجموع الفرعي</span>
-                                    <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{cartTotal.toLocaleString()} دج</span>
+                                    <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-mid)' }}>{t.subtotal}</span>
+                                    <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{cartTotal.toLocaleString()} {store?.currency || 'DZD'}</span>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.625rem', marginBottom: '0.625rem', borderBottom: '1px solid rgba(196,181,253,0.35)' }}>
-                                    <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-mid)' }}>التوصيل</span>
-                                    <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{getLiv() ? `${getLiv().toLocaleString()} دج` : '—'}</span>
+                                    <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-mid)' }}>{t.delivery}</span>
+                                    <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{getLiv() ? `${getLiv().toLocaleString()} ${store?.currency || 'DZD'}` : '—'}</span>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                                    <span style={{ fontWeight: 700, color: 'var(--lavender-dk)' }}>الإجمالي</span>
-                                    <span className="font-serif" style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.85rem', fontFamily: "'Quicksand', sans-serif" }}>دج</span></span>
+                                    <span style={{ fontWeight: 700, color: 'var(--lavender-dk)' }}>{t.total}</span>
+                                    <span className="font-serif" style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.85rem', fontFamily: "'Quicksand', sans-serif" }}>{store?.currency || 'DZD'}</span></span>
                                 </div>
                             </div>
 
                             <button type="submit" disabled={submitting} className="btn-soft" style={{ ...BTN_PRI, width: '100%', opacity: submitting ? 0.7 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}>
-                                {submitting ? <><Loader2 size={16} style={{ animation: 'spin-gentle 1s linear infinite' }} /> جاري...</> : '🌸 تأكيدي الطلب'}
+                                {submitting ? <><Loader2 size={16} style={{ animation: 'spin-gentle 1s linear infinite' }} /> {t.sending}</> : `🌸 ${t.confirmOrder}`}
                             </button>
                         </form>
                     </div>
@@ -1397,8 +1557,8 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 /* ══════════════════════════════════════════════════════════════
    STATIC PAGES
 ══════════════════════════════════════════════════════════════ */
-const Shell = ({ title, emoji, children }: { title: string; emoji: string; children: React.ReactNode }) => (
-    <div dir="rtl" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+const Shell = ({ title, emoji, dir, children }: { title: string; emoji: string; dir?: string; children: React.ReactNode }) => (
+    <div dir={dir || 'rtl'} style={{ background: 'var(--bg)', minHeight: '100vh' }}>
         <div className="pastel-dots" style={{ padding: '5rem 1.5rem 3rem', textAlign: 'center', background: 'linear-gradient(135deg, var(--lavender-lt), var(--rose-lt))' }}>
             <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1rem', animation: 'gentle-float 4s ease-in-out infinite' }}>{emoji}</span>
             <h1 className="font-serif" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 700, color: 'var(--lavender-dk)' }}>{title}</h1>
@@ -1415,36 +1575,42 @@ const IB = ({ icon, title, desc }: { icon: React.ReactNode; title: string; desc:
     </div>
 );
 
-export function Privacy() {
-    return <Shell emoji="🔒" title="سياسة الخصوصية"><IB icon={<Shield size={18} />} title="البيانات التي نجمعها" desc="نجمع فقط البيانات الضرورية لإتمام طلبك — الاسم، رقم الهاتف، والعنوان." /><IB icon={<Lock size={18} />} title="حماية بياناتك" desc="نستخدم أحدث بروتوكولات التشفير لضمان أمان معلوماتك الشخصية." /><IB icon={<Shield size={18} />} title="سياسة المشاركة" desc="لا نبيع أو نشارك بياناتك مع أطراف ثالثة. خصوصيتك أولويتنا." /></Shell>;
+export function Privacy({ store }: { store?: any }) {
+    const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+    return <Shell emoji="🔒" title={t.privacyTitle} dir={isRTL ? 'rtl' : 'ltr'}><IB icon={<Shield size={18} />} title={t.privacy1T} desc={t.privacy1D} /><IB icon={<Lock size={18} />} title={t.privacy2T} desc={t.privacy2D} /><IB icon={<Shield size={18} />} title={t.privacy3T} desc={t.privacy3D} /></Shell>;
 }
-export function Terms() {
-    return <Shell emoji="📋" title="الشروط والأحكام"><IB icon={<CheckCircle2 size={18} />} title="الطلبات والمدفوعات" desc="يتم تأكيد الطلبات عبر الهاتف قبل الشحن. الدفع عند الاستلام." /><IB icon={<Truck size={18} />} title="التوصيل" desc="نوفر خدمة التوصيل لجميع ولايات الجزائر بأفضل الأسعار." /><IB icon={<Shield size={18} />} title="الضمانات" desc="نلتزم بأعلى معايير الجودة والسلامة في جميع منتجاتنا." /></Shell>;
+export function Terms({ store }: { store?: any }) {
+    const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+    return <Shell emoji="📋" title={t.termsTitle} dir={isRTL ? 'rtl' : 'ltr'}><IB icon={<CheckCircle2 size={18} />} title={t.terms1T} desc={t.terms1D} /><IB icon={<Truck size={18} />} title={t.terms2T} desc={t.terms2D} /><IB icon={<Shield size={18} />} title={t.terms3T} desc={t.terms3D} /></Shell>;
 }
-export function Cookies() {
-    return <Shell emoji="🍪" title="ملفات الارتباط"><IB icon={<Shield size={18} />} title="الملفات الأساسية" desc="ضرورية لعمل سلة التسوق وحفظ بيانات جلستك." /><IB icon={<Sparkles size={18} />} title="تحسين التجربة" desc="تساعدنا على تقديم تجربة تسوق مخصصة وأفضل لك." /></Shell>;
+export function Cookies({ store }: { store?: any }) {
+    const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+    return <Shell emoji="🍪" title={t.cookiesTitle} dir={isRTL ? 'rtl' : 'ltr'}><IB icon={<Shield size={18} />} title={t.cookies1T} desc={t.cookies1D} /><IB icon={<Sparkles size={18} />} title={t.cookies2T} desc={t.cookies2D} /></Shell>;
 }
 
 export function Contact({ store }: { store: any }) {
+    const lang = getLang(store);
+    const t = T[lang];
+    const isRTL = lang === 'ar';
     const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
     const [sent, setSent] = useState(false);
     const [loading, setLoading] = useState(false);
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); setLoading(true);
         try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-        catch { showError('حدث خطأ'); } finally { setLoading(false); }
+        catch { showError(t.contactError); } finally { setLoading(false); }
     };
     return (
-        <div dir="rtl" style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+        <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: 'var(--bg)', minHeight: '100vh' }}>
             <div className="pastel-dots" style={{ padding: '5rem 1.5rem 3rem', textAlign: 'center', background: 'linear-gradient(135deg, var(--lavender-lt), var(--rose-lt))' }}>
                 <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1rem', animation: 'gentle-float 4s ease-in-out infinite' }}>💌</span>
-                <h1 className="font-serif" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 700, color: 'var(--lavender-dk)' }}>تواصلي معنا</h1>
-                <p style={{ color: 'var(--text-mid)', fontWeight: 600, marginTop: '0.5rem' }}>نحن هنا دائماً لمساعدتك 🌸</p>
+                <h1 className="font-serif" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 700, color: 'var(--lavender-dk)' }}>{t.contactPageTitle}</h1>
+                <p style={{ color: 'var(--text-mid)', fontWeight: 600, marginTop: '0.5rem' }}>{t.contactPageSubtitle}</p>
             </div>
             <div style={{ maxWidth: 1000, margin: '0 auto', padding: '3rem 1.5rem 5rem' }}>
                 <div className="contact-layout">
                     <div>
-                        {[{ e: '📞', l: 'الهاتف', v: store?.contact?.phone || 'غير متوفر' }, { e: '📍', l: 'الموقع', v: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') || 'الجزائر' }, { e: '📧', l: 'البريد', v: store?.contact?.email || 'غير متوفر' }].map((r, i) => (
+                        {[{ e: '📞', l: t.contactPhone, v: store?.contact?.phone || t.contactPhoneNA }, { e: '📍', l: t.contactLocation, v: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') || t.contactLocationNA }, { e: '📧', l: t.contactEmail, v: store?.contact?.email || t.contactEmailNA }].map((r, i) => (
                             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', padding: '1rem', borderRadius: 18, border: '2px solid var(--lavender-lt)', background: '#fff', marginBottom: '0.75rem', transition: 'all 0.25s' }}
                                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--lavender)'; el.style.boxShadow = '0 8px 24px var(--shadow)'; }}
                                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--lavender-lt)'; el.style.boxShadow = ''; }}>
@@ -1457,19 +1623,19 @@ export function Contact({ store }: { store: any }) {
                         {sent ? (
                             <div style={{ textAlign: 'center', padding: '3rem' }} className="anim-fade">
                                 <span style={{ fontSize: '4rem', display: 'block', marginBottom: '1rem', animation: 'gentle-float 3s ease-in-out infinite' }}>🌸</span>
-                                <h2 className="font-serif" style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--lavender-dk)', marginBottom: '0.5rem' }}>تم الإرسال!</h2>
-                                <p style={{ color: 'var(--text-mid)', fontWeight: 600, lineHeight: 1.7 }}>سنرد عليك في أقرب وقت.</p>
+                                <h2 className="font-serif" style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--lavender-dk)', marginBottom: '0.5rem' }}>{t.contactSentTitle}</h2>
+                                <p style={{ color: 'var(--text-mid)', fontWeight: 600, lineHeight: 1.7 }}>{t.contactSentDesc}</p>
                             </div>
                         ) : (
                             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
                                 <div className="form-row-2">
-                                    <div><label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.375rem' }}>الاسم</label><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={INP()} /></div>
-                                    <div><label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.375rem' }}>الهاتف</label><input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required style={INP()} /></div>
+                                    <div><label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.375rem' }}>{t.contactNameLabel}</label><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={INP()} /></div>
+                                    <div><label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.375rem' }}>{t.contactPhoneLabel}</label><input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required style={INP()} /></div>
                                 </div>
-                                <div><label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.375rem' }}>البريد الإلكتروني</label><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required style={INP()} /></div>
-                                <div><label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.375rem' }}>رسالتك</label><textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} style={{ ...INP(), resize: 'none' }} /></div>
+                                <div><label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.375rem' }}>{t.contactEmailLabel}</label><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required style={INP()} /></div>
+                                <div><label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.375rem' }}>{t.contactMessageLabel}</label><textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} style={{ ...INP(), resize: 'none' }} /></div>
                                 <button type="submit" disabled={loading} className="btn-soft" style={{ ...BTN_PRI, opacity: loading ? 0.7 : 1 }}>
-                                    {loading ? <><Loader2 size={16} style={{ animation: 'spin-gentle 1s linear infinite' }} /> جاري...</> : <>🌸 إرسال الرسالة</>}
+                                    {loading ? <><Loader2 size={16} style={{ animation: 'spin-gentle 1s linear infinite' }} /> {t.contactSending}</> : <>🌸 {t.contactSendBtn}</>}
                                 </button>
                             </form>
                         )}
@@ -1484,9 +1650,9 @@ export function StaticPage({ staticPage, page, store }: any) {
     const p = (staticPage || page || '').toLowerCase();
     return (
         <>
-            {p === 'privacy' && <Privacy />}
-            {p === 'terms' && <Terms />}
-            {p === 'cookies' && <Cookies />}
+            {p === 'privacy' && <Privacy store={store} />}
+            {p === 'terms' && <Terms store={store} />}
+            {p === 'cookies' && <Cookies store={store} />}
             {p === 'contact' && <Contact store={store} />}
         </>
     );

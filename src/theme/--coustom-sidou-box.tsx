@@ -156,7 +156,7 @@ body { background: ${BG}; color: ${TXT}; font-family: ${FONT_BODY}; }
 .sb-form-row-2 { display:grid; grid-template-columns:1fr; gap:.875rem; margin-bottom:.875rem; }
 @media (min-width:500px) { .sb-form-row-2 { grid-template-columns:1fr 1fr; } }
 
-.sb-search-dropdown { position:absolute; top:calc(100% + 8px); left:0; width:340px; background:${CARD}; border:1px solid ${BD}; z-index:60; }
+.sb-search-dropdown { position:absolute; top:calc(100% + 8px); inset-inline-end:0; width:340px; background:${CARD}; border:1px solid ${BD}; z-index:60; }
 @media (max-width:480px) { .sb-search-dropdown { position:fixed; left:12px; right:12px; width:auto; top:64px; } }
 
 @media (prefers-reduced-motion: reduce) { * { animation-duration:.01ms !important; animation-iteration-count:1 !important; } }
@@ -367,6 +367,7 @@ export function Navbar({ store, domain }: any) {
   const [badgeBump, setBadgeBump] = useState(false);
   const router = useRouter();
   const debounceRef = useRef<any>(null);
+  const searchRef = useRef<any>(null);
   const t = T[getLang(store)];
 
   const count = useCartStore((s: any) => s.count);
@@ -407,10 +408,22 @@ export function Navbar({ store, domain }: any) {
     return () => clearTimeout(debounceRef.current);
   }, [searchQuery, domain]);
 
+  useEffect(() => {
+    if (!showSearch) return;
+    const handler = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowSearch(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showSearch]);
+
   const submitSearch = () => {
     if (!searchQuery.trim()) return;
     router.push(`/?search=${encodeURIComponent(searchQuery)}`);
     setShowSearch(false);
+    setSearchQuery('');
   };
 
   const showCart = store?.cart !== false;
@@ -460,7 +473,7 @@ export function Navbar({ store, domain }: any) {
           </nav>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ position: 'relative' }}>
+            <div ref={searchRef} style={{ position: 'relative' }}>
               <button aria-label={t.search} onClick={() => setShowSearch((s) => !s)} style={{
                 background: 'transparent', border: `1px solid ${BD}`, borderRadius: 2, width: 40, height: 40,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', color: TXT, cursor: 'pointer',
@@ -651,42 +664,51 @@ export function Home({ store, page }: any) {
   const t = T[getLang(store)];
 
   return (
-    <div>
+    <div dir={t.dir}>
       {/* HERO */}
       <section style={{
-        position: 'relative', minHeight: 'clamp(480px, 68vh, 760px)', overflow: 'hidden',
-        background: `radial-gradient(circle at 30% 20%, rgba(0,217,255,.12), transparent 55%), linear-gradient(135deg, #060a14 0%, #0a1224 100%)`,
-        display: 'flex', alignItems: 'flex-end',
+        position: 'relative', minHeight: 'clamp(520px, 78vh, 860px)', overflow: 'hidden',
+        background: `radial-gradient(ellipse 80% 60% at 50% 40%, rgba(0,217,255,.13), transparent 70%), linear-gradient(160deg, #060a14 0%, #0b1428 50%, #060a14 100%)`,
+        display: 'flex', alignItems: 'center',
       }}>
         {store?.hero?.imageUrl && (
-          <img src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.32 }} />
+          <img src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.28 }} />
         )}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(6,10,20,0) 0%, rgba(6,10,20,.55) 55%, rgba(6,10,20,.96) 100%)' }} />
-        <div className="sb-hero-float" style={{ position: 'absolute', top: 60, insetInlineEnd: '8%', opacity: 0.5 }}>
-          <CircuitBoard size={110} color={A} strokeWidth={0.6} />
+        {/* overlays */}
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(6,10,20,.5) 0%, rgba(6,10,20,.35) 40%, rgba(6,10,20,.75) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,217,255,.018) 3px, rgba(0,217,255,.018) 4px)`, pointerEvents: 'none' }} />
+        {/* bottom glow line */}
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${A}, transparent)`, opacity: 0.6 }} />
+        {/* decorative icons */}
+        <div className="sb-hero-float" style={{ position: 'absolute', top: '8%', right: '4%', opacity: 0.18 }}>
+          <CircuitBoard size={180} color={A} strokeWidth={0.5} />
         </div>
-        <div className="sb-container" style={{ position: 'relative', paddingBottom: 56, paddingTop: 100 }}>
+        <div className="sb-hero-float" style={{ position: 'absolute', bottom: '12%', left: '3%', opacity: 0.12, animationDelay: '2s' }}>
+          <CircuitBoard size={120} color={A} strokeWidth={0.5} />
+        </div>
+        {/* centered content */}
+        <div className="sb-container" style={{ position: 'relative', padding: '80px 1.5rem', textAlign: 'center' }}>
           <span className="sb-hero-badge" style={{
             display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${A}`, color: A, background: AL,
-            fontFamily: FONT_MONO, fontSize: 11, fontWeight: 700, letterSpacing: 1, padding: '4px 10px', borderRadius: 2, marginBottom: 18,
+            fontFamily: FONT_MONO, fontSize: 11, fontWeight: 700, letterSpacing: 2, padding: '5px 14px', borderRadius: 2, marginBottom: 22,
           }}><Zap size={12} /> {t.heroDigital}</span>
           <h1 className="sb-hero-title" style={{
-            fontFamily: FONT_HEAD, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1,
-            fontSize: 'clamp(1.9rem, 5.2vw, 3.6rem)', margin: '0 0 14px', lineHeight: 1.08, color: TXT, maxWidth: 720,
+            fontFamily: FONT_HEAD, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2,
+            fontSize: 'clamp(2rem, 5.5vw, 4rem)', margin: '0 auto 18px', lineHeight: 1.05, color: TXT, maxWidth: 900,
           }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store?.hero?.title || t.heroDefaultTitle) }} />
           {store?.hero?.subtitle && (
-            <p className="sb-hero-sub" style={{ color: SUB, fontSize: 'clamp(.95rem,2vw,1.15rem)', maxWidth: 520, marginBottom: 30, lineHeight: 1.7 }}>{store.hero.subtitle}</p>
+            <p className="sb-hero-sub" style={{ color: SUB, fontSize: 'clamp(.95rem,1.8vw,1.15rem)', maxWidth: 600, margin: '0 auto 36px', lineHeight: 1.75 }}>{String(store.hero.subtitle).slice(0, 160)}</p>
           )}
-          <div className="sb-hero-cta" style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+          <div className="sb-hero-cta" style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center' }}>
             <a href="#products" style={{
               background: A, color: '#04141c', fontWeight: 900, fontFamily: FONT_MONO, textTransform: 'uppercase',
-              letterSpacing: 1, padding: '14px 28px', textDecoration: 'none', borderRadius: 2, fontSize: 13.5, minHeight: 44,
-              display: 'inline-flex', alignItems: 'center',
-            }}>{t.shopNow}</a>
+              letterSpacing: 1, padding: '15px 36px', textDecoration: 'none', borderRadius: 2, fontSize: 14, minHeight: 48,
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+            }}><Zap size={16} />{t.shopNow}</a>
             {store?.cart !== false && (
               <Link href="/cart" style={{
-                background: 'transparent', color: TXT, border: `1px solid ${BD2}`, fontWeight: 700, padding: '14px 28px',
-                textDecoration: 'none', borderRadius: 2, fontSize: 13.5, minHeight: 44, display: 'inline-flex', alignItems: 'center',
+                background: 'transparent', color: TXT, border: `1px solid ${BD2}`, fontWeight: 700, padding: '15px 36px',
+                textDecoration: 'none', borderRadius: 2, fontSize: 14, minHeight: 48, display: 'inline-flex', alignItems: 'center',
               }}>{t.cartBtn}</Link>
             )}
           </div>
@@ -842,8 +864,11 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                 {attr.variants.map((v) => {
                   const active = selectedVariants?.[attr.name] === v.value;
                   if (attr.displayMode === 'color') {
+                    const isImgUrl = /^https?:\/\/|^\//.test(v.value);
                     return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name} style={{
-                      width: 32, height: 32, borderRadius: '50%', background: v.value, cursor: 'pointer',
+                      width: 36, height: 36, borderRadius: '50%',
+                      background: isImgUrl ? `url(${v.value}) center/cover` : v.value,
+                      cursor: 'pointer', overflow: 'hidden',
                       border: `2px solid ${active ? A : BD2}`, boxShadow: active ? `0 0 0 2px ${BG}, 0 0 0 4px ${A}` : 'none',
                     }} />;
                   }

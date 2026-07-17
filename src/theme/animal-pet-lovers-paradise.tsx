@@ -960,8 +960,8 @@ export function Home({ store, page }: any) {
 /* ══════════════════════════════════════════════════════════════
    DETAILS
 ══════════════════════════════════════════════════════════════ */
-export function Details({ product, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
-    const t = T[getLang(product?.store)];
+export function Details({ product, store: storeprop, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
+    const t = T[getLang(storeprop || product?.store)];
     const [sel, setSel] = useState(0);
 
     return (
@@ -1060,7 +1060,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                 </div>
                             ))}
 
-                            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
+                            <ProductForm product={product} store={storeprop} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
 
                             {product.desc && (
                                 <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '2px solid var(--amber-lt)' }}>
@@ -1080,8 +1080,8 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
 /* ══════════════════════════════════════════════════════════════
    PRODUCT FORM
 ══════════════════════════════════════════════════════════════ */
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: ProductFormProps) {
-    const t = T[getLang(product?.store)];
+export function ProductForm({ product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: ProductFormProps) {
+    const t = T[getLang(storeprop || product?.store)];
     const router = useRouter();
     const [wilayas, setWilayas] = useState<Wilaya[]>([]);
     const [communes, setCommunes] = useState<Commune[]>([]);

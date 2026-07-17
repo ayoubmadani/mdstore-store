@@ -42,6 +42,8 @@ export interface ProductFormProps {
   platform?:        string;       // LP only
   priceLoss?:       number;       // LP only
   lpId?:string
+  title?:           string;       // builder-pages productForm block only — overrides the header text
+  buttonText?:      string;       // builder-pages productForm block only — overrides the submit button text
 }
 
 /* ─── Helpers ────────────────────────────────────────── */
@@ -89,7 +91,7 @@ const inputCls = (err?: boolean) =>
 export default function ProductForm({
   product, userId, domain,
   selectedOffer, setSelectedOffer, selectedVariants,
-  platform, priceLoss = 0,lpId
+  platform, priceLoss = 0, lpId, title, buttonText,
 }: ProductFormProps) {
   const router = useRouter();
 
@@ -243,7 +245,7 @@ export default function ProductForm({
       <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
         <div className="flex items-center gap-2">
           <ShoppingCart className="w-5 h-5 text-gray-700" />
-          <p className="font-bold text-gray-900">أدخل بيانات التسليم</p>
+          <p className="font-bold text-gray-900">{title || 'أدخل بيانات التسليم'}</p>
         </div>
         <p className="text-xs text-gray-500 mt-1">سنتواصل معك خلال 24 ساعة لتأكيد طلبك</p>
       </div>
@@ -416,7 +418,7 @@ export default function ProductForm({
           {submitting ? (
             <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />جاري إرسال الطلب...</>
           ) : (
-            <><ShoppingCart className="w-5 h-5" />تأكيد الطلب الآن</>
+            <><ShoppingCart className="w-5 h-5" />{buttonText || 'تأكيد الطلب الآن'}</>
           )}
         </button>
 

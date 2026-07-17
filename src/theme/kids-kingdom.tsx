@@ -1,5 +1,4 @@
 'use client';
-import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -21,8 +20,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 /* ═══════════════════════════════════════════════════════════
    I18N — يقرأ store.language من الداتابيز (ar افتراضي)
 ═══════════════════════════════════════════════════════════ */
-type Lang = 'ar' | 'fr';
-const getLang = (store?: any): Lang => (store?.language === 'fr' ? 'fr' : 'ar');
+type Lang = 'ar' | 'fr' | 'en';
+const getLang = (store?: any): Lang => {
+  if (store?.language === 'fr') return 'fr';
+  if (store?.language === 'en') return 'en';
+  return 'ar';
+};
 
 const T = {
   ar: {
@@ -145,6 +148,67 @@ const T = {
     contact_name_ph: 'Votre nom complet', contact_phone_ph: '05XXXXXXXX', contact_email_ph: 'email@example.com',
     contact_msg_label: '💬 Votre message', contact_msg_ph: 'Comment pouvons-nous vous aider ? 😊',
     contact_sending: 'Envoi en cours...', contact_send: '🚀 Envoyer le message', contact_error: 'Une erreur est survenue lors de l\u2019envoi',
+  },
+  en: {
+    nav_home: 'Home', nav_contact: 'Contact', nav_contact_full: '📞 Contact Us', nav_home_full: '🏠 Home',
+    search_ph_desktop: 'Search for toys... 🎮', search_ph_mobile: 'Search here... 🎯',
+    searching: '🔍 Searching...', view_all: 'View all results 🚀', no_results: 'No results found 🧩',
+    footer_links: '🗺️ Quick Links', footer_contact: '📡 Contact Us', footer_cart: 'Cart',
+    footer_privacy: 'Privacy', footer_terms: 'Terms', footer_rights: 'All rights reserved.',
+    footer_tagline: 'Because every child deserves the best!', footer_safe: 'Safe and fun products ✅',
+    footer_desc_fallback: 'High quality kids toys and clothing at great prices!',
+    view_details: 'Learn More',
+    hero_badge: '🎪 The Magical Kids World', hero_title_fallback: 'Everything<br/>your kids love! 🎉',
+    hero_sub_fallback: 'Safe and fun toys, clothing and entertainment for your happy kids 🌈',
+    shop_now: '🛍️ Shop Now', cart_cta: '🎁 Cart',
+    feat_1_t: 'Child Safe', feat_1_d: 'All products meet safety standards',
+    feat_2_t: 'Fast Delivery', feat_2_d: 'Arrives at your door in record time',
+    feat_3_t: 'High Quality', feat_3_d: 'Carefully selected products',
+    feat_4_t: 'Satisfaction Guaranteed', feat_4_d: 'Your satisfaction always matters',
+    shop_by_cat: '🎡 Shop by Category', featured_products: '🎁 Featured Products',
+    product_count: (n: number) => `${n} amazing product${n > 1 ? 's' : ''} 🌟`,
+    no_products: 'No products yet',
+    banner_title: 'The fun never stops here!', banner_sub: 'Thousands of fun and safe products waiting for your kids',
+    banner_cta: '🎪 Explore Now!',
+    price_label: '💰 Price', currency: 'DZD', choose_offer: '🎁 Choose a Package', qty_label: 'Quantity:',
+    product_details: '📖 Product Details',
+    order_now_title: '📦 Order Now', added_to_cart: 'Added!', add_to_cart: 'Add to Cart',
+    order_now_btn: 'Order Now', cancel: 'Cancel', delivery_info: '📦 Delivery Info',
+    name_label: '👤 Name', phone_label: '📞 Phone', wilaya_label: '📍 Wilaya', commune_label: '🏘️ Commune',
+    choose_wilaya: 'Choose Wilaya', choose_commune: 'Choose Commune', loading_dots: '⏳...',
+    delivery_type: '🚚 Delivery Type', home_delivery: 'Home Delivery', office_delivery: 'Post Office',
+    quantity_label: '🔢 Quantity', order_summary: '🧾 Order Summary',
+    sum_product: 'Product', sum_price: 'Price', sum_qty: 'Quantity', sum_delivery: 'Delivery',
+    sum_total: '💰 Total', confirm_order: '🎉 Confirm Order', processing: '⏳ Processing...',
+    secure_pay: 'Secure and encrypted payment',
+    err_name: 'Name is required', err_phone: 'Invalid phone number (e.g. 0550123456)',
+    err_wilaya: 'Wilaya is required', err_commune: 'Commune is required',
+    cart_title: '🛒 Shopping Cart', cart_items: (n: number) => `${n > 1 ? 'items' : 'item'} (${n})`,
+    cart_empty: 'Cart is empty 🧸', subtotal: 'Subtotal', delete: 'Remove',
+    delivery_details: 'Delivery Information', summary: '🧾 Summary', total_label: '💰 Total',
+    processing_short: '⏳ Processing...',
+    order_received: 'Order received! 🎉', order_received_desc: 'Thank you! We will contact you soon to confirm your order.',
+    back_to_store: '🛍️ Back to Store',
+    privacy_title: 'Privacy Policy', privacy_1_t: 'Data We Collect',
+    privacy_1_d: 'We only collect information necessary to complete your order — name, phone, and address.',
+    privacy_2_t: 'How We Protect Your Data', privacy_2_d: 'We use advanced encryption to keep your personal information secure.',
+    privacy_3_t: 'Sharing Policy', privacy_3_d: 'We never sell or share your data with third parties for marketing purposes.',
+    terms_title: 'Terms & Conditions', terms_1_t: 'Your Account & Responsibility',
+    terms_1_d: 'You are responsible for the accuracy of the information provided.',
+    terms_2_t: 'Orders & Payments', terms_2_d: 'All orders are confirmed by phone before shipping. Cash on delivery.',
+    terms_3_t: 'Governing Law', terms_3_d: 'All transactions are subject to applicable Algerian law.',
+    cookies_title: 'Cookies', cookies_1_t: 'Essential Cookies',
+    cookies_1_d: 'Required for the shopping cart and session tracking. Cannot be disabled.',
+    cookies_2_t: 'Analytics Cookies', cookies_2_d: 'Help us understand how you interact with the site to improve your experience.',
+    contact_title: 'Contact Us', contact_sub: "We'd love to hear from you! 🌟",
+    contact_phone: 'Phone', contact_location: 'Location', contact_email: 'Email',
+    contact_fallback_country: 'Algeria', contact_no_data: 'Not available',
+    contact_fast_t: 'Quick Reply! ⚡', contact_fast_d: 'Usually within a few hours',
+    contact_form_title: '✉️ Send a Message',
+    contact_success_t: 'Message sent!', contact_success_d: "We'll get back to you soon! 🌟",
+    contact_name_ph: 'Your full name', contact_phone_ph: '05XXXXXXXX', contact_email_ph: 'email@example.com',
+    contact_msg_label: '💬 Your Message', contact_msg_ph: 'How can we help you? 😊',
+    contact_sending: 'Sending...', contact_send: '🚀 Send Message', contact_error: 'An error occurred while sending',
   },
 } as const;
 
@@ -276,9 +340,13 @@ const THEME_CSS = `
   .details-layout {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1rem;
   }
-  @media (min-width: 768px) { .details-layout { grid-template-columns: 1fr 1fr; gap: 3rem; } }
+  @media (min-width: 768px) { .details-layout { grid-template-columns: 45fr 55fr; gap: 2.5rem; } }
+
+  /* ── Details gallery sticky (desktop only) ── */
+  .details-gallery { position: static; }
+  @media (min-width: 768px) { .details-gallery { position: sticky; top: 84px; align-self: start; } }
 
   /* ── Responsive: Form rows ── */
   .form-row-2 {
@@ -958,125 +1026,182 @@ export function Home({ store, page }: any) {
 ═══════════════════════════════════════════════════════════ */
 export function Details({ product, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
   const [sel, setSel] = useState(0);
+  const [wide, setWide] = useState(false);
   const lang = getLang(store || product?.store);
   const t = T[lang];
   const isRTL = lang === 'ar';
-  const colors = ['var(--coral)', 'var(--sky)', 'var(--grape)', 'var(--orange)', 'var(--mint-dk)'];
-  const accent = colors[parseInt(product.id || '0') % colors.length];
+  const ACCENTS = ['#FF6B6B', '#4ECDC4', '#A855F7', '#F97316', '#10B981'];
+  const accent = ACCENTS[parseInt(product.id || '0') % ACCENTS.length];
+  const stockLabel = autoGen
+    ? (isRTL ? '📦 متوفر دائماً' : '📦 Toujours dispo')
+    : inStock
+    ? (isRTL ? '✅ متوفر' : '✅ En stock')
+    : (isRTL ? '❌ نفد المخزون' : '❌ Épuisé');
 
-  return (
-    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: '4rem' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2.5rem 1.5rem' }}>
-        <div className="details-layout">
+  useEffect(() => {
+    const check = () => setWide(window.innerWidth >= 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
-          {/* Gallery */}
-          <div style={{ position: 'sticky', top: 84, alignSelf: 'start' }}>
-            <div style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 24, overflow: 'hidden', background: `${accent}12`, border: `3px solid ${accent}40` }}>
-              {allImages[sel]
-                ? <img src={allImages[sel]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem' }}>🧸</div>}
-              {discount > 0 && <div style={{ position: 'absolute', top: 14, [isRTL ? 'right' : 'left']: 14, width: 52, height: 52, borderRadius: '50%', background: 'var(--coral)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '0.85rem', transform: 'rotate(12deg)', boxShadow: '0 4px 16px rgba(255,107,107,0.5)' }}>{discount}%</div>}
-              {allImages.length > 1 && (
-                <>
-                  <button onClick={() => setSel(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', [isRTL ? 'right' : 'left']: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.9)', border: '2px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{isRTL ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}</button>
-                  <button onClick={() => setSel(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.9)', border: '2px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{isRTL ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}</button>
-                </>
-              )}
+  const card: React.CSSProperties = { background: '#fff', borderRadius: 20, padding: '1.25rem', border: '2.5px solid var(--border)', marginBottom: '0.875rem' };
 
+  /* ── Gallery ── */
+  const Gallery = (
+    <div style={{ marginBottom: wide ? 0 : '1rem' }}>
+      <div style={{ position: 'relative', width: '100%', aspectRatio: '1 / 1', borderRadius: 20, overflow: 'hidden', background: `${accent}18`, border: `3px solid ${accent}35` }}>
+        {allImages[sel]
+          ? <img src={allImages[sel]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'clamp(4rem, 14vw, 7rem)' }}>🧸</div>}
+        {discount > 0 && (
+          <div style={{ position: 'absolute', top: 14, [isRTL ? 'right' : 'left']: 14, width: 54, height: 54, borderRadius: '50%', background: 'var(--coral)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '0.9rem', transform: 'rotate(-12deg)', boxShadow: '0 4px 16px rgba(255,107,107,0.5)', zIndex: 2 }}>-{discount}%</div>
+        )}
+        {allImages.length > 1 && (
+          <>
+            <button onClick={() => setSel(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', [isRTL ? 'right' : 'left']: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.92)', border: '2px solid rgba(0,0,0,0.06)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
+              {isRTL ? <ChevronRight size={17} /> : <ChevronLeft size={17} />}
+            </button>
+            <button onClick={() => setSel(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.92)', border: '2px solid rgba(0,0,0,0.06)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
+              {isRTL ? <ChevronLeft size={17} /> : <ChevronRight size={17} />}
+            </button>
+            <div style={{ position: 'absolute', bottom: 10, left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 5, pointerEvents: 'none', zIndex: 2 }}>
+              {allImages.map((_: any, i: number) => (
+                <span key={i} style={{ width: sel === i ? 18 : 6, height: 6, borderRadius: 3, background: sel === i ? '#fff' : 'rgba(255,255,255,0.5)', display: 'inline-block', transition: 'width 0.2s' }} />
+              ))}
             </div>
-            {allImages.length > 1 && (
-              <div className="thumb-row">
-                {allImages.map((img: string, idx: number) => (
-                  <button key={idx} onClick={() => setSel(idx)} style={{ flexShrink: 0, width: 62, height: 62, borderRadius: 14, overflow: 'hidden', border: `3px solid ${sel === idx ? accent : 'var(--border)'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.2s' }}>
-                    <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </button>
-                ))}
-              </div>
-            )}
+          </>
+        )}
+      </div>
+      {allImages.length > 1 && (
+        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginTop: 10 }}>
+          {allImages.map((img: string, idx: number) => (
+            <button key={idx} onClick={() => setSel(idx)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 12, overflow: 'hidden', border: `3px solid ${sel === idx ? accent : 'var(--border)'}`, opacity: sel === idx ? 1 : 0.5, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.2s' }}>
+              <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  /* ── Info cards ── */
+  const Info = (
+    <div>
+      {/* Name + stock */}
+      <div style={card}>
+        <h1 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.3rem, 3.5vw, 2rem)', color: 'var(--text)', lineHeight: 1.2, marginBottom: '0.75rem' }}>{product.name}</h1>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 3 }}>
+            {[...Array(5)].map((_, i) => <Star key={i} size={14} style={{ fill: i < 4 ? 'var(--sun-dk)' : 'none', color: 'var(--sun-dk)' }} />)}
           </div>
+          <span style={{ display: 'inline-flex', alignItems: 'center', padding: '0.25rem 0.75rem', borderRadius: 50, fontWeight: 800, fontSize: '0.75rem', background: autoGen ? 'rgba(255,217,61,0.15)' : inStock ? 'rgba(110,231,183,0.15)' : 'rgba(255,107,107,0.1)', border: `2px solid ${autoGen ? 'var(--sun-dk)' : inStock ? 'var(--mint-dk)' : 'var(--coral)'}`, color: autoGen ? 'var(--sun-dk)' : inStock ? 'var(--mint-dk)' : 'var(--coral)' }}>
+            {stockLabel}
+          </span>
+        </div>
+      </div>
 
-          {/* Info */}
-          <div>
-            <div style={{ background: '#fff', borderRadius: 24, padding: '2rem', border: '3px solid var(--border)' }}>
-              <h1 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.5rem, 4vw, 2.25rem)', color: 'var(--text)', marginBottom: '0.625rem', lineHeight: 1.2 }}>
-                {product.name}
-              </h1>
-              <div style={{ display: 'flex', gap: 3, marginBottom: '1.25rem' }}>
-                {[...Array(5)].map((_, i) => <Star key={i} size={16} style={{ fill: i < 4 ? 'var(--sun-dk)' : 'none', color: 'var(--sun-dk)' }} />)}
-              </div>
+      {/* Price */}
+      <div style={{ background: `linear-gradient(135deg, ${accent}20, ${accent}08)`, border: `2.5px solid ${accent}40`, borderRadius: 20, padding: '1rem 1.25rem', marginBottom: '0.875rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <p style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--text-soft)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.2rem' }}>{t.price_label}</p>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+            <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', color: accent, lineHeight: 1 }}>{finalPrice.toLocaleString()}</span>
+            <span style={{ fontWeight: 700, color: 'var(--text-mid)', fontSize: '0.9rem' }}>{t.currency}</span>
+          </div>
+        </div>
+        <span style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', opacity: 0.45 }}>🏷️</span>
+      </div>
 
-              {/* Price */}
-              <div style={{ background: `${accent}10`, border: `3px solid ${accent}30`, borderRadius: 18, padding: '1.125rem 1.25rem', marginBottom: '1.5rem', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: 0, [isRTL ? 'right' : 'left']: 0, bottom: 0, width: 5, background: accent, borderRadius: isRTL ? '0 0 0 4px' : '0 0 4px 0' }} />
-                <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--text-soft)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem' }}>{t.price_label}</p>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
-                  <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2.75rem', color: accent }}>{finalPrice.toLocaleString()}</span>
-                  <span style={{ fontWeight: 700, color: 'var(--text-mid)', fontSize: '1rem' }}>{t.currency}</span>
+      {/* Offers */}
+      {product.offers?.length > 0 && (
+        <div style={card}>
+          <p style={{ fontSize: '0.68rem', fontWeight: 900, color: accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.625rem' }}>🎁 {t.choose_offer}</p>
+          {product.offers.map((o: any) => (
+            <label key={o.id} onClick={() => setSelectedOffer(o.id)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0.875rem', border: `2.5px solid ${selectedOffer === o.id ? accent : 'var(--border)'}`, borderRadius: 14, cursor: 'pointer', marginBottom: '0.5rem', background: selectedOffer === o.id ? `${accent}10` : 'transparent', transition: 'all 0.2s' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2.5px solid ${selectedOffer === o.id ? accent : 'var(--border)'}`, background: selectedOffer === o.id ? accent : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {selectedOffer === o.id && <Check size={9} color="#fff" />}
+                </div>
+                <div>
+                  <p style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text)' }}>{o.name}</p>
+                  <p style={{ fontSize: '0.68rem', color: 'var(--text-soft)', fontWeight: 600 }}>{t.qty_label} {o.quantity}</p>
                 </div>
               </div>
+              <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.05rem', color: accent, flexShrink: 0 }}>{o.price.toLocaleString()} {t.currency}</span>
+            </label>
+          ))}
+        </div>
+      )}
 
-              {/* Stock */}
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '0.4rem 1rem', borderRadius: 50, fontWeight: 800, fontSize: '0.8rem', marginBottom: '1.5rem', background: autoGen ? 'rgba(255,217,61,0.15)' : inStock ? 'rgba(110,231,183,0.15)' : 'rgba(255,107,107,0.1)', border: `2px solid ${autoGen ? 'var(--sun-dk)' : inStock ? 'var(--mint-dk)' : 'var(--coral)'}`, color: autoGen ? 'var(--sun-dk)' : inStock ? 'var(--mint-dk)' : 'var(--coral)' }}>
-
-              </div>
-
-              {/* Offers */}
-              {product.offers?.length > 0 && (
-                <div style={{ marginBottom: '1.25rem' }}>
-                  <p style={{ fontSize: '0.75rem', fontWeight: 900, color: accent, textTransform: 'uppercase', marginBottom: '0.625rem' }}>{t.choose_offer}</p>
-                  {product.offers.map((o: any) => (
-                    <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1rem', border: `3px solid ${selectedOffer === o.id ? accent : 'var(--border)'}`, borderRadius: 16, cursor: 'pointer', marginBottom: '0.5rem', background: selectedOffer === o.id ? `${accent}08` : 'transparent', transition: 'all 0.2s' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                        <div style={{ width: 20, height: 20, borderRadius: '50%', border: `2.5px solid ${selectedOffer === o.id ? accent : 'var(--border)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', background: selectedOffer === o.id ? accent : 'transparent' }}>
-                          {selectedOffer === o.id && <Check size={10} color="#fff" />}
-                        </div>
-                        <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
-                        <div>
-                          <p style={{ fontWeight: 700, fontSize: '0.9rem' }}>{o.name}</p>
-                          <p style={{ fontSize: '0.72rem', color: 'var(--text-soft)', fontWeight: 600 }}>{t.qty_label} {o.quantity}</p>
-                        </div>
-                      </div>
-                      <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.2rem', color: accent }}>{o.price.toLocaleString()} {t.currency}</span>
-                    </label>
+      {/* Attributes */}
+      {allAttrs.length > 0 && (
+        <div style={card}>
+          {allAttrs.map((attr: any, ai: number) => (
+            <div key={attr.id} style={{ marginBottom: ai < allAttrs.length - 1 ? '0.875rem' : 0 }}>
+              <p style={{ fontSize: '0.68rem', fontWeight: 900, color: accent, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.5rem' }}>🎨 {attr.name}</p>
+              {attr.displayMode === 'color' ? (
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {attr.variants.map((v: any) => {
+                    const isImgUrl = /^https?:\/\/|^\//.test(v.value);
+                    const active = selectedVariants[attr.name] === v.value;
+                    return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: 34, height: 34, borderRadius: '50%', background: isImgUrl ? `url(${v.value}) center/cover` : v.value, border: 'none', cursor: 'pointer', overflow: 'hidden', outline: `3px solid ${active ? accent : 'transparent'}`, outlineOffset: 3, transition: 'all 0.2s' }} />;
+                  })}
+                </div>
+              ) : attr.displayMode === 'image' ? (
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {attr.variants.map((v: any) => {
+                    const active = selectedVariants[attr.name] === v.value;
+                    return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: 52, height: 52, borderRadius: 12, overflow: 'hidden', border: `3px solid ${active ? accent : 'var(--border)'}`, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.2s' }}>
+                      <img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    </button>;
+                  })}
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {attr.variants.map((v: any) => (
+                    <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ padding: '0.35rem 0.875rem', border: `2.5px solid ${selectedVariants[attr.name] === v.value ? accent : 'var(--border)'}`, borderRadius: 50, fontWeight: 700, fontSize: '0.82rem', background: selectedVariants[attr.name] === v.value ? `${accent}15` : '#fff', color: selectedVariants[attr.name] === v.value ? accent : 'var(--text-mid)', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
+                      {v.name}
+                    </button>
                   ))}
                 </div>
               )}
-
-              {/* Attributes */}
-              {allAttrs.map((attr: any) => (
-                <div key={attr.id} style={{ marginBottom: '1.125rem' }}>
-                  <p style={{ fontSize: '0.75rem', fontWeight: 900, color: accent, textTransform: 'uppercase', marginBottom: '0.625rem' }}>🎨 {attr.name}</p>
-                  {attr.displayMode === 'color' ? (
-                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                      {attr.variants.map((v: any) => (
-                        <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ width: 32, height: 32, borderRadius: '50%', background: v.value, border: 'none', cursor: 'pointer', outline: `3px solid ${selectedVariants[attr.name] === v.value ? accent : 'transparent'}`, outlineOffset: 3, transition: 'all 0.2s' }} />
-                      ))}
-                    </div>
-                  ) : (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                      {attr.variants.map((v: any) => (
-                        <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ padding: '0.4rem 1rem', border: `2.5px solid ${selectedVariants[attr.name] === v.value ? accent : 'var(--border)'}`, borderRadius: 50, fontWeight: 700, fontSize: '0.85rem', background: selectedVariants[attr.name] === v.value ? `${accent}12` : '#fff', color: selectedVariants[attr.name] === v.value ? accent : 'var(--text-mid)', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
-                          {v.name}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-
-              <ProductForm product={product} userId={product.store.userId} domain={domain} store={store}
-                selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
-
-              {product.desc && (
-                <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '3px dashed var(--border)' }}>
-                  <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: 'var(--text)', marginBottom: '0.875rem' }}>{t.product_details}</p>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 600, lineHeight: 1.8, color: 'var(--text-mid)' }}
-                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc, { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'span'], ALLOWED_ATTR: ['class', 'style'] }) }} />
-                </div>
-              )}
             </div>
-          </div>
+          ))}
         </div>
+      )}
+
+      {/* Form */}
+      <div style={{ background: '#fff', borderRadius: 20, border: '2.5px solid var(--border)', marginBottom: '0.875rem' }}>
+        <ProductForm product={product} userId={product.store.userId} domain={domain} store={store}
+          selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
+      </div>
+
+      {/* Description */}
+      {product.desc && (
+        <div style={{ ...card, marginBottom: 0 }}>
+          <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--text)', marginBottom: '0.75rem' }}>📖 {t.product_details}</p>
+          <div style={{ fontSize: '0.875rem', fontWeight: 600, lineHeight: 1.85, color: 'var(--text-mid)' }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc, { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'span'], ALLOWED_ATTR: ['class', 'style'] }) }} />
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: '4rem' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '1rem' }}>
+        {wide ? (
+          <div style={{ display: 'grid', gridTemplateColumns: '45% 55%', gap: '2rem', alignItems: 'start' }}>
+            <div style={{ position: 'sticky', top: 88, alignSelf: 'start' }}>{Gallery}</div>
+            <div>{Info}</div>
+          </div>
+        ) : (
+          <div>
+            {Gallery}
+            {Info}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1150,14 +1275,14 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     try {
       await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
-      router.push(`/${domain}/successfully`);
+      router.push(`/successfully?productId=${product?.id}`);
     } catch { } finally { setSub(false); }
   };
 
   return (
-    <div style={{ paddingTop: '1.5rem', borderTop: '3px dashed var(--border)', marginTop: '1.5rem' }}>
-      <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.15rem', color: 'var(--text)', marginBottom: '1rem' }}>{t.order_now_title}</p>
-        {product.store?.cart && (
+    <div style={{ padding: '1.25rem 1.375rem' }}>
+      <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: 'var(--text)', marginBottom: '1rem' }}>{t.order_now_title}</p>
+        {store?.cart !== false && (
         <div className="cart-add-btns" style={{ marginBottom: '1.25rem' }}>
           <button onClick={addToCart} disabled={isAdded} className={isAdded ? 'anim-cart-pop' : ''} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '0.875rem', borderRadius: 16, cursor: isAdded ? 'default' : 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: '0.875rem', transition: 'all 0.3s', border: isAdded ? '2.5px solid var(--mint-dk)' : '2.5px solid var(--sky)', background: isAdded ? 'rgba(110,231,183,0.12)' : '#fff', color: isAdded ? 'var(--mint-dk)' : 'var(--sky-dk)' }}>
             {isAdded ? <><CheckCircle2 size={16} className="anim-check-in" /> {t.added_to_cart}</> : <><ShoppingCart size={16} /> {t.add_to_cart}</>}
@@ -1168,9 +1293,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         </div>
       )}
 
-      {(isOrderNow || !product.store?.cart) && (
+      {(isOrderNow || store?.cart === false) && (
         <div style={{ animation: 'pop-in 0.3s ease' }}>
-          {product.store?.cart && (
+          {store?.cart !== false && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <p style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--coral)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.delivery_info}</p>
               <button onClick={() => setIsOrderNow(false)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0.375rem 0.75rem', borderRadius: 10, border: '2px solid var(--border)', background: '#fff', color: 'var(--text-soft)', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -1511,11 +1636,12 @@ export function Contact({ store }: { store: any }) {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [contactError, setContactError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); setLoading(true);
+    e.preventDefault(); setLoading(true); setContactError(null);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-    catch { showError(t.contact_error); } finally { setLoading(false); }
+    catch { setContactError(t.contact_error); } finally { setLoading(false); }
   };
 
   return (
@@ -1588,6 +1714,7 @@ export function Contact({ store }: { store: any }) {
                 <button type="submit" disabled={loading} className="btn-bouncy" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '1rem', borderRadius: 18, border: 'none', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 900, fontSize: '1rem', color: '#fff', background: 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: '0 8px 28px rgba(255,107,107,0.4)', opacity: loading ? 0.7 : 1 }}>
                   {loading ? <><Loader2 size={18} style={{ animation: 'spin-slow 1s linear infinite' }} /> {t.contact_sending}</> : <>{t.contact_send}</>}
                 </button>
+                {contactError && <p style={{ color: 'var(--coral)', fontWeight: 700, fontSize: '0.875rem', textAlign: 'center', marginTop: '0.25rem' }}>{contactError}</p>}
               </form>
             )}
           </div>

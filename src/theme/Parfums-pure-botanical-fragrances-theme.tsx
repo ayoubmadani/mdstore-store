@@ -1,199 +1,25 @@
 'use client';
-import { showError } from '@/lib/showError';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+// ============================================================================
+// PURE BOTANICAL FRAGRANCES THEME
+// NAVBAR ARCHETYPE : D — Full-width Logo Strip
+// CARD ARCHETYPE   : 5 — Framed Label
+// HERO LAYOUT      : marquee (moving ticker + clean image-free headline)
+// TYPOGRAPHY PAIR  : Markazi Text + Cairo (ar) / Fraunces + Work Sans (fr/en)
+// ============================================================================
+
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import axios from 'axios';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import DOMPurify from 'isomorphic-dompurify';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import DOMPurify from 'dompurify';
 import {
-    Star, ChevronDown, AlertCircle, X, ToggleRight,
-    ArrowLeft, Plus, Minus, CheckCircle2, Lock, Shield,
-    Package, ShieldCheck, Phone, User, Search, ShoppingBag,
-    Trash2, Loader2, ChevronLeft, ChevronRight, Heart,
-    ShoppingCart, Leaf, Sparkles, Droplets, Home as HomeIcon, Building2, Menu,
-
+  Search, X, ShoppingBag, Menu, Phone, Mail, MapPin, Star,
+  ChevronLeft, ChevronRight, Trash2, Check, Minus, Plus, Leaf,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
+/* ============================== TYPES ============================== */
 
-/* ══════════════════════════════════════════════════════════════
-   عبير الطبيعة — Natural Perfume Boutique
-   ─────────────────────────────────────────────────────────────
-   Sage Green #6B8F6B · White #FFFFFF · Cream #F5F2EB
-   Fonts: Cairo (Arabic native) + Inter
-   
-   SIGNATURE ELEMENTS:
-   ✦ Sage green outer background framing white content card
-   ✦ Category circles with custom SVG fragrance icons
-   ✦ "أضف إلى السلة" button directly on product cards  
-   ✦ Rounded soft cards with shadow
-   ✦ صنع في الجزائر footer badge
-══════════════════════════════════════════════════════════════ */
-const CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap');
-  *, *::before, *::after { box-sizing:border-box; -webkit-font-smoothing:antialiased; margin:0; padding:0; }
-  html { scroll-behavior:smooth; }
-
-  :root {
-    --sage:      #6B8F6B;
-    --sage-2:    #5A7D5A;
-    --sage-3:    #7EA07E;
-    --sage-lt:   #E8F0E8;
-    --sage-xlt:  rgba(107,143,107,0.12);
-    --white:     #FFFFFF;
-    --ivory:     #FAF9F6;
-    --cream:     #F5F2EB;
-    --cream-2:   #EDE8DF;
-    --char:      #2D3A2D;
-    --char-2:    #3D4E3D;
-    --mid:       #5A6E5A;
-    --mist:      #8FA08F;
-    --line:      rgba(107,143,107,0.2);
-    --line-2:    rgba(107,143,107,0.35);
-    --red:       #9B2335;
-  }
-
-  body {
-    background:var(--sage);
-    color:var(--char);
-    font-family:'Cairo',sans-serif;
-    min-height:100vh;
-    zoom: 1.2;
-  }
-  a { text-decoration:none; color:inherit; }
-  ::-webkit-scrollbar { width:4px; }
-  ::-webkit-scrollbar-track { background:var(--sage); }
-  ::-webkit-scrollbar-thumb { background:var(--white); border-radius:2px; opacity:0.5; }
-
-  /* Main content card — white on green */
-  .main-card {
-    background:var(--white);
-    margin:0 auto;
-    box-shadow:0 8px 48px rgba(45,58,45,0.18);
-    min-height:100vh;
-    position:relative;
-  }
-
-  @keyframes fadeUp   { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes spin     { from{transform:rotate(0)} to{transform:rotate(360deg)} }
-  @keyframes check-in { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
-  @keyframes pulse    { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
-
-  .fu  { animation:fadeUp 0.6s ease both; }
-  .fu1 { animation-delay:0.1s; }
-  .fu2 { animation-delay:0.2s; }
-  .fu3 { animation-delay:0.3s; }
-  .anim-check { animation:check-in 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }
-
-  /* SCROLL REVEAL */
-  .sr { opacity:0; transform:translateY(18px); transition:opacity 0.6s ease,transform 0.6s ease; }
-  .sr.vis { opacity:1; transform:translateY(0); }
-
-  /* BUTTONS */
-  .btn-sage {
-    display:inline-flex; align-items:center; justify-content:center; gap:6px;
-    background:var(--sage); color:var(--white);
-    font-family:'Cairo',sans-serif; font-size:13px; font-weight:600;
-    border-radius:6px; padding:10px 20px; border:none; cursor:pointer;
-    transition:background 0.25s, transform 0.25s;
-  }
-  .btn-sage:hover { background:var(--sage-2); transform:translateY(-1px); }
-  .btn-sage:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
-
-  .btn-sage-outline {
-    display:inline-flex; align-items:center; justify-content:center; gap:6px;
-    background:transparent; color:var(--sage); border:1.5px solid var(--sage);
-    font-family:'Cairo',sans-serif; font-size:13px; font-weight:600;
-    border-radius:6px; padding:9px 18px; cursor:pointer;
-    transition:all 0.25s;
-  }
-  .btn-sage-outline:hover { background:var(--sage); color:var(--white); }
-
-  /* INPUTS */
-  .inp {
-    width:100%; padding:11px 14px;
-    background:var(--ivory); border:1.5px solid var(--line-2);
-    border-radius:8px;
-    font-family:'Cairo',sans-serif; font-size:13px; color:var(--char);
-    outline:none; transition:border-color 0.2s;
-  }
-  .inp:focus { border-color:var(--sage); }
-  .inp::placeholder { color:var(--mist); }
-  select.inp { appearance:none; cursor:pointer; }
-
-  /* PRODUCT CARD */
-  .p-card {
-    background:var(--white); border-radius:12px;
-    border:1px solid var(--line);
-    overflow:hidden; cursor:pointer;
-    transition:transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  .p-card:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(107,143,107,0.15); }
-  .p-card:hover .c-img img { transform:scale(1.04); }
-  .c-img img { display:block; width:100%; height:100%; object-fit:cover; transition:transform 0.5s ease; }
-
-  /* CATEGORY CIRCLE */
-  .cat-circle {
-    display:flex; flex-direction:column; align-items:center; gap:10px;
-    cursor:pointer; transition:transform 0.25s;
-  }
-  .cat-circle:hover { transform:translateY(-3px); }
-  .cat-circle:hover .cat-icon { background:var(--sage); border-color:var(--sage); }
-  .cat-circle:hover .cat-icon svg { color:var(--white); }
-  .cat-icon {
-    width:72px; height:72px; border-radius:50%;
-    background:var(--sage-lt); border:1.5px solid var(--line-2);
-    display:flex; align-items:center; justify-content:center;
-    transition:all 0.3s;
-  }
-  .cat-icon.active { background:var(--sage); border-color:var(--sage); }
-  .cat-icon.active svg { color:var(--white)!important; }
-
-  /* GRIDS */
-  .nav-links  { display:flex; align-items:center; gap:24px; flex:1; justify-content:center; }
-  .nav-burger { display:none; }
-  @media (max-width:700px) {
-    .nav-links { display:none; }
-    .nav-burger { display:flex; }
-  }
-
-  .prod-grid  { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-  .cat-grid   { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
-  .footer-g   { display:grid; grid-template-columns:1fr 1fr 1fr; gap:32px; }
-  .details-g  { display:grid; grid-template-columns:1fr 1fr; gap:0; }
-  .form-2c    { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .dlv-2c     { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-  .cart-g     { display:grid; grid-template-columns:1.2fr 1fr; gap:20px; align-items:start; }
-  .pagination { display:flex; justify-content:center; gap:6px; margin-top:40px; flex-wrap:wrap; }
-  .cart-btns  { display:flex; gap:8px; }
-
-  @media (max-width:700px) {
-    .main-card { margin:0; box-shadow:none; }
-    .prod-grid { grid-template-columns:1fr; gap:10px; }
-    .cat-grid  { grid-template-columns:repeat(4,1fr); gap:8px; }
-    .footer-g  { grid-template-columns:1fr; gap:20px; }
-    .cart-g    { grid-template-columns:1fr; }
-    .details-g { grid-template-columns:1fr; }
-    .cart-btns { flex-direction:column; }
-    .form-2c   { grid-template-columns:1fr; }
-    .dlv-2c    { grid-template-columns:1fr; }
-  }
-  @media (max-width:480px) {
-    .cat-grid  { grid-template-columns:repeat(4,1fr); }
-    .cat-icon  { width:56px; height:56px; }
-  }
-`;
-
-/* ─── FRAGRANCE CATEGORY ICONS ─── */
-const IconFloral = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--sage)' }}><circle cx="12" cy="12" r="3" /><path d="M12 2a4 4 0 0 1 0 8" /><path d="M12 2a4 4 0 0 0 0 8" /><path d="M12 14a4 4 0 0 1 0 8" /><path d="M12 14a4 4 0 0 0 0 8" /><path d="M2 12a4 4 0 0 1 8 0" /><path d="M2 12a4 4 0 0 0 8 0" /><path d="M14 12a4 4 0 0 1 8 0" /><path d="M14 12a4 4 0 0 0 8 0" /></svg>;
-const IconWood = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--sage)' }}><path d="M17 8C8 10 5.9 16.17 3.82 22" /><path d="M9.5 9.5c.5 3.5 5 5.5 6.5 8.5" /><path d="M3 9c4-2 7-2.5 10-1.5" /></svg>;
-const IconCitrus = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--sage)' }}><circle cx="12" cy="12" r="9" /><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4" /></svg>;
-const IconSpray = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--sage)' }}><path d="M3 9h14v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" /><path d="M17 9V6h2a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1h-2z" /><path d="M10 9V5" /><path d="M10 5a2 2 0 0 0-2-2" /><path d="M21 4l-2 2" /><path d="M19 4l2 2" /></svg>;
-const IconOud = () => <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--sage)' }}><path d="M12 22V8" /><path d="M5 12H2a10 10 0 0 0 20 0h-3" /><path d="M8 5.3C8 4 9.8 3 12 3s4 1 4 2.3c0 2.1-2 3.7-4 5.7-2-2-4-3.6-4-5.7Z" /></svg>;
-
-/* ─── TYPES ─── */
 interface Offer { id: string; name: string; quantity: number; price: number; }
 interface Variant { id: string; name: string; value: string; }
 interface Attribute { id: string; type: string; name: string; displayMode?: 'color' | 'image' | 'text' | null; variants: Variant[]; }
@@ -202,1315 +28,1289 @@ interface VariantAttributeEntry { attrId: string; attrName: string; displayMode:
 interface VariantDetail { id: string | number; name: VariantAttributeEntry[]; price: number; stock: number; autoGenerate: boolean; }
 interface Wilaya { id: string; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
 interface Commune { id: string; name: string; ar_name: string; wilayaId: string; }
-export interface Product {
-    id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
-    productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
-    variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-    store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
-}
-export interface ProductFormProps {
-    product: Product; userId: string; domain: string; redirectPath?: string;
-    selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
-    selectedVariants: Record<string, string>; platform?: string; priceLoss?: number;
+
+interface Product {
+  id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
+  productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; slug?: string;
+  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
 }
 
-const vm = (d: VariantDetail, s: Record<string, string>) =>
-    Object.entries(s).every(([n, v]) => d.name.some(e => e.attrName === n && e.value === v));
-const fetchWilayas = async (uid: string): Promise<Wilaya[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}`); return data || []; } catch { return []; } };
-const fetchCommunes = async (wid: string): Promise<Commune[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/get-communes/${wid}`); return data || []; } catch { return []; } };
+/* ============================== HELPERS ============================== */
 
-const INP = (err?: boolean): React.CSSProperties => ({
-    width: '100%', padding: '11px 14px', background: 'var(--ivory)',
-    border: `1.5px solid ${err ? 'var(--red)' : 'var(--line-2)'}`,
-    borderRadius: '8px',
-    fontFamily: "'Cairo',sans-serif", fontSize: '13px', color: 'var(--char)',
-    outline: 'none', transition: 'border-color 0.2s', appearance: 'none',
-});
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
-const FR = ({ error, label, children }: { error?: string; label?: string; children: React.ReactNode }) => (
-    <div style={{ marginBottom: '12px' }}>
-        {label && <p style={{ fontSize: '12px', fontWeight: 600, color: 'var(--mid)', marginBottom: '6px' }}>{label}</p>}
-        {children}
-        {error && <p style={{ fontSize: '11px', color: 'var(--red)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: 4 }}>
-            <AlertCircle style={{ width: '11px', height: '11px' }} />{error}
-        </p>}
-    </div>
-);
-
-function useScrollReveal() {
-    useEffect(() => {
-        const obs = new IntersectionObserver(entries => {
-            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
-        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-        document.querySelectorAll('.sr').forEach(el => obs.observe(el));
-        return () => obs.disconnect();
-    }, []);
+function variantMatches(d: VariantDetail, sel: Record<string, string>) {
+  return Object.entries(sel).every(([n, v]) => d.name.some((e) => e.attrName === n && e.value === v));
 }
 
-/* ══════════════════════════════════════════════════════════════
-   MAIN
-══════════════════════════════════════════════════════════════ */
-
-// ─── Translations ─────────────────────────────────────────────────────────────
-const jsonAr = {
-  dir: 'rtl',
-  // Navbar
-  home: 'الرئيسية',
-  contact: 'اتصل بنا',
-  cart: 'السلة',
-  search: 'ابحث...',
-  searching: 'جاري البحث...',
-  noResults: 'لا توجد نتائج',
-  showAll: 'عرض كل النتائج →',
-  // Home
-  all: 'الكل',
-  noProducts: 'لا توجد منتجات متاحة حالياً',
-  shopNow: 'تسوق الآن',
-  searchResultsFor: 'نتائج البحث عن:',
-  // Form
-  fullName: 'الاسم الكامل',
-  fullNamePh: 'أدخل اسمك',
-  errName: 'الاسم مطلوب',
-  phone: 'رقم الهاتف',
-  phonePh: '05xxxxxxxx',
-  errPhone: 'رقم الهاتف مطلوب',
-  errPhoneInvalid: 'رقم هاتف غير صالح',
-  wilaya: 'الولاية',
-  errWilaya: 'الولاية مطلوبة',
-  wilayaPh: 'اختر الولاية',
-  wilayaNA: 'التوصيل غير متاح حالياً',
-  commune: 'البلدية',
-  errCommune: 'البلدية مطلوبة',
-  communePh: 'اختر البلدية',
-  communeLoading: 'جاري التحميل...',
-  deliveryType: 'نوع التوصيل',
-  deliveryHome: 'توصيل للمنزل',
-  deliveryOffice: 'مكتب بريد',
-  qty: 'الكمية',
-  price: 'السعر',
-  delivery: 'التوصيل',
-  total: 'الإجمالي',
-  subtotal: 'المجموع الفرعي',
-  orderInfo: 'معلومات الطلب',
-  addToCart: 'أضف إلى السلة',
-  orderNow: 'اطلب الآن',
-  confirmOrder: 'تأكيد الطلب',
-  sending: 'جاري الإرسال...',
-  back: 'رجوع',
-  addedMsg: 'تمت الإضافة إلى السلة بنجاح!',
-  errSubmit: 'حدث خطأ أثناء إرسال الطلب',
-  // Cart & Success
-  myCart: 'السلة',
-  cartEmpty: 'السلة فارغة',
-  cartEmptyDesc: 'لم تقم بإضافة أي منتجات بعد',
-  successTitle: 'تم إرسال طلبك بنجاح!',
-  successDesc: 'سنتواصل معك قريباً لتأكيد التفاصيل',
-  backToShop: 'العودة للتسوق',
-  checkoutTitle: 'إتمام الطلب',
-  // Product
-  offersTitle: 'العروض المتاحة',
-  descTitle: 'الوصف',
-  // Footer
-  quickLinks: 'روابط سريعة',
-  contactSect: 'تواصل معنا',
-  privacy: 'الخصوصية',
-  terms: 'الشروط',
-  rightsReserved: 'جميع الحقوق محفوظة',
+const fetchWilayas = async (uid: string): Promise<Wilaya[]> => {
+  try {
+    const res = await fetch(`${API_URL}/shipping/public/get-shipping/${uid}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch { return []; }
 };
 
-const jsonFr = {
-  dir: 'ltr',
-  // Navbar
-  home: 'Accueil',
-  contact: 'Contact',
-  cart: 'Panier',
-  search: 'Rechercher un produit...',
-  searching: 'Recherche...',
-  noResults: 'Aucun résultat',
-  showAll: 'Voir tous les résultats',
-  // Home
-  all: 'Tout',
-  noProducts: 'Aucun produit disponible pour le moment.',
-  shopNow: 'Voir la boutique',
-  searchResultsFor: 'Résultats pour :',
-  // Form
-  fullName: 'Nom complet',
-  fullNamePh: 'Votre nom',
-  errName: 'Le nom est requis',
-  phone: 'Téléphone',
-  phonePh: '0555 12 34 56',
-  errPhone: 'Le numéro de téléphone est requis',
-  errPhoneInvalid: 'Numéro de téléphone invalide',
-  wilaya: 'Wilaya',
-  errWilaya: 'Sélectionnez une wilaya',
-  wilayaPh: 'Choisir la wilaya',
-  wilayaNA: 'Livraison indisponible pour le moment',
-  commune: 'Commune',
-  errCommune: 'Sélectionnez une commune',
-  communePh: 'Choisir la commune',
-  communeLoading: 'Chargement...',
-  deliveryType: 'Type de livraison',
-  deliveryHome: 'À domicile',
-  deliveryOffice: 'Point relais',
-  qty: 'Quantité',
-  price: 'Prix',
-  delivery: 'Livraison',
-  total: 'Total',
-  subtotal: 'Sous-total',
-  orderInfo: 'Informations de commande',
-  addToCart: 'Ajouter au panier',
-  orderNow: 'Commander maintenant',
-  confirmOrder: 'Confirmer la commande',
-  sending: 'Envoi en cours...',
-  back: 'Annuler',
-  addedMsg: 'Ajouté au panier ✓',
-  errSubmit: 'Une erreur est survenue, veuillez réessayer.',
-  // Cart & Success
-  myCart: 'Mon Panier',
-  cartEmpty: 'Votre panier est vide',
-  cartEmptyDesc: 'Découvrez notre sélection.',
-  successTitle: 'Commande confirmée',
-  successDesc: 'Merci pour votre commande, notre équipe vous contactera bientôt.',
-  backToShop: 'Retour à la boutique',
-  checkoutTitle: 'Finaliser la commande',
-  // Product
-  offersTitle: 'Offres groupées',
-  descTitle: 'Description',
-  // Footer
-  quickLinks: 'Navigation',
-  contactSect: 'Contact',
-  privacy: 'Confidentialité',
-  terms: 'Conditions',
-  rightsReserved: 'Tous droits réservés.',
+const fetchCommunes = async (wid: string): Promise<Commune[]> => {
+  try {
+    const res = await fetch(`${API_URL}/shipping/get-communes/${wid}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch { return []; }
 };
+
+const getVarId = (selectedVariants: Record<string, string>, product?: Product | null): string | number | null => {
+  if (!product?.variantDetails?.length) return null;
+  const match = product.variantDetails.find((d) => variantMatches(d, selectedVariants));
+  return match ? match.id : null;
+};
+
+/* ============================== I18N ============================== */
+
+type Lang = 'ar' | 'fr' | 'en';
+
+const getLang = (store?: any): Lang => {
+  if (store?.language === 'fr') return 'fr';
+  if (store?.language === 'en') return 'en';
+  return 'ar';
+};
+
+const T = {
+  ar: {
+    dir: 'rtl' as const,
+    home: 'الرئيسية', contact: 'تواصل معنا', cart: 'السلة',
+    search: 'ابحث عن عطر طبيعي...', searching: 'جاري البحث...', noResults: 'لا توجد نتائج',
+    showAll: 'عرض كل النتائج →',
+    all: 'الكل', noProducts: 'لا توجد منتجات متاحة حالياً', shopNow: 'اكتشف المجموعة',
+    trust: [
+      { t: 'توصيل سريع', s: 'لكل الولايات' },
+      { t: 'مكونات طبيعية', s: '100% عضوية' },
+      { t: 'دفع آمن', s: 'حماية كاملة للبيانات' },
+      { t: 'دعم 24/7', s: 'فريق متخصص للمساعدة' },
+    ],
+    quickLinks: 'روابط سريعة', contactUs: 'تواصل معنا',
+    privacy: 'الخصوصية', terms: 'الشروط', cookies: 'الكوكيز',
+    rightsReserved: 'جميع الحقوق محفوظة',
+    fullName: 'الاسم الكامل', fullNamePlaceholder: 'أدخل اسمك الكامل',
+    phone: 'رقم الهاتف', phonePlaceholder: '05xxxxxxxx',
+    wilaya: 'الولاية', wilayaPlaceholder: 'اختر الولاية', wilayaUnavailable: 'التوصيل غير متاح حالياً',
+    commune: 'البلدية', communePlaceholder: 'اختر البلدية', communeLoading: 'جاري التحميل...',
+    deliveryHome: 'توصيل للمنزل', deliveryOffice: 'مكتب بريد',
+    qty: 'الكمية', price: 'السعر', delivery: 'التوصيل', total: 'الإجمالي',
+    orderNow: 'اطلب الآن', addToCart: 'أضف إلى السلة',
+    confirmOrder: 'تأكيد الطلب', sending: 'جاري الإرسال...', cancel: 'إلغاء',
+    successTitle: 'تم إرسال طلبك بنجاح!', successDesc: 'سنتواصل معك قريباً لتأكيد التفاصيل.',
+    backToShop: 'العودة للتسوق',
+    cartEmpty: 'السلة فارغة', cartEmptyDesc: 'لم تتم إضافة أي عطور بعد.',
+    myCart: 'سلتي', subtotal: 'المجموع الفرعي',
+    errSubmit: 'حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مجدداً.',
+    errName: 'الاسم الكامل مطلوب (3 أحرف على الأقل)',
+    errPhone: 'رقم هاتف جزائري صحيح مطلوب (مثال: 0550123456)',
+    errWilaya: 'اختر الولاية', errCommune: 'اختر البلدية',
+    privacyTitle: 'سياسة الخصوصية', termsTitle: 'الشروط والأحكام',
+    cookiesTitle: 'سياسة الكوكيز', contactTitle: 'تواصل معنا',
+    offersTitle: 'العروض المتاحة', descTitle: 'الوصف',
+    searchResultsFor: 'نتائج البحث عن:',
+  },
+  fr: {
+    dir: 'ltr' as const,
+    home: 'Accueil', contact: 'Contact', cart: 'Panier',
+    search: 'Rechercher un parfum naturel...', searching: 'Recherche...', noResults: 'Aucun résultat',
+    showAll: 'Voir tous les résultats →',
+    all: 'Tout', noProducts: 'Aucun produit disponible pour le moment.', shopNow: 'Découvrir la collection',
+    trust: [
+      { t: 'Livraison Rapide', s: 'Partout en Algérie' },
+      { t: 'Ingrédients Naturels', s: '100% biologique' },
+      { t: 'Paiement Sécurisé', s: 'Vos données protégées' },
+      { t: 'Support 24/7', s: 'Toujours disponible' },
+    ],
+    quickLinks: 'Navigation', contactUs: 'Contact',
+    privacy: 'Confidentialité', terms: 'Conditions', cookies: 'Cookies',
+    rightsReserved: 'Tous droits réservés.',
+    fullName: 'Nom complet', fullNamePlaceholder: 'Votre nom complet',
+    phone: 'Téléphone', phonePlaceholder: '0555 12 34 56',
+    wilaya: 'Wilaya', wilayaPlaceholder: 'Choisir la wilaya', wilayaUnavailable: 'Livraison indisponible',
+    commune: 'Commune', communePlaceholder: 'Choisir la commune', communeLoading: 'Chargement...',
+    deliveryHome: 'À domicile', deliveryOffice: 'Point relais',
+    qty: 'Quantité', price: 'Prix', delivery: 'Livraison', total: 'Total',
+    orderNow: 'Commander', addToCart: 'Ajouter au panier',
+    confirmOrder: 'Confirmer la commande', sending: 'Envoi en cours...', cancel: 'Annuler',
+    successTitle: 'Commande confirmée !', successDesc: 'Notre équipe vous contactera bientôt.',
+    backToShop: 'Retour à la boutique',
+    cartEmpty: 'Votre panier est vide', cartEmptyDesc: 'Découvrez notre collection.',
+    myCart: 'Mon Panier', subtotal: 'Sous-total',
+    errSubmit: 'Une erreur est survenue. Veuillez réessayer.',
+    errName: 'Nom complet requis (3 caractères minimum)',
+    errPhone: 'Numéro de téléphone algérien valide requis (ex: 0550123456)',
+    errWilaya: 'Veuillez choisir une wilaya', errCommune: 'Veuillez choisir une commune',
+    privacyTitle: 'Politique de confidentialité', termsTitle: 'Conditions générales',
+    cookiesTitle: 'Politique des cookies', contactTitle: 'Nous contacter',
+    offersTitle: 'Offres groupées', descTitle: 'Description',
+    searchResultsFor: 'Résultats pour :',
+  },
+  en: {
+    dir: 'ltr' as const,
+    home: 'Home', contact: 'Contact', cart: 'Cart',
+    search: 'Search natural fragrances...', searching: 'Searching...', noResults: 'No results found',
+    showAll: 'Show all results →',
+    all: 'All', noProducts: 'No products available at the moment.', shopNow: 'Discover the Collection',
+    trust: [
+      { t: 'Fast Delivery', s: 'Across all wilayas' },
+      { t: 'Natural Ingredients', s: '100% organic' },
+      { t: 'Secure Payment', s: 'Full data protection' },
+      { t: '24/7 Support', s: 'Expert team always here' },
+    ],
+    quickLinks: 'Quick Links', contactUs: 'Contact Us',
+    privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies',
+    rightsReserved: 'All rights reserved.',
+    fullName: 'Full Name', fullNamePlaceholder: 'Enter your full name',
+    phone: 'Phone Number', phonePlaceholder: '0555 12 34 56',
+    wilaya: 'Wilaya', wilayaPlaceholder: 'Select wilaya', wilayaUnavailable: 'Delivery unavailable',
+    commune: 'Commune', communePlaceholder: 'Select commune', communeLoading: 'Loading...',
+    deliveryHome: 'Home Delivery', deliveryOffice: 'Pickup Point',
+    qty: 'Quantity', price: 'Price', delivery: 'Delivery', total: 'Total',
+    orderNow: 'Order Now', addToCart: 'Add to Cart',
+    confirmOrder: 'Confirm Order', sending: 'Sending...', cancel: 'Cancel',
+    successTitle: 'Order placed successfully!', successDesc: 'We will contact you shortly to confirm the details.',
+    backToShop: 'Back to Shop',
+    cartEmpty: 'Your cart is empty', cartEmptyDesc: 'Start exploring our collection.',
+    myCart: 'My Cart', subtotal: 'Subtotal',
+    errSubmit: 'An error occurred. Please try again.',
+    errName: 'Full name is required (at least 3 characters)',
+    errPhone: 'Valid Algerian phone number required (e.g. 0550123456)',
+    errWilaya: 'Please select a wilaya', errCommune: 'Please select a commune',
+    privacyTitle: 'Privacy Policy', termsTitle: 'Terms & Conditions',
+    cookiesTitle: 'Cookie Policy', contactTitle: 'Contact Us',
+    offersTitle: 'Available Offers', descTitle: 'Description',
+    searchResultsFor: 'Results for:',
+  },
+} as const;
+
+type TKeys = typeof T['ar'];
+
+/* ============================== THEME DESIGN TOKENS ============================== */
+
+const BG = '#faf7f1';
+const BG_ALT = '#f1ece1';
+const INK = '#2e2a22';
+const SAGE = '#7c8a63';
+const SAGE_DARK = '#5f6b4a';
+const MUTED = 'rgba(46,42,34,0.6)';
+const BORDER = 'rgba(46,42,34,0.14)';
+
+const THEME_CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400;600;700&family=Cairo:wght@300;400;500;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap');
+
+.pbf-root { background:${BG}; color:${INK}; min-height:100vh; }
+.pbf-root.lang-ar { font-family:'Cairo', sans-serif; }
+.pbf-root.lang-ar h1, .pbf-root.lang-ar h2, .pbf-root.lang-ar h3, .pbf-root.lang-ar .pbf-display { font-family:'Markazi Text', serif; }
+.pbf-root.lang-ltr { font-family:'Work Sans', sans-serif; }
+.pbf-root.lang-ltr h1, .pbf-root.lang-ltr h2, .pbf-root.lang-ltr h3, .pbf-root.lang-ltr .pbf-display { font-family:'Fraunces', serif; }
+
+.pbf-container { max-width:1280px; margin:0 auto; padding:0 1.5rem; }
+
+/* Navbar — Full-width Logo Strip archetype */
+.pbf-nav-top { display:flex; align-items:center; justify-content:center; padding:22px 0; border-bottom:1px solid ${BORDER}; }
+.pbf-nav-bottom { position:sticky; top:0; z-index:200; background:${BG}; border-bottom:1px solid ${BORDER}; }
+.pbf-nav-bottom-inner { display:flex; align-items:center; justify-content:space-between; padding:14px 0; }
+.pbf-nav-links { display:flex; align-items:center; gap:26px; }
+.pbf-nav-links a { color:${MUTED}; font-size:0.85rem; text-decoration:none; letter-spacing:0.02em; }
+.pbf-nav-links a:hover, .pbf-nav-links a.active { color:${SAGE_DARK}; }
+@media (max-width:760px) { .pbf-nav-links { display:none; } .pbf-nav-burger { display:flex !important; } }
+.pbf-nav-burger { display:none; }
+
+.pbf-desktop-search { position:relative; display:none; }
+@media (min-width:760px) { .pbf-desktop-search { display:block; } .pbf-mobile-search-btn { display:none !important; } }
+.pbf-search-dropdown {
+  position:absolute; inset-inline-end:0; top:calc(100% + 10px); width:340px; max-height:380px; overflow-y:auto;
+  background:#fff; border:1px solid ${BORDER}; border-radius:8px; box-shadow:0 20px 44px rgba(46,42,34,0.14); z-index:500;
+}
+@media (max-width:480px) { .pbf-search-dropdown { position:fixed; inset-inline-start:12px; inset-inline-end:12px; width:auto; top:76px; } }
+
+.pbf-mobile-overlay { position:fixed; inset:0; z-index:300; background:${BG}; display:flex; flex-direction:column; }
+
+/* Card — Framed Label archetype */
+.pbf-card { border:1px solid ${BORDER}; border-radius:4px; overflow:hidden; background:#fff; animation:pbfFadeUp 0.5s ease both; transition:box-shadow 0.28s ease, transform 0.28s ease; }
+.pbf-card:hover { transform:translateY(-4px); box-shadow:0 16px 32px rgba(46,42,34,0.1); }
+.pbf-card-eyebrow { background:${BG_ALT}; padding:4px 12px; font-size:0.62rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:${SAGE_DARK}; }
+.pbf-card-img-wrap { aspect-ratio:1/1; overflow:hidden; }
+.pbf-card-img { width:100%; height:100%; object-fit:cover; transition:transform 0.5s ease; }
+.pbf-card:hover .pbf-card-img { transform:scale(1.06); }
+.pbf-card-body { padding:0.9rem; }
+.pbf-card-name { font-size:0.85rem; font-weight:600; margin:0 0 8px; color:${INK}; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.pbf-card-price-row { display:flex; justify-content:space-between; align-items:center; margin-top:4px; }
+.pbf-card-price { font-weight:800; color:${SAGE_DARK}; font-size:0.95rem; white-space:nowrap; }
+.pbf-card-price-old { color:${MUTED}; text-decoration:line-through; font-size:0.75rem; white-space:nowrap; }
+.pbf-card-badge { background:${SAGE}; color:#fff; font-size:0.65rem; padding:2px 7px; border-radius:2px; font-weight:700; }
+.pbf-card-stars { display:flex; gap:2px; margin-bottom:6px; }
+
+.pbf-products-grid { display:grid; grid-template-columns:1fr; gap:1.1rem; }
+@media (min-width:640px) { .pbf-products-grid { grid-template-columns:repeat(2,1fr); } }
+@media (min-width:1024px) { .pbf-products-grid { grid-template-columns:repeat(3,1fr); } }
+@media (min-width:1280px) { .pbf-products-grid { grid-template-columns:repeat(4,1fr); } }
+
+/* Category chips — active indicator: underline */
+.pbf-cats { display:flex; gap:26px; flex-wrap:wrap; overflow-x:auto; padding:4px 0; }
+.pbf-cat-link { color:${MUTED}; font-size:0.85rem; text-decoration:none; padding-bottom:6px; border-bottom:2px solid transparent; white-space:nowrap; transition:color 0.2s ease, border-color 0.2s ease; }
+.pbf-cat-link.active { color:${INK}; border-bottom-color:${SAGE}; font-weight:600; }
+
+/* Hero — marquee (ticker + clean image-free headline) */
+.pbf-marquee-wrap { overflow:hidden; border-top:1px solid ${BORDER}; border-bottom:1px solid ${BORDER}; padding:12px 0; background:${BG_ALT}; }
+.pbf-marquee-track { display:flex; gap:3rem; width:max-content; animation:pbfMarquee 22s linear infinite; }
+.pbf-marquee-track span { font-size:0.78rem; letter-spacing:0.14em; text-transform:uppercase; color:${SAGE_DARK}; white-space:nowrap; }
+.pbf-hero { padding:5rem 0 4rem; text-align:center; }
+.pbf-hero-title { font-size:clamp(2.2rem, 6vw, 4.4rem); line-height:1.1; margin:0 auto 1.25rem; max-width:820px; font-weight:600; animation:pbfFadeUp 0.7s ease 0.1s both; }
+.pbf-hero-sub { font-size:clamp(1rem, 1.6vw, 1.15rem); color:${MUTED}; max-width:560px; margin:0 auto 2rem; animation:pbfFadeUp 0.7s ease 0.25s both; }
+.pbf-hero-cta-row { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; animation:pbfFadeUp 0.7s ease 0.4s both; }
+
+.pbf-btn-primary { background:${SAGE_DARK}; color:#fff; border:none; padding:14px 32px; font-weight:600; letter-spacing:0.02em; border-radius:2px; cursor:pointer; transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease; min-height:48px; }
+.pbf-btn-primary:hover { transform:translateY(-2px); box-shadow:0 10px 24px rgba(95,107,74,0.25); background:${SAGE}; }
+.pbf-btn-primary:active { transform:translateY(0) scale(0.97); }
+.pbf-btn-primary:disabled { opacity:0.55; cursor:not-allowed; transform:none; }
+.pbf-btn-outline { background:transparent; color:${INK}; border:1px solid ${BORDER}; padding:14px 32px; font-weight:500; letter-spacing:0.02em; border-radius:2px; cursor:pointer; transition:all 0.2s ease; min-height:48px; }
+.pbf-btn-outline:hover { border-color:${SAGE_DARK}; color:${SAGE_DARK}; }
+
+.pbf-trust-bar { display:grid; grid-template-columns:1fr; gap:1.5rem; padding:2.5rem 0; border-top:1px solid ${BORDER}; border-bottom:1px solid ${BORDER}; }
+@media (min-width:768px) { .pbf-trust-bar { grid-template-columns:repeat(4,1fr); } }
+.pbf-trust-item { text-align:center; }
+.pbf-trust-item strong { display:block; color:${SAGE_DARK}; font-size:0.95rem; margin-bottom:4px; }
+.pbf-trust-item span { color:${MUTED}; font-size:0.8rem; }
+
+.pbf-input-field { width:100%; background:#fff; border:1px solid ${BORDER}; color:${INK}; padding:12px 14px; border-radius:4px; font-size:0.9rem; min-height:44px; transition:border-color 0.2s, box-shadow 0.2s; }
+.pbf-input-field:focus { border-color:${SAGE_DARK}; box-shadow:0 0 0 3px rgba(95,107,74,0.12); outline:none; }
+.pbf-input-field:disabled { opacity:0.5; }
+.pbf-label { display:block; font-size:0.78rem; color:${MUTED}; margin-bottom:6px; letter-spacing:0.02em; }
+
+.pbf-skeleton { background:linear-gradient(90deg, #ece7db 25%, #f5f1e8 50%, #ece7db 75%); background-size:400px 100%; animation:pbfShimmer 1.4s infinite linear; border-radius:4px; }
+
+@keyframes pbfFadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+@keyframes pbfShimmer { 0% { background-position:-400px 0; } 100% { background-position:400px 0; } }
+@keyframes pbfMarquee { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+
+.pbf-fade-page { transition:opacity 0.3s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pbf-root * { animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+}
+`;
+
+/* ============================== MAIN ============================== */
 
 export default function Main({ store, children, domain }: any) {
+  const t = T[getLang(store)];
   const pathname = usePathname();
+  const [visible, setVisible] = useState(false);
+
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
-    return (
-        <div style={{ minHeight: '100vh', padding: '0', fontFamily: "'Cairo',sans-serif" }}>
-            <style>{CSS}</style>
-            <div className="main-card">
-                <Navbar store={store} domain={domain} />
-                <main>{children}</main>
-                <Footer store={store} />
-            </div>
-        </div>
-    );
+  useEffect(() => {
+    setVisible(false);
+    const tm = setTimeout(() => setVisible(true), 50);
+    return () => clearTimeout(tm);
+  }, [pathname]);
+
+  return (
+    <div className={`pbf-root ${t.dir === 'rtl' ? 'lang-ar' : 'lang-ltr'}`} dir={t.dir}>
+      <style dangerouslySetInnerHTML={{ __html: THEME_CSS }} />
+      <Navbar store={store} domain={domain} />
+      <main className="pbf-fade-page" style={{ opacity: visible ? 1 : 0 }}>{children}</main>
+      <Footer store={store} />
+    </div>
+  );
 }
 
-/* ══════════════════════════════════════════════════════════════
-   NAVBAR
-══════════════════════════════════════════════════════════════ */
+/* ============================== NAVBAR ============================== */
+// NAVBAR ARCHETYPE: D — Full-width Logo Strip
 
-export function Navbar({ store, domain }: { store: any; domain: string }) {
-    const [open, setOpen] = useState(false);
-    const [sq, setSq] = useState('');
-    const [ls, setLs] = useState<any[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [showS, setShowS] = useState(false);
-    const router = useRouter();
+export function Navbar({ store, domain }: any) {
+  const t = T[getLang(store)];
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [listSearch, setListSearch] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const debounceRef = useRef<any>(null);
 
-    const count = useCartStore(s => s.count);
-    const initCount = useCartStore(s => s.initCount);
+  const count = useCartStore((s: any) => s.count);
+  const initCount = useCartStore((s: any) => s.initCount);
 
-    useEffect(() => {
-        if (typeof window !== 'undefined' && domain) {
-            try { initCount(JSON.parse(localStorage.getItem(domain) || '[]').length); } catch { initCount(0); }
-        }
-    }, [domain, initCount]);
+  useEffect(() => {
+    try {
+      const arr = JSON.parse(localStorage.getItem(domain) || '[]');
+      initCount(arr.length);
+    } catch { initCount(0); }
+  }, [domain, initCount]);
 
-    useEffect(() => {
-        if (sq.length < 2) { setLs([]); return; }
-        const t = setTimeout(async () => {
-            setLoading(true);
-            try {
-                const { data } = await axios.get(`${API_URL}/products/public/${domain}`, { params: { search: sq } });
-                setLs(data.products || []);
-            }
-            catch { } finally { setLoading(false); }
-        }, 380);
-        return () => clearTimeout(t);
-    }, [sq, domain]);
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (searchQuery.trim().length < 2) { setListSearch([]); return; }
+    setLoading(true);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`${API_URL}/products/public/${domain}?search=${encodeURIComponent(searchQuery)}`);
+        const data = await res.json();
+        setListSearch(Array.isArray(data?.products) ? data.products : Array.isArray(data) ? data : []);
+      } catch { setListSearch([]); }
+      setLoading(false);
+    }, 380);
+    return () => clearTimeout(debounceRef.current);
+  }, [searchQuery, domain]);
 
-    const doSearch = (e?: React.FormEvent) => {
-        if (e) e.preventDefault();
-        if (sq.trim()) {
-            router.push(`/?search=${encodeURIComponent(sq)}`);
-            setSq('');
-            setShowS(false);
-        }
-    };
+  const mobileLinks = [
+    { h: '/', l: t.home },
+    { h: '/contact', l: t.contact },
+  ];
 
-    return (
-        <>
-        {store?.topBar?.enabled && store?.topBar?.text && (
-          <div style={{ background: '#6B8F6B', color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
-            {store.topBar.text}
+  const logoUrl = store?.design?.logoUrl;
+
+  const SearchResultRow = ({ p }: { p: Product }) => (
+    <Link href={`/product/${p.slug || p.id}`} onClick={() => { setShowSearch(false); setSearchFocused(false); }}
+      style={{ display: 'flex', gap: 12, padding: '10px 14px', alignItems: 'center', textDecoration: 'none', borderBottom: `1px solid ${BORDER}` }}>
+      <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} alt={p.name}
+        style={{ width: 46, height: 46, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />
+      <div style={{ minWidth: 0 }}>
+        <p style={{ fontSize: '0.85rem', fontWeight: 600, margin: 0, color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</p>
+        <p style={{ fontSize: '0.78rem', color: SAGE_DARK, margin: 0, fontWeight: 700 }}>
+          {Number(p.price).toLocaleString()} {store?.currency}
+        </p>
+      </div>
+    </Link>
+  );
+
+  return (
+    <>
+      {/* Top bar — large centered logo */}
+      <div className="pbf-nav-top">
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+          {logoUrl && !imgError ? (
+            <img src={logoUrl} alt={store?.name} onError={() => setImgError(true)}
+              style={{ height: 46, width: 'auto', objectFit: 'contain' }} />
+          ) : (
+            <span className="pbf-display" style={{ color: INK, fontSize: '1.8rem', fontWeight: 600, letterSpacing: '0.02em', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Leaf size={22} color={SAGE_DARK} /> {store?.name || 'Pure Botanical'}
+            </span>
+          )}
+        </Link>
+      </div>
+
+      {/* Bottom bar — links + search + cart, sticky */}
+      <div className="pbf-nav-bottom">
+        <div className="pbf-container pbf-nav-bottom-inner">
+          <nav className="pbf-nav-links">
+            <Link href="/" className={pathname === '/' ? 'active' : ''}>{t.home}</Link>
+            <Link href="/contact" className={pathname === '/contact' ? 'active' : ''}>{t.contact}</Link>
+          </nav>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div className="pbf-desktop-search">
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
+                placeholder={t.search}
+                style={{ width: searchFocused ? 240 : 170, transition: 'width 0.3s ease', background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 999, padding: '8px 14px', color: INK, fontSize: '0.8rem' }}
+              />
+              {listSearch.length > 0 && searchFocused && (
+                <div className="pbf-search-dropdown">
+                  {loading && <p style={{ padding: '1rem', textAlign: 'center', color: MUTED, fontSize: '0.8rem' }}>{t.searching}</p>}
+                  {listSearch.map((p) => <SearchResultRow key={p.id} p={p} />)}
+                  <Link href={`/?search=${searchQuery}`} onClick={() => setSearchFocused(false)}
+                    style={{ display: 'block', padding: '10px 16px', fontSize: '0.8rem', textAlign: 'center', color: SAGE_DARK, textDecoration: 'none' }}>
+                    {t.showAll}
+                  </Link>
+                </div>
+              )}
+            </div>
+            <button onClick={() => setShowSearch(true)} aria-label={t.search} className="pbf-mobile-search-btn"
+              style={{ background: 'none', border: 'none', color: INK, cursor: 'pointer', display: 'flex' }}>
+              <Search size={19} />
+            </button>
+
+            {store?.cart !== false && (
+              <Link href="/cart" style={{ position: 'relative', color: INK, display: 'flex' }}>
+                <ShoppingBag size={19} />
+                {count > 0 && (
+                  <span style={{ position: 'absolute', top: -8, insetInlineEnd: -8, background: SAGE_DARK, color: '#fff', fontSize: '0.65rem', fontWeight: 700, borderRadius: '50%', width: 17, height: 17, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {count}
+                  </span>
+                )}
+              </Link>
+            )}
+
+            <button className="pbf-nav-burger" onClick={() => setOpen(true)} aria-label="menu"
+              style={{ background: 'none', border: 'none', color: INK, cursor: 'pointer' }}>
+              <Menu size={20} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile menu overlay */}
+      {open && (
+        <div className="pbf-mobile-overlay" onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', padding: 18 }}>
+            <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: INK, cursor: 'pointer' }}>
+              <X size={26} />
+            </button>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 26, marginTop: 40 }}>
+            {mobileLinks.map((lnk) => (
+              <Link key={lnk.h} href={lnk.h} onClick={() => setOpen(false)}
+                style={{ color: INK, fontSize: '1.3rem', textDecoration: 'none' }}>
+                {lnk.l}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile search full-screen overlay */}
+      {showSearch && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 600, background: BG, display: 'flex', flexDirection: 'column' }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowSearch(false); }}>
+          <div style={{ background: '#fff', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10, borderBottom: `1px solid ${BORDER}` }}>
+            <Search size={20} color={MUTED} />
+            <input autoFocus value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t.search}
+              style={{ flex: 1, border: 'none', outline: 'none', fontSize: '1rem', background: 'transparent', color: INK }} />
+            <button onClick={() => { setShowSearch(false); setSearchQuery(''); setListSearch([]); }}
+              style={{ background: 'none', border: 'none', color: INK, cursor: 'pointer' }}>
+              <X size={22} />
+            </button>
+          </div>
+          <div style={{ flex: 1, overflowY: 'auto', background: BG }}>
+            {loading && <p style={{ padding: '1rem', textAlign: 'center', color: MUTED }}>{t.searching}</p>}
+            {listSearch.map((p) => <SearchResultRow key={p.id} p={p} />)}
+            {listSearch.length > 0 && (
+              <Link href={`/?search=${searchQuery}`} onClick={() => setShowSearch(false)}
+                style={{ display: 'block', padding: '14px', textAlign: 'center', background: '#fff', fontWeight: 600, color: SAGE_DARK, textDecoration: 'none' }}>
+                {t.showAll}
+              </Link>
+            )}
+            {searchQuery.length >= 2 && !loading && listSearch.length === 0 && (
+              <p style={{ padding: '2rem', textAlign: 'center', color: MUTED }}>{t.noResults}</p>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ============================== FOOTER ============================== */
+
+export function Footer({ store }: any) {
+  const t = T[getLang(store)];
+  const year = new Date().getFullYear();
+
+  const links = [
+    { h: '/', l: t.home },
+    { h: '/cart', l: t.cart },
+    { h: '/contact', l: t.contactUs },
+    { h: '/privacy', l: t.privacy },
+    { h: '/terms', l: t.terms },
+  ].filter((lnk) => lnk.h !== '/cart' || store?.cart !== false);
+
+  return (
+    <footer style={{ background: BG_ALT, borderTop: `1px solid ${BORDER}`, padding: '3.5rem 0 1.75rem' }}>
+      <div className="pbf-container">
+        <div className="pbf-footer-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
+          <div>
+            <h3 className="pbf-display" style={{ color: INK, fontSize: '1.4rem', margin: '0 0 10px', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Leaf size={18} color={SAGE_DARK} /> {store?.name || 'Pure Botanical'}
+            </h3>
+            <p style={{ color: MUTED, fontSize: '0.85rem', maxWidth: 320, lineHeight: 1.7 }}>{store?.hero?.subtitle}</p>
+          </div>
+          <div>
+            <h4 style={{ color: INK, fontSize: '0.9rem', marginBottom: 14, letterSpacing: '0.03em', textTransform: 'uppercase' }}>{t.quickLinks}</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {links.map((lnk) => (
+                <Link key={lnk.h} href={lnk.h} style={{ color: MUTED, fontSize: '0.85rem', textDecoration: 'none' }}>{lnk.l}</Link>
+              ))}
+            </div>
+          </div>
+          <div>
+            <h4 style={{ color: INK, fontSize: '0.9rem', marginBottom: 14, letterSpacing: '0.03em', textTransform: 'uppercase' }}>{t.contactUs}</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {store?.contact?.phone && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: MUTED, fontSize: '0.85rem' }}>
+                  <Phone size={14} /> {store.contact.phone}
+                </span>
+              )}
+              {store?.contact?.email && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: MUTED, fontSize: '0.85rem' }}>
+                  <Mail size={14} /> {store.contact.email}
+                </span>
+              )}
+              {store?.contact?.address && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: MUTED, fontSize: '0.85rem' }}>
+                  <MapPin size={14} /> {store.contact.wilaya ? `${store.contact.wilaya}, ` : ''}{store.contact.address}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+        <p style={{ textAlign: 'center', color: MUTED, fontSize: '0.75rem', borderTop: `1px solid ${BORDER}`, paddingTop: 20, marginTop: 32 }}>
+          © {year} {store?.name || 'Pure Botanical'} — {t.rightsReserved}
+        </p>
+      </div>
+      <style dangerouslySetInnerHTML={{ __html: `@media (min-width:768px){ .pbf-footer-grid{ grid-template-columns: 1.4fr 1fr 1fr; } }` }} />
+    </footer>
+  );
+}
+
+/* ============================== CARD ============================== */
+// CARD ARCHETYPE: 5 — Framed Label
+
+export function Card({ product, displayImage, discount, store, viewDetails }: any) {
+  const t = T[getLang(store)];
+  const [imgErr, setImgErr] = useState(false);
+  const img = displayImage || product?.productImage || product?.imagesProduct?.[0]?.imageUrl;
+  const price = Number(product?.price || 0).toLocaleString();
+  const priceOriginal = product?.priceOriginal ? Number(product.priceOriginal).toLocaleString() : null;
+
+  return (
+    <Link href={`/product/${product.slug || product.id}`} className="pbf-card" style={{ textDecoration: 'none', display: 'block' }}
+      onClick={() => viewDetails?.(product)}>
+      <div className="pbf-card-eyebrow">{product?.store?.name || t.all}</div>
+      <div className="pbf-card-img-wrap">
+        {img && !imgErr ? (
+          <img src={img} alt={product.name} onError={() => setImgErr(true)} className="pbf-card-img" />
+        ) : (
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: BG_ALT }}>
+            <Leaf size={36} color={BORDER} />
           </div>
         )}
-        <nav dir="rtl" style={{ background: 'var(--white)', borderBottom: '1px solid var(--line)', padding: '0 20px', position: 'sticky', top: 0, zIndex: 100 }}>
-            <div style={{maxWidth: 1080 , margin: 'auto'}}>
-                {/* الشريط العلوي الرئيسي */}
-                <div style={{ height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        {/* زر القائمة - Mobile فقط */}
-                        <button onClick={() => { setOpen(!open); setShowS(false); }} className="nav-burger" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--char)', padding: '8px' }}>
-                            {open ? <X style={{ width: '20px', height: '20px' }} /> : <Menu style={{ width: '20px', height: '20px' }} />}
-                        </button>
-
-                        {/* أيقونة البحث وتفعيل الشريط */}
-                        <button onClick={() => { setShowS(!showS); setOpen(false); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--char)', display: 'flex', padding: '8px' }}>
-                            {showS ? <X style={{ width: '20px', height: '20px' }} /> : <Search style={{ width: '20px', height: '20px' }} />}
-                        </button>
-                    </div>
-
-                    {/* روابط التنقل - Desktop فقط */}
-                    <div className="nav-links">
-                        <Link href="/" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--sage)', borderBottom: '2px solid var(--sage)', paddingBottom: '4px' }}>الرئيسية</Link>
-                        <Link href="/contact" style={{ fontSize: '13px', fontWeight: 500, color: 'var(--char)' }}>تواصل معنا</Link>
-                    </div>
-
-                    {/* اللوغو وسلة المشتريات */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <Link href="/" style={{ display: 'flex', alignItems: 'center' }}>
-                            {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
-                                ? <img src={store.design.logoUrl} alt={store?.name} style={{ height: '35px', width: 'auto' }} />
-                                : <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--char)' }}>{store?.name || 'عبير الطبيعة'}</span>
-                            }
-                        </Link>
-
-                        {store?.cart !== false && (
-                        <Link href="/cart" style={{ position: 'relative', color: 'var(--char)', display: 'flex', padding: '6px' }}>
-                            <ShoppingBag style={{ width: '20px', height: '20px' }} />
-                            {count > 0 && (
-                                <span style={{ position: 'absolute', top: 0, right: 0, width: '17px', height: '17px', background: 'var(--sage)', color: 'var(--white)', fontSize: '10px', fontWeight: 700, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-                                    {count}
-                                </span>
-                            )}
-                        </Link>
-                        )}
-                    </div>
-                </div>
-
-                {/* القائمة المنسدلة - Mobile فقط */}
-                {open && (
-                    <div style={{ padding: '8px 0 16px', borderTop: '1px solid var(--line)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <Link href="/" onClick={() => setOpen(false)} style={{ fontSize: '14px', fontWeight: 600, color: 'var(--char)', padding: '10px 4px' }}>الرئيسية</Link>
-                        <Link href="/contact" onClick={() => setOpen(false)} style={{ fontSize: '14px', fontWeight: 600, color: 'var(--char)', padding: '10px 4px' }}>تواصل معنا</Link>
-                    </div>
-                )}
-
-                {/* شريط البحث المنسدل عند الضغط على الأيقونة */}
-                {showS && (
-                    <div style={{ padding: '12px 0', borderTop: '1px solid var(--line)', position: 'relative' }}>
-                        <form onSubmit={doSearch}>
-                            <div style={{ position: 'relative', maxWidth: '600px', margin: '0 auto' }}>
-                                <Search style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: 'var(--mist)' }} />
-                                <input
-                                    autoFocus
-                                    type="text"
-                                    placeholder="ابحث عن عطر أو منتج..."
-                                    value={sq}
-                                    onChange={e => setSq(e.target.value)}
-                                    style={{
-                                        width: '100%',
-                                        padding: '10px 40px 10px 15px',
-                                        borderRadius: '8px',
-                                        border: '1px solid var(--line)',
-                                        background: 'var(--sage-lt)',
-                                        fontSize: '14px',
-                                        outline: 'none'
-                                    }}
-                                />
-                            </div>
-                        </form>
-
-                        {/* قائمة النتائج (Drop) - خلفية بيضاء صلبة */}
-                        {sq.length >= 2 && (
-                            <div style={{
-                                position: 'absolute',
-                                top: '100%',
-                                right: 0,
-                                left: 0,
-                                background: '#FFFFFF',
-                                border: '1px solid var(--line)',
-                                borderRadius: '0 0 12px 12px',
-                                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                                zIndex: 200,
-                                overflow: 'hidden',
-                                maxWidth: '600px',
-                                margin: '0 auto',
-                                paddingTop: 25
-                            }}>
-                                <button onClick={() => setSq('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
-                                    <X style={{ width: '14px', height: '14px' }} />
-                                </button>
-                                {loading ? (
-                                    <div style={{ padding: '1.5rem', textAlign: 'center', fontSize: '13px', color: 'var(--sage)', fontWeight: 600 }}>جاري البحث...</div>
-                                ) : ls.length > 0 ? (
-                                    <>
-                                        <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
-                                            {ls.map((p: any) => (
-                                                <Link href={`/product/${p.id}`} key={p.id} onClick={() => { setSq(''); setShowS(false); }}
-                                                    style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderBottom: '1px solid var(--line)', transition: 'background 0.2s' }}
-                                                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f9f9f9'; }}
-                                                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
-
-                                                    <div style={{ width: 48, height: 48, flexShrink: 0, overflow: 'hidden', borderRadius: '6px', background: 'var(--cream)', border: '1px solid var(--line)' }}>
-                                                        <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
-                                                    </div>
-
-                                                    <div style={{ flex: 1 }}>
-                                                        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--char)' }}>{p.name}</div>
-                                                        <div style={{ fontSize: '14px', color: 'var(--sage)', fontWeight: 700, marginTop: '2px' }}>{p.price} دج</div>
-                                                    </div>
-                                                    <ArrowLeft size={14} style={{ color: 'var(--mist)' }} />
-                                                </Link>
-                                            ))}
-                                        </div>
-
-                                        {/* زر عرض كل النتائج */}
-                                        <button
-                                            onClick={doSearch}
-                                            style={{
-                                                width: '100%',
-                                                padding: '12px',
-                                                background: 'var(--sage)',
-                                                color: 'white',
-                                                border: 'none',
-                                                fontSize: '12px',
-                                                fontWeight: 700,
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                gap: '8px'
-                                            }}
-                                        >
-                                            عرض جميع النتائج لـ "{sq}"
-                                        </button>
-                                    </>
-                                ) : (
-                                    <div style={{ padding: '1.5rem', textAlign: 'center', fontSize: '13px', color: 'var(--mist)' }}>لا توجد نتائج مطابقة</div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
-        </nav>
-        </>
-    );
-}
-
-/* ══════════════════════════════════════════════════════════════
-   FOOTER — sage green, 3 sections + صنع في الجزائر
-══════════════════════════════════════════════════════════════ */
-export function Footer({ store }: any) {
-    const yr = new Date().getFullYear();
-    return (
-        <footer dir="rtl" style={{ background: 'var(--sage)', fontFamily: "'Cairo',sans-serif", marginTop: '0' }}>
-            <div style={{ padding: '40px 24px 24px' , maxWidth:1080, margin: 'auto' }}>
-                <div className="footer-g">
-                    {/* قسم 1 — صنع في الجزائر */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '16px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                            {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
-                                ? <img src={store.design.logoUrl} alt={store?.name} style={{ height: '28px', filter: 'brightness(0) invert(1)', opacity: 0.8 }} />
-                                : <span style={{ fontSize: '1rem', fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>{store?.name}</span>
-                            }
-                        </div>
-                        {/* صنع في الجزائر badge */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.15)', borderRadius: '10px', padding: '10px 14px' }}>
-                            <span style={{ fontSize: '1.6rem' }}>🇩🇿</span>
-                            <div>
-                                <p style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.9)', margin: 0, lineHeight: 1.2 }}>صنع في</p>
-                                <p style={{ fontSize: '14px', fontWeight: 700, color: 'white', margin: 0, lineHeight: 1.2 }}>الجزائر</p>
-                            </div>
-                        </div>
-                        {/* Social icons */}
-                        <div style={{ display: 'flex', gap: '10px' }}>
-                            {['📷', '👥', '🐦', '💼', '🎵'].map((icon, i) => (
-                                <a key={i} href="#" style={{ width: 34, height: 34, background: 'rgba(255,255,255,0.2)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', transition: 'background 0.2s' }}
-                                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.35)'; }}
-                                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.2)'; }}>
-                                    {icon}
-                                </a>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* قسم 2 — روابط */}
-                    <div>
-                        <p style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.6)', marginBottom: '16px', textTransform: 'uppercase' }}>المنتجات</p>
-                        {[{ h: '/', l: 'المنجدية الطبيعة' }, { h: '/Privacy', l: 'Privacy Policy' }, { h: '/contact', l: 'صفحة الجزائرية' }, { h: '/Terms', l: 'تسبة الشباك رباية الهواية' }].map(lnk => (
-                            <a key={lnk.h} href={lnk.h} style={{ display: 'block', fontSize: '12px', color: 'rgba(255,255,255,0.7)', marginBottom: '10px', transition: 'color 0.2s' }}
-                                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'white'; }}
-                                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)'; }}>
-                                {lnk.l}
-                            </a>
-                        ))}
-                    </div>
-
-                    {/* قسم 3 — تواصل */}
-                    <div>
-                        <p style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.6)', marginBottom: '16px', textTransform: 'uppercase' }}>تواصل</p>
-                        {[
-                            { val: store?.contact?.phone },
-                            { val: store?.contact?.email },
-                            { val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
-                        ].filter(r => r.val).map((item, i) => (
-                            <p key={i} style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', marginBottom: '8px' }}>{item.val}</p>
-                        ))}
-                    </div>
-                </div>
-
-                <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', textAlign: 'center' }}>
-                        © Privacy Policy عمور الطوابر الحقوق المحفوظة {yr}
-                    </p>
-                </div>
-            </div>
-        </footer>
-    );
-}
-
-/* ══════════════════════════════════════════════════════════════
-   CARD — with "أضف إلى السلة" button
-══════════════════════════════════════════════════════════════ */
-export function Card({ product, displayImage, discount, domain, userId }: any) {
-    const [added, setAdded] = useState(false);
-    const [isAdding, setIsAdding] = useState(false);
-    const initCount = useCartStore(s => s.initCount);
-    const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
-    const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
-
-    const addToCart = (e: React.MouseEvent) => {
-        e.preventDefault(); e.stopPropagation();
-        setIsAdding(true);
-        setTimeout(() => {
-            const cart = JSON.parse(localStorage.getItem(domain) || '[]');
-            const exists = cart.findIndex((i: any) => i.productId === product.id);
-            if (exists >= 0) cart[exists].quantity++;
-            else cart.push({ productId: product.id, storeId: product.store.id, userId, product, finalPrice: price, quantity: 1, addedAt: Date.now() });
-            localStorage.setItem(domain, JSON.stringify(cart));
-            initCount(cart.length);
-            setIsAdding(false);
-            setAdded(true);
-            setTimeout(() => setAdded(false), 2000);
-        }, 300);
-    };
-
-    return (
-        <div className="p-card" style={{ display: 'block' }}>
-            <div className="c-img" style={{ position: 'relative', aspectRatio: '1/1', overflow: 'hidden', background: 'var(--cream)' }}>
-                {displayImage
-                    ? <img src={displayImage} alt={product.name} />
-                    : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,var(--sage-lt),var(--cream)' }}>
-                        <Droplets style={{ width: '36px', height: '36px', color: 'var(--sage)', opacity: 0.5 }} />
-                    </div>
-                }
-                {discount > 0 && (
-                    <div style={{ position: 'absolute', top: 8, right: 8, background: 'var(--sage)', color: 'var(--white)', fontSize: '10px', fontWeight: 600, padding: '3px 8px', borderRadius: '6px' }}>
-                        −{discount}%
-                    </div>
-                )}
-            </div>
-            <div style={{ padding: '10px 10px 12px' }}>
-                <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--char)', marginBottom: '3px', lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any, overflow: 'hidden' }}>
-                    {product.name}
-                </h3>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--char)' }}>{price.toLocaleString()} د.ج</span>
-                    {orig > price && <span style={{ fontSize: '11px', color: 'var(--mist)', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
-                </div>
-                < Link href={`/product/${product.slug || product.id}`}
-                    style={{
-                        width: '100%', padding: '8px 12px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 700, fontFamily: "'Cairo',sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'all 0.3s',
-                        background: added ? 'rgba(107,143,107,0.12)' : 'var(--sage)', color: added ? 'var(--sage)' : 'var(--white)',
-                        boxShadow: added ? 'none' : '0 2px 8px rgba(107,143,107,0.3)'
-                    }}>
-                    شاهد
-                </Link>
-            </div>
+      </div>
+      <div className="pbf-card-body">
+        <div className="pbf-card-stars">
+          {[1, 2, 3, 4, 5].map((i) => <Star key={i} size={11} fill={SAGE_DARK} color={SAGE_DARK} />)}
         </div>
-    );
+        <p className="pbf-card-name">{product.name}</p>
+        <div className="pbf-card-price-row">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span className="pbf-card-price">{price} {store?.currency}</span>
+            {priceOriginal && <span className="pbf-card-price-old">{priceOriginal} {store?.currency}</span>}
+          </div>
+          {discount > 0 && <span className="pbf-card-badge">-{discount}%</span>}
+        </div>
+      </div>
+    </Link>
+  );
 }
 
-/* ══════════════════════════════════════════════════════════════
-   HOME
-══════════════════════════════════════════════════════════════ */
+/* ============================== HOME ============================== */
+
 export function Home({ store, page }: any) {
-    useScrollReveal();
-    const products: any[] = store.products || [];
-    const cats: any[] = store.categories || [];
-    if (!page) page = 1;
-    const countPage = Math.ceil((store.count || products.length) / 48);
-    const searchParams = useSearchParams();
-    const activeCategory = searchParams.get('category');
+  const t = T[getLang(store)];
+  const searchParams = useSearchParams();
+  const activeCategory = searchParams.get('category');
+  const searchQ = searchParams.get('search');
+  const products: Product[] = store?.products || [];
+  const cats = store?.categories || [];
+  const [loading] = useState(false);
 
-    const [hoveredId, setHoveredId] = useState(null);
+  const countPage = Math.max(1, Math.ceil((store?.count || products.length || 0) / 48));
+  const currentPage = Number(page) || 1;
 
-    /* Default fragrance categories if none from store (decorative only) */
-    const fragranceCats = [
-        { id: 'floral', name: 'زهري', icon: <IconFloral /> },
-        { id: 'wood', name: 'خشبي', icon: <IconWood /> },
-        { id: 'citrus', name: 'حمضي', icon: <IconCitrus /> },
-        { id: 'spray', name: 'رذاذ عضوي', icon: <IconSpray /> },
-    ];
-    const hasRealCats = cats.length > 0;
-    const displayCats = hasRealCats
-        ? cats.slice(0, 8).map((c: any, i: number) => ({ ...c, icon: fragranceCats[i % 4].icon }))
-        : fragranceCats;
+  const tickerItems = [t.trust[0].t, t.trust[1].t, t.trust[2].t, t.trust[3].t];
 
-    return (
-        <div dir="rtl" style={{ maxWidth: 1080, margin: 'auto' }}>
-            {/* ── HERO ── */}
-            <section style={{ position: 'relative', background: 'var(--cream)', overflow: 'hidden', minHeight: '260px' }}>
-                {store.hero?.imageUrl && (
-                    <img src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                )}
-                {!store.hero?.imageUrl && (
-                    /* Decorative background if no image */
-                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg,var(--sage-lt) 0%,var(--cream) 50%,#E8F4E8 100%)' }} />
-                )}
-                {/* Overlay for text readability */}
-                {store.hero?.imageUrl && (
-                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to left,rgba(45,58,45,0.5) 30%,rgba(45,58,45,0.1) 70%,transparent 100%)' }} />
-                )}
-
-                <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: '260px', padding: '32px 24px' }}>
-                    <div style={{ textAlign: 'right', maxWidth: '280px' }}>
-                        <h1 className="fu" style={{ fontSize: 'clamp(1.6rem,5vw,2.4rem)', fontWeight: 700, color: store.hero?.imageUrl ? 'white' : 'var(--char)', lineHeight: 1.2, marginBottom: '10px' }}>
-                            {store.hero?.title || 'سحر الطبيعة في\nكل قطرة'}
-                        </h1>
-                        <p className="fu fu1" style={{ fontSize: '13px', color: store.hero?.imageUrl ? 'rgba(255,255,255,0.85)' : 'var(--mid)', marginBottom: '20px', lineHeight: 1.6 }}>
-                            {store.hero?.subtitle || 'عطور عضوية مستوحاة من جمال الزهور'}
-                        </p>
-                        <a href="#products" className="fu fu2 btn-sage" style={{ padding: '11px 24px', fontSize: '13px', borderRadius: '8px', display: 'inline-flex', boxShadow: '0 4px 12px rgba(107,143,107,0.3)' }}>
-                            تسوق الآن
-                        </a>
-                    </div>
-                </div>
-            </section>
-
-            {/* ── CATEGORY CIRCLES — "الفئات" ── */}
-            <section style={{ padding: '32px 20px', background: 'var(--white)' }}>
-                <h2 className="sr" style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--char)', textAlign: 'center', marginBottom: '24px' }}>الفئات</h2>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 15, justifyItems: 'center', justifyContent: 'center' }}>
-                    {hasRealCats && (
-                        <Link href="?" style={{ background: 'none', border: 'none', textDecoration: 'none' }}>
-                            <span style={{
-                                fontSize: '12px', fontWeight: 600,
-                                color: !activeCategory ? 'var(--white)' : 'var(--char)',
-                                backgroundColor: !activeCategory ? 'var(--sage)' : 'transparent',
-                                textAlign: 'center', lineHeight: 1.3, border: '1px solid var(--sage)',
-                                padding: '8px 20px', borderRadius: '20px', transition: 'all 0.3s ease', display: 'inline-block'
-                            }}>
-                                الكل
-                            </span>
-                        </Link>
-                    )}
-                    {displayCats.map((cat, i) => {
-                        const isActive = hasRealCats && activeCategory === String(cat.id);
-                        const Tag: any = hasRealCats ? Link : 'button';
-                        const tagProps: any = hasRealCats
-                            ? { href: `?category=${cat.id}` }
-                            : { type: 'button', style: { background: 'none', border: 'none', cursor: 'default' } };
-                        return (
-                            <Tag
-                                key={cat.id || i}
-                                {...tagProps}
-                                onMouseEnter={() => setHoveredId(cat.id)}
-                                onMouseLeave={() => setHoveredId(null)}
-                                style={{ background: 'none', border: 'none', textDecoration: 'none', ...(tagProps.style || {}) }}
-                            >
-                                <span style={{
-                                    fontSize: '12px',
-                                    fontWeight: 600,
-                                    color: isActive || hoveredId === cat.id ? 'var(--white)' : 'var(--char)',
-                                    backgroundColor: isActive || hoveredId === cat.id ? 'var(--sage)' : 'transparent',
-                                    textAlign: 'center',
-                                    lineHeight: 1.3,
-                                    border: "1px solid var(--sage)",
-                                    padding: '8px 20px',
-                                    borderRadius: '20px',
-                                    transition: 'all 0.3s ease',
-                                    display: 'inline-block'
-                                }}>
-                                    {cat.name}
-                                </span>
-                            </Tag>
-                        );
-                    })}
-                </div>
-            </section>
-
-            {/* ── PRODUCTS — "أمستجات" ── */}
-            <section id="products" style={{ padding: '8px 16px 32px', background: 'var(--white)' }}>
-                <h2 className="sr" style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--char)', textAlign: 'center', marginBottom: '20px' }}>أمستجات</h2>
-
-                {products.length === 0 ? (
-                    <div style={{ padding: '60px 0', textAlign: 'center' }}>
-                        <Droplets style={{ width: '48px', height: '48px', color: 'var(--sage)', opacity: 0.3, display: 'block', margin: '0 auto 12px' }} />
-                        <p style={{ color: 'var(--mist)', fontSize: '14px' }}>لا توجد منتجات بعد</p>
-                    </div>
-                ) : (
-                    <div className="prod-grid">
-                        {products.map((p: any, i: number) => {
-                            const img = p.productImage || p.imagesProduct?.[0]?.imageUrl;
-                            const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
-                            return (
-                                <div key={p.id} className="sr" style={{ transitionDelay: `${(i % 4) * 0.06}s` }}>
-                                    <Card product={p} displayImage={img} discount={disc} domain={store?.subdomain || ''} userId={p.store?.userId} />
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-
-                {/* Pagination */}
-                {countPage > 1 && (
-                    <div className="pagination" dir="rtl">
-                        <Link href={{ query: { page: Math.max(1, page - 1) } }} scroll={false}
-                            style={{ width: 36, height: 36, borderRadius: '8px', border: '1.5px solid var(--line-2)', background: 'var(--white)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--sage)', opacity: page <= 1 ? 0.3 : 1 }}>‹</Link>
-                        {Array.from({ length: countPage }).map((_, i) => {
-                            const pn = i + 1; const isA = Number(page) === pn;
-                            return (
-                                <Link key={pn} href={{ query: { page: pn } }} scroll={false}
-                                    style={{ width: 36, height: 36, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: isA ? 700 : 400, border: `1.5px solid ${isA ? 'var(--sage)' : 'var(--line-2)'}`, background: isA ? 'var(--sage)' : 'var(--white)', color: isA ? 'var(--white)' : 'var(--mid)' }}>
-                                    {pn}
-                                </Link>
-                            );
-                        })}
-                        <Link href={{ query: { page: Math.min(countPage, Number(page) + 1) } }} scroll={false}
-                            style={{ width: 36, height: 36, borderRadius: '8px', border: '1.5px solid var(--line-2)', background: 'var(--white)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--sage)', opacity: page >= countPage ? 0.3 : 1 }}>›</Link>
-                    </div>
-                )}
-            </section>
+  return (
+    <div>
+      {/* Marquee strip */}
+      <div className="pbf-marquee-wrap">
+        <div className="pbf-marquee-track">
+          {[...tickerItems, ...tickerItems, ...tickerItems].map((item, i) => (
+            <span key={i}>✦ {item}</span>
+          ))}
         </div>
-    );
-}
+      </div>
 
-/* ══════════════════════════════════════════════════════════════
-   DETAILS
-══════════════════════════════════════════════════════════════ */
-export function Details({ product, toggleWishlist, isWishlisted, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
-    const [sel, setSel] = useState(0);
-    if (!product) return null;
-    return (
-        <div dir="rtl" style={{ maxWidth: 1080, margin: "auto", background: 'var(--white)', fontFamily: "'Cairo',sans-serif" }}>
-
-            <div style={{ padding: '20px' }}>
-                <div className="details-g" style={{ gap: '24px' }}>
-                    {/* Gallery */}
-                    <div>
-                        <div style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', background: 'var(--cream)', aspectRatio: '1/1' }}>
-                            {allImages.length > 0
-                                ? <img src={allImages[sel]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                                : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,var(--sage-lt),var(--cream)' }}>
-                                    <Droplets style={{ width: '56px', height: '56px', color: 'var(--sage)', opacity: 0.4 }} />
-                                </div>
-                            }
-                            {discount > 0 && <div style={{ position: 'absolute', top: 12, right: 12, background: 'var(--sage)', color: 'var(--white)', fontSize: '11px', fontWeight: 600, padding: '4px 10px', borderRadius: '6px' }}>−{discount}%</div>}
-                            <button onClick={toggleWishlist} style={{ position: 'absolute', top: 12, left: 12, width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: isWishlisted ? 'var(--sage)' : 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', color: isWishlisted ? 'var(--white)' : 'var(--sage)', transition: 'all 0.3s' }}>
-                                <Heart style={{ width: '15px', height: '15px', fill: isWishlisted ? 'currentColor' : 'none' }} />
-                            </button>
-                            {allImages.length > 1 && (
-                                <>
-                                    <button onClick={() => setSel(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <ChevronRight style={{ width: '14px', height: '14px', color: 'var(--char)' }} />
-                                    </button>
-                                    <button onClick={() => setSel(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <ChevronLeft style={{ width: '14px', height: '14px', color: 'var(--char)' }} />
-                                    </button>
-                                </>
-                            )}
-                            {!inStock && !autoGen && (
-                                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(4px)', borderRadius: '12px' }}>
-
-                                </div>
-                            )}
-                        </div>
-                        {allImages.length > 1 && (
-                            <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
-                                {allImages.slice(0, 4).map((img: string, idx: number) => (
-                                    <button key={idx} onClick={() => setSel(idx)} style={{ width: '56px', height: '56px', borderRadius: '8px', overflow: 'hidden', border: `2px solid ${sel === idx ? 'var(--sage)' : 'transparent'}`, cursor: 'pointer', padding: 0, background: 'none', opacity: sel === idx ? 1 : 0.55, transition: 'all 0.25s' }}>
-                                        <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Info */}
-                    <div>
-                        <h1 style={{ fontSize: 'clamp(1.3rem,3vw,1.8rem)', fontWeight: 700, color: 'var(--char)', marginBottom: '8px', lineHeight: 1.3 }}>
-                            {product.name}
-                        </h1>
-                        <div style={{ display: 'flex', gap: '2px', marginBottom: '16px' }}>
-                            {[...Array(5)].map((_, i) => <Star key={i} style={{ width: '14px', height: '14px', fill: i < 4 ? 'var(--sage)' : 'none', color: 'var(--sage)' }} />)}
-                        </div>
-
-                        {/* Price */}
-                        <div style={{ background: 'var(--sage-lt)', borderRadius: '10px', padding: '14px 16px', marginBottom: '18px', display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
-                            <span style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--char)' }}>{finalPrice.toLocaleString()}</span>
-                            <span style={{ fontSize: '13px', color: 'var(--mid)', fontWeight: 500 }}>د.ج</span>
-                            {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
-                                <span style={{ fontSize: '12px', color: 'var(--mist)', textDecoration: 'line-through' }}>{parseFloat(product.priceOriginal).toLocaleString()} د.ج</span>
-                            )}
-                        </div>
-
-                        {/* Offers */}
-                        {product.offers?.length > 0 && (
-                            <div style={{ marginBottom: '16px' }}>
-                                <p style={{ fontSize: '12px', fontWeight: 600, color: 'var(--mid)', marginBottom: '8px' }}>الباقات المتاحة</p>
-                                {product.offers.map((o: any) => (
-                                    <label key={o.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 14px', border: `1.5px solid ${selectedOffer === o.id ? 'var(--sage)' : 'var(--line-2)'}`, borderRadius: '8px', cursor: 'pointer', marginBottom: 6, background: selectedOffer === o.id ? 'var(--sage-lt)' : 'transparent', transition: 'all 0.25s' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                            <div style={{ width: 16, height: 16, borderRadius: '50%', border: `1.5px solid ${selectedOffer === o.id ? 'var(--sage)' : 'var(--mist)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                {selectedOffer === o.id && <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--sage)' }} />}
-                                            </div>
-                                            <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
-                                            <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--char)' }}>{o.name}</span>
-                                        </div>
-                                        <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--sage)' }}>{o.price.toLocaleString()} د.ج</span>
-                                    </label>
-                                ))}
-                            </div>
-                        )}
-
-                        {/* Attributes */}
-                        {allAttrs.map((attr: any) => (
-                            <div key={attr.id} style={{ marginBottom: '14px' }}>
-                                <p style={{ fontSize: '12px', fontWeight: 600, color: 'var(--mid)', marginBottom: '8px' }}>{attr.name}</p>
-                                {attr.displayMode === 'color' ? (
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                                        {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: 26, height: 26, borderRadius: '50%', backgroundColor: v.value, border: 'none', cursor: 'pointer', outline: `2.5px solid ${s ? 'var(--sage)' : 'transparent'}`, outlineOffset: 2, transition: 'outline 0.2s' }} />; })}
-                                    </div>
-                                ) : attr.displayMode === 'image' ? (
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                                        {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ width: 52, height: 64, overflow: 'hidden', border: `2px solid ${s ? 'var(--sage)' : 'var(--line-2)'}`, borderRadius: '8px', cursor: 'pointer', padding: 0, opacity: s ? 1 : 0.55, transition: 'all 0.25s' }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>; })}
-                                    </div>
-                                ) : (
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                                        {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ padding: '7px 14px', borderRadius: '6px', border: `1.5px solid ${s ? 'var(--sage)' : 'var(--line-2)'}`, background: s ? 'var(--sage)' : 'transparent', color: s ? 'var(--white)' : 'var(--mid)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.25s', fontFamily: "'Cairo',sans-serif" }}>{v.name}</button>; })}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-
-                        <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
-
-                        {product.desc && (
-                            <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid var(--line)' }}>
-                                <p style={{ fontSize: '12px', fontWeight: 600, color: 'var(--mid)', marginBottom: '10px' }}>وصف المنتج</p>
-                                <div style={{ fontSize: '13px', lineHeight: '1.9', color: 'var(--mid)', fontWeight: 400 }}
-                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc, { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'span'], ALLOWED_ATTR: ['class', 'style'] }) }} />
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-/* ══════════════════════════════════════════════════════════════
-   PRODUCT FORM
-══════════════════════════════════════════════════════════════ */
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0 }: ProductFormProps) {
-    const router = useRouter();
-    const [wilayas, setWilayas] = useState<Wilaya[]>([]);
-    const [communes, setCommunes] = useState<Commune[]>([]);
-    const [loadingC, setLC] = useState(false);
-    const [fd, setFd] = useState({ customerId: '', customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '', quantity: 1, priceLoss: 0, typeLivraison: 'home' as 'home' | 'office' });
-    const [errors, setErrors] = useState<Record<string, string>>({});
-    const [sub, setSub] = useState(false);
-    const [isOrderNow, setIsOrderNow] = useState(false);
-    const [isAdded, setIsAdded] = useState(false);
-    const initCount = useCartStore(s => s.initCount);
-
-    useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
-    useEffect(() => { if (typeof window !== 'undefined') { const id = localStorage.getItem('customerId'); if (id) setFd(p => ({ ...p, customerId: id })); } }, []);
-    useEffect(() => { if (!fd.customerWelaya) { setCommunes([]); return; } setLC(true); fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLC(false); }); }, [fd.customerWelaya]);
-
-    const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
-    const getFP = useCallback((): number => {
-        const base = typeof product.price === 'string' ? parseFloat(product.price) : product.price as number;
-        const off = product.offers?.find((o: any) => o.id === selectedOffer); if (off) return off.price;
-        if (product.variantDetails?.length && Object.keys(selectedVariants).length > 0) {
-            const m = product.variantDetails.find((v: any) => vm(v, selectedVariants)); if (m && m.price !== -1) return m.price;
-        }
-        return base;
-    }, [product, selectedOffer, selectedVariants]);
-    const getLiv = useCallback((): number => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; }, [selW, fd.typeLivraison]);
-    const fp = getFP();
-    const total = () => fp * fd.quantity + +getLiv();
-    const validate = () => {
-        const e: Record<string, string> = {};
-        if (!fd.customerName.trim() || fd.customerName.length < 3) e.customerName = 'الاسم مطلوب';
-        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
-        if (!fd.customerWelaya) e.customerWelaya = 'اختر الولاية';
-        if (!fd.customerCommune) e.customerCommune = 'اختر البلدية';
-        return e;
-    };
-    const getVarId = useCallback(() => {
-        if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
-        return product.variantDetails.find((v: any) => vm(v, selectedVariants))?.id;
-    }, [product.variantDetails, selectedVariants]);
-
-    const addToCart = () => {
-        setIsAdded(true);
-        const cart = JSON.parse(localStorage.getItem(domain) || '[]');
-        cart.push({ ...fd, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
-        localStorage.setItem(domain, JSON.stringify(cart)); initCount(cart.length);
-        setTimeout(() => setIsAdded(false), 2200);
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault(); const er = validate(); if (Object.keys(er).length) { setErrors(er); return; }
-        setErrors({}); setSub(true);
-        try {
-            await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
-            if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
-            router.push(`/${domain}/successfully`);
-        } catch { } finally { setSub(false); }
-    };
-
-    const onF = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => { e.target.style.borderColor = 'var(--sage)'; };
-    const onB = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>, err?: boolean) => { e.target.style.borderColor = err ? 'var(--red)' : 'var(--line-2)'; };
-
-    return (
-        <div dir="rtl" style={{ marginTop: '16px' }}>
-            {/* Cart/Order toggle */}
-        {product.store?.cart && (
-                <div className="cart-btns" style={{ marginBottom: '12px' }}>
-                    <button onClick={addToCart} disabled={isAdded}
-                        style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '11px', cursor: isAdded ? 'default' : 'pointer', fontSize: '13px', fontWeight: 600, border: `1.5px solid ${isAdded ? 'var(--sage)' : 'var(--line-2)'}`, borderRadius: '8px', background: isAdded ? 'var(--sage-lt)' : 'var(--white)', color: isAdded ? 'var(--sage)' : 'var(--mid)', transition: 'all 0.3s', fontFamily: "'Cairo',sans-serif" }}>
-                        {isAdded ? <><CheckCircle2 size={14} className="anim-check" />أُضيف</> : <><ShoppingBag size={14} />السلة</>}
-                    </button>
-                    <button onClick={() => setIsOrderNow(true)} className="btn-sage" style={{ flex: 2, padding: '11px', fontSize: '13px', borderRadius: '8px' }}>
-                        اطلب الآن
-                    </button>
-                </div>
+      {/* Hero — marquee layout: clean, image-free, centered typography */}
+      <section className="pbf-hero">
+        <div className="pbf-container">
+          <h1 className="pbf-hero-title"
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store?.hero?.title || store?.name || '') }} />
+          <p className="pbf-hero-sub">{store?.hero?.subtitle}</p>
+          <div className="pbf-hero-cta-row">
+            <Link href="#products" className="pbf-btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
+              {t.shopNow}
+            </Link>
+            {store?.cart !== false && (
+              <Link href="/cart" className="pbf-btn-outline" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
+                {t.cart}
+              </Link>
             )}
+          </div>
+        </div>
+      </section>
 
-            {(isOrderNow || !product.store?.cart) && (
-                <div style={{ background: 'var(--ivory)', border: '1.5px solid var(--line-2)', borderRadius: '12px', overflow: 'hidden' }}>
-                    <div style={{ padding: '12px 16px', background: 'var(--sage-lt)', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--sage)', margin: 0 }}>بيانات الطلب</p>
-                        {product.store?.cart && (
-                            <button onClick={() => setIsOrderNow(false)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', border: '1px solid var(--line-2)', borderRadius: '6px', background: 'var(--white)', color: 'var(--mist)', fontSize: '11px', fontWeight: 500, cursor: 'pointer', fontFamily: "'Cairo',sans-serif" }}>
-                                <X style={{ width: '9px', height: '9px' }} /> إلغاء
-                            </button>
-                        )}
+      <div className="pbf-container" style={{ padding: '1rem 1.5rem 3rem' }}>
+        {/* Trust bar */}
+        <div className="pbf-trust-bar">
+          {t.trust.map((item: any, i: number) => (
+            <div className="pbf-trust-item" key={i}>
+              <strong>{item.t}</strong>
+              <span>{item.s}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Categories */}
+        <div className="pbf-cats" style={{ margin: '2.5rem 0 2rem' }}>
+          <Link href="/" className={`pbf-cat-link ${!activeCategory ? 'active' : ''}`}>{t.all}</Link>
+          {cats.map((cat: any) => (
+            <Link key={cat.id} href={`?category=${cat.id}`}
+              className={`pbf-cat-link ${activeCategory === String(cat.id) ? 'active' : ''}`}>
+              {cat.name}
+            </Link>
+          ))}
+        </div>
+
+        {searchQ && (
+          <p style={{ color: MUTED, marginBottom: 20 }}>{t.searchResultsFor} <strong style={{ color: INK }}>{searchQ}</strong></p>
+        )}
+
+        {/* Products */}
+        <div id="products" className="pbf-products-grid">
+          {loading
+            ? [...Array(8)].map((_, i) => <div key={i} className="pbf-skeleton" style={{ aspectRatio: '3/4' }} />)
+            : products.length > 0
+              ? products.map((p: Product, i: number) => {
+                  const discount = p.priceOriginal
+                    ? Math.round(((Number(p.priceOriginal) - Number(p.price)) / Number(p.priceOriginal)) * 100)
+                    : 0;
+                  return (
+                    <div key={p.id} style={{ animationDelay: `${i * 0.06}s` }}>
+                      <Card product={p} displayImage={p.productImage || p.imagesProduct?.[0]?.imageUrl} discount={discount} store={store} />
                     </div>
+                  );
+                })
+              : <p style={{ color: MUTED, gridColumn: '1/-1', textAlign: 'center', padding: '3rem 0' }}>{t.noProducts}</p>}
+        </div>
 
-                    <form onSubmit={handleSubmit} style={{ padding: '16px' }}>
-                        <div className="form-2c">
-                            <FR error={errors.customerName} label="الاسم">
-                                <div style={{ position: 'relative' }}>
-                                    <User style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--mist)', pointerEvents: 'none' }} />
-                                    <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder="اسمك الكامل"
-                                        style={{ ...INP(!!errors.customerName), paddingLeft: '32px' }} onFocus={onF} onBlur={e => onB(e, !!errors.customerName)} />
-                                </div>
-                            </FR>
-                            <FR error={errors.customerPhone} label="الهاتف">
-                                <div style={{ position: 'relative' }}>
-                                    <span style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', fontSize: '12px', color: 'var(--mist)', pointerEvents: 'none' }}>📞</span>
-                                    <input type="tel" dir="ltr" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} placeholder="0550 123 456"
-                                        style={{ ...INP(!!errors.customerPhone), paddingLeft: '32px' }} onFocus={onF} onBlur={e => onB(e, !!errors.customerPhone)} />
-                                </div>
-                            </FR>
-                        </div>
-                        <div className="form-2c">
-                            <FR error={errors.customerWelaya} label="الولاية">
-                                <div style={{ position: 'relative' }}>
-                                    <ChevronDown style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--mist)', pointerEvents: 'none' }} />
-                                    <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}
-                                        style={{ ...INP(!!errors.customerWelaya), paddingLeft: '28px' }} onFocus={onF} onBlur={e => onB(e, !!errors.customerWelaya)}>
-                                        <option value="">اختر الولاية</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
-                                    </select>
-                                </div>
-                            </FR>
-                            <FR error={errors.customerCommune} label="البلدية">
-                                <div style={{ position: 'relative' }}>
-                                    <ChevronDown style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--mist)', pointerEvents: 'none' }} />
-                                    <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })}
-                                        style={{ ...INP(!!errors.customerCommune), paddingLeft: '28px', opacity: !fd.customerWelaya ? 0.4 : 1 }} onFocus={onF} onBlur={e => onB(e, !!errors.customerCommune)}>
-                                        <option value="">{loadingC ? '...' : fd.customerWelaya ? 'اختر البلدية' : 'اختر الولاية أولاً'}</option>
-                                        {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
-                                    </select>
-                                </div>
-                            </FR>
-                        </div>
+        {/* Pagination */}
+        {countPage > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: '2.5rem', flexWrap: 'wrap' }}>
+            {[...Array(countPage)].map((_, i) => (
+              <Link key={i} href={{ query: { ...(activeCategory ? { category: activeCategory } : {}), page: i + 1 } }} scroll={false}
+                style={{
+                  minWidth: 40, minHeight: 40, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  border: `1px solid ${currentPage === i + 1 ? SAGE_DARK : BORDER}`, color: currentPage === i + 1 ? SAGE_DARK : MUTED,
+                  borderRadius: 4, textDecoration: 'none', fontSize: '0.85rem',
+                }}>
+                {i + 1}
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
-                        <FR label="نوع التوصيل">
-                            <div className="dlv-2c">
-                                {(['home', 'office'] as const).map(type => (
-                                    <button key={type} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: type }))}
-                                        style={{ padding: '11px 8px', borderRadius: '8px', border: `1.5px solid ${fd.typeLivraison === type ? 'var(--sage)' : 'var(--line-2)'}`, background: fd.typeLivraison === type ? 'var(--sage-lt)' : 'var(--white)', cursor: 'pointer', textAlign: 'center', transition: 'all 0.25s', fontFamily: "'Cairo',sans-serif" }}>
-                                        <p style={{ fontSize: '12px', fontWeight: 600, color: fd.typeLivraison === type ? 'var(--sage)' : 'var(--mid)', margin: '0 0 3px' }}>{type === 'home' ? '🏠 منزل' : '🏢 مكتب'}</p>
-                                        {selW && <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--char)', margin: 0 }}>
-                                            {(type === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج
-                                        </p>}
-                                    </button>
-                                ))}
-                            </div>
-                        </FR>
+/* ============================== DETAILS ============================== */
 
-                        <FR label="الكمية">
-                            <div style={{ display: 'inline-flex', alignItems: 'center', border: '1.5px solid var(--line-2)', borderRadius: '8px', overflow: 'hidden' }}>
-                                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--mid)', fontSize: '18px', fontWeight: 300, transition: 'background 0.2s' }}
-                                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--sage-lt)'; }}
-                                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>−</button>
-                                <span style={{ width: 44, textAlign: 'center', fontSize: '14px', fontWeight: 700, color: 'var(--char)' }}>{fd.quantity}</span>
-                                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--mid)', fontSize: '18px', fontWeight: 300, transition: 'background 0.2s' }}
-                                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--sage-lt)'; }}
-                                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>+</button>
-                            </div>
-                        </FR>
+export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
+  const t = T[getLang(store || product?.store)];
+  const [sel, setSel] = useState(0);
+  const images: string[] = allImages?.length ? allImages : (product?.imagesProduct?.map((i: ProductImage) => i.imageUrl) || [product?.productImage].filter(Boolean));
 
-                        {/* Summary */}
-                        <div style={{ background: 'var(--sage-lt)', borderRadius: '10px', padding: '14px 16px', marginBottom: '14px' }}>
-                            {[{ l: 'المنتج', v: product.name.slice(0, 20) + (product.name.length > 20 ? '...' : '') }, { l: 'السعر', v: `${fp.toLocaleString()} دج` }, { l: 'الكمية', v: `× ${fd.quantity}` }, { l: 'التوصيل', v: selW ? `${getLiv().toLocaleString()} دج` : '—' }].map(row => (
-                                <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', fontSize: '12px', borderBottom: '1px solid var(--line)' }}>
-                                    <span style={{ color: 'var(--mid)' }}>{row.l}</span>
-                                    <span style={{ fontWeight: 600, color: 'var(--char)' }}>{row.v}</span>
-                                </div>
-                            ))}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px' }}>
-                                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--mid)' }}>الإجمالي</span>
-                                <span style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--char)' }}>{total().toLocaleString()} <span style={{ fontSize: '12px', fontWeight: 500 }}>دج</span></span>
-                            </div>
-                        </div>
-
-                        <button type="submit" disabled={sub} className="btn-sage" style={{ width: '100%', padding: '13px', fontSize: '14px', borderRadius: '8px', cursor: sub ? 'not-allowed' : 'pointer', opacity: sub ? 0.55 : 1, boxShadow: '0 4px 14px rgba(107,143,107,0.3)' }}>
-                            {sub ? <><Loader2 style={{ width: '15px', height: '15px', animation: 'spin 1s linear infinite' }} /> جاري...</> : <><ShoppingCart style={{ width: '15px', height: '15px' }} />تأكيد الطلب</>}
-                        </button>
-                        <p style={{ fontSize: '11px', textAlign: 'center', color: 'var(--mist)', marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
-                            <Shield style={{ width: '11px', height: '11px', color: 'var(--sage)' }} /> معاملة آمنة ومشفرة
-                        </p>
-                    </form>
-                </div>
+  return (
+    <div className="pbf-container" style={{ padding: '2.5rem 1.5rem' }}>
+      <div className="pbf-details-inner" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2.5rem' }}>
+        {/* Gallery */}
+        <div>
+          <div style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 6, overflow: 'hidden', background: BG_ALT, border: `1px solid ${BORDER}` }}>
+            {images?.[sel] && <img src={images[sel]} alt={product?.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}
+            {images?.length > 1 && (
+              <>
+                <button onClick={() => setSel((s) => (s - 1 + images.length) % images.length)}
+                  style={{ position: 'absolute', top: '50%', insetInlineStart: 10, transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.85)', border: 'none', color: INK, borderRadius: '50%', width: 38, height: 38, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ChevronLeft size={18} />
+                </button>
+                <button onClick={() => setSel((s) => (s + 1) % images.length)}
+                  style={{ position: 'absolute', top: '50%', insetInlineEnd: 10, transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.85)', border: 'none', color: INK, borderRadius: '50%', width: 38, height: 38, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ChevronRight size={18} />
+                </button>
+              </>
             )}
+          </div>
+          {images?.length > 1 && (
+            <div style={{ display: 'flex', gap: 10, marginTop: 12, overflowX: 'auto' }}>
+              {images.map((img: string, i: number) => (
+                <button key={i} onClick={() => setSel(i)}
+                  style={{ width: 64, height: 64, flexShrink: 0, borderRadius: 4, overflow: 'hidden', border: sel === i ? `2px solid ${SAGE_DARK}` : `1px solid ${BORDER}`, padding: 0, cursor: 'pointer', background: 'none' }}>
+                  <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-    );
+
+        {/* Info */}
+        <div>
+          <h1 className="pbf-display" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', margin: '0 0 10px', color: INK }}>{product?.name}</h1>
+          <div style={{ display: 'flex', gap: 2, marginBottom: 14 }}>
+            {[1, 2, 3, 4, 5].map((i) => <Star key={i} size={16} fill={SAGE_DARK} color={SAGE_DARK} />)}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 20 }}>
+            <span style={{ fontSize: '1.6rem', fontWeight: 700, color: SAGE_DARK }}>{Number(finalPrice ?? product?.price).toLocaleString()} {product?.store?.currency}</span>
+            {discount > 0 && product?.priceOriginal && (
+              <span style={{ color: MUTED, textDecoration: 'line-through' }}>{Number(product.priceOriginal).toLocaleString()} {product?.store?.currency}</span>
+            )}
+          </div>
+
+          {product?.offers?.length > 0 && (
+            <div style={{ marginBottom: 22 }}>
+              <h4 style={{ fontSize: '0.9rem', marginBottom: 10, color: INK }}>{t.offersTitle}</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {product.offers.map((o: Offer) => (
+                  <label key={o.id} style={{ display: 'flex', alignItems: 'center', gap: 10, border: `1px solid ${selectedOffer === o.id ? SAGE_DARK : BORDER}`, borderRadius: 4, padding: '10px 12px', cursor: 'pointer' }}>
+                    <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} />
+                    <span style={{ color: INK, fontSize: '0.85rem' }}>{o.name} — {o.quantity}x</span>
+                    <span style={{ marginInlineStart: 'auto', color: SAGE_DARK, fontWeight: 700 }}>{Number(o.price).toLocaleString()} {product?.store?.currency}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {allAttrs?.length > 0 && allAttrs.map((attr: Attribute) => (
+            <div key={attr.id} style={{ marginBottom: 20 }}>
+              <p style={{ fontSize: '0.85rem', color: MUTED, marginBottom: 10 }}>{attr.name}</p>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {attr.variants.map((v) => {
+                  const isSel = selectedVariants?.[attr.name] === v.value;
+                  if (attr.displayMode === 'color') {
+                    return (
+                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
+                        style={{ width: 34, height: 34, borderRadius: '50%', background: v.value, border: isSel ? `2px solid ${SAGE_DARK}` : `1px solid ${BORDER}`, cursor: 'pointer' }} />
+                    );
+                  }
+                  if (attr.displayMode === 'image') {
+                    return (
+                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
+                        style={{ width: 48, height: 48, borderRadius: 4, overflow: 'hidden', border: isSel ? `2px solid ${SAGE_DARK}` : `1px solid ${BORDER}`, padding: 0, cursor: 'pointer' }}>
+                        <img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </button>
+                    );
+                  }
+                  return (
+                    <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
+                      style={{ padding: '8px 16px', borderRadius: 4, border: isSel ? `2px solid ${SAGE_DARK}` : `1px solid ${BORDER}`, color: isSel ? SAGE_DARK : INK, background: 'none', cursor: 'pointer', fontSize: '0.82rem' }}>
+                      {v.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+
+          <ProductForm
+            product={product}
+            userId={product?.store?.userId}
+            domain={domain}
+            selectedOffer={selectedOffer}
+            setSelectedOffer={setSelectedOffer}
+            selectedVariants={selectedVariants}
+            store={store}
+          />
+
+          {product?.desc && (
+            <div style={{ marginTop: 32, borderTop: `1px solid ${BORDER}`, paddingTop: 24 }}>
+              <h4 style={{ fontSize: '0.9rem', marginBottom: 10, color: INK }}>{t.descTitle}</h4>
+              <div style={{ color: MUTED, fontSize: '0.9rem', lineHeight: 1.8 }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc) }} />
+            </div>
+          )}
+        </div>
+      </div>
+      <style dangerouslySetInnerHTML={{ __html: `@media (min-width:768px){ .pbf-details-inner{ grid-template-columns: 1fr 1fr; } }` }} />
+    </div>
+  );
 }
 
-/* ══════════════════════════════════════════════════════════════
-   CART
-══════════════════════════════════════════════════════════════ */
-export function Cart({ domain, store }: { domain: string; store: any }) {
-    const [items, setItems] = useState<any[]>([]);
-    const [wilayas, setWilayas] = useState<Wilaya[]>([]);
-    const [communes, setCommunes] = useState<Commune[]>([]);
-    const [loadingC, setLC] = useState(false);
-    const [submitting, setSubmitting] = useState(false);
-    const [success, setSuccess] = useState(false);
-    const [fd, setFd] = useState({ customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '', typeLivraison: 'home' as 'home' | 'office' });
-    const [errors, setErrors] = useState<Record<string, string>>({});
-    const initCount = useCartStore(s => s.initCount);
+/* ============================== PRODUCT FORM ============================== */
 
-    useEffect(() => { setItems(JSON.parse(localStorage.getItem(domain) || '[]')); if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas); }, [domain, store]);
-    useEffect(() => { if (!fd.customerWelaya) { setCommunes([]); return; } setLC(true); fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLC(false); }); }, [fd.customerWelaya]);
+export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store: storeProp }: any) {
+  const store = storeProp || product?.store;
+  const t = T[getLang(store)];
+  const router = useRouter();
 
-    const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
-    const getLiv = () => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; };
-    const cartTotal = items.reduce((a, i) => a + (i.finalPrice * i.quantity), 0);
-    const finalTotal = cartTotal + +getLiv();
-    const update = (n: any[]) => { setItems(n); localStorage.setItem(domain, JSON.stringify(n)); initCount(n.length); };
-    const changeQty = (i: number, d: number) => { const n = [...items]; n[i].quantity = Math.max(1, n[i].quantity + d); update(n); };
+  const [fd, setFd] = useState({
+    customerId: '', customerName: '', customerPhone: '',
+    customerWelaya: '', customerCommune: '',
+    quantity: 1, priceLoss: 0,
+    typeLivraison: 'home' as 'home' | 'office',
+  });
+  const [wilayas, setWilayas] = useState<Wilaya[]>([]);
+  const [communes, setCommunes] = useState<Commune[]>([]);
+  const [loadingC, setLoadingC] = useState(false);
+  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const er: Record<string, string> = {};
-        if (!fd.customerName.trim() || fd.customerName.length < 3) er.n = 'الاسم مطلوب';
-        if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.p = 'رقم هاتف غير صالح (مثال: 0550123456)';
-        if (!fd.customerWelaya) er.w = 'الولاية مطلوبة';
-        if (!fd.customerCommune) er.c = 'البلدية مطلوبة';
-        if (Object.keys(er).length) { setErrors(er); return; }
-        setErrors({}); setSubmitting(true);
-        try {
-            await axios.post(`${API_URL}/orders/create`, items.map(i => ({ ...fd, productId: i.productId, storeId: i.storeId, userId: i.userId, selectedOffer: i.selectedOffer, variantDetailId: i.variantDetailId, selectedVariants: i.selectedVariants, platform: i.platform || 'store', finalPrice: i.finalPrice, totalPrice: finalTotal, priceLivraison: +getLiv(), quantity: i.quantity, customerId: i.customerId || '', priceLoss: selW?.livraisonReturn ?? 0 })));
-            setSuccess(true); localStorage.removeItem(domain); setItems([]); initCount(0);
-        } catch { } finally { setSubmitting(false); }
-    };
+  const initCount = useCartStore((s: any) => s.initCount);
 
-    const onF = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => { e.target.style.borderColor = 'var(--sage)'; };
-    const onB = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>, err?: boolean) => { e.target.style.borderColor = err ? 'var(--red)' : 'var(--line-2)'; };
+  useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
 
-    if (success) return (
-        <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--white)', fontFamily: "'Cairo',sans-serif" }}>
-            <div style={{ textAlign: 'center', padding: '3rem 2rem', border: '1px solid var(--line)', borderRadius: '16px', maxWidth: 400, width: '100%', background: 'var(--ivory)' }}>
-                <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'var(--sage-lt)', border: '2px solid var(--sage)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                    <CheckCircle2 size={28} style={{ color: 'var(--sage)' }} />
-                </div>
-                <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--char)', marginBottom: 8 }}>تم استلام طلبك 🌿</h2>
-                <p style={{ fontSize: '13px', color: 'var(--mid)', marginBottom: 24, lineHeight: 1.7 }}>شكراً لاختيارك عبير الطبيعة. سنتواصل معك قريباً.</p>
-                <Link href="/" className="btn-sage" style={{ display: 'inline-flex', padding: '12px 32px', fontSize: '13px', borderRadius: '8px' }}>العودة للمتجر</Link>
-            </div>
-        </div>
-    );
+  useEffect(() => {
+    if (!fd.customerWelaya) { setCommunes([]); return; }
+    setLoadingC(true);
+    fetchCommunes(fd.customerWelaya).then((d) => { setCommunes(d); setLoadingC(false); });
+  }, [fd.customerWelaya]);
 
-    if (!items.length) return (
-        <div dir="rtl" style={{ minHeight: '55vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--white)', fontFamily: "'Cairo',sans-serif" }}>
-            <div style={{ textAlign: 'center', padding: '3rem 2rem', maxWidth: 320, width: '100%' }}>
-                <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'var(--sage-lt)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                    <ShoppingBag size={32} style={{ color: 'var(--sage)', opacity: 0.6 }} />
-                </div>
-                <p style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--mid)', marginBottom: 8 }}>السلة فارغة</p>
-                <p style={{ fontSize: '12px', color: 'var(--mist)', marginBottom: 20 }}>أضف عطورك المفضلة</p>
-                <Link href="/" className="btn-sage" style={{ display: 'inline-flex', padding: '11px 28px', fontSize: '13px', borderRadius: '8px' }}>تسوق الآن</Link>
-            </div>
-        </div>
-    );
+  const selW = wilayas.find((w) => String(w.id) === String(fd.customerWelaya));
 
-    return (
-        <div dir="rtl" style={{ minHeight: '100vh', background: 'var(--ivory)', padding: '20px 16px 60px', fontFamily: "'Cairo',sans-serif" }}>
-            <div style={{ maxWidth: 860, margin: '0 auto' }}>
-                <h1 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--char)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <ShoppingBag size={20} style={{ color: 'var(--sage)' }} /> سلة التسوق
-                    <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--mist)', marginRight: 'auto' }}>{items.length} منتجات</span>
-                </h1>
+  const getFP = useCallback((): number => {
+    if (selectedOffer && product?.offers?.length) {
+      const o = product.offers.find((of: Offer) => of.id === selectedOffer);
+      if (o) return Number(o.price);
+    }
+    if (product?.variantDetails?.length) {
+      const match = product.variantDetails.find((d: VariantDetail) => variantMatches(d, selectedVariants || {}));
+      if (match && match.price !== -1) return Number(match.price);
+    }
+    return Number(product?.price || 0);
+  }, [selectedOffer, product, selectedVariants]);
 
-                <div className="cart-g">
-                    {/* Items */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        {items.map((item, i) => (
-                            <div key={i} style={{ display: 'flex', gap: '12px', padding: '14px', borderRadius: '12px', background: 'var(--white)', border: '1px solid var(--line)', transition: 'box-shadow 0.25s' }}
-                                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(107,143,107,0.1)'; }}
-                                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}>
-                                <div style={{ width: 72, height: 90, flexShrink: 0, overflow: 'hidden', borderRadius: '8px', background: 'var(--cream)' }}>
-                                    <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} alt="" />
-                                </div>
-                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                                    <div>
-                                        <h4 style={{ fontWeight: 600, color: 'var(--char)', fontSize: '13px', lineHeight: 1.3, marginBottom: 3 }}>{item.product?.name}</h4>
-                                        <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--sage)' }}>{item.finalPrice?.toLocaleString()} دج</p>
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                        <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid var(--line-2)', borderRadius: '8px', overflow: 'hidden' }}>
-                                            <button onClick={() => changeQty(i, -1)} style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--mid)', fontSize: '16px' }}
-                                                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--sage-lt)'; }}
-                                                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>-</button>
-                                            <span style={{ width: 30, textAlign: 'center', fontSize: '13px', fontWeight: 700, color: 'var(--char)' }}>{item.quantity}</span>
-                                            <button onClick={() => changeQty(i, 1)} style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--mid)', fontSize: '16px' }}
-                                                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--sage-lt)'; }}
-                                                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>+</button>
-                                        </div>
-                                        <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '5px 10px', border: 'none', background: 'transparent', color: 'var(--mist)', fontSize: '11px', cursor: 'pointer', fontFamily: "'Cairo',sans-serif", transition: 'color 0.2s' }}
-                                            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--red)'; }}
-                                            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--mist)'; }}>
-                                            <Trash2 size={12} /> حذف
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', borderRadius: '10px', background: 'var(--sage-lt)' }}>
-                            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--mid)' }}>المجموع الفرعي</span>
-                            <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--char)' }}>{cartTotal.toLocaleString()} دج</span>
-                        </div>
-                    </div>
+  const getLiv = useCallback((): number => {
+    if (!selW) return 0;
+    return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
+  }, [selW, fd.typeLivraison]);
 
-                    {/* Checkout */}
-                    <div style={{ background: 'var(--white)', borderRadius: '12px', border: '1px solid var(--line)', overflow: 'hidden' }}>
-                        <div style={{ padding: '12px 16px', background: 'var(--sage-lt)', borderBottom: '1px solid var(--line)' }}>
-                            <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--sage)', margin: 0 }}>إتمام الطلب</p>
-                        </div>
-                        <form onSubmit={handleSubmit} style={{ padding: '16px' }}>
-                            <div className="form-2c">
-                                <FR error={errors.n} label="الاسم">
-                                    <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} style={INP(!!errors.n)} onFocus={onF} onBlur={e => onB(e, !!errors.n)} />
-                                </FR>
-                                <FR error={errors.p} label="الهاتف">
-                                    <input type="tel" dir="ltr" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} style={INP(!!errors.p)} onFocus={onF} onBlur={e => onB(e, !!errors.p)} />
-                                </FR>
-                            </div>
-                            <div className="form-2c">
-                                <FR error={errors.w} label="الولاية">
-                                    <div style={{ position: 'relative' }}>
-                                        <ChevronDown style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--mist)', pointerEvents: 'none' }} />
-                                        <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP(!!errors.w), paddingLeft: '28px' }} onFocus={onF} onBlur={e => onB(e, !!errors.w)}>
-                                            <option value="">اختر</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
-                                        </select>
-                                    </div>
-                                </FR>
-                                <FR error={errors.c} label="البلدية">
-                                    <div style={{ position: 'relative' }}>
-                                        <ChevronDown style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--mist)', pointerEvents: 'none' }} />
-                                        <select value={fd.customerCommune} disabled={loadingC || !fd.customerWelaya} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...INP(!!errors.c), paddingLeft: '28px', opacity: !fd.customerWelaya ? 0.4 : 1 }} onFocus={onF} onBlur={e => onB(e, !!errors.c)}>
-                                            <option value="">{loadingC ? '...' : 'اختر'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
-                                        </select>
-                                    </div>
-                                </FR>
-                            </div>
-                            {/* Summary */}
-                            <div style={{ background: 'var(--sage-lt)', borderRadius: '10px', padding: '12px 14px', marginBottom: '14px' }}>
-                                {[{ l: 'المجموع الفرعي', v: `${cartTotal.toLocaleString()} دج` }, { l: 'التوصيل', v: getLiv() ? `${getLiv().toLocaleString()} دج` : '—' }].map(r => (
-                                    <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: '12px', borderBottom: '1px solid rgba(107,143,107,0.1)' }}>
-                                        <span style={{ color: 'var(--mid)' }}>{r.l}</span>
-                                        <span style={{ fontWeight: 600, color: 'var(--char)' }}>{r.v}</span>
-                                    </div>
-                                ))}
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px' }}>
-                                    <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--mid)' }}>الإجمالي</span>
-                                    <span style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--char)' }}>{finalTotal.toLocaleString()} دج</span>
-                                </div>
-                            </div>
-                            <button type="submit" disabled={submitting} className="btn-sage" style={{ width: '100%', padding: '13px', fontSize: '14px', borderRadius: '8px', cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.55 : 1, boxShadow: '0 4px 14px rgba(107,143,107,0.3)' }}>
-                                {submitting ? <><Loader2 style={{ width: '15px', height: '15px', animation: 'spin 1s linear infinite' }} />جاري...</> : <><ShoppingCart style={{ width: '15px', height: '15px' }} />تأكيد الطلب</>}
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
+  const fp = getFP();
+  const total = () => fp * fd.quantity + getLiv();
 
-/* ══════════════════════════════════════════════════════════════
-   STATIC PAGES
-══════════════════════════════════════════════════════════════ */
-export function StaticPage({ staticPage, page, store }: any) {
-    const p = (staticPage || page || '').toLowerCase();
-    return (
+  const validate = () => {
+    const errs: Record<string, string> = {};
+    if (!fd.customerName || fd.customerName.trim().length < 3) errs.customerName = t.errName;
+    if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone)) errs.customerPhone = t.errPhone;
+    if (!fd.customerWelaya) errs.customerWelaya = t.errWilaya;
+    if (!fd.customerCommune) errs.customerCommune = t.errCommune;
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const buildPayload = () => ({
+    ...fd,
+    product,
+    productId: product?.id,
+    storeId: product?.store?.id,
+    userId,
+    variantDetailId: getVarId(selectedVariants || {}, product),
+    selectedOffer,
+    selectedVariants,
+    platform,
+    finalPrice: fp,
+    totalPrice: total(),
+    priceLivraison: getLiv(),
+    addedAt: new Date().toISOString(),
+  });
+
+  const addToCart = () => {
+    try {
+      const arr = JSON.parse(localStorage.getItem(domain) || '[]');
+      arr.push(buildPayload());
+      localStorage.setItem(domain, JSON.stringify(arr));
+      initCount(arr.length);
+    } catch { /* noop */ }
+  };
+
+  const submitOrder = async () => {
+    if (!validate()) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch(`${API_URL}/orders/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildPayload()),
+      });
+      if (!res.ok) throw new Error('failed');
+      const data = await res.json();
+      if (data?.customerId) localStorage.setItem('customerId', data.customerId);
+      router.push(`/successfully?productId=${product?.id}`);
+    } catch {
+      setErrors({ submit: t.errSubmit });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div style={{ marginTop: 24, borderTop: `1px solid ${BORDER}`, paddingTop: 24 }}>
+      {!isOrderNow ? (
         <>
-            {p === 'privacy' && <Privacy />}
-            {p === 'terms' && <Terms />}
-            {p === 'cookies' && <Cookies />}
-            {p === 'contact' && <Contact store={store} />}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
+            <span className="pbf-label" style={{ margin: 0 }}>{t.qty}</span>
+            <div style={{ display: 'flex', alignItems: 'center', border: `1px solid ${BORDER}`, borderRadius: 4 }}>
+              <button onClick={() => setFd((f) => ({ ...f, quantity: Math.max(1, f.quantity - 1) }))}
+                style={{ width: 40, height: 40, background: 'none', border: 'none', color: INK, cursor: 'pointer' }}><Minus size={14} /></button>
+              <span style={{ width: 36, textAlign: 'center', color: INK }}>{fd.quantity}</span>
+              <button onClick={() => setFd((f) => ({ ...f, quantity: f.quantity + 1 }))}
+                style={{ width: 40, height: 40, background: 'none', border: 'none', color: INK, cursor: 'pointer' }}><Plus size={14} /></button>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <button className="pbf-btn-primary" onClick={() => setIsOrderNow(true)}>{t.orderNow}</button>
+            {store?.cart !== false && (
+              <button className="pbf-btn-outline" onClick={addToCart}>{t.addToCart}</button>
+            )}
+          </div>
         </>
-    );
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div>
+            <label className="pbf-label">{t.fullName}</label>
+            <input className="pbf-input-field" placeholder={t.fullNamePlaceholder} value={fd.customerName}
+              onChange={(e) => setFd((f) => ({ ...f, customerName: e.target.value }))} />
+            {errors.customerName && <span style={{ color: '#b3453a', fontSize: '0.75rem' }}>{errors.customerName}</span>}
+          </div>
+          <div>
+            <label className="pbf-label">{t.phone}</label>
+            <input className="pbf-input-field" placeholder={t.phonePlaceholder} value={fd.customerPhone}
+              onChange={(e) => setFd((f) => ({ ...f, customerPhone: e.target.value }))} />
+            {errors.customerPhone && <span style={{ color: '#b3453a', fontSize: '0.75rem' }}>{errors.customerPhone}</span>}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div>
+              <label className="pbf-label">{t.wilaya}</label>
+              <select className="pbf-input-field" disabled={wilayas.length === 0} value={fd.customerWelaya}
+                onChange={(e) => setFd((f) => ({ ...f, customerWelaya: e.target.value, customerCommune: '' }))}>
+                <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
+                {wilayas.map((w) => (
+                  <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>
+                ))}
+              </select>
+              {errors.customerWelaya && <span style={{ color: '#b3453a', fontSize: '0.75rem' }}>{errors.customerWelaya}</span>}
+            </div>
+            <div>
+              <label className="pbf-label">{t.commune}</label>
+              <select className="pbf-input-field" disabled={!fd.customerWelaya || loadingC} value={fd.customerCommune}
+                onChange={(e) => setFd((f) => ({ ...f, customerCommune: e.target.value }))}>
+                <option value="">{loadingC ? t.communeLoading : t.communePlaceholder}</option>
+                {communes.map((c) => (
+                  <option key={c.id} value={c.id}>{t.dir === 'rtl' ? c.ar_name : c.name}</option>
+                ))}
+              </select>
+              {errors.customerCommune && <span style={{ color: '#b3453a', fontSize: '0.75rem' }}>{errors.customerCommune}</span>}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button onClick={() => setFd((f) => ({ ...f, typeLivraison: 'home' }))}
+              style={{ flex: 1, padding: '10px', borderRadius: 4, border: `1px solid ${fd.typeLivraison === 'home' ? SAGE_DARK : BORDER}`, background: 'none', color: fd.typeLivraison === 'home' ? SAGE_DARK : MUTED, cursor: 'pointer', minHeight: 44 }}>
+              {t.deliveryHome}
+            </button>
+            <button onClick={() => setFd((f) => ({ ...f, typeLivraison: 'office' }))}
+              style={{ flex: 1, padding: '10px', borderRadius: 4, border: `1px solid ${fd.typeLivraison === 'office' ? SAGE_DARK : BORDER}`, background: 'none', color: fd.typeLivraison === 'office' ? SAGE_DARK : MUTED, cursor: 'pointer', minHeight: 44 }}>
+              {t.deliveryOffice}
+            </button>
+          </div>
+
+          {/* Summary — placed above buttons, per §15.24 */}
+          <div style={{ border: `1px solid ${BORDER}`, borderRadius: 6, padding: 14, display: 'flex', flexDirection: 'column', gap: 8, background: '#fff' }}>
+            {[
+              { l: t.price, v: `${fp.toLocaleString()} ${product?.store?.currency || ''}` },
+              { l: t.qty, v: `× ${fd.quantity}` },
+              { l: t.delivery, v: selW ? `${getLiv().toLocaleString()} ${product?.store?.currency || ''}` : '—' },
+              { l: t.total, v: `${total().toLocaleString()} ${product?.store?.currency || ''}`, strong: true },
+            ].map((row) => (
+              <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                <span style={{ color: MUTED, fontSize: '0.85rem' }}>{row.l}</span>
+                <span style={{ color: (row as any).strong ? SAGE_DARK : INK, fontWeight: (row as any).strong ? 700 : 500, whiteSpace: 'nowrap', flexShrink: 0 }}>{row.v}</span>
+              </div>
+            ))}
+          </div>
+
+          {errors.submit && <span style={{ color: '#b3453a', fontSize: '0.8rem' }}>{errors.submit}</span>}
+
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button className="pbf-btn-primary" onClick={submitOrder} disabled={submitting} style={{ flex: 1 }}>
+              {submitting ? t.sending : t.confirmOrder}
+            </button>
+            <button className="pbf-btn-outline" onClick={() => setIsOrderNow(false)} disabled={submitting} style={{ flex: 1 }}>
+              {t.cancel}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
-const Shell = ({ children, title, emoji }: { children: React.ReactNode; title: string; emoji?: string }) => (
-    <div dir="rtl" style={{ background: 'var(--white)', minHeight: '100vh', fontFamily: "'Cairo',sans-serif" }}>
-        <div style={{ background: 'var(--sage-lt)', borderBottom: '1px solid var(--line)', padding: '28px 20px' }}>
-            <h1 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--char)', display: 'flex', alignItems: 'center', gap: 10 }}>
-                {emoji && <span style={{ fontSize: '1.5rem' }}>{emoji}</span>}
-                {title}
-            </h1>
-        </div>
-        <div style={{ padding: '24px 20px 60px' }}>{children}</div>
-    </div>
-);
+/* ============================== CART ============================== */
 
-const IB = ({ title, body, tag }: { title: string; body: string; tag?: string }) => (
-    <div style={{ padding: '16px', borderRadius: '10px', background: 'var(--ivory)', border: '1px solid var(--line)', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-        <div style={{ flex: 1 }}>
-            <h3 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--char)', marginBottom: '5px' }}>{title}</h3>
-            <p style={{ fontSize: '12px', lineHeight: '1.75', color: 'var(--mid)', margin: 0 }}>{body}</p>
+export function Cart({ domain, store }: any) {
+  const t = T[getLang(store)];
+  const [items, setItems] = useState<any[]>([]);
+  const [wilayas, setWilayas] = useState<Wilaya[]>([]);
+  const [communes, setCommunes] = useState<Commune[]>([]);
+  const [loadingC, setLoadingC] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [fd, setFd] = useState({
+    customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '',
+    typeLivraison: 'home' as 'home' | 'office',
+  });
+
+  const initCount = useCartStore((s: any) => s.initCount);
+
+  useEffect(() => {
+    try { setItems(JSON.parse(localStorage.getItem(domain) || '[]')); } catch { setItems([]); }
+  }, [domain]);
+
+  useEffect(() => {
+    if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas);
+  }, [store]);
+
+  useEffect(() => {
+    if (!fd.customerWelaya) { setCommunes([]); return; }
+    setLoadingC(true);
+    fetchCommunes(fd.customerWelaya).then((d) => { setCommunes(d); setLoadingC(false); });
+  }, [fd.customerWelaya]);
+
+  const selW = wilayas.find((w) => String(w.id) === String(fd.customerWelaya));
+  const getLiv = useCallback((): number => {
+    if (!selW) return 0;
+    return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
+  }, [selW, fd.typeLivraison]);
+
+  const cartTotal = items.reduce((sum, it) => sum + Number(it.finalPrice || 0) * Number(it.quantity || 1), 0);
+  const finalTotal = cartTotal + getLiv();
+
+  const removeItem = (idx: number) => {
+    const next = items.filter((_, i) => i !== idx);
+    setItems(next);
+    localStorage.setItem(domain, JSON.stringify(next));
+    initCount(next.length);
+  };
+
+  const validate = () => {
+    const errs: Record<string, string> = {};
+    if (!fd.customerName || fd.customerName.trim().length < 3) errs.customerName = t.errName;
+    if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone)) errs.customerPhone = t.errPhone;
+    if (!fd.customerWelaya) errs.customerWelaya = t.errWilaya;
+    if (!fd.customerCommune) errs.customerCommune = t.errCommune;
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const submitOrder = async () => {
+    if (!validate()) return;
+    setSubmitting(true);
+    try {
+      const payload = items.map((it) => ({
+        ...it, ...fd, priceLivraison: getLiv(), totalPrice: Number(it.finalPrice || 0) * Number(it.quantity || 1) + getLiv(),
+      }));
+      const res = await fetch(`${API_URL}/orders/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('failed');
+      localStorage.removeItem(domain);
+      initCount(0);
+      setSuccess(true);
+    } catch {
+      setErrors({ submit: t.errSubmit });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <div className="pbf-container" style={{ padding: '5rem 1.5rem', textAlign: 'center' }}>
+        <div style={{ width: 70, height: 70, borderRadius: '50%', background: SAGE_DARK, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+          <Check size={34} color="#fff" />
         </div>
-        {tag && <span style={{ fontSize: '10px', fontWeight: 600, padding: '3px 10px', borderRadius: '20px', background: 'var(--sage-lt)', color: 'var(--sage)', flexShrink: 0, marginTop: 2, alignSelf: 'flex-start' }}>{tag}</span>}
+        <h2 className="pbf-display" style={{ color: INK, fontSize: '1.6rem', marginBottom: 10 }}>{t.successTitle}</h2>
+        <p style={{ color: MUTED, marginBottom: 24 }}>{t.successDesc}</p>
+        <Link href="/" className="pbf-btn-primary" style={{ textDecoration: 'none', display: 'inline-flex' }}>{t.backToShop}</Link>
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="pbf-container" style={{ padding: '5rem 1.5rem', textAlign: 'center' }}>
+        <ShoppingBag size={48} color={BORDER} style={{ margin: '0 auto 16px' }} />
+        <h2 style={{ color: INK, fontSize: '1.3rem', marginBottom: 8 }}>{t.cartEmpty}</h2>
+        <p style={{ color: MUTED, marginBottom: 24 }}>{t.cartEmptyDesc}</p>
+        <Link href="/" className="pbf-btn-primary" style={{ textDecoration: 'none', display: 'inline-flex' }}>{t.shopNow}</Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="pbf-container" style={{ padding: '2.5rem 1.5rem' }}>
+      <h1 className="pbf-display" style={{ color: INK, marginBottom: 24 }}>{t.myCart}</h1>
+      <div className="pbf-cart-inner" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {items.map((it, idx) => (
+            <div key={idx} style={{ display: 'flex', gap: 14, border: `1px solid ${BORDER}`, borderRadius: 6, padding: 14, alignItems: 'center', background: '#fff' }}>
+              <img src={it.product?.productImage || it.product?.imagesProduct?.[0]?.imageUrl} alt={it.product?.name}
+                style={{ width: 66, height: 66, objectFit: 'cover', borderRadius: 4, flexShrink: 0 }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ color: INK, fontWeight: 600, margin: '0 0 4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{it.product?.name}</p>
+                <p style={{ color: SAGE_DARK, fontWeight: 700, margin: 0 }}>{Number(it.finalPrice).toLocaleString()} {store?.currency} × {it.quantity}</p>
+              </div>
+              <button onClick={() => removeItem(idx)} style={{ background: 'none', border: 'none', color: MUTED, cursor: 'pointer' }}>
+                <Trash2 size={18} />
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div>
+          <div style={{ border: `1px solid ${BORDER}`, borderRadius: 6, padding: 18, display: 'flex', flexDirection: 'column', gap: 14, background: '#fff' }}>
+            <div>
+              <label className="pbf-label">{t.fullName}</label>
+              <input className="pbf-input-field" placeholder={t.fullNamePlaceholder} value={fd.customerName}
+                onChange={(e) => setFd((f) => ({ ...f, customerName: e.target.value }))} />
+              {errors.customerName && <span style={{ color: '#b3453a', fontSize: '0.75rem' }}>{errors.customerName}</span>}
+            </div>
+            <div>
+              <label className="pbf-label">{t.phone}</label>
+              <input className="pbf-input-field" placeholder={t.phonePlaceholder} value={fd.customerPhone}
+                onChange={(e) => setFd((f) => ({ ...f, customerPhone: e.target.value }))} />
+              {errors.customerPhone && <span style={{ color: '#b3453a', fontSize: '0.75rem' }}>{errors.customerPhone}</span>}
+            </div>
+            <div>
+              <label className="pbf-label">{t.wilaya}</label>
+              <select className="pbf-input-field" disabled={wilayas.length === 0} value={fd.customerWelaya}
+                onChange={(e) => setFd((f) => ({ ...f, customerWelaya: e.target.value, customerCommune: '' }))}>
+                <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
+                {wilayas.map((w) => (
+                  <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>
+                ))}
+              </select>
+              {errors.customerWelaya && <span style={{ color: '#b3453a', fontSize: '0.75rem' }}>{errors.customerWelaya}</span>}
+            </div>
+            <div>
+              <label className="pbf-label">{t.commune}</label>
+              <select className="pbf-input-field" disabled={!fd.customerWelaya || loadingC} value={fd.customerCommune}
+                onChange={(e) => setFd((f) => ({ ...f, customerCommune: e.target.value }))}>
+                <option value="">{loadingC ? t.communeLoading : t.communePlaceholder}</option>
+                {communes.map((c) => (
+                  <option key={c.id} value={c.id}>{t.dir === 'rtl' ? c.ar_name : c.name}</option>
+                ))}
+              </select>
+              {errors.customerCommune && <span style={{ color: '#b3453a', fontSize: '0.75rem' }}>{errors.customerCommune}</span>}
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setFd((f) => ({ ...f, typeLivraison: 'home' }))}
+                style={{ flex: 1, padding: '10px', borderRadius: 4, border: `1px solid ${fd.typeLivraison === 'home' ? SAGE_DARK : BORDER}`, background: 'none', color: fd.typeLivraison === 'home' ? SAGE_DARK : MUTED, cursor: 'pointer', minHeight: 44 }}>
+                {t.deliveryHome}
+              </button>
+              <button onClick={() => setFd((f) => ({ ...f, typeLivraison: 'office' }))}
+                style={{ flex: 1, padding: '10px', borderRadius: 4, border: `1px solid ${fd.typeLivraison === 'office' ? SAGE_DARK : BORDER}`, background: 'none', color: fd.typeLivraison === 'office' ? SAGE_DARK : MUTED, cursor: 'pointer', minHeight: 44 }}>
+                {t.deliveryOffice}
+              </button>
+            </div>
+
+            <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                <span style={{ color: MUTED, fontSize: '0.85rem' }}>{t.subtotal}</span>
+                <span style={{ color: INK, whiteSpace: 'nowrap', flexShrink: 0 }}>{cartTotal.toLocaleString()} {store?.currency}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                <span style={{ color: MUTED, fontSize: '0.85rem' }}>{t.delivery}</span>
+                <span style={{ color: INK, whiteSpace: 'nowrap', flexShrink: 0 }}>{selW ? `${getLiv().toLocaleString()} ${store?.currency}` : '—'}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                <span style={{ color: INK, fontWeight: 700 }}>{t.total}</span>
+                <span style={{ color: SAGE_DARK, fontWeight: 700, whiteSpace: 'nowrap', flexShrink: 0 }}>{finalTotal.toLocaleString()} {store?.currency}</span>
+              </div>
+            </div>
+
+            {errors.submit && <span style={{ color: '#b3453a', fontSize: '0.8rem' }}>{errors.submit}</span>}
+
+            <button className="pbf-btn-primary" onClick={submitOrder} disabled={submitting}>
+              {submitting ? t.sending : t.confirmOrder}
+            </button>
+          </div>
+        </div>
+      </div>
+      <style dangerouslySetInnerHTML={{ __html: `@media (min-width:1024px){ .pbf-cart-inner{ grid-template-columns: 1.2fr 1fr; } }` }} />
     </div>
-);
+  );
+}
+
+/* ============================== STATIC PAGES ============================== */
+
+function StaticShell({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="pbf-container" style={{ padding: '3.5rem 1.5rem', maxWidth: 860 }}>
+      <h1 className="pbf-display" style={{ color: INK, fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', marginBottom: 24 }}>{title}</h1>
+      <div style={{ color: MUTED, fontSize: '0.95rem', lineHeight: 1.9 }}>{children}</div>
+    </div>
+  );
+}
 
 export function Privacy() {
-    return (
-        <Shell title="سياسة الخصوصية" emoji="🔒">
-            <IB title="البيانات التي نجمعها" body="اسمك ورقم هاتفك وعنوان التوصيل فقط — لا نجمع أكثر مما نحتاج." />
-            <IB title="كيف نستخدم بياناتك" body="حصرياً لتنفيذ وتوصيل طلبك. لا استخدام تجاري." />
-            <IB title="الأمان والتشفير" body="جميع بياناتك محمية بتشفير SSL." />
-            <IB title="مشاركة البيانات" body="لا نبيع بياناتك. تُشارك فقط مع شريك التوصيل." tag="مضمون" />
-        </Shell>
-    );
+  return (
+    <StaticShell title="Privacy Policy">
+      <p>This page outlines how customer data is collected, used, and protected across this storefront.</p>
+    </StaticShell>
+  );
 }
 
 export function Terms() {
-    return (
-        <Shell title="شروط الخدمة" emoji="📋">
-            <IB title="الطلبات" body="لا رسوم خفية. السعر المعروض هو السعر النهائي." />
-            <IB title="جودة المنتجات" body="جميع عطورنا طبيعية 100% ومضمونة الجودة." tag="مضمون" />
-            <IB title="الإرجاع" body="الإرجاع مقبول خلال 7 أيام في حالة العيب." />
-            <IB title="القانون" body="تخضع الشروط لقوانين الجمهورية الجزائرية." />
-        </Shell>
-    );
+  return (
+    <StaticShell title="Terms & Conditions">
+      <p>This page outlines the terms governing purchases made through this storefront.</p>
+    </StaticShell>
+  );
 }
 
 export function Cookies() {
-    return (
-        <Shell title="ملفات الارتباط" emoji="🍪">
-            <IB title="كوكيز أساسية" body="ضرورية لتشغيل المتجر والسلة." tag="مطلوب" />
-            <IB title="كوكيز التفضيلات" body="تحفظ إعداداتك لتجربة أفضل." tag="اختياري" />
-            <IB title="التحكم" body="يمكنك إدارة الكوكيز من إعدادات متصفحك." />
-        </Shell>
-    );
+  return (
+    <StaticShell title="Cookie Policy">
+      <p>This page explains how cookies are used to improve your shopping experience.</p>
+    </StaticShell>
+  );
 }
 
-export function Contact({ store }: { store?: any }) {
-    const [form, setForm] = useState({ name: '', phone: '', email: '', message: '' });
-    const [sent, setSent] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault(); setLoading(true);
-        try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store?.id }); setSent(true); }
-        catch { showError('حدث خطأ'); } finally { setLoading(false); }
-    };
-    const onF = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = 'var(--sage)'; };
-    const onB = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = 'var(--line-2)'; };
+export function Contact({ store }: any) {
+  const t = T[getLang(store)];
+  return (
+    <div className="pbf-container" style={{ padding: '3.5rem 1.5rem', maxWidth: 720 }}>
+      <h1 className="pbf-display" style={{ color: INK, fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', marginBottom: 24 }}>{t.contactTitle}</h1>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {store?.contact?.phone && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: MUTED }}>
+            <Phone size={18} color={SAGE_DARK} /> {store.contact.phone}
+          </div>
+        )}
+        {store?.contact?.email && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: MUTED }}>
+            <Mail size={18} color={SAGE_DARK} /> {store.contact.email}
+          </div>
+        )}
+        {store?.contact?.address && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: MUTED }}>
+            <MapPin size={18} color={SAGE_DARK} /> {store.contact.wilaya ? `${store.contact.wilaya}, ` : ''}{store.contact.address}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
-    return (
-        <div dir="rtl" style={{ background: 'var(--white)', minHeight: '100vh', fontFamily: "'Cairo',sans-serif", padding: '24px 20px 60px' }}>
-            <h1 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--char)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: '1.4rem' }}>💬</span> تواصل معنا
-            </h1>
-            <p style={{ fontSize: '12px', color: 'var(--mist)', marginBottom: '24px' }}>نرد خلال 24 ساعة</p>
-
-            {/* Contact info */}
-            {[
-                { icon: '📞', label: 'الهاتف', val: store?.contact?.phone },
-                { icon: '✉️', label: 'البريد', val: store?.contact?.email },
-                { icon: '📍', label: 'الموقع', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
-            ].filter(r => r.val).map(item => (
-                <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '13px 16px', borderRadius: '10px', background: 'var(--sage-lt)', border: '1px solid var(--line)', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '1.2rem' }}>{item.icon}</span>
-                    <div>
-                        <p style={{ fontSize: '10px', fontWeight: 600, color: 'var(--sage)', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>{item.label}</p>
-                        <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--char)', margin: 0 }}>{item.val}</p>
-                    </div>
-                </div>
-            ))}
-
-            <div style={{ marginTop: '24px', background: 'var(--ivory)', borderRadius: '12px', border: '1px solid var(--line)', padding: '20px' }}>
-                <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--char)', marginBottom: '16px' }}>أرسل رسالة</p>
-                {sent ? (
-                    <div style={{ textAlign: 'center', padding: '32px 20px' }}>
-                        <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '12px' }}>✅</span>
-                        <p style={{ fontWeight: 700, color: 'var(--char)', marginBottom: '4px' }}>تم الإرسال</p>
-                        <p style={{ fontSize: '12px', color: 'var(--mist)' }}>سنرد عليك قريباً</p>
-                    </div>
-                ) : (
-                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        <div className="form-2c">
-                            <div>
-                                <p style={{ fontSize: '11px', fontWeight: 600, color: 'var(--mid)', marginBottom: 5 }}>الاسم</p>
-                                <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={INP()} onFocus={onF} onBlur={onB} />
-                            </div>
-                            <div>
-                                <p style={{ fontSize: '11px', fontWeight: 600, color: 'var(--mid)', marginBottom: 5 }}>الهاتف</p>
-                                <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required style={INP()} onFocus={onF} onBlur={onB} />
-                            </div>
-                        </div>
-                        <div>
-                            <p style={{ fontSize: '11px', fontWeight: 600, color: 'var(--mid)', marginBottom: 5 }}>البريد الإلكتروني</p>
-                            <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="example@email.com" style={INP()} onFocus={onF} onBlur={onB} />
-                        </div>
-                                                <div>
-                            <p style={{ fontSize: '11px', fontWeight: 600, color: 'var(--mid)', marginBottom: 5 }}>رسالتك</p>
-                            <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder="كيف يمكننا مساعدتك؟" rows={4} required
-                                style={{ ...INP(), resize: 'none' }} onFocus={onF} onBlur={onB} />
-                        </div>
-                        <button type="submit" disabled={loading} className="btn-sage" style={{ width: '100%', padding: '12px', fontSize: '13px', borderRadius: '8px', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.55 : 1 }}>
-                            {loading ? <><Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} />جاري...</> : 'إرسال الرسالة 🌿'}
-                        </button>
-                    </form>
-                )}
-            </div>
-        </div>
-    );
+export function StaticPage({ staticPage, page, store }: any) {
+  const t = T[getLang(store)];
+  return (
+    <StaticShell title={staticPage?.title || page || t.home}>
+      <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(staticPage?.content || '') }} />
+    </StaticShell>
+  );
 }
