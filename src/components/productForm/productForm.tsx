@@ -66,6 +66,7 @@ export interface ProductFormProps {
   inputBackgroundColor?: string;
   inputBorderColor?:     string;
   inputTextColor?:       string;
+  borderRadius?:         number;  // builder-pages productForm block only — 0 by default (square corners)
 }
 
 /* ─── Helpers ────────────────────────────────────────── */
@@ -118,6 +119,7 @@ export default function ProductForm({
   platform, priceLoss = 0, lpId, builderPageId, title, buttonText, renderBefore,
   backgroundColor, textColor, buttonBackgroundColor, buttonTextColor,
   buttonBorderColor, inputBackgroundColor, inputBorderColor, inputTextColor,
+  borderRadius,
 }: ProductFormProps) {
   const router = useRouter();
 
@@ -285,7 +287,7 @@ export default function ProductForm({
 
   /* ── Render ── */
   return (
-    <div className="rounded-3xl overflow-hidden shadow-xl shadow-gray-900/5 border" style={{ backgroundColor: cardBg, borderColor: fieldBorder, color: cardText }}>
+    <div className="overflow-hidden shadow-xl shadow-gray-900/5 border" style={{ backgroundColor: cardBg, borderColor: fieldBorder, color: cardText, borderRadius: borderRadius ?? 0 }}>
 
       {/* Header */}
       <div className="px-6 py-5 border-b" style={{ borderColor: fieldBorder }}>

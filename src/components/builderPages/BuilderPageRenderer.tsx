@@ -59,7 +59,21 @@ interface BuilderPageData {
 // no drag/resize handles, and real click behavior instead of the editor's
 // always-prevented-default (a button actually navigates, or actually scrolls
 // to the order form).
-function FloatingElements({ elements }: { elements: unknown }) {
+//
+// `referenceWidth` is the page width the merchant was actually looking at
+// while sizing text in the editor (the page's own maxWidth) — text fontSize
+// is expressed in that same fixed px value everywhere else, which is only
+// correct at that one width. Below it (an actual phone screen, once the
+// page column itself shrinks below the desktop-sized editor canvas), a
+// fixed px size stays the same while its %-based box shrinks around it,
+// so the text overflows the box and spills across whatever is underneath
+// (typically the block's own image). `100cqw` = 1% of the nearest ancestor
+// with `containerType:'inline-size'` (set on this element's own wrapper),
+// so scaling the fontSize by (original / referenceWidth) * 100cqw keeps it
+// proportional to *that specific block's* rendered width at any viewport
+// size — clamped so it never renders smaller than 10px or bigger than the
+// original px value the merchant actually set.
+function FloatingElements({ elements, referenceWidth }: { elements: unknown; referenceWidth: number }) {
   const items = Array.isArray(elements) ? (elements as FloatingElement[]) : [];
   if (items.length === 0) return null;
 
@@ -118,12 +132,13 @@ function FloatingElements({ elements }: { elements: unknown }) {
         }
 
         // text element
+        const basePx = el.fontSize || 24;
         return (
           <div
             key={el.id}
             style={{
               ...commonStyle,
-              fontSize: el.fontSize || 24,
+              fontSize: `clamp(10px, ${(basePx / referenceWidth) * 100}cqw, ${basePx}px)`,
               fontWeight: el.fontWeight || 700,
               fontStyle: el.fontStyle || 'normal',
               textDecoration: el.textDecoration || 'none',
@@ -142,23 +157,37 @@ function FloatingElements({ elements }: { elements: unknown }) {
 }
 
 // Mirrors dashboard/src/pages/editor/blocks/ImageBlock.jsx.
-function ImageBlockRenderer({ props }: { props: Record<string, unknown> }) {
+function ImageBlockRenderer({ props, referenceWidth }: { props: Record<string, unknown>; referenceWidth: number }) {
   const { src, alt, caption, width, align, height } = props as ImageBlockProps;
   if (!src) return null;
   const widthPct = width || 100;
   const justify = align === 'start' ? 'flex-start' : align === 'end' ? 'flex-end' : 'center';
+  // `height` is a fixed px value set at the page's reference width (720 by
+  // default) — expressed here as a real aspect-ratio (box width at the
+  // reference width : height) so it stays proportional at any container
+  // width. object-fit:contain (not cover) means this never needs to crop,
+  // so it doesn't need an exactly-right box height to look correct — any
+  // rounding slack just shows as empty space around the image instead of
+  // cutting off part of it, which is what made getting this pixel-perfect
+  // worth fighting for in the first place.
+  // Assumes the height was set against the full reference width (720 by
+  // default) regardless of widthPct — simpler, and matches how this field
+  // is actually used in practice (a custom crop height on a full-width
+  // image), instead of a widthPct-scaled ratio that only made sense for a
+  // narrower, aligned image that also happens to have a custom height.
+  const aspectRatio = height ? `${referenceWidth} / ${height}` : undefined;
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: justify }}>
-      <div style={{ width: `${widthPct}%`, maxWidth: '100%', height: height || undefined, overflow: 'hidden', borderRadius: 12 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: justify, width: '100%' }}>
+      <div style={{ width: `${widthPct}%`, maxWidth: '100%', minWidth: 0, minHeight: 0, aspectRatio, overflow: 'hidden' }}>
         {/* eslint-disable-next-line @next/next/no-img-element -- dynamic per-page src, not a static build-time asset */}
         <img
           src={src}
           alt={alt || ''}
           style={{
             width: '100%',
-            height: height ? '100%' : 'auto',
+            height: aspectRatio ? '100%' : 'auto',
             display: 'block',
-            objectFit: height ? 'cover' : undefined,
+            objectFit: aspectRatio ? 'cover' : undefined,
             objectPosition: 'top',
           }}
         />
@@ -202,11 +231,12 @@ function SpacerBlockRenderer({ props, elements, maxWidth }: { props: Record<stri
               width: '100%',
               maxWidth: `${maxWidth}px`,
               zIndex: 30,
+              containerType: 'inline-size' as const,
             }
           : { position: 'relative' as const }),
       }}
     >
-      {isPinned && <FloatingElements elements={elements} />}
+      {isPinned && <FloatingElements elements={elements} referenceWidth={maxWidth} />}
     </div>
   );
 }
@@ -237,8 +267,10 @@ export default function BuilderPageRenderer({ page, lpDomain }: { page: BuilderP
       dir="rtl"
       style={{
         backgroundColor: settings.backgroundColor || '#ffffff',
+        width: '100%',
         maxWidth: `${pageMaxWidth}px`,
         marginInline: 'auto',
+        boxSizing: 'border-box',
         padding: pagePadding || undefined,
         paddingTop: pinnedTopHeight ? pinnedTopHeight + pagePadding : undefined,
         paddingBottom: pinnedBottomHeight ? pinnedBottomHeight + pagePadding : undefined,
@@ -248,8 +280,8 @@ export default function BuilderPageRenderer({ page, lpDomain }: { page: BuilderP
       {page.tree.map((block, index) => {
         const isPinnedSpacer = block.type === 'spacer' && (block.props?.position === 'top' || block.props?.position === 'bottom');
         return (
-          <div key={block.id ?? index} style={{ position: 'relative' }} id={block.type === 'productForm' ? 'md-product-form' : undefined}>
-            {block.type === 'image' && <ImageBlockRenderer props={block.props} />}
+          <div key={block.id ?? index} style={{ position: 'relative', containerType: 'inline-size' }} id={block.type === 'productForm' ? 'md-product-form' : undefined}>
+            {block.type === 'image' && <ImageBlockRenderer props={block.props} referenceWidth={pageMaxWidth} />}
             {block.type === 'spacer' && <SpacerBlockRenderer props={block.props} elements={isPinnedSpacer ? block.props?.elements : undefined} maxWidth={pageMaxWidth} />}
             {block.type === 'productForm' && (
               <ProductFormBlockRenderer
@@ -259,7 +291,7 @@ export default function BuilderPageRenderer({ page, lpDomain }: { page: BuilderP
                 builderPageId={page.id}
               />
             )}
-            {!isPinnedSpacer && <FloatingElements elements={block.props?.elements} />}
+            {!isPinnedSpacer && <FloatingElements elements={block.props?.elements} referenceWidth={pageMaxWidth} />}
           </div>
         );
       })}

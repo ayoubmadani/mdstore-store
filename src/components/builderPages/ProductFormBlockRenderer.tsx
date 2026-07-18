@@ -52,6 +52,8 @@ interface ProductFormBlockProps {
   inputBackgroundColor?: string;
   inputBorderColor?: string;
   inputTextColor?: string;
+  paddingX?: number;
+  borderRadius?: number;
 }
 
 export default function ProductFormBlockRenderer({
@@ -103,6 +105,8 @@ export default function ProductFormBlockRenderer({
     inputBackgroundColor,
     inputBorderColor,
     inputTextColor,
+    paddingX,
+    borderRadius,
   } = (props || {}) as ProductFormBlockProps;
 
   // Matches ProductForm.tsx's own default fallback exactly (both are only
@@ -240,7 +244,8 @@ export default function ProductFormBlockRenderer({
   return (
     <div
       style={{
-        padding: 20,
+        paddingBlock: 20,
+        paddingInline: `${paddingX ?? 3}%`,
         width: '100%',
         boxSizing: 'border-box',
         backgroundColor: containerBackgroundColor || 'transparent',
@@ -278,6 +283,7 @@ export default function ProductFormBlockRenderer({
           inputBackgroundColor={inputBackgroundColor}
           inputBorderColor={inputBorderColor}
           inputTextColor={inputTextColor}
+          borderRadius={borderRadius}
         />
       )}
     </div>
