@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import ProductForm from '@/components/productForm/productForm';
+import { getProductFormStrings } from '@/components/productForm/translations';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -26,8 +27,6 @@ function variantMatches(detail: VariantDetail, sel: Record<string, string>): boo
     detail.name?.some((entry) => entry.attrName === attrName && entry.value === value)
   );
 }
-
-const formatPrice = (n: number) => `${Number(n || 0).toLocaleString('en-US')} دج`;
 
 // Mirrors dashboard/src/pages/editor/blocks/ProductFormBlock.jsx's own
 // product/offers/attributes picker UI + colors, then hands off the actual
@@ -61,12 +60,16 @@ export default function ProductFormBlockRenderer({
   props,
   lpDomain,
   builderPageId,
+  language,
 }: {
   productId?: string;
   props: Record<string, unknown>;
   lpDomain: string;
   builderPageId: string;
+  language?: string;
 }) {
+  const t = getProductFormStrings(language);
+  const formatPrice = (n: number) => `${Number(n || 0).toLocaleString('en-US')} ${t.currency}`;
   const [product, setProduct] = useState<ProductInfo | null>(null);
   const [selectedOffer, setSelectedOffer] = useState<string | null>(null);
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
@@ -163,7 +166,7 @@ export default function ProductFormBlockRenderer({
                   onChange={() => setSelectedOffer(selectedOffer === offer.id ? null : offer.id)}
                   style={{ accentColor }}
                 />
-                {offer.name} <span style={{ opacity: 0.6 }}>({offer.quantity} قطع)</span>
+                {offer.name} <span style={{ opacity: 0.6 }}>({offer.quantity} {t.pieces})</span>
               </span>
               <span style={{ fontWeight: 700 }}>{formatPrice(offer.price)}</span>
             </label>
@@ -252,7 +255,7 @@ export default function ProductFormBlockRenderer({
       }}
     >
       {!product ? (
-        <p style={{ textAlign: 'center', fontSize: 14, opacity: 0.6 }}>جارٍ التحميل...</p>
+        <p style={{ textAlign: 'center', fontSize: 14, opacity: 0.6 }}>{t.loading}</p>
       ) : (
         <ProductForm
           product={{
@@ -284,6 +287,7 @@ export default function ProductFormBlockRenderer({
           inputBorderColor={inputBorderColor}
           inputTextColor={inputTextColor}
           borderRadius={borderRadius}
+          language={language}
         />
       )}
     </div>

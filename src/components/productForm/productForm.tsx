@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { getProductFormStrings } from './translations';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -67,6 +68,7 @@ export interface ProductFormProps {
   inputBorderColor?:     string;
   inputTextColor?:       string;
   borderRadius?:         number;  // builder-pages productForm block only — 0 by default (square corners)
+  language?:             string;  // builder-pages productForm block only — page.settings.language, defaults to 'ar'
 }
 
 /* ─── Helpers ────────────────────────────────────────── */
@@ -119,9 +121,10 @@ export default function ProductForm({
   platform, priceLoss = 0, lpId, builderPageId, title, buttonText, renderBefore,
   backgroundColor, textColor, buttonBackgroundColor, buttonTextColor,
   buttonBorderColor, inputBackgroundColor, inputBorderColor, inputTextColor,
-  borderRadius,
+  borderRadius, language,
 }: ProductFormProps) {
   const router = useRouter();
+  const t = getProductFormStrings(language);
 
   // Defaults match this component's existing hardcoded Tailwind palette
   // exactly (gray-900 #111827, gray-50 #f9fafb, gray-200 #e5e7eb, white),
@@ -226,15 +229,15 @@ export default function ProductForm({
   const validate = useCallback((): boolean => {
     const e: Record<string, string> = {};
     if (!formData.customerName.trim() || formData.customerName.length < 3)
-      e.customerName  = 'الاسم الكامل مطلوب (3 أحرف على الأقل)';
+      e.customerName  = t.errorName;
     if (!/^(0|\+213)[5-7][0-9]{8}$/.test(formData.customerPhone.replace(/\s/g, '')))
-      e.customerPhone = 'رقم هاتف جزائري صحيح مطلوب (مثال: 0550123456)';
-    if (!formData.customerWelaya)  e.customerWelaya  = 'اختر الولاية';
-    if (!formData.customerCommune) e.customerCommune = 'اختر البلدية';
-    if (formData.quantity < 1)     e.quantity        = 'الكمية يجب أن تكون 1 على الأقل';
+      e.customerPhone = t.errorPhone;
+    if (!formData.customerWelaya)  e.customerWelaya  = t.errorWilaya;
+    if (!formData.customerCommune) e.customerCommune = t.errorCommune;
+    if (formData.quantity < 1)     e.quantity        = t.errorQuantity;
     setFormErrors(e);
     return Object.keys(e).length === 0;
-  }, [formData]);
+  }, [formData, t]);
 
   /* ── Submit ── */
   const handleSubmit = async (e: React.FormEvent) => {
@@ -277,7 +280,7 @@ export default function ProductForm({
         router.push(`${window.location.pathname}/successfully?productId=${product.id}`);
       }
     } catch {
-      alert('حدث خطأ في الاتصال بالخادم');
+      alert(t.connectionError);
     } finally {
       setSubmitting(false);
     }
@@ -293,9 +296,9 @@ export default function ProductForm({
       <div className="px-6 py-5 border-b" style={{ borderColor: fieldBorder }}>
         <div className="flex items-center gap-2">
           <ShoppingCart className="w-5 h-5" style={{ opacity: 0.75 }} />
-          <p className="font-bold">{title || 'أدخل بيانات التسليم'}</p>
+          <p className="font-bold">{title || t.formTitle}</p>
         </div>
-        <p className="text-xs mt-1" style={{ opacity: 0.55 }}>سنتواصل معك خلال 24 ساعة لتأكيد طلبك</p>
+        <p className="text-xs mt-1" style={{ opacity: 0.55 }}>{t.formSubtitle}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -303,17 +306,17 @@ export default function ProductForm({
 
         {/* Name + Phone */}
         <div className="grid grid-cols-1 gap-4">
-          <FieldWrapper error={formErrors.customerName} label="الاسم الكامل" labelColor={cardText}>
+          <FieldWrapper error={formErrors.customerName} label={t.fullName} labelColor={cardText}>
             <div className="relative">
               <User className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
-              <input type="text" value={formData.customerName} placeholder="محمد أحمد"
+              <input type="text" value={formData.customerName} placeholder={t.fullNamePlaceholder}
                 onChange={e => setFormData({ ...formData, customerName: e.target.value })}
                 className={`${inputCls(!!formErrors.customerName)} pr-10`}
                 style={fieldStyle(!!formErrors.customerName)} />
             </div>
           </FieldWrapper>
 
-          <FieldWrapper error={formErrors.customerPhone} label="رقم الهاتف" labelColor={cardText}>
+          <FieldWrapper error={formErrors.customerPhone} label={t.phone} labelColor={cardText}>
             <div className="relative">
               <Phone className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
               <input type="tel" dir="ltr" value={formData.customerPhone} placeholder="0550 123 456"
@@ -326,21 +329,21 @@ export default function ProductForm({
 
         {/* Wilaya + Commune */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FieldWrapper error={formErrors.customerWelaya} label="الولاية" labelColor={cardText}>
+          <FieldWrapper error={formErrors.customerWelaya} label={t.wilaya} labelColor={cardText}>
             <div className="relative">
               <MapPin className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
               <select value={formData.customerWelaya}
                 onChange={e => setFormData({ ...formData, customerWelaya: e.target.value, customerCommune: '' })}
                 className={`${inputCls(!!formErrors.customerWelaya)} pr-10 appearance-none cursor-pointer`}
                 style={fieldStyle(!!formErrors.customerWelaya)}>
-                <option value="">اختر الولاية</option>
+                <option value="">{t.selectWilaya}</option>
                 {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
               </select>
               <ChevronDown className="absolute left-3 top-3.5 w-4 h-4 pointer-events-none" style={{ opacity: 0.4 }} />
             </div>
           </FieldWrapper>
 
-          <FieldWrapper error={formErrors.customerCommune} label="البلدية" labelColor={cardText}>
+          <FieldWrapper error={formErrors.customerCommune} label={t.commune} labelColor={cardText}>
             <div className="relative">
               <MapPin className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
               <select value={formData.customerCommune}
@@ -349,9 +352,9 @@ export default function ProductForm({
                 className={`${inputCls(!!formErrors.customerCommune)} pr-10 appearance-none cursor-pointer disabled:opacity-50`}
                 style={fieldStyle(!!formErrors.customerCommune)}>
                 <option value="">
-                  {loadingCommunes ? 'جاري التحميل...'
-                    : formData.customerWelaya ? 'اختر البلدية'
-                    : 'اختر الولاية أولاً'}
+                  {loadingCommunes ? t.loadingCommunes
+                    : formData.customerWelaya ? t.selectCommune
+                    : t.selectWilayaFirst}
                 </option>
                 {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
@@ -362,7 +365,7 @@ export default function ProductForm({
 
         {/* Delivery type */}
         <div>
-          <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: cardText, opacity: 0.6 }}>نوع التوصيل</p>
+          <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: cardText, opacity: 0.6 }}>{t.deliveryType}</p>
           <div className="grid grid-cols-2 gap-3">
             {(['home', 'office'] as const).map(type => {
               const isSelected = formData.typeLivraison === type;
@@ -380,10 +383,10 @@ export default function ProductForm({
                     ? <Home      className="w-6 h-6" style={{ opacity: isSelected ? 1 : 0.4 }} />
                     : <Building2 className="w-6 h-6" style={{ opacity: isSelected ? 1 : 0.4 }} />}
                   <div className="text-center">
-                    <p className="text-sm font-bold">{type === 'home' ? 'توصيل للمنزل' : 'استلام من المكتب'}</p>
+                    <p className="text-sm font-bold">{type === 'home' ? t.home : t.office}</p>
                     {selectedWilayaData && (
                       <p className="text-xs mt-0.5" style={{ opacity: isSelected ? 0.75 : 0.5 }}>
-                        {(type === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice).toLocaleString('ar-DZ')} د.ج
+                        {(type === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice).toLocaleString('ar-DZ')} {t.currency}
                       </p>
                     )}
                   </div>
@@ -392,12 +395,12 @@ export default function ProductForm({
             })}
           </div>
           {!selectedWilayaData && (
-            <p className="text-xs mt-2 text-center" style={{ color: cardText, opacity: 0.4 }}>اختر الولاية لعرض تكلفة التوصيل</p>
+            <p className="text-xs mt-2 text-center" style={{ color: cardText, opacity: 0.4 }}>{t.selectWilayaForPrice}</p>
           )}
         </div>
 
         {/* Quantity */}
-        <FieldWrapper error={formErrors.quantity} label="الكمية" labelColor={cardText}>
+        <FieldWrapper error={formErrors.quantity} label={t.quantity} labelColor={cardText}>
           <div className="flex items-center gap-4">
             <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
               className="w-12 h-12 rounded-xl border-2 flex items-center justify-center transition-all font-bold text-xl active:scale-95"
@@ -406,14 +409,14 @@ export default function ProductForm({
             <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: p.quantity + 1 }))}
               className="w-12 h-12 rounded-xl border-2 flex items-center justify-center transition-all font-bold text-xl active:scale-95"
               style={{ borderColor: fieldBorder, color: cardText }}>+</button>
-            <span className="text-sm font-medium" style={{ color: cardText, opacity: 0.45 }}>قطعة</span>
+            <span className="text-sm font-medium" style={{ color: cardText, opacity: 0.45 }}>{t.piece}</span>
           </div>
         </FieldWrapper>
 
         {/* Order summary */}
         <div className="rounded-2xl p-5 space-y-3 text-sm border" style={{ backgroundColor: fieldBg, borderColor: fieldBorder, color: cardText }}>
           <div className="flex justify-between" style={{ opacity: 0.75 }}>
-            <span className="flex items-center gap-1"><Package className="w-4 h-4" /> المنتج</span>
+            <span className="flex items-center gap-1"><Package className="w-4 h-4" /> {t.product}</span>
             <span className="font-bold truncate max-w-[50%]" style={{ opacity: 1 }}>{product.name}</span>
           </div>
 
@@ -422,7 +425,7 @@ export default function ProductForm({
             if (!offer) return null;
             return (
               <div className="flex justify-between items-center" style={{ opacity: 0.75 }}>
-                <span className="flex items-center gap-1"><Tag className="w-3.5 h-3.5 text-amber-500" /> العرض</span>
+                <span className="flex items-center gap-1"><Tag className="w-3.5 h-3.5 text-amber-500" /> {t.offer}</span>
                 <span className="text-amber-600 font-bold bg-amber-50 px-2.5 py-1 rounded-lg text-xs border border-amber-100">{offer.name}</span>
               </div>
             );
@@ -445,27 +448,27 @@ export default function ProductForm({
           })}
 
           <div className="flex justify-between" style={{ opacity: 0.75 }}>
-            <span className="flex items-center gap-1"><Truck className="w-4 h-4" /> التوصيل</span>
+            <span className="flex items-center gap-1"><Truck className="w-4 h-4" /> {t.delivery}</span>
             <span className="font-medium" style={{ opacity: 1 }}>
-              {formData.typeLivraison === 'home' ? 'المنزل' : 'المكتب'}
-              {selectedWilayaData && <span className="mr-1" style={{ opacity: 0.7 }}>({getPriceLivraison().toLocaleString('ar-DZ')} د.ج)</span>}
+              {formData.typeLivraison === 'home' ? t.homeShort : t.officeShort}
+              {selectedWilayaData && <span className="mr-1" style={{ opacity: 0.7 }}>({getPriceLivraison().toLocaleString('ar-DZ')} {t.currency})</span>}
             </span>
           </div>
 
           <div className="flex justify-between" style={{ opacity: 0.75 }}>
-            <span>سعر القطعة</span>
-            <span className="font-bold" style={{ opacity: 1 }}>{finalPrice.toLocaleString('ar-DZ')} د.ج</span>
+            <span>{t.unitPrice}</span>
+            <span className="font-bold" style={{ opacity: 1 }}>{finalPrice.toLocaleString('ar-DZ')} {t.currency}</span>
           </div>
           <div className="flex justify-between" style={{ opacity: 0.75 }}>
-            <span>الكمية</span>
+            <span>{t.quantity}</span>
             <span className="font-bold" style={{ opacity: 1 }}>× {formData.quantity}</span>
           </div>
 
           <div className="flex justify-between items-center pt-3 border-t-2 border-dashed" style={{ borderColor: fieldBorder }}>
-            <span className="font-bold text-base">الإجمالي الكلي</span>
+            <span className="font-bold text-base">{t.total}</span>
             <span className="text-2xl font-black">
               {getTotalPrice().toLocaleString('ar-DZ')}
-              <span className="text-sm font-bold mr-1" style={{ opacity: 0.6 }}>د.ج</span>
+              <span className="text-sm font-bold mr-1" style={{ opacity: 0.6 }}>{t.currency}</span>
             </span>
           </div>
         </div>
@@ -481,14 +484,14 @@ export default function ProductForm({
             cursor: submitting ? 'not-allowed' : 'pointer',
           }}>
           {submitting ? (
-            <><div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${btnText}55`, borderTopColor: 'transparent' }} />جاري إرسال الطلب...</>
+            <><div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${btnText}55`, borderTopColor: 'transparent' }} />{t.submitting}</>
           ) : (
-            <><ShoppingCart className="w-5 h-5" />{buttonText || 'تأكيد الطلب الآن'}</>
+            <><ShoppingCart className="w-5 h-5" />{buttonText || t.submit}</>
           )}
         </button>
 
         <p className="text-xs text-center flex items-center justify-center gap-1" style={{ color: cardText, opacity: 0.4 }}>
-          <Shield className="w-3 h-3" />بياناتك آمنة ومشفرة 100%
+          <Shield className="w-3 h-3" />{t.secure}
         </p>
       </form>
     </div>

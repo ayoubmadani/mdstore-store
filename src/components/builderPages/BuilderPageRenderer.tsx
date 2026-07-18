@@ -1,7 +1,110 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { Phone, MessageCircle, Mail, MapPin, ShoppingCart, ArrowUp, ArrowDown, Facebook, Instagram } from 'lucide-react';
 import ProductFormBlockRenderer from './ProductFormBlockRenderer';
 import AddShow from '@/components/addShow';
+import WhatsAppIcon from './WhatsAppIcon';
+
+// Matches dashboard/src/pages/editor/blocks/floatingButtonIcons.jsx's own
+// name→icon map exactly — the stored value is just this portable string,
+// resolved independently to each app's own icon import.
+const FLOATING_BUTTON_ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
+  Phone, MessageCircle, Mail, MapPin, ShoppingCart, ArrowUp, ArrowDown, Facebook, Instagram,
+  WhatsApp: WhatsAppIcon,
+};
+
+const FLOATING_BUTTON_POSITION_STYLE: Record<string, React.CSSProperties> = {
+  'top-right': { top: 20, right: 20 },
+  'top-left': { top: 20, left: 20 },
+  'top-center': { top: 20, left: '50%', transform: 'translateX(-50%)' },
+  'bottom-right': { bottom: 20, right: 20 },
+  'bottom-left': { bottom: 20, left: 20 },
+  'bottom-center': { bottom: 20, left: '50%', transform: 'translateX(-50%)' },
+};
+
+// Page-wide floating action button block (e.g. a WhatsApp/call button).
+// Anchoring it to the *true* viewport corner (like a WhatsApp button on a
+// normal full-width site) put it out in the empty margin on a wide desktop
+// screen, since this page builder always renders a narrow, mobile-width
+// column (settings.maxWidth, 720px by default) even on desktop — the
+// button ended up floating well outside the visible page content instead
+// of near it. Bounding it to that same column, the same way
+// SpacerBlockRenderer's pinned bar already does, keeps it anchored to a
+// corner of the actual visible page at any viewport size.
+function FloatingActionButton({ props, referenceWidth }: { props: Record<string, unknown>; referenceWidth: number }) {
+  const { link, linkType, position, contentType, text, icon, width: w, height: h, backgroundColor, textColor } = props as FloatingButtonProps;
+  const isFormLink = linkType === 'form';
+  // Once a "jump to order form" button's own target has scrolled into view,
+  // its job is done — leaving it on screen just sits a floating button on
+  // top of the very form it was pointing at. Only tracked for form-linked
+  // buttons; an external-link button (WhatsApp, phone, etc.) has no such
+  // target and always stays visible.
+  const [formInView, setFormInView] = useState(false);
+
+  useEffect(() => {
+    if (!isFormLink) return undefined;
+    const target = document.getElementById('md-product-form');
+    if (!target) return undefined;
+    const observer = new IntersectionObserver(([entry]) => setFormInView(entry.isIntersecting), { threshold: 0.2 });
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [isFormLink]);
+
+  if (isFormLink && formInView) return null;
+
+  const isText = (contentType || 'icon') === 'text';
+  const Icon = FLOATING_BUTTON_ICONS[icon || 'MessageCircle'] || FLOATING_BUTTON_ICONS.MessageCircle;
+  const width = w || 56;
+  const height = h || 56;
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        bottom: 0,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '100%',
+        maxWidth: `${referenceWidth}px`,
+        pointerEvents: 'none',
+        zIndex: 40,
+      }}
+    >
+      <a
+        href={isFormLink ? '#md-product-form' : link || '#'}
+        target={isFormLink ? undefined : '_blank'}
+        rel={isFormLink ? undefined : 'noreferrer'}
+        onClick={(e) => {
+          if (!isFormLink) return;
+          e.preventDefault();
+          document.getElementById('md-product-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }}
+        style={{
+          position: 'absolute',
+          ...FLOATING_BUTTON_POSITION_STYLE[position || 'bottom-right'],
+          width: isText ? undefined : width,
+          height,
+          minWidth: isText ? width : undefined,
+          padding: isText ? '0 16px' : 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: isText ? 12 : '50%',
+          backgroundColor: backgroundColor || '#10b981',
+          color: textColor || '#ffffff',
+          boxShadow: '0 10px 25px -5px rgba(0,0,0,0.25)',
+          fontWeight: 700,
+          fontSize: 14,
+          textDecoration: 'none',
+          pointerEvents: 'auto',
+        }}
+      >
+        {isText ? text : <Icon size={Math.round(Math.min(width, height) * 0.45)} />}
+      </a>
+    </div>
+  );
+}
 
 interface FloatingElement {
   id: string;
@@ -45,12 +148,25 @@ interface BuilderBlock {
   type: string;
   props: Record<string, unknown>;
 }
+interface FloatingButtonProps {
+  link?: string;
+  linkType?: 'external' | 'form';
+  position?: 'top-right' | 'top-left' | 'top-center' | 'bottom-right' | 'bottom-left' | 'bottom-center';
+  contentType?: 'text' | 'icon';
+  text?: string;
+  icon?: string;
+  width?: number;
+  height?: number;
+  backgroundColor?: string;
+  textColor?: string;
+}
+
 interface BuilderPageData {
   id: string;
   name: string;
   storeId: string;
   productId?: string;
-  settings?: { backgroundColor?: string; maxWidth?: number; padding?: number };
+  settings?: { backgroundColor?: string; maxWidth?: number; padding?: number; language?: 'ar' | 'fr' | 'en' };
   tree: BuilderBlock[];
 }
 
@@ -264,7 +380,8 @@ export default function BuilderPageRenderer({ page, lpDomain }: { page: BuilderP
 
   return (
     <div
-      dir="rtl"
+      dir={(settings.language || 'ar') === 'ar' ? 'rtl' : 'ltr'}
+      lang={settings.language || 'ar'}
       style={{
         backgroundColor: settings.backgroundColor || '#ffffff',
         width: '100%',
@@ -279,6 +396,7 @@ export default function BuilderPageRenderer({ page, lpDomain }: { page: BuilderP
       <AddShow storeId={page.storeId} productId={page.productId} builderPageId={page.id} />
       {page.tree.map((block, index) => {
         const isPinnedSpacer = block.type === 'spacer' && (block.props?.position === 'top' || block.props?.position === 'bottom');
+        if (block.type === 'floatingButton') return <FloatingActionButton key={block.id ?? index} props={block.props} referenceWidth={pageMaxWidth} />;
         return (
           <div key={block.id ?? index} style={{ position: 'relative', containerType: 'inline-size' }} id={block.type === 'productForm' ? 'md-product-form' : undefined}>
             {block.type === 'image' && <ImageBlockRenderer props={block.props} referenceWidth={pageMaxWidth} />}
@@ -289,6 +407,7 @@ export default function BuilderPageRenderer({ page, lpDomain }: { page: BuilderP
                 props={block.props}
                 lpDomain={lpDomain}
                 builderPageId={page.id}
+                language={settings.language}
               />
             )}
             {!isPinnedSpacer && <FloatingElements elements={block.props?.elements} referenceWidth={pageMaxWidth} />}
