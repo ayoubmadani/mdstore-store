@@ -23,10 +23,10 @@ export default async function SiteFooter() {
             </Link>
             <p className="text-gray-500 dark:text-gray-400 leading-relaxed text-sm">{tFooter('description')}</p>
             <div className="flex gap-4">
-              <SocialIcon icon={<Facebook size={18} />} href="#" />
-              <SocialIcon icon={<Twitter size={18} />} href="#" />
-              <SocialIcon icon={<Instagram size={18} />} href="#" />
-              <SocialIcon icon={<Linkedin size={18} />} href="#" />
+              <SocialIcon icon={<Facebook size={18} />} href="#" label="Facebook" />
+              <SocialIcon icon={<Twitter size={18} />} href="#" label="Twitter" />
+              <SocialIcon icon={<Instagram size={18} />} href="#" label="Instagram" />
+              <SocialIcon icon={<Linkedin size={18} />} href="#" label="LinkedIn" />
             </div>
           </div>
 
@@ -89,9 +89,10 @@ const FooterLink = ({ href, label }: { href: string; label: string }) => (
   </li>
 );
 
-const SocialIcon = ({ icon, href }: { icon: React.ReactNode; href: string }) => (
+const SocialIcon = ({ icon, href, label }: { icon: React.ReactNode; href: string; label: string }) => (
   <a
     href={href}
+    aria-label={label}
     className="w-9 h-9 bg-gray-50 dark:bg-zinc-900 text-gray-400 dark:text-gray-500 rounded-lg flex items-center justify-center hover:bg-brand-primary hover:text-white dark:hover:bg-brand-primary dark:hover:text-white transition-all shadow-sm"
   >
     {icon}

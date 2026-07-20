@@ -72,11 +72,11 @@ export default async function AboutPage() {
             <div className="grid grid-cols-2 gap-4 pt-4">
               <div className="p-4 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl border border-indigo-100 dark:border-indigo-500/10">
                 <h4 className="font-bold text-indigo-600 dark:text-indigo-400 text-xl mb-1">2026</h4>
-                <p className="text-[10px] text-indigo-500 opacity-80 uppercase tracking-widest font-black">تاريخ الانطلاق</p>
+                <p className="text-[10px] text-indigo-700 dark:text-indigo-300 uppercase tracking-widest font-black">تاريخ الانطلاق</p>
               </div>
               <div className="p-4 bg-purple-50 dark:bg-purple-500/10 rounded-2xl border border-purple-100 dark:border-purple-500/10">
                 <h4 className="font-bold text-purple-700 dark:text-purple-400 text-xl mb-1">+100</h4>
-                <p className="text-[10px] text-purple-600 dark:text-purple-400 opacity-80 uppercase tracking-widest font-black">تاجر موثوق</p>
+                <p className="text-[10px] text-purple-700 dark:text-purple-300 uppercase tracking-widest font-black">تاجر موثوق</p>
               </div>
             </div>
           </div>

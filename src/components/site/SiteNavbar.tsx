@@ -104,6 +104,7 @@ export default function SiteNavbar() {
         <div className="hidden md:flex items-center gap-3">
           <button
             onClick={toggleTheme}
+            aria-label={isDarkMode ? t('light_mode') : t('dark_mode')}
             className="p-2.5 rounded-xl bg-gray-50 dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 text-gray-600 dark:text-amber-400 hover:scale-110 active:scale-95 transition-all"
           >
             {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
