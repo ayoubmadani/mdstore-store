@@ -1,0 +1,16 @@
+# MdStore
+
+> MdStore is an all-in-one e-commerce platform that lets merchants in North Africa and the Arab world launch and manage their own online store in minutes, no coding required.
+
+## Pages
+
+- [Home](https://mdstore.top/): Overview of the platform and its features.
+- [About](https://mdstore.top/about): MdStore's story, mission, and values.
+- [Plans & Pricing](https://mdstore.top/plan): Subscription plans and pricing.
+- [Contact](https://mdstore.top/contact): Get in touch with the MdStore team.
+
+## Legal
+
+- [Privacy Policy](https://mdstore.top/privacy)
+- [Terms of Use](https://mdstore.top/terms)
+- [Cookie Policy](https://mdstore.top/cookies)
