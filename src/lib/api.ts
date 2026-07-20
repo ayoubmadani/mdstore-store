@@ -3,6 +3,50 @@ import { Store } from '@/types/store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+export interface Plan {
+  id: string;
+  name: string;
+  currency: string;
+  monthlyPrice: number;
+  yearlyPrice: number;
+  features?: {
+    storeNumber?: number;
+    productNumber?: number;
+    landingPageNumber?: number;
+    commission?: number;
+    isNtfy?: boolean;
+    pixelFacebookNumber?: number;
+    pixelTiktokNumber?: number;
+  };
+}
+
+export async function getActivePlans(): Promise<Plan[] | null> {
+  if (!API_URL) return null;
+  try {
+    const { data } = await axios.get(`${API_URL}/plans?active=true`, { timeout: 10000 });
+    return data || [];
+  } catch {
+    return null;
+  }
+}
+
+export interface ContactFormInput {
+  username: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+export async function submitContact(input: ContactFormInput): Promise<boolean> {
+  if (!API_URL) return false;
+  try {
+    const response = await axios.post(`${API_URL}/admin/contact`, input, { timeout: 10000 });
+    return response.status === 200 || response.status === 201;
+  } catch {
+    return false;
+  }
+}
+
 export async function getProduct(domain: string, productId: string): Promise<any | null> {
   if (!API_URL || !domain || !productId) return null
   try {

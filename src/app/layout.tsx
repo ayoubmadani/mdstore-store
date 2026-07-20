@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { getLocale } from "next-intl/server";
 import "./globals.css";
 import SetCustomerId from "@/components/setCustomerId";
 
@@ -27,14 +28,16 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const dir = locale === "ar" ? "rtl" : "ltr";
 
   return (
-    <html lang="en">
+    <html lang={locale} dir={dir}>
       <SetCustomerId />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

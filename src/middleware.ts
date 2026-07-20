@@ -1,6 +1,17 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+const SUPPORTED_LOCALES = ['ar', 'en', 'fr'];
+const DEFAULT_LOCALE = 'ar';
+
+function negotiateLocale(acceptLanguage: string | null): string {
+  if (!acceptLanguage) return DEFAULT_LOCALE;
+  const preferred = acceptLanguage
+    .split(',')
+    .map((p) => p.split(';')[0].trim().slice(0, 2).toLowerCase());
+  return preferred.find((l) => SUPPORTED_LOCALES.includes(l)) ?? DEFAULT_LOCALE;
+}
+
 export function middleware(req: NextRequest) {
   const url = req.nextUrl; // لا حاجة لـ clone() هنا في البداية
   const path = url.pathname;
@@ -34,14 +45,16 @@ export function middleware(req: NextRequest) {
   const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'mdstore.top').toLowerCase();
   const searchHostname = hostname.replace('www.', '');
 
-  // 3. معالجة الموقع الرئيسي
+  // 3. معالجة الموقع الرئيسي — يُعرض هنا مباشرة عبر (site)، مع تحديد اللغة عبر كوكي
   if (searchHostname === rootDomain) {
-    const appUrl = process.env.MDSTORE_APP_URL;
-    if (appUrl) {
-      return NextResponse.redirect(new URL(appUrl, req.url));
+    const res = NextResponse.next();
+    if (!req.cookies.get('NEXT_LOCALE')) {
+      res.cookies.set('NEXT_LOCALE', negotiateLocale(req.headers.get('accept-language')), {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 365,
+      });
     }
-    // إذا لم يتوفر رابط التطبيق، يمكن توجيهه لمسار افتراضي أو تركه يمر
-    return NextResponse.next();
+    return res;
   }
 
   // 4. تحديد هوية المتجر (المعرف)
