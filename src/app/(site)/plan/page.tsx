@@ -34,9 +34,9 @@ export default async function PlanPage() {
       </div>
 
       {plans === null ? (
-        <p className="text-center text-red-400 py-20 text-sm">{t('error_load')}</p>
+        <p className="text-center text-red-600 dark:text-red-400 py-20 text-sm">{t('error_load')}</p>
       ) : plans.length === 0 ? (
-        <p className="text-center text-gray-400 py-20 text-sm">{t('no_plans')}</p>
+        <p className="text-center text-gray-500 dark:text-zinc-400 py-20 text-sm">{t('no_plans')}</p>
       ) : (
         <PlanToggle plans={plans} />
       )}

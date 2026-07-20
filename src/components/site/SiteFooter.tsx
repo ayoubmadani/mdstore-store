@@ -68,7 +68,7 @@ export default async function SiteFooter() {
           </div>
         </div>
 
-        <div className="border-t border-gray-100 dark:border-zinc-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+        <div className="border-t border-gray-100 dark:border-zinc-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
           <p>© {new Date().getFullYear()} MdStore. {tFooter('rights')}</p>
           <div className="flex gap-6">
             <span className="hover:text-brand-primary cursor-pointer transition-colors">Algeria 🇩🇿</span>

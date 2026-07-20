@@ -66,7 +66,7 @@ export default async function PrivacyPage() {
               <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{t('updates_desc')}</p>
             </div>
           </div>
-          <div className="text-sm text-gray-400 dark:text-zinc-500 font-medium">{t('last_updated')}: 06/02/2026</div>
+          <div className="text-sm text-gray-500 dark:text-zinc-400 font-medium">{t('last_updated')}: 06/02/2026</div>
         </div>
       </div>
     </div>
