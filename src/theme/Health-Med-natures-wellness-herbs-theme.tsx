@@ -112,14 +112,14 @@ const THEME_CSS = `
     overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
     animation: glb-ov-in 0.2s ease;
   }
-  .glb-search-panel { max-width: 640px; margin: 0 auto; padding: 5rem 1.5rem 4rem; animation: glb-ov-panel 0.28s ease; direction: rtl; }
+  .glb-search-panel { max-width: 640px; margin: 0 auto; padding: 5rem 1.5rem 4rem; animation: glb-ov-panel 0.28s ease; }
   .glb-search-form { border-bottom: 2px solid ${G}; display: flex; align-items: center; margin-bottom: 2rem; }
-  .glb-search-input { flex: 1; font-size: 1.375rem; border: none; background: transparent; color: ${INK}; outline: none; padding: 0.5rem 0.5rem 0.75rem; font-family: 'DM Sans', sans-serif; direction: rtl; }
+  .glb-search-input { flex: 1; font-size: 1.375rem; border: none; background: transparent; color: ${INK}; outline: none; padding: 0.5rem 0.5rem 0.75rem; font-family: 'DM Sans', sans-serif; }
   .glb-search-input::placeholder { color: ${GB}; }
-  .glb-search-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; direction: rtl; }
+  .glb-search-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
   .glb-search-card { display: block; background: ${CARD}; border-radius: 12px; border: 1px solid ${BD}; overflow: hidden; transition: all 0.2s; text-decoration: none; color: inherit; }
   .glb-search-card:hover { border-color: ${GA}; box-shadow: 0 4px 16px rgba(45,106,79,0.1); }
-  .glb-search-card-info { padding: 0.625rem 0.75rem; direction: rtl; }
+  .glb-search-card-info { padding: 0.625rem 0.75rem; }
 `;
 
 interface Offer { id: string; name: string; quantity: number; price: number; }
@@ -140,6 +140,7 @@ export interface ProductFormProps {
   product: Product; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
   selectedVariants: Record<string, string>; platform?: string; priceLoss?: number;
+  store?: any;
 }
 
 function variantMatches(d: VariantDetail, sel: Record<string, string>) {
@@ -220,6 +221,82 @@ const jsonAr = {
   privacy: 'الخصوصية',
   terms: 'الشروط',
   rightsReserved: 'جميع الحقوق محفوظة',
+  // Theme-specific
+  logoSubtitle: 'أعشاب وصحة',
+  heroBadge: 'منتجات طبيعية 100%',
+  heroTitleDef: 'الطبيعة في<br/><span style="color:#2D6A4F">أفضل حالاتها</span>',
+  heroSubtitleDef: 'منتجات عشبية وصحية طبيعية 100% — مختارة بعناية لصحتك ورفاهيتك.',
+  heroBrowse: 'تصفح المنتجات',
+  heroBadges: ['🌿 أعشاب طازجة', '✅ معتمد', '🚚 توصيل سريع', '💯 مضمون'],
+  trust: [
+    { t: 'توصيل 58 ولاية', s: 'على الأبواب' },
+    { t: 'دفع عند الاستلام', s: '100% آمن' },
+    { t: 'طبيعي بالكامل', s: 'بدون كيميائيات' },
+    { t: 'معتمد صحياً', s: 'لصحة أفضل' },
+  ],
+  catTitle: 'تصفح الفئات',
+  prodTitle: 'جميع المنتجات',
+  prodUnit: 'منتج',
+  prodNone: 'لا توجد منتجات بعد',
+  cardBadge1: 'طبيعي',
+  cardBadge2: 'معتمد',
+  viewProduct: 'عرض المنتج',
+  natural100: 'طبيعي 100%',
+  discountBadge: 'خصم',
+  priceLabel: 'السعر',
+  qtyOfferLabel: 'الكمية:',
+  footerSubDef: 'منتجات طبيعية، أعشاب وعناية صحية بجودة عالية ومضمونة.',
+  footerPages: 'الصفحات',
+  footerContactTitle: 'تواصل',
+  homeBtn: 'للبيت',
+  officeBtn: 'للمكتب',
+  productLabel: 'المنتج',
+  totalMaj: 'المجموع',
+  delivInfoTitle: 'معلومات التوصيل',
+  cartTitle: 'سلة التسوق',
+  qtyInCart: 'الكمية:',
+  finalTotalLabel: 'الإجمالي',
+  cartSuccessTitle: 'تم استلام طلبك!',
+  cartSuccessDesc: 'سنتواصل معك قريباً لتأكيد الطلب.',
+  backToStore: 'العودة للمتجر',
+  errRequired: 'مطلوب',
+  processing: 'جاري المعالجة...',
+  addedShort: 'تمت الإضافة',
+  addBtn: 'أضف للسلة',
+  delivDataTitle: 'بيانات التوصيل',
+  cancelLabel: 'إلغاء',
+  nameLabel: 'الاسم',
+  phoneLabel: 'الهاتف',
+  emailLabel: 'البريد الإلكتروني',
+  msgLabel: 'الرسالة',
+  sendBtn: 'إرسال الرسالة',
+  contactErrMsg: 'حدث خطأ في الإرسال',
+  contactLocLabel: 'الموقع',
+  contactReply: 'نرد في غضون ساعة',
+  contactSentTitle: 'تم الإرسال بنجاح!',
+  contactSentDesc: 'سنرد عليك في أقرب وقت.',
+  contactAnotherBtn: 'إرسال رسالة أخرى',
+  searchTitle: 'البحث عن منتج',
+  searchPh: 'ابحث في المنتجات...',
+  privacyTitle: 'سياسة الخصوصية',
+  privacyData: 'البيانات التي نجمعها',
+  privacyDataBody: 'نجمع فقط المعلومات الضرورية لمعالجة طلباتكم، مثل الاسم، رقم الهاتف، وعنوان التوصيل.',
+  privacyProtect: 'حماية البيانات',
+  privacyProtectBody: 'تُخزن جميع البيانات بشكل مشفر. نستخدم بروتوكولات حماية معتمدة لضمان أمان معلوماتكم.',
+  privacyShare: 'مشاركة المعلومات',
+  privacyShareBody: 'لا نقوم ببيع أو مشاركة بياناتكم مع أي جهات خارجية باستثناء شركاء التوصيل.',
+  termsTitle: 'شروط الاستخدام',
+  termsAccount: 'الحساب والمسؤولية',
+  termsAccountBody: 'المستخدم مسؤول عن دقة البيانات المدخلة وعن الحفاظ على سرية حسابه.',
+  termsOrders: 'الطلبات والمدفوعات',
+  termsOrdersBody: 'يتم تأكيد الطلبات عبر الهاتف قبل الشحن. الأسعار المعلنة هي الأسعار النهائية.',
+  termsLaw: 'القانون الحاكم',
+  termsLawBody: 'تخضع كافة التعاملات للقوانين المعمول بها في جمهورية الجزائر الديمقراطية الشعبية.',
+  cookiesTitle: 'ملفات الارتباط',
+  cookiesEssential: 'الملفات الأساسية',
+  cookiesEssentialBody: 'نستخدم ملفات تعريف الارتباط الضرورية لضمان عمل سلة المشتريات وأمان جلسة الدخول.',
+  cookiesExp: 'تحسين التجربة',
+  cookiesExpBody: 'نستخدم بعض الملفات لفهم كيفية استخدام الموقع وتطوير تجربة التصفح.',
 };
 
 const jsonFr = {
@@ -286,7 +363,226 @@ const jsonFr = {
   privacy: 'Confidentialité',
   terms: 'Conditions',
   rightsReserved: 'Tous droits réservés.',
+  // Theme-specific
+  logoSubtitle: 'Herbes & Santé',
+  heroBadge: 'Produits 100% naturels',
+  heroTitleDef: 'La nature dans<br/><span style="color:#2D6A4F">toute sa splendeur</span>',
+  heroSubtitleDef: 'Produits à base de plantes et soins de santé 100% naturels — sélectionnés avec soin pour votre bien-être.',
+  heroBrowse: 'Découvrir les produits',
+  heroBadges: ['🌿 Herbes fraîches', '✅ Certifié', '🚚 Livraison rapide', '💯 Garanti'],
+  trust: [
+    { t: 'Livraison 58 wilayas', s: 'Partout en Algérie' },
+    { t: 'Paiement à la livraison', s: '100% sécurisé' },
+    { t: '100% Naturel', s: 'Sans produits chimiques' },
+    { t: 'Certifié santé', s: 'Pour une meilleure santé' },
+  ],
+  catTitle: 'Parcourir les catégories',
+  prodTitle: 'Tous les produits',
+  prodUnit: 'produit',
+  prodNone: 'Aucun produit disponible.',
+  cardBadge1: 'Naturel',
+  cardBadge2: 'Certifié',
+  viewProduct: 'Voir le produit',
+  natural100: '100% Naturel',
+  discountBadge: 'Remise',
+  priceLabel: 'Prix',
+  qtyOfferLabel: 'Quantité :',
+  footerSubDef: 'Produits naturels, herbes et soins de santé de haute qualité.',
+  footerPages: 'Pages',
+  footerContactTitle: 'Contact',
+  homeBtn: 'À domicile',
+  officeBtn: 'Point relais',
+  productLabel: 'Produit',
+  totalMaj: 'Total',
+  delivInfoTitle: 'Informations de livraison',
+  cartTitle: 'Panier',
+  qtyInCart: 'Quantité :',
+  finalTotalLabel: 'Total général',
+  cartSuccessTitle: 'Commande reçue !',
+  cartSuccessDesc: 'Nous vous contacterons bientôt pour confirmer votre commande.',
+  backToStore: 'Retour à la boutique',
+  errRequired: 'Requis',
+  processing: 'Traitement en cours...',
+  addedShort: 'Ajouté',
+  addBtn: 'Ajouter au panier',
+  delivDataTitle: 'Informations de livraison',
+  cancelLabel: 'Annuler',
+  nameLabel: 'Nom',
+  phoneLabel: 'Téléphone',
+  emailLabel: 'Email',
+  msgLabel: 'Message',
+  sendBtn: 'Envoyer le message',
+  contactErrMsg: "Une erreur est survenue lors de l'envoi.",
+  contactLocLabel: 'Localisation',
+  contactReply: "Réponse en moins d'une heure",
+  contactSentTitle: 'Message envoyé !',
+  contactSentDesc: 'Nous vous répondrons dans les plus brefs délais.',
+  contactAnotherBtn: 'Envoyer un autre message',
+  searchTitle: 'Rechercher un produit',
+  searchPh: 'Rechercher dans les produits...',
+  privacyTitle: 'Politique de confidentialité',
+  privacyData: 'Données collectées',
+  privacyDataBody: "Nous collectons uniquement les informations nécessaires pour traiter vos commandes, comme le nom, le numéro de téléphone et l'adresse de livraison.",
+  privacyProtect: 'Protection des données',
+  privacyProtectBody: "Toutes les données sont stockées de manière chiffrée. Nous utilisons des protocoles de protection certifiés pour garantir la sécurité de vos informations.",
+  privacyShare: "Partage d'informations",
+  privacyShareBody: "Nous ne vendons pas vos données et ne les partageons pas avec des tiers, sauf avec nos partenaires de livraison.",
+  termsTitle: "Conditions d'utilisation",
+  termsAccount: 'Compte et responsabilité',
+  termsAccountBody: "L'utilisateur est responsable de l'exactitude des données saisies et de la confidentialité de son compte.",
+  termsOrders: 'Commandes et paiements',
+  termsOrdersBody: "Les commandes sont confirmées par téléphone avant l'expédition. Les prix affichés sont les prix finaux.",
+  termsLaw: 'Loi applicable',
+  termsLawBody: "Toutes les transactions sont soumises aux lois en vigueur en République Algérienne Démocratique et Populaire.",
+  cookiesTitle: 'Fichiers témoins',
+  cookiesEssential: 'Fichiers essentiels',
+  cookiesEssentialBody: "Nous utilisons des cookies essentiels pour assurer le bon fonctionnement du panier et la sécurité de la session.",
+  cookiesExp: "Amélioration de l'expérience",
+  cookiesExpBody: "Nous utilisons certains fichiers pour comprendre l'utilisation du site et améliorer l'expérience de navigation.",
 };
+
+const jsonEn = {
+  dir: 'ltr',
+  home: 'Home',
+  contact: 'Contact',
+  cart: 'Cart',
+  search: 'Search...',
+  searching: 'Searching...',
+  noResults: 'No results found',
+  showAll: 'View all results',
+  all: 'All',
+  noProducts: 'No products available yet.',
+  shopNow: 'Shop Now',
+  searchResultsFor: 'Search results for:',
+  fullName: 'Full name',
+  fullNamePh: 'Enter your name',
+  errName: 'Name is required',
+  phone: 'Phone number',
+  phonePh: '05xxxxxxxx',
+  errPhone: 'Phone number is required',
+  errPhoneInvalid: 'Invalid phone number',
+  wilaya: 'Wilaya',
+  errWilaya: 'Wilaya is required',
+  wilayaPh: 'Select a wilaya',
+  wilayaNA: 'Delivery not available at the moment',
+  commune: 'Commune',
+  errCommune: 'Commune is required',
+  communePh: 'Select a commune',
+  communeLoading: 'Loading...',
+  deliveryType: 'Delivery type',
+  deliveryHome: 'Home delivery',
+  deliveryOffice: 'Post office',
+  qty: 'Quantity',
+  price: 'Price',
+  delivery: 'Delivery',
+  total: 'Total',
+  subtotal: 'Subtotal',
+  orderInfo: 'Order information',
+  addToCart: 'Add to cart',
+  orderNow: 'Order now',
+  confirmOrder: 'Confirm order',
+  sending: 'Sending...',
+  back: 'Back',
+  addedMsg: 'Added to cart ✓',
+  errSubmit: 'An error occurred while submitting.',
+  myCart: 'My Cart',
+  cartEmpty: 'Your cart is empty',
+  cartEmptyDesc: 'You have not added any products yet.',
+  successTitle: 'Order placed successfully!',
+  successDesc: 'We will contact you soon to confirm the details.',
+  backToShop: 'Back to shopping',
+  checkoutTitle: 'Checkout',
+  offersTitle: 'Available offers',
+  descTitle: 'Description',
+  quickLinks: 'Quick links',
+  contactSect: 'Contact us',
+  privacy: 'Privacy',
+  terms: 'Terms',
+  rightsReserved: 'All rights reserved.',
+  logoSubtitle: 'Herbs & Health',
+  heroBadge: '100% Natural Products',
+  heroTitleDef: 'Nature at its<br/><span style="color:#2D6A4F">finest</span>',
+  heroSubtitleDef: '100% natural herbal and health products — carefully selected for your health and wellness.',
+  heroBrowse: 'Browse Products',
+  heroBadges: ['🌿 Fresh herbs', '✅ Certified', '🚚 Fast delivery', '💯 Guaranteed'],
+  trust: [
+    { t: 'Delivery 58 wilayas', s: 'Nationwide' },
+    { t: 'Cash on delivery', s: '100% secure' },
+    { t: '100% Natural', s: 'No chemicals' },
+    { t: 'Health certified', s: 'For better health' },
+  ],
+  catTitle: 'Browse categories',
+  prodTitle: 'All products',
+  prodUnit: 'product',
+  prodNone: 'No products yet.',
+  cardBadge1: 'Natural',
+  cardBadge2: 'Certified',
+  viewProduct: 'View product',
+  natural100: '100% Natural',
+  discountBadge: 'Off',
+  priceLabel: 'Price',
+  qtyOfferLabel: 'Qty:',
+  footerSubDef: 'Natural products, herbs and health care of the highest quality.',
+  footerPages: 'Pages',
+  footerContactTitle: 'Contact',
+  homeBtn: 'Home delivery',
+  officeBtn: 'Post office',
+  productLabel: 'Product',
+  totalMaj: 'Total',
+  delivInfoTitle: 'Delivery information',
+  cartTitle: 'Shopping cart',
+  qtyInCart: 'Qty:',
+  finalTotalLabel: 'Grand total',
+  cartSuccessTitle: 'Order received!',
+  cartSuccessDesc: 'We will contact you soon to confirm your order.',
+  backToStore: 'Back to store',
+  errRequired: 'Required',
+  processing: 'Processing...',
+  addedShort: 'Added',
+  addBtn: 'Add to cart',
+  delivDataTitle: 'Delivery information',
+  cancelLabel: 'Cancel',
+  nameLabel: 'Name',
+  phoneLabel: 'Phone',
+  emailLabel: 'Email',
+  msgLabel: 'Message',
+  sendBtn: 'Send message',
+  contactErrMsg: 'An error occurred while sending.',
+  contactLocLabel: 'Location',
+  contactReply: 'Response within one hour',
+  contactSentTitle: 'Message sent!',
+  contactSentDesc: 'We will reply as soon as possible.',
+  contactAnotherBtn: 'Send another message',
+  searchTitle: 'Search for a product',
+  searchPh: 'Search products...',
+  privacyTitle: 'Privacy Policy',
+  privacyData: 'Data we collect',
+  privacyDataBody: 'We only collect the information necessary to process your orders, such as name, phone number, and delivery address.',
+  privacyProtect: 'Data protection',
+  privacyProtectBody: 'All data is stored in encrypted form. We use certified protection protocols to ensure the security of your information.',
+  privacyShare: 'Information sharing',
+  privacyShareBody: 'We do not sell or share your data with any third parties except delivery partners.',
+  termsTitle: 'Terms of use',
+  termsAccount: 'Account & responsibility',
+  termsAccountBody: 'The user is responsible for the accuracy of the data entered and for maintaining the confidentiality of their account.',
+  termsOrders: 'Orders & payments',
+  termsOrdersBody: 'Orders are confirmed by phone before shipping. The displayed prices are the final prices.',
+  termsLaw: 'Governing law',
+  termsLawBody: "All transactions are subject to the laws in force in the People's Democratic Republic of Algeria.",
+  cookiesTitle: 'Cookies',
+  cookiesEssential: 'Essential files',
+  cookiesEssentialBody: 'We use essential cookies to ensure the shopping cart works and the login session is secure.',
+  cookiesExp: 'Experience improvement',
+  cookiesExpBody: 'We use some files to understand how the site is used and to improve the browsing experience.',
+};
+
+type Lang = 'ar' | 'fr' | 'en';
+const getLang = (store?: any): Lang => {
+  if (store?.language === 'fr') return 'fr';
+  if (store?.language === 'en') return 'en';
+  return 'ar';
+};
+const T: Record<Lang, typeof jsonAr> = { ar: jsonAr, fr: jsonFr as any, en: jsonEn as any };
 
 export default function Main({ store, children, domain }: any) {
   const pathname = usePathname();
@@ -302,6 +598,7 @@ export default function Main({ store, children, domain }: any) {
 }
 
 export function Navbar({ store, domain }: { store: any; domain: string }) {
+  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -327,12 +624,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
   useEffect(() => {
     if (searchQuery.length < 2) { setListSearch([]); return; }
-    const t = setTimeout(async () => {
+    const timer = setTimeout(async () => {
       setLoading(true);
       try { const { data } = await axios.get(`${API_URL}/products/public/${domain}`, { params: { search: searchQuery } }); setListSearch(data.products || []); }
       catch { } finally { setLoading(false); }
     }, 380);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [searchQuery, domain]);
 
   useEffect(() => {
@@ -348,7 +645,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   return (
     <>
       {store?.topBar?.enabled && store?.topBar?.text && (
-        <div dir="rtl" style={{ background: G, padding: '0.375rem 1.5rem' }}>
+        <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: G, padding: '0.375rem 1.5rem' }}>
           <p style={{ fontSize: '0.72rem', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', textAlign: 'center' as const }}>
             <Leaf size={10} style={{ flexShrink: 0 }} />
             {store.topBar.text}
@@ -356,7 +653,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           </p>
         </div>
       )}
-      <nav dir="rtl" style={{ position: 'sticky', top: 0, zIndex: 50, background: scrolled ? 'rgba(246,248,245,0.95)' : '#fff', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${scrolled ? BD : '#EDF2EE'}`, boxShadow: scrolled ? '0 2px 20px rgba(45,106,79,0.08)' : 'none', transition: 'all 0.25s' }}>
+      <nav dir={isRTL ? 'rtl' : 'ltr'} style={{ position: 'sticky', top: 0, zIndex: 50, background: scrolled ? 'rgba(246,248,245,0.95)' : '#fff', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${scrolled ? BD : '#EDF2EE'}`, boxShadow: scrolled ? '0 2px 20px rgba(45,106,79,0.08)' : 'none', transition: 'all 0.25s' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
           <Link href="/" style={{ flexShrink: 0 }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
@@ -368,14 +665,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 </div>
                 <div>
                   <span style={{ fontSize: '0.9rem', fontWeight: 700, color: INK, display: 'block', lineHeight: 1.15 }}>{store?.name || 'Nature Wellness'}</span>
-                  <span style={{ fontSize: '0.58rem', color: SUB, display: 'block' }}>أعشاب وصحة</span>
+                  <span style={{ fontSize: '0.58rem', color: SUB, display: 'block' }}>{t.logoSubtitle}</span>
                 </div>
               </div>
             )}
           </Link>
 
           <div className="nav-desktop" style={{ flex: 1, justifyContent: 'center' }}>
-            {[{ h: '/', l: 'الرئيسية' }, { h: '/contact', l: 'تواصل معنا' }].map(i => (
+            {[{ h: '/', l: t.home }, { h: '/contact', l: t.contactSect }].map(i => (
               <Link key={i.h} href={i.h} style={{ fontSize: '0.875rem', fontWeight: 500, color: SUB, transition: 'color 0.15s', padding: '0.3rem 0.75rem', borderRadius: 8 }}
                 onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = G; (e.currentTarget as HTMLAnchorElement).style.background = GL; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = SUB; (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'; }}>
@@ -394,7 +691,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               <Link href="/cart" style={{ position: 'relative', background: `linear-gradient(135deg, ${G} 0%, ${GA} 100%)`, color: '#fff', height: 38, padding: '0 1rem', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.875rem', fontWeight: 600, transition: 'opacity 0.18s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.88')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}>
-                <ShoppingCart size={14} /> السلة
+                <ShoppingCart size={14} /> {t.cart}
                 {count > 0 && <span style={{ background: '#fff', color: G, fontSize: 10, fontWeight: 800, width: 17, height: 17, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
               </Link>
             )}
@@ -415,31 +712,30 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         </div>
         <div style={{ overflow: 'hidden', maxHeight: open ? 200 : 0, transition: 'max-height 0.25s ease', background: '#fff', borderTop: open ? `1px solid ${BD}` : 'none' }}>
           <div style={{ padding: '0.5rem 1.5rem 1rem' }}>
-            {[{ h: '/', l: 'الرئيسية' }, { h: '/contact', l: 'تواصل معنا' }].map(i => (
+            {[{ h: '/', l: t.home }, { h: '/contact', l: t.contactSect }].map(i => (
               <Link key={i.h} href={i.h} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: `1px solid ${BD}`, fontSize: '0.9rem', fontWeight: 500, color: INK }}>
                 {i.l} <ArrowLeft size={14} style={{ color: G }} />
               </Link>
             ))}
-
           </div>
         </div>
       </nav>
 
       {showSearch && (
         <div className="glb-search-ov" onClick={e => { if (e.target === e.currentTarget) setShowSearch(false); }}>
-          <div className="glb-search-panel">
+          <div className="glb-search-panel" dir={isRTL ? 'rtl' : 'ltr'}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: SUB }}>البحث عن منتج</span>
+              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: SUB }}>{t.searchTitle}</span>
               <button onClick={() => setShowSearch(false)} style={{ width: 32, height: 32, borderRadius: 8, border: `1px solid ${BD}`, background: CARD, color: SUB, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><X size={14} /></button>
             </div>
             <form className="glb-search-form" onSubmit={handleSearch}>
-              <Search size={18} style={{ color: G, flexShrink: 0, marginLeft: 10 }} />
-              <input ref={searchInputRef} className="glb-search-input" type="text" placeholder="ابحث في المنتجات..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+              <Search size={18} style={{ color: G, flexShrink: 0, margin: '0 10px' }} />
+              <input ref={searchInputRef} className="glb-search-input" type="text" placeholder={t.searchPh} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
             </form>
-            {loading && <p style={{ textAlign: 'center', color: G, fontSize: '0.82rem', padding: '2rem' }}>جاري البحث...</p>}
+            {loading && <p style={{ textAlign: 'center', color: G, fontSize: '0.82rem', padding: '2rem' }}>{t.searching}</p>}
             {!loading && listSearch.length > 0 && (
               <>
-              <div className="glb-search-grid">
+              <div className="glb-search-grid" dir={isRTL ? 'rtl' : 'ltr'}>
                 {listSearch.map((p: any) => (
                   <Link key={p.id} href={`/product/${p.slug || p.id}`} className="glb-search-card" onClick={() => setShowSearch(false)}>
                     {(p.productImage || p.imagesProduct?.[0]?.imageUrl) && (
@@ -447,18 +743,18 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                     )}
                     <div className="glb-search-card-info">
                       <p style={{ fontSize: '0.82rem', fontWeight: 600, color: INK, marginBottom: 3, lineHeight: 1.35 }}>{p.name}</p>
-                      <p style={{ fontSize: '0.78rem', fontWeight: 700, color: G }}>{Number(p.price).toLocaleString()} دج</p>
+                      <p style={{ fontSize: '0.78rem', fontWeight: 700, color: G }}>{Number(p.price).toLocaleString()} {store?.currency || 'DZD'}</p>
                     </div>
                   </Link>
                 ))}
               </div>
               <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: GL, border: 'none', borderTop: `1px solid rgba(45,106,79,0.2)`, color: G, fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                عرض جميع النتائج <ArrowLeft size={14} />
+                {t.showAll} <ArrowLeft size={14} />
               </button>
               </>
             )}
             {!loading && searchQuery.length >= 2 && listSearch.length === 0 && (
-              <p style={{ textAlign: 'center', color: GB, fontSize: '0.875rem', padding: '3rem' }}>لا توجد نتائج</p>
+              <p style={{ textAlign: 'center', color: GB, fontSize: '0.875rem', padding: '3rem' }}>{t.noResults}</p>
             )}
           </div>
         </div>
@@ -468,8 +764,9 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 }
 
 export function Footer({ store }: any) {
+  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
   return (
-    <footer dir="rtl" style={{ background: GD, color: 'rgba(255,255,255,0.4)', marginTop: 80, padding: '3.5rem 1.5rem 1.5rem' }}>
+    <footer dir={isRTL ? 'rtl' : 'ltr'} style={{ background: GD, color: 'rgba(255,255,255,0.4)', marginTop: 80, padding: '3.5rem 1.5rem 1.5rem' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div className="footer-inner">
           <div>
@@ -480,13 +777,13 @@ export function Footer({ store }: any) {
               <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>{store?.name}</span>
             </div>
             <p style={{ fontSize: '0.875rem', lineHeight: 1.85, maxWidth: 280, color: 'rgba(255,255,255,0.45)' }}>
-              {store?.hero?.subtitle?.substring(0, 90) || 'منتجات طبيعية، أعشاب وعناية صحية بجودة عالية ومضمونة.'}
+              {store?.hero?.subtitle?.substring(0, 90) || t.footerSubDef}
             </p>
             <p style={{ marginTop: '2rem', fontSize: '0.68rem', color: 'rgba(255,255,255,0.18)' }}>© {new Date().getFullYear()} {store?.name}</p>
           </div>
           <div>
-            <h4 style={{ fontSize: '0.72rem', fontWeight: 700, color: GA, textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: '1.125rem' }}>الصفحات</h4>
-            {[{ h: '/', l: 'الرئيسية' }, { h: '/cart', l: 'السلة' }, { h: '/contact', l: 'تواصل معنا' }, { h: '/Privacy', l: 'الخصوصية' }, { h: '/Terms', l: 'الشروط' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
+            <h4 style={{ fontSize: '0.72rem', fontWeight: 700, color: GA, textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: '1.125rem' }}>{t.footerPages}</h4>
+            {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contactSect }, { h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
               <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'rgba(255,255,255,0.4)', marginBottom: '0.6rem', transition: 'color 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = GA)}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
@@ -495,7 +792,7 @@ export function Footer({ store }: any) {
             ))}
           </div>
           <div>
-            <h4 style={{ fontSize: '0.72rem', fontWeight: 700, color: GA, textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: '1.125rem' }}>تواصل</h4>
+            <h4 style={{ fontSize: '0.72rem', fontWeight: 700, color: GA, textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: '1.125rem' }}>{t.footerContactTitle}</h4>
             {[
               { icon: <Phone size={13} />, val: store?.contact?.phone },
               { icon: <Mail size={13} />, val: store?.contact?.email },
@@ -513,7 +810,8 @@ export function Footer({ store }: any) {
   );
 }
 
-export function Card({ product, displayImage, discount, store, viewDetails }: any) {
+export function Card({ product, displayImage, discount, store }: any) {
+  const cardLang = getLang(store); const cardT = T[cardLang];
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
   const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
   return (
@@ -531,19 +829,19 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
       </div>
       <div style={{ padding: '0.875rem 1rem 1rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <div style={{ display: 'flex', gap: '0.375rem', marginBottom: '0.5rem' }}>
-          <span style={{ fontSize: '0.58rem', fontWeight: 600, color: G, background: GL, borderRadius: 20, padding: '2px 7px', display: 'inline-flex', alignItems: 'center', gap: 2, whiteSpace: 'nowrap' as const }}><Leaf size={8} />طبيعي</span>
-          <span style={{ fontSize: '0.58rem', fontWeight: 600, color: '#059669', background: '#D1FAE5', borderRadius: 20, padding: '2px 7px', whiteSpace: 'nowrap' as const }}>✅ معتمد</span>
+          <span style={{ fontSize: '0.58rem', fontWeight: 600, color: G, background: GL, borderRadius: 20, padding: '2px 7px', display: 'inline-flex', alignItems: 'center', gap: 2, whiteSpace: 'nowrap' as const }}><Leaf size={8} />{cardT.cardBadge1}</span>
+          <span style={{ fontSize: '0.58rem', fontWeight: 600, color: '#059669', background: '#D1FAE5', borderRadius: 20, padding: '2px 7px', whiteSpace: 'nowrap' as const }}>✅ {cardT.cardBadge2}</span>
         </div>
         <h3 className="nat-card-name" style={{ fontSize: '0.875rem', fontWeight: 600, color: INK, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', transition: 'color 0.18s', flex: 1, marginBottom: '0.5rem' }}>{product.name}</h3>
         <div style={{ marginBottom: '0.75rem' }}>
           <span className="price-mono" style={{ fontSize: '1.25rem', fontWeight: 700, color: G }}>{price.toLocaleString()}</span>
-          <span style={{ fontSize: '0.68rem', color: SUB, marginRight: 3 }}>{store.currency || 'دج'}</span>
-          {orig > price && <span style={{ fontSize: '0.68rem', color: GB, textDecoration: 'line-through', marginRight: 5 }}>{orig.toLocaleString()}</span>}
+          <span style={{ fontSize: '0.68rem', color: SUB, margin: '0 3px' }}>{store?.currency || 'DZD'}</span>
+          {orig > price && <span style={{ fontSize: '0.68rem', color: GB, textDecoration: 'line-through', margin: '0 5px' }}>{orig.toLocaleString()}</span>}
         </div>
         <Link href={`/product/${product.slug || product.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: `linear-gradient(135deg, ${G}, ${GA})`, color: '#fff', fontSize: '0.82rem', fontWeight: 600, padding: '0.6rem', borderRadius: 24, transition: 'opacity 0.18s' }}
           onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.85')}
           onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}>
-          عرض المنتج <ArrowLeft size={12} />
+          {cardT.viewProduct} <ArrowLeft size={12} />
         </Link>
       </div>
     </div>
@@ -551,15 +849,17 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 }
 
 export function Home({ store, page }: any) {
+  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
   const products: any[] = store.products || [];
   const cats: any[] = store.categories || [];
   const searchParams = useSearchParams();
   const activeCategory = searchParams.get('category');
   if (!page) page = 1;
   const countPage = Math.ceil((store.count || products.length) / 48);
+  const trustIcons = [<Truck size={16} key={0} />, <Shield size={16} key={1} />, <Leaf size={16} key={2} />, <Heart size={16} key={3} />];
 
   return (
-    <div dir="rtl">
+    <div dir={isRTL ? 'rtl' : 'ltr'}>
       {/* HERO */}
       <section style={{ position: 'relative', overflow: 'hidden', background: '#E8F5EE', minHeight: 'clamp(380px, 52vh, 600px)', display: 'flex', alignItems: 'center', borderBottom: `1px solid rgba(45,106,79,0.12)` }}>
         <div style={{ position: 'absolute', top: -60, right: -60, width: 320, height: 320, background: 'rgba(82,183,136,0.18)', borderRadius: '60% 40% 70% 30% / 50% 60% 40% 50%' }} />
@@ -574,29 +874,29 @@ export function Home({ store, page }: any) {
             <div>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(45,106,79,0.1)', border: `1px solid rgba(45,106,79,0.22)`, borderRadius: 20, padding: '0.35rem 1rem', marginBottom: '1.5rem' }}>
                 <Leaf size={12} style={{ color: G }} />
-                <span style={{ fontSize: '0.7rem', fontWeight: 600, color: G }}>منتجات طبيعية 100%</span>
+                <span style={{ fontSize: '0.7rem', fontWeight: 600, color: G }}>{t.heroBadge}</span>
               </div>
               <h1 style={{ fontSize: 'clamp(2.25rem,5.5vw,4.5rem)', fontWeight: 700, color: GD, lineHeight: 1.1, letterSpacing: '-0.02em', marginBottom: '1rem' }}
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'الطبيعة في<br/><span style="color:#2D6A4F">أفضل حالاتها</span>') }} />
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || t.heroTitleDef) }} />
               <p style={{ fontSize: '1rem', color: SUB, lineHeight: 1.8, marginBottom: '2rem', maxWidth: 440 }}>
-                {store.hero?.subtitle || 'منتجات عشبية وصحية طبيعية 100% — مختارة بعناية لصحتك ورفاهيتك.'}
+                {store.hero?.subtitle || t.heroSubtitleDef}
               </p>
               <div className="hero-actions">
                 <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: `linear-gradient(135deg, ${G} 0%, ${GA} 100%)`, color: '#fff', fontWeight: 600, fontSize: '0.9rem', padding: '0.875rem 1.875rem', borderRadius: 12, transition: 'opacity 0.18s' }}
                   onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.88')}
                   onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}>
-                  تصفح المنتجات <ArrowLeft size={15} />
+                  {t.heroBrowse} <ArrowLeft size={15} />
                 </a>
                 {store?.cart !== false && (
                   <Link href="/cart" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, color: SUB, fontWeight: 500, fontSize: '0.9rem', padding: '0.875rem 1.5rem', borderRadius: 12, border: `1px solid ${BD}`, background: CARD, transition: 'all 0.18s' }}
                     onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = G; (e.currentTarget as HTMLAnchorElement).style.color = G; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = BD; (e.currentTarget as HTMLAnchorElement).style.color = SUB; }}>
-                    السلة
+                    {t.cart}
                   </Link>
                 )}
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '2rem' }}>
-                {['🌿 أعشاب طازجة', '✅ معتمد', '🚚 توصيل سريع', '💯 مضمون'].map((b, i) => (
+                {t.heroBadges.map((b: string, i: number) => (
                   <span key={i} style={{ fontSize: '0.72rem', color: G, background: 'rgba(45,106,79,0.09)', border: `1px solid rgba(45,106,79,0.2)`, borderRadius: 20, padding: '0.3rem 0.75rem' }}>{b}</span>
                 ))}
               </div>
@@ -608,14 +908,9 @@ export function Home({ store, page }: any) {
       {/* TRUST ROW */}
       <section style={{ padding: '1.5rem', maxWidth: 1280, margin: '0 auto' }}>
         <div className="trust-row">
-          {[
-            { icon: <Truck size={16} />, t: 'توصيل 58 ولاية', s: 'على الأبواب' },
-            { icon: <Shield size={16} />, t: 'دفع عند الاستلام', s: '100% آمن' },
-            { icon: <Leaf size={16} />, t: 'طبيعي بالكامل', s: 'بدون كيميائيات' },
-            { icon: <Heart size={16} />, t: 'معتمد صحياً', s: 'لصحة أفضل' },
-          ].map((item, i) => (
+          {t.trust.map((item: any, i: number) => (
             <div key={i} style={{ flex: 1, minWidth: 160, padding: '1rem 1.25rem', background: CARD, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ width: 38, height: 38, background: GL, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', color: G, flexShrink: 0 }}>{item.icon}</div>
+              <div style={{ width: 38, height: 38, background: GL, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', color: G, flexShrink: 0 }}>{trustIcons[i]}</div>
               <div>
                 <p style={{ fontSize: '0.8rem', fontWeight: 600, color: INK }}>{item.t}</p>
                 <p style={{ fontSize: '0.68rem', color: SUB }}>{item.s}</p>
@@ -632,14 +927,14 @@ export function Home({ store, page }: any) {
             <div style={{ width: 28, height: 28, background: GL, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Leaf size={13} color={G} />
             </div>
-            <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: INK }}>تصفح الفئات</h2>
+            <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: INK }}>{t.catTitle}</h2>
           </div>
           <div className="cats-grid">
             <Link href="?" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', padding: '1rem 0.75rem', border: `1px solid ${!activeCategory ? G : BD}`, borderRadius: 14, background: !activeCategory ? GL : CARD, textAlign: 'center', transition: 'all 0.2s' }}>
               <div style={{ width: 38, height: 38, background: GL, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Leaf size={17} color={G} />
               </div>
-              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: !activeCategory ? GD : INK, lineHeight: 1.3 }}>الكل</span>
+              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: !activeCategory ? GD : INK, lineHeight: 1.3 }}>{t.all}</span>
             </Link>
               {cats.map((cat: any) => {
               const isActive = activeCategory === String(cat.id);
@@ -665,26 +960,26 @@ export function Home({ store, page }: any) {
             <div style={{ width: 28, height: 28, background: GL, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Package size={13} color={G} />
             </div>
-            <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: INK }}>جميع المنتجات</h2>
+            <h2 style={{ fontSize: '0.9rem', fontWeight: 700, color: INK }}>{t.prodTitle}</h2>
           </div>
-          {store.count > 0 && <span style={{ fontSize: '0.72rem', color: SUB, background: GL, padding: '0.25rem 0.75rem', borderRadius: 20 }}>{store.count} منتج</span>}
+          {store.count > 0 && <span style={{ fontSize: '0.72rem', color: SUB, background: GL, padding: '0.25rem 0.75rem', borderRadius: 20 }}>{store.count} {t.prodUnit}</span>}
         </div>
         {products.length === 0 ? (
           <div style={{ padding: '5rem 1.5rem', textAlign: 'center', border: `1px dashed ${BD}`, borderRadius: 16, background: CARD }}>
             <Package size={36} color={GB} style={{ display: 'block', margin: '0 auto 1rem' }} />
-            <p style={{ color: SUB, fontSize: '0.875rem' }}>لا توجد منتجات بعد</p>
+            <p style={{ color: SUB, fontSize: '0.875rem' }}>{t.prodNone}</p>
           </div>
         ) : (
           <div className="products-grid">
             {products.map((p: any) => {
               const img = p.productImage || p.imagesProduct?.[0]?.imageUrl;
               const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
-              return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="عرض" />;
+              return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} />;
             })}
           </div>
         )}
         {countPage > 1 && (
-          <div className="pagination" dir="rtl">
+          <div className="pagination" dir={isRTL ? 'rtl' : 'ltr'}>
             <Link href={{ query: { page: Math.max(1, page - 1) } }} scroll={false} style={{ height: 36, padding: '0 0.875rem', borderRadius: 20, border: `1px solid ${BD}`, display: 'flex', alignItems: 'center', background: CARD, color: SUB, fontSize: '0.8rem' }}>❮</Link>
             {Array.from({ length: countPage }).map((_, i) => {
               const pn = i + 1; const isA = Number(page) === pn;
@@ -698,15 +993,16 @@ export function Home({ store, page }: any) {
   );
 }
 
-export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
+export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
+  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
   const [sel, setSel] = useState(0);
   return (
-    <div dir="rtl" style={{ background: BG, paddingBottom: '4rem' }}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: BG, paddingBottom: '4rem' }}>
       <div className="details-inner" style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div className="gallery-container">
           <div style={{ position: 'relative', aspectRatio: '1/1', overflow: 'hidden', background: '#EBF4EE', borderRadius: 20, border: `1px solid ${BD}` }}>
             {allImages[sel] ? <img src={allImages[sel]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 20 }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Package size={48} color={GB} /></div>}
-            {discount > 0 && <div style={{ position: 'absolute', top: 12, right: 12, background: `linear-gradient(135deg, ${G}, ${GA})`, color: '#fff', padding: '3px 10px', fontSize: 11, fontWeight: 700, borderRadius: 20 }}>{discount}% خصم</div>}
+            {discount > 0 && <div style={{ position: 'absolute', top: 12, right: 12, background: `linear-gradient(135deg, ${G}, ${GA})`, color: '#fff', padding: '3px 10px', fontSize: 11, fontWeight: 700, borderRadius: 20 }}>{discount}% {t.discountBadge}</div>}
             {allImages.length > 1 && (
               <>
                 <button onClick={() => setSel(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 34, height: 34, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: INK }}><ChevronRight size={15} /></button>
@@ -727,15 +1023,15 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
         <div>
           <div className="info-container">
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', background: GL, borderRadius: 20, padding: '0.3rem 0.875rem', marginBottom: '0.75rem' }}>
-              <Leaf size={11} color={G} /><span style={{ fontSize: '0.65rem', fontWeight: 600, color: G }}>طبيعي 100%</span>
+              <Leaf size={11} color={G} /><span style={{ fontSize: '0.65rem', fontWeight: 600, color: G }}>{t.natural100}</span>
             </div>
             <h1 style={{ fontSize: 'clamp(1.5rem,4vw,2.25rem)', fontWeight: 700, color: INK, marginBottom: '0.5rem', lineHeight: 1.2 }}>{product.name}</h1>
             <div style={{ display: 'flex', gap: 2, marginBottom: '1.25rem' }}>{[...Array(5)].map((_, i) => <Star key={i} size={13} style={{ fill: i < 4 ? GA : 'none', color: GA }} />)}</div>
             <div style={{ padding: '1.25rem', background: GL, borderRadius: 14, border: `1px solid rgba(45,106,79,0.15)`, marginBottom: '1.5rem' }}>
-              <p style={{ fontSize: '0.65rem', fontWeight: 600, color: SUB, marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>السعر</p>
+              <p style={{ fontSize: '0.65rem', fontWeight: 600, color: SUB, marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.priceLabel}</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
                 <span className="price-mono" style={{ fontSize: '2.5rem', fontWeight: 700, color: G }}>{finalPrice.toLocaleString()}</span>
-                <span style={{ fontSize: '0.9rem', fontWeight: 600, color: SUB }}>دج</span>
+                <span style={{ fontSize: '0.9rem', fontWeight: 600, color: SUB }}>{store?.currency || 'DZD'}</span>
               </div>
             </div>
             {product.offers?.length > 0 && (
@@ -749,10 +1045,10 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                       <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
                       <div>
                         <p style={{ fontWeight: 600, color: INK, fontSize: '0.875rem' }}>{o.name}</p>
-                        <p style={{ fontSize: '0.7rem', color: SUB }}>الكمية: {o.quantity}</p>
+                        <p style={{ fontSize: '0.7rem', color: SUB }}>{t.qtyOfferLabel} {o.quantity}</p>
                       </div>
                     </div>
-                    <span className="price-mono" style={{ fontWeight: 700, color: G }}>{o.price.toLocaleString()} دج</span>
+                    <span className="price-mono" style={{ fontWeight: 700, color: G }}>{o.price.toLocaleString()} {store?.currency || 'DZD'}</span>
                   </label>
                 ))}
               </div>
@@ -774,7 +1070,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                 </div>
               </div>
             ))}
-            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
+            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store} />
             {product.desc && (
               <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: `1px solid ${BD}` }}>
                 <div style={{ fontSize: '0.9rem', lineHeight: 1.85, color: SUB }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc) }} />
@@ -795,7 +1091,8 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
   </div>
 );
 
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: ProductFormProps) {
+export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: ProductFormProps) {
+  const lang = getLang(store); const t = T[lang];
   const router = useRouter();
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -830,10 +1127,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const total = () => fp * fd.quantity + +getLiv();
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!fd.customerName.trim()) e.customerName = 'مطلوب';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم غير صالح';
-    if (!fd.customerWelaya) e.customerWelaya = 'مطلوب';
-    if (!fd.customerCommune) e.customerCommune = 'مطلوب';
+    if (!fd.customerName.trim()) e.customerName = t.errRequired;
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
+    if (!fd.customerWelaya) e.customerWelaya = t.errRequired;
+    if (!fd.customerCommune) e.customerCommune = t.errRequired;
     return e;
   };
   const getVarId = useCallback(() => {
@@ -868,12 +1165,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         {product.store.cart && (
         <div className="cart-add-btns" style={{ marginBottom: '1.25rem' }}>
           <button onClick={addToCart} disabled={isAdded} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.8rem 1rem', border: `1.5px solid ${isAdded ? '#22C55E' : BD}`, borderRadius: 12, fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', background: isAdded ? 'rgba(34,197,94,0.05)' : CARD, color: isAdded ? '#22C55E' : SUB, transition: 'all 0.18s', fontFamily: 'inherit' }}>
-            {isAdded ? <><CheckCircle2 size={14} className="anim-check" />تمت الإضافة</> : <><ShoppingCart size={14} />أضف للسلة</>}
+            {isAdded ? <><CheckCircle2 size={14} className="anim-check" />{t.addedShort}</> : <><ShoppingCart size={14} />{t.addBtn}</>}
           </button>
           <button onClick={() => setIsOrderNow(true)} style={{ flex: 1, ...S.btnPrimary, width: 'auto', borderRadius: 12 }}
             onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = GD)}
             onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = G)}>
-            طلب الآن
+            {t.orderNow}
           </button>
         </div>
       )}
@@ -881,46 +1178,46 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         <div className="anim-fade-up">
           {product.store.cart && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <p style={{ fontWeight: 600, fontSize: '0.7rem', color: SUB, textTransform: 'uppercase', letterSpacing: '0.06em' }}>بيانات التوصيل</p>
-              <button onClick={() => setIsOrderNow(false)} style={{ fontSize: '0.78rem', color: SUB, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>إلغاء</button>
+              <p style={{ fontWeight: 600, fontSize: '0.7rem', color: SUB, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.delivDataTitle}</p>
+              <button onClick={() => setIsOrderNow(false)} style={{ fontSize: '0.78rem', color: SUB, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>{t.cancelLabel}</button>
             </div>
           )}
           <form onSubmit={handleSubmit}>
             <div className="form-row-2">
-              <FR error={errors.customerName} label="الاسم"><input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder="الاسم الكامل" style={inp(!!errors.customerName)} /></FR>
-              <FR error={errors.customerPhone} label="الهاتف"><input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} placeholder="0XXXXXXXXX" style={inp(!!errors.customerPhone)} /></FR>
+              <FR error={errors.customerName} label={t.nameLabel}><input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder={t.fullName} style={inp(!!errors.customerName)} /></FR>
+              <FR error={errors.customerPhone} label={t.phoneLabel}><input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} placeholder={t.phonePh} style={inp(!!errors.customerPhone)} /></FR>
             </div>
             <div className="form-row-2">
-              <FR error={errors.customerWelaya} label="الولاية">
+              <FR error={errors.customerWelaya} label={t.wilaya}>
                 <div style={{ position: 'relative' }}>
                   <ChevronDown size={12} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: SUB, pointerEvents: 'none' }} />
                   <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...inp(!!errors.customerWelaya), paddingRight: 32, fontFamily: 'inherit' }}>
-                    <option value="">اختر</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                    <option value="">{t.wilayaPh}</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
-              <FR error={errors.customerCommune} label="البلدية">
+              <FR error={errors.customerCommune} label={t.commune}>
                 <div style={{ position: 'relative' }}>
                   <ChevronDown size={12} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: SUB, pointerEvents: 'none' }} />
                   <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inp(!!errors.customerCommune), paddingRight: 32, opacity: (!fd.customerWelaya || loadingC) ? 0.5 : 1, fontFamily: 'inherit' }}>
-                    <option value="">{loadingC ? '...' : 'اختر'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                    <option value="">{loadingC ? t.communeLoading : t.communePh}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
             </div>
             <div style={{ marginBottom: '0.875rem' }}>
-              <p style={{ fontSize: '0.7rem', fontWeight: 600, color: SUB, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>التوصيل</p>
+              <p style={{ fontSize: '0.7rem', fontWeight: 600, color: SUB, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.deliveryType}</p>
               <div className="delivery-grid">
-                {(['home', 'office'] as const).map(t => (
-                  <button key={t} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: t }))} style={{ padding: '0.75rem', border: `1.5px solid ${fd.typeLivraison === t ? G : BD}`, borderRadius: 12, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === t ? GL : CARD, transition: 'all 0.18s', fontFamily: 'inherit' }}>
-                    <p style={{ fontWeight: 600, fontSize: '0.8rem', marginBottom: 3, color: fd.typeLivraison === t ? G : SUB }}>{t === 'home' ? 'للبيت' : 'للمكتب'}</p>
-                    {selW && <p className="price-mono" style={{ fontSize: '1rem', fontWeight: 700, color: fd.typeLivraison === t ? G : SUB }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج</p>}
+                {(['home', 'office'] as const).map(type => (
+                  <button key={type} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: type }))} style={{ padding: '0.75rem', border: `1.5px solid ${fd.typeLivraison === type ? G : BD}`, borderRadius: 12, textAlign: 'start', cursor: 'pointer', background: fd.typeLivraison === type ? GL : CARD, transition: 'all 0.18s', fontFamily: 'inherit' }}>
+                    <p style={{ fontWeight: 600, fontSize: '0.8rem', marginBottom: 3, color: fd.typeLivraison === type ? G : SUB }}>{type === 'home' ? t.homeBtn : t.officeBtn}</p>
+                    {selW && <p className="price-mono" style={{ fontSize: '1rem', fontWeight: 700, color: fd.typeLivraison === type ? G : SUB }}>{(type === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} {store?.currency || 'DZD'}</p>}
                   </button>
                 ))}
               </div>
             </div>
             <div style={{ marginBottom: '0.875rem' }}>
-              <p style={{ fontSize: '0.7rem', fontWeight: 600, color: SUB, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>الكمية</p>
+              <p style={{ fontSize: '0.7rem', fontWeight: 600, color: SUB, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.qty}</p>
               <div style={{ display: 'inline-flex', alignItems: 'center', border: `1.5px solid ${BD}`, borderRadius: 12, overflow: 'hidden', background: CARD }}>
                 <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: SUB, borderLeft: `1px solid ${BD}` }}><Minus size={12} /></button>
                 <span style={{ width: 40, textAlign: 'center', fontWeight: 700, fontSize: '0.9rem', color: INK }}>{fd.quantity}</span>
@@ -929,8 +1226,8 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
             <div style={{ background: GL, borderRadius: 14, border: `1px solid rgba(45,106,79,0.15)`, padding: '1rem 1.125rem', marginBottom: '1rem' }}>
               {[
-                { l: 'المنتج', v: product.name.slice(0, 26) + (product.name.length > 26 ? '...' : '') },
-                { l: 'التوصيل', v: selW ? `${getLiv().toLocaleString()} دج` : '—' },
+                { l: t.productLabel, v: product.name.slice(0, 26) + (product.name.length > 26 ? '...' : '') },
+                { l: t.delivery, v: selW ? `${getLiv().toLocaleString()} ${store?.currency || 'DZD'}` : '—' },
               ].map(r => (
                 <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: `1px solid rgba(45,106,79,0.12)` }}>
                   <span style={{ fontSize: '0.78rem', color: SUB }}>{r.l}</span>
@@ -938,14 +1235,14 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 </div>
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <span style={{ fontWeight: 600, fontSize: '0.875rem', color: INK }}>المجموع</span>
-                <span className="price-mono" style={{ fontSize: '1.75rem', fontWeight: 700, color: G }}>{total().toLocaleString()} <span style={{ fontSize: '0.75rem' }}>دج</span></span>
+                <span style={{ fontWeight: 600, fontSize: '0.875rem', color: INK }}>{t.totalMaj}</span>
+                <span className="price-mono" style={{ fontSize: '1.75rem', fontWeight: 700, color: G }}>{total().toLocaleString()} <span style={{ fontSize: '0.75rem' }}>{store?.currency || 'DZD'}</span></span>
               </div>
             </div>
             <button type="submit" disabled={sub} style={{ ...S.btnPrimary, opacity: sub ? 0.7 : 1 }}
               onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = GD)}
               onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = G)}>
-              {sub ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />جاري المعالجة...</> : 'تأكيد الطلب'}
+              {sub ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />{t.processing}</> : t.confirmOrder}
             </button>
           </form>
         </div>
@@ -955,6 +1252,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 }
 
 export function Cart({ domain, store }: { domain: string; store: any }) {
+  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
   const [items, setItems] = useState<any[]>([]);
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -980,10 +1278,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const er: Record<string, string> = {};
-    if (!fd.customerName.trim()) er.name = 'مطلوب';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم غير صالح';
-    if (!fd.customerWelaya) er.w = 'مطلوب';
-    if (!fd.customerCommune) er.c = 'مطلوب';
+    if (!fd.customerName.trim()) er.name = t.errRequired;
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = t.errPhoneInvalid;
+    if (!fd.customerWelaya) er.w = t.errRequired;
+    if (!fd.customerCommune) er.c = t.errRequired;
     if (Object.keys(er).length) { setErrors(er); return; }
     setErrors({}); setSubmitting(true);
     try {
@@ -995,33 +1293,33 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const inp = (err?: boolean) => ({ ...S.input, ...(err ? S.inputErr : {}) });
 
   if (success) return (
-    <div dir="rtl" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: BG }}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: BG }}>
       <div style={{ textAlign: 'center', background: CARD, padding: '3rem 2rem', borderRadius: 20, border: `1px solid ${BD}`, maxWidth: 440, width: '100%' }}>
         <CheckCircle2 size={48} style={{ color: G, display: 'block', margin: '0 auto 1.25rem' }} />
-        <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: INK, marginBottom: '0.5rem' }}>تم استلام طلبك!</h2>
-        <p style={{ color: SUB, lineHeight: 1.75, marginBottom: '2rem', fontSize: '0.9rem' }}>سنتواصل معك قريباً لتأكيد الطلب.</p>
-        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: `linear-gradient(135deg, ${G}, ${GA})`, color: '#fff', padding: '0.75rem 2rem', fontWeight: 600, fontSize: '0.875rem', borderRadius: 12 }}>العودة للمتجر</Link>
+        <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: INK, marginBottom: '0.5rem' }}>{t.cartSuccessTitle}</h2>
+        <p style={{ color: SUB, lineHeight: 1.75, marginBottom: '2rem', fontSize: '0.9rem' }}>{t.cartSuccessDesc}</p>
+        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: `linear-gradient(135deg, ${G}, ${GA})`, color: '#fff', padding: '0.75rem 2rem', fontWeight: 600, fontSize: '0.875rem', borderRadius: 12 }}>{t.backToStore}</Link>
       </div>
     </div>
   );
 
   if (!items.length) return (
-    <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: BG }}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: BG }}>
       <div style={{ textAlign: 'center', padding: '4rem 2rem', border: `1px solid ${BD}`, borderRadius: 20, maxWidth: 400, width: '100%', background: CARD }}>
         <ShoppingBag size={44} style={{ color: GB, display: 'block', margin: '0 auto 1.25rem' }} />
-        <p style={{ color: SUB, fontSize: '0.9rem', marginBottom: '2rem' }}>السلة فارغة</p>
-        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: `linear-gradient(135deg, ${G}, ${GA})`, color: '#fff', padding: '0.75rem 1.875rem', fontWeight: 600, fontSize: '0.875rem', borderRadius: 12 }}>تسوق الآن</Link>
+        <p style={{ color: SUB, fontSize: '0.9rem', marginBottom: '2rem' }}>{t.cartEmpty}</p>
+        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: `linear-gradient(135deg, ${G}, ${GA})`, color: '#fff', padding: '0.75rem 1.875rem', fontWeight: 600, fontSize: '0.875rem', borderRadius: 12 }}>{t.shopNow}</Link>
       </div>
     </div>
   );
 
   return (
-    <div dir="rtl" style={{ padding: '2.5rem 1.5rem', maxWidth: 1280, margin: '0 auto', minHeight: '100vh', background: BG }}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ padding: '2.5rem 1.5rem', maxWidth: 1280, margin: '0 auto', minHeight: '100vh', background: BG }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
         <div style={{ width: 32, height: 32, background: GL, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <ShoppingCart size={15} color={G} />
         </div>
-        <h1 style={{ fontSize: 'clamp(1.5rem,5vw,2.25rem)', fontWeight: 700, color: INK }}>سلة التسوق</h1>
+        <h1 style={{ fontSize: 'clamp(1.5rem,5vw,2.25rem)', fontWeight: 700, color: INK }}>{t.cartTitle}</h1>
       </div>
       <div className="cart-inner">
         <div style={{ background: CARD, borderRadius: 16, border: `1px solid ${BD}`, alignSelf: 'start', overflow: 'hidden' }}>
@@ -1030,8 +1328,8 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: 68, height: 68, objectFit: 'cover', flexShrink: 0, borderRadius: 10, border: `1px solid ${BD}` }} alt="" />
               <div style={{ flex: 1 }}>
                 <h4 style={{ fontWeight: 600, color: INK, marginBottom: '0.3rem', fontSize: '0.875rem', lineHeight: 1.4 }}>{item.product?.name}</h4>
-                <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 700, color: G }}>{item.finalPrice?.toLocaleString()} دج</p>
-                <p style={{ fontSize: '0.68rem', color: SUB, marginTop: '0.15rem' }}>الكمية: {item.quantity}</p>
+                <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 700, color: G }}>{item.finalPrice?.toLocaleString()} {store?.currency || 'DZD'}</p>
+                <p style={{ fontSize: '0.68rem', color: SUB, marginTop: '0.15rem' }}>{t.qtyInCart} {item.quantity}</p>
               </div>
               <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: GB, padding: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'flex-start', transition: 'color 0.15s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = '#DC2626')}
@@ -1041,62 +1339,62 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             </div>
           ))}
           <div style={{ padding: '1rem', background: GL, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 600, color: SUB, fontSize: '0.875rem' }}>المجموع الفرعي</span>
-            <span className="price-mono" style={{ fontSize: '1.25rem', fontWeight: 700, color: G }}>{cartTotal.toLocaleString()} دج</span>
+            <span style={{ fontWeight: 600, color: SUB, fontSize: '0.875rem' }}>{t.subtotal}</span>
+            <span className="price-mono" style={{ fontSize: '1.25rem', fontWeight: 700, color: G }}>{cartTotal.toLocaleString()} {store?.currency || 'DZD'}</span>
           </div>
         </div>
         <div style={{ background: CARD, borderRadius: 16, border: `1px solid ${BD}`, padding: '1.75rem', alignSelf: 'start' }}>
-          <h3 style={{ fontWeight: 700, fontSize: '0.9rem', color: INK, marginBottom: '1.5rem' }}>معلومات التوصيل</h3>
+          <h3 style={{ fontWeight: 700, fontSize: '0.9rem', color: INK, marginBottom: '1.5rem' }}>{t.delivInfoTitle}</h3>
           <form onSubmit={handleSubmit}>
             <div className="form-row-2">
-              <FR error={errors.name} label="الاسم"><input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} style={inp(!!errors.name)} /></FR>
-              <FR error={errors.phone} label="الهاتف"><input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} style={inp(!!errors.phone)} /></FR>
+              <FR error={errors.name} label={t.nameLabel}><input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} style={inp(!!errors.name)} /></FR>
+              <FR error={errors.phone} label={t.phoneLabel}><input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} style={inp(!!errors.phone)} /></FR>
             </div>
             <div className="form-row-2">
-              <FR error={errors.w} label="الولاية">
+              <FR error={errors.w} label={t.wilaya}>
                 <div style={{ position: 'relative' }}>
                   <ChevronDown size={12} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: SUB, pointerEvents: 'none' }} />
                   <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...inp(!!errors.w), paddingRight: 30, fontFamily: 'inherit' }}>
-                    <option value="">اختر</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                    <option value="">{t.wilayaPh}</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
-              <FR error={errors.c} label="البلدية">
+              <FR error={errors.c} label={t.commune}>
                 <div style={{ position: 'relative' }}>
                   <ChevronDown size={12} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: SUB, pointerEvents: 'none' }} />
                   <select value={fd.customerCommune} disabled={loadingC || !fd.customerWelaya} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inp(!!errors.c), paddingRight: 30, opacity: (!fd.customerWelaya || loadingC) ? 0.5 : 1, fontFamily: 'inherit' }}>
-                    <option value="">{loadingC ? '...' : 'اختر'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                    <option value="">{loadingC ? t.communeLoading : t.communePh}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
             </div>
             <div style={{ margin: '1rem 0' }}>
-              <p style={{ fontSize: '0.7rem', fontWeight: 600, color: SUB, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.5rem' }}>نوع التوصيل</p>
+              <p style={{ fontSize: '0.7rem', fontWeight: 600, color: SUB, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.5rem' }}>{t.deliveryType}</p>
               <div className="delivery-grid">
-                {(['home', 'office'] as const).map(t => (
-                  <button key={t} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: t }))} style={{ padding: '0.75rem', border: `1.5px solid ${fd.typeLivraison === t ? G : BD}`, borderRadius: 12, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === t ? GL : CARD, fontFamily: 'inherit', transition: 'all 0.18s' }}>
-                    <p style={{ fontWeight: 600, fontSize: '0.8rem', color: fd.typeLivraison === t ? G : SUB, marginBottom: 3 }}>{t === 'home' ? 'للبيت' : 'للمكتب'}</p>
-                    {selW && <p style={{ fontWeight: 700, fontSize: '0.95rem', color: fd.typeLivraison === t ? G : SUB }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج</p>}
+                {(['home', 'office'] as const).map(type => (
+                  <button key={type} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: type }))} style={{ padding: '0.75rem', border: `1.5px solid ${fd.typeLivraison === type ? G : BD}`, borderRadius: 12, textAlign: 'start', cursor: 'pointer', background: fd.typeLivraison === type ? GL : CARD, fontFamily: 'inherit', transition: 'all 0.18s' }}>
+                    <p style={{ fontWeight: 600, fontSize: '0.8rem', color: fd.typeLivraison === type ? G : SUB, marginBottom: 3 }}>{type === 'home' ? t.homeBtn : t.officeBtn}</p>
+                    {selW && <p style={{ fontWeight: 700, fontSize: '0.95rem', color: fd.typeLivraison === type ? G : SUB }}>{(type === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} {store?.currency || 'DZD'}</p>}
                   </button>
                 ))}
               </div>
             </div>
             <div style={{ background: GL, borderRadius: 14, border: `1px solid rgba(45,106,79,0.15)`, padding: '1rem', margin: '1rem 0' }}>
-              {[{ l: 'المجموع الفرعي', v: `${cartTotal.toLocaleString()} دج` }, { l: 'التوصيل', v: getLiv() ? `${getLiv().toLocaleString()} دج` : '—' }].map(r => (
+              {[{ l: t.subtotal, v: `${cartTotal.toLocaleString()} ${store?.currency || 'DZD'}` }, { l: t.delivery, v: getLiv() ? `${getLiv().toLocaleString()} ${store?.currency || 'DZD'}` : '—' }].map(r => (
                 <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: `1px solid rgba(45,106,79,0.12)` }}>
                   <span style={{ fontSize: '0.78rem', color: SUB }}>{r.l}</span>
                   <span style={{ fontWeight: 600, color: INK }}>{r.v}</span>
                 </div>
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <span style={{ fontWeight: 700, color: INK }}>الإجمالي</span>
-                <span className="price-mono" style={{ fontSize: '1.875rem', fontWeight: 700, color: G }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.75rem' }}>دج</span></span>
+                <span style={{ fontWeight: 700, color: INK }}>{t.finalTotalLabel}</span>
+                <span className="price-mono" style={{ fontSize: '1.875rem', fontWeight: 700, color: G }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.75rem' }}>{store?.currency || 'DZD'}</span></span>
               </div>
             </div>
             <button type="submit" disabled={submitting} style={{ ...S.btnPrimary, opacity: submitting ? 0.7 : 1 }}
               onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = GD)}
               onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = G)}>
-              {submitting ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />جاري المعالجة...</> : 'تأكيد الطلب'}
+              {submitting ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />{t.processing}</> : t.confirmOrder}
             </button>
           </form>
         </div>
@@ -1105,8 +1403,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 }
 
-const Shell = ({ children, title }: { children: React.ReactNode; title: string }) => (
-  <div dir="rtl" style={{ minHeight: '100vh', background: BG }}>
+const Shell = ({ children, title, store }: { children: React.ReactNode; title: string; store?: any }) => {
+  const isRTL = getLang(store) === 'ar';
+  return (
+  <div dir={isRTL ? 'rtl' : 'ltr'} style={{ minHeight: '100vh', background: BG }}>
     <div style={{ background: GD, paddingTop: 88, paddingBottom: 48, paddingLeft: 24, paddingRight: 24 }}>
       <div style={{ maxWidth: 860, margin: '0 auto' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(82,183,136,0.15)', border: '1px solid rgba(82,183,136,0.3)', borderRadius: 20, padding: '0.3rem 0.875rem', marginBottom: '1rem' }}>
@@ -1117,7 +1417,8 @@ const Shell = ({ children, title }: { children: React.ReactNode; title: string }
     </div>
     <div style={{ maxWidth: 860, margin: '0 auto', padding: '3rem 1.5rem 6rem' }}>{children}</div>
   </div>
-);
+  );
+};
 
 const InfoBlock = ({ title, body }: { title: string; body: string }) => (
   <div style={{ padding: '1.125rem 0', borderBottom: `1px solid ${BD}`, display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
@@ -1131,42 +1432,46 @@ const InfoBlock = ({ title, body }: { title: string; body: string }) => (
   </div>
 );
 
-export function Privacy() {
+export function Privacy({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="سياسة الخصوصية">
+    <Shell title={t.privacyTitle} store={store}>
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 16, border: `1px solid ${BD}` }}>
-        <InfoBlock title="البيانات التي نجمعها" body="نجمع فقط المعلومات الضرورية لمعالجة طلباتكم، مثل الاسم، رقم الهاتف، وعنوان التوصيل." />
-        <InfoBlock title="حماية البيانات" body="تُخزن جميع البيانات بشكل مشفر. نستخدم بروتوكولات حماية معتمدة لضمان أمان معلوماتكم." />
-        <InfoBlock title="مشاركة المعلومات" body="لا نقوم ببيع أو مشاركة بياناتكم مع أي جهات خارجية باستثناء شركاء التوصيل." />
+        <InfoBlock title={t.privacyData} body={t.privacyDataBody} />
+        <InfoBlock title={t.privacyProtect} body={t.privacyProtectBody} />
+        <InfoBlock title={t.privacyShare} body={t.privacyShareBody} />
       </div>
     </Shell>
   );
 }
 
-export function Terms() {
+export function Terms({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="شروط الاستخدام">
+    <Shell title={t.termsTitle} store={store}>
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 16, border: `1px solid ${BD}` }}>
-        <InfoBlock title="الحساب والمسؤولية" body="المستخدم مسؤول عن دقة البيانات المدخلة وعن الحفاظ على سرية حسابه." />
-        <InfoBlock title="الطلبات والمدفوعات" body="يتم تأكيد الطلبات عبر الهاتف قبل الشحن. الأسعار المعلنة هي الأسعار النهائية." />
-        <InfoBlock title="القانون الحاكم" body="تخضع كافة التعاملات للقوانين المعمول بها في جمهورية الجزائر الديمقراطية الشعبية." />
+        <InfoBlock title={t.termsAccount} body={t.termsAccountBody} />
+        <InfoBlock title={t.termsOrders} body={t.termsOrdersBody} />
+        <InfoBlock title={t.termsLaw} body={t.termsLawBody} />
       </div>
     </Shell>
   );
 }
 
-export function Cookies() {
+export function Cookies({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="ملفات الارتباط">
+    <Shell title={t.cookiesTitle} store={store}>
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 16, border: `1px solid ${BD}` }}>
-        <InfoBlock title="الملفات الأساسية" body="نستخدم ملفات تعريف الارتباط الضرورية لضمان عمل سلة المشتريات وأمان جلسة الدخول." />
-        <InfoBlock title="تحسين التجربة" body="نستخدم بعض الملفات لفهم كيفية استخدام الموقع وتطوير تجربة التصفح." />
+        <InfoBlock title={t.cookiesEssential} body={t.cookiesEssentialBody} />
+        <InfoBlock title={t.cookiesExp} body={t.cookiesExpBody} />
       </div>
     </Shell>
   );
 }
 
 export function Contact({ store }: { store: any }) {
+  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -1174,25 +1479,25 @@ export function Contact({ store }: { store: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-    catch { showError('حدث خطأ في الإرسال'); } finally { setLoading(false); }
+    catch { showError(t.contactErrMsg); } finally { setLoading(false); }
   };
 
   return (
-    <div dir="rtl" style={{ background: BG, minHeight: '100vh' }}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: BG, minHeight: '100vh' }}>
       <div style={{ background: GD, paddingTop: 88, paddingBottom: 48, paddingLeft: 24, paddingRight: 24 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(82,183,136,0.15)', border: '1px solid rgba(82,183,136,0.3)', borderRadius: 20, padding: '0.3rem 0.875rem', marginBottom: '1rem' }}>
             <Leaf size={12} style={{ color: GA }} /><span style={{ fontSize: '0.68rem', fontWeight: 600, color: GA }}>Nature Wellness</span>
           </div>
-          <h1 style={{ fontSize: 'clamp(2.25rem,6vw,3.5rem)', fontWeight: 700, color: '#fff' }}>تواصل معنا</h1>
+          <h1 style={{ fontSize: 'clamp(2.25rem,6vw,3.5rem)', fontWeight: 700, color: '#fff' }}>{t.contactSect}</h1>
         </div>
       </div>
       <div className="contact-inner" style={{ maxWidth: 1100, margin: '0 auto', padding: '3rem 1.5rem 6rem' }}>
         <div>
           <div style={{ background: CARD, borderRadius: 16, border: `1px solid ${BD}`, padding: '1.25rem', marginBottom: '1rem' }}>
             {[
-              { icon: <Phone size={14} />, label: 'الهاتف', val: store?.contact?.phone || 'غير متوفر' },
-              { icon: <MapPin size={14} />, label: 'الموقع', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') || 'الجزائر' },
+              { icon: <Phone size={14} />, label: t.phoneLabel, val: store?.contact?.phone || '—' },
+              { icon: <MapPin size={14} />, label: t.contactLocLabel, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') || '—' },
             ].map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginBottom: i === 0 ? '1rem' : 0 }}>
                 <div style={{ width: 36, height: 36, background: GL, border: `1px solid rgba(45,106,79,0.15)`, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', color: G, flexShrink: 0 }}>{r.icon}</div>
@@ -1205,33 +1510,33 @@ export function Contact({ store }: { store: any }) {
           </div>
           <div style={{ background: GL, borderRadius: 12, border: `1px solid rgba(45,106,79,0.15)`, padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
             <span style={{ width: 7, height: 7, borderRadius: '50%', background: GA, display: 'inline-block' }} />
-            <span style={{ fontSize: '0.78rem', fontWeight: 600, color: G }}>نرد في غضون ساعة</span>
+            <span style={{ fontSize: '0.78rem', fontWeight: 600, color: G }}>{t.contactReply}</span>
           </div>
         </div>
         <div style={{ background: CARD, borderRadius: 16, border: `1px solid ${BD}`, padding: '2rem' }}>
           {sent ? (
             <div style={{ textAlign: 'center', padding: '3.5rem 1rem' }}>
               <CheckCircle2 size={48} style={{ color: G, display: 'block', margin: '0 auto 1.25rem' }} />
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: INK, marginBottom: '0.5rem' }}>تم الإرسال بنجاح!</h2>
-              <p style={{ color: SUB, lineHeight: 1.75, marginBottom: '2rem', fontSize: '0.9rem' }}>سنرد عليك في أقرب وقت.</p>
-              <button onClick={() => setSent(false)} style={{ padding: '0.7rem 1.875rem', border: `1px solid ${G}`, borderRadius: 12, background: GL, color: G, fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'inherit' }}>إرسال رسالة أخرى</button>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: INK, marginBottom: '0.5rem' }}>{t.contactSentTitle}</h2>
+              <p style={{ color: SUB, lineHeight: 1.75, marginBottom: '2rem', fontSize: '0.9rem' }}>{t.contactSentDesc}</p>
+              <button onClick={() => setSent(false)} style={{ padding: '0.7rem 1.875rem', border: `1px solid ${G}`, borderRadius: 12, background: GL, color: G, fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'inherit' }}>{t.contactAnotherBtn}</button>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
-                <FR label="الاسم"><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={S.input} /></FR>
-                <FR label="الهاتف"><input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required style={S.input} /></FR>
+                <FR label={t.nameLabel}><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={S.input} /></FR>
+                <FR label={t.phoneLabel}><input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required style={S.input} /></FR>
               </div>
               <div style={{ marginBottom: '0.875rem' }}>
-                <FR label="البريد الإلكتروني"><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required style={S.input} /></FR>
+                <FR label={t.emailLabel}><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required style={S.input} /></FR>
               </div>
               <div style={{ marginBottom: '1.25rem' }}>
-                <FR label="الرسالة"><textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} style={{ ...S.input, resize: 'none' }} /></FR>
+                <FR label={t.msgLabel}><textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} style={{ ...S.input, resize: 'none' }} /></FR>
               </div>
               <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = GD)}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = G)}>
-                {loading ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />جاري الإرسال...</> : <>إرسال الرسالة <ArrowLeft size={15} /></>}
+                {loading ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />{t.sending}</> : <>{t.sendBtn} <ArrowLeft size={15} /></>}
               </button>
             </form>
           )}
@@ -1245,9 +1550,9 @@ export function StaticPage({ staticPage, page, store }: any) {
   const p = (staticPage || page || '').toLowerCase();
   return (
     <>
-      {p === 'privacy' && <Privacy />}
-      {p === 'terms' && <Terms />}
-      {p === 'cookies' && <Cookies />}
+      {p === 'privacy' && <Privacy store={store} />}
+      {p === 'terms' && <Terms store={store} />}
+      {p === 'cookies' && <Cookies store={store} />}
       {p === 'contact' && <Contact store={store} />}
     </>
   );

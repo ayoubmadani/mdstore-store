@@ -1,1 +1,1 @@
-node scripts/bundle-themes.mjs --slug=color-bold-red-rush-ecommerce-theme
+node scripts/bundle-themes.mjs --slug=Marine-whitecap-marine-essentials-theme

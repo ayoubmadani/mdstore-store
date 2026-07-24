@@ -11,7 +11,7 @@ import {
   Trash2, Loader2, MapPin, Leaf, Sparkles, Droplets, Heart, Flower2,
   Mail,
 } from 'lucide-react';
-import { useCartStore } from '../../../store/useCartStore';
+import { useCartStore } from '@/store/useCartStore';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -159,6 +159,7 @@ export interface ProductFormProps {
   product: Product; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string|null; setSelectedOffer: (id: string|null) => void;
   selectedVariants: Record<string,string>; platform?: string; priceLoss?: number;
+  store?: any;
 }
 
 /* ─── Helpers ─── */
@@ -244,6 +245,75 @@ const jsonAr = {
   privacy: 'الخصوصية',
   terms: 'الشروط',
   rightsReserved: 'جميع الحقوق محفوظة',
+  pages: 'الصفحات',
+  cookies: 'سياسة الكوكيز',
+  cancel: 'إلغاء',
+  deliveryInfoTitle: 'بيانات التوصيل',
+  productLabel: 'المنتج',
+  viewDetails: 'اكتشفي',
+  browseCategories: 'تصفحي الفئات',
+  productsTitle: 'منتجاتنا',
+  itemUnit: 'منتج',
+  heroEyebrow: 'نقي · طبيعي · عضوي',
+  heroTitle: 'جمالكِ من الطبيعة',
+  heroSub: 'مستحضرات تجميل عضوية نقية مصنوعة من أفضل المكونات الطبيعية، لبشرة مشرقة وصحية.',
+  whyUsLabel: 'لماذا نحن',
+  whyUsTitle: 'الطبيعة في كل قطرة',
+  organicBadge: 'عضوي طبيعي',
+  addedShort: 'تمت الإضافة',
+  addToCartShort: 'أضف للسلة',
+  orderNowFem: 'اطلبي الآن',
+  trustItems: [
+    { t: 'مكونات عضوية', s: '100% طبيعية معتمدة' },
+    { t: 'زيوت نقية', s: 'بدون إضافات كيماوية' },
+    { t: 'Cruelty-Free', s: 'غير مُختبر على الحيوانات' },
+    { t: 'نباتية 100%', s: 'Vegan Certified' },
+  ],
+  miniStats: [
+    { n: '+500', l: 'منتج طبيعي' },
+    { n: '58', l: 'ولاية' },
+    { n: '100%', l: 'عضوي' },
+  ],
+  features: [
+    { t: '100% عضوي', d: 'مكونات معتمدة عضوياً من أجود المصادر الطبيعية حول العالم.' },
+    { t: 'بدون كيماويات', d: 'خالية تماماً من البارابين، السيليكون، والأصباغ الصناعية.' },
+    { t: 'آمن للبشرة', d: 'مختبر ومعتمد من خبراء التجميل والجلدية لجميع أنواع البشرة.' },
+    { t: 'Vegan', d: 'لا مكونات حيوانية ولا اختبارات على الحيوانات — أخلاقي 100%.' },
+  ],
+  contactTitle: 'تواصلي معنا',
+  contactPhoneLabel: 'الهاتف',
+  contactLocationLabel: 'الموقع',
+  contactAvailable: 'نرد في غضون ساعة واحدة',
+  emailLabel: 'البريد الإلكتروني',
+  messageLabel: 'الرسالة',
+  namePh: 'الاسم الكامل',
+  emailPh: 'your@email.com',
+  messagePh: 'رسالتك...',
+  sendLabel: 'إرسال الرسالة',
+  messageSentTitle: 'تم الإرسال!',
+  messageSentDesc: 'سنرد عليكِ في أقرب وقت.',
+  anotherMsg: 'إرسال رسالة أخرى',
+  errContact: 'حدث خطأ في الإرسال',
+  legalSub: 'آخر تحديث: يناير 2025',
+  privacyTitle: 'سياسة الخصوصية',
+  termsTitle: 'شروط الاستخدام',
+  cookiesTitle: 'ملفات الارتباط',
+  privDataTitle: 'البيانات التي نجمعها',
+  privDataBody: 'نجمع فقط المعلومات الضرورية لمعالجة طلباتكم، مثل الاسم، رقم الهاتف، وعنوان التوصيل.',
+  privSecTitle: 'حماية البيانات',
+  privSecBody: 'تُخزن جميع البيانات بشكل مشفر. نستخدم بروتوكولات حماية معتمدة لضمان أمان معلوماتكم.',
+  privShareTitle: 'مشاركة المعلومات',
+  privShareBody: 'لا نقوم ببيع أو مشاركة بياناتكم مع أي جهات خارجية باستثناء شركاء التوصيل.',
+  termsAccTitle: 'الحساب والمسؤولية',
+  termsAccBody: 'المستخدمة مسؤولة عن دقة البيانات المدخلة والحفاظ على سرية حسابها.',
+  termsPayTitle: 'الطلبات والمدفوعات',
+  termsPayBody: 'يتم تأكيد الطلبات عبر الهاتف قبل الشحن. الأسعار المعلنة هي الأسعار النهائية.',
+  termsLawTitle: 'القانون الحاكم',
+  termsLawBody: 'تخضع كافة التعاملات للقوانين المعمول بها في جمهورية الجزائر الديمقراطية الشعبية.',
+  cookEssTitle: 'الملفات الأساسية',
+  cookEssBody: 'نستخدم ملفات تعريف الارتباط الضرورية لضمان عمل سلة المشتريات وأمان جلسة الدخول.',
+  cookPrefTitle: 'تحسين التجربة',
+  cookPrefBody: 'نستخدم بعض الملفات لفهم كيفية استخدام الموقع وتطوير تجربة التصفح.',
 };
 
 const jsonFr = {
@@ -310,13 +380,220 @@ const jsonFr = {
   privacy: 'Confidentialité',
   terms: 'Conditions',
   rightsReserved: 'Tous droits réservés.',
+  pages: 'Pages',
+  cookies: 'Cookies',
+  cancel: 'Annuler',
+  deliveryInfoTitle: 'Informations de livraison',
+  productLabel: 'Produit',
+  viewDetails: 'Découvrir',
+  browseCategories: 'Nos catégories',
+  productsTitle: 'Nos Produits',
+  itemUnit: 'produit',
+  heroEyebrow: 'Pur · Naturel · Organique',
+  heroTitle: 'Votre beauté vient de la nature',
+  heroSub: 'Des cosmétiques biologiques purs, fabriqués à partir des meilleurs ingrédients naturels pour une peau rayonnante.',
+  whyUsLabel: 'Pourquoi nous',
+  whyUsTitle: 'La nature dans chaque goutte',
+  organicBadge: 'Bio & Naturel',
+  addedShort: 'Ajouté',
+  addToCartShort: 'Ajouter',
+  orderNowFem: 'Commander',
+  trustItems: [
+    { t: 'Ingrédients Bio', s: '100% naturels certifiés' },
+    { t: 'Huiles Pures', s: 'Sans additifs chimiques' },
+    { t: 'Cruelty-Free', s: 'Non testé sur les animaux' },
+    { t: '100% Vegan', s: 'Vegan Certified' },
+  ],
+  miniStats: [
+    { n: '+500', l: 'produits naturels' },
+    { n: '58', l: 'wilayas' },
+    { n: '100%', l: 'biologique' },
+  ],
+  features: [
+    { t: '100% Bio', d: 'Ingrédients certifiés biologiques issus des meilleures sources naturelles.' },
+    { t: 'Sans chimiques', d: 'Entièrement exempt de parabènes, silicones et colorants synthétiques.' },
+    { t: 'Sûr pour la peau', d: 'Testé et approuvé par des experts pour tous les types de peau.' },
+    { t: 'Vegan', d: 'Aucun ingrédient animal, aucun test sur les animaux — 100% éthique.' },
+  ],
+  contactTitle: 'Contactez-nous',
+  contactPhoneLabel: 'Téléphone',
+  contactLocationLabel: 'Localisation',
+  contactAvailable: 'Nous répondons en moins d\'une heure',
+  emailLabel: 'Email',
+  messageLabel: 'Message',
+  namePh: 'Votre nom complet',
+  emailPh: 'votre@email.com',
+  messagePh: 'Votre message...',
+  sendLabel: 'Envoyer le message',
+  messageSentTitle: 'Message envoyé !',
+  messageSentDesc: 'Nous vous répondrons dans les plus brefs délais.',
+  anotherMsg: 'Envoyer un autre message',
+  errContact: 'Une erreur est survenue lors de l\'envoi.',
+  legalSub: 'Dernière mise à jour : janvier 2025',
+  privacyTitle: 'Politique de confidentialité',
+  termsTitle: 'Conditions d\'utilisation',
+  cookiesTitle: 'Politique des cookies',
+  privDataTitle: 'Données collectées',
+  privDataBody: 'Nous collectons uniquement les informations nécessaires au traitement de vos commandes : nom, téléphone et adresse de livraison.',
+  privSecTitle: 'Protection des données',
+  privSecBody: 'Toutes vos données sont stockées de manière chiffrée, avec des protocoles de sécurité certifiés.',
+  privShareTitle: 'Partage des informations',
+  privShareBody: 'Nous ne vendons ni ne partageons vos données avec des tiers, à l\'exception de nos partenaires de livraison.',
+  termsAccTitle: 'Compte et responsabilité',
+  termsAccBody: 'L\'utilisateur est responsable de l\'exactitude des informations saisies et de la confidentialité de son compte.',
+  termsPayTitle: 'Commandes et paiements',
+  termsPayBody: 'Les commandes sont confirmées par téléphone avant expédition. Les prix affichés sont définitifs.',
+  termsLawTitle: 'Loi applicable',
+  termsLawBody: 'Toutes les transactions sont soumises aux lois en vigueur en République Algérienne Démocratique et Populaire.',
+  cookEssTitle: 'Cookies essentiels',
+  cookEssBody: 'Nous utilisons des cookies nécessaires pour assurer le fonctionnement du panier et la sécurité de votre session.',
+  cookPrefTitle: 'Amélioration de l\'expérience',
+  cookPrefBody: 'Nous utilisons certains cookies pour comprendre comment le site est utilisé et améliorer l\'expérience de navigation.',
 };
+
+const jsonEn = {
+  dir: 'ltr',
+  home: 'Home',
+  contact: 'Contact',
+  cart: 'Cart',
+  search: 'Search products...',
+  searching: 'Searching...',
+  noResults: 'No results found',
+  showAll: 'Show all results',
+  all: 'All',
+  noProducts: 'No products available at the moment.',
+  shopNow: 'Shop Now',
+  searchResultsFor: 'Results for:',
+  fullName: 'Full Name',
+  fullNamePh: 'Enter your name',
+  errName: 'Name is required',
+  phone: 'Phone',
+  phonePh: '05xxxxxxxx',
+  errPhone: 'Phone number is required',
+  errPhoneInvalid: 'Invalid phone number',
+  wilaya: 'Wilaya',
+  errWilaya: 'Please select a wilaya',
+  wilayaPh: 'Select wilaya',
+  wilayaNA: 'Delivery not available at the moment',
+  commune: 'Commune',
+  errCommune: 'Please select a commune',
+  communePh: 'Select commune',
+  communeLoading: 'Loading...',
+  deliveryType: 'Delivery type',
+  deliveryHome: 'Home delivery',
+  deliveryOffice: 'Post office',
+  qty: 'Quantity',
+  price: 'Price',
+  delivery: 'Delivery',
+  total: 'Total',
+  subtotal: 'Subtotal',
+  orderInfo: 'Order information',
+  addToCart: 'Add to Cart',
+  orderNow: 'Order Now',
+  confirmOrder: 'Confirm Order',
+  sending: 'Processing...',
+  back: 'Cancel',
+  addedMsg: 'Added to cart ✓',
+  errSubmit: 'An error occurred, please try again.',
+  myCart: 'My Cart',
+  cartEmpty: 'Your cart is empty',
+  cartEmptyDesc: 'Discover our selection.',
+  successTitle: 'Order confirmed!',
+  successDesc: 'Thank you, our team will contact you soon.',
+  backToShop: 'Back to shop',
+  checkoutTitle: 'Complete your order',
+  offersTitle: 'Available offers',
+  descTitle: 'Description',
+  quickLinks: 'Quick Links',
+  contactSect: 'Contact',
+  privacy: 'Privacy',
+  terms: 'Terms',
+  rightsReserved: 'All rights reserved.',
+  pages: 'Pages',
+  cookies: 'Cookie Policy',
+  cancel: 'Cancel',
+  deliveryInfoTitle: 'Delivery information',
+  productLabel: 'Product',
+  viewDetails: 'View details',
+  browseCategories: 'Browse categories',
+  productsTitle: 'Our Products',
+  itemUnit: 'product',
+  heroEyebrow: 'Pure · Natural · Organic',
+  heroTitle: 'Your beauty from nature',
+  heroSub: 'Pure organic cosmetics made from the finest natural ingredients for radiant, healthy skin.',
+  whyUsLabel: 'Why us',
+  whyUsTitle: 'Nature in every drop',
+  organicBadge: 'Organic & Natural',
+  addedShort: 'Added',
+  addToCartShort: 'Add',
+  orderNowFem: 'Order Now',
+  trustItems: [
+    { t: 'Organic Ingredients', s: '100% certified natural' },
+    { t: 'Pure Oils', s: 'No chemical additives' },
+    { t: 'Cruelty-Free', s: 'Not tested on animals' },
+    { t: '100% Vegan', s: 'Vegan Certified' },
+  ],
+  miniStats: [
+    { n: '+500', l: 'natural products' },
+    { n: '58', l: 'wilayas' },
+    { n: '100%', l: 'organic' },
+  ],
+  features: [
+    { t: '100% Organic', d: 'Certified organic ingredients from the finest natural sources worldwide.' },
+    { t: 'Chemical-Free', d: 'Completely free of parabens, silicones, and synthetic dyes.' },
+    { t: 'Skin-Safe', d: 'Tested and approved by beauty and dermatology experts for all skin types.' },
+    { t: 'Vegan', d: 'No animal ingredients, no animal testing — 100% ethical.' },
+  ],
+  contactTitle: 'Contact Us',
+  contactPhoneLabel: 'Phone',
+  contactLocationLabel: 'Location',
+  contactAvailable: 'We reply within one hour',
+  emailLabel: 'Email',
+  messageLabel: 'Message',
+  namePh: 'Your full name',
+  emailPh: 'your@email.com',
+  messagePh: 'Your message...',
+  sendLabel: 'Send Message',
+  messageSentTitle: 'Sent!',
+  messageSentDesc: 'We\'ll get back to you as soon as possible.',
+  anotherMsg: 'Send another message',
+  errContact: 'An error occurred while sending.',
+  legalSub: 'Last updated: January 2025',
+  privacyTitle: 'Privacy Policy',
+  termsTitle: 'Terms of Use',
+  cookiesTitle: 'Cookie Policy',
+  privDataTitle: 'Data We Collect',
+  privDataBody: 'We collect only the information necessary to process your orders: name, phone number, and delivery address.',
+  privSecTitle: 'Data Protection',
+  privSecBody: 'All data is stored in encrypted form using certified security protocols to ensure your information is safe.',
+  privShareTitle: 'Information Sharing',
+  privShareBody: 'We do not sell or share your data with any third parties, except our delivery partners.',
+  termsAccTitle: 'Account & Responsibility',
+  termsAccBody: 'The user is responsible for the accuracy of information entered and for maintaining the confidentiality of their account.',
+  termsPayTitle: 'Orders & Payments',
+  termsPayBody: 'Orders are confirmed by phone before shipment. The displayed prices are final.',
+  termsLawTitle: 'Governing Law',
+  termsLawBody: 'All transactions are subject to the laws in force in the People\'s Democratic Republic of Algeria.',
+  cookEssTitle: 'Essential Cookies',
+  cookEssBody: 'We use essential cookies to ensure the shopping cart works and your session is secure.',
+  cookPrefTitle: 'Experience Improvement',
+  cookPrefBody: 'We use some cookies to understand how the site is used and improve your browsing experience.',
+};
+
+type Lang = 'ar' | 'fr' | 'en';
+const getLang = (store?: any): Lang => {
+  if (store?.language === 'fr') return 'fr';
+  if (store?.language === 'en') return 'en';
+  return 'ar';
+};
+const T: Record<Lang, typeof jsonAr> = { ar: jsonAr, fr: jsonFr as any, en: jsonEn as any };
 
 export default function Main({ store, children, domain }: any) {
   const pathname = usePathname();
+  const t = T[getLang(store)];
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
-    <div style={{ minHeight:'100vh', background: BG }}>
+    <div dir={t.dir} style={{ minHeight:'100vh', background: BG }}>
       <style>{THEME_CSS}</style>
       <Navbar store={store} domain={domain} />
       <main>{children}</main>
@@ -329,6 +606,8 @@ export default function Main({ store, children, domain }: any) {
    NAVBAR
 ══════════════════════════════════════════ */
 export function Navbar({ store, domain }: { store: any; domain: string }) {
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
   const [open, setOpen]         = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -386,7 +665,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       )}
 
       {/* ── Nav bar ── */}
-      <nav dir="rtl" style={{
+      <nav dir={isRTL ? 'rtl' : 'ltr'} style={{
         position:'sticky', top:0, zIndex:50,
         background: scrolled ? 'rgba(250,246,243,0.96)' : '#fff',
         backdropFilter:'blur(16px)',
@@ -415,11 +694,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
           {/* Desktop links */}
           <div className="nav-desktop" style={{ flex:1, justifyContent:'center' }}>
-            {[{ h:'/', l:'الرئيسية' }, { h:'/contact', l:'تواصل معنا' }].map(lnk => (
-              <Link key={lnk.h} href={lnk.h} style={{ fontSize:'0.875rem', fontWeight:500, color: SUB, transition:'color 0.15s', letterSpacing:'0.02em' }}
+            {([['/','home'],['/contact','contact']] as [string, keyof typeof t][]).map(([href, key]) => (
+              <Link key={href} href={href} style={{ fontSize:'0.875rem', fontWeight:500, color: SUB, transition:'color 0.15s', letterSpacing:'0.02em' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = ROD)}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = SUB)}>
-                {lnk.l}
+                {t[key] as string}
               </Link>
             ))}
           </div>
@@ -435,7 +714,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               <Link href="/cart" style={{ position:'relative', display:'flex', alignItems:'center', gap:7, background:`linear-gradient(135deg,${RO},${ROD})`, color:'#fff', height:38, padding:'0 1.25rem', borderRadius:12, fontSize:'0.8rem', fontWeight:600, letterSpacing:'0.04em', transition:'opacity 0.2s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '0.88')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity = '1')}>
-                <ShoppingCart size={13} /> السلة
+                <ShoppingCart size={13} /> {t.cart}
                 {count > 0 && <span style={{ background:'#fff', color: ROD, fontSize:9, fontWeight:800, width:17, height:17, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>{count}</span>}
               </Link>
             )}
@@ -459,9 +738,9 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         {/* Mobile menu */}
         <div style={{ overflow:'hidden', maxHeight: open ? 180 : 0, transition:'max-height 0.28s ease', background: CR, borderTop: open ? `1px solid ${BD}` : 'none' }}>
           <div style={{ padding:'0.875rem 1.5rem 1.5rem' }}>
-            {[{ h:'/', l:'الرئيسية' }, { h:'/contact', l:'تواصل معنا' }].map(lnk => (
-              <Link key={lnk.h} href={lnk.h} onClick={() => setOpen(false)} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'0.8rem 0', borderBottom:`1px solid ${BD}`, fontSize:'0.9rem', fontWeight:500, color: INK }}>
-                {lnk.l} <ArrowLeft size={13} style={{ color: RO }} />
+            {([['/','home'],['/contact','contact']] as [string, keyof typeof t][]).map(([href, key]) => (
+              <Link key={href} href={href} onClick={() => setOpen(false)} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'0.8rem 0', borderBottom:`1px solid ${BD}`, fontSize:'0.9rem', fontWeight:500, color: INK }}>
+                {t[key] as string} <ArrowLeft size={13} style={{ color: RO }} />
               </Link>
             ))}
           </div>
@@ -475,15 +754,15 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'2rem' }}>
               <div style={{ display:'flex', alignItems:'center', gap:8 }}>
                 <Flower2 size={14} color={RO} />
-                <span style={{ fontSize:'0.65rem', fontWeight:600, color: SUB, letterSpacing:'0.12em', textTransform:'uppercase' }}>البحث</span>
+                <span style={{ fontSize:'0.65rem', fontWeight:600, color: SUB, letterSpacing:'0.12em', textTransform:'uppercase' }}>{t.search}</span>
               </div>
               <button onClick={() => setShowSearch(false)} style={{ width:32, height:32, borderRadius:'50%', border:`1px solid ${BD}`, background: CARD, color: SUB, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}><X size={13}/></button>
             </div>
             <form className="glb-search-form" onSubmit={handleSearch}>
-              <Search size={16} style={{ color: RO, flexShrink:0, marginLeft:10 }} />
-              <input ref={searchInputRef} className="glb-search-input" type="text" placeholder="ابحثي عن منتج..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+              <Search size={16} style={{ color: RO, flexShrink:0, ...(isRTL ? { marginLeft:10 } : { marginRight:10 }) }} />
+              <input ref={searchInputRef} className="glb-search-input" type="text" placeholder={t.search} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} dir={isRTL ? 'rtl' : 'ltr'} />
             </form>
-            {loading && <p style={{ textAlign:'center', color: RO, fontSize:'0.82rem', padding:'2rem' }}>جاري البحث...</p>}
+            {loading && <p style={{ textAlign:'center', color: RO, fontSize:'0.82rem', padding:'2rem' }}>{t.searching}</p>}
             {!loading && listSearch.length > 0 && (
               <>
               <div className="glb-search-grid">
@@ -494,18 +773,18 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                     )}
                     <div className="glb-search-card-info">
                       <p style={{ fontSize:'0.78rem', fontWeight:500, color: INK, marginBottom:3, lineHeight:1.35 }}>{p.name}</p>
-                      <p style={{ fontSize:'0.74rem', fontWeight:700, color: RO }}>{Number(p.price).toLocaleString()} دج</p>
+                      <p style={{ fontSize:'0.74rem', fontWeight:700, color: RO }}>{Number(p.price).toLocaleString()} {store?.currency || 'DZD'}</p>
                     </div>
                   </Link>
                 ))}
               </div>
               <button onClick={handleSearch} style={{ width: '100%', padding: '12px', background: ROL, border: 'none', borderTop: `1px solid rgba(193,123,142,0.2)`, color: RO, fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                عرض جميع النتائج <ArrowLeft size={14} />
+                {t.showAll} <ArrowLeft size={14} />
               </button>
               </>
             )}
             {!loading && searchQuery.length >= 2 && listSearch.length === 0 && (
-              <p style={{ textAlign:'center', color: BD, fontSize:'0.875rem', padding:'3rem' }}>لا توجد نتائج</p>
+              <p style={{ textAlign:'center', color: BD, fontSize:'0.875rem', padding:'3rem' }}>{t.noResults}</p>
             )}
           </div>
         </div>
@@ -518,8 +797,10 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
    FOOTER
 ══════════════════════════════════════════ */
 export function Footer({ store }: any) {
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
   return (
-    <footer dir="rtl" style={{ background: INK, color:'rgba(255,255,255,0.38)', marginTop:80 }}>
+    <footer dir={isRTL ? 'rtl' : 'ltr'} style={{ background: INK, color:'rgba(255,255,255,0.38)', marginTop:80 }}>
       <div style={{ maxWidth:1320, margin:'0 auto', padding:'4.5rem 2rem 2rem' }}>
         <div className="footer-cols" style={{ paddingBottom:'3rem', marginBottom:'2rem', borderBottom:'1px solid rgba(255,255,255,0.06)' }}>
           <div>
@@ -528,27 +809,27 @@ export function Footer({ store }: any) {
               <span style={{ fontSize:'1.1rem', fontWeight:700, color:'#fff', fontFamily:"'Cormorant Garamond',serif", letterSpacing:'-0.01em' }}>{store?.name}</span>
             </div>
             <p style={{ fontSize:'0.875rem', lineHeight:1.95, maxWidth:260, fontWeight:300 }}>
-              {store?.hero?.subtitle?.substring(0,110) || 'مستحضرات تجميل عضوية نقية مستوحاة من جمال الطبيعة.'}
+              {store?.description}
             </p>
             <div style={{ display:'flex', gap:6, marginTop:'1.75rem', flexWrap:'wrap' }}>
-              {['🌿 عضوي', '🐇 Cruelty-Free', '🌱 Vegan'].map(b => (
+              {['🌿 Organic', '🐇 Cruelty-Free', '🌱 Vegan'].map(b => (
                 <span key={b} style={{ fontSize:'0.58rem', fontWeight:600, color:'rgba(255,255,255,0.3)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:6, padding:'3px 9px', letterSpacing:'0.08em' }}>{b}</span>
               ))}
             </div>
-            <p style={{ marginTop:'2.5rem', fontSize:'0.6rem', color:'rgba(255,255,255,0.14)' }}>© {new Date().getFullYear()} {store?.name}</p>
+            <p style={{ marginTop:'2.5rem', fontSize:'0.6rem', color:'rgba(255,255,255,0.14)' }}>© {new Date().getFullYear()} {store?.name} — {t.rightsReserved}</p>
           </div>
           <div>
-            <h4 style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.16em', marginBottom:'1.5rem' }}>الصفحات</h4>
-            {[{ h:'/', l:'الرئيسية' }, { h:'/cart', l:'السلة' }, { h:'/contact', l:'تواصلي معنا' }, { h:'/Privacy', l:'الخصوصية' }, { h:'/Terms', l:'الشروط' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk,i) => (
-              <Link key={i} href={lnk.h} style={{ display:'block', fontSize:'0.875rem', color:'rgba(255,255,255,0.38)', marginBottom:'0.65rem', fontWeight:300, transition:'color 0.15s' }}
+            <h4 style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.16em', marginBottom:'1.5rem' }}>{t.pages}</h4>
+            {[['/', t.home], ['/cart', t.cart], ['/contact', t.contactSect], ['/Privacy', t.privacy], ['/Terms', t.terms], ['/Cookies', t.cookies]].filter(([h]) => h !== '/cart' || store?.cart !== false).map(([h, l], i) => (
+              <Link key={i} href={h} style={{ display:'block', fontSize:'0.875rem', color:'rgba(255,255,255,0.38)', marginBottom:'0.65rem', fontWeight:300, transition:'color 0.15s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = RO)}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.38)')}>
-                {lnk.l}
+                {l}
               </Link>
             ))}
           </div>
           <div>
-            <h4 style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.16em', marginBottom:'1.5rem' }}>تواصل</h4>
+            <h4 style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.16em', marginBottom:'1.5rem' }}>{t.contactSect}</h4>
             {[
               { icon:<Phone size={12}/>, val: store?.contact?.phone },
               { icon:<Mail size={12}/>, val: store?.contact?.email },
@@ -597,7 +878,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <h3 style={{ fontSize:'0.875rem', fontWeight:500, color: INK, lineHeight:1.5, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' as const, overflow:'hidden', marginBottom:'0.625rem' }}>{product.name}</h3>
         <div style={{ display:'flex', alignItems:'center', gap:6 }}>
           <span className="price-mono" style={{ fontSize:'1.05rem', fontWeight:700, color: INK }}>{price.toLocaleString()}</span>
-          <span style={{ fontSize:'0.62rem', color: SUB }}>{store.currency||'دج'}</span>
+          <span style={{ fontSize:'0.62rem', color: SUB }}>{store?.currency || 'DZD'}</span>
           {orig > price && <span className="price-mono" style={{ fontSize:'0.7rem', color: BD, textDecoration:'line-through' }}>{orig.toLocaleString()}</span>}
         </div>
         {/* Stars */}
@@ -616,6 +897,9 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
    HOME
 ══════════════════════════════════════════ */
 export function Home({ store, page }: any) {
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
+  const currency = store?.currency || 'DZD';
   const products: any[] = store.products || [];
   const cats:     any[] = store.categories || [];
   const searchParams = useSearchParams();
@@ -624,7 +908,7 @@ export function Home({ store, page }: any) {
   const countPage = Math.ceil((store.count || products.length) / 48);
 
   return (
-    <div dir="rtl">
+    <div dir={isRTL ? 'rtl' : 'ltr'}>
 
       {/* ══ HERO — صورة خلفية كاملة ══ */}
       <section style={{ position:'relative', minHeight:'clamp(580px,88vh,820px)', overflow:'hidden' }}>
@@ -648,19 +932,19 @@ export function Home({ store, page }: any) {
               {/* Eyebrow */}
               <div style={{ display:'inline-flex', alignItems:'center', gap:10, marginBottom:'1.75rem', background:'rgba(255,255,255,0.1)', backdropFilter:'blur(8px)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:50, padding:'6px 16px' }}>
                 <Flower2 size={11} color={RO} />
-                <span style={{ fontSize:'0.6rem', fontWeight:600, color:'rgba(255,255,255,0.9)', letterSpacing:'0.2em', textTransform:'uppercase' }}>نقي · طبيعي · عضوي</span>
+                <span style={{ fontSize:'0.6rem', fontWeight:600, color:'rgba(255,255,255,0.9)', letterSpacing:'0.2em', textTransform:'uppercase' }}>{t.heroEyebrow}</span>
               </div>
 
               {/* Heading */}
               <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(3rem,7vw,5.5rem)', fontWeight:600, color:'#fff', lineHeight:1.05, letterSpacing:'-0.02em', marginBottom:'1.25rem' }}
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'جمالكِ<br/><em style="color:' + RO + ';font-style:italic">من الطبيعة</em>') }} />
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || t.heroTitle) }} />
 
               {/* Divider */}
               <div style={{ width:56, height:2, background:`linear-gradient(to left,${RO},transparent)`, marginBottom:'1.5rem' }} />
 
               {/* Subtitle */}
               <p style={{ fontSize:'clamp(0.9rem,2vw,1.05rem)', color:'rgba(255,255,255,0.75)', lineHeight:1.9, marginBottom:'2.5rem', fontWeight:300, maxWidth:380 }}>
-                {store.hero?.subtitle || 'مستحضرات تجميل عضوية نقية مصنوعة من أفضل المكونات الطبيعية، لبشرة مشرقة وصحية.'}
+                {store.hero?.subtitle || t.heroSub}
               </p>
 
               {/* CTAs */}
@@ -668,20 +952,20 @@ export function Home({ store, page }: any) {
                 <a href="#products" style={{ display:'inline-flex', alignItems:'center', gap:8, background:`linear-gradient(135deg,${RO},${ROD})`, color:'#fff', fontWeight:600, fontSize:'0.875rem', padding:'0.95rem 2rem', borderRadius:12, letterSpacing:'0.06em', boxShadow:`0 8px 28px rgba(193,123,142,0.45)`, transition:'opacity 0.2s' }}
                   onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.opacity='0.88')}
                   onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.opacity='1')}>
-                  اكتشفي المنتجات <ArrowLeft size={15} />
+                  {t.shopNow} <ArrowLeft size={15} />
                 </a>
                 {store?.cart !== false && (
                   <Link href="/cart" style={{ display:'inline-flex', alignItems:'center', gap:8, color:'#fff', fontWeight:500, fontSize:'0.875rem', padding:'0.95rem 1.75rem', borderRadius:12, border:'1.5px solid rgba(255,255,255,0.35)', backdropFilter:'blur(8px)', background:'rgba(255,255,255,0.08)', letterSpacing:'0.04em', transition:'all 0.2s' }}
                     onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background='rgba(255,255,255,0.18)')}
                     onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background='rgba(255,255,255,0.08)')}>
-                    <ShoppingCart size={14} /> السلة
+                    <ShoppingCart size={14} /> {t.cart}
                   </Link>
                 )}
               </div>
 
               {/* Mini stats */}
               <div style={{ display:'flex', gap:'2rem', paddingTop:'2rem', borderTop:'1px solid rgba(255,255,255,0.15)' }}>
-                {[{ n:'+500', l:'منتج طبيعي' }, { n:'58', l:'ولاية' }, { n:'100%', l:'عضوي' }].map((s:{n:string;l:string},i:number) => (
+                {t.miniStats.map((s,i) => (
                   <div key={i}>
                     <p style={{ fontSize:'1.5rem', fontWeight:700, color:'#fff', lineHeight:1, fontFamily:"'Cormorant Garamond',serif" }}>{s.n}</p>
                     <p style={{ fontSize:'0.6rem', color:'rgba(255,255,255,0.55)', marginTop:4, letterSpacing:'0.1em', textTransform:'uppercase' }}>{s.l}</p>
@@ -695,32 +979,30 @@ export function Home({ store, page }: any) {
 
       {/* ══ TRUST STRIP ══ */}
       <section className="trust-strip" style={{ borderBottom:`1px solid ${BD}` }}>
-        {[
-          { icon:<Leaf size={16}/>,      t:'مكونات عضوية',    s:'100% طبيعية معتمدة' },
-          { icon:<Droplets size={16}/>,  t:'زيوت نقية',       s:'بدون إضافات كيماوية' },
-          { icon:<Heart size={16}/>,     t:'Cruelty-Free',    s:'غير مُختبر على الحيوانات' },
-          { icon:<Sparkles size={16}/>,  t:'نباتية 100%',     s:'Vegan Certified' },
-        ].map((item,i) => (
-          <div key={i} style={{ padding:'1.25rem 1.375rem', display:'flex', alignItems:'center', gap:'0.875rem', background: i%2===0 ? CR : CARD, borderLeft: i>0 ? `1px solid ${BD}` : 'none', borderTop: i>=2 ? `1px solid ${BD}` : 'none', transition:'background 0.2s' }}>
-            <div style={{ width:40, height:40, borderRadius:12, background: ROL, border:`1px solid ${ROB}`, display:'flex', alignItems:'center', justifyContent:'center', color: RO, flexShrink:0 }}>{item.icon}</div>
-            <div>
-              <p style={{ fontSize:'0.8rem', fontWeight:600, color: INK }}>{item.t}</p>
-              <p style={{ fontSize:'0.62rem', color: SUB, marginTop:2 }}>{item.s}</p>
+        {t.trustItems.map((item, i) => {
+          const icons = [<Leaf size={16}/>, <Droplets size={16}/>, <Heart size={16}/>, <Sparkles size={16}/>];
+          return (
+            <div key={i} style={{ padding:'1.25rem 1.375rem', display:'flex', alignItems:'center', gap:'0.875rem', background: i%2===0 ? CR : CARD, borderLeft: i>0 ? `1px solid ${BD}` : 'none', borderTop: i>=2 ? `1px solid ${BD}` : 'none', transition:'background 0.2s' }}>
+              <div style={{ width:40, height:40, borderRadius:12, background: ROL, border:`1px solid ${ROB}`, display:'flex', alignItems:'center', justifyContent:'center', color: RO, flexShrink:0 }}>{icons[i]}</div>
+              <div>
+                <p style={{ fontSize:'0.8rem', fontWeight:600, color: INK }}>{item.t}</p>
+                <p style={{ fontSize:'0.62rem', color: SUB, marginTop:2 }}>{item.s}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </section>
 
       {/* ══ CATEGORIES ══ */}
       {cats.length > 0 && (
         <section style={{ padding:'2.75rem 1.5rem', maxWidth:1320, margin:'0 auto' }}>
           <div style={{ display:'flex', alignItems:'center', gap:'1rem', marginBottom:'1.25rem' }}>
-            <h2 style={{ fontSize:'1rem', fontWeight:600, color: INK, letterSpacing:'-0.01em', whiteSpace:'nowrap' as const }}>تصفحي الفئات</h2>
+            <h2 style={{ fontSize:'1rem', fontWeight:600, color: INK, letterSpacing:'-0.01em', whiteSpace:'nowrap' as const }}>{t.browseCategories}</h2>
             <div style={{ flex:1, height:1, background: BD }} />
           </div>
           <div className="cats-scroll">
             <Link href="?" style={{ display:'inline-flex', alignItems:'center', padding:'0.5rem 1.25rem', borderRadius:999, border:`1.5px solid ${!activeCategory ? RO : '#ccc'}`, background: !activeCategory ? RO : 'transparent', color: !activeCategory ? '#fff' : 'inherit', fontSize:'0.82rem', fontWeight:600, cursor:'pointer' }}>
-                الكل
+                {t.all}
               </Link>
             {cats.map((cat:any) => {
               const isActive = activeCategory === String(cat.id);
@@ -742,8 +1024,8 @@ export function Home({ store, page }: any) {
         <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:'2.25rem', paddingBottom:'1.25rem', borderBottom:`1px solid ${BD}` }}>
           <div>
             <p style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.18em', marginBottom:6 }}>Pure Organics</p>
-            <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(1.75rem,4vw,2.5rem)', fontWeight:600, color: INK, lineHeight:1, letterSpacing:'-0.02em' }}>منتجاتنا</h2>
-            {store.count > 0 && <p style={{ fontSize:'0.68rem', color: SUB, marginTop:5 }}>{store.count} منتج</p>}
+            <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(1.75rem,4vw,2.5rem)', fontWeight:600, color: INK, lineHeight:1, letterSpacing:'-0.02em' }}>{t.productsTitle}</h2>
+            {store.count > 0 && <p style={{ fontSize:'0.68rem', color: SUB, marginTop:5 }}>{store.count} {t.itemUnit}</p>}
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
             <Flower2 size={13} color={RO} className="anim-petals" />
@@ -753,14 +1035,14 @@ export function Home({ store, page }: any) {
         {products.length === 0 ? (
           <div style={{ padding:'7rem 1.5rem', textAlign:'center', border:`1.5px dashed ${BD}`, borderRadius:16, background: CR }}>
             <Flower2 size={44} color={BD} style={{ display:'block', margin:'0 auto 1.25rem' }} />
-            <p style={{ color: SUB, fontSize:'0.9rem', fontWeight:300 }}>لا توجد منتجات بعد</p>
+            <p style={{ color: SUB, fontSize:'0.9rem', fontWeight:300 }}>{t.noProducts}</p>
           </div>
         ) : (
           <div className="products-grid">
             {products.map((p:any) => {
               const img  = p.productImage || p.imagesProduct?.[0]?.imageUrl;
               const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
-              return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="اكتشفي" />;
+              return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails={t.viewDetails} />;
             })}
           </div>
         )}
@@ -781,24 +1063,22 @@ export function Home({ store, page }: any) {
       <section style={{ background: INK, padding:'5rem 1.5rem', marginTop:'-2rem' }}>
         <div style={{ maxWidth:1320, margin:'0 auto' }}>
           <div style={{ textAlign:'center', marginBottom:'3.5rem' }}>
-            <p style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.2em', marginBottom:12 }}>لماذا نحن</p>
-            <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(2rem,5vw,3rem)', fontWeight:600, color:'#fff', letterSpacing:'-0.02em' }}>الطبيعة في كل قطرة</h2>
+            <p style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.2em', marginBottom:12 }}>{t.whyUsLabel}</p>
+            <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(2rem,5vw,3rem)', fontWeight:600, color:'#fff', letterSpacing:'-0.02em' }}>{t.whyUsTitle}</h2>
           </div>
           <div className="features-grid">
-            {[
-              { icon:<Leaf size={20}/>,     t:'100% عضوي',     d:'مكونات معتمدة عضوياً من أجود المصادر الطبيعية حول العالم.' },
-              { icon:<Droplets size={20}/>, t:'بدون كيماويات', d:'خالية تماماً من البارابين، السيليكون، والأصباغ الصناعية.' },
-              { icon:<Heart size={20}/>,    t:'آمن للبشرة',    d:'مختبر ومعتمد من خبراء التجميل والجلدية لجميع أنواع البشرة.' },
-              { icon:<Sparkles size={20}/>, t:'Vegan',         d:'لا مكونات حيوانية ولا اختبارات على الحيوانات — أخلاقي 100%.' },
-            ].map((f,i) => (
-              <div key={i} style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:16, padding:'2rem 1.5rem', transition:'all 0.3s' }}
-                onMouseEnter={e => { const el=e.currentTarget as HTMLDivElement; el.style.background='rgba(193,123,142,0.08)'; el.style.borderColor='rgba(193,123,142,0.25)'; }}
-                onMouseLeave={e => { const el=e.currentTarget as HTMLDivElement; el.style.background='rgba(255,255,255,0.04)'; el.style.borderColor='rgba(255,255,255,0.08)'; }}>
-                <div style={{ width:44, height:44, borderRadius:12, background: ROL, display:'flex', alignItems:'center', justifyContent:'center', color: RO, marginBottom:'1.25rem' }}>{f.icon}</div>
-                <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'#fff', marginBottom:'0.625rem', fontFamily:"'Cormorant Garamond',serif" }}>{f.t}</h3>
-                <p style={{ fontSize:'0.82rem', color:'rgba(255,255,255,0.42)', lineHeight:1.85, fontWeight:300 }}>{f.d}</p>
-              </div>
-            ))}
+            {t.features.map((f, i) => {
+              const icons = [<Leaf size={20}/>, <Droplets size={20}/>, <Heart size={20}/>, <Sparkles size={20}/>];
+              return (
+                <div key={i} style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:16, padding:'2rem 1.5rem', transition:'all 0.3s' }}
+                  onMouseEnter={e => { const el=e.currentTarget as HTMLDivElement; el.style.background='rgba(193,123,142,0.08)'; el.style.borderColor='rgba(193,123,142,0.25)'; }}
+                  onMouseLeave={e => { const el=e.currentTarget as HTMLDivElement; el.style.background='rgba(255,255,255,0.04)'; el.style.borderColor='rgba(255,255,255,0.08)'; }}>
+                  <div style={{ width:44, height:44, borderRadius:12, background: ROL, display:'flex', alignItems:'center', justifyContent:'center', color: RO, marginBottom:'1.25rem' }}>{icons[i]}</div>
+                  <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'#fff', marginBottom:'0.625rem', fontFamily:"'Cormorant Garamond',serif" }}>{f.t}</h3>
+                  <p style={{ fontSize:'0.82rem', color:'rgba(255,255,255,0.42)', lineHeight:1.85, fontWeight:300 }}>{f.d}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -809,10 +1089,13 @@ export function Home({ store, page }: any) {
 /* ══════════════════════════════════════════
    DETAILS
 ══════════════════════════════════════════ */
-export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
+export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
+  const t = T[getLang(store || product?.store)];
+  const isRTL = t.dir === 'rtl';
+  const currency = store?.currency || product?.store?.currency || 'DZD';
   const [sel, setSel] = useState(0);
   return (
-    <div dir="rtl" style={{ background: BG, paddingBottom:'4rem' }}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: BG, paddingBottom:'4rem' }}>
       <div className="details-inner" style={{ maxWidth:1320, margin:'0 auto' }}>
         {/* Gallery */}
         <div className="gallery-container">
@@ -843,16 +1126,16 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
         <div>
           <div className="info-panel">
             <div style={{ display:'inline-flex', alignItems:'center', gap:7, background: ROL, border:`1px solid ${ROB}`, borderRadius:50, padding:'5px 14px', marginBottom:'1.25rem' }}>
-              <Leaf size={11} color={RO}/><span style={{ fontSize:'0.58rem', fontWeight:700, color: ROD, letterSpacing:'0.12em', textTransform:'uppercase' }}>عضوي طبيعي</span>
+              <Leaf size={11} color={RO}/><span style={{ fontSize:'0.58rem', fontWeight:700, color: ROD, letterSpacing:'0.12em', textTransform:'uppercase' }}>{t.organicBadge}</span>
             </div>
             <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(1.75rem,4vw,2.5rem)', fontWeight:600, color: INK, marginBottom:'0.5rem', lineHeight:1.15, letterSpacing:'-0.02em' }}>{product.name}</h1>
             <div style={{ display:'flex', gap:2, marginBottom:'1.5rem' }}>{[...Array(5)].map((_,i) => <Star key={i} size={13} style={{ fill:i<4?GD:'none', color:GD }} />)}</div>
 
             <div style={{ padding:'1.25rem 1.5rem', background: CR, borderRadius:14, border:`1px solid ${BD}`, marginBottom:'1.75rem' }}>
-              <p style={{ fontSize:'0.58rem', fontWeight:700, color: SUB, marginBottom:'0.3rem', textTransform:'uppercase', letterSpacing:'0.1em' }}>السعر</p>
+              <p style={{ fontSize:'0.58rem', fontWeight:700, color: SUB, marginBottom:'0.3rem', textTransform:'uppercase', letterSpacing:'0.1em' }}>{t.price}</p>
               <div style={{ display:'flex', alignItems:'baseline', gap:'0.4rem' }}>
                 <span className="price-mono" style={{ fontSize:'2.5rem', fontWeight:700, color: INK, fontFamily:"'Cormorant Garamond',serif" }}>{finalPrice.toLocaleString()}</span>
-                <span style={{ fontSize:'1rem', color: SUB, fontWeight:300 }}>دج</span>
+                <span style={{ fontSize:'1rem', color: SUB, fontWeight:300 }}>{currency}</span>
               </div>
             </div>
 
@@ -867,10 +1150,10 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                       <input type="radio" name="offer" checked={selectedOffer===o.id} onChange={() => setSelectedOffer(o.id)} style={{ display:'none' }} />
                       <div>
                         <p style={{ fontWeight:500, color: INK, fontSize:'0.875rem' }}>{o.name}</p>
-                        <p style={{ fontSize:'0.68rem', color: SUB }}>الكمية: {o.quantity}</p>
+                        <p style={{ fontSize:'0.68rem', color: SUB }}>{t.qty}: {o.quantity}</p>
                       </div>
                     </div>
-                    <span className="price-mono" style={{ fontWeight:700, color: INK }}>{o.price.toLocaleString()} دج</span>
+                    <span className="price-mono" style={{ fontWeight:700, color: INK }}>{o.price.toLocaleString()} {currency}</span>
                   </label>
                 ))}
               </div>
@@ -894,7 +1177,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               </div>
             ))}
 
-            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
+            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store || product?.store} />
 
             {product.desc && (
               <div style={{ marginTop:'1.5rem', paddingTop:'1.25rem', borderTop:`1px solid ${BD}` }}>
@@ -919,7 +1202,10 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
   </div>
 );
 
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: ProductFormProps) {
+export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: ProductFormProps) {
+  const t = T[getLang(store || product?.store)];
+  const isRTL = t.dir === 'rtl';
+  const currency = store?.currency || product?.store?.currency || 'DZD';
   const router = useRouter();
   const [wilayas, setWilayas]   = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -954,10 +1240,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const total = () => fp * fd.quantity + +getLiv();
   const validate = () => {
     const e: Record<string,string> = {};
-    if (!fd.customerName.trim()) e.customerName='مطلوب';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone='رقم غير صالح';
-    if (!fd.customerWelaya) e.customerWelaya='مطلوب';
-    if (!fd.customerCommune) e.customerCommune='مطلوب';
+    if (!fd.customerName.trim()) e.customerName = t.errName;
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
+    if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
+    if (!fd.customerCommune) e.customerCommune = t.errCommune;
     return e;
   };
   const getVarId = useCallback(() => {
@@ -992,12 +1278,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         {product.store.cart && (
         <div className="cart-add-btns" style={{ marginBottom:'1.25rem' }}>
           <button onClick={addToCart} disabled={isAdded} style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:6, padding:'0.85rem 1rem', border:`1.5px solid ${isAdded ? '#22C55E' : BD}`, borderRadius:12, fontSize:'0.875rem', fontWeight:500, cursor:'pointer', background: isAdded ? 'rgba(34,197,94,0.06)' : CARD, color: isAdded ? '#22C55E' : SUB, transition:'all 0.2s', fontFamily:'inherit' }}>
-            {isAdded ? <><CheckCircle2 size={14} className="anim-check"/>تمت الإضافة</> : <><ShoppingCart size={14}/>أضف للسلة</>}
+            {isAdded ? <><CheckCircle2 size={14} className="anim-check"/>{t.addedShort}</> : <><ShoppingCart size={14}/>{t.addToCartShort}</>}
           </button>
           <button onClick={() => setON(true)} style={{ flex:1, ...S.btnPrimary, width:'auto', background:`linear-gradient(135deg,${RO},${ROD})`, borderRadius:12 }}
             onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.opacity='0.88')}
             onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.opacity='1')}>
-            اطلبي الآن
+            {t.orderNowFem}
           </button>
         </div>
       )}
@@ -1005,46 +1291,46 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         <div className="anim-fade-up">
           {product.store.cart && (
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1rem' }}>
-              <p style={{ fontWeight:700, fontSize:'0.62rem', color: SUB, textTransform:'uppercase', letterSpacing:'0.1em' }}>بيانات التوصيل</p>
-              <button onClick={() => setON(false)} style={{ fontSize:'0.78rem', color: SUB, background:'none', border:'none', cursor:'pointer', fontFamily:'inherit' }}>إلغاء ✕</button>
+              <p style={{ fontWeight:700, fontSize:'0.62rem', color: SUB, textTransform:'uppercase', letterSpacing:'0.1em' }}>{t.deliveryInfoTitle}</p>
+              <button onClick={() => setON(false)} style={{ fontSize:'0.78rem', color: SUB, background:'none', border:'none', cursor:'pointer', fontFamily:'inherit' }}>{t.cancel} ✕</button>
             </div>
           )}
           <form onSubmit={handleSubmit}>
             <div className="form-row-2">
-              <FR error={errors.customerName} label="الاسم"><input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder="الاسم الكامل" style={inp(!!errors.customerName)} /></FR>
-              <FR error={errors.customerPhone} label="الهاتف"><input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} placeholder="0XXXXXXXXX" style={inp(!!errors.customerPhone)} /></FR>
+              <FR error={errors.customerName} label={t.fullName}><input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder={t.fullNamePh} style={inp(!!errors.customerName)} /></FR>
+              <FR error={errors.customerPhone} label={t.phone}><input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} placeholder={t.phonePh} style={inp(!!errors.customerPhone)} /></FR>
             </div>
             <div className="form-row-2">
-              <FR error={errors.customerWelaya} label="الولاية">
+              <FR error={errors.customerWelaya} label={t.wilaya}>
                 <div style={{ position:'relative' }}>
-                  <ChevronDown size={12} style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color: SUB, pointerEvents:'none' }} />
-                  <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune:'' })} style={{ ...inp(!!errors.customerWelaya), paddingRight:32, fontFamily:'inherit' }}>
-                    <option value="">اختري</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                  <ChevronDown size={12} style={{ position:'absolute', ...(isRTL ? { right:10 } : { left:10 }), top:'50%', transform:'translateY(-50%)', color: SUB, pointerEvents:'none' }} />
+                  <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune:'' })} style={{ ...inp(!!errors.customerWelaya), paddingInlineEnd:32, fontFamily:'inherit' }}>
+                    <option value="">{t.wilayaPh}</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
-              <FR error={errors.customerCommune} label="البلدية">
+              <FR error={errors.customerCommune} label={t.commune}>
                 <div style={{ position:'relative' }}>
-                  <ChevronDown size={12} style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color: SUB, pointerEvents:'none' }} />
-                  <select value={fd.customerCommune} disabled={!fd.customerWelaya||loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inp(!!errors.customerCommune), paddingRight:32, opacity:(!fd.customerWelaya||loadingC)?0.5:1, fontFamily:'inherit' }}>
-                    <option value="">{loadingC?'...':'اختري'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                  <ChevronDown size={12} style={{ position:'absolute', ...(isRTL ? { right:10 } : { left:10 }), top:'50%', transform:'translateY(-50%)', color: SUB, pointerEvents:'none' }} />
+                  <select value={fd.customerCommune} disabled={!fd.customerWelaya||loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inp(!!errors.customerCommune), paddingInlineEnd:32, opacity:(!fd.customerWelaya||loadingC)?0.5:1, fontFamily:'inherit' }}>
+                    <option value="">{loadingC ? t.communeLoading : t.communePh}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
             </div>
             <div style={{ marginBottom:'0.875rem' }}>
-              <p style={{ fontSize:'0.62rem', fontWeight:700, color: SUB, marginBottom:'0.5rem', textTransform:'uppercase', letterSpacing:'0.1em' }}>التوصيل</p>
+              <p style={{ fontSize:'0.62rem', fontWeight:700, color: SUB, marginBottom:'0.5rem', textTransform:'uppercase', letterSpacing:'0.1em' }}>{t.deliveryType}</p>
               <div className="delivery-grid">
-                {(['home','office'] as const).map(t => (
-                  <button key={t} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: t }))} style={{ padding:'0.8rem', border:`1.5px solid ${fd.typeLivraison===t ? RO : BD}`, borderRadius:12, textAlign:'center', cursor:'pointer', background: fd.typeLivraison===t ? ROL : CARD, transition:'all 0.18s', fontFamily:'inherit' }}>
-                    <p style={{ fontWeight:600, fontSize:'0.78rem', marginBottom:3, color: fd.typeLivraison===t ? ROD : SUB }}>{t==='home'?'للبيت':'للمكتب'}</p>
-                    {selW && <p className="price-mono" style={{ fontSize:'1rem', fontWeight:700, color: fd.typeLivraison===t ? ROD : SUB }}>{(t==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} دج</p>}
+                {(['home','office'] as const).map(dtype => (
+                  <button key={dtype} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: dtype }))} style={{ padding:'0.8rem', border:`1.5px solid ${fd.typeLivraison===dtype ? RO : BD}`, borderRadius:12, textAlign:'center', cursor:'pointer', background: fd.typeLivraison===dtype ? ROL : CARD, transition:'all 0.18s', fontFamily:'inherit' }}>
+                    <p style={{ fontWeight:600, fontSize:'0.78rem', marginBottom:3, color: fd.typeLivraison===dtype ? ROD : SUB }}>{dtype==='home' ? t.deliveryHome : t.deliveryOffice}</p>
+                    {selW && <p className="price-mono" style={{ fontSize:'1rem', fontWeight:700, color: fd.typeLivraison===dtype ? ROD : SUB }}>{(dtype==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} {currency}</p>}
                   </button>
                 ))}
               </div>
             </div>
             <div style={{ marginBottom:'0.875rem' }}>
-              <p style={{ fontSize:'0.62rem', fontWeight:700, color: SUB, marginBottom:'0.5rem', textTransform:'uppercase', letterSpacing:'0.1em' }}>الكمية</p>
+              <p style={{ fontSize:'0.62rem', fontWeight:700, color: SUB, marginBottom:'0.5rem', textTransform:'uppercase', letterSpacing:'0.1em' }}>{t.qty}</p>
               <div style={{ display:'inline-flex', alignItems:'center', border:`1px solid ${BD}`, borderRadius:12, overflow:'hidden', background: CR }}>
                 <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1,p.quantity-1) }))} style={{ width:38, height:38, display:'flex', alignItems:'center', justifyContent:'center', background:'none', border:'none', cursor:'pointer', color: SUB, borderLeft:`1px solid ${BD}` }}><Minus size={13}/></button>
                 <span style={{ width:44, textAlign:'center', fontWeight:700, fontSize:'0.95rem', color: INK }}>{fd.quantity}</span>
@@ -1053,8 +1339,8 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
             <div style={{ background: CR, borderRadius:14, border:`1px solid ${BD}`, padding:'1.125rem 1.25rem', marginBottom:'1rem' }}>
               {[
-                { l:'المنتج', v: product.name.slice(0,30)+(product.name.length>30?'...':'') },
-                { l:'التوصيل', v: selW?`${getLiv().toLocaleString()} دج`:'—' },
+                { l: t.productLabel, v: product.name.slice(0,30)+(product.name.length>30?'...':'') },
+                { l: t.delivery, v: selW ? `${getLiv().toLocaleString()} ${currency}` : '—' },
               ].map(r => (
                 <div key={r.l} style={{ display:'flex', justifyContent:'space-between', paddingBottom:'0.5rem', marginBottom:'0.5rem', borderBottom:`1px solid ${BD}` }}>
                   <span style={{ fontSize:'0.78rem', color: SUB, fontWeight:300 }}>{r.l}</span>
@@ -1062,14 +1348,14 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 </div>
               ))}
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline' }}>
-                <span style={{ fontWeight:700, fontSize:'0.875rem', color: INK }}>المجموع</span>
-                <span className="price-mono" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'2rem', fontWeight:700, color: INK }}>{total().toLocaleString()} <span style={{ fontSize:'0.75rem', fontWeight:300 }}>دج</span></span>
+                <span style={{ fontWeight:700, fontSize:'0.875rem', color: INK }}>{t.total}</span>
+                <span className="price-mono" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'2rem', fontWeight:700, color: INK }}>{total().toLocaleString()} <span style={{ fontSize:'0.75rem', fontWeight:300 }}>{currency}</span></span>
               </div>
             </div>
             <button type="submit" disabled={sub} style={{ ...S.btnPrimary, opacity: sub?0.7:1, background:`linear-gradient(135deg,${RO},${ROD})`, boxShadow:`0 8px 24px rgba(193,123,142,0.35)` }}
               onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.opacity='0.88')}
               onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.opacity='1')}>
-              {sub ? <><Loader2 size={15} style={{ animation:'spin 1s linear infinite' }}/>جاري المعالجة...</> : 'تأكيد الطلب'}
+              {sub ? <><Loader2 size={15} style={{ animation:'spin 1s linear infinite' }}/>{t.sending}</> : t.confirmOrder}
             </button>
           </form>
         </div>
@@ -1082,6 +1368,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
    CART
 ══════════════════════════════════════════ */
 export function Cart({ domain, store }: { domain: string; store: any }) {
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
+  const currency = store?.currency || 'DZD';
   const [items, setItems]       = useState<any[]>([]);
   const [wilayas, setWilayas]   = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -1107,10 +1396,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const er: Record<string,string> = {};
-    if (!fd.customerName.trim()) er.name='مطلوب';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone='رقم غير صالح';
-    if (!fd.customerWelaya) er.w='مطلوب';
-    if (!fd.customerCommune) er.c='مطلوب';
+    if (!fd.customerName.trim()) er.name = t.errName;
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = t.errPhoneInvalid;
+    if (!fd.customerWelaya) er.w = t.errWilaya;
+    if (!fd.customerCommune) er.c = t.errCommune;
     if (Object.keys(er).length) { setErrors(er); return; }
     setErrors({}); setSubmitting(true);
     try {
@@ -1122,38 +1411,38 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const inp = (err?: boolean) => ({ ...S.input, ...(err ? S.inputErr : {}) });
 
   if (success) return (
-    <div dir="rtl" style={{ minHeight:'70vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'1.5rem', background: BG }}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ minHeight:'70vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'1.5rem', background: BG }}>
       <div style={{ textAlign:'center', background: CARD, padding:'4rem 2.5rem', borderRadius:24, border:`1px solid ${BD}`, maxWidth:440, width:'100%', boxShadow:'0 24px 64px rgba(193,123,142,0.1)' }}>
         <div style={{ width:60, height:60, borderRadius:'50%', background:`linear-gradient(135deg,${RO},${ROD})`, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 1.75rem', boxShadow:`0 8px 24px rgba(193,123,142,0.4)` }}>
           <CheckCircle2 size={28} color="#fff" />
         </div>
-        <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'2rem', fontWeight:600, color: INK, marginBottom:'0.625rem', letterSpacing:'-0.02em' }}>تم استلام طلبك!</h2>
-        <p style={{ color: SUB, lineHeight:1.9, marginBottom:'2.25rem', fontSize:'0.9rem', fontWeight:300 }}>سنتواصل معك قريباً لتأكيد الطلب.</p>
+        <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'2rem', fontWeight:600, color: INK, marginBottom:'0.625rem', letterSpacing:'-0.02em' }}>{t.successTitle}</h2>
+        <p style={{ color: SUB, lineHeight:1.9, marginBottom:'2.25rem', fontSize:'0.9rem', fontWeight:300 }}>{t.successDesc}</p>
         <Link href="/" style={{ display:'inline-flex', alignItems:'center', gap:8, background:`linear-gradient(135deg,${RO},${ROD})`, color:'#fff', padding:'0.9rem 2.25rem', borderRadius:12, fontWeight:600, fontSize:'0.875rem' }}>
-          العودة للمتجر
+          {t.backToShop}
         </Link>
       </div>
     </div>
   );
 
   if (!items.length) return (
-    <div dir="rtl" style={{ minHeight:'60vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'1.5rem', background: BG }}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ minHeight:'60vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'1.5rem', background: BG }}>
       <div style={{ textAlign:'center', padding:'4.5rem 2.5rem', border:`1.5px dashed ${BD}`, borderRadius:24, maxWidth:400, width:'100%', background: CARD }}>
         <ShoppingBag size={44} style={{ color: BD, display:'block', margin:'0 auto 1.5rem' }} />
-        <p style={{ color: SUB, fontSize:'0.9rem', marginBottom:'2.25rem', fontWeight:300 }}>سلتكِ فارغة</p>
+        <p style={{ color: SUB, fontSize:'0.9rem', marginBottom:'2.25rem', fontWeight:300 }}>{t.cartEmpty}</p>
         <Link href="/" style={{ display:'inline-flex', alignItems:'center', gap:8, background:`linear-gradient(135deg,${RO},${ROD})`, color:'#fff', padding:'0.85rem 2rem', borderRadius:12, fontWeight:600, fontSize:'0.875rem' }}>
-          اكتشفي المنتجات
+          {t.shopNow}
         </Link>
       </div>
     </div>
   );
 
   return (
-    <div dir="rtl" style={{ padding:'2.5rem 1.5rem', maxWidth:1320, margin:'0 auto', minHeight:'100vh', background: BG }}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ padding:'2.5rem 1.5rem', maxWidth:1320, margin:'0 auto', minHeight:'100vh', background: BG }}>
       <div style={{ marginBottom:'2.25rem', paddingBottom:'1.25rem', borderBottom:`1px solid ${BD}` }}>
         <p style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.18em', marginBottom:8 }}>Pure Organics</p>
-        <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(1.75rem,4vw,2.5rem)', fontWeight:600, color: INK, letterSpacing:'-0.02em' }}>السلة</h1>
-        <p style={{ fontSize:'0.72rem', color: SUB, marginTop:4, fontWeight:300 }}>{items.length} منتجات</p>
+        <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(1.75rem,4vw,2.5rem)', fontWeight:600, color: INK, letterSpacing:'-0.02em' }}>{t.myCart}</h1>
+        <p style={{ fontSize:'0.72rem', color: SUB, marginTop:4, fontWeight:300 }}>{items.length} {t.itemUnit}</p>
       </div>
       <div className="cart-inner">
         {/* Items */}
@@ -1164,7 +1453,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               <div style={{ flex:1 }}>
                 <p style={{ fontSize:'0.55rem', color: RO, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:4 }}>{item.product?.store?.name}</p>
                 <h4 style={{ fontWeight:500, color: INK, marginBottom:'0.4rem', fontSize:'0.875rem', lineHeight:1.45 }}>{item.product?.name}</h4>
-                <p className="price-mono" style={{ fontSize:'1.1rem', fontWeight:700, color: INK }}>{item.finalPrice?.toLocaleString()} دج</p>
+                <p className="price-mono" style={{ fontSize:'1.1rem', fontWeight:700, color: INK }}>{item.finalPrice?.toLocaleString()} {currency}</p>
               </div>
               <button onClick={() => update(items.filter((_,idx) => idx!==i))} style={{ color: BD, padding:'0.25rem', background:'none', border:'none', cursor:'pointer', alignSelf:'flex-start', transition:'color 0.15s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color='#DC2626')}
@@ -1174,64 +1463,64 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             </div>
           ))}
           <div style={{ padding:'1.125rem 1.25rem', background: CR, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-            <span style={{ fontWeight:500, color: SUB, fontSize:'0.8rem' }}>المجموع الفرعي</span>
-            <span className="price-mono" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.5rem', fontWeight:700, color: INK }}>{cartTotal.toLocaleString()} دج</span>
+            <span style={{ fontWeight:500, color: SUB, fontSize:'0.8rem' }}>{t.subtotal}</span>
+            <span className="price-mono" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.5rem', fontWeight:700, color: INK }}>{cartTotal.toLocaleString()} {currency}</span>
           </div>
         </div>
 
         {/* Form */}
         <div style={{ background: CARD, borderRadius:18, border:`1px solid ${BD}`, padding:'2rem' }}>
-          <h3 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:600, fontSize:'1.25rem', color: INK, marginBottom:'1.75rem', letterSpacing:'-0.01em' }}>معلومات التوصيل</h3>
+          <h3 style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:600, fontSize:'1.25rem', color: INK, marginBottom:'1.75rem', letterSpacing:'-0.01em' }}>{t.deliveryInfoTitle}</h3>
           <form onSubmit={handleSubmit}>
             <div className="form-row-2">
-              <FR error={errors.name} label="الاسم"><input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} style={inp(!!errors.name)} /></FR>
-              <FR error={errors.phone} label="الهاتف"><input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} style={inp(!!errors.phone)} /></FR>
+              <FR error={errors.name} label={t.fullName}><input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder={t.fullNamePh} style={inp(!!errors.name)} /></FR>
+              <FR error={errors.phone} label={t.phone}><input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} placeholder={t.phonePh} style={inp(!!errors.phone)} /></FR>
             </div>
             <div className="form-row-2">
-              <FR error={errors.w} label="الولاية">
+              <FR error={errors.w} label={t.wilaya}>
                 <div style={{ position:'relative' }}>
-                  <ChevronDown size={12} style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color: SUB, pointerEvents:'none' }} />
-                  <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune:'' })} style={{ ...inp(!!errors.w), paddingRight:30, fontFamily:'inherit' }}>
-                    <option value="">اختري</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                  <ChevronDown size={12} style={{ position:'absolute', ...(isRTL ? { right:10 } : { left:10 }), top:'50%', transform:'translateY(-50%)', color: SUB, pointerEvents:'none' }} />
+                  <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune:'' })} style={{ ...inp(!!errors.w), paddingInlineEnd:30, fontFamily:'inherit' }}>
+                    <option value="">{t.wilayaPh}</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
-              <FR error={errors.c} label="البلدية">
+              <FR error={errors.c} label={t.commune}>
                 <div style={{ position:'relative' }}>
-                  <ChevronDown size={12} style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color: SUB, pointerEvents:'none' }} />
-                  <select value={fd.customerCommune} disabled={loadingC||!fd.customerWelaya} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inp(!!errors.c), paddingRight:30, opacity:(!fd.customerWelaya||loadingC)?0.5:1, fontFamily:'inherit' }}>
-                    <option value="">{loadingC?'...':'اختري'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                  <ChevronDown size={12} style={{ position:'absolute', ...(isRTL ? { right:10 } : { left:10 }), top:'50%', transform:'translateY(-50%)', color: SUB, pointerEvents:'none' }} />
+                  <select value={fd.customerCommune} disabled={loadingC||!fd.customerWelaya} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inp(!!errors.c), paddingInlineEnd:30, opacity:(!fd.customerWelaya||loadingC)?0.5:1, fontFamily:'inherit' }}>
+                    <option value="">{loadingC ? t.communeLoading : t.communePh}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
             </div>
             <div style={{ margin:'0.875rem 0' }}>
-              <p style={{ fontSize:'0.62rem', fontWeight:700, color: SUB, textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'0.5rem' }}>نوع التوصيل</p>
+              <p style={{ fontSize:'0.62rem', fontWeight:700, color: SUB, textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'0.5rem' }}>{t.deliveryType}</p>
               <div className="delivery-grid">
-                {(['home','office'] as const).map(t => (
-                  <button key={t} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: t }))} style={{ padding:'0.85rem', border:`1.5px solid ${fd.typeLivraison===t ? RO : BD}`, borderRadius:12, textAlign:'center', cursor:'pointer', background: fd.typeLivraison===t ? ROL : CARD, fontFamily:'inherit', transition:'all 0.18s' }}>
-                    <p style={{ fontWeight:600, fontSize:'0.78rem', color: fd.typeLivraison===t ? ROD : SUB, marginBottom:3 }}>{t==='home'?'للبيت':'للمكتب'}</p>
-                    {selW && <p style={{ fontWeight:700, fontSize:'0.95rem', color: fd.typeLivraison===t ? ROD : SUB }}>{(t==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} دج</p>}
+                {(['home','office'] as const).map(dtype => (
+                  <button key={dtype} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: dtype }))} style={{ padding:'0.85rem', border:`1.5px solid ${fd.typeLivraison===dtype ? RO : BD}`, borderRadius:12, textAlign:'center', cursor:'pointer', background: fd.typeLivraison===dtype ? ROL : CARD, fontFamily:'inherit', transition:'all 0.18s' }}>
+                    <p style={{ fontWeight:600, fontSize:'0.78rem', color: fd.typeLivraison===dtype ? ROD : SUB, marginBottom:3 }}>{dtype==='home' ? t.deliveryHome : t.deliveryOffice}</p>
+                    {selW && <p style={{ fontWeight:700, fontSize:'0.95rem', color: fd.typeLivraison===dtype ? ROD : SUB }}>{(dtype==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} {currency}</p>}
                   </button>
                 ))}
               </div>
             </div>
             <div style={{ background: CR, borderRadius:14, border:`1px solid ${BD}`, padding:'1.125rem', margin:'1rem 0' }}>
-              {[{ l:'المجموع الفرعي', v:`${cartTotal.toLocaleString()} دج` }, { l:'التوصيل', v: getLiv()?`${getLiv().toLocaleString()} دج`:'—' }].map(r => (
+              {[{ l: t.subtotal, v:`${cartTotal.toLocaleString()} ${currency}` }, { l: t.delivery, v: getLiv()?`${getLiv().toLocaleString()} ${currency}`:'—' }].map(r => (
                 <div key={r.l} style={{ display:'flex', justifyContent:'space-between', paddingBottom:'0.5rem', marginBottom:'0.5rem', borderBottom:`1px solid ${BD}` }}>
                   <span style={{ fontSize:'0.78rem', color: SUB, fontWeight:300 }}>{r.l}</span>
                   <span style={{ fontWeight:600, color: INK }}>{r.v}</span>
                 </div>
               ))}
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline' }}>
-                <span style={{ fontWeight:700, color: INK }}>الإجمالي</span>
-                <span className="price-mono" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'2.25rem', fontWeight:700, color: INK }}>{finalTotal.toLocaleString()} <span style={{ fontSize:'0.75rem', fontWeight:300 }}>دج</span></span>
+                <span style={{ fontWeight:700, color: INK }}>{t.total}</span>
+                <span className="price-mono" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'2.25rem', fontWeight:700, color: INK }}>{finalTotal.toLocaleString()} <span style={{ fontSize:'0.75rem', fontWeight:300 }}>{currency}</span></span>
               </div>
             </div>
             <button type="submit" disabled={submitting} style={{ ...S.btnPrimary, opacity: submitting?0.7:1, background:`linear-gradient(135deg,${RO},${ROD})`, boxShadow:`0 8px 24px rgba(193,123,142,0.35)`, borderRadius:12 }}
               onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.opacity='0.88')}
               onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.opacity='1')}>
-              {submitting ? <><Loader2 size={15} style={{ animation:'spin 1s linear infinite' }}/>جاري المعالجة...</> : 'تأكيد الطلب'}
+              {submitting ? <><Loader2 size={15} style={{ animation:'spin 1s linear infinite' }}/>{t.sending}</> : t.confirmOrder}
             </button>
           </form>
         </div>
@@ -1243,20 +1532,25 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 /* ══════════════════════════════════════════
    STATIC PAGES
 ══════════════════════════════════════════ */
-const Shell = ({ children, title }: { children: React.ReactNode; title: string }) => (
-  <div dir="rtl" style={{ minHeight:'100vh', background: BG }}>
-    <div style={{ background:`linear-gradient(135deg,${CR} 0%,rgba(193,123,142,0.08) 100%)`, borderBottom:`1px solid ${BD}`, paddingTop:72, paddingBottom:52, paddingLeft:24, paddingRight:24 }}>
-      <div style={{ maxWidth:860, margin:'0 auto' }}>
-        <div style={{ display:'inline-flex', alignItems:'center', gap:8, marginBottom:'1rem' }}>
-          <Flower2 size={12} color={RO} />
-          <span style={{ fontSize:'0.58rem', fontWeight:700, color: RO, letterSpacing:'0.18em', textTransform:'uppercase' }}>Pure Organics</span>
+const Shell = ({ children, title, sub, store }: { children: React.ReactNode; title: string; sub?: string; store?: any }) => {
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
+  return (
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ minHeight:'100vh', background: BG }}>
+      <div style={{ background:`linear-gradient(135deg,${CR} 0%,rgba(193,123,142,0.08) 100%)`, borderBottom:`1px solid ${BD}`, paddingTop:72, paddingBottom:52, paddingLeft:24, paddingRight:24 }}>
+        <div style={{ maxWidth:860, margin:'0 auto' }}>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:8, marginBottom:'1rem' }}>
+            <Flower2 size={12} color={RO} />
+            <span style={{ fontSize:'0.58rem', fontWeight:700, color: RO, letterSpacing:'0.18em', textTransform:'uppercase' }}>Pure Organics</span>
+          </div>
+          <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(2rem,5vw,3.25rem)', fontWeight:600, color: INK, letterSpacing:'-0.03em' }}>{title}</h1>
+          {sub && <p style={{ fontSize:'0.8rem', color: SUB, marginTop:'0.5rem' }}>{sub}</p>}
         </div>
-        <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(2rem,5vw,3.25rem)', fontWeight:600, color: INK, letterSpacing:'-0.03em' }}>{title}</h1>
       </div>
+      <div style={{ maxWidth:860, margin:'0 auto', padding:'3rem 1.5rem 6rem' }}>{children}</div>
     </div>
-    <div style={{ maxWidth:860, margin:'0 auto', padding:'3rem 1.5rem 6rem' }}>{children}</div>
-  </div>
-);
+  );
+};
 
 const IB = ({ title, body }: { title: string; body: string }) => (
   <div style={{ padding:'1.25rem 0', borderBottom:`1px solid ${BD}`, display:'flex', gap:'1rem', alignItems:'flex-start' }}>
@@ -1268,42 +1562,47 @@ const IB = ({ title, body }: { title: string; body: string }) => (
   </div>
 );
 
-export function Privacy() {
+export function Privacy({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="سياسة الخصوصية">
+    <Shell title={t.privacyTitle} sub={t.legalSub} store={store}>
       <div style={{ background: CARD, padding:'1.5rem 2rem', borderRadius:18, border:`1px solid ${BD}` }}>
-        <IB title="البيانات التي نجمعها" body="نجمع فقط المعلومات الضرورية لمعالجة طلباتكم، مثل الاسم، رقم الهاتف، وعنوان التوصيل." />
-        <IB title="حماية البيانات" body="تُخزن جميع البيانات بشكل مشفر. نستخدم بروتوكولات حماية معتمدة لضمان أمان معلوماتكم." />
-        <IB title="مشاركة المعلومات" body="لا نقوم ببيع أو مشاركة بياناتكم مع أي جهات خارجية باستثناء شركاء التوصيل." />
+        <IB title={t.privDataTitle} body={t.privDataBody} />
+        <IB title={t.privSecTitle} body={t.privSecBody} />
+        <IB title={t.privShareTitle} body={t.privShareBody} />
       </div>
     </Shell>
   );
 }
 
-export function Terms() {
+export function Terms({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="شروط الاستخدام">
+    <Shell title={t.termsTitle} sub={t.legalSub} store={store}>
       <div style={{ background: CARD, padding:'1.5rem 2rem', borderRadius:18, border:`1px solid ${BD}` }}>
-        <IB title="الحساب والمسؤولية" body="المستخدمة مسؤولة عن دقة البيانات المدخلة والحفاظ على سرية حسابها." />
-        <IB title="الطلبات والمدفوعات" body="يتم تأكيد الطلبات عبر الهاتف قبل الشحن. الأسعار المعلنة هي الأسعار النهائية." />
-        <IB title="القانون الحاكم" body="تخضع كافة التعاملات للقوانين المعمول بها في جمهورية الجزائر الديمقراطية الشعبية." />
+        <IB title={t.termsAccTitle} body={t.termsAccBody} />
+        <IB title={t.termsPayTitle} body={t.termsPayBody} />
+        <IB title={t.termsLawTitle} body={t.termsLawBody} />
       </div>
     </Shell>
   );
 }
 
-export function Cookies() {
+export function Cookies({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="ملفات الارتباط">
+    <Shell title={t.cookiesTitle} sub={t.legalSub} store={store}>
       <div style={{ background: CARD, padding:'1.5rem 2rem', borderRadius:18, border:`1px solid ${BD}` }}>
-        <IB title="الملفات الأساسية" body="نستخدم ملفات تعريف الارتباط الضرورية لضمان عمل سلة المشتريات وأمان جلسة الدخول." />
-        <IB title="تحسين التجربة" body="نستخدم بعض الملفات لفهم كيفية استخدام الموقع وتطوير تجربة التصفح." />
+        <IB title={t.cookEssTitle} body={t.cookEssBody} />
+        <IB title={t.cookPrefTitle} body={t.cookPrefBody} />
       </div>
     </Shell>
   );
 }
 
 export function Contact({ store }: { store: any }) {
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
   const [form, setForm]   = useState({ name:'', email:'', phone:'', message:'' });
   const [sent, setSent]   = useState(false);
   const [loading, setL]   = useState(false);
@@ -1311,26 +1610,26 @@ export function Contact({ store }: { store: any }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setL(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id }); setSent(true); }
-    catch { showError('حدث خطأ في الإرسال'); } finally { setL(false); }
+    catch { showError(t.errContact); } finally { setL(false); }
   };
 
   return (
-    <div dir="rtl" style={{ background: BG, minHeight:'100vh' }}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: BG, minHeight:'100vh' }}>
       <div style={{ background:`linear-gradient(135deg,${CR} 0%,rgba(193,123,142,0.08) 100%)`, borderBottom:`1px solid ${BD}`, paddingTop:72, paddingBottom:52, paddingLeft:24, paddingRight:24 }}>
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
           <div style={{ display:'inline-flex', alignItems:'center', gap:8, marginBottom:'1rem' }}>
             <Flower2 size={12} color={RO}/><span style={{ fontSize:'0.58rem', fontWeight:700, color: RO, letterSpacing:'0.18em', textTransform:'uppercase' }}>Pure Organics</span>
           </div>
-          <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(2rem,5vw,3.25rem)', fontWeight:600, color: INK, letterSpacing:'-0.03em' }}>تواصلي معنا</h1>
+          <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(2rem,5vw,3.25rem)', fontWeight:600, color: INK, letterSpacing:'-0.03em' }}>{t.contactTitle}</h1>
         </div>
       </div>
       <div className="contact-inner" style={{ maxWidth:1100, margin:'0 auto', padding:'3rem 1.5rem 6rem' }}>
         <div>
           <div style={{ background: CARD, borderRadius:18, border:`1px solid ${BD}`, padding:'1.5rem', marginBottom:'1rem' }}>
             {[
-              { icon:<Phone size={13}/>, l:'الهاتف', val: store?.contact?.phone||'غير متوفر' },
-              { icon:<MapPin size={13}/>, l:'الموقع', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')||'الجزائر' },
-            ].map((r,i) => (
+              { icon:<Phone size={13}/>, l: t.contactPhoneLabel, val: store?.contact?.phone },
+              { icon:<MapPin size={13}/>, l: t.contactLocationLabel, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
+            ].filter(r => r.val).map((r,i) => (
               <div key={i} style={{ display:'flex', alignItems:'center', gap:'0.875rem', marginBottom: i===0 ? '1.25rem' : 0 }}>
                 <div style={{ width:36, height:36, borderRadius:12, background: ROL, border:`1px solid ${ROB}`, display:'flex', alignItems:'center', justifyContent:'center', color: RO, flexShrink:0 }}>{r.icon}</div>
                 <div>
@@ -1342,33 +1641,33 @@ export function Contact({ store }: { store: any }) {
           </div>
           <div style={{ background: ROL, border:`1px solid ${ROB}`, borderRadius:12, padding:'0.875rem 1rem', display:'flex', alignItems:'center', gap:'0.625rem' }}>
             <Flower2 size={12} color={RO}/>
-            <span style={{ fontSize:'0.75rem', fontWeight:500, color: ROD }}>نرد في غضون ساعة واحدة</span>
+            <span style={{ fontSize:'0.75rem', fontWeight:500, color: ROD }}>{t.contactAvailable}</span>
           </div>
         </div>
         <div style={{ background: CARD, borderRadius:20, border:`1px solid ${BD}`, padding:'2.5rem', boxShadow:'0 8px 32px rgba(193,123,142,0.06)' }}>
           {sent ? (
             <div style={{ textAlign:'center', padding:'3.5rem 1rem' }}>
               <div style={{ width:60, height:60, borderRadius:'50%', background:`linear-gradient(135deg,${RO},${ROD})`, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 1.75rem', boxShadow:`0 8px 24px rgba(193,123,142,0.4)` }}><CheckCircle2 size={28} color="#fff"/></div>
-              <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.75rem', fontWeight:600, color: INK, marginBottom:'0.5rem', letterSpacing:'-0.02em' }}>تم الإرسال!</h2>
-              <p style={{ color: SUB, lineHeight:1.9, marginBottom:'2.25rem', fontSize:'0.9rem', fontWeight:300 }}>سنرد عليكِ في أقرب وقت.</p>
-              <button onClick={() => setSent(false)} style={{ padding:'0.75rem 2.25rem', borderRadius:12, border:`1.5px solid ${RO}`, background: ROL, color: ROD, fontWeight:600, cursor:'pointer', fontSize:'0.875rem', fontFamily:'inherit' }}>إرسال رسالة أخرى</button>
+              <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'1.75rem', fontWeight:600, color: INK, marginBottom:'0.5rem', letterSpacing:'-0.02em' }}>{t.messageSentTitle}</h2>
+              <p style={{ color: SUB, lineHeight:1.9, marginBottom:'2.25rem', fontSize:'0.9rem', fontWeight:300 }}>{t.messageSentDesc}</p>
+              <button onClick={() => setSent(false)} style={{ padding:'0.75rem 2.25rem', borderRadius:12, border:`1.5px solid ${RO}`, background: ROL, color: ROD, fontWeight:600, cursor:'pointer', fontSize:'0.875rem', fontFamily:'inherit' }}>{t.anotherMsg}</button>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="form-row-2" style={{ marginBottom:'0.875rem' }}>
-                <FR label="الاسم"><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={S.input} /></FR>
-                <FR label="الهاتف"><input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required style={S.input} /></FR>
+                <FR label={t.fullName}><input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder={t.namePh} required style={S.input} /></FR>
+                <FR label={t.phone}><input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder={t.phonePh} required style={S.input} /></FR>
               </div>
               <div style={{ marginBottom:'0.875rem' }}>
-                <FR label="البريد الإلكتروني"><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required style={S.input} /></FR>
+                <FR label={t.emailLabel}><input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder={t.emailPh} required style={S.input} /></FR>
               </div>
               <div style={{ marginBottom:'1.5rem' }}>
-                <FR label="الرسالة"><textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} style={{ ...S.input, resize:'none' }} /></FR>
+                <FR label={t.messageLabel}><textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder={t.messagePh} required rows={5} style={{ ...S.input, resize:'none' }} /></FR>
               </div>
               <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading?0.7:1, background:`linear-gradient(135deg,${RO},${ROD})`, boxShadow:`0 8px 24px rgba(193,123,142,0.35)`, borderRadius:12 }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.opacity='0.88')}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.opacity='1')}>
-                {loading ? <><Loader2 size={15} style={{ animation:'spin 1s linear infinite' }}/>جاري الإرسال...</> : <>إرسال الرسالة <ArrowLeft size={15}/></>}
+                {loading ? <><Loader2 size={15} style={{ animation:'spin 1s linear infinite' }}/>{t.sending}</> : <>{t.sendLabel} <ArrowLeft size={15}/></>}
               </button>
             </form>
           )}
@@ -1382,9 +1681,9 @@ export function StaticPage({ staticPage, page, store }: any) {
   const p = (staticPage||page||'').toLowerCase();
   return (
     <>
-      {p==='privacy'  && <Privacy />}
-      {p==='terms'    && <Terms />}
-      {p==='cookies'  && <Cookies />}
+      {p==='privacy'  && <Privacy store={store} />}
+      {p==='terms'    && <Terms store={store} />}
+      {p==='cookies'  && <Cookies store={store} />}
       {p==='contact'  && <Contact store={store} />}
     </>
   );

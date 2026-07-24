@@ -504,16 +504,6 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
 
   return (
     <div style={S.body} dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Breadcrumb */}
-      <div style={{ borderBottom: '1px solid #e5e5e5', padding: '0.6rem 1rem', background: '#f8f8f8' }}>
-        <div style={S.container}>
-          <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: '#888' }}>
-            <Link href="/" style={{ color: '#555', textDecoration: 'none' }}>الرئيسية</Link>
-            <ChevronLeft size={12} />
-            <span style={{ color: '#111', fontWeight: 500 }}>{product.name}</span>
-          </nav>
-        </div>
-      </div>
 
       <div style={{ ...S.container, padding: '2rem 1rem' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', alignItems: 'start' }}>

@@ -225,7 +225,8 @@ const CSS = `
     .prod-grid  { grid-template-columns:repeat(1,1fr); gap:10px; }
     .cat-grid   { grid-template-columns:repeat(2,1fr); }
     .trust-bar  { grid-template-columns:repeat(2,1fr); }
-    .footer-g   { grid-template-columns:1fr 1fr; gap:24px; }
+    .footer-g   { grid-template-columns:1fr; gap:24px; }
+    .footer-g > div:first-child { grid-column: 1 !important; }
     .details-g  { grid-template-columns:1fr; }
     .details-L  { padding:0; position:static; width:100%; height:auto; aspect-ratio:1; margin-bottom:20px; display:flex; flex-direction:column; gap:20px; }
     .details-R  { padding:20px 0; }
@@ -259,6 +260,7 @@ export interface ProductFormProps {
   product: Product; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
   selectedVariants: Record<string, string>; platform?: string; priceLoss?: number;
+  store?: any;
 }
 function variantMatches(d: VariantDetail, sel: Record<string, string>): boolean {
   return Object.entries(sel).every(([n, v]) => d.name.some(e => e.attrName === n && e.value === v));
@@ -296,6 +298,92 @@ const jsonAr = {
   noProducts: 'لا توجد منتجات متاحة حالياً',
   shopNow: 'تسوق الآن',
   searchResultsFor: 'نتائج البحث عن:',
+  // Hero defaults
+  heroDefaultP1: 'عالم الألعاب',
+  heroDefaultP2: 'بين',
+  heroDefaultP3: 'يديك',
+  heroSubDefault: 'كل ما تحتاجه للعب الاحترافي — PS5، Xbox، يدات التحكم، الألعاب وكل الإكسسوارات. توصيل لجميع ولايات الجزائر.',
+  cartLink: 'السلة',
+  statProducts: 'منتج متاح',
+  stat58: 'ولاية توصيل',
+  statOriginal: 'منتجات أصيلة',
+  // Trust bar
+  trustItems: [
+    { title: 'توصيل 58 ولاية', desc: 'توصيل سريع لكل الجزائر' },
+    { title: 'منتجات أصيلة 100%', desc: 'ضمان الجودة والأصالة' },
+    { title: 'أفضل الأسعار', desc: 'أسعار تنافسية دائماً' },
+    { title: 'خدمة سريعة', desc: 'رد سريع على استفساراتك' },
+  ],
+  // Categories
+  categoriesTitle: 'تسوق حسب',
+  categoriesHighlight: 'الفئة',
+  allCats: 'عرض كل الفئات',
+  // Products
+  productsLabel: 'المنتجات',
+  productsTitle: 'كل',
+  productsHighlight: 'المنتجات',
+  noProductsComing: 'المنتجات قادمة قريباً...',
+  viewDetails: 'عرض المنتج',
+  // CTA Banner
+  ctaEyebrow: '// توصيل لكل الجزائر',
+  ctaTitle: 'توصيل',
+  ctaHighlight: '58 ولاية',
+  ctaContactBtn: 'تواصل معنا',
+  // Details
+  detailsLabel: 'تفاصيل المنتج',
+  priceLabel: 'السعر',
+  saveLabel: 'وفّر',
+  offersLabel: 'الباقات',
+  qtyLabel: 'الكمية',
+  descLabel: 'وصف المنتج',
+  // ProductForm
+  addedShort: 'تمت الإضافة!',
+  addToCartShort: 'أضف للسلة',
+  orderNowBtn: 'طلب الآن',
+  deliveryInfoTitle: '// بيانات التوصيل',
+  cancel: 'إلغاء',
+  orderSummary: 'ملخص الطلب',
+  productLabel: 'المنتج',
+  securePay: 'دفع آمن ومشفر',
+  safeData: 'بيانات مشفّرة',
+  verified: 'موثّق ومعتمد',
+  // Cart
+  cartTitle: 'سلة',
+  cartHighlight: 'التسوق',
+  deleteLabel: 'حذف',
+  communeFirstSelect: 'الولاية أولاً',
+  // Contact
+  contactEyebrow: '// تواصل',
+  contactTitle: 'تواصل',
+  contactHighlight: 'معنا',
+  contactReplyTime: 'نرد خلال أقل من ساعتين 🎮',
+  contactWaysTitle: 'طرق التواصل',
+  contactFormTitle: 'أرسل رسالة',
+  phoneLabel: 'الهاتف',
+  locationLabel: 'الموقع',
+  storeLabel: 'المتجر',
+  storeDesc: 'كل ما تحتاجه للعب الاحترافي',
+  onlineLabel: 'متصل الآن',
+  replyTimeLabel: 'وقت الرد',
+  replyTimeVal: 'أقل من ساعتين',
+  deliveryWilayas: '58 ولاية',
+  nameContactLabel: 'اسمك',
+  emailLabel: 'البريد الإلكتروني',
+  phoneContactLabel: 'الهاتف',
+  messageLabel: 'رسالتك',
+  messagePh: 'كيف يمكننا مساعدتك؟',
+  namePh: 'الاسم الكامل',
+  sendLabel: 'إرسال الرسالة',
+  messageSentTitle: 'تم إرسال رسالتك!',
+  messageSentDesc: 'سنرد عليك في أقل من ساعتين 🎮',
+  errContact: 'حدث خطاء في الارسال يمكن محاولة بعد حين',
+  // Footer
+  pages: 'الصفحات',
+  cookies: 'الكوكيز',
+  footerDesc: 'وجهتك الأولى لعالم الألعاب والاحتراف في الجزائر. جودة أصلية وتوصيل سريع.',
+  footerTagline: 'صُنع بكل شغف للألعاب.',
+  footerHomeLink: 'المتجر',
+  footerSupportLink: 'الدعم الفني',
   // Form
   fullName: 'الاسم الكامل',
   fullNamePh: 'أدخل اسمك',
@@ -313,8 +401,8 @@ const jsonAr = {
   communePh: 'اختر البلدية',
   communeLoading: 'جاري التحميل...',
   deliveryType: 'نوع التوصيل',
-  deliveryHome: 'توصيل للمنزل',
-  deliveryOffice: 'مكتب بريد',
+  deliveryHome: 'للمنزل',
+  deliveryOffice: 'للمكتب',
   qty: 'الكمية',
   price: 'السعر',
   delivery: 'التوصيل',
@@ -324,17 +412,17 @@ const jsonAr = {
   addToCart: 'أضف إلى السلة',
   orderNow: 'اطلب الآن',
   confirmOrder: 'تأكيد الطلب',
-  sending: 'جاري الإرسال...',
+  sending: 'جاري المعالجة...',
   back: 'رجوع',
   addedMsg: 'تمت الإضافة إلى السلة بنجاح!',
   errSubmit: 'حدث خطأ أثناء إرسال الطلب',
   // Cart & Success
   myCart: 'السلة',
   cartEmpty: 'السلة فارغة',
-  cartEmptyDesc: 'لم تقم بإضافة أي منتجات بعد',
-  successTitle: 'تم إرسال طلبك بنجاح!',
-  successDesc: 'سنتواصل معك قريباً لتأكيد التفاصيل',
-  backToShop: 'العودة للتسوق',
+  cartEmptyDesc: 'أضف بعض المنتجات للبدء بالتسوق',
+  successTitle: 'تم استلام طلبك!',
+  successDesc: 'شكراً لثقتك. سنتصل بك قريباً لتأكيد الطلب وترتيب التوصيل 🎮',
+  backToShop: 'العودة للمتجر',
   checkoutTitle: 'إتمام الطلب',
   // Product
   offersTitle: 'العروض المتاحة',
@@ -345,6 +433,39 @@ const jsonAr = {
   privacy: 'الخصوصية',
   terms: 'الشروط',
   rightsReserved: 'جميع الحقوق محفوظة',
+  // Legal
+  legalSub: '// قانوني',
+  privacyTitle: 'سياسة الخصوصية',
+  termsTitle: 'شروط الاستخدام',
+  cookiesTitle: 'سياسة الكوكيز',
+  privDataTitle: 'البيانات التي نجمعها',
+  privDataBody: 'فقط اسمك ورقم هاتفك وعنوان التوصيل — ما هو ضروري لمعالجة طلبك.',
+  privUseTitle: 'كيف نستخدمها',
+  privUseBody: 'حصرياً لتنفيذ وتوصيل مشترياتك.',
+  privSecTitle: 'الأمان',
+  privSecBody: 'بياناتك محمية بتشفير على مستوى المؤسسات.',
+  privShareTitle: 'مشاركة البيانات',
+  privShareBody: 'لا نبيع البيانات أبداً. تُشارك فقط مع شركاء التوصيل الموثوقين.',
+  privLastUpdate: '// آخر تحديث: فبراير 2026',
+  termsAccountTitle: 'حسابك',
+  termsAccountBody: 'أنت مسؤول عن أمان بيانات تسجيل الدخول وكل النشاط تحت حسابك.',
+  termsPayTitle: 'المدفوعات',
+  termsPayBody: 'لا رسوم مخفية. السعر المعروض هو السعر النهائي.',
+  termsAuthTitle: 'الاستخدام المحظور',
+  termsAuthBody: 'المنتجات الأصيلة فقط. لا مجال للمنتجات المقلدة.',
+  termsAuthTag: 'صارم',
+  termsLawTitle: 'القانون الحاكم',
+  termsLawBody: 'تخضع هذه الشروط لقوانين جمهورية الجزائر الديمقراطية الشعبية.',
+  cookEssTitle: 'الكوكيز الأساسية',
+  cookEssBody: 'ضرورية للجلسات والسلة والدفع. لا يمكن تعطيلها.',
+  cookEssTag: 'مطلوب',
+  cookPrefTitle: 'كوكيز التفضيلات',
+  cookPrefBody: 'تحفظ إعداداتك لتجربة أفضل.',
+  cookPrefTag: 'اختياري',
+  cookAnalTitle: 'كوكيز التحليلات',
+  cookAnalBody: 'بيانات مجمعة ومجهولة لتحسين المنصة.',
+  cookAnalTag: 'اختياري',
+  cookManageNote: 'يمكنك إدارة تفضيلات الكوكيز من إعدادات المتصفح.',
 };
 
 const jsonFr = {
@@ -362,6 +483,92 @@ const jsonFr = {
   noProducts: 'Aucun produit disponible pour le moment.',
   shopNow: 'Voir la boutique',
   searchResultsFor: 'Résultats pour :',
+  // Hero defaults
+  heroDefaultP1: "L'univers du gaming",
+  heroDefaultP2: 'entre',
+  heroDefaultP3: 'vos mains',
+  heroSubDefault: 'Tout ce dont vous avez besoin pour jouer — PS5, Xbox, manettes, jeux et accessoires. Livraison partout en Algérie.',
+  cartLink: 'Panier',
+  statProducts: 'produits',
+  stat58: 'wilayas de livraison',
+  statOriginal: 'produits authentiques',
+  // Trust bar
+  trustItems: [
+    { title: 'Livraison 58 wilayas', desc: 'Livraison rapide partout en Algérie' },
+    { title: 'Produits 100% authentiques', desc: 'Garantie qualité et authenticité' },
+    { title: 'Meilleurs prix', desc: 'Prix compétitifs toujours' },
+    { title: 'Service rapide', desc: 'Réponse rapide à vos questions' },
+  ],
+  // Categories
+  categoriesTitle: 'Acheter par',
+  categoriesHighlight: 'catégorie',
+  allCats: 'Voir toutes les catégories',
+  // Products
+  productsLabel: 'Produits',
+  productsTitle: 'Tous les',
+  productsHighlight: 'produits',
+  noProductsComing: 'Produits bientôt disponibles...',
+  viewDetails: 'Voir le produit',
+  // CTA Banner
+  ctaEyebrow: '// Livraison partout en Algérie',
+  ctaTitle: 'Livraison',
+  ctaHighlight: '58 wilayas',
+  ctaContactBtn: 'Nous contacter',
+  // Details
+  detailsLabel: 'Détails du produit',
+  priceLabel: 'Prix',
+  saveLabel: 'Économisez',
+  offersLabel: 'Offres',
+  qtyLabel: 'Quantité',
+  descLabel: 'Description du produit',
+  // ProductForm
+  addedShort: 'Ajouté !',
+  addToCartShort: 'Ajouter',
+  orderNowBtn: 'Commander',
+  deliveryInfoTitle: '// Informations de livraison',
+  cancel: 'Annuler',
+  orderSummary: 'Résumé de la commande',
+  productLabel: 'Produit',
+  securePay: 'Paiement sécurisé',
+  safeData: 'Données chiffrées',
+  verified: 'Certifié et approuvé',
+  // Cart
+  cartTitle: 'Panier',
+  cartHighlight: "d'achat",
+  deleteLabel: 'Supprimer',
+  communeFirstSelect: 'Wilaya d\'abord',
+  // Contact
+  contactEyebrow: '// Contact',
+  contactTitle: 'Nous',
+  contactHighlight: 'contacter',
+  contactReplyTime: 'Réponse en moins de 2 heures 🎮',
+  contactWaysTitle: 'Moyens de contact',
+  contactFormTitle: 'Envoyer un message',
+  phoneLabel: 'Téléphone',
+  locationLabel: 'Adresse',
+  storeLabel: 'Boutique',
+  storeDesc: 'Tout pour le gaming professionnel',
+  onlineLabel: 'En ligne maintenant',
+  replyTimeLabel: 'Temps de réponse',
+  replyTimeVal: 'Moins de 2 heures',
+  deliveryWilayas: '58 wilayas',
+  nameContactLabel: 'Votre nom',
+  emailLabel: 'Email',
+  phoneContactLabel: 'Téléphone',
+  messageLabel: 'Votre message',
+  messagePh: 'Comment pouvons-nous vous aider ?',
+  namePh: 'Nom complet',
+  sendLabel: 'Envoyer le message',
+  messageSentTitle: 'Message envoyé !',
+  messageSentDesc: 'Nous vous répondrons en moins de 2 heures 🎮',
+  errContact: 'Une erreur est survenue, veuillez réessayer plus tard.',
+  // Footer
+  pages: 'Pages',
+  cookies: 'Cookies',
+  footerDesc: 'Votre première destination pour le gaming professionnel en Algérie. Qualité authentique et livraison rapide.',
+  footerTagline: 'Fait avec passion pour le gaming.',
+  footerHomeLink: 'Boutique',
+  footerSupportLink: 'Support technique',
   // Form
   fullName: 'Nom complet',
   fullNamePh: 'Votre nom',
@@ -390,16 +597,16 @@ const jsonFr = {
   addToCart: 'Ajouter au panier',
   orderNow: 'Commander maintenant',
   confirmOrder: 'Confirmer la commande',
-  sending: 'Envoi en cours...',
+  sending: 'Traitement en cours...',
   back: 'Annuler',
   addedMsg: 'Ajouté au panier ✓',
   errSubmit: 'Une erreur est survenue, veuillez réessayer.',
   // Cart & Success
   myCart: 'Mon Panier',
   cartEmpty: 'Votre panier est vide',
-  cartEmptyDesc: 'Découvrez notre sélection.',
-  successTitle: 'Commande confirmée',
-  successDesc: 'Merci pour votre commande, notre équipe vous contactera bientôt.',
+  cartEmptyDesc: 'Ajoutez des produits pour commencer vos achats.',
+  successTitle: 'Commande reçue !',
+  successDesc: 'Merci pour votre confiance. Nous vous contacterons bientôt pour confirmer la commande 🎮',
   backToShop: 'Retour à la boutique',
   checkoutTitle: 'Finaliser la commande',
   // Product
@@ -411,13 +618,119 @@ const jsonFr = {
   privacy: 'Confidentialité',
   terms: 'Conditions',
   rightsReserved: 'Tous droits réservés.',
+  // Legal
+  legalSub: '// Légal',
+  privacyTitle: 'Politique de confidentialité',
+  termsTitle: "Conditions d'utilisation",
+  cookiesTitle: 'Politique des cookies',
+  privDataTitle: 'Données que nous collectons',
+  privDataBody: 'Uniquement votre nom, numéro de téléphone et adresse de livraison — le strict nécessaire pour traiter votre commande.',
+  privUseTitle: 'Comment nous les utilisons',
+  privUseBody: 'Exclusivement pour exécuter et livrer vos achats.',
+  privSecTitle: 'Sécurité',
+  privSecBody: 'Vos données sont protégées par un chiffrement de niveau entreprise.',
+  privShareTitle: 'Partage des données',
+  privShareBody: 'Nous ne vendons jamais vos données. Elles sont partagées uniquement avec nos partenaires de livraison de confiance.',
+  privLastUpdate: '// Dernière mise à jour : Février 2026',
+  termsAccountTitle: 'Votre compte',
+  termsAccountBody: "Vous êtes responsable de la sécurité de vos identifiants et de toute activité sous votre compte.",
+  termsPayTitle: 'Paiements',
+  termsPayBody: 'Aucuns frais cachés. Le prix affiché est le prix final.',
+  termsAuthTitle: 'Utilisations interdites',
+  termsAuthBody: 'Produits authentiques uniquement. Les produits contrefaits sont strictement interdits.',
+  termsAuthTag: 'STRICT',
+  termsLawTitle: 'Loi applicable',
+  termsLawBody: 'Ces conditions sont régies par les lois de la République Algérienne Démocratique et Populaire.',
+  cookEssTitle: 'Cookies essentiels',
+  cookEssBody: 'Nécessaires pour les sessions, le panier et le paiement. Ne peuvent pas être désactivés.',
+  cookEssTag: 'REQUIS',
+  cookPrefTitle: 'Cookies de préférences',
+  cookPrefBody: 'Sauvegardent vos paramètres pour une meilleure expérience.',
+  cookPrefTag: 'OPTIONNEL',
+  cookAnalTitle: 'Cookies analytiques',
+  cookAnalBody: 'Données agrégées et anonymisées pour améliorer la plateforme.',
+  cookAnalTag: 'OPTIONNEL',
+  cookManageNote: 'Vous pouvez gérer vos préférences de cookies dans les paramètres de votre navigateur.',
 };
+
+const jsonEn = {
+  dir: 'ltr',
+  home: 'Home', contact: 'Contact', cart: 'Cart',
+  search: 'Search products...', searching: 'Searching...', noResults: 'No results found', showAll: 'View all results',
+  all: 'All', noProducts: 'No products available right now.', shopNow: 'Shop Now', searchResultsFor: 'Search results for:',
+  heroDefaultP1: 'Gaming World', heroDefaultP2: 'at your', heroDefaultP3: 'Fingertips',
+  heroSubDefault: 'Everything you need to game like a pro — PS5, Xbox, controllers, games and accessories. Delivery across Algeria.',
+  cartLink: 'Cart', statProducts: 'products', stat58: 'wilaya delivery', statOriginal: 'authentic products',
+  trustItems: [
+    { title: 'Delivery 58 wilayas', desc: 'Fast delivery across Algeria' },
+    { title: '100% Authentic', desc: 'Quality and authenticity guaranteed' },
+    { title: 'Best Prices', desc: 'Always competitive prices' },
+    { title: 'Fast Service', desc: 'Quick response to your queries' },
+  ],
+  categoriesTitle: 'Shop by', categoriesHighlight: 'Category', allCats: 'View all categories',
+  productsLabel: 'Products', productsTitle: 'All', productsHighlight: 'Products',
+  noProductsComing: 'Products coming soon...', viewDetails: 'View Product',
+  ctaEyebrow: '// Delivery across Algeria', ctaTitle: 'Delivery', ctaHighlight: '58 wilayas', ctaContactBtn: 'Contact Us',
+  detailsLabel: 'Product Details', priceLabel: 'Price', saveLabel: 'Save', offersLabel: 'Bundles', qtyLabel: 'Quantity', descLabel: 'Product Description',
+  addedShort: 'Added!', addToCartShort: 'Add to Cart', orderNowBtn: 'Order Now',
+  deliveryInfoTitle: '// Delivery Information', cancel: 'Cancel', orderSummary: 'Order Summary',
+  productLabel: 'Product', securePay: 'Secure & encrypted payment', safeData: 'Encrypted data', verified: 'Certified & verified',
+  cartTitle: 'Shopping', cartHighlight: 'Cart', deleteLabel: 'Remove', communeFirstSelect: 'Select wilaya first',
+  contactEyebrow: '// Contact', contactTitle: 'Contact', contactHighlight: 'Us',
+  contactReplyTime: 'Reply within 2 hours 🎮', contactWaysTitle: 'Ways to reach us', contactFormTitle: 'Send a message',
+  phoneLabel: 'Phone', locationLabel: 'Location', storeLabel: 'Store', storeDesc: 'Everything for professional gaming',
+  onlineLabel: 'Online now', replyTimeLabel: 'Reply time', replyTimeVal: 'Under 2 hours', deliveryWilayas: '58 wilayas',
+  nameContactLabel: 'Your name', emailLabel: 'Email', phoneContactLabel: 'Phone',
+  messageLabel: 'Your message', messagePh: 'How can we help you?', namePh: 'Full name', sendLabel: 'Send message',
+  messageSentTitle: 'Message sent!', messageSentDesc: "We'll reply within 2 hours 🎮",
+  errContact: 'An error occurred, please try again later.',
+  pages: 'Pages', cookies: 'Cookies',
+  footerDesc: 'Your first destination for professional gaming in Algeria. Authentic quality and fast delivery.',
+  footerTagline: 'Made with passion for gaming.', footerHomeLink: 'Store', footerSupportLink: 'Technical support',
+  fullName: 'Full name', fullNamePh: 'Enter your name', errName: 'Name is required',
+  phone: 'Phone number', phonePh: '05xxxxxxxx', errPhone: 'Phone number is required', errPhoneInvalid: 'Invalid phone number',
+  wilaya: 'Wilaya', errWilaya: 'Please select a wilaya', wilayaPh: 'Choose wilaya', wilayaNA: 'Delivery not available currently',
+  commune: 'Commune', errCommune: 'Please select a commune', communePh: 'Choose commune', communeLoading: 'Loading...',
+  deliveryType: 'Delivery type', deliveryHome: 'Home delivery', deliveryOffice: 'Post office',
+  qty: 'Quantity', price: 'Price', delivery: 'Delivery', total: 'Total', subtotal: 'Subtotal',
+  orderInfo: 'Order information', addToCart: 'Add to cart', orderNow: 'Order now',
+  confirmOrder: 'Confirm order', sending: 'Processing...', back: 'Back',
+  addedMsg: 'Successfully added to cart!', errSubmit: 'An error occurred while submitting the order.',
+  myCart: 'Cart', cartEmpty: 'Your cart is empty', cartEmptyDesc: "Add products to start shopping.",
+  successTitle: 'Order received!', successDesc: "Thank you for your trust. We'll contact you soon to confirm your order 🎮",
+  backToShop: 'Back to store', checkoutTitle: 'Complete order',
+  offersTitle: 'Available offers', descTitle: 'Description',
+  quickLinks: 'Quick links', contactSect: 'Contact us', privacy: 'Privacy', terms: 'Terms', rightsReserved: 'All rights reserved.',
+  legalSub: '// Legal', privacyTitle: 'Privacy Policy', termsTitle: 'Terms of Use', cookiesTitle: 'Cookie Policy',
+  privDataTitle: 'Data we collect', privDataBody: 'Only your name, phone number and delivery address — the minimum necessary to process your order.',
+  privUseTitle: 'How we use it', privUseBody: 'Exclusively to fulfill and deliver your purchases.',
+  privSecTitle: 'Security', privSecBody: 'Your data is protected with enterprise-level encryption.',
+  privShareTitle: 'Data sharing', privShareBody: 'We never sell your data. It is only shared with trusted delivery partners.',
+  privLastUpdate: '// Last updated: February 2026',
+  termsAccountTitle: 'Your account', termsAccountBody: 'You are responsible for the security of your login credentials and all activity under your account.',
+  termsPayTitle: 'Payments', termsPayBody: 'No hidden fees. The displayed price is the final price.',
+  termsAuthTitle: 'Prohibited uses', termsAuthBody: 'Authentic products only. Counterfeit products are strictly prohibited.', termsAuthTag: 'STRICT',
+  termsLawTitle: 'Governing law', termsLawBody: "These terms are governed by the laws of the People's Democratic Republic of Algeria.",
+  cookEssTitle: 'Essential cookies', cookEssBody: 'Required for sessions, cart and payments. Cannot be disabled.', cookEssTag: 'REQUIRED',
+  cookPrefTitle: 'Preference cookies', cookPrefBody: 'Save your settings for a better experience.', cookPrefTag: 'OPTIONAL',
+  cookAnalTitle: 'Analytics cookies', cookAnalBody: 'Aggregated and anonymous data to improve the platform.', cookAnalTag: 'OPTIONAL',
+  cookManageNote: 'You can manage your cookie preferences in your browser settings.',
+};
+
+type Lang = 'ar' | 'fr' | 'en';
+const getLang = (store?: any): Lang => {
+  if (store?.language === 'fr') return 'fr';
+  if (store?.language === 'en') return 'en';
+  return 'ar';
+};
+const T: Record<Lang, typeof jsonAr> = { ar: jsonAr, fr: jsonFr as any, en: jsonEn as any };
 
 export default function Main({ store, children, domain }: any) {
   const pathname = usePathname();
+  const t = T[getLang(store)];
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: 'var(--navy)' }} className="hex-bg">
+    <div dir={t.dir} style={{ minHeight: '100vh', backgroundColor: 'var(--navy)' }} className="hex-bg">
       <style>{CSS}</style>
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(to right,transparent,var(--cyan),transparent)', opacity: 0.4, pointerEvents: 'none', zIndex: 9999, animation: 'scan-line 8s linear infinite' }} />
       <Navbar store={store} domain={domain} />
@@ -436,6 +749,9 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
   const [listSearch, setListSearch] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
+  const currency = store?.currency || 'DZD';
 
   const itemsCartCount = useCartStore((state) => state.count);
   const initCount = useCartStore((state) => state.initCount);
@@ -452,14 +768,14 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
 
   useEffect(() => {
     if (searchQuery.length < 2) { setListSearch([]); return; }
-    const t = setTimeout(async () => {
+    const tmr = setTimeout(async () => {
       setLoading(true);
       try {
         const { data } = await axios.get(`${API_URL}/products/public/${domain}`, { params: { search: searchQuery } });
         setListSearch(data.products || []);
       } catch { } finally { setLoading(false); }
     }, 400);
-    return () => clearTimeout(t);
+    return () => clearTimeout(tmr);
   }, [searchQuery, domain]);
 
   const handleSearchSubmit = (e?: React.FormEvent) => {
@@ -477,12 +793,17 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
   }, []);
 
   const DropdownResults = () => (
-    <div style={{ position: 'absolute', top: '100%', right: 0, left: 0, maxWidth: '400px', background: 'rgba(10,22,40,0.98)', border: '1px solid var(--line)', borderRadius: '0 0 8px 8px', zIndex: 100, boxShadow: '0 10px 30px rgba(0,0,0,0.5)', marginTop: '4px', maxHeight: '300px', overflowY: 'auto' }}>
-      <button onClick={() => setSearchQuery('')} style={{ position: 'sticky', top: 0, float: 'left', margin: '6px', background: 'none', border: 'none', color: 'var(--mid)', cursor: 'pointer', lineHeight: 1 }}>
-        <X size={14} />
-      </button>
+    <div style={{ position: 'absolute', top: '100%', right: 0, left: 0, maxWidth: '400px', background: 'rgba(10,22,40,0.98)', border: '1px solid var(--line)', borderRadius: '0 0 8px 8px', zIndex: 100, boxShadow: '0 10px 30px rgba(0,0,0,0.5)', marginTop: '4px', maxHeight: '340px', overflowY: 'auto' }}>
+      <div style={{ position: 'sticky', top: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(0,212,255,0.06)', borderBottom: '1px solid var(--line)', backdropFilter: 'blur(8px)' }}>
+        <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', letterSpacing: '0.18em', color: 'var(--cyan)', textTransform: 'uppercase' }}>// SEARCH</span>
+        <button onClick={() => setSearchQuery('')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '22px', height: '22px', background: 'rgba(255,255,255,0.06)', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--mid)', cursor: 'pointer', transition: 'all 0.15s' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,42,109,0.15)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--pink)'; (e.currentTarget as HTMLElement).style.color = 'var(--pink)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--line)'; (e.currentTarget as HTMLElement).style.color = 'var(--mid)'; }}>
+          <X size={12} />
+        </button>
+      </div>
       {loading
-        ? <div style={{ padding: '15px', color: 'var(--cyan)', textAlign: 'center', fontSize: '12px' }}>جاري البحث...</div>
+        ? <div style={{ padding: '15px', color: 'var(--cyan)', textAlign: 'center', fontSize: '12px' }}>{t.searching}</div>
         : listSearch.length > 0 ? (
           <>
             {listSearch.map((p: any) => (
@@ -491,18 +812,18 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
                 <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} style={{ width: '40px', height: '40px', borderRadius: '4px', objectFit: 'cover', border: '1px solid var(--line)' }} alt="" />
                 <div style={{ flex: 1 }}>
                   <div style={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}>{p.name}</div>
-                  <div style={{ color: 'var(--cyan)', fontSize: '11px' }}>{p.price} دج</div>
+                  <div style={{ color: 'var(--cyan)', fontSize: '11px' }}>{p.price} {currency}</div>
                 </div>
               </Link>
             ))}
             <button
               onClick={() => handleSearchSubmit()}
               style={{ width: '100%', padding: '12px', background: 'rgba(0,255,255,0.05)', border: 'none', borderTop: '1px solid var(--line)', color: 'var(--cyan)', fontWeight: 700, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontFamily: "'Tajawal',sans-serif" }}>
-              عرض جميع النتائج <ArrowLeft size={14} />
+              {t.showAll} <ArrowLeft size={14} />
             </button>
           </>
         ) : searchQuery.length >= 2 && (
-          <div style={{ padding: '15px', color: 'var(--mid)', textAlign: 'center', fontSize: '12px' }}>لا توجد نتائج</div>
+          <div style={{ padding: '15px', color: 'var(--mid)', textAlign: 'center', fontSize: '12px' }}>{t.noResults}</div>
         )
       }
     </div>
@@ -515,7 +836,7 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
           {store.topBar.text}
         </div>
       )}
-      <nav dir="rtl" style={{ position: 'sticky', top: 0, zIndex: 50, background: scrolled ? 'rgba(5,11,26,0.97)' : 'rgba(5,11,26,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--line)', transition: 'all 0.3s' }}>
+      <nav dir={t.dir} style={{ position: 'sticky', top: 0, zIndex: 50, background: scrolled ? 'rgba(5,11,26,0.97)' : 'rgba(5,11,26,0.85)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--line)', transition: 'all 0.3s' }}>
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '15px' }}>
 
         {/* Logo */}
@@ -529,7 +850,7 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
         {/* Desktop Search */}
         <div className="nav-links" style={{ flex: 1, maxWidth: '400px', position: 'relative' }}>
           <form onSubmit={handleSearchSubmit} style={{ width: '100%', position: 'relative' }}>
-            <input type="text" placeholder="ابحث عن منتج..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+            <input type="text" placeholder={t.search} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
               style={{ width: '100%', padding: '8px 35px 8px 15px', borderRadius: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--line)', color: '#fff', outline: 'none', fontFamily: "'Tajawal',sans-serif" }} />
             <Search size={14} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--cyan)' }} />
           </form>
@@ -538,8 +859,8 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
 
         {/* Desktop Links */}
         <div className="nav-links" style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-          <Link href="/" style={{ color: 'var(--mid)', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>المتجر</Link>
-          <Link href="/contact" style={{ color: 'var(--mid)', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>تواصل معنا</Link>
+          <Link href="/" style={{ color: 'var(--mid)', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>{t.home}</Link>
+          <Link href="/contact" style={{ color: 'var(--mid)', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>{t.contact}</Link>
           {/* Cart Icon */}
           {store?.cart !== false && (
           <Link href="/cart" style={{ position: 'relative', color: 'var(--mid)', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '38px', height: '38px', border: '1px solid var(--line)', borderRadius: '6px', transition: 'all 0.2s' }}
@@ -549,7 +870,7 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
             {itemsCartCount > 0 && <span className="cart-badge">{itemsCartCount}</span>}
           </Link>
           )}
-          <a href="#products" className="btn-cyan" style={{ padding: '8px 18px', fontSize: '12px' }}>تسوق الآن</a>
+          <a href="#products" className="btn-cyan" style={{ padding: '8px 18px', fontSize: '12px' }}>{t.shopNow}</a>
         </div>
 
         {/* Mobile Toggle */}
@@ -571,7 +892,7 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
         <div style={{ padding: '10px 20px', background: 'var(--navy-2)', borderTop: '1px solid var(--line)' }}>
           <div style={{ maxWidth: '600px', margin: '0 auto', position: 'relative' }}>
             <form onSubmit={handleSearchSubmit}>
-              <input autoFocus type="text" placeholder="ابحث هنا..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+              <input autoFocus type="text" placeholder={t.search} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
                 style={{ width: '100%', padding: '12px 40px', borderRadius: '8px', background: '#000', border: '1px solid var(--cyan)', color: '#fff', fontFamily: "'Tajawal',sans-serif" }} />
               <Search size={18} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--cyan)' }} />
             </form>
@@ -584,10 +905,10 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
       <div style={{ maxHeight: open ? '240px' : '0', overflow: 'hidden', transition: 'all 0.3s', background: 'var(--navy-2)' }}>
         <div style={{ padding: '10px 20px' }}>
           <Link href="/" onClick={() => setOpen(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', color: '#fff', textDecoration: 'none', borderBottom: '1px solid var(--line)', fontSize: '15px' }}>
-            المتجر <ArrowLeft size={14} style={{ color: 'var(--cyan)' }} />
+            {t.home} <ArrowLeft size={14} style={{ color: 'var(--cyan)' }} />
           </Link>
           <Link href="/contact" onClick={() => setOpen(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', color: '#fff', textDecoration: 'none', fontSize: '15px' }}>
-            تواصل معنا <ArrowLeft size={14} style={{ color: 'var(--cyan)' }} />
+            {t.contact} <ArrowLeft size={14} style={{ color: 'var(--cyan)' }} />
           </Link>
         </div>
       </div>
@@ -608,11 +929,13 @@ export function Footer({ store }: any) {
   const yr = new Date().getFullYear();
   const cyan = 'var(--cyan)';
   const pink = 'var(--pink)';
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
   return (
-    <footer dir="rtl" style={{ backgroundColor: 'var(--navy-3)', borderTop: '2px solid var(--line)', fontFamily: "'Tajawal',sans-serif", marginTop: '80px', position: 'relative', overflow: 'hidden' }}>
+    <footer dir={t.dir} style={{ backgroundColor: 'var(--navy-3)', borderTop: '2px solid var(--line)', fontFamily: "'Tajawal',sans-serif", marginTop: '80px', position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', bottom: 0, left: 0, width: '300px', height: '300px', background: `radial-gradient(circle, ${cyan}05 0%, transparent 70%)`, pointerEvents: 'none' }} />
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '60px 20px 30px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '40px', paddingBottom: '40px', borderBottom: '1px solid var(--line)' }}>
+        <div className="footer-g" style={{ paddingBottom: '40px', borderBottom: '1px solid var(--line)' }}>
           <div style={{ gridColumn: 'span 2' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <div style={{ padding: '8px', border: `1px solid ${cyan}`, borderRadius: '4px', background: `${cyan}05` }}>
@@ -626,7 +949,7 @@ export function Footer({ store }: any) {
               </span>
             </div>
             <p style={{ fontSize: '15px', lineHeight: '1.8', color: 'var(--mid)', maxWidth: '300px' }}>
-              {store?.hero?.subtitle?.substring(0, 80) || 'وجهتك الأولى لعالم الألعاب والاحتراف في الجزائر. جودة أصلية وتوصيل سريع.'}
+              {store?.hero?.subtitle?.substring(0, 80) || t.footerDesc}
             </p>
             <div style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
               {['🎮', '🕹️', '👾', '🔥'].map((e, i) => (
@@ -639,8 +962,8 @@ export function Footer({ store }: any) {
             </div>
           </div>
           {[
-            { title: 'روابط سريعة', links: [['/', 'المتجر'], ['/cart', 'السلة'], ['/contact', 'الدعم الفني'], ['/Privacy', 'سياسة الخصوصية'], ['/Terms', 'شروط الاستخدام']] },
-            { title: 'تواصل معنا', links: [[`tel:${store.contact.phone}`, store.contact.phone], ['#', [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')], [`email:${store.contact.email}`, store.contact.email]] },
+            { title: t.quickLinks, links: [['/', t.footerHomeLink], ['/cart', t.cart], ['/contact', t.footerSupportLink], ['/Privacy', t.privacy], ['/Terms', t.terms]] },
+            { title: t.contactSect, links: [[`tel:${store.contact.phone}`, store.contact.phone], ['#', [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')], [`mailto:${store.contact.email}`, store.contact.email]] },
           ].map(col => (
             <div key={col.title}>
               <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '11px', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase', color: cyan, marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -650,8 +973,8 @@ export function Footer({ store }: any) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {col.links.map(([href, label]) => (
                   <a key={label} href={href} style={{ fontSize: '14px', color: 'var(--mid)', textDecoration: 'none', transition: 'all 0.3s', display: 'inline-block' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'white'; (e.currentTarget as HTMLElement).style.transform = 'translateX(-5px)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--mid)'; (e.currentTarget as HTMLElement).style.transform = 'translateX(0)'; }}>
+                    onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'white'; el.style.paddingInlineStart = '5px'; }}
+                    onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--mid)'; el.style.paddingInlineStart = '0'; }}>
                     {label}
                   </a>
                 ))}
@@ -660,7 +983,7 @@ export function Footer({ store }: any) {
           ))}
         </div>
         <div style={{ paddingTop: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
-          <p style={{ fontSize: '13px', color: 'var(--dim)' }}>© {yr} <span style={{ color: cyan }}>{store?.name}</span>. صُنع بكل شغف للألعاب.</p>
+          <p style={{ fontSize: '13px', color: 'var(--dim)' }}>© {yr} <span style={{ color: cyan }}>{store?.name}</span>. {t.footerTagline}</p>
           <span style={{ fontSize: '11px', color: 'var(--dim)', letterSpacing: '1px', textTransform: 'uppercase' }}>Gaming Engine 2.0</span>
         </div>
       </div>
@@ -702,7 +1025,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
             <span style={{ fontSize: '1.4rem', fontWeight: 900, color: 'white' }}>
               {price.toLocaleString()}
-              <span style={{ fontSize: '12px', fontWeight: 600, color: brandColor, marginRight: '4px' }}>دج</span>
+              <span style={{ fontSize: '12px', fontWeight: 600, color: brandColor, marginRight: '4px' }}>{store?.currency || 'DZD'}</span>
             </span>
             {orig > price && <span style={{ fontSize: '12px', color: 'var(--dim)', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
           </div>
@@ -721,22 +1044,26 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 export function Home({ store, page }: any) {
   const products: any[] = store.products || [];
   const cats: any[] = store.categories || [];
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
+  const currency = store?.currency || 'DZD';
 
   if (!page) {
     page = 1
   }
 
-  const trust = [
-    { icon: <Truck style={{ width: '20px', height: '20px' }} />, color: 'var(--cyan)', title: 'توصيل 58 ولاية', desc: 'توصيل سريع لكل الجزائر' },
-    { icon: <Shield style={{ width: '20px', height: '20px' }} />, color: 'var(--pink)', title: 'منتجات أصيلة 100%', desc: 'ضمان الجودة والأصالة' },
-    { icon: <Trophy style={{ width: '20px', height: '20px' }} />, color: 'var(--gold)', title: 'أفضل الأسعار', desc: 'أسعار تنافسية دائماً' },
-    { icon: <Zap style={{ width: '20px', height: '20px' }} />, color: 'var(--purple)', title: 'خدمة سريعة', desc: 'رد سريع على استفساراتك' },
+  const trustIcons = [
+    { icon: <Truck style={{ width: '20px', height: '20px' }} />, color: 'var(--cyan)' },
+    { icon: <Shield style={{ width: '20px', height: '20px' }} />, color: 'var(--pink)' },
+    { icon: <Trophy style={{ width: '20px', height: '20px' }} />, color: 'var(--gold)' },
+    { icon: <Zap style={{ width: '20px', height: '20px' }} />, color: 'var(--purple)' },
   ];
+  const trust = t.trustItems.map((item, i) => ({ ...item, ...trustIcons[i] }));
 
   const countPage = Math.ceil(store.count / 48);
 
   return (
-    <div dir="rtl">
+    <div dir={t.dir}>
       {/* ── HERO ── */}
       <section style={{ position: 'relative', minHeight: '92vh', display: 'flex', alignItems: 'center', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }} className="circuit-bg">
         {store.hero?.imageUrl && (
@@ -774,28 +1101,28 @@ export function Home({ store, page }: any) {
             })() : (
               /* العنوان الافتراضي في حال عدم وجود عنوان في المتجر */
               <h1 className="fu fu-1" style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(2.2rem,7vw,5.5rem)', lineHeight: 1.05, marginBottom: '16px', letterSpacing: '-0.01em', textShadow: '0 4px 20px rgba(0,0,0,0.5)' }}>
-                <span className="gold-shimmer">عالم الألعاب</span><br />
-                <span style={{ color: 'var(--white)' }}>بين </span>
-                <span className="neon-cyan">يديك</span>
+                <span className="gold-shimmer">{t.heroDefaultP1}</span><br />
+                <span style={{ color: 'var(--white)' }}>{t.heroDefaultP2} </span>
+                <span className="neon-cyan">{t.heroDefaultP3}</span>
               </h1>
             )
           }
           <NeonDivider color="cyan" />
           <p className="fu fu-2" style={{ fontSize: 'clamp(14px,2vw,18px)', lineHeight: '1.8', color: 'var(--white)', opacity: 0.9, marginBottom: '32px', maxWidth: '520px', fontWeight: 400, textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
-            {store.hero?.subtitle || 'كل ما تحتاجه للعب الاحترافي — PS5، Xbox، يدات التحكم، الألعاب وكل الإكسسوارات. توصيل لجميع ولايات الجزائر.'}
+            {store.hero?.subtitle || t.heroSubDefault}
           </p>
           <div className="fu fu-3" style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
             <a href="#products" className="btn-cyan" style={{ fontSize: '15px', padding: '14px 32px', textDecoration: 'none' }}>
-              <Gamepad2 style={{ width: '16px', height: '16px' }} /> تسوق الآن
+              <Gamepad2 style={{ width: '16px', height: '16px' }} /> {t.shopNow}
             </a>
             {store?.cart !== false && (
             <Link href="/cart" className="btn-ghost-c" style={{ fontSize: '14px', padding: '13px 28px', textDecoration: 'none' }}>
-              <ShoppingCart style={{ width: '15px', height: '15px' }} /> السلة
+              <ShoppingCart style={{ width: '15px', height: '15px' }} /> {t.cartLink}
             </Link>
             )}
           </div>
           <div style={{ display: 'flex', gap: '32px', marginTop: '48px', paddingTop: '32px', borderTop: '1px solid var(--line)', flexWrap: 'wrap' }}>
-            {[{ n: `${products.length}+`, l: 'منتج متاح', c: 'var(--cyan)' }, { n: '58', l: 'ولاية توصيل', c: 'var(--pink)' }, { n: '100%', l: 'منتجات أصيلة', c: 'var(--gold)' }].map((s, i) => (
+            {[{ n: `${products.length}+`, l: t.statProducts, c: 'var(--cyan)' }, { n: '58', l: t.stat58, c: 'var(--pink)' }, { n: '100%', l: t.statOriginal, c: 'var(--gold)' }].map((s, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
                 <p className="orb" style={{ fontSize: '2rem', fontWeight: 900, color: s.c, lineHeight: 1, margin: 0, textShadow: `0 0 16px ${s.c}80` }}>{s.n}</p>
                 <p style={{ fontSize: '12px', color: 'var(--white)', opacity: 0.7, margin: '4px 0 0', fontWeight: 500 }}>{s.l}</p>
@@ -831,11 +1158,11 @@ export function Home({ store, page }: any) {
               <div>
                 <div style={{ display: 'inline-block', padding: '4px 12px', backgroundColor: 'rgba(0,212,255,0.1)', border: '1px solid var(--cyan)', borderRadius: '4px', fontSize: '10px', fontWeight: 800, color: 'var(--cyan)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '12px' }}>EXPLORE</div>
                 <h2 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(1.8rem,4vw,2.8rem)', color: 'var(--white)', margin: 0 }}>
-                  تسوق حسب <span className="neon-pink">الفئة</span>
+                  {t.categoriesTitle} <span className="neon-pink">{t.categoriesHighlight}</span>
                 </h2>
               </div>
               <Link href="/" style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cyan)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                عرض كل الفئات
+                {t.allCats}
                 <div style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid var(--cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <ArrowLeft style={{ width: '14px', height: '14px' }} />
                 </div>
@@ -871,9 +1198,9 @@ export function Home({ store, page }: any) {
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px' }}>
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '32px' }}>
             <div>
-              <div className="slabel" style={{ marginBottom: '10px' }}>المنتجات</div>
+              <div className="slabel" style={{ marginBottom: '10px' }}>{t.productsLabel}</div>
               <h2 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(1.6rem,3vw,2.4rem)', color: 'var(--white)', margin: 0 }}>
-                كل <span className="neon-cyan">المنتجات</span>
+                {t.productsTitle} <span className="neon-cyan">{t.productsHighlight}</span>
               </h2>
             </div>
             <p style={{ fontSize: '13px', color: 'var(--dim)' }}>{countPage} / {page} منتج</p>
@@ -881,13 +1208,13 @@ export function Home({ store, page }: any) {
           {products.length === 0
             ? <div style={{ padding: '80px 0', textAlign: 'center', border: '1px solid var(--line)', borderRadius: '8px', background: 'var(--panel)' }}>
               <Gamepad2 style={{ width: '56px', height: '56px', color: 'var(--dim)', margin: '0 auto 16px' }} />
-              <p style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--mid)' }}>المنتجات قادمة قريباً...</p>
+              <p style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--mid)' }}>{t.noProductsComing}</p>
             </div>
             : <div className="prod-grid">
               {products.map((p: any) => {
                 const img = p.productImage || p.imagesProduct?.[0]?.imageUrl || store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' || '/fallback-image.png';
                 const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
-                return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="عرض المنتج" />;
+                return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails={t.viewDetails} />;
               })}
             </div>
           }
@@ -952,20 +1279,20 @@ export function Home({ store, page }: any) {
         <div style={{ position: 'relative', zIndex: 2, maxWidth: '640px', margin: '0 auto' }}>
           <NeonDivider color="pink" />
           <div style={{ margin: '24px 0' }}>
-            <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '11px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--pink)', marginBottom: '14px' }}>// توصيل لكل الجزائر</p>
+            <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '11px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--pink)', marginBottom: '14px' }}>{t.ctaEyebrow}</p>
             <h2 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(1.8rem,5vw,3.5rem)', color: 'var(--white)', lineHeight: 1.05, marginBottom: '16px' }}>
-              توصيل <span className="neon-cyan">58 ولاية</span>
+              {t.ctaTitle} <span className="neon-cyan">{t.ctaHighlight}</span>
             </h2>
             <p style={{ fontSize: '15px', lineHeight: '1.8', color: 'var(--mid)', marginBottom: '28px' }}>
-              الجزائر بلدية اولاد فايت بلاطو قرب مسجد ابوبكر الصديق
+              {[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')}
             </p>
           </div>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="#products" className="btn-cyan" style={{ fontSize: '14px', padding: '13px 30px' }}>
-              <Gamepad2 style={{ width: '15px', height: '15px' }} /> تسوق الآن
+              <Gamepad2 style={{ width: '15px', height: '15px' }} /> {t.shopNow}
             </a>
             <Link href="/contact" className="btn-pink" style={{ fontSize: '14px', padding: '13px 30px', textDecoration: 'none' }}>
-              <Phone style={{ width: '15px', height: '15px' }} /> تواصل معنا
+              <Phone style={{ width: '15px', height: '15px' }} /> {t.ctaContactBtn}
             </Link>
           </div>
           <NeonDivider color="cyan" />
@@ -976,10 +1303,13 @@ export function Home({ store, page }: any) {
 }
 
 /* ── DETAILS ────────────────────────────────────────────────── */
-export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, isRTL }: any) {
+export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
   const [sel, setSel] = useState(0);
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
+  const currency = store?.currency || 'DZD';
   return (
-    <div dir="rtl" style={{ backgroundColor: 'var(--navy)' }}>
+    <div dir={t.dir} style={{ backgroundColor: 'var(--navy)' }}>
      
 
       <div className="details-g" style={{ maxWidth: '1280px', margin: '0 auto' }}>
@@ -1020,7 +1350,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
         {/* Info */}
         <div className="details-R">
           <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', padding: '24px', marginTop: '24px' }}>
-            <div className="slabel" style={{ marginBottom: '10px' }}>تفاصيل المنتج</div>
+            <div className="slabel" style={{ marginBottom: '10px' }}>{t.detailsLabel}</div>
             <h1 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(1.4rem,3vw,2.2rem)', color: 'var(--white)', lineHeight: 1.15, marginBottom: '14px' }}>{product.name}</h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px', paddingBottom: '20px', borderBottom: '1px solid var(--line)', flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', gap: '2px' }}>
@@ -1034,15 +1364,15 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
 
             {/* Price */}
             <div style={{ marginBottom: '20px', padding: '16px', background: 'var(--navy-3)', borderRadius: '6px', border: '1px solid var(--line)' }}>
-              <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--mid)', letterSpacing: '0.16em', margin: '0 0 6px', textTransform: 'uppercase' }}>السعر</p>
+              <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--mid)', letterSpacing: '0.16em', margin: '0 0 6px', textTransform: 'uppercase' }}>{t.priceLabel}</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
                 <span className="neon-cyan orb" style={{ fontSize: '2.4rem', fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1 }}>{finalPrice.toLocaleString()}</span>
-                <span style={{ fontSize: '15px', color: 'var(--mid)' }}>دج</span>
+                <span style={{ fontSize: '15px', color: 'var(--mid)' }}>{currency}</span>
                 {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
                   <>
                     <span style={{ fontSize: '14px', textDecoration: 'line-through', color: 'var(--dim)' }}>{parseFloat(product.priceOriginal).toLocaleString()}</span>
                     <span style={{ fontSize: '11px', background: 'var(--pink)', color: 'var(--white)', padding: '2px 8px', borderRadius: '3px', fontWeight: 700 }}>
-                      وفّر {(parseFloat(product.priceOriginal) - finalPrice).toLocaleString()} دج
+                      {t.saveLabel} {(parseFloat(product.priceOriginal) - finalPrice).toLocaleString()} {currency}
                     </span>
                   </>
                 )}
@@ -1052,7 +1382,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             {/* Offers */}
             {product.offers?.length > 0 && (
               <div style={{ marginBottom: '20px', paddingBottom: '20px', borderBottom: '1px solid var(--line)' }}>
-                <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '10px', textTransform: 'uppercase' }}>الباقات</p>
+                <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '10px', textTransform: 'uppercase' }}>{t.offersLabel}</p>
                 {product.offers.map((offer: any) => (
                   <label key={offer.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', border: `1px solid ${selectedOffer === offer.id ? 'var(--cyan)' : 'var(--line)'}`, cursor: 'pointer', marginBottom: '8px', borderRadius: '6px', transition: 'all 0.2s', backgroundColor: selectedOffer === offer.id ? 'rgba(0,212,255,0.05)' : 'transparent', boxShadow: selectedOffer === offer.id ? 'var(--glow-c)' : 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1062,11 +1392,11 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                       <input type="radio" name="offer" value={offer.id} checked={selectedOffer === offer.id} onChange={() => setSelectedOffer(offer.id)} style={{ display: 'none' }} />
                       <div>
                         <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--white)', margin: 0 }}>{offer.name}</p>
-                        <p style={{ fontSize: '11px', color: 'var(--mid)', margin: 0 }}>الكمية: {offer.quantity}</p>
+                        <p style={{ fontSize: '11px', color: 'var(--mid)', margin: 0 }}>{t.qtyLabel}: {offer.quantity}</p>
                       </div>
                     </div>
                     <span className="neon-cyan orb" style={{ fontSize: '1.1rem', fontWeight: 900, textShadow: 'none' }}>
-                      {offer.price.toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '11px', color: 'var(--mid)' }}>دج</span>
+                      {offer.price.toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '11px', color: 'var(--mid)' }}>{currency}</span>
                     </span>
                   </label>
                 ))}
@@ -1093,11 +1423,11 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
               </div>
             ))}
 
-            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
+            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store} />
 
             {product.desc && (
               <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
-                <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '12px', textTransform: 'uppercase' }}>وصف المنتج</p>
+                <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '12px', textTransform: 'uppercase' }}>{t.descLabel}</p>
                 <div style={{ fontSize: '14px', lineHeight: '1.8', color: 'var(--mid)' }}
                   dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc, { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'span'], ALLOWED_ATTR: ['class', 'style'] }) }} />
               </div>
@@ -1120,8 +1450,11 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
   </div>
 );
 
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0 }: ProductFormProps) {
+export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0, store }: ProductFormProps) {
   const router = useRouter();
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
+  const currency = store?.currency || 'DZD';
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLC] = useState(false);
@@ -1154,10 +1487,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const total = () => fp * fd.quantity + +getLiv();
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!fd.customerName.trim()) e.customerName = 'الاسم مطلوب';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
-    if (!fd.customerWelaya) e.customerWelaya = 'الولاية مطلوبة';
-    if (!fd.customerCommune) e.customerCommune = 'البلدية مطلوبة';
+    if (!fd.customerName.trim()) e.customerName = t.errName;
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
+    if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
+    if (!fd.customerCommune) e.customerCommune = t.errCommune;
     return e;
   };
   const getVariantDetailId = useCallback(() => {
@@ -1193,7 +1526,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   };
 
   return (
-    <div style={{ direction: 'rtl', marginTop: '20px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
+    <div style={{ direction: isRTL ? 'rtl' : 'ltr', marginTop: '20px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
 
       {/* ── أزرار السلة / الطلب المباشر ── */}
         {product.store.cart && (
@@ -1214,12 +1547,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             {isAdded ? (
               <>
                 <CheckCircle2 size={17} className="animate-check" />
-                <span className="animate-check">تمت الإضافة!</span>
+                <span className="animate-check">{t.addedShort}</span>
               </>
             ) : (
               <>
                 <ShoppingCart size={17} />
-                <span>أضف للسلة</span>
+                <span>{t.addToCartShort}</span>
               </>
             )}
           </button>
@@ -1238,7 +1571,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 24px rgba(255,45,138,0.6)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 16px rgba(255,45,138,0.3)'; }}>
             <Zap size={17} />
-            طلب الآن
+            {t.orderNowBtn}
           </button>
         </div>
       )}
@@ -1248,84 +1581,84 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         <div style={{ animation: 'fadeIn 0.3s ease-in-out' }}>
           {product.store.cart && (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', margin: 0 }}>// بيانات التوصيل</p>
+              <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', margin: 0 }}>{t.deliveryInfoTitle}</p>
               <button onClick={() => setIsOrderNow(false)} style={{ background: 'none', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--mid)', cursor: 'pointer', padding: '4px 10px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <X size={12} /> إلغاء
+                <X size={12} /> {t.cancel}
               </button>
             </div>
           )}
           <form onSubmit={handleSubmit}>
             <div className="form-2c">
-              <FR error={errors.customerName} label="الاسم">
+              <FR error={errors.customerName} label={t.fullName}>
                 <div style={{ position: 'relative' }}>
-                  <User style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
-                  <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder="الاسم الكامل"
-                    className={`inp${errors.customerName ? ' inp-err' : ''}`} style={{ paddingLeft: '36px' }}
+                  <User style={{ position: 'absolute', ...(isRTL ? { right: '12px' } : { left: '12px' }), top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
+                  <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder={t.fullNamePh}
+                    className={`inp${errors.customerName ? ' inp-err' : ''}`} style={{ paddingInlineStart: '36px' }}
                     onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.customerName ? 'var(--pink)' : 'var(--dim)'; }} />
                 </div>
               </FR>
-              <FR error={errors.customerPhone} label="الهاتف">
+              <FR error={errors.customerPhone} label={t.phone}>
                 <div style={{ position: 'relative' }}>
-                  <Phone style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
-                  <input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} placeholder="0X XX XX XX XX"
-                    className={`inp${errors.customerPhone ? ' inp-err' : ''}`} style={{ paddingLeft: '36px' }}
+                  <Phone style={{ position: 'absolute', ...(isRTL ? { right: '12px' } : { left: '12px' }), top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
+                  <input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} placeholder={t.phonePh}
+                    className={`inp${errors.customerPhone ? ' inp-err' : ''}`} style={{ paddingInlineStart: '36px' }}
                     onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.customerPhone ? 'var(--pink)' : 'var(--dim)'; }} />
                 </div>
               </FR>
             </div>
             <div className="form-2c">
-              <FR error={errors.customerWelaya} label="الولاية">
+              <FR error={errors.customerWelaya} label={t.wilaya}>
                 <div style={{ position: 'relative' }}>
-                  <ChevronDown style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
+                  <ChevronDown style={{ position: 'absolute', ...(isRTL ? { left: '12px' } : { right: '12px' }), top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
                   <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}
-                    className={`inp${errors.customerWelaya ? ' inp-err' : ''}`} style={{ paddingRight: '34px' }}
+                    className={`inp${errors.customerWelaya ? ' inp-err' : ''}`} style={{ paddingInlineEnd: '34px' }}
                     onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.customerWelaya ? 'var(--pink)' : 'var(--dim)'; }}>
-                    <option value="">اختر الولاية</option>
+                    <option value="">{t.wilayaPh}</option>
                     {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
-              <FR error={errors.customerCommune} label="البلدية">
+              <FR error={errors.customerCommune} label={t.commune}>
                 <div style={{ position: 'relative' }}>
-                  <ChevronDown style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
+                  <ChevronDown style={{ position: 'absolute', ...(isRTL ? { left: '12px' } : { right: '12px' }), top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
                   <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })}
-                    className={`inp${errors.customerCommune ? ' inp-err' : ''}`} style={{ paddingRight: '34px', opacity: !fd.customerWelaya ? 0.4 : 1 }}
+                    className={`inp${errors.customerCommune ? ' inp-err' : ''}`} style={{ paddingInlineEnd: '34px', opacity: !fd.customerWelaya ? 0.4 : 1 }}
                     onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.customerCommune ? 'var(--pink)' : 'var(--dim)'; }}>
-                    <option value="">{loadingC ? '...' : 'اختر البلدية'}</option>
+                    <option value="">{loadingC ? '...' : t.communePh}</option>
                     {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
             </div>
 
-            <FR label="طريقة التوصيل">
+            <FR label={t.deliveryType}>
               <div className="dlv-2c">
-                {(['home', 'office'] as const).map(type => (
-                  <button key={type} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: type }))}
-                    style={{ padding: '12px 10px', border: `1px solid ${fd.typeLivraison === type ? 'var(--cyan)' : 'var(--line)'}`, backgroundColor: fd.typeLivraison === type ? 'rgba(0,212,255,0.06)' : 'transparent', cursor: 'pointer', textAlign: 'right', borderRadius: '6px', transition: 'all 0.2s', boxShadow: fd.typeLivraison === type ? 'var(--glow-c)' : 'none' }}>
-                    <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', color: fd.typeLivraison === type ? 'var(--cyan)' : 'var(--mid)', margin: '0 0 4px', textTransform: 'uppercase' }}>
-                      {type === 'home' ? 'للبيت' : 'للمكتب'}
+                {(['home', 'office'] as const).map(dtype => (
+                  <button key={dtype} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: dtype }))}
+                    style={{ padding: '12px 10px', border: `1px solid ${fd.typeLivraison === dtype ? 'var(--cyan)' : 'var(--line)'}`, backgroundColor: fd.typeLivraison === dtype ? 'rgba(0,212,255,0.06)' : 'transparent', cursor: 'pointer', textAlign: isRTL ? 'right' : 'left', borderRadius: '6px', transition: 'all 0.2s', boxShadow: fd.typeLivraison === dtype ? 'var(--glow-c)' : 'none' }}>
+                    <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', color: fd.typeLivraison === dtype ? 'var(--cyan)' : 'var(--mid)', margin: '0 0 4px', textTransform: 'uppercase' }}>
+                      {dtype === 'home' ? t.deliveryHome : t.deliveryOffice}
                     </p>
-                    {selW && <p className="orb" style={{ fontSize: '1rem', fontWeight: 900, color: fd.typeLivraison === type ? 'var(--cyan)' : 'var(--dim)', margin: 0 }}>
-                      {(type === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()}
-                      <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '11px', marginRight: '3px', color: 'var(--mid)' }}>دج</span>
+                    {selW && <p className="orb" style={{ fontSize: '1rem', fontWeight: 900, color: fd.typeLivraison === dtype ? 'var(--cyan)' : 'var(--dim)', margin: 0 }}>
+                      {(dtype === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()}
+                      <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '11px', marginInlineStart: '3px', color: 'var(--mid)' }}>{currency}</span>
                     </p>}
                   </button>
                 ))}
               </div>
             </FR>
 
-            <FR label="الكمية">
+            <FR label={t.qty}>
               <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid var(--line)', borderRadius: '6px', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }}>
                 <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
-                  style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderLeft: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.18s' }}
+                  style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderInlineEnd: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.18s' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
                   <Minus style={{ width: '12px', height: '12px' }} />
                 </button>
                 <span className="orb" style={{ width: '44px', textAlign: 'center', fontSize: '1.1rem', fontWeight: 900, color: 'var(--white)' }}>{fd.quantity}</span>
                 <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))}
-                  style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderRight: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.18s' }}
+                  style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderInlineStart: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.18s' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
                   <Plus style={{ width: '12px', height: '12px' }} />
@@ -1337,13 +1670,13 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <div style={{ border: '1px solid var(--line)', borderRadius: '6px', marginBottom: '14px', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }}>
               <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,212,255,0.05)' }}>
                 <Package style={{ width: '13px', height: '13px', color: 'var(--cyan)' }} />
-                <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.18em', color: 'var(--cyan)', textTransform: 'uppercase' }}>ملخص الطلب</span>
+                <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.18em', color: 'var(--cyan)', textTransform: 'uppercase' }}>{t.orderSummary}</span>
               </div>
               {[
-                { l: 'المنتج', v: product.name.slice(0, 22) },
-                { l: 'السعر', v: `${fp.toLocaleString()} دج` },
-                { l: 'الكمية', v: `× ${fd.quantity}` },
-                { l: 'التوصيل', v: selW ? `${getLiv().toLocaleString()} دج` : '—' },
+                { l: t.productLabel, v: product.name.slice(0, 22) },
+                { l: t.price, v: `${fp.toLocaleString()} ${currency}` },
+                { l: t.qty, v: `× ${fd.quantity}` },
+                { l: t.delivery, v: selW ? `${getLiv().toLocaleString()} ${currency}` : '—' },
               ].map(row => (
                 <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 14px', borderBottom: '1px solid var(--line)' }}>
                   <span style={{ fontSize: '12px', color: 'var(--mid)' }}>{row.l}</span>
@@ -1351,19 +1684,19 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 </div>
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '12px 14px', background: 'rgba(0,212,255,0.04)' }}>
-                <span style={{ fontSize: '12px', color: 'var(--mid)' }}>المجموع</span>
+                <span style={{ fontSize: '12px', color: 'var(--mid)' }}>{t.total}</span>
                 <span className="neon-cyan orb" style={{ fontSize: '1.6rem', fontWeight: 900, letterSpacing: '-0.01em' }}>
-                  {total().toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '12px', color: 'var(--mid)' }}>دج</span>
+                  {total().toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '12px', color: 'var(--mid)' }}>{currency}</span>
                 </span>
               </div>
             </div>
 
             <button type="submit" disabled={sub} className="btn-cyan"
               style={{ width: '100%', justifyContent: 'center', fontSize: '15px', padding: '13px', cursor: sub ? 'not-allowed' : 'pointer', opacity: sub ? 0.7 : 1, clipPath: 'none', borderRadius: '6px' }}>
-              {sub ? '⚡ جاري المعالجة...' : '✅ تأكيد الطلب'}
+              {sub ? `⚡ ${t.sending}` : `✅ ${t.confirmOrder}`}
             </button>
             <p style={{ fontSize: '11px', color: 'var(--dim)', textAlign: 'center', marginTop: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
-              <Lock style={{ width: '10px', height: '10px', color: 'var(--cyan)' }} /> دفع آمن ومشفر
+              <Lock style={{ width: '10px', height: '10px', color: 'var(--cyan)' }} /> {t.securePay}
             </p>
           </form>
         </div>
@@ -1383,6 +1716,9 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const [fd, setFd] = useState({ customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '', typeLivraison: 'home' as 'home' | 'office' });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const initCount = useCartStore((state) => state.initCount);
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
+  const currency = store?.currency || 'DZD';
 
   useEffect(() => {
     const saved = localStorage.getItem(domain);
@@ -1407,10 +1743,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!fd.customerName.trim()) e.name = 'الاسم مطلوب';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.phone = 'رقم هاتف غير صالح (مثال: 0550123456)';
-    if (!fd.customerWelaya) e.welaya = 'الولاية مطلوبة';
-    if (!fd.customerCommune) e.commune = 'البلدية مطلوبة';
+    if (!fd.customerName.trim()) e.name = t.errName;
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.phone = t.errPhoneInvalid;
+    if (!fd.customerWelaya) e.welaya = t.errWilaya;
+    if (!fd.customerCommune) e.commune = t.errCommune;
     setErrors(e); return Object.keys(e).length === 0;
   };
 
@@ -1436,7 +1772,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   /* ── Success ── */
   if (success) {
     return (
-      <div dir="rtl" style={{
+      <div dir={t.dir} style={{
         minHeight: '70vh',
         display: 'flex',
         alignItems: 'center',
@@ -1449,10 +1785,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             <CheckCircle2 size={40} style={{ color: 'var(--cyan)' }} />
           </div>
           <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--pink)', letterSpacing: '0.2em', marginBottom: '12px', textTransform: 'uppercase' }}>// ORDER CONFIRMED</p>
-          <h2 className="orb" style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--white)', marginBottom: '10px' }}>تم استلام طلبك!</h2>
-          <p style={{ color: 'var(--mid)', fontSize: '14px', lineHeight: '1.7', marginBottom: '28px' }}>شكراً لثقتك. سنتصل بك قريباً لتأكيد الطلب وترتيب التوصيل 🎮</p>
+          <h2 className="orb" style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--white)', marginBottom: '10px' }}>{t.successTitle}</h2>
+          <p style={{ color: 'var(--mid)', fontSize: '14px', lineHeight: '1.7', marginBottom: '28px' }}>{t.successDesc}</p>
           <Link href="/" className="btn-cyan" style={{ textDecoration: 'none', justifyContent: 'center' }}>
-            <Gamepad2 size={16} /> العودة للمتجر
+            <Gamepad2 size={16} /> {t.backToShop}
           </Link>
         </div>
       </div>
@@ -1462,7 +1798,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   /* ── Empty ── */
   if (cartItems.length === 0) {
     return (
-      <div dir="rtl" style={{
+      <div dir={t.dir} style={{
         minHeight: '60vh',
         display: 'flex',
         alignItems: 'center',
@@ -1473,10 +1809,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         <div className="fu fu-1" style={{ textAlign: 'center', background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '12px', padding: '60px 40px', maxWidth: '420px', width: '100%' }}>
           <ShoppingBag size={56} style={{ color: 'var(--dim)', margin: '0 auto 20px', display: 'block', opacity: 0.5 }} />
           <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.2em', marginBottom: '10px' }}>// EMPTY CART</p>
-          <h3 className="orb" style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--white)', marginBottom: '16px' }}>السلة فارغة</h3>
-          <p style={{ color: 'var(--mid)', fontSize: '14px', marginBottom: '24px' }}>أضف بعض المنتجات للبدء بالتسوق</p>
+          <h3 className="orb" style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--white)', marginBottom: '16px' }}>{t.cartEmpty}</h3>
+          <p style={{ color: 'var(--mid)', fontSize: '14px', marginBottom: '24px' }}>{t.cartEmptyDesc}</p>
           <Link href="/" className="btn-cyan" style={{ textDecoration: 'none', justifyContent: 'center' }}>
-            <Gamepad2 size={16} /> تسوق الآن
+            <Gamepad2 size={16} /> {t.shopNow}
           </Link>
         </div>
       </div>
@@ -1484,8 +1820,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   }
 
   return (
-    <div dir="rtl" style={{
-      minHeight: '100vh',
+    <div dir={t.dir} style={{
       padding: '32px 20px 80px',
       background: 'var(--navy)'
     }}>
@@ -1494,7 +1829,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         <div className="fu" style={{ marginBottom: '32px' }}>
           <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--pink)', letterSpacing: '0.2em', marginBottom: '8px', textTransform: 'uppercase' }}>// SHOPPING CART</p>
           <h1 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(1.8rem,4vw,2.8rem)', color: 'var(--white)', margin: 0 }}>
-            سلة <span className="neon-cyan">التسوق</span>
+            {t.cartTitle} <span className="neon-cyan">{t.cartHighlight}</span>
           </h1>
           <NeonDivider color="cyan" />
         </div>
@@ -1524,27 +1859,27 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: 'var(--white)', lineHeight: 1.4 }}>{item.product?.name}</h4>
                     {item.selectedOffer && <p style={{ margin: 0, fontSize: '11px', color: 'var(--mid)' }}>الباقة: {item.selectedOffer}</p>}
                     <p className="neon-cyan orb" style={{ fontSize: '1.1rem', fontWeight: 900, margin: 0 }}>
-                      {item.finalPrice?.toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '12px', color: 'var(--mid)' }}>دج</span>
+                      {item.finalPrice?.toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '12px', color: 'var(--mid)' }}>{currency}</span>
                     </p>
                     {/* Qty + Delete */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: 'auto' }}>
                       <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid var(--line)', borderRadius: '4px', overflow: 'hidden', background: 'var(--navy-3)' }}>
-                        <button onClick={() => changeQty(index, -1)} style={{ width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderLeft: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.15s' }}
+                        <button onClick={() => changeQty(index, -1)} style={{ width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderInlineEnd: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.15s' }}
                           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
                           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
                           <Minus size={12} />
                         </button>
                         <span className="orb" style={{ width: '38px', textAlign: 'center', fontSize: '14px', fontWeight: 900, color: 'var(--white)' }}>{item.quantity}</span>
-                        <button onClick={() => changeQty(index, 1)} style={{ width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderRight: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.15s' }}
+                        <button onClick={() => changeQty(index, 1)} style={{ width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderInlineStart: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.15s' }}
                           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
                           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
                           <Plus size={12} />
                         </button>
                       </div>
-                      <button onClick={() => removeItem(index)} style={{ marginRight: 'auto', background: 'transparent', border: '1px solid rgba(255,68,68,0.3)', borderRadius: '4px', color: 'var(--red)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', fontWeight: 600, padding: '5px 10px', transition: 'all 0.2s' }}
+                      <button onClick={() => removeItem(index)} style={{ marginInlineStart: 'auto', background: 'transparent', border: '1px solid rgba(255,68,68,0.3)', borderRadius: '4px', color: 'var(--red)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', fontWeight: 600, padding: '5px 10px', transition: 'all 0.2s' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,68,68,0.1)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--red)'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,68,68,0.3)'; }}>
-                        <Trash2 size={13} /> حذف
+                        <Trash2 size={13} /> {t.deleteLabel}
                       </button>
                     </div>
                   </div>
@@ -1553,8 +1888,8 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 
               {/* Subtotal */}
               <div style={{ padding: '16px 20px', background: 'rgba(0,212,255,0.04)', borderTop: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--mid)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>المجموع الفرعي</span>
-                <span className="neon-cyan orb" style={{ fontSize: '1.3rem', fontWeight: 900 }}>{cartTotal.toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif'", fontSize: '12px', fontWeight: 400, color: 'var(--mid)' }}>دج</span></span>
+                <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--mid)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{t.subtotal}</span>
+                <span className="neon-cyan orb" style={{ fontSize: '1.3rem', fontWeight: 900 }}>{cartTotal.toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif'", fontSize: '12px', fontWeight: 400, color: 'var(--mid)' }}>{currency}</span></span>
               </div>
             </div>
           </div>
@@ -1565,17 +1900,17 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               {/* Header */}
               <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--line)', background: 'rgba(0,212,255,0.04)', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Truck size={18} style={{ color: 'var(--cyan)' }} />
-                <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.16em', color: 'var(--cyan)', textTransform: 'uppercase' }}>معلومات التوصيل</span>
+                <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.16em', color: 'var(--cyan)', textTransform: 'uppercase' }}>{t.deliveryInfoTitle}</span>
               </div>
 
               <form onSubmit={handleSubmit} style={{ padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {/* الاسم */}
                 <div>
-                  <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '6px' }}>الاسم الكامل *</p>
+                  <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '6px' }}>{t.fullName} *</p>
                   <div style={{ position: 'relative' }}>
-                    <User size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
+                    <User size={14} style={{ position: 'absolute', ...(isRTL ? { right: '12px' } : { left: '12px' }), top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
                     <input type="text" value={fd.customerName} onChange={e => { setFd({ ...fd, customerName: e.target.value }); if (errors.name) setErrors({ ...errors, name: '' }); }}
-                      placeholder="الاسم الكامل" className={`inp${errors.name ? ' inp-err' : ''}`} style={{ paddingLeft: '36px' }}
+                      placeholder={t.fullNamePh} className={`inp${errors.name ? ' inp-err' : ''}`} style={{ paddingInlineStart: '36px' }}
                       onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.name ? 'var(--pink)' : 'var(--dim)'; }} />
                   </div>
                   {errors.name && <p style={{ fontSize: '11px', color: 'var(--pink)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}><AlertCircle size={11} /> {errors.name}</p>}
@@ -1583,11 +1918,11 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 
                 {/* الهاتف */}
                 <div>
-                  <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '6px' }}>رقم الهاتف *</p>
+                  <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '6px' }}>{t.phone} *</p>
                   <div style={{ position: 'relative' }}>
-                    <Phone size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
+                    <Phone size={14} style={{ position: 'absolute', ...(isRTL ? { right: '12px' } : { left: '12px' }), top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
                     <input type="tel" value={fd.customerPhone} onChange={e => { setFd({ ...fd, customerPhone: e.target.value }); if (errors.phone) setErrors({ ...errors, phone: '' }); }}
-                      placeholder="0XXXXXXXXX" className={`inp${errors.phone ? ' inp-err' : ''}`} style={{ paddingLeft: '36px' }}
+                      placeholder={t.phonePh} className={`inp${errors.phone ? ' inp-err' : ''}`} style={{ paddingInlineStart: '36px' }}
                       onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.phone ? 'var(--pink)' : 'var(--dim)'; }} />
                   </div>
                   {errors.phone && <p style={{ fontSize: '11px', color: 'var(--pink)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}><AlertCircle size={11} /> {errors.phone}</p>}
@@ -1596,26 +1931,26 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 {/* الولاية + البلدية */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div>
-                    <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '6px' }}>الولاية *</p>
+                    <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '6px' }}>{t.wilaya} *</p>
                     <div style={{ position: 'relative' }}>
-                      <ChevronDown size={13} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
+                      <ChevronDown size={13} style={{ position: 'absolute', ...(isRTL ? { left: '12px' } : { right: '12px' }), top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
                       <select value={fd.customerWelaya} onChange={e => { setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' }); if (errors.welaya) setErrors({ ...errors, welaya: '' }); }}
-                        className={`inp${errors.welaya ? ' inp-err' : ''}`} style={{ paddingRight: '34px' }}
+                        className={`inp${errors.welaya ? ' inp-err' : ''}`} style={{ paddingInlineEnd: '34px' }}
                         onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.welaya ? 'var(--pink)' : 'var(--dim)'; }}>
-                        <option value="">الولاية</option>
+                        <option value="">{t.wilayaPh}</option>
                         {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                       </select>
                     </div>
                     {errors.welaya && <p style={{ fontSize: '11px', color: 'var(--pink)', marginTop: '4px' }}>{errors.welaya}</p>}
                   </div>
                   <div>
-                    <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '6px' }}>البلدية *</p>
+                    <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '6px' }}>{t.commune} *</p>
                     <div style={{ position: 'relative' }}>
-                      <ChevronDown size={13} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
+                      <ChevronDown size={13} style={{ position: 'absolute', ...(isRTL ? { left: '12px' } : { right: '12px' }), top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
                       <select value={fd.customerCommune} disabled={loadingC || !fd.customerWelaya} onChange={e => { setFd({ ...fd, customerCommune: e.target.value }); if (errors.commune) setErrors({ ...errors, commune: '' }); }}
-                        className={`inp${errors.commune ? ' inp-err' : ''}`} style={{ paddingRight: '34px', opacity: !fd.customerWelaya ? 0.4 : 1 }}
+                        className={`inp${errors.commune ? ' inp-err' : ''}`} style={{ paddingInlineEnd: '34px', opacity: !fd.customerWelaya ? 0.4 : 1 }}
                         onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.commune ? 'var(--pink)' : 'var(--dim)'; }}>
-                        <option value="">{loadingC ? '...' : !fd.customerWelaya ? 'الولاية أولاً' : 'البلدية'}</option>
+                        <option value="">{loadingC ? '...' : !fd.customerWelaya ? t.communeFirstSelect : t.communePh}</option>
                         {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                       </select>
                     </div>
@@ -1625,16 +1960,16 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 
                 {/* نوع التوصيل */}
                 <div>
-                  <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '8px' }}>نوع التوصيل</p>
+                  <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '8px' }}>{t.deliveryType}</p>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                    {(['home', 'office'] as const).map(type => (
-                      <button key={type} type="button" onClick={() => setFd({ ...fd, typeLivraison: type })}
-                        style={{ padding: '13px', borderRadius: '4px', border: `1px solid ${fd.typeLivraison === type ? 'var(--cyan)' : 'var(--line)'}`, background: fd.typeLivraison === type ? 'rgba(0,212,255,0.07)' : 'transparent', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s', boxShadow: fd.typeLivraison === type ? 'var(--glow-c)' : 'none' }}>
-                        <div style={{ fontSize: '13px', fontWeight: 700, color: fd.typeLivraison === type ? 'var(--cyan)' : 'var(--mid)', marginBottom: '4px' }}>
-                          {type === 'home' ? '🏠 للبيت' : '🏢 للمكتب'}
+                    {(['home', 'office'] as const).map(dtype => (
+                      <button key={dtype} type="button" onClick={() => setFd({ ...fd, typeLivraison: dtype })}
+                        style={{ padding: '13px', borderRadius: '4px', border: `1px solid ${fd.typeLivraison === dtype ? 'var(--cyan)' : 'var(--line)'}`, background: fd.typeLivraison === dtype ? 'rgba(0,212,255,0.07)' : 'transparent', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s', boxShadow: fd.typeLivraison === dtype ? 'var(--glow-c)' : 'none' }}>
+                        <div style={{ fontSize: '13px', fontWeight: 700, color: fd.typeLivraison === dtype ? 'var(--cyan)' : 'var(--mid)', marginBottom: '4px' }}>
+                          {dtype === 'home' ? `🏠 ${t.deliveryHome}` : `🏢 ${t.deliveryOffice}`}
                         </div>
-                        <div className="orb" style={{ fontSize: '1rem', fontWeight: 900, color: fd.typeLivraison === type ? 'var(--cyan)' : 'var(--dim)' }}>
-                          {selW ? `${(type === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج` : '---'}
+                        <div className="orb" style={{ fontSize: '1rem', fontWeight: 900, color: fd.typeLivraison === dtype ? 'var(--cyan)' : 'var(--dim)' }}>
+                          {selW ? `${(dtype === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} ${currency}` : '---'}
                         </div>
                       </button>
                     ))}
@@ -1644,11 +1979,11 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 {/* ملخص الحساب */}
                 <div style={{ border: '1px solid var(--line)', borderRadius: '6px', overflow: 'hidden', background: 'var(--navy-3)' }}>
                   <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--line)', background: 'rgba(0,212,255,0.04)' }}>
-                    <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase' }}>// الملخص المالي</span>
+                    <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase' }}>{t.orderSummary}</span>
                   </div>
                   {[
-                    { l: 'المجموع الفرعي', v: `${cartTotal.toLocaleString()} دج` },
-                    { l: 'رسوم التوصيل', v: getLivPrice() ? `${getLivPrice().toLocaleString()} دج` : '---' },
+                    { l: t.subtotal, v: `${cartTotal.toLocaleString()} ${currency}` },
+                    { l: t.delivery, v: getLivPrice() ? `${getLivPrice().toLocaleString()} ${currency}` : '---' },
                   ].map(row => (
                     <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 14px', borderBottom: '1px solid var(--line)' }}>
                       <span style={{ fontSize: '12px', color: 'var(--mid)' }}>{row.l}</span>
@@ -1656,9 +1991,9 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     </div>
                   ))}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '14px', background: 'rgba(0,212,255,0.05)' }}>
-                    <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--mid)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>الإجمالي</span>
+                    <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--mid)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{t.total}</span>
                     <span className="neon-cyan orb" style={{ fontSize: '2rem', fontWeight: 900 }}>
-                      {finalTotal.toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif'", fontWeight: 400, fontSize: '13px', color: 'var(--mid)' }}>دج</span>
+                      {finalTotal.toLocaleString()} <span style={{ fontFamily: "'Tajawal',sans-serif'", fontWeight: 400, fontSize: '13px', color: 'var(--mid)' }}>{currency}</span>
                     </span>
                   </div>
                 </div>
@@ -1667,17 +2002,17 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <button type="submit" disabled={submitting} className="btn-cyan"
                   style={{ width: '100%', justifyContent: 'center', fontSize: '15px', padding: '14px', cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1, clipPath: 'none', borderRadius: '6px' }}>
                   {submitting
-                    ? <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Loader2 size={18} style={{ animation: 'spin-slow 1s linear infinite' }} /> جاري المعالجة...</span>
-                    : <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={18} /> تأكيد الطلب</span>
+                    ? <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Loader2 size={18} style={{ animation: 'spin-slow 1s linear infinite' }} /> {t.sending}</span>
+                    : <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={18} /> {t.confirmOrder}</span>
                   }
                 </button>
 
                 {/* ضمانات */}
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
                   {[
-                    { icon: <Lock size={11} />, label: 'دفع آمن' },
-                    { icon: <ShieldCheck size={11} />, label: 'بيانات مشفّرة' },
-                    { icon: <BadgeCheck size={11} />, label: 'موثّق ومعتمد' },
+                    { icon: <Lock size={11} />, label: t.securePay },
+                    { icon: <ShieldCheck size={11} />, label: t.safeData },
+                    { icon: <BadgeCheck size={11} />, label: t.verified },
                   ].map((b, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: 'var(--dim)' }}>
                       <span style={{ color: 'var(--cyan)' }}>{b.icon}</span> {b.label}
@@ -1695,27 +2030,30 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 /* ── STATIC PAGES ────────────────────────────────────────────── */
 export function StaticPage({ staticPage, store }: { staticPage: string, store: Store }) {
   const p = staticPage.toLowerCase();
-  return <>{p === 'privacy' && <Privacy />}{p === 'terms' && <Terms />}{p === 'cookies' && <Cookies />}{p === 'contact' && <Contact store={store} />}</>;
+  return <>{p === 'privacy' && <Privacy store={store} />}{p === 'terms' && <Terms store={store} />}{p === 'cookies' && <Cookies store={store} />}{p === 'contact' && <Contact store={store} />}</>;
 }
 
-const Shell = ({ children, title, sub }: { children: React.ReactNode; title: string; sub?: string }) => (
-  <div dir="rtl" style={{ backgroundColor: 'var(--navy)', minHeight: '100vh' }} className="hex-bg">
-    <div style={{ background: 'linear-gradient(135deg,var(--navy-2),var(--navy-3))', padding: '72px 20px 48px', borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }} className="circuit-bg">
-      <div style={{ maxWidth: '760px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
-        {sub && <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--pink)', marginBottom: '10px', textTransform: 'uppercase' }}>{sub}</p>}
-        <h1 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(2rem,5vw,3.5rem)', color: 'var(--white)', lineHeight: 1, margin: '0 0 14px', letterSpacing: '-0.01em' }}>
-          <span className="neon-cyan">{title}</span>
-        </h1>
-        <NeonDivider color="pink" />
+const Shell = ({ children, title, sub, store }: { children: React.ReactNode; title: string; sub?: string; store?: any }) => {
+  const t = T[getLang(store)];
+  return (
+    <div dir={t.dir} style={{ backgroundColor: 'var(--navy)', minHeight: '100vh' }} className="hex-bg">
+      <div style={{ background: 'linear-gradient(135deg,var(--navy-2),var(--navy-3))', padding: '72px 20px 48px', borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }} className="circuit-bg">
+        <div style={{ maxWidth: '760px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
+          {sub && <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--pink)', marginBottom: '10px', textTransform: 'uppercase' }}>{sub}</p>}
+          <h1 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(2rem,5vw,3.5rem)', color: 'var(--white)', lineHeight: 1, margin: '0 0 14px', letterSpacing: '-0.01em' }}>
+            <span className="neon-cyan">{title}</span>
+          </h1>
+          <NeonDivider color="pink" />
+        </div>
+      </div>
+      <div style={{ maxWidth: '760px', margin: '0 auto', padding: '40px 20px 80px' }}>
+        <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', padding: '32px', boxShadow: 'var(--glow-c)' }}>
+          {children}
+        </div>
       </div>
     </div>
-    <div style={{ maxWidth: '760px', margin: '0 auto', padding: '40px 20px 80px' }}>
-      <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', padding: '32px', boxShadow: 'var(--glow-c)' }}>
-        {children}
-      </div>
-    </div>
-  </div>
-);
+  );
+};
 
 const IB = ({ title, body, tag }: { title: string; body: string; tag?: string }) => (
   <div style={{ paddingBottom: '18px', marginBottom: '18px', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', gap: '16px', alignItems: 'flex-start' }}>
@@ -1729,38 +2067,41 @@ const IB = ({ title, body, tag }: { title: string; body: string; tag?: string })
   </div>
 );
 
-export function Privacy() {
+export function Privacy({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="سياسة الخصوصية" sub="// قانوني">
-      <IB title="البيانات التي نجمعها" body="فقط اسمك ورقم هاتفك وعنوان التوصيل — ما هو ضروري لمعالجة طلبك." />
-      <IB title="كيف نستخدمها" body="حصرياً لتنفيذ وتوصيل مشترياتك." />
-      <IB title="الأمان" body="بياناتك محمية بتشفير على مستوى المؤسسات." />
-      <IB title="مشاركة البيانات" body="لا نبيع البيانات أبداً. تُشارك فقط مع شركاء التوصيل الموثوقين." />
-      <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--dim)', marginTop: '16px', letterSpacing: '0.12em' }}>// آخر تحديث: فبراير 2026</p>
+    <Shell title={t.privacyTitle} sub={t.legalSub} store={store}>
+      <IB title={t.privDataTitle} body={t.privDataBody} />
+      <IB title={t.privUseTitle} body={t.privUseBody} />
+      <IB title={t.privSecTitle} body={t.privSecBody} />
+      <IB title={t.privShareTitle} body={t.privShareBody} />
+      <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--dim)', marginTop: '16px', letterSpacing: '0.12em' }}>{t.privLastUpdate}</p>
     </Shell>
   );
 }
 
-export function Terms() {
+export function Terms({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="شروط الاستخدام" sub="// قانوني">
-      <IB title="حسابك" body="أنت مسؤول عن أمان بيانات تسجيل الدخول وكل النشاط تحت حسابك." />
-      <IB title="المدفوعات" body="لا رسوم مخفية. السعر المعروض هو السعر النهائي." />
-      <IB title="الاستخدام المحظور" body="المنتجات الأصيلة فقط. لا مجال للمنتجات المقلدة." tag="صارم" />
-      <IB title="القانون الحاكم" body="تخضع هذه الشروط لقوانين جمهورية الجزائر الديمقراطية الشعبية." />
+    <Shell title={t.termsTitle} sub={t.legalSub} store={store}>
+      <IB title={t.termsAccountTitle} body={t.termsAccountBody} />
+      <IB title={t.termsPayTitle} body={t.termsPayBody} />
+      <IB title={t.termsAuthTitle} body={t.termsAuthBody} tag={t.termsAuthTag} />
+      <IB title={t.termsLawTitle} body={t.termsLawBody} />
     </Shell>
   );
 }
 
-export function Cookies() {
+export function Cookies({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="سياسة الكوكيز" sub="// قانوني">
-      <IB title="الكوكيز الأساسية" body="ضرورية للجلسات والسلة والدفع. لا يمكن تعطيلها." tag="مطلوب" />
-      <IB title="كوكيز التفضيلات" body="تحفظ إعداداتك لتجربة أفضل." tag="اختياري" />
-      <IB title="كوكيز التحليلات" body="بيانات مجمعة ومجهولة لتحسين المنصة." tag="اختياري" />
+    <Shell title={t.cookiesTitle} sub={t.legalSub} store={store}>
+      <IB title={t.cookEssTitle} body={t.cookEssBody} tag={t.cookEssTag} />
+      <IB title={t.cookPrefTitle} body={t.cookPrefBody} tag={t.cookPrefTag} />
+      <IB title={t.cookAnalTitle} body={t.cookAnalBody} tag={t.cookAnalTag} />
       <div style={{ marginTop: '16px', padding: '14px', border: '1px solid var(--line)', borderRadius: '6px', display: 'flex', gap: '10px', alignItems: 'flex-start', background: 'rgba(0,212,255,0.03)' }}>
         <ToggleRight style={{ width: '18px', height: '18px', color: 'var(--cyan)', flexShrink: 0, marginTop: '1px' }} />
-        <p style={{ fontSize: '13px', color: 'var(--mid)', lineHeight: '1.8', margin: 0 }}>يمكنك إدارة تفضيلات الكوكيز من إعدادات المتصفح.</p>
+        <p style={{ fontSize: '13px', color: 'var(--mid)', lineHeight: '1.8', margin: 0 }}>{t.cookManageNote}</p>
       </div>
     </Shell>
   );
@@ -1769,58 +2110,59 @@ export function Cookies() {
 export function Contact({ store }: { store: Store }) {
   const [form, setForm] = useState({ name: '', email: '', message: '', phone: '' });
   const [sent, setSent] = useState(false);
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      console.log({ ...form, storeId: store.id });
       const { data } = await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store.id })
       setSent(true);
     } catch (error) {
-      showError('حدث خطاء في الارسال يمكن محاولة بعد حين')
+      showError(t.errContact)
     }
   }
   return (
-    <div dir="rtl" style={{ backgroundColor: 'var(--navy)', minHeight: '100vh' }} className="hex-bg">
+    <div dir={t.dir} style={{ backgroundColor: 'var(--navy)', minHeight: '100vh' }} className="hex-bg">
       <div style={{ background: 'linear-gradient(135deg,var(--navy-2),var(--navy-3))', padding: '72px 20px 48px', borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }} className="circuit-bg">
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 30% 50%,rgba(0,212,255,0.06) 0%,transparent 60%)', pointerEvents: 'none' }} />
         <div style={{ maxWidth: '960px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
-          <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--pink)', marginBottom: '12px' }}>// تواصل</p>
+          <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--pink)', marginBottom: '12px' }}>{t.contactEyebrow}</p>
           <h1 style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 900, fontSize: 'clamp(2rem,6vw,4rem)', color: 'var(--white)', lineHeight: 1, margin: '0 0 14px' }}>
-            تواصل <span className="neon-cyan">معنا</span>
+            {t.contactTitle} <span className="neon-cyan">{t.contactHighlight}</span>
           </h1>
           <NeonDivider color="cyan" />
-          <p style={{ fontSize: '14px', color: 'var(--mid)', marginTop: '10px' }}>نرد خلال أقل من ساعتين 🎮</p>
+          <p style={{ fontSize: '14px', color: 'var(--mid)', marginTop: '10px' }}>{t.contactReplyTime}</p>
         </div>
       </div>
 
       <div className="contact-g" style={{ maxWidth: '960px', margin: '0 auto', padding: '40px 20px 80px' }}>
         <div>
           <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', padding: '24px', boxShadow: 'var(--glow-c)', marginBottom: '12px' }}>
-            <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '16px', textTransform: 'uppercase' }}>طرق التواصل</p>
+            <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '16px', textTransform: 'uppercase' }}>{t.contactWaysTitle}</p>
             {[
-              { icon: '📞', label: 'الهاتف', val: store.contact.phone, href: `tel:${store.contact.phone}` },
-              { icon: '📍', label: 'الموقع', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / '), href: undefined },
-              { icon: '🎮', label: 'المتجر', val: 'كل ما تحتاجه للعب الاحترافي', href: undefined },
+              { icon: '📞', label: t.phoneLabel, val: store.contact.phone, href: `tel:${store.contact.phone}` },
+              { icon: '📍', label: t.locationLabel, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / '), href: undefined },
+              { icon: '🎮', label: t.storeLabel, val: t.storeDesc, href: undefined },
             ].map(item => (
-              <a key={item.label} href={item.href || '#'} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '13px 0', borderBottom: '1px solid var(--line)', textDecoration: 'none', transition: 'padding-right 0.25s' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.paddingRight = '8px'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.paddingRight = '0'; }}>
+              <a key={item.label} href={item.href || '#'} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '13px 0', borderBottom: '1px solid var(--line)', textDecoration: 'none', transition: 'padding-inline-end 0.25s' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.paddingInlineEnd = '8px'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.paddingInlineEnd = '0'; }}>
                 <div style={{ width: '36px', height: '36px', border: '1px solid var(--line)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', flexShrink: 0, background: 'var(--navy-3)' }}>{item.icon}</div>
                 <div>
                   <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.14em', margin: '0 0 3px', textTransform: 'uppercase' }}>{item.label}</p>
                   <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--white)', margin: 0, lineHeight: 1.5 }}>{item.val}</p>
                 </div>
-                {item.href && <ArrowLeft style={{ width: '13px', height: '13px', color: 'var(--pink)', marginRight: 'auto', marginTop: '4px' }} />}
+                {item.href && <ArrowLeft style={{ width: '13px', height: '13px', color: 'var(--pink)', marginInlineStart: 'auto', marginTop: '4px' }} />}
               </a>
             ))}
           </div>
           <div style={{ background: 'var(--panel)', border: '1px solid var(--cyan)', borderRadius: '8px', padding: '16px 20px', boxShadow: 'var(--glow-c)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--cyan)', animation: 'pulse-cyan 2s ease-in-out infinite' }} />
-              <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, color: 'var(--cyan)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>متصل الآن</span>
+              <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, color: 'var(--cyan)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>{t.onlineLabel}</span>
             </div>
-            {[{ l: 'وقت الرد', v: 'أقل من ساعتين' }, { l: 'التوصيل', v: '58 ولاية' }].map(s => (
+            {[{ l: t.replyTimeLabel, v: t.replyTimeVal }, { l: t.delivery, v: t.deliveryWilayas }].map(s => (
               <div key={s.l} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderTop: '1px solid var(--line)' }}>
                 <span style={{ fontSize: '12px', color: 'var(--mid)' }}>{s.l}</span>
                 <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--white)' }}>{s.v}</span>
@@ -1830,16 +2172,16 @@ export function Contact({ store }: { store: Store }) {
         </div>
 
         <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px', padding: '24px' }}>
-          <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '20px', textTransform: 'uppercase' }}>أرسل رسالة</p>
+          <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '20px', textTransform: 'uppercase' }}>{t.contactFormTitle}</p>
           {sent ? (
             <div style={{ minHeight: '240px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--cyan)', borderRadius: '8px', textAlign: 'center', padding: '32px', boxShadow: 'var(--glow-c)', background: 'rgba(0,212,255,0.04)' }}>
               <CheckCircle2 style={{ width: '36px', height: '36px', color: 'var(--cyan)', marginBottom: '12px' }} />
-              <h3 className="orb" style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--white)', margin: '0 0 8px' }}>تم إرسال رسالتك!</h3>
-              <p style={{ fontSize: '13px', color: 'var(--mid)' }}>سنرد عليك في أقل من ساعتين 🎮</p>
+              <h3 className="orb" style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--white)', margin: '0 0 8px' }}>{t.messageSentTitle}</h3>
+              <p style={{ fontSize: '13px', color: 'var(--mid)' }}>{t.messageSentDesc}</p>
             </div>
           ) : (
             <form onSubmit={e => handleSubmit(e)} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {[{ label: 'اسمك', type: 'text', key: 'name', ph: 'الاسم الكامل' }, { label: 'البريد الإلكتروني', type: 'email', key: 'email', ph: 'بريدك@الإلكتروني' }, { label: 'الهاتف', type: 'tel', key: 'phone', ph: '0550000000' }].map(f => (
+              {[{ label: t.nameContactLabel, type: 'text', key: 'name', ph: t.namePh }, { label: t.emailLabel, type: 'email', key: 'email', ph: 'email@example.com' }, { label: t.phoneContactLabel, type: 'tel', key: 'phone', ph: '0550000000' }].map(f => (
                 <div key={f.key}>
                   <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.16em', color: 'var(--cyan)', marginBottom: '6px', textTransform: 'uppercase' }}>{f.label}</p>
                   <input type={f.type} value={(form as any)[f.key]} onChange={e => setForm({ ...form, [f.key]: e.target.value })} placeholder={f.ph} required className="inp"
@@ -1848,14 +2190,14 @@ export function Contact({ store }: { store: Store }) {
                 </div>
               ))}
               <div>
-                <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.16em', color: 'var(--cyan)', marginBottom: '6px', textTransform: 'uppercase' }}>رسالتك</p>
-                <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder="كيف يمكننا مساعدتك؟" rows={4} required className="inp"
+                <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', fontWeight: 700, letterSpacing: '0.16em', color: 'var(--cyan)', marginBottom: '6px', textTransform: 'uppercase' }}>{t.messageLabel}</p>
+                <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder={t.messagePh} rows={4} required className="inp"
                   style={{ resize: 'none' as any }}
                   onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; e.target.style.boxShadow = '0 0 0 3px rgba(0,212,255,0.15)'; }}
                   onBlur={e => { e.target.style.borderColor = 'var(--dim)'; e.target.style.boxShadow = 'none'; }} />
               </div>
               <button type="submit" className="btn-cyan" style={{ justifyContent: 'center', width: '100%', clipPath: 'none', borderRadius: '6px', fontSize: '14px', padding: '13px' }}>
-                إرسال الرسالة <ArrowLeft style={{ width: '14px', height: '14px' }} />
+                {t.sendLabel} <ArrowLeft style={{ width: '14px', height: '14px' }} />
               </button>
             </form>
           )}

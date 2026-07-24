@@ -53,7 +53,7 @@ export default async function HomePage() {
 
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                 <Link
-                  href={`${DASHBOARD_URL}/auth/register`}
+                  href={`${DASHBOARD_URL}/select-lang/locale`}
                   className="w-full sm:w-auto px-10 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg hover:bg-indigo-700 shadow-xl shadow-indigo-200 dark:shadow-none transition-all transform hover:-translate-y-1"
                 >
                   {t('get_started')}

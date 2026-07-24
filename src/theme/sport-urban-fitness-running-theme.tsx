@@ -107,6 +107,11 @@ const T = {
     name: 'الاسم', email: 'البريد الإلكتروني', message: 'الرسالة', send: 'إرسال الرسالة',
     sendAnother: 'إرسال رسالة أخرى', msgSuccessTitle: 'تم إرسال رسالتك!', msgSuccessDesc: 'سنرد عليك في أقرب وقت ممكن.',
     location: 'الموقع', deleteItem: 'حذف',
+    priv1Title: 'جمع البيانات', priv1Body: 'نقوم بجمع المعلومات الضرورية فقط لمعالجة طلبك وتوصيله، مثل الاسم، رقم الهاتف، والعنوان.',
+    priv2Title: 'استخدام البيانات', priv2Body: 'تُستخدم بياناتك فقط لغرض إتمام عملية الشراء والتواصل معك بخصوص طلبك.',
+    terms1Title: 'الطلبات والدفع', terms1Body: 'يتم تأكيد الطلبات عبر الهاتف، والدفع عند الاستلام في معظم الحالات.',
+    terms2Title: 'الإرجاع والاستبدال', terms2Body: 'يمكن إرجاع المنتج خلال فترة محددة في حال وجود عيب مصنعي.',
+    cookies1Title: 'ملفات تعريف الارتباط', cookies1Body: 'نستخدم ملفات تعريف الارتباط لتحسين تجربتك أثناء التصفح وحفظ محتوى سلتك.',
   },
   fr: {
     dir: 'ltr' as const,
@@ -147,6 +152,11 @@ const T = {
     name: 'Nom', email: 'Email', message: 'Message', send: 'Envoyer le message',
     sendAnother: 'Envoyer un autre message', msgSuccessTitle: 'Message envoyé !', msgSuccessDesc: 'Nous vous répondrons rapidement.',
     location: 'Emplacement', deleteItem: 'Supprimer',
+    priv1Title: 'Collecte des données', priv1Body: 'Nous collectons uniquement les informations nécessaires au traitement et à la livraison de votre commande : nom, téléphone et adresse.',
+    priv2Title: 'Utilisation des données', priv2Body: 'Vos données sont utilisées uniquement pour finaliser votre achat et communiquer avec vous à ce sujet.',
+    terms1Title: 'Commandes et paiement', terms1Body: 'Les commandes sont confirmées par téléphone, avec paiement à la livraison dans la plupart des cas.',
+    terms2Title: 'Retours et échanges', terms2Body: 'Le produit peut être retourné dans un délai déterminé en cas de défaut de fabrication.',
+    cookies1Title: 'Cookies', cookies1Body: 'Nous utilisons des cookies pour améliorer votre expérience de navigation et enregistrer le contenu de votre panier.',
   },
   en: {
     dir: 'ltr' as const,
@@ -187,6 +197,11 @@ const T = {
     name: 'Name', email: 'Email', message: 'Message', send: 'Send Message',
     sendAnother: 'Send another message', msgSuccessTitle: 'Message sent!', msgSuccessDesc: 'We will get back to you shortly.',
     location: 'Location', deleteItem: 'Remove',
+    priv1Title: 'Data Collection', priv1Body: 'We only collect the information necessary to process and deliver your order, such as name, phone number, and address.',
+    priv2Title: 'Use of Data', priv2Body: 'Your data is used solely to complete your purchase and communicate with you about your order.',
+    terms1Title: 'Orders & Payment', terms1Body: 'Orders are confirmed by phone, with cash on delivery in most cases.',
+    terms2Title: 'Returns & Exchanges', terms2Body: 'Products may be returned within a set period in case of a manufacturing defect.',
+    cookies1Title: 'Cookies', cookies1Body: 'We use cookies to improve your browsing experience and save your cart contents.',
   },
 } as const;
 
@@ -464,7 +479,7 @@ export function Navbar({ store, domain }: any) {
                   <Link key={p.id} href={`/product/${p.slug || p.id}`} style={{ display: 'flex', gap: 10, padding: '10px 14px', borderBottom: `1px solid ${BD}`, alignItems: 'center' }}>
                     <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} alt={p.name} style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: 4, flexShrink: 0, background: BD }} />
                     <div>
-                      <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600 }}>{p.name}</p>
+                      <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600, color: TXT }}>{p.name}</p>
                       <p style={{ margin: 0, fontSize: '0.8rem', color: AD, fontWeight: 700 }}>{Number(p.price).toLocaleString()} {store?.currency}</p>
                     </div>
                   </Link>
@@ -531,13 +546,13 @@ export function Navbar({ store, domain }: any) {
               <X size={22} color={TXT} />
             </button>
           </div>
-          <div style={{ flex: 1, overflowY: 'auto', background: '#fff' }}>
+          <div style={{ flex: 1, overflowY: 'auto', background: '#fff', color: TXT }}>
             {loading && <p style={{ padding: '1rem', textAlign: 'center', color: SUB }}>{t.searching}</p>}
             {listSearch.map((p) => (
               <Link key={p.id} href={`/product/${p.slug || p.id}`} onClick={() => setShowSearch(false)} style={{ display: 'flex', gap: 12, padding: '12px 16px', borderBottom: `1px solid ${BD}`, alignItems: 'center' }}>
                 <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} alt={p.name} style={{ width: 52, height: 52, objectFit: 'cover', borderRadius: 6, flexShrink: 0, background: BD }} />
                 <div>
-                  <p style={{ fontSize: '0.9rem', fontWeight: 600, margin: 0 }}>{p.name}</p>
+                  <p style={{ fontSize: '0.9rem', fontWeight: 600, margin: 0, color: TXT }}>{p.name}</p>
                   <p style={{ fontSize: '0.8rem', color: AD, margin: 0, fontWeight: 700 }}>{Number(p.price).toLocaleString()} {store?.currency}</p>
                 </div>
               </Link>
@@ -1021,7 +1036,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
           <div className="form-row-2">
             <div style={{ position: 'relative' }}>
               <ChevronDown size={12} style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
-              <select disabled={wilayas.length === 0} value={fd.customerWelaya} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...inputBase(!!errors.customerWelaya), paddingRight: 36 }}>
+              <select disabled={wilayas.length === 0} value={fd.customerWelaya} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...inputBase(!!errors.customerWelaya), paddingInlineEnd: 36 }}>
                 <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
                 {wilayas.map((w) => <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>)}
               </select>
@@ -1029,7 +1044,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
             </div>
             <div style={{ position: 'relative' }}>
               <ChevronDown size={12} style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
-              <select disabled={!fd.customerWelaya || loadingC} value={fd.customerCommune} onChange={(e) => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inputBase(!!errors.customerCommune), paddingRight: 36 }}>
+              <select disabled={!fd.customerWelaya || loadingC} value={fd.customerCommune} onChange={(e) => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inputBase(!!errors.customerCommune), paddingInlineEnd: 36 }}>
                 <option value="">{loadingC ? t.communeLoading : t.communePlaceholder}</option>
                 {communes.map((c) => <option key={c.id} value={c.id}>{t.dir === 'rtl' ? c.ar_name : c.name}</option>)}
               </select>
@@ -1242,7 +1257,7 @@ export function Cart({ domain, store }: any) {
           <div className="form-row-2">
             <div style={{ position: 'relative' }}>
               <ChevronDown size={12} style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
-              <select disabled={wilayas.length === 0} value={fd.customerWelaya} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...inputBase(!!errors.customerWelaya), paddingRight: 36 }}>
+              <select disabled={wilayas.length === 0} value={fd.customerWelaya} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...inputBase(!!errors.customerWelaya), paddingInlineEnd: 36 }}>
                 <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
                 {wilayas.map((w) => <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>)}
               </select>
@@ -1250,7 +1265,7 @@ export function Cart({ domain, store }: any) {
             </div>
             <div style={{ position: 'relative' }}>
               <ChevronDown size={12} style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
-              <select disabled={!fd.customerWelaya || loadingC} value={fd.customerCommune} onChange={(e) => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inputBase(!!errors.customerCommune), paddingRight: 36 }}>
+              <select disabled={!fd.customerWelaya || loadingC} value={fd.customerCommune} onChange={(e) => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inputBase(!!errors.customerCommune), paddingInlineEnd: 36 }}>
                 <option value="">{loadingC ? t.communeLoading : t.communePlaceholder}</option>
                 {communes.map((c) => <option key={c.id} value={c.id}>{t.dir === 'rtl' ? c.ar_name : c.name}</option>)}
               </select>
@@ -1316,47 +1331,29 @@ function InfoBlock({ title, body }: { title: string; body: string }) {
 
 export function Privacy({ store }: any = {}) {
   const t = Tt[getLang(store)];
-  const isAr = t.dir === 'rtl';
   return (
     <Shell title={t.privacyTitle}>
-      <InfoBlock
-        title={isAr ? 'جمع البيانات' : t.dir === 'ltr' && store?.language === 'fr' ? 'Collecte des données' : 'Data Collection'}
-        body={isAr ? 'نقوم بجمع المعلومات الضرورية فقط لمعالجة طلبك وتوصيله، مثل الاسم، رقم الهاتف، والعنوان.' : store?.language === 'fr' ? 'Nous collectons uniquement les informations nécessaires au traitement et à la livraison de votre commande : nom, téléphone et adresse.' : 'We only collect the information necessary to process and deliver your order, such as name, phone number, and address.'}
-      />
-      <InfoBlock
-        title={isAr ? 'استخدام البيانات' : store?.language === 'fr' ? 'Utilisation des données' : 'Use of Data'}
-        body={isAr ? 'تُستخدم بياناتك فقط لغرض إتمام عملية الشراء والتواصل معك بخصوص طلبك.' : store?.language === 'fr' ? "Vos données sont utilisées uniquement pour finaliser votre achat et communiquer avec vous à ce sujet." : 'Your data is used solely to complete your purchase and communicate with you about your order.'}
-      />
+      <InfoBlock title={t.priv1Title} body={t.priv1Body} />
+      <InfoBlock title={t.priv2Title} body={t.priv2Body} />
     </Shell>
   );
 }
 
 export function Terms({ store }: any = {}) {
   const t = Tt[getLang(store)];
-  const isAr = t.dir === 'rtl';
   return (
     <Shell title={t.termsTitle}>
-      <InfoBlock
-        title={isAr ? 'الطلبات والدفع' : store?.language === 'fr' ? 'Commandes et paiement' : 'Orders & Payment'}
-        body={isAr ? 'يتم تأكيد الطلبات عبر الهاتف، والدفع عند الاستلام في معظم الحالات.' : store?.language === 'fr' ? 'Les commandes sont confirmées par téléphone, avec paiement à la livraison dans la plupart des cas.' : 'Orders are confirmed by phone, with cash on delivery in most cases.'}
-      />
-      <InfoBlock
-        title={isAr ? 'الإرجاع والاستبدال' : store?.language === 'fr' ? 'Retours et échanges' : 'Returns & Exchanges'}
-        body={isAr ? 'يمكن إرجاع المنتج خلال فترة محددة في حال وجود عيب مصنعي.' : store?.language === 'fr' ? 'Le produit peut être retourné dans un délai déterminé en cas de défaut de fabrication.' : 'Products may be returned within a set period in case of a manufacturing defect.'}
-      />
+      <InfoBlock title={t.terms1Title} body={t.terms1Body} />
+      <InfoBlock title={t.terms2Title} body={t.terms2Body} />
     </Shell>
   );
 }
 
 export function Cookies({ store }: any = {}) {
   const t = Tt[getLang(store)];
-  const isAr = t.dir === 'rtl';
   return (
     <Shell title={t.cookiesTitle}>
-      <InfoBlock
-        title={isAr ? 'ملفات تعريف الارتباط' : store?.language === 'fr' ? 'Cookies' : 'Cookies'}
-        body={isAr ? 'نستخدم ملفات تعريف الارتباط لتحسين تجربتك أثناء التصفح وحفظ محتوى سلتك.' : store?.language === 'fr' ? 'Nous utilisons des cookies pour améliorer votre expérience de navigation et enregistrer le contenu de votre panier.' : 'We use cookies to improve your browsing experience and save your cart contents.'}
-      />
+      <InfoBlock title={t.cookies1Title} body={t.cookies1Body} />
     </Shell>
   );
 }

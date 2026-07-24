@@ -667,10 +667,10 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 <div className="nav-desktop-search" style={{ flex: 1, maxWidth: 340, position: 'relative' }}>
                     <form onSubmit={doSearch}>
                         <input type="text" placeholder={`${t.search} 🌸`} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                            style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.75rem', borderRadius: 50, border: '2px solid var(--lavender-lt)', background: '#fff', fontSize: '0.875rem', fontWeight: 600, outline: 'none', transition: 'border-color 0.2s', fontFamily: "'Quicksand', sans-serif" }}
+                            style={{ width: '100%', padding: isRTL ? '0.6rem 1rem 0.6rem 2.75rem' : '0.6rem 2.75rem 0.6rem 1rem', borderRadius: 50, border: '2px solid var(--lavender-lt)', background: '#fff', fontSize: '0.875rem', fontWeight: 600, outline: 'none', transition: 'border-color 0.2s', fontFamily: "'Quicksand', sans-serif" }}
                             onFocus={e => (e.target.style.borderColor = 'var(--lavender)')}
                             onBlur={e => (e.target.style.borderColor = 'var(--lavender-lt)')} />
-                        <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--lavender)' }} />
+                        <Search size={15} style={{ position: 'absolute', ...(isRTL ? { left: 12 } : { right: 12 }), top: '50%', transform: 'translateY(-50%)', color: 'var(--lavender)' }} />
                     </form>
                     {searchQuery.length >= 2 && <Drop />}
                 </div>
@@ -714,8 +714,8 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 <div style={{ padding: '0.625rem 1.25rem', background: '#fff', borderTop: '1px solid var(--lavender-lt)', position: 'relative' }}>
                     <form onSubmit={doSearch} style={{ position: 'relative' }}>
                         <input autoFocus type="text" placeholder={t.search} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                            style={{ ...INP(), padding: '0.75rem 1rem 0.75rem 2.75rem' }} />
-                        <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--lavender)' }} />
+                            style={{ ...INP(), padding: isRTL ? '0.75rem 1rem 0.75rem 2.75rem' : '0.75rem 2.75rem 0.75rem 1rem' }} />
+                        <Search size={15} style={{ position: 'absolute', ...(isRTL ? { left: 12 } : { right: 12 }), top: '50%', transform: 'translateY(-50%)', color: 'var(--lavender)' }} />
                     </form>
                     {searchQuery.length >= 2 && <Drop />}
                 </div>

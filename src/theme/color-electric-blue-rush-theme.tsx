@@ -766,10 +766,10 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div className="nav-search-d" style={{ position: 'relative' }}>
             <form onSubmit={handleSearch}>
               <input type="text" placeholder={t.search} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.75rem', borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', fontSize: '0.875rem', outline: 'none', transition: 'border-color 0.2s' }}
+                style={{ width: '100%', padding: isRTL ? '0.625rem 1rem 0.625rem 2.75rem' : '0.625rem 2.75rem 0.625rem 1rem', borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', fontSize: '0.875rem', outline: 'none', transition: 'border-color 0.2s' }}
                 onFocus={e => (e.target.style.borderColor = '#1D4ED8')}
                 onBlur={e => (e.target.style.borderColor = '#E0E0E0')} />
-              <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} />
+              <Search size={15} style={{ position: 'absolute', ...(isRTL ? { left: 12 } : { right: 12 }), top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} />
             </form>
             {searchQuery.length >= 2 && <DropResults />}
           </div>
@@ -815,8 +815,8 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div style={{ padding: '0.625rem 1.25rem', background: '#fff', borderTop: '1px solid #E8E8E8', position: 'relative' }} className="anim-slide-down">
             <form onSubmit={handleSearch} style={{ position: 'relative' }}>
               <input autoFocus type="text" placeholder={t.search} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.75rem', border: '1.5px solid #1D4ED8', borderRadius: 8, background: '#F8F8F6', fontSize: '0.9rem', outline: 'none' }} />
-              <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#1D4ED8' }} />
+                style={{ width: '100%', padding: isRTL ? '0.75rem 1rem 0.75rem 2.75rem' : '0.75rem 2.75rem 0.75rem 1rem', border: '1.5px solid #1D4ED8', borderRadius: 8, background: '#F8F8F6', fontSize: '0.9rem', outline: 'none' }} />
+              <Search size={15} style={{ position: 'absolute', ...(isRTL ? { left: 12 } : { right: 12 }), top: '50%', transform: 'translateY(-50%)', color: '#1D4ED8' }} />
             </form>
             {searchQuery.length >= 2 && <DropResults />}
           </div>

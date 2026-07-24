@@ -215,7 +215,7 @@ export interface Product {
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
 }
 export interface ProductFormProps {
-  product: Product; userId: string; domain: string; redirectPath?: string;
+  product: Product; store?: any; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string|null; setSelectedOffer: (id: string|null) => void;
   selectedVariants: Record<string,string>; platform?: string; priceLoss?: number;
 }
@@ -233,11 +233,11 @@ const INP_S = (err?: boolean): React.CSSProperties => ({
 });
 
 const FR = ({ error, label, children }: { error?: string; label?: string; children: React.ReactNode }) => (
-  <div style={{marginBottom:'14px',direction:'rtl'}}>
-    {label && <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--mid)',marginBottom:'6px',textAlign:'right'}}>{label}</p>}
+  <div style={{marginBottom:'14px'}}>
+    {label && <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--mid)',marginBottom:'6px',textAlign:'start'}}>{label}</p>}
     {children}
-    {error && <p style={{fontSize:'11px',color:'#ef4444',marginTop:'4px',display:'flex',alignItems:'center',gap:'4px',justifyContent:'flex-end'}}>
-      {error}<AlertCircle style={{width:'11px',height:'11px'}}/>
+    {error && <p style={{fontSize:'11px',color:'#ef4444',marginTop:'4px',display:'flex',alignItems:'center',gap:'4px',justifyContent:'flex-start'}}>
+      <AlertCircle style={{width:'11px',height:'11px'}}/>{error}
     </p>}
   </div>
 );
@@ -311,6 +311,87 @@ const jsonAr = {
   privacy: 'الخصوصية',
   terms: 'الشروط',
   rightsReserved: 'جميع الحقوق محفوظة',
+  // Navbar extra
+  searchPhD: 'ابحث عن المعدات...',
+  searchPhM: 'ابحث هنا...',
+  shopCta: 'تسوق المعدات الآن',
+  // Hero
+  heroBadge: 'متجر اللياقة البدنية #1 في الجزائر',
+  heroTitleDef: 'غذّي <span style="color:var(--fire)">جسمك</span><br/>بالقوة.',
+  heroHighlightWord: 'جسمك',
+  heroSubDef: 'معدات لياقة بدنية فاخرة، مكملات غذائية، وملابس رياضية. توصيل سريع إلى جميع الولايات الـ 58.',
+  heroShopBtn: 'تسوق الآن',
+  heroCatsBtn: 'الأقسام',
+  mottos: ['لا ألم، لا نتيجة','تجاوز حدودك','تمرن بجنون','ابقَ مركزاً','وضعية الوحش مفعلة'],
+  // Stats
+  statProduct: 'منتج', statDelivery: 'توصيل', statOriginal: 'أصلي', statRank: 'في الجزائر',
+  // Trust
+  trustDelivery: 'توصيل سريع', trustDeliveryDesc: '48 ساعة عبر الجزائر',
+  trustOriginal: 'معدات أصلية', trustOriginalDesc: 'منتجات أصلية 100%',
+  trustPrice: 'أفضل الأسعار', trustPriceDesc: 'قيمة لا تضاهى',
+  trustPro: 'أداء احترافي', trustProDesc: 'معدات احترافية',
+  // Categories
+  catLabel: 'الأقسام', catHead1: 'التدريب حسب', catHead2: 'القسم',
+  // Products
+  prodLabel: 'المنتجات', prodHead1: 'جميع', prodHead2: 'المعدات',
+  prodCountSuffix: 'عنصر', noProds: 'قريباً',
+  // CTA
+  ctaHead1: 'هل أنت مستعد', ctaHighlight: 'للتحول؟',
+  ctaDesc: 'انضم إلى آلاف الرياضيين في جميع أنحاء الجزائر. احصل على المعدات التي تحتاجها للوصول إلى قمة أدائك.',
+  ctaBtn1: 'تسوق جميع المعدات',
+  // Footer
+  footerBio: 'عزز أداءك. معدات لياقة بدنية فاخرة للرياضيين الجادين.',
+  footerDelivery: 'توصيل مجاني للطلبات +5000 دج',
+  footerLinks: '// الروابط', footerCartLink: 'سلة التسوق',
+  footerContactLabel: '// تواصل معنا',
+  footerAvailable: 'متاحون الآن ⚡', footerReply: 'نرد خلال ساعات',
+  footerMoto: 'لا أيام للراحة // تمرن بقوة // كن أقوى // تجاوز حدودك //',
+  // Details
+  detailLabel: 'تفاصيل المنتج',
+  inStock: 'متوفر', outStock: 'غير متوفر', infiniteStock: '∞ متوفر',
+  priceLabel: 'السعر', offerQtyLabel: 'الكمية:',
+  // ProductForm
+  delivDataTitle: 'بيانات التوصيل', cancelLabel: 'إلغاء',
+  summaryTitle: 'ملخص الطلب', productLabel: 'المنتج',
+  processing: 'جاري المعالجة...', addedToCart: 'أُضيف للسلة',
+  secureLabel: 'آمن', fastDelivLabel: 'توصيل سريع', originalLabel: 'أصلي',
+  homeDelivLabel: 'إلى المنزل', officeDelivLabel: 'إلى المكتب',
+  // Cart
+  cartItemsCount: 'منتج', deleteLabel: 'حذف',
+  delivInfoTitle: '// معلومات التوصيل', cartDelivType: '// نوع التوصيل',
+  homeLabel: 'للبيت', officeLabel: 'للمكتب',
+  cartProcessing: 'جاري...', cartSuccessTitle: 'تم استلام طلبك!',
+  cartSuccessDesc: 'شكراً لثقتك. سنتواصل معك قريباً. 💪',
+  backToStore: 'العودة للمتجر',
+  // Privacy
+  privacyTitle: 'سياسة الخصوصية', privacySub: 'الشؤون القانونية',
+  priv1Title: 'البيانات التي نجمعها', priv1Body: 'فقط اسمك ورقم هاتفك وعنوان التوصيل — الحد الأدنى المطلوب لمعالجة طلبك.',
+  priv2Title: 'كيف نستخدمها', priv2Body: 'حصرياً لتنفيذ وشحن طلبك. لا نستخدمها للتسويق أو بيع البيانات.',
+  priv3Title: 'الأمان', priv3Body: 'بياناتك محمية بتشفير عالي المستوى ومؤمنة في جميع الأوقات.',
+  priv4Title: 'مشاركة البيانات', priv4Body: 'لا نبيع بياناتك أبداً. تُشارك فقط مع شركاء التوصيل الموثوقين.', priv4Tag: 'مضمون',
+  // Terms
+  termsTitle: 'شروط الخدمة', termsSub: 'الشؤون القانونية',
+  terms1Title: 'الطلبات', terms1Body: 'لا توجد رسوم خفية. السعر المعروض هو السعر النهائي.',
+  terms2Title: 'المنتجات الأصيلة', terms2Body: 'نبيع المنتجات الأصيلة فقط؛ السلع المقلدة ممنوعة منعاً باتاً.', terms2Tag: 'صارم',
+  terms3Title: 'القانون المعمول به', terms3Body: 'تخضع هذه الشروط لقوانين الجمهورية الجزائرية الديمقراطية الشعبية.',
+  // Cookies
+  cookiesTitle: 'سياسة ملفات الارتباط', cookiesSub: 'الشؤون القانونية',
+  cookies1Title: 'ملفات الارتباط الأساسية', cookies1Body: 'مطلوبة للجلسات والسلة وإتمام الشراء. لا يمكن تعطيلها.', cookies1Tag: 'مطلوب',
+  cookies2Title: 'ملفات ارتباط التحليلات', cookies2Body: 'بيانات مجمعة لتحسين المنصة. لا تتضمن بيانات شخصية.', cookies2Tag: 'اختياري',
+  cookiesNotice: 'يمكنك إدارة أو حذف ملفات الارتباط من إعدادات المتصفح الخاص بك في أي وقت.',
+  // Contact
+  contactSub: 'تواصل معنا', contactTitle: 'تواصل', contactTitleHighlight: 'معنا',
+  contactDesc: 'فريقنا يجيب خلال 24 ساعة 💪',
+  contactInfoTitle: '// معلومات الاتصال',
+  contactPhoneLabel: 'الهاتف', contactLocLabel: 'الموقع', contactMailLabel: 'البريد',
+  contactCta1: 'تمرّن. كل. نم.', contactCta2: 'كرر العملية.',
+  contactFormTitle: '// أرسل رسالة',
+  contactNameLabel: 'الاسم', contactPhoneInputLabel: 'الهاتف',
+  contactEmailLabel: 'البريد الإلكتروني',
+  contactMsgLabel: 'رسالتك', contactMsgPh: 'كيف يمكننا مساعدتك؟',
+  contactSentTitle: 'تم إرسال الرسالة!', contactSentDesc: 'سنرد عليك خلال 24 ساعة. 💪',
+  contactSendBtn: 'إرسال الرسالة', contactSending: 'جاري...',
+  contactErrMsg: 'حدث خطأ',
 };
 
 const jsonFr = {
@@ -377,7 +458,195 @@ const jsonFr = {
   privacy: 'Confidentialité',
   terms: 'Conditions',
   rightsReserved: 'Tous droits réservés.',
+  // Navbar extra
+  searchPhD: 'Chercher des équipements...',
+  searchPhM: 'Rechercher...',
+  shopCta: 'Acheter les équipements',
+  // Hero
+  heroBadge: '#1 boutique fitness en Algérie',
+  heroTitleDef: 'Nourrissez <span style="color:var(--fire)">votre corps</span><br/>avec la force.',
+  heroHighlightWord: 'votre corps',
+  heroSubDef: 'Équipements fitness premium, suppléments nutritionnels et vêtements de sport. Livraison rapide vers les 58 wilayas.',
+  heroShopBtn: 'Acheter maintenant',
+  heroCatsBtn: 'Catégories',
+  mottos: ['No pain, no gain','Repousse tes limites','Entraîne-toi dur','Reste concentré','Mode bête activé'],
+  // Stats
+  statProduct: 'produit', statDelivery: 'livraison', statOriginal: 'original', statRank: 'en Algérie',
+  // Trust
+  trustDelivery: 'Livraison rapide', trustDeliveryDesc: '48h partout en Algérie',
+  trustOriginal: 'Équipements originaux', trustOriginalDesc: 'Produits certifiés 100%',
+  trustPrice: 'Meilleurs prix', trustPriceDesc: 'Valeur imbattable',
+  trustPro: 'Performance pro', trustProDesc: 'Équipements professionnels',
+  // Categories
+  catLabel: 'Catégories', catHead1: "S'entraîner par", catHead2: 'catégorie',
+  // Products
+  prodLabel: 'Produits', prodHead1: 'Tous les', prodHead2: 'équipements',
+  prodCountSuffix: 'article', noProds: 'Bientôt disponible',
+  // CTA
+  ctaHead1: 'Êtes-vous prêt pour', ctaHighlight: 'la transformation ?',
+  ctaDesc: "Rejoignez des milliers de sportifs à travers l'Algérie. Obtenez les équipements dont vous avez besoin pour atteindre votre pic de performance.",
+  ctaBtn1: 'Voir tous les équipements',
+  // Footer
+  footerBio: 'Boostez vos performances. Équipements fitness premium pour les sportifs sérieux.',
+  footerDelivery: 'Livraison gratuite à partir de 5000 DA',
+  footerLinks: '// Navigation', footerCartLink: 'Panier',
+  footerContactLabel: '// Nous contacter',
+  footerAvailable: 'Disponibles maintenant ⚡', footerReply: 'Réponse en quelques heures',
+  footerMoto: 'No rest days // Train hard // Be stronger // Push your limits //',
+  // Details
+  detailLabel: 'Détails du produit',
+  inStock: 'En stock', outStock: 'Épuisé', infiniteStock: '∞ Disponible',
+  priceLabel: 'Prix', offerQtyLabel: 'Quantité :',
+  // ProductForm
+  delivDataTitle: 'Données de livraison', cancelLabel: 'Annuler',
+  summaryTitle: 'Résumé de la commande', productLabel: 'Produit',
+  processing: 'Traitement en cours...', addedToCart: 'Ajouté ✓',
+  secureLabel: 'Sécurisé', fastDelivLabel: 'Livraison rapide', originalLabel: 'Original',
+  homeDelivLabel: 'À domicile', officeDelivLabel: 'Point relais',
+  // Cart
+  cartItemsCount: 'article', deleteLabel: 'Supprimer',
+  delivInfoTitle: '// Infos de livraison', cartDelivType: '// Type de livraison',
+  homeLabel: 'À domicile', officeLabel: 'Point relais',
+  cartProcessing: 'Envoi...', cartSuccessTitle: 'Commande reçue !',
+  cartSuccessDesc: 'Merci pour votre confiance. Nous vous contacterons bientôt. 💪',
+  backToStore: 'Retour à la boutique',
+  // Privacy
+  privacyTitle: 'Politique de confidentialité', privacySub: 'Mentions légales',
+  priv1Title: 'Données collectées', priv1Body: 'Uniquement votre nom, numéro de téléphone et adresse de livraison — le minimum requis pour traiter votre commande.',
+  priv2Title: 'Utilisation', priv2Body: 'Exclusivement pour traiter et expédier votre commande. Aucun marketing ni vente de données.',
+  priv3Title: 'Sécurité', priv3Body: 'Vos données sont protégées par un chiffrement de haut niveau et sécurisées à tout moment.',
+  priv4Title: 'Partage des données', priv4Body: 'Nous ne vendons jamais vos données. Partagées uniquement avec nos partenaires de livraison de confiance.', priv4Tag: 'Garanti',
+  // Terms
+  termsTitle: "Conditions d'utilisation", termsSub: 'Mentions légales',
+  terms1Title: 'Commandes', terms1Body: 'Aucun frais caché. Le prix affiché est le prix final.',
+  terms2Title: 'Produits originaux', terms2Body: 'Nous vendons uniquement des produits originaux ; les contrefaçons sont strictement interdites.', terms2Tag: 'Strict',
+  terms3Title: 'Loi applicable', terms3Body: 'Ces conditions sont soumises aux lois de la République Algérienne Démocratique et Populaire.',
+  // Cookies
+  cookiesTitle: 'Politique des cookies', cookiesSub: 'Mentions légales',
+  cookies1Title: 'Cookies essentiels', cookies1Body: 'Nécessaires pour les sessions, le panier et le passage en caisse. Ne peuvent pas être désactivés.', cookies1Tag: 'Requis',
+  cookies2Title: 'Cookies analytiques', cookies2Body: 'Données agrégées pour améliorer la plateforme. Aucune donnée personnelle incluse.', cookies2Tag: 'Optionnel',
+  cookiesNotice: 'Vous pouvez gérer ou supprimer les cookies depuis les paramètres de votre navigateur à tout moment.',
+  // Contact
+  contactSub: 'Nous contacter', contactTitle: 'Contactez-', contactTitleHighlight: 'nous',
+  contactDesc: 'Notre équipe répond en 24h 💪',
+  contactInfoTitle: '// Informations de contact',
+  contactPhoneLabel: 'Téléphone', contactLocLabel: 'Adresse', contactMailLabel: 'E-mail',
+  contactCta1: 'Train. Eat. Sleep.', contactCta2: 'Repeat.',
+  contactFormTitle: '// Envoyer un message',
+  contactNameLabel: 'Nom', contactPhoneInputLabel: 'Téléphone',
+  contactEmailLabel: 'E-mail',
+  contactMsgLabel: 'Votre message', contactMsgPh: 'Comment pouvons-nous vous aider ?',
+  contactSentTitle: 'Message envoyé !', contactSentDesc: 'Nous vous répondrons dans les 24 heures. 💪',
+  contactSendBtn: 'Envoyer le message', contactSending: 'Envoi...',
+  contactErrMsg: 'Une erreur est survenue',
 };
+
+const jsonEn = {
+  dir: 'ltr',
+  home: 'Home', contact: 'Contact', cart: 'Cart',
+  search: 'Search...', searching: 'Searching...', noResults: 'No results', showAll: 'View all results',
+  all: 'All', noProducts: 'No products available at the moment.', shopNow: 'Shop Now', searchResultsFor: 'Results for:',
+  fullName: 'Full name', fullNamePh: 'Your name', errName: 'Name is required',
+  phone: 'Phone', phonePh: '0555 12 34 56', errPhone: 'Phone number is required', errPhoneInvalid: 'Invalid phone number',
+  wilaya: 'Wilaya', errWilaya: 'Select a wilaya', wilayaPh: 'Choose wilaya', wilayaNA: 'Delivery unavailable',
+  commune: 'Commune', errCommune: 'Select a commune', communePh: 'Choose commune', communeLoading: 'Loading...',
+  deliveryType: 'Delivery type', deliveryHome: 'Home delivery', deliveryOffice: 'Office pickup',
+  qty: 'Quantity', price: 'Price', delivery: 'Delivery', total: 'Total', subtotal: 'Subtotal', orderInfo: 'Order info',
+  addToCart: 'Add to cart', orderNow: 'Order now', confirmOrder: 'Confirm order',
+  sending: 'Sending...', back: 'Cancel', addedMsg: 'Added to cart ✓', errSubmit: 'An error occurred, please try again.',
+  myCart: 'My Cart', cartEmpty: 'Your cart is empty', cartEmptyDesc: 'Discover our selection.',
+  successTitle: 'Order confirmed', successDesc: 'Thank you for your order, our team will contact you soon.',
+  backToShop: 'Back to store', checkoutTitle: 'Checkout',
+  offersTitle: 'Bundle offers', descTitle: 'Description',
+  quickLinks: 'Navigation', contactSect: 'Contact', privacy: 'Privacy', terms: 'Terms',
+  rightsReserved: 'All rights reserved.',
+  // Navbar extra
+  searchPhD: 'Search equipment...', searchPhM: 'Search...', shopCta: 'Shop Equipment Now',
+  // Hero
+  heroBadge: '#1 Fitness Store in Algeria',
+  heroTitleDef: 'Fuel <span style="color:var(--fire)">Your Body</span><br/>With Power.',
+  heroHighlightWord: 'Your Body',
+  heroSubDef: 'Premium fitness equipment, nutritional supplements and sportswear. Fast delivery to all 58 wilayas.',
+  heroShopBtn: 'Shop Now', heroCatsBtn: 'Categories',
+  mottos: ['No pain, no gain','Push your limits','Train insane','Stay focused','Beast mode ON'],
+  // Stats
+  statProduct: 'product', statDelivery: 'delivery', statOriginal: 'original', statRank: 'in Algeria',
+  // Trust
+  trustDelivery: 'Fast Delivery', trustDeliveryDesc: '48h across Algeria',
+  trustOriginal: 'Original Gear', trustOriginalDesc: '100% certified products',
+  trustPrice: 'Best Prices', trustPriceDesc: 'Unbeatable value',
+  trustPro: 'Pro Performance', trustProDesc: 'Professional equipment',
+  // Categories
+  catLabel: 'Categories', catHead1: 'Train by', catHead2: 'category',
+  // Products
+  prodLabel: 'Products', prodHead1: 'All', prodHead2: 'Equipment',
+  prodCountSuffix: 'item', noProds: 'Coming Soon',
+  // CTA
+  ctaHead1: 'Are you ready for', ctaHighlight: 'transformation?',
+  ctaDesc: 'Join thousands of athletes across Algeria. Get the equipment you need to reach your peak performance.',
+  ctaBtn1: 'Shop All Equipment',
+  // Footer
+  footerBio: 'Elevate your performance. Premium fitness equipment for serious athletes.',
+  footerDelivery: 'Free delivery on orders +5000 DA',
+  footerLinks: '// Navigation', footerCartLink: 'Cart',
+  footerContactLabel: '// Contact Us',
+  footerAvailable: 'Available now ⚡', footerReply: 'Reply within hours',
+  footerMoto: 'No rest days // Train hard // Be stronger // Push your limits //',
+  // Details
+  detailLabel: 'Product Details',
+  inStock: 'In Stock', outStock: 'Out of Stock', infiniteStock: '∞ Available',
+  priceLabel: 'Price', offerQtyLabel: 'Quantity:',
+  // ProductForm
+  delivDataTitle: 'Delivery Data', cancelLabel: 'Cancel',
+  summaryTitle: 'Order Summary', productLabel: 'Product',
+  processing: 'Processing...', addedToCart: 'Added ✓',
+  secureLabel: 'Secure', fastDelivLabel: 'Fast delivery', originalLabel: 'Original',
+  homeDelivLabel: 'Home delivery', officeDelivLabel: 'Office pickup',
+  // Cart
+  cartItemsCount: 'item', deleteLabel: 'Remove',
+  delivInfoTitle: '// Delivery Info', cartDelivType: '// Delivery Type',
+  homeLabel: 'Home', officeLabel: 'Office',
+  cartProcessing: 'Sending...', cartSuccessTitle: 'Order received!',
+  cartSuccessDesc: 'Thank you for your trust. We will contact you soon. 💪',
+  backToStore: 'Back to store',
+  // Privacy
+  privacyTitle: 'Privacy Policy', privacySub: 'Legal',
+  priv1Title: 'Data We Collect', priv1Body: 'Only your name, phone number and delivery address — the minimum required to process your order.',
+  priv2Title: 'How We Use It', priv2Body: 'Exclusively to process and ship your order. No marketing or data sales.',
+  priv3Title: 'Security', priv3Body: 'Your data is protected by high-level encryption and secured at all times.',
+  priv4Title: 'Data Sharing', priv4Body: 'We never sell your data. Shared only with trusted delivery partners.', priv4Tag: 'Guaranteed',
+  // Terms
+  termsTitle: 'Terms of Service', termsSub: 'Legal',
+  terms1Title: 'Orders', terms1Body: 'No hidden fees. The displayed price is the final price.',
+  terms2Title: 'Original Products', terms2Body: 'We sell only original products; counterfeit goods are strictly prohibited.', terms2Tag: 'Strict',
+  terms3Title: 'Applicable Law', terms3Body: "These terms are governed by the laws of the People's Democratic Republic of Algeria.",
+  // Cookies
+  cookiesTitle: 'Cookie Policy', cookiesSub: 'Legal',
+  cookies1Title: 'Essential Cookies', cookies1Body: 'Required for sessions, cart and checkout. Cannot be disabled.', cookies1Tag: 'Required',
+  cookies2Title: 'Analytics Cookies', cookies2Body: 'Aggregated data to improve the platform. No personal data included.', cookies2Tag: 'Optional',
+  cookiesNotice: 'You can manage or delete cookies from your browser settings at any time.',
+  // Contact
+  contactSub: 'Contact Us', contactTitle: 'Contact', contactTitleHighlight: 'Us',
+  contactDesc: 'Our team replies within 24 hours 💪',
+  contactInfoTitle: '// Contact Info',
+  contactPhoneLabel: 'Phone', contactLocLabel: 'Location', contactMailLabel: 'Email',
+  contactCta1: 'Train. Eat. Sleep.', contactCta2: 'Repeat.',
+  contactFormTitle: '// Send a Message',
+  contactNameLabel: 'Name', contactPhoneInputLabel: 'Phone',
+  contactEmailLabel: 'Email',
+  contactMsgLabel: 'Your message', contactMsgPh: 'How can we help you?',
+  contactSentTitle: 'Message sent!', contactSentDesc: 'We will reply within 24 hours. 💪',
+  contactSendBtn: 'Send Message', contactSending: 'Sending...',
+  contactErrMsg: 'An error occurred',
+};
+
+type Lang = 'ar' | 'fr' | 'en';
+const getLang = (store?: any): Lang => {
+  if (store?.language === 'fr') return 'fr';
+  if (store?.language === 'en') return 'en';
+  return 'ar';
+};
+const T: Record<Lang, typeof jsonAr> = { ar: jsonAr, fr: jsonFr as any, en: jsonEn as any };
 
 export default function Main({ store, children, domain }: any) {
   const pathname = usePathname();
@@ -396,6 +665,9 @@ export default function Main({ store, children, domain }: any) {
    NAVBAR - FIRE GYM EDITION (PRO)
 ═══════════════════════════════════════════════════════════ */
 export function Navbar({ store, domain }: { store: any; domain: string }) {
+  const lang = getLang(store);
+  const t = T[lang];
+  const isRTL = lang === 'ar';
   const [open, setOpen]         = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [sq, setSq]             = useState('');
@@ -424,12 +696,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   // 3. منطق البحث المباشر (Debounced Search)
   useEffect(() => {
     if (sq.length < 2) { setLs([]); return; }
-    const t = setTimeout(async () => {
+    const timer = setTimeout(async () => {
       setLoading(true);
       try { const {data} = await axios.get(`${API_URL}/products/public/${domain}`, {params:{search:sq}}); setLs(data.products||[]); }
       catch {} finally { setLoading(false); }
     }, 380);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [sq, domain]);
 
   const doSearch = (e?: React.FormEvent) => { 
@@ -479,7 +751,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     </div>
 
     {loading ? (
-      <div style={{padding:'1.5rem', textAlign:'center', color:'var(--fire)', fontFamily:"'Barlow Condensed',sans-serif", fontWeight:700, letterSpacing:'0.1em'}}>جاري البحث...</div>
+      <div style={{padding:'1.5rem', textAlign:'center', color:'var(--fire)', fontFamily:"'Barlow Condensed',sans-serif", fontWeight:700, letterSpacing:'0.1em'}}>{t.searching}</div>
     ) : ls.length > 0 ? (
       <div style={{maxHeight:'320px', overflowY:'auto'}}>
         {ls.map((p:any) => (
@@ -488,28 +760,27 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <img src={p.productImage||p.imagesProduct?.[0]?.imageUrl} style={{width:40, height:40, objectFit:'cover', flexShrink:0, borderRadius:'4px'}} alt=""/>
             <div style={{flex:1}}>
               <div style={{fontSize:'13px', fontWeight:700, color:'var(--white)', fontFamily:"'Barlow Condensed',sans-serif", textTransform:'uppercase'}}>{p.name}</div>
-              <div style={{fontSize:'14px', color:'var(--fire)', fontWeight:700}}>{p.price} دج</div>
+              <div style={{fontSize:'14px', color:'var(--fire)', fontWeight:700}}>{p.price} {store?.currency || 'DZD'}</div>
             </div>
           </Link>
         ))}
-        {/* زر عرض المزيد داخل القائمة */}
         <button onClick={() => doSearch()} style={{
-          width:'100%', padding:'12px', background:'rgba(255,69,0,0.05)', border:'none', 
-          borderTop:'1px solid var(--line)', color:'var(--fire)', fontWeight:800, 
+          width:'100%', padding:'12px', background:'rgba(255,69,0,0.05)', border:'none',
+          borderTop:'1px solid var(--line)', color:'var(--fire)', fontWeight:800,
           fontSize:'12px', cursor:'pointer', fontFamily:"'Barlow Condensed',sans-serif", letterSpacing:'0.1em',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
         }}>
-          عرض جميع النتائج <ArrowLeft size={12} />
+          {t.showAll} <ArrowLeft size={12} />
         </button>
       </div>
     ) : sq.length >= 2 && (
-      <div style={{padding:'1.5rem', textAlign:'center', color:'var(--mid)', fontSize:'13px'}}>لا توجد نتائج مطابقة</div>
+      <div style={{padding:'1.5rem', textAlign:'center', color:'var(--mid)', fontSize:'13px'}}>{t.noResults}</div>
     )}
   </div>
 );
 
   return (
-    <header dir="rtl" style={{position:'sticky', top:0, zIndex:100, fontFamily:"'Barlow',sans-serif"}}>
+    <header dir={isRTL ? 'rtl' : 'ltr'} style={{position:'sticky', top:0, zIndex:100, fontFamily:"'Barlow',sans-serif"}}>
       
       {/* Ticker - شريط الإعلانات المتحرك */}
       {store?.topBar?.enabled && store?.topBar?.text && (
@@ -546,9 +817,9 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Desktop Search */}
           <div  className="nav-search-d" style={{flex:1, maxWidth:350, position:'relative'}}>
             <form onSubmit={doSearch} style={{position:'relative'}}>
-              <input type="text" placeholder="ابحث عن المعدات..." value={sq} onChange={e=>setSq(e.target.value)}
-                className="inp" style={{padding:'10px 40px 10px 14px', fontSize:'13px', background:'rgba(255,255,255,0.04)', borderRadius:'4px'}}/>
-              <Search size={14} style={{position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', color:'var(--mid)'}}/>
+              <input type="text" placeholder={t.searchPhD} value={sq} onChange={e=>setSq(e.target.value)}
+                className="inp" style={{padding: isRTL ? '10px 40px 10px 14px' : '10px 14px 10px 40px', fontSize:'13px', background:'rgba(255,255,255,0.04)', borderRadius:'4px'}}/>
+              <Search size={14} style={{position:'absolute', ...(isRTL ? {left:14} : {right:14}), top:'50%', transform:'translateY(-50%)', color:'var(--mid)'}}/>
             </form>
             {sq.length >= 2 && <SearchDrop/>}
           </div>
@@ -558,7 +829,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             
             {/* Desktop Links */}
             <div  style={{ alignItems:'center', gap:'24px'}} className="hidden lg:flex">
-              {[{h:'/',l:'الرئيسية'}, {h:'/contact',l:'تواصل معنا'}].map(i=>(
+              {[{h:'/',l:t.home}, {h:'/contact',l:t.contact}].map(i=>(
                 <Link key={i.h} href={i.h} style={{fontSize:'13px', fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--mid)', textDecoration:'none', transition:'0.2s'}}
                   onMouseEnter={e=>(e.currentTarget.style.color='var(--fire)')}
                   onMouseLeave={e=>(e.currentTarget.style.color='var(--mid)')}>
@@ -601,9 +872,9 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       {showSearch && (
         <div style={{background:'var(--dark)', borderBottom:'1px solid var(--fire)', padding:'12px 20px', position:'relative'}} className="anim-slide-down">
           <form onSubmit={doSearch} style={{position:'relative'}}>
-            <input autoFocus type="text" placeholder="ابحث هنا..." value={sq} onChange={e=>setSq(e.target.value)}
-              className="inp" style={{padding:'12px 40px 12px 14px'}}/>
-            <Search size={16} style={{position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', color:'var(--fire)'}}/>
+            <input autoFocus type="text" placeholder={t.searchPhM} value={sq} onChange={e=>setSq(e.target.value)}
+              className="inp" style={{padding: isRTL ? '12px 40px 12px 14px' : '12px 14px 12px 40px'}}/>
+            <Search size={16} style={{position:'absolute', ...(isRTL ? {left:14} : {right:14}), top:'50%', transform:'translateY(-50%)', color:'var(--fire)'}}/>
           </form>
           {sq.length >= 2 && <SearchDrop/>}
         </div>
@@ -618,14 +889,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <div style={{padding:'15px 25px 25px'}}>
           <div style={{display:'flex', flexDirection:'column', gap:'10px'}}>
             <Link href="/" onClick={()=>setOpen(false)} style={{display:'flex', justifyContent:'space-between', padding:'12px 0', fontSize:'14px', fontWeight:800, color:'var(--white)', textDecoration:'none', borderBottom:'1px solid var(--line)', textTransform:'uppercase'}}>
-              الرئيسية <ArrowLeft size={14} style={{color:'var(--fire)'}}/>
+              {t.home} <ArrowLeft size={14} style={{color:'var(--fire)'}}/>
             </Link>
             <Link href="/contact" onClick={()=>setOpen(false)} style={{display:'flex', justifyContent:'space-between', padding:'12px 0', fontSize:'14px', fontWeight:800, color:'var(--white)', textDecoration:'none', borderBottom:'1px solid var(--line)', textTransform:'uppercase'}}>
-              تواصل معنا <ArrowLeft size={14} style={{color:'var(--fire)'}}/>
+              {t.contact} <ArrowLeft size={14} style={{color:'var(--fire)'}}/>
             </Link>
 
             <button onClick={()=>{router.push('/#products'); setOpen(false);}} className="btn-fire" style={{marginTop:'15px', width:'100%', clipPath:'none', borderRadius:'4px', fontWeight:800}}>
-              <Dumbbell size={16} style={{marginLeft:8}}/> تسوق المعدات الآن
+              <Dumbbell size={16} style={{marginInlineEnd:8}}/> {t.shopCta}
             </button>
           </div>
         </div>
@@ -638,13 +909,15 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
    FOOTER — 3 أقسام
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
   return (
-    <footer dir="rtl" style={{backgroundColor:'var(--dark)',borderTop:'2px solid var(--fire)',fontFamily:"'Barlow',sans-serif"}}>
+    <footer dir={isRTL ? 'rtl' : 'ltr'} style={{backgroundColor:'var(--dark)',borderTop:'2px solid var(--fire)',fontFamily:"'Barlow',sans-serif"}}>
       {/* Moto stripe */}
       <div style={{overflow:'hidden',whiteSpace:'nowrap',background:'var(--fire)',padding:'10px 0'}}>
         <div className="moto-inner">
-          {Array(8).fill(null).map((_,i) => <span key={i} className="bc" style={{fontSize:'12px',fontWeight:800,letterSpacing:'0.25em',textTransform:'uppercase',color:'white',margin:'0 40px'}}>لا أيام للراحة // تمرن بقوة // كن أقوى // تجاوز حدودك //</span>)}
-          {Array(8).fill(null).map((_,i) => <span key={`b${i}`} className="bc" style={{fontSize:'12px',fontWeight:800,letterSpacing:'0.25em',textTransform:'uppercase',color:'white',margin:'0 40px'}}>لا أيام للراحة // تمرن بقوة // كن أقوى // تجاوز حدودك //</span>)}
+          {Array(8).fill(null).map((_,i) => <span key={i} className="bc" style={{fontSize:'12px',fontWeight:800,letterSpacing:'0.25em',textTransform:'uppercase',color:'white',margin:'0 40px'}}>{t.footerMoto}</span>)}
+          {Array(8).fill(null).map((_,i) => <span key={`b${i}`} className="bc" style={{fontSize:'12px',fontWeight:800,letterSpacing:'0.25em',textTransform:'uppercase',color:'white',margin:'0 40px'}}>{t.footerMoto}</span>)}
         </div>
       </div>
 
@@ -661,19 +934,19 @@ export function Footer({ store }: any) {
               }
             </div>
             <p style={{fontSize:'13px',lineHeight:'1.7',color:'var(--mid)',maxWidth:'240px',fontWeight:400}}>
-              {store?.hero?.subtitle?.substring(0,80) || 'عزز أداءك. معدات لياقة بدنية فاخرة للرياضيين الجادين.'}
+              {store?.hero?.subtitle?.substring(0,80) || t.footerBio}
             </p>
             <div style={{marginTop:'14px',display:'flex',alignItems:'center',gap:'8px'}}>
               <Truck style={{width:'14px',height:'14px',color:'var(--fire)'}}/>
-              <span style={{fontSize:'12px',fontWeight:600,color:'var(--gold)'}}>توصيل مجاني للطلبات +5000 دج</span>
+              <span style={{fontSize:'12px',fontWeight:600,color:'var(--gold)'}}>{t.footerDelivery}</span>
             </div>
-            <p style={{fontSize:'11px',color:'var(--dim)',marginTop:'24px'}}>© {new Date().getFullYear()} {store?.name}. جميع الحقوق محفوظة.</p>
+            <p style={{fontSize:'11px',color:'var(--dim)',marginTop:'24px'}}>© {new Date().getFullYear()} {store?.name}. {t.rightsReserved}</p>
           </div>
 
           {/* قسم 2 — الروابط */}
           <div>
-            <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'16px'}}>// الروابط</p>
-            {[{h:'/',l:'الرئيسية'},{h:'/cart',l:'سلة التسوق'},{h:'/contact',l:'تواصل معنا'},{h:'/Privacy',l:'سياسة الخصوصية'},{h:'/Terms',l:'شروط الاستخدام'}].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk=>(
+            <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'16px'}}>{t.footerLinks}</p>
+            {[{h:'/',l:t.home},{h:'/cart',l:t.footerCartLink},{h:'/contact',l:t.contact},{h:'/Privacy',l:t.privacy},{h:'/Terms',l:t.terms}].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk=>(
               <a key={lnk.h} href={lnk.h} style={{display:'block',fontSize:'13px',color:'var(--mid)',marginBottom:'8px',transition:'color 0.2s'}}
                 onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--fire)';}}
                 onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mid)';}}>
@@ -684,7 +957,7 @@ export function Footer({ store }: any) {
 
           {/* قسم 3 — تواصل */}
           <div>
-            <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'16px'}}>// تواصل معنا</p>
+            <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'16px'}}>{t.footerContactLabel}</p>
             {[
               {icon:'📞', val:store?.contact?.phone},
               {icon:'📍', val:[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')},
@@ -696,8 +969,8 @@ export function Footer({ store }: any) {
               </div>
             ))}
             <div style={{marginTop:'14px',padding:'12px 14px',border:'1px solid var(--fire)',background:'rgba(255,69,0,0.07)'}}>
-              <p className="bb" style={{fontSize:'1rem',color:'var(--gold)',marginBottom:2}}>متاحون الآن ⚡</p>
-              <p style={{fontSize:'11px',color:'var(--dim)'}}>نرد خلال ساعات</p>
+              <p className="bb" style={{fontSize:'1rem',color:'var(--gold)',marginBottom:2}}>{t.footerAvailable}</p>
+              <p style={{fontSize:'11px',color:'var(--dim)'}}>{t.footerReply}</p>
             </div>
           </div>
 
@@ -711,10 +984,11 @@ export function Footer({ store }: any) {
    CARD
 ══════════════════════════════════════════════════════════════ */
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
+  const cardT = T[getLang(store)];
   const price = typeof product.price==='string' ? parseFloat(product.price) : product.price;
   const orig  = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
   return (
-    <div className="p-card" dir="rtl">
+    <div className="p-card" dir={cardT.dir === 'rtl' ? 'rtl' : 'ltr'}>
       <div className="p-img" style={{position:'relative',aspectRatio:'1/1',overflow:'hidden',backgroundColor:'var(--panel-2)'}}>
         {displayImage
           ? <img src={displayImage} alt={product.name}/>
@@ -733,11 +1007,11 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         </div>
         <div style={{display:'flex',alignItems:'baseline',gap:'6px',marginTop:'auto'}}>
           <span className="bb" style={{fontSize:'1.4rem',color:'var(--fire)'}}>{price.toLocaleString()}</span>
-          <span style={{fontSize:'11px',color:'var(--mid)'}}>دج</span>
+          <span style={{fontSize:'11px',color:'var(--mid)'}}>{store?.currency || 'DZD'}</span>
           {orig>price && <span style={{fontSize:'11px',color:'var(--dim)',textDecoration:'line-through'}}>{orig.toLocaleString()}</span>}
         </div>
         <Link href={`/product/${product.slug||product.id}`} className="btn-fire" style={{width:'100%',fontSize:'13px',padding:'10px 14px',clipPath:'none',marginTop:'4px'}}>
-          {viewDetails||'عرض التفاصيل'}
+          {viewDetails||cardT.shopNow}
         </Link>
       </div>
     </div>
@@ -748,17 +1022,20 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
    HOME
 ══════════════════════════════════════════════════════════════ */
 export function Home({ store, page }: any) {
+  const lang = getLang(store);
+  const t = T[lang];
+  const isRTL = lang === 'ar';
   const products: any[] = store.products || [];
   const cats: any[]     = store.categories || [];
   if (!page) page = 1;
   const countPage = Math.ceil((store.count||products.length)/48);
 
-  const mottos = ['لا ألم، لا نتيجة','تجاوز حدودك','تمرن بجنون','ابقَ مركزاً','وضعية الوحش مفعلة'];
+  const mottos = t.mottos;
   const [mIdx, setMIdx] = useState(0);
-  useEffect(() => { const t = setInterval(() => setMIdx(p=>(p+1)%mottos.length), 2500); return () => clearInterval(t); }, []);
+  useEffect(() => { const interval = setInterval(() => setMIdx(p=>(p+1)%mottos.length), 2500); return () => clearInterval(interval); }, []);
 
   return (
-    <div dir="rtl">
+    <div dir={isRTL ? 'rtl' : 'ltr'}>
 
       {/* ── HERO ── */}
       <section style={{position:'relative',overflow:'hidden',backgroundColor:'var(--black)',minHeight:'80vh',display:'flex',alignItems:'center',justifyContent:'center',paddingTop:30 , paddingBottom: 25}}>
@@ -776,7 +1053,7 @@ export function Home({ store, page }: any) {
           {/* Badge */}
           <div style={{display:'inline-flex',alignItems:'center',gap:'6px',border:'1px solid var(--fire)',padding:'4px 12px',marginBottom:'16px',backgroundColor:'rgba(255,69,0,0.12)'}}>
             <Flame style={{width:'12px',height:'12px',color:'var(--fire)',animation:'flicker 1.2s ease-in-out infinite'}}/>
-            <span className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--fire)'}}>متجر اللياقة البدنية #1 في الجزائر</span>
+            <span className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.15em',textTransform:'uppercase',color:'var(--fire)'}}>{t.heroBadge}</span>
           </div>
 
           {/* Animated motto */}
@@ -784,27 +1061,27 @@ export function Home({ store, page }: any) {
 
           {/* H1 */}
           <h1 className="bb" style={{fontSize:'clamp(3rem,8vw,6.5rem)',lineHeight:0.95,color:'var(--white)',letterSpacing:'-0.01em',marginBottom:'18px',textShadow:'0 3px 12px rgba(0,0,0,0.6)'}}
-            dangerouslySetInnerHTML={{__html:DOMPurify.sanitize(store.hero?.title?.replace(/<[^>]+>/g,'').replace('جسمك','<span style="color:var(--fire)">جسمك</span>')||'غذّي <span style="color:var(--fire)">جسمك</span><br/>بالقوة.')}}>
+            dangerouslySetInnerHTML={{__html:DOMPurify.sanitize(store.hero?.title?.replace(/<[^>]+>/g,'').replace(t.heroHighlightWord,`<span style="color:var(--fire)">${t.heroHighlightWord}</span>`)||t.heroTitleDef)}}>
           </h1>
 
           <p style={{fontSize:'clamp(14px,1.8vw,17px)',lineHeight:'1.6',color:'rgba(255,255,255,0.7)',maxWidth:'520px',marginBottom:'28px',textShadow:'0 1px 3px rgba(0,0,0,0.5)'}}>
-            {store.hero?.subtitle||'معدات لياقة بدنية فاخرة، مكملات غذائية، وملابس رياضية. توصيل سريع إلى جميع الولايات الـ 58.'}
+            {store.hero?.subtitle||t.heroSubDef}
           </p>
 
           <div style={{display:'flex',gap:'12px',flexWrap:'wrap',justifyContent:'center',marginBottom:'36px'}}>
             <a href="#products" className="btn-fire" style={{fontSize:'14px',padding:'12px 34px'}}>
-              <Dumbbell style={{width:'16px',height:'16px'}}/> تسوق الآن
+              <Dumbbell style={{width:'16px',height:'16px'}}/> {t.heroShopBtn}
             </a>
             {cats.length > 0 && (
               <a href="#categories" style={{fontSize:'14px',padding:'12px 34px',border:'1px solid #fff',color:'#fff',display:'flex',alignItems:'center',gap:'6px'}}>
-                الأقسام <ChevronDown style={{width:'14px',height:'14px'}}/>
+                {t.heroCatsBtn} <ChevronDown style={{width:'14px',height:'14px'}}/>
               </a>
             )}
           </div>
 
           {/* Stats */}
           <div className="fu-3" style={{display:'flex',gap:'32px',paddingTop:'22px',borderTop:'1px solid rgba(255,255,255,0.08)',flexWrap:'wrap',justifyContent:'center',width:'100%',maxWidth:'700px'}}>
-            {[{v:`${products.length}+`,l:'منتج',c:'var(--gold)'},{v:'48h',l:'توصيل',c:'var(--fire)'},{v:'100%',l:'أصلي',c:'var(--green)'},{v:'#1',l:'في الجزائر',c:'var(--gold)'}].map((s,i)=>(
+            {[{v:`${products.length}+`,l:t.statProduct,c:'var(--gold)'},{v:'48h',l:t.statDelivery,c:'var(--fire)'},{v:'100%',l:t.statOriginal,c:'var(--green)'},{v:'#1',l:t.statRank,c:'var(--gold)'}].map((s,i)=>(
               <div key={i} style={{textAlign:'center'}}>
                 <p className="bb" style={{fontSize:'clamp(1.8rem,4vw,2.6rem)',color:s.c,lineHeight:1,margin:0}}>{s.v}</p>
                 <p className="bc" style={{fontSize:'10px',fontWeight:700,letterSpacing:'0.15em',textTransform:'uppercase',color:'rgba(255,255,255,0.45)',margin:'4px 0 0'}}>{s.l}</p>
@@ -819,10 +1096,10 @@ export function Home({ store, page }: any) {
         <div style={{maxWidth:'1280px',margin:'0 auto'}}>
           <div className="trust-row">
             {[
-              {icon:<Truck style={{width:'20px',height:'20px'}}/>,color:'var(--fire)',title:'توصيل سريع',desc:'48 ساعة عبر الجزائر'},
-              {icon:<Shield style={{width:'20px',height:'20px'}}/>,color:'var(--gold)',title:'معدات أصلية',desc:'منتجات أصلية 100%'},
-              {icon:<Trophy style={{width:'20px',height:'20px'}}/>,color:'var(--fire)',title:'أفضل الأسعار',desc:'قيمة لا تضاهى'},
-              {icon:<TrendingUp style={{width:'20px',height:'20px'}}/>,color:'var(--green)',title:'أداء احترافي',desc:'معدات احترافية'},
+              {icon:<Truck style={{width:'20px',height:'20px'}}/>,color:'var(--fire)',title:t.trustDelivery,desc:t.trustDeliveryDesc},
+              {icon:<Shield style={{width:'20px',height:'20px'}}/>,color:'var(--gold)',title:t.trustOriginal,desc:t.trustOriginalDesc},
+              {icon:<Trophy style={{width:'20px',height:'20px'}}/>,color:'var(--fire)',title:t.trustPrice,desc:t.trustPriceDesc},
+              {icon:<TrendingUp style={{width:'20px',height:'20px'}}/>,color:'var(--green)',title:t.trustPro,desc:t.trustProDesc},
             ].map((item,i)=>(
               <div key={i} style={{display:'flex',alignItems:'center',gap:'12px',padding:'16px 20px',borderRight:i>0?'1px solid var(--line)':'none'}}>
                 <div style={{color:item.color,flexShrink:0}}>{item.icon}</div>
@@ -842,9 +1119,9 @@ export function Home({ store, page }: any) {
           <div style={{maxWidth:'1280px',margin:'0 auto',padding:'0 20px'}}>
             <div style={{display:'flex',alignItems:'flex-end',justifyContent:'space-between',marginBottom:'32px'}}>
               <div>
-                <p className="s-label" style={{marginBottom:'8px'}}>الأقسام</p>
+                <p className="s-label" style={{marginBottom:'8px'}}>{t.catLabel}</p>
                 <h2 className="bb" style={{fontSize:'clamp(2rem,5vw,3.5rem)',color:'var(--white)',lineHeight:0.95,letterSpacing:'0.02em'}}>
-                  التدريب حسب<br/><span style={{color:'var(--fire)'}}>القسم</span>
+                  {t.catHead1}<br/><span style={{color:'var(--fire)'}}>{t.catHead2}</span>
                 </h2>
               </div>
             </div>
@@ -878,25 +1155,25 @@ export function Home({ store, page }: any) {
         <div style={{maxWidth:'1280px',margin:'0 auto',padding:'0 20px'}}>
           <div style={{display:'flex',alignItems:'flex-end',justifyContent:'space-between',marginBottom:'28px',paddingBottom:'16px',borderBottom:'1px solid var(--line)'}}>
             <div>
-              <p className="s-label" style={{marginBottom:'8px'}}>المنتجات</p>
+              <p className="s-label" style={{marginBottom:'8px'}}>{t.prodLabel}</p>
               <h2 className="bb" style={{fontSize:'clamp(2rem,5vw,3.5rem)',color:'var(--white)',lineHeight:0.95,letterSpacing:'0.02em'}}>
-                جميع <span style={{color:'var(--fire)'}}>المعدات</span>
+                {t.prodHead1} <span style={{color:'var(--fire)'}}>{t.prodHead2}</span>
               </h2>
             </div>
-            <p className="bc" style={{fontSize:'13px',fontWeight:600,color:'var(--dim)',letterSpacing:'0.1em',textTransform:'uppercase'}}>{products.length} عنصر</p>
+            <p className="bc" style={{fontSize:'13px',fontWeight:600,color:'var(--dim)',letterSpacing:'0.1em',textTransform:'uppercase'}}>{products.length} {t.prodCountSuffix}</p>
           </div>
 
           {products.length === 0 ? (
             <div style={{padding:'80px 0',textAlign:'center',border:'1px dashed var(--dim)'}}>
               <Dumbbell style={{width:'48px',height:'48px',color:'var(--dim)',margin:'0 auto 16px',opacity:0.4,display:'block'}}/>
-              <p className="bb" style={{fontSize:'1.8rem',color:'var(--dim)'}}>قريباً</p>
+              <p className="bb" style={{fontSize:'1.8rem',color:'var(--dim)'}}>{t.noProds}</p>
             </div>
           ) : (
             <div className="prod-grid">
               {products.map((p:any)=>{
                 const img  = p.productImage||p.imagesProduct?.[0]?.imageUrl;
                 const disc = p.priceOriginal ? Math.round(((p.priceOriginal-p.price)/p.priceOriginal)*100) : 0;
-                return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="عرض التفاصيل"/>;
+                return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails={t.shopNow}/>;
               })}
             </div>
           )}
@@ -928,17 +1205,17 @@ export function Home({ store, page }: any) {
         <div style={{position:'relative',zIndex:2,maxWidth:'640px',margin:'0 auto',textAlign:'center'}}>
           <div style={{display:'flex',justifyContent:'center',marginBottom:'16px'}}><FireIcon size={48}/></div>
           <h2 className="bb" style={{fontSize:'clamp(2.5rem,7vw,5rem)',color:'var(--white)',lineHeight:0.9,marginBottom:'14px'}}>
-            هل أنت مستعد <span style={{color:'var(--fire)'}}>للتحول</span>؟
+            {t.ctaHead1} <span style={{color:'var(--fire)'}}>{t.ctaHighlight}</span>
           </h2>
           <p style={{fontSize:'15px',color:'var(--mid)',lineHeight:'1.7',marginBottom:'32px'}}>
-            انضم إلى آلاف الرياضيين في جميع أنحاء الجزائر. احصل على المعدات التي تحتاجها للوصول إلى قمة أدائك.
+            {t.ctaDesc}
           </p>
           <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap'}}>
             <a href="#products" className="btn-fire" style={{fontSize:'15px',padding:'14px 36px'}}>
-              <Dumbbell style={{width:'16px',height:'16px'}}/> تسوق جميع المعدات
+              <Dumbbell style={{width:'16px',height:'16px'}}/> {t.ctaBtn1}
             </a>
             <Link href="/contact" className="btn-gold" style={{fontSize:'15px',padding:'14px 36px'}}>
-              تواصل معنا <ArrowLeft style={{width:'14px',height:'14px'}}/>
+              {t.contact} <ArrowLeft style={{width:'14px',height:'14px'}}/>
             </Link>
           </div>
         </div>
@@ -950,11 +1227,14 @@ export function Home({ store, page }: any) {
 /* ══════════════════════════════════════════════════════════════
    DETAILS
 ══════════════════════════════════════════════════════════════ */
-export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
+export function Details({ product, store: storeprop, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
+  const lang = getLang(storeprop || product?.store);
+  const t = T[lang];
+  const isRTL = lang === 'ar';
   const [sel, setSel] = useState(0);
   if (!product) return null;
   return (
-    <div dir="rtl" style={{backgroundColor:'var(--black)'}}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{backgroundColor:'var(--black)'}}>
       
 
       <div style={{maxWidth:'1280px',margin:'0 auto',padding:'32px 20px'}}>
@@ -1000,23 +1280,23 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
 
           {/* Info */}
           <div>
-            <p className="s-label" style={{marginBottom:'10px'}}>تفاصيل المنتج</p>
+            <p className="s-label" style={{marginBottom:'10px'}}>{t.detailLabel}</p>
             <h1 className="bb" style={{fontSize:'clamp(1.8rem,4vw,3rem)',color:'var(--white)',lineHeight:0.95,marginBottom:'14px',letterSpacing:'0.02em'}}>{product.name}</h1>
             <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'20px',paddingBottom:'20px',borderBottom:'1px solid var(--line)',flexWrap:'wrap'}}>
               <div style={{display:'flex',gap:'2px'}}>
                 {[...Array(5)].map((_,i)=><Star key={i} style={{width:'13px',height:'13px',fill:i<4?'var(--gold)':'none',color:'var(--gold)'}}/>)}
               </div>
-              <span style={{marginRight:'auto',padding:'4px 14px',backgroundColor:inStock||autoGen?'rgba(57,255,20,0.1)':'rgba(255,69,0,0.1)',color:inStock||autoGen?'var(--green)':'var(--fire)',fontSize:'11px',fontWeight:700,fontFamily:"'Barlow Condensed',sans-serif",letterSpacing:'0.12em',textTransform:'uppercase',border:`1px solid ${inStock||autoGen?'rgba(57,255,20,0.3)':'var(--fire)'}`}}>
-                {autoGen?'∞ متوفر':inStock?'متوفر':'غير متوفر'}
+              <span style={{marginInlineStart:'auto',padding:'4px 14px',backgroundColor:inStock||autoGen?'rgba(57,255,20,0.1)':'rgba(255,69,0,0.1)',color:inStock||autoGen?'var(--green)':'var(--fire)',fontSize:'11px',fontWeight:700,fontFamily:"'Barlow Condensed',sans-serif",letterSpacing:'0.12em',textTransform:'uppercase',border:`1px solid ${inStock||autoGen?'rgba(57,255,20,0.3)':'var(--fire)'}`}}>
+                {autoGen?t.infiniteStock:inStock?t.inStock:t.outStock}
               </span>
             </div>
 
             {/* Price */}
-            <div style={{padding:'16px',backgroundColor:'var(--panel)',border:'1px solid var(--line)',borderRight:'3px solid var(--fire)',borderLeft:'none',marginBottom:'22px'}}>
-              <p className="bc" style={{fontSize:'11px',fontWeight:600,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--mid)',marginBottom:'5px'}}>السعر</p>
+            <div style={{padding:'16px',backgroundColor:'var(--panel)',border:'1px solid var(--line)',borderInlineStart:'3px solid var(--fire)',marginBottom:'22px'}}>
+              <p className="bc" style={{fontSize:'11px',fontWeight:600,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--mid)',marginBottom:'5px'}}>{t.priceLabel}</p>
               <div style={{display:'flex',alignItems:'baseline',gap:'10px',flexWrap:'wrap'}}>
                 <span className="bb" style={{fontSize:'3rem',color:'var(--fire)',lineHeight:1}}>{finalPrice.toLocaleString()}</span>
-                <span className="bc" style={{fontSize:'14px',color:'var(--mid)',fontWeight:600}}>دج</span>
+                <span className="bc" style={{fontSize:'14px',color:'var(--mid)',fontWeight:600}}>{storeprop?.currency || 'DZD'}</span>
                 {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
                   <span style={{fontSize:'14px',textDecoration:'line-through',color:'var(--dim)'}}>{parseFloat(product.priceOriginal).toLocaleString()}</span>
                 )}
@@ -1026,7 +1306,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             {/* Offers */}
             {product.offers?.length > 0 && (
               <div style={{marginBottom:'22px',paddingBottom:'22px',borderBottom:'1px solid var(--line)'}}>
-                <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'10px'}}>العروض</p>
+                <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'10px'}}>{t.offersTitle}</p>
                 {product.offers.map((o:any)=>(
                   <label key={o.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 14px',border:`1.5px solid ${selectedOffer===o.id?'var(--fire)':'var(--line)'}`,cursor:'pointer',marginBottom:'8px',backgroundColor:selectedOffer===o.id?'rgba(255,69,0,0.08)':'transparent',transition:'all 0.2s'}}>
                     <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
@@ -1036,10 +1316,10 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                       <input type="radio" name="offer" checked={selectedOffer===o.id} onChange={()=>setSelectedOffer(o.id)} style={{display:'none'}}/>
                       <div>
                         <p className="bc" style={{fontSize:'14px',fontWeight:700,color:'var(--white)',margin:0,letterSpacing:'0.04em',textTransform:'uppercase'}}>{o.name}</p>
-                        <p style={{fontSize:'11px',color:'var(--dim)',margin:0}}>الكمية: {o.quantity}</p>
+                        <p style={{fontSize:'11px',color:'var(--dim)',margin:0}}>{t.offerQtyLabel} {o.quantity}</p>
                       </div>
                     </div>
-                    <span className="bb" style={{fontSize:'1.3rem',color:'var(--fire)'}}>{o.price.toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'11px',color:'var(--dim)'}}>دج</span></span>
+                    <span className="bb" style={{fontSize:'1.3rem',color:'var(--fire)'}}>{o.price.toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'11px',color:'var(--dim)'}}>{storeprop?.currency || 'DZD'}</span></span>
                   </label>
                 ))}
               </div>
@@ -1076,11 +1356,11 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
               </div>
             ))}
 
-            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants}/>
+            <ProductForm product={product} store={storeprop} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants}/>
 
             {product.desc && (
               <div style={{marginTop:'28px',paddingTop:'22px',borderTop:'1px solid var(--line)'}}>
-                <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'12px'}}>معلومات المنتج</p>
+                <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'12px'}}>{t.descTitle}</p>
                 <div style={{fontSize:'14px',lineHeight:'1.85',color:'var(--mid)',fontWeight:400}}
                   dangerouslySetInnerHTML={{__html:DOMPurify.sanitize(product.desc,{ALLOWED_TAGS:['p','br','strong','em','ul','ol','li','h1','h2','h3','span'],ALLOWED_ATTR:['class','style']})}}/>
               </div>
@@ -1095,7 +1375,9 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
 /* ══════════════════════════════════════════════════════════════
    PRODUCT FORM
 ══════════════════════════════════════════════════════════════ */
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss=0 }: ProductFormProps) {
+export function ProductForm({ product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss=0 }: ProductFormProps) {
+  const t = T[getLang(storeprop || product?.store)];
+  const isRTL = t.dir === 'rtl';
   const router = useRouter();
   const [wilayas, setWilayas]   = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -1127,10 +1409,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const total = ()=> fp*fd.quantity + +getLiv();
   const validate = ()=>{
     const e:Record<string,string>={};
-    if(!fd.customerName.trim())  e.customerName='الاسم مطلوب';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
-    if(!fd.customerWelaya)       e.customerWelaya='الولاية مطلوبة';
-    if(!fd.customerCommune)      e.customerCommune='البلدية مطلوبة';
+    if(!fd.customerName.trim())  e.customerName=t.errName;
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
+    if(!fd.customerWelaya)       e.customerWelaya=t.errWilaya;
+    if(!fd.customerCommune)      e.customerCommune=t.errCommune;
     return e;
   };
   const getVarId = useCallback(()=>{
@@ -1159,15 +1441,15 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   };
 
   return (
-    <div dir="rtl" style={{marginTop:'22px',paddingTop:'20px',borderTop:'1px solid var(--line)'}}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{marginTop:'22px',paddingTop:'20px',borderTop:'1px solid var(--line)'}}>
       {/* Cart + Order buttons */}
         {product.store?.cart && (
         <div style={{display:'flex',gap:'8px',marginBottom:'16px'}}>
           <button onClick={addToCart} disabled={isAdded} className="bc" style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:7,padding:'12px',cursor:isAdded?'default':'pointer',fontFamily:'inherit',fontWeight:800,fontSize:'13px',letterSpacing:'0.08em',textTransform:'uppercase',border:`1.5px solid ${isAdded?'var(--green)':'var(--dim)'}`,background:isAdded?'rgba(57,255,20,0.1)':'transparent',color:isAdded?'var(--green)':'var(--mid)',transition:'all 0.25s'}}>
-            {isAdded?<><CheckCircle2 size={14} className="anim-check"/>أُضيف للسلة</>:<><ShoppingCart size={14}/>أضف للسلة</>}
+            {isAdded?<><CheckCircle2 size={14} className="anim-check"/>{t.addedToCart}</>:<><ShoppingCart size={14}/>{t.addToCart}</>}
           </button>
           <button onClick={()=>setIsOrderNow(true)} className="btn-fire" style={{flex:1,clipPath:'none',padding:'12px'}}>
-            <Zap style={{width:'14px',height:'14px'}}/> اطلب الآن
+            <Zap style={{width:'14px',height:'14px'}}/> {t.orderNow}
           </button>
         </div>
       )}
@@ -1176,61 +1458,61 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         <div>
           {product.store?.cart && (
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'14px'}}>
-              <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--fire)',margin:0}}>بيانات التوصيل</p>
+              <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--fire)',margin:0}}>{t.delivDataTitle}</p>
               <button onClick={()=>setIsOrderNow(false)} className="bc" style={{display:'flex',alignItems:'center',gap:4,padding:'4px 10px',border:'1px solid var(--dim)',background:'transparent',color:'var(--mid)',fontSize:'11px',fontWeight:700,cursor:'pointer',fontFamily:'inherit',letterSpacing:'0.1em',textTransform:'uppercase'}}>
-                <X style={{width:'11px',height:'11px'}}/> إلغاء
+                <X style={{width:'11px',height:'11px'}}/> {t.cancelLabel}
               </button>
             </div>
           )}
           <form onSubmit={handleSubmit}>
             <div className="form-2c">
-              <FR error={errors.customerName} label="الاسم الكامل">
-                <input type="text" value={fd.customerName} onChange={e=>setFd({...fd,customerName:e.target.value})} placeholder="اسمك الكامل"
+              <FR error={errors.customerName} label={t.fullName}>
+                <input type="text" value={fd.customerName} onChange={e=>setFd({...fd,customerName:e.target.value})} placeholder={t.fullNamePh}
                   style={INP_S(!!errors.customerName)} className={`inp${errors.customerName?' inp-err':''}`}
                   onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerName?'#ef4444':'var(--dim)';}}/>
               </FR>
-              <FR error={errors.customerPhone} label="رقم الهاتف">
-                <input type="tel" value={fd.customerPhone} onChange={e=>setFd({...fd,customerPhone:e.target.value})} placeholder="0X XX XX XX XX"
+              <FR error={errors.customerPhone} label={t.phone}>
+                <input type="tel" value={fd.customerPhone} onChange={e=>setFd({...fd,customerPhone:e.target.value})} placeholder={t.phonePh}
                   style={INP_S(!!errors.customerPhone)} className={`inp${errors.customerPhone?' inp-err':''}`}
                   onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerPhone?'#ef4444':'var(--dim)';}}/>
               </FR>
             </div>
             <div className="form-2c">
-              <FR error={errors.customerWelaya} label="الولاية">
+              <FR error={errors.customerWelaya} label={t.wilaya}>
                 <div style={{position:'relative'}}>
-                  <ChevronDown style={{position:'absolute',left:'11px',top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
+                  <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
                   <select value={fd.customerWelaya} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})}
-                    className={`inp${errors.customerWelaya?' inp-err':''}`} style={{paddingLeft:'32px'}}
+                    className={`inp${errors.customerWelaya?' inp-err':''}`} style={isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}}
                     onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerWelaya?'#ef4444':'var(--dim)';}}>
-                    <option value="">اختر الولاية</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                    <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {isRTL?w.ar_name:w.name}</option>)}
                   </select>
                 </div>
               </FR>
-              <FR error={errors.customerCommune} label="البلدية">
+              <FR error={errors.customerCommune} label={t.commune}>
                 <div style={{position:'relative'}}>
-                  <ChevronDown style={{position:'absolute',left:'11px',top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
+                  <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
                   <select value={fd.customerCommune} disabled={!fd.customerWelaya||loadingC} onChange={e=>setFd({...fd,customerCommune:e.target.value})}
-                    className={`inp${errors.customerCommune?' inp-err':''}`} style={{paddingLeft:'32px',opacity:!fd.customerWelaya?0.4:1}}
+                    className={`inp${errors.customerCommune?' inp-err':''}`} style={{...(isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}),opacity:!fd.customerWelaya?0.4:1}}
                     onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerCommune?'#ef4444':'var(--dim)';}}>
-                    <option value="">{loadingC?'جاري التحميل...':'اختر البلدية'}</option>{communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                    <option value="">{loadingC?t.communeLoading:t.communePh}</option>{communes.map(c=><option key={c.id} value={c.id}>{isRTL?c.ar_name:c.name}</option>)}
                   </select>
                 </div>
               </FR>
             </div>
 
-            <FR label="نوع التوصيل">
+            <FR label={t.deliveryType}>
               <div className="dlv-2c">
-                {(['home','office'] as const).map(type=>(
-                  <button key={type} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:type}))}
-                    style={{padding:'12px 10px',border:`1.5px solid ${fd.typeLivraison===type?'var(--fire)':'var(--dim)'}`,backgroundColor:fd.typeLivraison===type?'rgba(255,69,0,0.1)':'transparent',cursor:'pointer',textAlign:'right',transition:'all 0.2s',fontFamily:'inherit'}}>
-                    <p className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:fd.typeLivraison===type?'var(--fire)':'var(--mid)',margin:'0 0 4px'}}>{type==='home'?'إلى المنزل':'إلى المكتب'}</p>
-                    {selW && <p className="bb" style={{fontSize:'1rem',color:fd.typeLivraison===type?'var(--fire)':'var(--dim)',margin:0}}>{(type==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'11px',color:'var(--dim)'}}>دج</span></p>}
+                {(['home','office'] as const).map(dtype=>(
+                  <button key={dtype} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:dtype}))}
+                    style={{padding:'12px 10px',border:`1.5px solid ${fd.typeLivraison===dtype?'var(--fire)':'var(--dim)'}`,backgroundColor:fd.typeLivraison===dtype?'rgba(255,69,0,0.1)':'transparent',cursor:'pointer',textAlign:'start',transition:'all 0.2s',fontFamily:'inherit'}}>
+                    <p className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:fd.typeLivraison===dtype?'var(--fire)':'var(--mid)',margin:'0 0 4px'}}>{dtype==='home'?t.homeDelivLabel:t.officeDelivLabel}</p>
+                    {selW && <p className="bb" style={{fontSize:'1rem',color:fd.typeLivraison===dtype?'var(--fire)':'var(--dim)',margin:0}}>{(dtype==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'11px',color:'var(--dim)'}}>{storeprop?.currency || 'DZD'}</span></p>}
                   </button>
                 ))}
               </div>
             </FR>
 
-            <FR label="الكمية">
+            <FR label={t.qty}>
               <div style={{display:'inline-flex',alignItems:'center',border:'1.5px solid var(--dim)',overflow:'hidden',backgroundColor:'var(--panel)'}}>
                 <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderRight:'1px solid var(--dim)',background:'transparent',cursor:'pointer',color:'var(--fire)',fontSize:'18px',fontWeight:700}}>-</button>
                 <span className="bb" style={{width:'44px',textAlign:'center',fontSize:'1.2rem',color:'var(--white)'}}>{fd.quantity}</span>
@@ -1242,25 +1524,25 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <div style={{border:'1px solid var(--line)',borderRight:'3px solid var(--fire)',borderLeft:'none',marginBottom:'14px',overflow:'hidden',backgroundColor:'var(--panel)'}}>
               <div style={{padding:'10px 14px',borderBottom:'1px solid var(--line)',display:'flex',alignItems:'center',gap:'8px',backgroundColor:'var(--panel-2)'}}>
                 <Package style={{width:'13px',height:'13px',color:'var(--fire)'}}/>
-                <span className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)'}}>ملخص الطلب</span>
+                <span className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)'}}>{t.summaryTitle}</span>
               </div>
-              {[{l:'المنتج',v:product.name.slice(0,22)+(product.name.length>22?'...':'')},{l:'السعر',v:`${fp.toLocaleString()} دج`},{l:'الكمية',v:`× ${fd.quantity}`},{l:'التوصيل',v:selW?`${getLiv().toLocaleString()} دج`:'—'}].map(row=>(
+              {[{l:t.productLabel,v:product.name.slice(0,22)+(product.name.length>22?'...':'')},{l:t.price,v:`${fp.toLocaleString()} ${storeprop?.currency||'DZD'}`},{l:t.qty,v:`× ${fd.quantity}`},{l:t.delivery,v:selW?`${getLiv().toLocaleString()} ${storeprop?.currency||'DZD'}`:'—'}].map(row=>(
                 <div key={row.l} style={{display:'flex',justifyContent:'space-between',padding:'7px 14px',borderBottom:'1px solid var(--line)'}}>
                   <span className="bc" style={{fontSize:'12px',color:'var(--dim)',letterSpacing:'0.06em',textTransform:'uppercase'}}>{row.l}</span>
                   <span style={{fontSize:'13px',fontWeight:600,color:'var(--mid)'}}>{row.v}</span>
                 </div>
               ))}
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',padding:'12px 14px'}}>
-                <span className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--mid)'}}>المجموع</span>
-                <span className="bb" style={{fontSize:'1.8rem',color:'var(--fire)'}}>{total().toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'12px',color:'var(--dim)'}}>دج</span></span>
+                <span className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--mid)'}}>{t.total}</span>
+                <span className="bb" style={{fontSize:'1.8rem',color:'var(--fire)'}}>{total().toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'12px',color:'var(--dim)'}}>{storeprop?.currency||'DZD'}</span></span>
               </div>
             </div>
 
             <button type="submit" disabled={sub} className="btn-fire" style={{width:'100%',fontSize:'15px',padding:'14px',cursor:sub?'not-allowed':'pointer',opacity:sub?0.7:1,clipPath:'none',marginBottom:'10px'}}>
-              {sub?<><Loader2 style={{width:'15px',height:'15px',animation:'spin 1s linear infinite'}}/> جاري المعالجة...</>:<><Zap style={{width:'15px',height:'15px'}}/> تأكيد الطلب</>}
+              {sub?<><Loader2 style={{width:'15px',height:'15px',animation:'spin 1s linear infinite'}}/> {t.processing}</>:<><Zap style={{width:'15px',height:'15px'}}/> {t.confirmOrder}</>}
             </button>
             <div style={{display:'flex',justifyContent:'center',gap:'16px'}}>
-              {[{icon:<Lock style={{width:'11px',height:'11px'}}/>,label:'آمن'},{icon:<Truck style={{width:'11px',height:'11px'}}/>,label:'توصيل سريع'},{icon:<Shield style={{width:'11px',height:'11px'}}/>,label:'أصلي'}].map((b,i)=>(
+              {[{icon:<Lock style={{width:'11px',height:'11px'}}/>,label:t.secureLabel},{icon:<Truck style={{width:'11px',height:'11px'}}/>,label:t.fastDelivLabel},{icon:<Shield style={{width:'11px',height:'11px'}}/>,label:t.originalLabel}].map((b,i)=>(
                 <div key={i} className="bc" style={{display:'flex',alignItems:'center',gap:'4px',fontSize:'11px',color:'var(--dim)',fontWeight:600,letterSpacing:'0.06em'}}>
                   <span style={{color:'var(--fire)'}}>{b.icon}</span> {b.label}
                 </div>
@@ -1277,6 +1559,8 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
    CART
 ══════════════════════════════════════════════════════════════ */
 export function Cart({ domain, store }: { domain: string; store: any }) {
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
   const [items, setItems]       = useState<any[]>([]);
   const [wilayas, setWilayas]   = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -1300,10 +1584,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const handleSubmit = async (e:React.FormEvent)=>{
     e.preventDefault();
     const er:Record<string,string>={};
-    if(!fd.customerName.trim()) er.name='مطلوب';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم هاتف غير صالح (مثال: 0550123456)';
-    if(!fd.customerWelaya) er.w='مطلوب';
-    if(!fd.customerCommune) er.c='مطلوب';
+    if(!fd.customerName.trim()) er.name=t.errName;
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone=t.errPhoneInvalid;
+    if(!fd.customerWelaya) er.w=t.errWilaya;
+    if(!fd.customerCommune) er.c=t.errCommune;
     if(Object.keys(er).length){setErrors(er);return;}
     setErrors({}); setSubmitting(true);
     try{
@@ -1313,32 +1597,32 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   };
 
   if(success) return (
-    <div dir="rtl" style={{minHeight:'70vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem',background:'var(--black)'}}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{minHeight:'70vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem',background:'var(--black)'}}>
       <div style={{textAlign:'center',background:'var(--panel)',padding:'4rem 2.5rem',border:'2px solid var(--fire)',maxWidth:460,width:'100%'}}>
         <CheckCircle2 style={{width:'48px',height:'48px',color:'var(--green)',display:'block',margin:'0 auto 1.25rem'}}/>
-        <h2 className="bb" style={{fontSize:'2.5rem',color:'var(--white)',marginBottom:'0.625rem'}}>تم استلام طلبك!</h2>
-        <p style={{color:'var(--mid)',marginBottom:'2rem',lineHeight:1.7}}>شكراً لثقتك. سنتواصل معك قريباً. 💪</p>
-        <Link href="/" className="btn-fire" style={{display:'inline-flex',clipPath:'none',padding:'13px 28px'}}>العودة للمتجر</Link>
+        <h2 className="bb" style={{fontSize:'2.5rem',color:'var(--white)',marginBottom:'0.625rem'}}>{t.cartSuccessTitle}</h2>
+        <p style={{color:'var(--mid)',marginBottom:'2rem',lineHeight:1.7}}>{t.cartSuccessDesc}</p>
+        <Link href="/" className="btn-fire" style={{display:'inline-flex',clipPath:'none',padding:'13px 28px'}}>{t.backToStore}</Link>
       </div>
     </div>
   );
 
   if(!items.length) return (
-    <div dir="rtl" style={{minHeight:'60vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem',background:'var(--black)'}}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{minHeight:'60vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem',background:'var(--black)'}}>
       <div style={{textAlign:'center',padding:'4rem 2rem',border:'1px dashed var(--dim)',maxWidth:400,width:'100%'}}>
         <Dumbbell style={{width:'48px',height:'48px',color:'var(--dim)',display:'block',margin:'0 auto 1.25rem',opacity:0.4}}/>
-        <p className="bb" style={{fontSize:'2rem',color:'var(--dim)',marginBottom:'1.75rem'}}>السلة فارغة</p>
-        <Link href="/" className="btn-fire" style={{display:'inline-flex',clipPath:'none',padding:'13px 28px'}}>تسوق الآن</Link>
+        <p className="bb" style={{fontSize:'2rem',color:'var(--dim)',marginBottom:'1.75rem'}}>{t.cartEmpty}</p>
+        <Link href="/" className="btn-fire" style={{display:'inline-flex',clipPath:'none',padding:'13px 28px'}}>{t.shopNow}</Link>
       </div>
     </div>
   );
 
   return (
-    <div dir="rtl" style={{minHeight:'100vh',background:'var(--black)',padding:'2.5rem 1.5rem 5rem'}}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{minHeight:'100vh',background:'var(--black)',padding:'2.5rem 1.5rem 5rem'}}>
       <div style={{maxWidth:1280,margin:'0 auto'}}>
         <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',marginBottom:'2rem',paddingBottom:'1rem',borderBottom:'2px solid var(--fire)'}}>
-          <h1 className="bb" style={{fontSize:'clamp(2rem,5vw,3rem)',color:'var(--white)'}}>سلة التسوق</h1>
-          <p className="bc" style={{fontSize:'13px',color:'var(--dim)',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase'}}>{items.length} منتج</p>
+          <h1 className="bb" style={{fontSize:'clamp(2rem,5vw,3rem)',color:'var(--white)'}}>{t.myCart}</h1>
+          <p className="bc" style={{fontSize:'13px',color:'var(--dim)',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase'}}>{items.length} {t.cartItemsCount}</p>
         </div>
         <div className="cart-layout">
           {/* Items */}
@@ -1351,7 +1635,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:'space-between'}}>
                   <div>
                     <h4 className="bc" style={{fontWeight:700,color:'var(--white)',fontSize:'13px',letterSpacing:'0.04em',textTransform:'uppercase',marginBottom:'4px'}}>{item.product?.name}</h4>
-                    <p className="bb" style={{fontSize:'1.2rem',color:'var(--fire)'}}>{item.finalPrice?.toLocaleString()} دج</p>
+                    <p className="bb" style={{fontSize:'1.2rem',color:'var(--fire)'}}>{item.finalPrice?.toLocaleString()} {store?.currency || 'DZD'}</p>
                   </div>
                   <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:'8px'}}>
                     <div style={{display:'inline-flex',alignItems:'center',border:'1px solid var(--dim)',overflow:'hidden'}}>
@@ -1362,97 +1646,96 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     <button onClick={()=>update(items.filter((_,idx)=>idx!==i))} className="bc" style={{display:'flex',alignItems:'center',gap:4,padding:'4px 8px',border:'none',background:'transparent',color:'var(--dim)',fontSize:'11px',fontWeight:700,cursor:'pointer',letterSpacing:'0.1em',textTransform:'uppercase',transition:'color 0.15s',fontFamily:'inherit'}}
                       onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.color='var(--fire)';}}
                       onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.color='var(--dim)';}}>
-                      <Trash2 size={12}/> حذف
+                      <Trash2 size={12}/> {t.deleteLabel}
                     </button>
                   </div>
                 </div>
               </div>
             ))}
             <div style={{display:'flex',justifyContent:'space-between',padding:'14px',background:'var(--panel-2)'}}>
-              <span className="bc" style={{fontWeight:700,fontSize:'13px',color:'var(--mid)',letterSpacing:'0.1em',textTransform:'uppercase'}}>المجموع الفرعي</span>
-              <span className="bb" style={{fontSize:'1.5rem',color:'var(--white)'}}>{cartTotal.toLocaleString()} دج</span>
+              <span className="bc" style={{fontWeight:700,fontSize:'13px',color:'var(--mid)',letterSpacing:'0.1em',textTransform:'uppercase'}}>{t.subtotal}</span>
+              <span className="bb" style={{fontSize:'1.5rem',color:'var(--white)'}}>{cartTotal.toLocaleString()} {store?.currency || 'DZD'}</span>
             </div>
           </div>
 
           {/* Checkout */}
           <div style={{background:'var(--panel)',border:'1px solid var(--line)',borderTop:'2px solid var(--fire)',padding:'22px',alignSelf:'start'}}>
-            <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'16px'}}>// معلومات التوصيل</p>
+            <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'16px'}}>{t.delivInfoTitle}</p>
             <form onSubmit={handleSubmit}>
               <div className="form-2c">
-                <FR error={errors.name} label="الاسم">
+                <FR error={errors.name} label={t.fullName}>
                   <input type="text" value={fd.customerName} onChange={e=>setFd({...fd,customerName:e.target.value})} className={`inp${errors.name?' inp-err':''}`}
                     onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.name?'#ef4444':'var(--dim)';}}/>
                 </FR>
-                <FR error={errors.phone} label="الهاتف">
+                <FR error={errors.phone} label={t.phone}>
                   <input type="tel" value={fd.customerPhone} onChange={e=>setFd({...fd,customerPhone:e.target.value})} className={`inp${errors.phone?' inp-err':''}`}
                     onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.phone?'#ef4444':'var(--dim)';}}/>
                 </FR>
               </div>
               <div className="form-2c">
-                <FR error={errors.w} label="الولاية">
+                <FR error={errors.w} label={t.wilaya}>
                   <div style={{position:'relative'}}>
-                    <ChevronDown style={{position:'absolute',left:'11px',top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
-                    <select value={fd.customerWelaya} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})} className={`inp${errors.w?' inp-err':''}`} style={{paddingLeft:'32px'}}
+                    <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
+                    <select value={fd.customerWelaya} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})} className={`inp${errors.w?' inp-err':''}`} style={isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}}
                       onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.w?'#ef4444':'var(--dim)';}}>
-                      <option value="">اختر</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                      <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {isRTL?w.ar_name:w.name}</option>)}
                     </select>
                   </div>
                 </FR>
-                <FR error={errors.c} label="البلدية">
+                <FR error={errors.c} label={t.commune}>
                   <div style={{position:'relative'}}>
-                    <ChevronDown style={{position:'absolute',left:'11px',top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
-                    <select value={fd.customerCommune} disabled={loadingC||!fd.customerWelaya} onChange={e=>setFd({...fd,customerCommune:e.target.value})} className={`inp${errors.c?' inp-err':''}`} style={{paddingLeft:'32px',opacity:!fd.customerWelaya?0.4:1}}
+                    <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
+                    <select value={fd.customerCommune} disabled={loadingC||!fd.customerWelaya} onChange={e=>setFd({...fd,customerCommune:e.target.value})} className={`inp${errors.c?' inp-err':''}`} style={{...(isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}),opacity:!fd.customerWelaya?0.4:1}}
                       onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.c?'#ef4444':'var(--dim)';}}>
-                      <option value="">{loadingC?'...':'اختر'}</option>{communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                      <option value="">{loadingC?t.communeLoading:t.communePh}</option>{communes.map(c=><option key={c.id} value={c.id}>{isRTL?c.ar_name:c.name}</option>)}
                     </select>
                   </div>
                 </FR>
               </div>
 
-              {/* نوع التوصيل — جديد */}
               <div style={{marginBottom:'14px'}}>
-                <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'10px'}}>// نوع التوصيل</p>
+                <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'10px'}}>{t.cartDelivType}</p>
                 <div className="delivery-grid">
-                  {(['home','office'] as const).map(t=>(
+                  {(['home','office'] as const).map(dtype=>(
                     <button
-                      key={t}
+                      key={dtype}
                       type="button"
-                      onClick={()=>setFd(p=>({...p,typeLivraison:t}))}
+                      onClick={()=>setFd(p=>({...p,typeLivraison:dtype}))}
                       style={{
                         padding:'14px',
-                        border:`1px solid ${fd.typeLivraison===t?'var(--fire)':'var(--line)'}`,
-                        borderTop:`2px solid ${fd.typeLivraison===t?'var(--fire)':'var(--line)'}`,
-                        background:fd.typeLivraison===t?'var(--panel-2)':'var(--panel)',
+                        border:`1px solid ${fd.typeLivraison===dtype?'var(--fire)':'var(--line)'}`,
+                        borderTop:`2px solid ${fd.typeLivraison===dtype?'var(--fire)':'var(--line)'}`,
+                        background:fd.typeLivraison===dtype?'var(--panel-2)':'var(--panel)',
                         textAlign:'center',
                         cursor:'pointer',
                         fontFamily:'inherit',
                         transition:'all 0.2s'
                       }}
                     >
-                      <span style={{display:'block',fontSize:'1.5rem',marginBottom:'4px'}}>{t==='home'?'🏠':'🏢'}</span>
-                      <p className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:fd.typeLivraison===t?'var(--white)':'var(--dim)'}}>{t==='home'?'للبيت':'للمكتب'}</p>
-                      {selW && <p className="bb" style={{fontSize:'1rem',color:'var(--fire)',marginTop:'3px'}}>{(t==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} دج</p>}
+                      <span style={{display:'block',fontSize:'1.5rem',marginBottom:'4px'}}>{dtype==='home'?'🏠':'🏢'}</span>
+                      <p className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:fd.typeLivraison===dtype?'var(--white)':'var(--dim)'}}>{dtype==='home'?t.homeLabel:t.officeLabel}</p>
+                      {selW && <p className="bb" style={{fontSize:'1rem',color:'var(--fire)',marginTop:'3px'}}>{(dtype==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} {store?.currency || 'DZD'}</p>}
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Summary */}
-              <div style={{border:'1px solid var(--line)',borderRight:'3px solid var(--fire)',borderLeft:'none',marginBottom:'14px',overflow:'hidden',background:'var(--panel-2)'}}>
-                {[{l:'المجموع الفرعي',v:`${cartTotal.toLocaleString()} دج`},{l:'التوصيل',v:getLiv()?`${getLiv().toLocaleString()} دج`:'—'}].map(row=>(
+              <div style={{border:'1px solid var(--line)',borderInlineStart:'3px solid var(--fire)',marginBottom:'14px',overflow:'hidden',background:'var(--panel-2)'}}>
+                {[{l:t.subtotal,v:`${cartTotal.toLocaleString()} ${store?.currency||'DZD'}`},{l:t.delivery,v:getLiv()?`${getLiv().toLocaleString()} ${store?.currency||'DZD'}`:'—'}].map(row=>(
                   <div key={row.l} style={{display:'flex',justifyContent:'space-between',padding:'7px 14px',borderBottom:'1px solid var(--line)'}}>
                     <span className="bc" style={{fontSize:'12px',color:'var(--dim)',letterSpacing:'0.06em',textTransform:'uppercase'}}>{row.l}</span>
                     <span style={{fontSize:'13px',fontWeight:600,color:'var(--mid)'}}>{row.v}</span>
                   </div>
                 ))}
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',padding:'12px 14px'}}>
-                  <span className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--mid)'}}>الإجمالي</span>
-                  <span className="bb" style={{fontSize:'1.8rem',color:'var(--fire)'}}>{finalTotal.toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'12px',color:'var(--dim)'}}>دج</span></span>
+                  <span className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--mid)'}}>{t.total}</span>
+                  <span className="bb" style={{fontSize:'1.8rem',color:'var(--fire)'}}>{finalTotal.toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'12px',color:'var(--dim)'}}>{store?.currency||'DZD'}</span></span>
                 </div>
               </div>
 
               <button type="submit" disabled={submitting} className="btn-fire" style={{width:'100%',fontSize:'15px',padding:'14px',cursor:submitting?'not-allowed':'pointer',opacity:submitting?0.7:1,clipPath:'none'}}>
-                {submitting?<><Loader2 style={{width:'15px',height:'15px',animation:'spin 1s linear infinite'}}/> جاري...</>:<><Zap style={{width:'15px',height:'15px'}}/> تأكيد الطلب</>}
+                {submitting?<><Loader2 style={{width:'15px',height:'15px',animation:'spin 1s linear infinite'}}/> {t.cartProcessing}</>:<><Zap style={{width:'15px',height:'15px'}}/> {t.confirmOrder}</>}
               </button>
             </form>
           </div>
@@ -1469,36 +1752,39 @@ export function StaticPage({ staticPage, page, store }: any) {
   const p = (staticPage||page||'').toLowerCase();
   return (
     <>
-      {p==='privacy'  && <Privacy/>}
-      {p==='terms'    && <Terms/>}
-      {p==='cookies'  && <Cookies/>}
+      {p==='privacy'  && <Privacy store={store}/>}
+      {p==='terms'    && <Terms store={store}/>}
+      {p==='cookies'  && <Cookies store={store}/>}
       {p==='contact'  && <Contact store={store}/>}
     </>
   );
 }
 
-const Shell = ({ children, title, sub }: { children: React.ReactNode; title: string; sub?: string }) => (
-  <div dir="rtl" style={{backgroundColor:'var(--black)',minHeight:'100vh'}}>
-    <div style={{backgroundColor:'var(--dark)',padding:'56px 20px 40px',borderBottom:`2px solid var(--fire)`,position:'relative',overflow:'hidden'}}>
-      <div style={{position:'absolute',inset:0,backgroundImage:'linear-gradient(rgba(255,69,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,69,0,0.04) 1px,transparent 1px)',backgroundSize:'40px 40px',pointerEvents:'none'}}/>
-      <div style={{maxWidth:'720px',margin:'0 auto',position:'relative',zIndex:2,textAlign:'right'}}>
-        {sub && <p className="s-label" style={{marginBottom:'10px'}}>{sub}</p>}
-        <h1 className="bb" style={{fontSize:'clamp(2.5rem,6vw,5rem)',color:'var(--white)',lineHeight:0.95,letterSpacing:'0.02em'}}>
-          {title}
-        </h1>
+const Shell = ({ children, title, sub, store }: { children: React.ReactNode; title: string; sub?: string; store?: any }) => {
+  const isRTL = T[getLang(store)].dir === 'rtl';
+  return (
+    <div dir={isRTL?'rtl':'ltr'} style={{backgroundColor:'var(--black)',minHeight:'100vh'}}>
+      <div style={{backgroundColor:'var(--dark)',padding:'56px 20px 40px',borderBottom:`2px solid var(--fire)`,position:'relative',overflow:'hidden'}}>
+        <div style={{position:'absolute',inset:0,backgroundImage:'linear-gradient(rgba(255,69,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,69,0,0.04) 1px,transparent 1px)',backgroundSize:'40px 40px',pointerEvents:'none'}}/>
+        <div style={{maxWidth:'720px',margin:'0 auto',position:'relative',zIndex:2,textAlign:'start'}}>
+          {sub && <p className="s-label" style={{marginBottom:'10px'}}>{sub}</p>}
+          <h1 className="bb" style={{fontSize:'clamp(2.5rem,6vw,5rem)',color:'var(--white)',lineHeight:0.95,letterSpacing:'0.02em'}}>
+            {title}
+          </h1>
+        </div>
+      </div>
+      <div style={{maxWidth:'720px',margin:'0 auto',padding:'36px 20px 80px'}}>
+        <div style={{backgroundColor:'var(--panel)',border:'1px solid var(--line)',borderInlineStart:'3px solid var(--fire)',padding:'28px',textAlign:'start'}}>
+          {children}
+        </div>
       </div>
     </div>
-    <div style={{maxWidth:'720px',margin:'0 auto',padding:'36px 20px 80px'}}>
-      <div style={{backgroundColor:'var(--panel)',border:'1px solid var(--line)',borderRight:'3px solid var(--fire)',borderLeft:'none',padding:'28px',textAlign:'right'}}>
-        {children}
-      </div>
-    </div>
-  </div>
-);
+  );
+};
 
 const IB = ({ title, body, tag }: { title: string; body: string; tag?: string }) => (
   <div style={{paddingBottom:'18px',marginBottom:'18px',borderBottom:'1px solid var(--line)',display:'flex',justifyContent:'space-between',gap:'16px',alignItems:'flex-start'}}>
-    <div style={{flex:1,textAlign:'right'}}>
+    <div style={{flex:1,textAlign:'start'}}>
       <h3 className="bc" style={{fontSize:'14px',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--white)',margin:'0 0 7px'}}>
         {title} <span style={{color:'var(--fire)'}}>{'//'}</span>
       </h3>
@@ -1508,36 +1794,39 @@ const IB = ({ title, body, tag }: { title: string; body: string; tag?: string })
   </div>
 );
 
-export function Privacy() {
+export function Privacy({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="سياسة الخصوصية" sub="الشؤون القانونية">
-      <IB title="البيانات التي نجمعها" body="فقط اسمك ورقم هاتفك وعنوان التوصيل — الحد الأدنى المطلوب لمعالجة طلبك."/>
-      <IB title="كيف نستخدمها" body="حصرياً لتنفيذ وشحن طلبك. لا نستخدمها للتسويق أو بيع البيانات."/>
-      <IB title="الأمان" body="بياناتك محمية بتشفير عالي المستوى ومؤمنة في جميع الأوقات."/>
-      <IB title="مشاركة البيانات" body="لا نبيع بياناتك أبداً. تُشارك فقط مع شركاء التوصيل الموثوقين." tag="مضمون"/>
+    <Shell title={t.privacyTitle} sub={t.privacySub} store={store}>
+      <IB title={t.priv1Title} body={t.priv1Body} tag={t.priv1Tag}/>
+      <IB title={t.priv2Title} body={t.priv2Body}/>
+      <IB title={t.priv3Title} body={t.priv3Body}/>
+      <IB title={t.priv4Title} body={t.priv4Body} tag={t.priv4Tag}/>
     </Shell>
   );
 }
 
-export function Terms() {
+export function Terms({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="شروط الخدمة" sub="الشؤون القانونية">
-      <IB title="الطلبات" body="لا توجد رسوم خفية. السعر المعروض هو السعر النهائي."/>
-      <IB title="المنتجات الأصيلة" body="نبيع المنتجات الأصيلة فقط؛ السلع المقلدة ممنوعة منعاً باتاً." tag="صارم"/>
-      <IB title="القانون المعمول به" body="تخضع هذه الشروط لقوانين الجمهورية الجزائرية الديمقراطية الشعبية."/>
+    <Shell title={t.termsTitle} sub={t.termsSub} store={store}>
+      <IB title={t.terms1Title} body={t.terms1Body}/>
+      <IB title={t.terms2Title} body={t.terms2Body} tag={t.terms2Tag}/>
+      <IB title={t.terms3Title} body={t.terms3Body}/>
     </Shell>
   );
 }
 
-export function Cookies() {
+export function Cookies({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="سياسة ملفات الارتباط" sub="الشؤون القانونية">
-      <IB title="ملفات الارتباط الأساسية" body="مطلوبة للجلسات والسلة وإتمام الشراء. لا يمكن تعطيلها." tag="مطلوب"/>
-      <IB title="ملفات ارتباط التحليلات" body="بيانات مجمعة لتحسين المنصة. لا تتضمن بيانات شخصية." tag="اختياري"/>
+    <Shell title={t.cookiesTitle} sub={t.cookiesSub} store={store}>
+      <IB title={t.cookies1Title} body={t.cookies1Body} tag={t.cookies1Tag}/>
+      <IB title={t.cookies2Title} body={t.cookies2Body} tag={t.cookies2Tag}/>
       <div style={{marginTop:'16px',padding:'14px',border:'1px solid var(--fire)',display:'flex',gap:'10px',alignItems:'flex-start',backgroundColor:'rgba(255,69,0,0.05)'}}>
         <ToggleRight style={{width:'17px',height:'17px',color:'var(--fire)',flexShrink:0,marginTop:'1px'}}/>
-        <p style={{fontSize:'13px',color:'var(--mid)',lineHeight:'1.75',margin:0,textAlign:'right'}}>
-          يمكنك إدارة أو حذف ملفات الارتباط من إعدادات المتصفح الخاص بك في أي وقت.
+        <p style={{fontSize:'13px',color:'var(--mid)',lineHeight:'1.75',margin:0,textAlign:'start'}}>
+          {t.cookiesNotice}
         </p>
       </div>
     </Shell>
@@ -1545,89 +1834,89 @@ export function Cookies() {
 }
 
 export function Contact({ store }: { store?: any }) {
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
   const [form, setForm] = useState({name:'',email:'',phone:'',message:''});
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const handleSubmit = async (e:React.FormEvent)=>{
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`,{...form,storeId:store?.id}); setSent(true); }
-    catch { showError('حدث خطأ'); } finally { setLoading(false); }
+    catch { showError(t.contactErrMsg); } finally { setLoading(false); }
   };
 
   return (
-    <div dir="rtl" style={{backgroundColor:'var(--black)',minHeight:'100vh'}}>
+    <div dir={isRTL?'rtl':'ltr'} style={{backgroundColor:'var(--black)',minHeight:'100vh'}}>
       <div style={{backgroundColor:'var(--dark)',padding:'56px 20px 40px',borderBottom:`2px solid var(--fire)`,position:'relative',overflow:'hidden'}}>
         <div style={{position:'absolute',inset:0,backgroundImage:'linear-gradient(rgba(255,69,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,69,0,0.04) 1px,transparent 1px)',backgroundSize:'40px 40px',pointerEvents:'none'}}/>
-        <div style={{maxWidth:'960px',margin:'0 auto',position:'relative',zIndex:2,textAlign:'right'}}>
-          <p className="s-label" style={{marginBottom:'10px'}}>تواصل معنا</p>
+        <div style={{maxWidth:'960px',margin:'0 auto',position:'relative',zIndex:2,textAlign:'start'}}>
+          <p className="s-label" style={{marginBottom:'10px'}}>{t.contactSub}</p>
           <h1 className="bb" style={{fontSize:'clamp(2.5rem,6vw,5rem)',color:'var(--white)',lineHeight:0.95,marginBottom:'8px'}}>
-            تواصل <span style={{color:'var(--fire)'}}>معنا</span>
+            {t.contactTitle} <span style={{color:'var(--fire)'}}>{t.contactTitleHighlight}</span>
           </h1>
-          <p style={{fontSize:'14px',color:'var(--mid)'}}>فريقنا يجيب خلال 24 ساعة 💪</p>
+          <p style={{fontSize:'14px',color:'var(--mid)'}}>{t.contactDesc}</p>
         </div>
       </div>
 
       <div className="contact-g" style={{maxWidth:'960px',margin:'0 auto',padding:'36px 20px 80px'}}>
-        {/* Info */}
         <div>
-          <div style={{backgroundColor:'var(--panel)',border:'1px solid var(--line)',borderRight:'3px solid var(--fire)',borderLeft:'none',padding:'22px',marginBottom:'12px',textAlign:'right'}}>
-            <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'16px'}}>// معلومات الاتصال</p>
+          <div style={{backgroundColor:'var(--panel)',border:'1px solid var(--line)',borderInlineStart:'3px solid var(--fire)',padding:'22px',marginBottom:'12px',textAlign:'start'}}>
+            <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'16px'}}>{t.contactInfoTitle}</p>
             {[
-              {icon:'📞',label:'الهاتف',val:store?.contact?.phone},
-              {icon:'📍',label:'الموقع',val:[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')},
-              {icon:'✉️',label:'البريد',val:store?.contact?.email},
+              {icon:'📞',label:t.contactPhoneLabel,val:store?.contact?.phone},
+              {icon:'📍',label:t.contactLocLabel,val:[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')},
+              {icon:'✉️',label:t.contactMailLabel,val:store?.contact?.email},
             ].filter(r=>r.val).map((item,i)=>(
               <div key={i} style={{display:'flex',alignItems:'center',gap:'12px',padding:'11px 0',borderBottom:'1px solid var(--line)'}}>
                 <div style={{width:'34px',height:'34px',backgroundColor:'rgba(255,69,0,0.1)',border:'1px solid var(--fire)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1rem',flexShrink:0}}>{item.icon}</div>
-                <div style={{textAlign:'right'}}>
+                <div style={{textAlign:'start'}}>
                   <p className="bc" style={{fontSize:'10px',fontWeight:700,letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--fire)',margin:'0 0 1px'}}>{item.label}</p>
                   <p style={{fontSize:'13px',fontWeight:600,color:'var(--white)',margin:0}}>{item.val}</p>
                 </div>
               </div>
             ))}
           </div>
-          <div style={{backgroundColor:'var(--fire)',padding:'18px 20px',position:'relative',overflow:'hidden',textAlign:'right'}}>
-            <p className="bb" style={{fontSize:'1.4rem',color:'white',margin:'0 0 4px'}}>تمرّن. كل. نم.</p>
-            <p className="bb" style={{fontSize:'1.8rem',color:'var(--gold)',margin:0,lineHeight:1}}>كرر العملية.</p>
+          <div style={{backgroundColor:'var(--fire)',padding:'18px 20px',position:'relative',overflow:'hidden',textAlign:'start'}}>
+            <p className="bb" style={{fontSize:'1.4rem',color:'white',margin:'0 0 4px'}}>{t.contactCta1}</p>
+            <p className="bb" style={{fontSize:'1.8rem',color:'var(--gold)',margin:0,lineHeight:1}}>{t.contactCta2}</p>
           </div>
         </div>
 
-        {/* Form */}
-        <div style={{backgroundColor:'var(--panel)',border:'1px solid var(--line)',borderRight:'3px solid var(--fire)',borderLeft:'none',padding:'24px',textAlign:'right'}}>
-          <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'18px'}}>// أرسل رسالة</p>
+        <div style={{backgroundColor:'var(--panel)',border:'1px solid var(--line)',borderInlineStart:'3px solid var(--fire)',padding:'24px',textAlign:'start'}}>
+          <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'18px'}}>{t.contactFormTitle}</p>
           {sent ? (
             <div style={{minHeight:'200px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',border:'1px solid var(--fire)',textAlign:'center',backgroundColor:'rgba(255,69,0,0.05)',padding:'28px'}}>
               <CheckCircle2 style={{width:'32px',height:'32px',color:'var(--green)',marginBottom:'12px'}}/>
-              <h3 className="bb" style={{fontSize:'1.5rem',color:'var(--white)',margin:'0 0 6px'}}>تم إرسال الرسالة!</h3>
-              <p style={{fontSize:'13px',color:'var(--mid)'}}>سنرد عليك خلال 24 ساعة. 💪</p>
+              <h3 className="bb" style={{fontSize:'1.5rem',color:'var(--white)',margin:'0 0 6px'}}>{t.contactSentTitle}</h3>
+              <p style={{fontSize:'13px',color:'var(--mid)'}}>{t.contactSentDesc}</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{display:'flex',flexDirection:'column',gap:'14px'}}>
               <div className="form-2c">
                 <div>
-                  <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--mid)',marginBottom:'5px'}}>الاسم</p>
+                  <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--mid)',marginBottom:'5px'}}>{t.contactNameLabel}</p>
                   <input type="text" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} required className="inp"
                     onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor='var(--dim)';}}/>
                 </div>
                 <div>
-                  <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--mid)',marginBottom:'5px'}}>الهاتف</p>
+                  <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--mid)',marginBottom:'5px'}}>{t.contactPhoneInputLabel}</p>
                   <input type="tel" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} required className="inp"
                     onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor='var(--dim)';}}/>
                 </div>
               </div>
               <div>
-                <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--mid)',marginBottom:'5px'}}>البريد الإلكتروني</p>
+                <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--mid)',marginBottom:'5px'}}>{t.contactEmailLabel}</p>
                 <input type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} required className="inp"
                   onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor='var(--dim)';}}/>
               </div>
               <div>
-                <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--mid)',marginBottom:'5px'}}>رسالتك</p>
-                <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder="كيف يمكننا مساعدتك؟" rows={4} required className="inp"
+                <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--mid)',marginBottom:'5px'}}>{t.contactMsgLabel}</p>
+                <textarea value={form.message} onChange={e=>setForm({...form,message:e.target.value})} placeholder={t.contactMsgPh} rows={4} required className="inp"
                   style={{resize:'none'}}
                   onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor='var(--dim)';}}/>
               </div>
               <button type="submit" disabled={loading} className="btn-fire" style={{justifyContent:'center',width:'100%',fontSize:'14px',padding:'13px',clipPath:'none',opacity:loading?0.7:1,cursor:loading?'not-allowed':'pointer'}}>
-                {loading?<><Loader2 style={{width:'15px',height:'15px',animation:'spin 1s linear infinite'}}/> جاري...</>:<>إرسال الرسالة <ArrowLeft style={{width:'14px',height:'14px'}}/></>}
+                {loading?<><Loader2 style={{width:'15px',height:'15px',animation:'spin 1s linear infinite'}}/> {t.contactSending}</>:<>{t.contactSendBtn} <ArrowLeft style={{width:'14px',height:'14px'}}/></>}
               </button>
             </form>
           )}

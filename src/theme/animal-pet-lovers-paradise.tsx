@@ -498,6 +498,7 @@ export default function Main({ store, children, domain }: any) {
 ══════════════════════════════════════════════════════════════ */
 export function Navbar({ store, domain }: { store: any; domain: string }) {
     const t = T[getLang(store)];
+    const isRTL = t.dir === 'rtl';
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -602,10 +603,10 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 <div className="nav-desktop-search" style={{ flex: 1, maxWidth: 340, position: 'relative' }}>
                     <form onSubmit={doSearch}>
                         <input type="text" placeholder={t.searchPh} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                            style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.75rem', borderRadius: 50, border: '2px solid var(--amber-lt)', background: '#fff', fontSize: '0.875rem', fontWeight: 600, outline: 'none', transition: 'border-color 0.2s', fontFamily: "'Nunito', sans-serif" }}
+                            style={{ width: '100%', padding: isRTL ? '0.6rem 1rem 0.6rem 2.75rem' : '0.6rem 2.75rem 0.6rem 1rem', borderRadius: 50, border: '2px solid var(--amber-lt)', background: '#fff', fontSize: '0.875rem', fontWeight: 600, outline: 'none', transition: 'border-color 0.2s', fontFamily: "'Nunito', sans-serif" }}
                             onFocus={e => (e.target.style.borderColor = 'var(--amber)')}
                             onBlur={e => (e.target.style.borderColor = 'var(--amber-lt)')} />
-                        <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--amber)' }} />
+                        <Search size={15} style={{ position: 'absolute', ...(isRTL ? { left: 12 } : { right: 12 }), top: '50%', transform: 'translateY(-50%)', color: 'var(--amber)' }} />
                     </form>
                     {searchQuery.length >= 2 && <Drop />}
                 </div>
@@ -649,8 +650,8 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 <div style={{ padding: '0.625rem 1.25rem', background: '#fff', borderTop: '1px solid var(--amber-lt)', position: 'relative' }}>
                     <form onSubmit={doSearch} style={{ position: 'relative' }}>
                         <input autoFocus type="text" placeholder={t.searchPhMobile} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                            style={{ ...INP(), padding: '0.75rem 1rem 0.75rem 2.75rem' }} />
-                        <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--amber)' }} />
+                            style={{ ...INP(), padding: isRTL ? '0.75rem 1rem 0.75rem 2.75rem' : '0.75rem 2.75rem 0.75rem 1rem' }} />
+                        <Search size={15} style={{ position: 'absolute', ...(isRTL ? { left: 12 } : { right: 12 }), top: '50%', transform: 'translateY(-50%)', color: 'var(--amber)' }} />
                     </form>
                     {searchQuery.length >= 2 && <Drop />}
                 </div>
@@ -1182,16 +1183,16 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
                         <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
                             <FR error={errors.customerWelaya} label={t.wilaya}>
                                 <div style={{ position: 'relative' }}>
-                                    <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--amber)', pointerEvents: 'none' }} />
-                                    <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP(!!errors.customerWelaya), paddingLeft: 32, fontFamily: 'inherit' }}>
+                                    <ChevronDown size={13} style={{ position: 'absolute', ...(t.dir === 'rtl' ? { left: 12 } : { right: 12 }), top: '50%', transform: 'translateY(-50%)', color: 'var(--amber)', pointerEvents: 'none' }} />
+                                    <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP(!!errors.customerWelaya), ...(t.dir === 'rtl' ? { paddingLeft: 32 } : { paddingRight: 32 }), fontFamily: 'inherit' }}>
                                         <option value="">{t.wilayaPh}</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>)}
                                     </select>
                                 </div>
                             </FR>
                             <FR error={errors.customerCommune} label={t.commune}>
                                 <div style={{ position: 'relative' }}>
-                                    <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--amber)', pointerEvents: 'none' }} />
-                                    <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...INP(!!errors.customerCommune), paddingLeft: 32, opacity: !fd.customerWelaya ? 0.5 : 1, fontFamily: 'inherit' }}>
+                                    <ChevronDown size={13} style={{ position: 'absolute', ...(t.dir === 'rtl' ? { left: 12 } : { right: 12 }), top: '50%', transform: 'translateY(-50%)', color: 'var(--amber)', pointerEvents: 'none' }} />
+                                    <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...INP(!!errors.customerCommune), ...(t.dir === 'rtl' ? { paddingLeft: 32 } : { paddingRight: 32 }), opacity: !fd.customerWelaya ? 0.5 : 1, fontFamily: 'inherit' }}>
                                         <option value="">{loadingC ? t.communeLoading : t.communePh}</option>{communes.map(c => <option key={c.id} value={c.id}>{t.dir === 'rtl' ? c.ar_name : c.name}</option>)}
                                     </select>
                                 </div>
@@ -1354,16 +1355,16 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                             <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
                                 <FR error={errors.w} label={t.wilayaLabel}>
                                     <div style={{ position: 'relative' }}>
-                                        <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--amber)', pointerEvents: 'none' }} />
-                                        <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP(!!errors.w), paddingLeft: 32, fontFamily: 'inherit' }}>
+                                        <ChevronDown size={13} style={{ position: 'absolute', ...(t.dir === 'rtl' ? { left: 12 } : { right: 12 }), top: '50%', transform: 'translateY(-50%)', color: 'var(--amber)', pointerEvents: 'none' }} />
+                                        <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP(!!errors.w), ...(t.dir === 'rtl' ? { paddingLeft: 32 } : { paddingRight: 32 }), fontFamily: 'inherit' }}>
                                             <option value="">{t.wilayaPh}</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>)}
                                         </select>
                                     </div>
                                 </FR>
                                 <FR error={errors.c} label={t.communeLabel}>
                                     <div style={{ position: 'relative' }}>
-                                        <ChevronDown size={13} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--amber)', pointerEvents: 'none' }} />
-                                        <select value={fd.customerCommune} disabled={loadingC || !fd.customerWelaya} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...INP(!!errors.c), paddingLeft: 32, opacity: !fd.customerWelaya ? 0.5 : 1, fontFamily: 'inherit' }}>
+                                        <ChevronDown size={13} style={{ position: 'absolute', ...(t.dir === 'rtl' ? { left: 12 } : { right: 12 }), top: '50%', transform: 'translateY(-50%)', color: 'var(--amber)', pointerEvents: 'none' }} />
+                                        <select value={fd.customerCommune} disabled={loadingC || !fd.customerWelaya} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...INP(!!errors.c), ...(t.dir === 'rtl' ? { paddingLeft: 32 } : { paddingRight: 32 }), opacity: !fd.customerWelaya ? 0.5 : 1, fontFamily: 'inherit' }}>
                                             <option value="">{loadingC ? t.communeLoading : t.communePh}</option>{communes.map(c => <option key={c.id} value={c.id}>{t.dir === 'rtl' ? c.ar_name : c.name}</option>)}
                                         </select>
                                     </div>
