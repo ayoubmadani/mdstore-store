@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { Facebook, Twitter, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 
 const DASHBOARD_URL = process.env.NEXT_PUBLIC_DASHBOARD_URL || '';
@@ -9,6 +9,7 @@ export default async function SiteFooter() {
   const tNav = await getTranslations('nav');
   const tContact = await getTranslations('contact');
   const tHome = await getTranslations('home');
+  const locale = await getLocale();
 
   return (
     <footer className="bg-white dark:bg-brand-dark border-t border-gray-100 dark:border-zinc-800 pt-16 pb-8 transition-colors duration-300">
@@ -36,7 +37,7 @@ export default async function SiteFooter() {
               <FooterLink href="/" label={tNav('home')} />
               <FooterLink href="/about" label={tNav('about')} />
               <FooterLink href="/contact" label={tNav('contact')} />
-              <FooterLink href={`${DASHBOARD_URL}/auth/register`} label={tHome('get_started')} />
+              <FooterLink href={`${DASHBOARD_URL}/select-lang/${locale}`} label={tHome('get_started')} />
             </ul>
           </div>
 

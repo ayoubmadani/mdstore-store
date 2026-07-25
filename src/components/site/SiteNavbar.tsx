@@ -140,7 +140,7 @@ export default function SiteNavbar() {
           </div>
 
           <a
-            href={`${DASHBOARD_URL}/auth`}
+            href={`${DASHBOARD_URL}/select-lang/${locale}`}
             className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-black hover:bg-indigo-700 shadow-lg shadow-indigo-100 dark:shadow-none transition-all text-sm"
           >
             {t('login_btn')}
@@ -220,7 +220,7 @@ export default function SiteNavbar() {
           </div>
 
           <a
-            href={`${DASHBOARD_URL}/select-lang/locale`}
+            href={`${DASHBOARD_URL}/select-lang/${locale}`}
             onClick={closeMobileMenu}
             className="mt-1 w-full text-center py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black transition-all shadow-lg shadow-indigo-100 dark:shadow-none text-sm"
           >

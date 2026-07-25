@@ -37,7 +37,7 @@ export default async function RootLayout({
   const dir = locale === "ar" ? "rtl" : "ltr";
 
   return (
-    <html lang={locale} dir={dir}>
+    <html lang={locale} dir={dir} suppressHydrationWarning>
       <SetCustomerId />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
