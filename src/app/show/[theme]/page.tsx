@@ -1,28 +1,21 @@
-import dynamic from 'next/dynamic';
-import { use, useMemo } from 'react';
+import type { Metadata } from 'next';
+import PreviewClient from './PreviewClient';
 
 interface ParamsType {
     params: Promise<{ theme: string }>;
 }
 
-export default function Page({ params }: ParamsType) {
-    const { theme } = use(params);
+export const metadata: Metadata = {
+    title: 'معاينة الثيم',
+    robots: { index: false, follow: false },
+};
 
-    // استخدام useMemo لضمان عدم إعادة تحميل المكون إلا إذا تغير اسم القالب
-    const Main = useMemo(() => dynamic(
-        () => import(`@/constendTheme/${theme}`).catch(() => {
-            return () => <p>Theme "{theme}" not found!</p>;
-        }),
-        {
-            loading: () => <p>Loading theme...</p>,
-            ssr: true
-        }
-    ), [theme]);
+export default async function Page({ params }: ParamsType) {
+    const { theme } = await params;
 
     return (
         <main>
-            
-            <Main />
+            <PreviewClient theme={theme} />
         </main>
     );
 }
