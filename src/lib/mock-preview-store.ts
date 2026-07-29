@@ -2,7 +2,7 @@ import type { Store } from '@/types/store'
 
 // بيانات وهمية تُستخدم فقط في صفحة معاينة الثيمات /show/[theme] — لا تلامس أي API حقيقي.
 
-type PreviewLang = 'ar' | 'fr' | 'en'
+export type PreviewLang = 'ar' | 'fr' | 'en'
 
 const CATEGORY_1 = 'preview-cat-1'
 const CATEGORY_2 = 'preview-cat-2'
@@ -45,7 +45,7 @@ const PRODUCT_TEXT: Record<PreviewLang, { name: string; desc: string }[]> = {
   ],
 }
 
-function buildPreviewProducts(lang: PreviewLang) {
+export function buildPreviewProducts(lang: PreviewLang) {
   const t = PRODUCT_TEXT[lang]
   const store = {
     id: PREVIEW_STORE_ID,
@@ -136,9 +136,6 @@ export const PREVIEW_COMMUNES = [
   { id: 'c1', name: 'Bab Ezzouar', ar_name: 'باب الزوار', wilayaId: '16' },
   { id: 'c2', name: 'Hydra', ar_name: 'حيدرة', wilayaId: '16' },
 ]
-
-// نسخة افتراضية (عربي) — تُستخدم من preview-mock-api.ts لطلبات البحث بدون سياق لغة
-export const PREVIEW_PRODUCTS = buildPreviewProducts('ar')
 
 export function buildPreviewStore(themeSlug: string, lang: PreviewLang = 'ar'): Store & Record<string, any> {
   const t = STORE_TEXT[lang]

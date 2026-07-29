@@ -1,7 +1,14 @@
 'use client'
 
 import axios, { type AxiosResponse } from 'axios'
-import { PREVIEW_PRODUCTS, PREVIEW_WILAYAS, PREVIEW_COMMUNES } from './mock-preview-store'
+import { buildPreviewProducts, PREVIEW_WILAYAS, PREVIEW_COMMUNES, type PreviewLang } from './mock-preview-store'
+
+// تُحدَّث من PreviewClient عند تبديل اللغة حتى تبحث نتائج "fake search" في نفس لغة
+// الواجهة المعروضة حالياً (أسماء المنتجات مترجمة لكل لغة).
+let activeLang: PreviewLang = 'ar'
+export function setPreviewSearchLang(lang: PreviewLang) {
+  activeLang = lang
+}
 
 // يعترض طلبات axios الصادرة من كود الثيم (نفس نسخة axios المُلقّنة داخل ThemeRunner)
 // أثناء معاينة /show/[theme] فقط، ويرجّع بيانات وهمية بدل ضرب الـ API الحقيقي —
@@ -32,10 +39,11 @@ export function installPreviewMockApi(): () => void {
     axios.get = ((url: string, config?: any) => {
       if (typeof url === 'string') {
         if (url.includes('/products/public/')) {
+          const products = buildPreviewProducts(activeLang)
           const search = String(config?.params?.search || '').trim().toLowerCase()
           const data = search
-            ? PREVIEW_PRODUCTS.filter(p => p.name.toLowerCase().includes(search))
-            : PREVIEW_PRODUCTS
+            ? products.filter(p => p.name.toLowerCase().includes(search))
+            : products
           return fakeResponse(data)
         }
         if (url.includes('/shipping/public/get-shipping/')) return fakeResponse(PREVIEW_WILAYAS)
