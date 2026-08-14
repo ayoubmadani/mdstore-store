@@ -221,7 +221,7 @@ export default function ProductClient({
             items: [{ item_name: product.name, item_id: product.id, price: getFinalPrice(), quantity: formData.quantity }],
           })
         if (res.data?.customerId) localStorage.setItem('customerId', res.data.customerId)
-        router.push(`/${domain}/success`)
+        router.push(`/success?productId=${product.id}`)
       }
     } catch {
       setFormErrors({ submit: 'حدث خطأ في الاتصال بالخادم، يرجى المحاولة مجددًا' })

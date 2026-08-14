@@ -136,7 +136,7 @@ const CSS = `
 
   .prod-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
   .trust-bar { display:grid; grid-template-columns:repeat(4,1fr); }
-  .footer-g  { display:grid; grid-template-columns:2fr 1fr 1fr; gap:48px; }
+  .footer-g  { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; }
   .details-g { display:grid; grid-template-columns:1fr 1fr; gap:32px; }
   .contact-g { display:grid; grid-template-columns:1fr 1fr; gap:56px; }
   .form-2c   { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
@@ -177,7 +177,7 @@ export interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
   variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
+  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; currency?: string; };
 }
 export interface ProductFormProps {
   product: Product; userId: string; domain: string; redirectPath?: string;
@@ -262,10 +262,11 @@ const jsonAr = {
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
   // Footer
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
+  cookies: 'الكوكيز',
   rightsReserved: 'جميع الحقوق محفوظة',
   // Extra
   trust: [
@@ -305,6 +306,7 @@ const jsonAr = {
   contactLink: 'تواصل معنا',
   privacyLink: 'سياسة الخصوصية',
   termsLink: 'شروط الخدمة',
+  cookiesLink: 'الكوكيز',
   privacyTitle: 'سياسة الخصوصية', privacySub: 'قانوني',
   priv1Title: 'البيانات التي نجمعها', priv1Body: 'فقط اسمك ورقم هاتفك وعنوان التوصيل — ما هو ضروري لمعالجة طلبك.',
   priv2Title: 'كيف نستخدمها', priv2Body: 'حصرياً لتنفيذ وتوصيل مشترياتك. لا استخدام تجاري.',
@@ -381,7 +383,7 @@ const jsonFr = {
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
   // Footer
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
@@ -424,6 +426,7 @@ const jsonFr = {
   contactLink: 'Nous contacter',
   privacyLink: 'Politique de confidentialité',
   termsLink: 'Conditions générales',
+  cookiesLink: 'Cookies',
   privacyTitle: 'Politique de confidentialité', privacySub: 'Légal',
   priv1Title: 'Données collectées', priv1Body: 'Uniquement votre nom, numéro de téléphone et adresse de livraison — le strict nécessaire.',
   priv2Title: 'Utilisation des données', priv2Body: "Exclusivement pour l'exécution et la livraison de vos achats. Pas d'usage commercial.",
@@ -458,7 +461,7 @@ const jsonEn = {
   successTitle: 'Order Confirmed!', successDesc: 'Thank you! Our team will contact you shortly.',
   backToShop: 'Back to Shop', checkoutTitle: 'Checkout',
   offersTitle: 'Available Offers', descTitle: 'Description',
-  quickLinks: 'Quick Links', contactSect: 'Contact', privacy: 'Privacy', terms: 'Terms', rightsReserved: 'All rights reserved.',
+  quickLinks: 'Quick Links', legalNav: 'Legal', contactSect: 'Contact', privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies', rightsReserved: 'All rights reserved.',
   trust: [
     { t: 'Fast Delivery', s: '48h to your door' },
     { t: 'Free Returns', s: '30-day returns' },
@@ -475,7 +478,7 @@ const jsonEn = {
   msgLabel: 'Message', msgPh: 'How can we help you?', sendBtn: 'Send Message',
   mailLbl: 'Email', locLbl: 'Location',
   helpTitle: 'We are happy to help', replyTime: 'We reply within 24 hours 💄', contactSub: 'Get in Touch',
-  cartLinks: 'Cart', contactLink: 'Contact Us', privacyLink: 'Privacy Policy', termsLink: 'Terms of Service',
+  cartLinks: 'Cart', contactLink: 'Contact Us', privacyLink: 'Privacy Policy', termsLink: 'Terms of Service', cookiesLink: 'Cookie Policy',
   privacyTitle: 'Privacy Policy', privacySub: 'Legal',
   priv1Title: 'Data We Collect', priv1Body: 'Only your name, phone number, and delivery address — the minimum needed to process your order.',
   priv2Title: 'How We Use It', priv2Body: 'Exclusively to fulfill and deliver your purchases. No commercial use.',
@@ -954,8 +957,23 @@ export function Footer({ store }: any) {
                 { href: '/', label: t.home },
                 { href: '/cart', label: t.cartLinks },
                 { href: '/contact', label: t.contactLink },
-                { href: '/Privacy', label: t.privacyLink },
-                { href: '/Terms', label: t.termsLink },
+              ].map(l => (
+                <a key={l.href} href={l.href} style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', transition: 'color 0.2s' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--plum-lt)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; }}>
+                  {l.label}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--plum-lt)', marginBottom: '18px' }}>{t.legalNav}</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {[
+                { href: '/privacy', label: t.privacyLink },
+                { href: '/terms', label: t.termsLink },
+                { href: '/cookies', label: t.cookiesLink },
               ].map(l => (
                 <a key={l.href} href={l.href} style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', transition: 'color 0.2s' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--plum-lt)'; }}
@@ -1290,21 +1308,24 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                     {attr.variants.map((v: any) => {
                       const s = selectedVariants[attr.name] === v.value;
-                      return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: '28px', height: '28px', backgroundColor: v.value, border: 'none', cursor: 'pointer', borderRadius: '50%', outline: s ? '3px solid var(--plum)' : '3px solid transparent', outlineOffset: '3px' }} />;
+                      const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)));
+                      return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: '28px', height: '28px', backgroundColor: v.value, border: 'none', cursor: available ? 'pointer' : 'not-allowed', borderRadius: '50%', outline: s ? '3px solid var(--plum)' : '3px solid transparent', outlineOffset: '3px', opacity: available ? 1 : 0.35 }} />;
                     })}
                   </div>
                 ) : attr.displayMode === 'image' ? (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                     {attr.variants.map((v: any) => {
                       const s = selectedVariants[attr.name] === v.value;
-                      return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ width: '48px', height: '48px', overflow: 'hidden', border: `2px solid ${s ? 'var(--plum)' : 'var(--line-dk)'}`, cursor: 'pointer', padding: 0, borderRadius: '4px' }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>;
+                      const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)));
+                      return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: '48px', height: '48px', overflow: 'hidden', border: `2px solid ${s ? 'var(--plum)' : 'var(--line-dk)'}`, cursor: available ? 'pointer' : 'not-allowed', padding: 0, borderRadius: '4px', opacity: available ? 1 : 0.35 }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>;
                     })}
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                     {attr.variants.map((v: any) => {
                       const s = selectedVariants[attr.name] === v.value;
-                      return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ padding: '6px 14px', border: `1.5px solid ${s ? 'var(--plum)' : 'var(--line-dk)'}`, borderRadius: '4px', fontFamily: "'DM Sans',sans-serif", fontSize: '13px', fontWeight: 500, background: s ? 'var(--soft)' : 'transparent', color: s ? 'var(--plum)' : 'var(--mid)', cursor: 'pointer', transition: 'all 0.2s' }}>{v.name}</button>;
+                      const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)));
+                      return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ padding: '6px 14px', border: `1.5px solid ${s ? 'var(--plum)' : 'var(--line-dk)'}`, borderRadius: '4px', fontFamily: "'DM Sans',sans-serif", fontSize: '13px', fontWeight: 500, background: s ? 'var(--soft)' : 'transparent', color: s ? 'var(--plum)' : (available ? 'var(--mid)' : '#bbb'), cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.2s', textDecoration: available ? 'none' : 'line-through' }}>{v.name}</button>;
                     })}
                   </div>
                 )}
@@ -1403,7 +1424,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     try {
       await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (typeof window !== 'undefined' && fd.customerId) localStorage.setItem('customerId', fd.customerId);
-      router.push(`/${domain}/successfully`);
+      router.push(`/successfully?productId=${product?.id}`);
     } catch (err) { console.error(err); } finally { setSub(false); }
   };
 

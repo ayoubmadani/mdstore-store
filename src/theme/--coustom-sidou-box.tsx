@@ -151,7 +151,7 @@ body { background: ${BG}; color: ${TXT}; font-family: ${FONT_BODY}; }
 @media (min-width:768px) { .sb-details-inner { grid-template-columns:1fr 1fr; } }
 
 .sb-footer-grid { display:grid; grid-template-columns:1fr; gap:2rem; }
-@media (min-width:768px) { .sb-footer-grid { grid-template-columns:repeat(3,1fr); } }
+@media (min-width:768px) { .sb-footer-grid { grid-template-columns:1.5fr 1fr 1fr 1fr; } }
 
 .sb-form-row-2 { display:grid; grid-template-columns:1fr; gap:.875rem; margin-bottom:.875rem; }
 @media (min-width:500px) { .sb-form-row-2 { grid-template-columns:1fr 1fr; } }
@@ -195,8 +195,8 @@ const T = {
     successTitle: 'تم إرسال طلبك ✓', successDesc: 'سيتم التواصل معك قريباً لتأكيد الطلب.',
     backToShop: 'العودة للمتجر', checkoutTitle: 'إتمام الطلب',
     offersTitle: 'العروض', descTitle: 'الوصف',
-    quickLinks: 'روابط', contactSect: 'تواصل معنا',
-    privacy: 'سياسة الخصوصية', terms: 'الشروط والأحكام', rightsReserved: 'جميع الحقوق محفوظة.',
+    quickLinks: 'روابط', legalNav: 'قانوني', contactSect: 'تواصل معنا',
+    privacy: 'سياسة الخصوصية', terms: 'الشروط والأحكام', cookies: 'الكوكيز', rightsReserved: 'جميع الحقوق محفوظة.',
     heroDigital: 'متجر إلكترونيات رقمي', heroDefaultTitle: 'تكنولوجيا تضيء طريقك',
     trust: [
       { t: 'توصيل سريع', s: 'لكل الولايات' },
@@ -246,8 +246,8 @@ const T = {
     successTitle: 'Commande confirmée ✓', successDesc: 'Merci pour votre commande, notre équipe vous contactera bientôt.',
     backToShop: 'Retour à la boutique', checkoutTitle: 'Finaliser la commande',
     offersTitle: 'Offres groupées', descTitle: 'Description',
-    quickLinks: 'Navigation', contactSect: 'Contact',
-    privacy: 'Confidentialité', terms: 'Conditions', rightsReserved: 'Tous droits réservés.',
+    quickLinks: 'Navigation', legalNav: 'Légal', contactSect: 'Contact',
+    privacy: 'Confidentialité', terms: 'Conditions', cookies: 'Cookies', rightsReserved: 'Tous droits réservés.',
     heroDigital: 'Boutique électronique numérique', heroDefaultTitle: 'La technologie qui illumine votre chemin',
     trust: [
       { t: 'Livraison rapide', s: 'Partout en Algérie' },
@@ -297,8 +297,8 @@ const T = {
     successTitle: 'Order placed ✓', successDesc: 'Thank you! Our team will contact you shortly to confirm your order.',
     backToShop: 'Back to Shop', checkoutTitle: 'Complete your order',
     offersTitle: 'Bundle offers', descTitle: 'Description',
-    quickLinks: 'Quick Links', contactSect: 'Contact Us',
-    privacy: 'Privacy Policy', terms: 'Terms & Conditions', rightsReserved: 'All rights reserved.',
+    quickLinks: 'Quick Links', legalNav: 'Legal', contactSect: 'Contact Us',
+    privacy: 'Privacy Policy', terms: 'Terms & Conditions', cookies: 'Cookies', rightsReserved: 'All rights reserved.',
     heroDigital: 'Digital electronics store', heroDefaultTitle: 'Technology that lights your way',
     trust: [
       { t: 'Fast Delivery',      s: 'Across all wilayas' },
@@ -455,16 +455,18 @@ export function Navbar({ store, domain }: any) {
         <div className="sb-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 72, gap: 16 }}>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
             {logo && !imgError ? (
-              <img src={logo} alt={store?.name} onError={() => setImgError(true)} style={{ height: 38, width: 'auto', objectFit: 'contain' }} />
+              <img src={logo} alt={store?.name} onError={() => setImgError(true)} style={{ height: 38, width: 'auto', maxWidth: 160, objectFit: 'contain' }} />
             ) : (
-              <div style={{
-                width: 38, height: 38, borderRadius: 4, background: AL, border: `1px solid ${A}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', color: A, fontWeight: 900, fontFamily: FONT_MONO,
-              }}>{(store?.name || 'SB').slice(0, 2).toUpperCase()}</div>
+              <>
+                <div style={{
+                  width: 38, height: 38, borderRadius: 4, background: AL, border: `1px solid ${A}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', color: A, fontWeight: 900, fontFamily: FONT_MONO,
+                }}>{(store?.name || 'SB').slice(0, 2).toUpperCase()}</div>
+                <span style={{ fontFamily: FONT_HEAD, fontWeight: 900, fontSize: 18, letterSpacing: 1, textTransform: 'uppercase', color: TXT }}>
+                  {store?.name || 'sidou-box'}
+                </span>
+              </>
             )}
-            <span style={{ fontFamily: FONT_HEAD, fontWeight: 900, fontSize: 18, letterSpacing: 1, textTransform: 'uppercase', color: TXT }}>
-              {store?.name || 'sidou-box'}
-            </span>
           </Link>
 
           <nav className="sb-nav-links">
@@ -562,13 +564,16 @@ export function Navbar({ store, domain }: any) {
 export function Footer({ store }: any) {
   const t = T[getLang(store)];
   const showCart = store?.cart !== false;
-  const pageLinks = [
+  const navLinks = [
     { h: '/', l: t.home },
     { h: '/cart', l: t.cart },
     { h: '/contact', l: t.contact },
+  ].filter((lnk) => lnk.h !== '/cart' || showCart);
+  const legalLinks = [
     { h: '/privacy', l: t.privacy },
     { h: '/terms', l: t.terms },
-  ].filter((lnk) => lnk.h !== '/cart' || showCart);
+    { h: '/cookies', l: t.cookies },
+  ];
 
   return (
     <footer style={{ background: CARD, borderTop: `1px solid ${BD}`, marginTop: 60 }}>
@@ -584,7 +589,15 @@ export function Footer({ store }: any) {
           <div>
             <div style={{ fontWeight: 700, fontSize: 13, color: TXT, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16 }}>{t.quickLinks}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {pageLinks.map((l) => (
+              {navLinks.map((l) => (
+                <Link key={l.h} href={l.h} style={{ color: SUB, textDecoration: 'none', fontSize: 13.5 }}>{l.l}</Link>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 13, color: TXT, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16 }}>{t.legalNav}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {legalLinks.map((l) => (
                 <Link key={l.h} href={l.h} style={{ color: SUB, textDecoration: 'none', fontSize: 13.5 }}>{l.l}</Link>
               ))}
             </div>
@@ -863,23 +876,27 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {attr.variants.map((v) => {
                   const active = selectedVariants?.[attr.name] === v.value;
+                  const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)));
                   if (attr.displayMode === 'color') {
                     const isImgUrl = /^https?:\/\/|^\//.test(v.value);
-                    return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name} style={{
+                    return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.name} style={{
                       width: 36, height: 36, borderRadius: '50%',
                       background: isImgUrl ? `url(${v.value}) center/cover` : v.value,
-                      cursor: 'pointer', overflow: 'hidden',
+                      cursor: available ? 'pointer' : 'not-allowed', overflow: 'hidden',
                       border: `2px solid ${active ? A : BD2}`, boxShadow: active ? `0 0 0 2px ${BG}, 0 0 0 4px ${A}` : 'none',
+                      opacity: available ? 1 : 0.35,
                     }} />;
                   }
                   if (attr.displayMode === 'image') {
-                    return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{
-                      width: 48, height: 48, border: `1px solid ${active ? A : BD}`, padding: 0, cursor: 'pointer', overflow: 'hidden',
+                    return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{
+                      width: 48, height: 48, border: `1px solid ${active ? A : BD}`, padding: 0, cursor: available ? 'pointer' : 'not-allowed', overflow: 'hidden',
+                      opacity: available ? 1 : 0.35,
                     }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>;
                   }
-                  return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{
+                  return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{
                     padding: '8px 16px', border: `1px solid ${active ? A : BD2}`, background: active ? AL : 'transparent',
-                    color: active ? A : TXT, cursor: 'pointer', fontSize: 13, fontWeight: 600,
+                    color: active ? A : (available ? TXT : '#bbb'), cursor: available ? 'pointer' : 'not-allowed', fontSize: 13, fontWeight: 600,
+                    textDecoration: available ? 'none' : 'line-through',
                   }}>{v.name}</button>;
                 })}
               </div>

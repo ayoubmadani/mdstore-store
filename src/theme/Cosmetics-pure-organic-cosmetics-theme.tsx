@@ -116,7 +116,7 @@ const THEME_CSS = `
   .contact-inner { display: grid; grid-template-columns: 1fr; gap: 2rem; }
   @media (min-width: 1024px) { .contact-inner { grid-template-columns: 1fr 1.8fr; } }
   .footer-cols { display: grid; grid-template-columns: 1fr; gap: 2.5rem; }
-  @media (min-width: 768px) { .footer-cols { grid-template-columns: 2fr 1fr 1fr; } }
+  @media (min-width: 768px) { .footer-cols { grid-template-columns: 2fr 1fr 1fr 1fr; } }
   .cart-add-btns { display: flex; flex-direction: column; gap: 0.75rem; }
   @media (min-width: 500px) { .cart-add-btns { flex-direction: row; } }
   .delivery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
@@ -153,7 +153,7 @@ export interface Product {
   id: string; name: string; price: string|number; priceOriginal?: string|number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
   variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
+  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; currency?: string; };
 }
 export interface ProductFormProps {
   product: Product; userId: string; domain: string; redirectPath?: string;
@@ -240,13 +240,13 @@ const jsonAr = {
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
   // Footer
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
+  cookies: 'سياسة الكوكيز',
   rightsReserved: 'جميع الحقوق محفوظة',
   pages: 'الصفحات',
-  cookies: 'سياسة الكوكيز',
   cancel: 'إلغاء',
   deliveryInfoTitle: 'بيانات التوصيل',
   productLabel: 'المنتج',
@@ -375,7 +375,7 @@ const jsonFr = {
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
   // Footer
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
@@ -504,7 +504,7 @@ const jsonEn = {
   checkoutTitle: 'Complete your order',
   offersTitle: 'Available offers',
   descTitle: 'Description',
-  quickLinks: 'Quick Links',
+  quickLinks: 'Quick Links', legalNav: 'Legal',
   contactSect: 'Contact',
   privacy: 'Privacy',
   terms: 'Terms',
@@ -678,7 +678,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Logo */}
           <Link href="/" style={{ flexShrink:0, display:'flex', alignItems:'center', gap:10 }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <img src={store.design.logoUrl} style={{ height:36, objectFit:'contain' }} alt={store?.name||''} onError={() => setImgError(true)} />
+              <img src={store.design.logoUrl} style={{ height:36, objectFit:'contain', maxWidth: 160 }} alt={store?.name||''} onError={() => setImgError(true)} />
             ) : (
               <>
                 <div style={{ width:34, height:34, borderRadius:'50%', background:`linear-gradient(135deg,${RO},${ROD})`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
@@ -820,7 +820,17 @@ export function Footer({ store }: any) {
           </div>
           <div>
             <h4 style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.16em', marginBottom:'1.5rem' }}>{t.pages}</h4>
-            {[['/', t.home], ['/cart', t.cart], ['/contact', t.contactSect], ['/Privacy', t.privacy], ['/Terms', t.terms], ['/Cookies', t.cookies]].filter(([h]) => h !== '/cart' || store?.cart !== false).map(([h, l], i) => (
+            {[['/', t.home], ['/cart', t.cart], ['/contact', t.contactSect]].filter(([h]) => h !== '/cart' || store?.cart !== false).map(([h, l], i) => (
+              <Link key={i} href={h} style={{ display:'block', fontSize:'0.875rem', color:'rgba(255,255,255,0.38)', marginBottom:'0.65rem', fontWeight:300, transition:'color 0.15s' }}
+                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = RO)}
+                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.38)')}>
+                {l}
+              </Link>
+            ))}
+          </div>
+          <div>
+            <h4 style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.16em', marginBottom:'1.5rem' }}>{t.legalNav}</h4>
+            {[['/privacy', t.privacy], ['/terms', t.terms], ['/cookies', t.cookies]].map(([h, l], i) => (
               <Link key={i} href={h} style={{ display:'block', fontSize:'0.875rem', color:'rgba(255,255,255,0.38)', marginBottom:'0.65rem', fontWeight:300, transition:'color 0.15s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = RO)}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.38)')}>
@@ -1165,11 +1175,12 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                 <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
                   {attr.variants.map((v:any) => {
                     const isSel = selectedVariants[attr.name] === v.value;
+                    const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)));
                     return (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={
-                        attr.displayMode==='color' ? { width:26, height:26, borderRadius:'50%', background:v.value, border:`2px solid ${BD}`, cursor:'pointer', outline:`2.5px solid ${isSel ? RO : 'transparent'}`, outlineOffset:2, transition:'outline 0.15s' }
-                        : attr.displayMode==='image' ? { width:46, height:46, backgroundImage:`url(${v.value})`, backgroundSize:'cover', backgroundPosition:'center', border:`2px solid ${isSel ? RO : BD}`, borderRadius:8, cursor:'pointer', transition:'all 0.15s' }
-                        : { padding:'0.4rem 0.925rem', border:`1.5px solid ${isSel ? RO : BD}`, borderRadius:50, fontSize:'0.8rem', fontWeight:500, background: isSel ? ROL : CARD, color: isSel ? ROD : SUB, cursor:'pointer', transition:'all 0.15s', fontFamily:'inherit' }
+                      <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={
+                        attr.displayMode==='color' ? { width:26, height:26, borderRadius:'50%', background:v.value, border:`2px solid ${BD}`, cursor: available ? 'pointer' : 'not-allowed', outline:`2.5px solid ${isSel ? RO : 'transparent'}`, outlineOffset:2, transition:'outline 0.15s', opacity: available ? 1 : 0.35 }
+                        : attr.displayMode==='image' ? { width:46, height:46, backgroundImage:`url(${v.value})`, backgroundSize:'cover', backgroundPosition:'center', border:`2px solid ${isSel ? RO : BD}`, borderRadius:8, cursor: available ? 'pointer' : 'not-allowed', transition:'all 0.15s', opacity: available ? 1 : 0.35 }
+                        : { padding:'0.4rem 0.925rem', border:`1.5px solid ${isSel ? RO : BD}`, borderRadius:50, fontSize:'0.8rem', fontWeight:500, background: isSel ? ROL : CARD, color: isSel ? ROD : (available ? SUB : '#bbb'), cursor: available ? 'pointer' : 'not-allowed', transition:'all 0.15s', fontFamily:'inherit', textDecoration: available ? 'none' : 'line-through' }
                       }>{attr.displayMode!=='color' && attr.displayMode!=='image' && v.name}</button>
                     );
                   })}
