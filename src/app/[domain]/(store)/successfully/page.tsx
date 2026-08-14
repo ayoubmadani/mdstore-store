@@ -6,5 +6,5 @@ export default async function SuccessfullyRedirect({
   params: Promise<{ domain: string }>
 }) {
   const { domain } = await params
-  redirect(`/${domain}/success`)
+  redirect(`/success`)
 }
