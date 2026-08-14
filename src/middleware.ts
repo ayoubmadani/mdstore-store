@@ -4,6 +4,12 @@ import type { NextRequest } from 'next/server';
 const SUPPORTED_LOCALES = ['ar', 'en', 'fr'];
 const DEFAULT_LOCALE = 'ar';
 
+// أنماط شائعة لبوتات فحص الثغرات (.env, .git, wp-login.php, phpinfo.php...)
+// نحظرها فوراً قبل الـ rewrite لأن أي مسار غير معروف يمر عبر صفحة [domain]
+// الديناميكية ويُشغّل رندر SSR كامل بدلاً من 404 رخيص
+const SCANNER_PATH_PATTERN =
+  /(^|\/)\.(?!well-known(\/|$))[^/]+|\.(php|aspx?|jsp|cgi|axd|key|pem|tfstate)$|\b(wp-admin|wp-login|wp-json|phpinfo|_profiler|_debugbar|_ignition|telescope|actuator|nginx_status|server-status|server-info|elmah|id_rsa|id_dsa|id_ecdsa|id_ed25519|credentials\.json|secrets\.(json|yml)|serviceaccountkey|service-account|firebase-adminsdk|firebase-service-account|firebase-config|privatekey|terraform\.tfstate|docker-compose|dockerfile|rclone\.conf|swagger\.json|openapi\.json)\b/i;
+
 function negotiateLocale(acceptLanguage: string | null): string {
   if (!acceptLanguage) return DEFAULT_LOCALE;
   const preferred = acceptLanguage
@@ -15,6 +21,11 @@ function negotiateLocale(acceptLanguage: string | null): string {
 export function middleware(req: NextRequest) {
   const url = req.nextUrl; // لا حاجة لـ clone() هنا في البداية
   const path = url.pathname;
+
+  // 0. حظر فوري لمسارات فحص الثغرات المعروفة (باستثناء /api التي لها منطقها الخاص)
+  if (!path.startsWith('/api') && SCANNER_PATH_PATTERN.test(path)) {
+    return new NextResponse(null, { status: 404 });
+  }
 
   // 1. استثناء الملفات التقنية والملفات الثابتة
   if (path.startsWith('/_next') || path.includes('.')) {
