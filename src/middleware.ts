@@ -21,13 +21,23 @@ function negotiateLocale(acceptLanguage: string | null): string {
 export function middleware(req: NextRequest) {
   const url = req.nextUrl; // لا حاجة لـ clone() هنا في البداية
   const path = url.pathname;
+  const hostname = req.headers.get('host')?.toLowerCase() || '';
 
-  // 0. حظر فوري لمسارات فحص الثغرات المعروفة (باستثناء /api التي لها منطقها الخاص)
+  // 0. حظر الوصول المباشر عبر رابط النشر الخام لـ Vercel (*.vercel.app) — لا يصل
+  // أي عميل حقيقي للمتجر من هذا الرابط أبداً (فقط عبر *.mdstore.top أو دومين
+  // مخصص)، وبوتات الفحص تستهدفه بكثرة (favicon.ico/png، /...) وهذه المسارات
+  // تحتوي نقطة فتمر من فحص السكانر كملف ثابت وتصل لرندر [domain] كامل (حتى
+  // 3.5 ثانية) بدل رفضها فوراً بلا أي تكلفة
+  if (hostname.endsWith('.vercel.app')) {
+    return new NextResponse(null, { status: 404 });
+  }
+
+  // 1. حظر فوري لمسارات فحص الثغرات المعروفة (باستثناء /api التي لها منطقها الخاص)
   if (!path.startsWith('/api') && SCANNER_PATH_PATTERN.test(path)) {
     return new NextResponse(null, { status: 404 });
   }
 
-  // 1. استثناء الملفات التقنية والملفات الثابتة
+  // 2. استثناء الملفات التقنية والملفات الثابتة
   if (path.startsWith('/_next') || path.includes('.')) {
     return NextResponse.next();
   }
@@ -51,12 +61,11 @@ export function middleware(req: NextRequest) {
     return res;
   }
 
-  // 2. جلب وتجهيز الـ Hostname
-  const hostname = req.headers.get('host')?.toLowerCase() || '';
+  // 3. تجهيز rootDomain (الـ hostname محسوب مسبقاً في الأعلى)
   const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'mdstore.top').toLowerCase();
   const searchHostname = hostname.replace('www.', '');
 
-  // 3. معالجة الموقع الرئيسي — يُعرض هنا مباشرة عبر (site)، مع تحديد اللغة عبر كوكي
+  // 4. معالجة الموقع الرئيسي — يُعرض هنا مباشرة عبر (site)، مع تحديد اللغة عبر كوكي
   if (searchHostname === rootDomain) {
     const res = NextResponse.next();
     if (!req.cookies.get('NEXT_LOCALE')) {
@@ -68,16 +77,16 @@ export function middleware(req: NextRequest) {
     return res;
   }
 
-  // 4. تحديد هوية المتجر (المعرف)
+  // 5. تحديد هوية المتجر (المعرف)
   // نستخدم الـ hostname بالكامل (بدون www) كمعرف للمتجر سواء كان فرعياً أو مخصصاً
   const storeIdentifier = searchHostname;
 
-  // 5. حماية من الحلقات التكرارية (Loop Protection)
+  // 6. حماية من الحلقات التكرارية (Loop Protection)
   if (path.startsWith(`/${storeIdentifier}`)) {
     return NextResponse.next();
   }
 
-  // 6. التوجيه الداخلي (Rewrite)
+  // 7. التوجيه الداخلي (Rewrite)
   // ملاحظة: Next.js يتعامل مع الـ Rewrite داخلياً بشكل أفضل عند تمرير المسار النسبي
   url.pathname = `/${storeIdentifier}${path}`;
   
