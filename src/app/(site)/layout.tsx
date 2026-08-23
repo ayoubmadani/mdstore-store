@@ -3,6 +3,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getLocale } from 'next-intl/server';
 import SiteNavbar from '@/components/site/SiteNavbar';
 import SiteFooter from '@/components/site/SiteFooter';
+import GoogleAnalytics from '@/components/site/GoogleAnalytics';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://mdstore.top';
 
@@ -42,6 +43,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       {/* eslint-disable-next-line @next/next/no-sync-scripts */}
       <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <GoogleAnalytics />
       <div className="min-h-screen flex flex-col bg-white dark:bg-brand-dark transition-colors duration-500">
         <SiteNavbar />
         <main className="flex-grow w-full">

@@ -30,6 +30,15 @@ export const usePixel = () => {
           order_id: orderId
         });
       }
+
+      // 3. Google Analytics Purchase
+      if (pixel.type === 'google' && typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'purchase', {
+          transaction_id: orderId,
+          value: total,
+          currency: currency,
+        });
+      }
     });
   };
 

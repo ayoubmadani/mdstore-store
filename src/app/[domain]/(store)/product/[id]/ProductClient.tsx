@@ -99,6 +99,8 @@ export default function ProductClient({
       (window as any).fbq('track', 'ViewContent', { content_name: product.name, content_ids: [product.id], content_type: 'product', value: price, currency: 'DZD' })
     if ((window as any).ttq)
       (window as any).ttq.track('ViewContent', { contents: [{ content_id: product.id, content_name: product.name, price }], value: price, currency: 'DZD' })
+    if ((window as any).gtag)
+      (window as any).gtag('event', 'view_item', { currency: 'DZD', value: price, items: [{ item_id: product.id, item_name: product.name }] })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Business logic ── */

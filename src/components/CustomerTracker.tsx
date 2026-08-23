@@ -62,6 +62,26 @@ const CustomerTracker = ({ pixels }: CustomerTrackerProps) => {
               </Script>
             );
 
+          case 'google':
+            return (
+              <React.Fragment key={pixel.id}>
+                <Script
+                  id={`ga-lib-${pixel.id}`}
+                  src={`https://www.googletagmanager.com/gtag/js?id=${pixel.pixelId}`}
+                  strategy="afterInteractive"
+                />
+                <Script id={`ga-init-${pixel.id}`} strategy="afterInteractive">
+                  {`
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    window.gtag = gtag;
+                    gtag('js', new Date());
+                    gtag('config', '${pixel.pixelId}');
+                  `}
+                </Script>
+              </React.Fragment>
+            );
+
           default:
             return null;
         }

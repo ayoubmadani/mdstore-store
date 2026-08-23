@@ -64,6 +64,9 @@ export default function SuccessPage({
           if (px.type === 'tiktok' && (window as any).ttq) {
             (window as any).ttq.track('CompletePayment', { value: total, currency: 'DZD', order_id: id });
           }
+          if (px.type === 'google' && (window as any).gtag) {
+            (window as any).gtag('event', 'purchase', { transaction_id: id, value: total, currency: 'DZD' });
+          }
         });
         hasTracked.current = true;
       } catch {}
