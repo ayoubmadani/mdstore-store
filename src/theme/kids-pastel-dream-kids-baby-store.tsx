@@ -160,7 +160,7 @@ const THEME_CSS = `
     padding-bottom: 2.5rem;
     border-bottom: 1px solid rgba(255,255,255,0.15);
   }
-  @media (min-width: 768px) { .footer-cols { grid-template-columns: 1.8fr 1fr 1fr; } }
+  @media (min-width: 768px) { .footer-cols { grid-template-columns: 1.8fr 1fr 1fr 1fr; } }
 
   .hero-actions { display: flex; flex-direction: column; gap: 0.875rem; }
   @media (min-width: 540px) { .hero-actions { flex-direction: row; align-items: center; } }
@@ -307,10 +307,11 @@ const jsonAr = {
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
   // Footer
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
+  cookies: 'الكوكيز',
   rightsReserved: 'جميع الحقوق محفوظة',
   // Hero & Home sections
   heroBadge: 'العناية بطفلك بكل محبة',
@@ -411,10 +412,11 @@ const jsonFr = {
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
   // Footer
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
+  cookies: 'Cookies',
   rightsReserved: 'Tous droits réservés.',
   // Hero & Home sections
   heroBadge: 'Prendre soin de votre bébé avec amour',
@@ -474,7 +476,7 @@ const jsonEn = {
   successTitle: 'Order sent successfully!', successDesc: 'We will contact you soon to confirm the details',
   backToShop: 'Back to Shopping', checkoutTitle: 'Complete Order',
   offersTitle: 'Available Offers', descTitle: 'Description',
-  quickLinks: 'Quick Links', contactSect: 'Contact Us', privacy: 'Privacy', terms: 'Terms', rightsReserved: 'All rights reserved',
+  quickLinks: 'Quick Links', legalNav: 'Legal', contactSect: 'Contact Us', privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies', rightsReserved: 'All rights reserved',
   // Hero & Home sections
   heroBadge: 'Caring for your baby with love',
   heroDefaultTitle: 'Everything your<br/>little one needs',
@@ -656,11 +658,16 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
                 {/* Logo */}
                 <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 14, background: 'linear-gradient(135deg, var(--lavender) 0%, var(--rose) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                        {(store.design.logoUrl && store.design.logoUrl !== '/default-logo.png') ? <img src={store.design.logoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
-                            : <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.1rem', fontWeight: 700, color: '#fff' }}>{(store?.name || 'P')[0]}</span>}
-                    </div>
-                    <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.375rem', fontWeight: 600, color: 'var(--text)', letterSpacing: '-0.01em' }}>{store?.name}</span>
+                    {(store.design.logoUrl && store.design.logoUrl !== '/default-logo.png') ? (
+                        <img src={store.design.logoUrl} style={{ height: 44, width: 'auto', maxWidth: 160, objectFit: 'contain' }} alt={store?.name || ''} />
+                    ) : (
+                        <>
+                            <div style={{ width: 44, height: 44, borderRadius: 14, background: 'linear-gradient(135deg, var(--lavender) 0%, var(--rose) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.1rem', fontWeight: 700, color: '#fff' }}>{(store?.name || 'P')[0]}</span>
+                            </div>
+                            <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.375rem', fontWeight: 600, color: 'var(--text)', letterSpacing: '-0.01em' }}>{store?.name}</span>
+                        </>
+                    )}
                 </Link>
 
                 {/* Desktop search */}
@@ -774,7 +781,7 @@ export function Footer({ store }: any) {
                     {/* قسم 2 */}
                     <div>
                         <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--peach)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>{t.quickLinks}</h4>
-                        {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }, { h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
+                        {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
                             <a key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
                                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = '#fff'; el.style.paddingRight = '8px'; }}
                                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(255,255,255,0.6)'; el.style.paddingRight = '0'; }}>
@@ -783,7 +790,19 @@ export function Footer({ store }: any) {
                         ))}
                     </div>
                     {/* قسم 3 */}
-                    <div>
+                    
+          {/* قانوني */}
+          <div>
+            <p style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '1rem' }}>{t.legalNav}</p>
+            {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', opacity: 0.6, transition: 'opacity 0.15s' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.6')}>
+              {lnk.l}
+            </Link>
+            ))}
+          </div>
+<div>
                         <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--peach)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>{t.contactSect}</h4>
                         {[
                             { e: '📞', v: store?.contact?.phone },
@@ -1117,55 +1136,59 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                                         {attr.variants.map((v: any) => {
                                             const isSelected = selectedVariants[attr.name] === v.value;
+                                            const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                                                Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(
+                                                    ([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)
+                                                )
+                                            );
 
-                                            // حالة الألوان
                                             if (attr.displayMode === 'color') {
                                                 return (
                                                     <button
                                                         key={v.id}
-                                                        onClick={() => handleVariantSelection(attr.name, v.value)}
+                                                        onClick={() => available && handleVariantSelection(attr.name, v.value)}
                                                         style={{
                                                             width: 32,
                                                             height: 32,
                                                             borderRadius: '50%',
                                                             background: v.value,
                                                             border: '1px solid rgba(0,0,0,0.1)',
-                                                            cursor: 'pointer',
+                                                            cursor: available ? 'pointer' : 'not-allowed',
                                                             outline: `2px solid ${isSelected ? 'var(--lavender-dk)' : 'transparent'}`,
                                                             outlineOffset: 2,
-                                                            transition: '0.2s all'
+                                                            transition: '0.2s all',
+                                                            opacity: available ? 1 : 0.35,
                                                         }}
                                                         title={v.name}
                                                     />
                                                 );
                                             }
 
-                                            // حالة الصور (مثل صور القماش أو نقشات معينة)
                                             if (attr.displayMode === 'image') {
                                                 return (
                                                     <button
                                                         key={v.id}
-                                                        onClick={() => handleVariantSelection(attr.name, v.value)}
+                                                        onClick={() => available && handleVariantSelection(attr.name, v.value)}
                                                         style={{
                                                             width: 40,
                                                             height: 40,
-                                                            borderRadius: 10, // حواف مربعة قليلاً تبدو أفضل للصور
+                                                            borderRadius: 10,
                                                             backgroundImage: `url(${v.value})`,
                                                             backgroundSize: 'cover',
                                                             backgroundPosition: 'center',
                                                             border: isSelected ? '2px solid var(--lavender-dk)' : '2px solid var(--border)',
-                                                            cursor: 'pointer',
-                                                            transition: '0.2s all'
+                                                            cursor: available ? 'pointer' : 'not-allowed',
+                                                            transition: '0.2s all',
+                                                            opacity: available ? 1 : 0.35,
                                                         }}
                                                     />
                                                 );
                                             }
 
-                                            // الحالة الافتراضية (نصوص مثل المقاسات S, M, L)
                                             return (
                                                 <button
                                                     key={v.id}
-                                                    onClick={() => handleVariantSelection(attr.name, v.value)}
+                                                    onClick={() => available && handleVariantSelection(attr.name, v.value)}
                                                     style={{
                                                         padding: '0.4rem 1.125rem',
                                                         border: `2px solid ${isSelected ? 'var(--lavender-dk)' : 'var(--border)'}`,
@@ -1173,10 +1196,11 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                                         fontWeight: 700,
                                                         fontSize: '0.85rem',
                                                         background: isSelected ? 'var(--lavender-lt)' : '#fff',
-                                                        color: isSelected ? 'var(--lavender-dk)' : 'var(--text-mid)',
-                                                        cursor: 'pointer',
+                                                        color: isSelected ? 'var(--lavender-dk)' : (available ? 'var(--text-mid)' : '#bbb'),
+                                                        cursor: available ? 'pointer' : 'not-allowed',
                                                         fontFamily: 'inherit',
-                                                        transition: 'all 0.2s'
+                                                        transition: 'all 0.2s',
+                                                        textDecoration: available ? 'none' : 'line-through',
                                                     }}
                                                 >
                                                     {v.name}
@@ -1272,7 +1296,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         try {
             await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
             if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
-            router.push(`/${domain}/successfully`);
+            router.push(`/successfully?productId=${product?.id}`);
         } catch { } finally { setSub(false); }
     };
 

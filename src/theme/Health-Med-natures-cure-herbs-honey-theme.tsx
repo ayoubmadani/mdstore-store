@@ -110,7 +110,7 @@ const CSS = `
   .prod-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
   .cat-grid  { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
   .trust-row { display:grid; grid-template-columns:repeat(4,1fr); }
-  .footer-g  { display:grid; grid-template-columns:2fr 1fr 1fr; gap:48px; }
+  .footer-g  { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; }
   .details-g { display:grid; grid-template-columns:1fr 1fr; gap:40px; }
   .contact-g { display:grid; grid-template-columns:1fr 1fr; gap:48px; }
   .form-2c   { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
@@ -274,10 +274,11 @@ const jsonAr = {
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
   // Footer
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
+  cookies: 'الكوكيز',
   rightsReserved: 'جميع الحقوق محفوظة',
   stat3V: 'موثوق',
   heroBadge: 'متجر الأعشاب الطبية #1 في الجزائر',
@@ -394,10 +395,11 @@ const jsonFr = {
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
   // Footer
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
+  cookies: 'Cookies',
   rightsReserved: 'Tous droits réservés.',
   stat3V: 'Certifié',
   heroBadge: 'La boutique n°1 d\'herbes médicinales en Algérie',
@@ -473,7 +475,7 @@ const jsonEn = {
   successTitle: 'Order sent!', successDesc: 'We will contact you soon',
   backToShop: 'Back to Shopping', checkoutTitle: 'Complete Order',
   offersTitle: 'Available Offers', descTitle: 'Description',
-  quickLinks: 'Quick Links', contactSect: 'Contact Us', privacy: 'Privacy', terms: 'Terms', rightsReserved: 'All rights reserved',
+  quickLinks: 'Quick Links', legalNav: 'Legal', contactSect: 'Contact Us', privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies', rightsReserved: 'All rights reserved',
   stat3V: 'Trusted',
   heroBadge: 'Algeria\'s #1 Herbal Medicine Store',
   heroTitle: 'The Power of <span style="color:var(--green)">Nature</span><br/>in Our Products',
@@ -668,7 +670,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         }}>
           <Link href="/" style={{ display:'flex', alignItems:'center', gap:'10px', flexShrink:0 }}>
             {(store.design?.logoUrl && store.design.logoUrl !== '/default-logo.png')
-              ? <img src={store.design.logoUrl} alt={store.name} style={{ height:'32px', width:'auto', objectFit:'contain' }} />
+              ? <img src={store.design.logoUrl} alt={store.name} style={{ height:'32px', width:'auto', objectFit:'contain', maxWidth: 160 }} />
               : <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
                   <HerbLeaf size={24} />
                   <span className="pd" style={{ fontSize:'1.2rem', fontWeight:700, color:'var(--green)' }}>
@@ -810,7 +812,23 @@ export function Footer({ store }: any) {
             <p className="pd" style={{ fontSize:'12px', fontWeight:600, color:'var(--gold)', marginBottom:'16px' }}>
               {t.footerLinks}
             </p>
-            {[{ h:'/', l: t.home }, { h:'/cart', l: t.cart }, { h:'/contact', l: t.contact }, { h:'/Privacy', l: t.privacy }, { h:'/Terms', l: t.terms }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk => (
+            {[{ h:'/', l: t.home }, { h:'/cart', l: t.cart }, { h:'/contact', l: t.contact }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk => (
+              <a key={lnk.h} href={lnk.h} style={{
+                display:'block', fontSize:'13px', color:'rgba(255,255,255,0.6)',
+                marginBottom:'8px', transition:'color 0.2s'
+              }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--gold)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.6)'; }}>
+                {lnk.l}
+              </a>
+            ))}
+          </div>
+
+          <div>
+            <p className="pd" style={{ fontSize:'12px', fontWeight:600, color:'var(--gold)', marginBottom:'16px' }}>
+              {t.legalNav}
+            </p>
+            {[{ h:'/Privacy', l: t.privacy }, { h:'/Terms', l: t.terms }, { h:'/cookies', l: t.cookies }].map(lnk => (
               <a key={lnk.h} href={lnk.h} style={{
                 display:'block', fontSize:'13px', color:'rgba(255,255,255,0.6)',
                 marginBottom:'8px', transition:'color 0.2s'
@@ -1329,31 +1347,39 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                 <p className="pd" style={{ fontSize:'11px', fontWeight:600, color:'var(--green)', marginBottom:'10px' }}>{attr.name}</p>
                 {attr.displayMode === 'color' ? (
                   <div style={{ display:'flex', flexWrap:'wrap', gap:'8px' }}>
-                    {attr.variants.map((v: any) => (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name}
-                        style={{ width:'28px', height:'28px', borderRadius:'8px', backgroundColor:v.value, border:'none', cursor:'pointer', outline:`3px solid ${selectedVariants[attr.name]===v.value?'var(--gold)':'transparent'}`, outlineOffset:'3px' }} />
-                    ))}
+                    {attr.variants.map((v: any) => {
+                      const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)));
+                      return (
+                        <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.name}
+                          style={{ width:'28px', height:'28px', borderRadius:'8px', backgroundColor:v.value, border:'none', cursor: available ? 'pointer' : 'not-allowed', outline:`3px solid ${selectedVariants[attr.name]===v.value?'var(--gold)':'transparent'}`, outlineOffset:'3px', opacity: available ? 1 : 0.35 }} />
+                      );
+                    })}
                   </div>
                 ) : attr.displayMode === 'image' ? (
                   <div style={{ display:'flex', flexWrap:'wrap', gap:'6px' }}>
-                    {attr.variants.map((v: any) => (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ width:'52px', height:'52px', overflow:'hidden', borderRadius:'10px', border:`2px solid ${selectedVariants[attr.name]===v.value?'var(--gold)':'var(--tan)'}`, cursor:'pointer', padding:0 }}>
-                        <img src={v.value} alt={v.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
-                      </button>
-                    ))}
+                    {attr.variants.map((v: any) => {
+                      const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)));
+                      return (
+                        <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width:'52px', height:'52px', overflow:'hidden', borderRadius:'10px', border:`2px solid ${selectedVariants[attr.name]===v.value?'var(--gold)':'var(--tan)'}`, cursor: available ? 'pointer' : 'not-allowed', padding:0, opacity: available ? 1 : 0.35 }}>
+                          <img src={v.value} alt={v.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
+                        </button>
+                      );
+                    })}
                   </div>
                 ) : (
                   <div style={{ display:'flex', flexWrap:'wrap', gap:'6px' }}>
                     {attr.variants.map((v: any) => {
                       const s = selectedVariants[attr.name] === v.value;
+                      const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)));
                       return (
-                        <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
+                        <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
                           className="pd" style={{
                             padding:'8px 16px', borderRadius:'8px',
                             border:`1.5px solid ${s?'var(--gold)':'var(--tan)'}`,
                             background:s?'var(--gold)':'transparent',
-                            color:s?'white':'var(--warm)', fontSize:'13px', fontWeight:700,
-                            cursor:'pointer', transition:'all 0.2s'
+                            color:s?'white':(available ? 'var(--warm)' : '#bbb'), fontSize:'13px', fontWeight:700,
+                            cursor: available ? 'pointer' : 'not-allowed', transition:'all 0.2s',
+                            textDecoration: available ? 'none' : 'line-through'
                           }}>
                           {v.name}
                         </button>
@@ -1446,7 +1472,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     try{
       await axios.post(`${API_URL}/orders/create`,{...fd,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});
       if(fd.customerId) localStorage.setItem('customerId',fd.customerId);
-      router.push(`/${domain}/successfully`);
+      router.push(`/successfully?productId=${product?.id}`);
     }catch{}finally{setSub(false);}
   };
 

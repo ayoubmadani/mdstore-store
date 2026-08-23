@@ -64,7 +64,7 @@ const T = {
       { t: 'دفع آمن',       s: 'حماية كاملة للبيانات' },
       { t: 'دعم 24/7',       s: 'فريق متخصص للمساعدة' },
     ],
-    quickLinks: 'روابط سريعة', contactUs: 'تواصل معنا',
+    quickLinks: 'روابط سريعة', legalNav: 'قانوني', contactUs: 'تواصل معنا',
     privacy: 'الخصوصية', terms: 'الشروط', cookies: 'الكوكيز',
     rightsReserved: 'جميع الحقوق محفوظة',
     fullName: 'الاسم الكامل', fullNamePlaceholder: 'أدخل اسمك الكامل',
@@ -100,7 +100,7 @@ const T = {
       { t: 'Paiement Sécurisé',  s: 'Vos données protégées' },
       { t: 'Support 24/7',       s: 'Toujours disponible' },
     ],
-    quickLinks: 'Navigation', contactUs: 'Contact',
+    quickLinks: 'Navigation', legalNav: 'Légal', contactUs: 'Contact',
     privacy: 'Confidentialité', terms: 'Conditions', cookies: 'Cookies',
     rightsReserved: 'Tous droits réservés.',
     fullName: 'Nom complet', fullNamePlaceholder: 'Votre nom complet',
@@ -136,7 +136,7 @@ const T = {
       { t: 'Secure Payment',       s: 'Full data protection' },
       { t: '24/7 Support',         s: 'Expert team always here' },
     ],
-    quickLinks: 'Quick Links', contactUs: 'Contact Us',
+    quickLinks: 'Quick Links', legalNav: 'Legal', contactUs: 'Contact Us',
     privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies',
     rightsReserved: 'All rights reserved.',
     fullName: 'Full Name', fullNamePlaceholder: 'Enter your full name',
@@ -357,7 +357,7 @@ export function Navbar({ store, domain }: any) {
           {/* Logo */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: TXT, flexShrink: 0 }}>
             {logo && !imgError ? (
-              <img src={logo} alt={store?.name} onError={() => setImgError(true)} style={{ height: 36, width: 'auto', objectFit: 'contain' }} />
+              <img src={logo} alt={store?.name} onError={() => setImgError(true)} style={{ height: 36, width: 'auto', objectFit: 'contain', maxWidth: 160 }} />
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <IconAnchor size={28} color={A} />
@@ -497,15 +497,12 @@ export function Footer({ store }: any) {
     { h: '/', l: t.home },
     { h: '/contact', l: t.contact },
     { h: '/cart', l: t.cart },
-    { h: '/privacy', l: t.privacy },
-    { h: '/terms', l: t.terms },
-    { h: '/cookies', l: t.cookies },
   ].filter(lnk => lnk.h !== '/cart' || store?.cart !== false);
 
   return (
     <footer style={{ background: '#0f172a', color: '#94a3b8', marginTop: 'auto' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '3rem 1.5rem 2rem' }}>
-        <div className="wc-footer-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2.5rem', marginBottom: '2.5rem' }}>
+        <div className="wc-footer-grid" style={{ gap: '2.5rem', marginBottom: '2.5rem' }}>
           {/* Brand */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
@@ -529,7 +526,19 @@ export function Footer({ store }: any) {
           </div>
 
           {/* Contact */}
+          
+          {/* قانوني */}
           <div>
+            <p style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '1rem' }}>{t.legalNav}</p>
+            {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', opacity: 0.6, transition: 'opacity 0.15s' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.6')}>
+              {lnk.l}
+            </Link>
+            ))}
+          </div>
+<div>
             <h4 style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 700, margin: '0 0 14px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.contactUs}</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {store?.contact?.phone && (
@@ -849,23 +858,28 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                       {attr.variants.map((v: Variant) => {
                         const isSelected = selectedVariants[attr.name] === v.value;
+                        const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                          Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(
+                            ([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)
+                          )
+                        );
                         if (attr.displayMode === 'color') {
                           return (
-                            <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.value}
-                              style={{ width: 32, height: 32, borderRadius: '50%', background: v.value, border: `2px solid ${isSelected ? A : BD}`, cursor: 'pointer', boxShadow: isSelected ? `0 0 0 2px ${A}` : 'none' }} />
+                            <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.value}
+                              style={{ width: 32, height: 32, borderRadius: '50%', background: v.value, border: `2px solid ${isSelected ? A : BD}`, cursor: available ? 'pointer' : 'not-allowed', boxShadow: isSelected ? `0 0 0 2px ${A}` : 'none', opacity: available ? 1 : 0.35 }} />
                           );
                         }
                         if (attr.displayMode === 'image') {
                           return (
-                            <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                              style={{ width: 44, height: 44, borderRadius: 6, overflow: 'hidden', border: `2px solid ${isSelected ? A : BD}`, padding: 0, cursor: 'pointer' }}>
+                            <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
+                              style={{ width: 44, height: 44, borderRadius: 6, overflow: 'hidden', border: `2px solid ${isSelected ? A : BD}`, padding: 0, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}>
                               <img src={v.value} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             </button>
                           );
                         }
                         return (
-                          <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                            style={{ padding: '6px 14px', borderRadius: 6, border: `1px solid ${isSelected ? A : BD}`, background: isSelected ? A : '#fff', color: isSelected ? '#fff' : TXT, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
+                          <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
+                            style={{ padding: '6px 14px', borderRadius: 6, border: `1px solid ${isSelected ? A : BD}`, background: isSelected ? A : '#fff', color: isSelected ? '#fff' : (available ? TXT : '#bbb'), fontSize: '0.8rem', fontWeight: 600, cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.2s', textDecoration: available ? 'none' : 'line-through' }}>
                             {v.value}
                           </button>
                         );
@@ -1657,7 +1671,8 @@ function ThemeCSS() {
 
       /* ─── Responsive: Footer ─── */
       @media (min-width: 768px) {
-        .wc-footer-grid { grid-template-columns: 1.2fr 1fr 1fr !important; }
+        .wc-footer-grid { display:grid; grid-template-columns: 1fr; }
+        @media (min-width:768px) { .wc-footer-grid { grid-template-columns: 1.2fr 1fr 1fr 1fr; } }
       }
 
       /* ─── Responsive: Products ─── */

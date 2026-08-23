@@ -91,7 +91,7 @@ const THEME_CSS = `
   @media (min-width: 1024px) { .contact-inner { grid-template-columns: 1fr 2fr; } }
 
   .footer-inner { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding-bottom: 2.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(178,210,195,0.2); }
-  @media (min-width: 768px) { .footer-inner { grid-template-columns: 2fr 1fr 1fr; } }
+  @media (min-width: 768px) { .footer-inner { grid-template-columns: 2fr 1fr 1fr 1fr; } }
 
   .hero-actions { display: flex; flex-direction: column; gap: 0.75rem; }
   @media (min-width: 500px) { .hero-actions { flex-direction: row; align-items: center; } }
@@ -216,10 +216,11 @@ const jsonAr = {
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
   // Footer
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
+  cookies: 'الكوكيز',
   rightsReserved: 'جميع الحقوق محفوظة',
   // Theme-specific
   logoSubtitle: 'أعشاب وصحة',
@@ -358,10 +359,11 @@ const jsonFr = {
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
   // Footer
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
+  cookies: 'Cookies',
   rightsReserved: 'Tous droits réservés.',
   // Theme-specific
   logoSubtitle: 'Herbes & Santé',
@@ -494,10 +496,11 @@ const jsonEn = {
   checkoutTitle: 'Checkout',
   offersTitle: 'Available offers',
   descTitle: 'Description',
-  quickLinks: 'Quick links',
+  quickLinks: 'Quick links', legalNav: 'Legal',
   contactSect: 'Contact us',
   privacy: 'Privacy',
   terms: 'Terms',
+  cookies: 'Cookies',
   rightsReserved: 'All rights reserved.',
   logoSubtitle: 'Herbs & Health',
   heroBadge: '100% Natural Products',
@@ -657,7 +660,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
           <Link href="/" style={{ flexShrink: 0 }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <img src={store.design.logoUrl} style={{ height: 36, objectFit: 'contain', display: 'block' }} alt={store?.name || ''} onError={() => setImgError(true)} />
+              <img src={store.design.logoUrl} style={{ height: 36, objectFit: 'contain', maxWidth: 160, display: 'block' }} alt={store?.name || ''} onError={() => setImgError(true)} />
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ width: 32, height: 32, background: `linear-gradient(135deg, ${G} 0%, ${GA} 100%)`, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -783,7 +786,17 @@ export function Footer({ store }: any) {
           </div>
           <div>
             <h4 style={{ fontSize: '0.72rem', fontWeight: 700, color: GA, textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: '1.125rem' }}>{t.footerPages}</h4>
-            {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contactSect }, { h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
+            {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contactSect }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'rgba(255,255,255,0.4)', marginBottom: '0.6rem', transition: 'color 0.15s' }}
+                onMouseEnter={e => (e.currentTarget.style.color = GA)}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
+                {lnk.l}
+              </Link>
+            ))}
+          </div>
+          <div>
+            <h4 style={{ fontSize: '0.72rem', fontWeight: 700, color: GA, textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: '1.125rem' }}>{t.legalNav}</h4>
+            {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
               <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'rgba(255,255,255,0.4)', marginBottom: '0.6rem', transition: 'color 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = GA)}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
@@ -1059,11 +1072,12 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
                   {attr.variants.map((v: any) => {
                     const isSel = selectedVariants[attr.name] === v.value;
+                    const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)));
                     return (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={
-                        attr.displayMode === 'color' ? { width: 28, height: 28, borderRadius: '50%', background: v.value, border: `2px solid ${BD}`, cursor: 'pointer', outline: `2.5px solid ${isSel ? G : 'transparent'}`, outlineOffset: 2 }
-                        : attr.displayMode === 'image' ? { width: 44, height: 44, backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 8, border: `2px solid ${isSel ? G : BD}`, cursor: 'pointer' }
-                        : { padding: '0.4rem 0.875rem', border: `1.5px solid ${isSel ? G : BD}`, borderRadius: 20, fontSize: '0.8rem', fontWeight: 600, background: isSel ? GL : CARD, color: isSel ? G : SUB, cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit' }
+                      <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={
+                        attr.displayMode === 'color' ? { width: 28, height: 28, borderRadius: '50%', background: v.value, border: `2px solid ${BD}`, cursor: available ? 'pointer' : 'not-allowed', outline: `2.5px solid ${isSel ? G : 'transparent'}`, outlineOffset: 2, opacity: available ? 1 : 0.35 }
+                        : attr.displayMode === 'image' ? { width: 44, height: 44, backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 8, border: `2px solid ${isSel ? G : BD}`, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }
+                        : { padding: '0.4rem 0.875rem', border: `1.5px solid ${isSel ? G : BD}`, borderRadius: 20, fontSize: '0.8rem', fontWeight: 600, background: isSel ? GL : CARD, color: isSel ? G : (available ? SUB : '#bbb'), cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.15s', fontFamily: 'inherit', textDecoration: available ? 'none' : 'line-through' }
                       }>{attr.displayMode !== 'color' && attr.displayMode !== 'image' && v.name}</button>
                     );
                   })}
@@ -1486,7 +1500,19 @@ export function Contact({ store }: { store: any }) {
     <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: BG, minHeight: '100vh' }}>
       <div style={{ background: GD, paddingTop: 88, paddingBottom: 48, paddingLeft: 24, paddingRight: 24 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(82,183,136,0.15)', border: '1px solid rgba(82,183,136,0.3)', borderRadius: 20, padding: '0.3rem 0.875rem', marginBottom: '1rem' }}>
+          
+          {/* قانوني */}
+          <div>
+            <p style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '1rem' }}>{t.legalNav}</p>
+            {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', opacity: 0.6, transition: 'opacity 0.15s' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.6')}>
+              {lnk.l}
+            </Link>
+            ))}
+          </div>
+<div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(82,183,136,0.15)', border: '1px solid rgba(82,183,136,0.3)', borderRadius: 20, padding: '0.3rem 0.875rem', marginBottom: '1rem' }}>
             <Leaf size={12} style={{ color: GA }} /><span style={{ fontSize: '0.68rem', fontWeight: 600, color: GA }}>Nature Wellness</span>
           </div>
           <h1 style={{ fontSize: 'clamp(2.25rem,6vw,3.5rem)', fontWeight: 700, color: '#fff' }}>{t.contactSect}</h1>

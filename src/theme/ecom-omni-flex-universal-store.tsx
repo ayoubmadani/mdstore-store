@@ -114,7 +114,7 @@ const CSS = `
   /* Grids */
   .prod-grid  { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
   .trust-bar  { display:grid; grid-template-columns:repeat(4,1fr); }
-  .footer-g   { display:grid; grid-template-columns:2fr 1fr 1fr; gap:48px; }
+  .footer-g   { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; }
   .details-g  { display:grid; grid-template-columns:1fr 1fr; }
   .details-L  { position:sticky; top:64px; height:calc(100vh - 64px); overflow:hidden; }
   .details-R  { padding:40px 36px 80px; }
@@ -150,7 +150,7 @@ const CSS = `
 `;
 
 /* ─── TYPES ─── */
-interface Offer     { id:string; name:string; quantity:number; price:number; }
+interface Offer     { id:string; name:string; quantity:number; price:number; subTitle?:string; shippingFree?:boolean; }
 interface Variant   { id:string; name:string; value:string; }
 interface Attribute { id:string; type:string; name:string; displayMode?:'color'|'image'|'text'|null; variants:Variant[]; }
 interface ProductImage          { id:string; imageUrl:string; }
@@ -161,8 +161,8 @@ interface Commune { id:string; name:string; ar_name:string; wilayaId:string; }
 export interface Product {
   id:string; name:string; price:string|number; priceOriginal?:string|number; desc?:string;
   productImage?:string; imagesProduct?:ProductImage[]; offers?:Offer[]; attributes?:Attribute[];
-  variantDetails?:VariantDetail[]; stock?:number; isActive?:boolean;
-  store:{ id:string; name:string; subdomain:string; userId:string; cart?:boolean; };
+  variantDetails?:VariantDetail[]; stock?:number; isActive?:boolean; shippingFree?:boolean;
+  store:{ id:string; name:string; subdomain:string; userId:string; cart?:boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 export interface ProductFormProps {
   product:Product; userId:string; domain:string; redirectPath?:string;
@@ -255,14 +255,18 @@ const jsonAr = {
   // Product
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
+  freeShippingBadge: '🚚 توصيل مجاني',
+  freeShippingThreshold: '🚚 توصيل مجاني للطلبات بـ {{amount}} دج أو أكثر',
+  freeShippingRemaining: 'أضف {{amount}} دج أخرى للحصول على توصيل مجاني',
+  freeShippingReached: '🎉 حصلت على توصيل مجاني!',
   // Footer
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
+  cookies: 'الكوكيز',
   rightsReserved: 'جميع الحقوق محفوظة',
   pages: 'الصفحات',
-  cookies: 'سياسة الكوكيز',
   // Hero
   heroEyebrow: '✦ تجربة تسوق متكاملة',
   heroTitle: 'مُصمَّم للتميز. أداء شامل.',
@@ -412,8 +416,12 @@ const jsonFr = {
   // Product
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
+  freeShippingBadge: '🚚 Livraison gratuite',
+  freeShippingThreshold: '🚚 Livraison gratuite dès {{amount}} DZD d\'achat',
+  freeShippingRemaining: 'Ajoutez {{amount}} DZD de plus pour la livraison gratuite',
+  freeShippingReached: '🎉 Livraison gratuite obtenue !',
   // Footer
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
@@ -569,8 +577,12 @@ const jsonEn = {
   // Product
   offersTitle: 'Bundle Offers',
   descTitle: 'Description',
+  freeShippingBadge: '🚚 Free Delivery',
+  freeShippingThreshold: '🚚 Free Delivery on orders over {{amount}} DZD',
+  freeShippingRemaining: 'Add {{amount}} DZD more for free delivery',
+  freeShippingReached: '🎉 You got free delivery!',
   // Footer
-  quickLinks: 'Quick Links',
+  quickLinks: 'Quick Links', legalNav: 'Legal',
   contactSect: 'Contact Us',
   privacy: 'Privacy Policy',
   terms: 'Terms of Service',
@@ -863,13 +875,15 @@ export function Footer({ store }: any) {
   const t = T[getLang(store)];
   const isRTL = t.dir === 'rtl';
   const yr = new Date().getFullYear();
-  const links = [
+  const navLinks = [
     {h:'/',l:t.home},
     ...(store?.cart !== false ? [{h:'/cart',l:t.cart}] : []),
     {h:'/contact',l:t.contact},
-    {h:'/Privacy',l:t.privacy},
-    {h:'/Terms',l:t.terms},
-    {h:'/Cookies',l:t.cookies},
+  ];
+  const legalLinks = [
+    {h:'/privacy',l:t.privacy},
+    {h:'/terms',l:t.terms},
+    {h:'/cookies',l:t.cookies},
   ];
   return (
     <footer dir={isRTL ? 'rtl' : 'ltr'} style={{backgroundColor:'var(--navy)',fontFamily:"'Inter',sans-serif",borderTop:'1px solid var(--line-lt)'}}>
@@ -896,7 +910,19 @@ export function Footer({ store }: any) {
           {/* قسم 2 — روابط */}
           <div>
             <p className="bc" style={{fontSize:'14px',fontWeight:700,letterSpacing:'0.1em',color:'var(--blue)',marginBottom:'24px'}}>{t.pages}</p>
-            {links.map(lnk=>(
+            {navLinks.map(lnk=>(
+              <a key={lnk.h} href={lnk.h} style={{display:'block',fontSize:'13px',color:'rgba(255,255,255,0.5)',marginBottom:'12px',transition:'all 0.2s'}}
+                onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.color='var(--white)';el.style.paddingInlineStart='5px';}}
+                onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.color='rgba(255,255,255,0.5)';el.style.paddingInlineStart='0';}}>
+                {lnk.l}
+              </a>
+            ))}
+          </div>
+
+          {/* قسم — قانوني */}
+          <div>
+            <p className="bc" style={{fontSize:'14px',fontWeight:700,letterSpacing:'0.1em',color:'var(--blue)',marginBottom:'24px'}}>{t.legalNav}</p>
+            {legalLinks.map(lnk=>(
               <a key={lnk.h} href={lnk.h} style={{display:'block',fontSize:'13px',color:'rgba(255,255,255,0.5)',marginBottom:'12px',transition:'all 0.2s'}}
                 onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.color='var(--white)';el.style.paddingInlineStart='5px';}}
                 onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.color='rgba(255,255,255,0.5)';el.style.paddingInlineStart='0';}}>
@@ -944,6 +970,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
               <Package style={{width:'40px',height:'40px',color:'var(--dim)',opacity:0.5}}/>
             </div>}
         {discount>0 && <div style={{position:'absolute',top:'10px',right:'10px',backgroundColor:'var(--blue)',color:'white',fontSize:'11px',fontWeight:700,padding:'3px 9px'}}>-{discount}%</div>}
+        {product.shippingFree && <div style={{position:'absolute',top:'10px',left:'10px',backgroundColor:'var(--ink)',color:'white',fontSize:'10px',fontWeight:700,padding:'3px 8px'}}>🚚</div>}
         <div style={{position:'absolute',top:0,left:0,right:0,height:'3px',background:'linear-gradient(to right,var(--blue),var(--blue-3))'}}/>
       </div>
       <div style={{padding:'14px'}}>
@@ -1216,6 +1243,12 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
             </div>
           </div>
 
+          {(product.shippingFree || (store?.supportFreeShipping && store?.freeShippingMinAmount != null)) && (
+            <p style={{fontSize:'13px',fontWeight:700,color:'var(--blue)',marginBottom:'18px'}}>
+              {product.shippingFree ? t.freeShippingBadge : t.freeShippingThreshold.replace('{{amount}}', String(store.freeShippingMinAmount))}
+            </p>
+          )}
+
           {/* Offers */}
           {product.offers?.length>0 && (
             <div style={{marginBottom:'22px',paddingBottom:'22px',borderBottom:'1px solid var(--line)'}}>
@@ -1229,7 +1262,9 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
                     <input type="radio" name="offer" checked={selectedOffer===o.id} onChange={()=>setSelectedOffer(o.id)} style={{display:'none'}}/>
                     <div>
                       <p style={{fontSize:'13px',fontWeight:600,color:'var(--ink)',margin:0}}>{o.name}</p>
+                      {o.subTitle && <p style={{fontSize:'11px',color:'var(--dim)',margin:'2px 0 0'}}>{o.subTitle}</p>}
                       <p style={{fontSize:'11px',color:'var(--dim)',margin:0}}>{t.qty}: {o.quantity}</p>
+                      {o.shippingFree && <p style={{fontSize:'10px',fontWeight:700,color:'var(--blue)',margin:'2px 0 0'}}>{t.freeShippingBadge}</p>}
                     </div>
                   </div>
                   <span style={{fontSize:'1.1rem',fontWeight:700,color:'var(--blue)'}}>{o.price.toLocaleString()} <span style={{fontSize:'11px',fontWeight:400,color:'var(--dim)'}}>{currency}</span></span>
@@ -1244,15 +1279,15 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
               <p className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.16em',color:'var(--mid)',marginBottom:'10px'}}>// {attr.name}</p>
               {attr.displayMode==='color' ? (
                 <div style={{display:'flex',flexWrap:'wrap',gap:'8px'}}>
-                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} title={v.name} style={{width:'28px',height:'28px',backgroundColor:v.value,border:'none',cursor:'pointer',outline:`3px solid ${s?'var(--blue)':'transparent'}`,outlineOffset:'3px'}}/>;})}
+                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; const available=!product.variantDetails?.length||product.variantDetails.some((vd:any)=>Object.entries({...selectedVariants,[attr.name]:v.value}).every(([n,val])=>vd.name.some((e:any)=>e.attrName===n&&e.value===val))); return <button key={v.id} onClick={()=>available&&handleVariantSelection(attr.name,v.value)} title={v.name} style={{width:'28px',height:'28px',backgroundColor:v.value,border:'none',cursor:available?'pointer':'not-allowed',outline:`3px solid ${s?'var(--blue)':'transparent'}`,outlineOffset:'3px',opacity:available?1:0.35}}/>;})}
                 </div>
               ) : attr.displayMode==='image' ? (
                 <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>
-                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} style={{width:'52px',height:'52px',overflow:'hidden',border:`2px solid ${s?'var(--blue)':'var(--line)'}`,cursor:'pointer',padding:0}}><img src={v.value} alt={v.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/></button>;})}
+                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; const available=!product.variantDetails?.length||product.variantDetails.some((vd:any)=>Object.entries({...selectedVariants,[attr.name]:v.value}).every(([n,val])=>vd.name.some((e:any)=>e.attrName===n&&e.value===val))); return <button key={v.id} onClick={()=>available&&handleVariantSelection(attr.name,v.value)} style={{width:'52px',height:'52px',overflow:'hidden',border:`2px solid ${s?'var(--blue)':'var(--line)'}`,cursor:available?'pointer':'not-allowed',padding:0,opacity:available?1:0.35}}><img src={v.value} alt={v.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/></button>;})}
                 </div>
               ) : (
                 <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>
-                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} className="bc" style={{padding:'8px 16px',border:`1.5px solid ${s?'var(--blue)':'var(--line)'}`,backgroundColor:s?'var(--blue)':'transparent',color:s?'white':'var(--mid)',fontSize:'13px',fontWeight:700,letterSpacing:'0.1em',cursor:'pointer',transition:'all 0.2s'}}>{v.name}</button>;})}
+                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; const available=!product.variantDetails?.length||product.variantDetails.some((vd:any)=>Object.entries({...selectedVariants,[attr.name]:v.value}).every(([n,val])=>vd.name.some((e:any)=>e.attrName===n&&e.value===val))); return <button key={v.id} onClick={()=>available&&handleVariantSelection(attr.name,v.value)} className="bc" style={{padding:'8px 16px',border:`1.5px solid ${s?'var(--blue)':'var(--line)'}`,backgroundColor:s?'var(--blue)':'transparent',color:s?'white':(available?'var(--mid)':'#bbb'),fontSize:'13px',fontWeight:700,letterSpacing:'0.1em',cursor:available?'pointer':'not-allowed',transition:'all 0.2s',textDecoration:available?'none':'line-through'}}>{v.name}</button>;})}
                 </div>
               )}
             </div>
@@ -1304,9 +1339,19 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     }
     return base;
   },[product,selectedOffer,selectedVariants]);
-  const getLiv = useCallback(():number=>{ if(!selW) return 0; return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice; },[selW,fd.typeLivraison]);
+  const supportQty = (store?.supportQty ?? product.store?.supportQty) !== false;
   const fp    = getFP();
-  const total = ()=>fp*fd.quantity+ +getLiv();
+  const qty   = supportQty ? fd.quantity : 1;
+  const selOfferObj = product.offers?.find((o: any) => o.id === selectedOffer);
+  const storeInfo = store || product.store;
+  const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
+    (storeInfo?.supportFreeShipping && storeInfo?.freeShippingMinAmount != null && (fp * qty) >= Number(storeInfo.freeShippingMinAmount)));
+  const getLiv = useCallback((): number => {
+    if (orderFreeShipping) return 0;
+    if (!selW) return 0;
+    return Number(fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice);
+  }, [selW, fd.typeLivraison, orderFreeShipping]);
+  const total = ()=>fp*qty+ +getLiv();
   const validate = ()=>{
     const e:Record<string,string>={};
     if(!fd.customerName.trim())  e.customerName=t.errName;
@@ -1323,7 +1368,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const addToCart = ()=>{
     setIsAdded(true);
     const cart=JSON.parse(localStorage.getItem(domain)||'[]');
-    cart.push({...fd,product,variantDetailId:getVarId(),productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv(),addedAt:Date.now()});
+    cart.push({...fd,quantity:qty,product,variantDetailId:getVarId(),productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv(),addedAt:Date.now()});
     localStorage.setItem(domain,JSON.stringify(cart)); initCount(cart.length);
     setTimeout(()=>setIsAdded(false),2000);
   };
@@ -1332,9 +1377,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     e.preventDefault(); const er=validate(); if(Object.keys(er).length){setErrors(er);return;}
     setErrors({}); setSub(true);
     try{
-      await axios.post(`${API_URL}/orders/create`,{...fd,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});
+      await axios.post(`${API_URL}/orders/create`,{...fd,quantity:qty,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});
       if(fd.customerId) localStorage.setItem('customerId',fd.customerId);
-      router.push(`/${domain}/successfully`);
+      router.push(`/successfully?productId=${product?.id}`);
     }catch{}finally{setSub(false);}
   };
 
@@ -1413,30 +1458,36 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                   <button key={dtype} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:dtype}))}
                     style={{padding:'12px 10px',border:`1.5px solid ${fd.typeLivraison===dtype?'var(--blue)':'var(--line)'}`,backgroundColor:fd.typeLivraison===dtype?'rgba(58,134,255,0.06)':'var(--white)',cursor:'pointer',textAlign:'center',transition:'all 0.2s',fontFamily:'inherit'}}>
                     <p className="bc" style={{fontSize:'13px',fontWeight:700,letterSpacing:'0.1em',color:fd.typeLivraison===dtype?'var(--blue)':'var(--mid)',margin:'0 0 4px'}}>{dtype==='home'?t.deliveryHome:t.deliveryOffice}</p>
-                    {selW && <p style={{fontSize:'1rem',fontWeight:700,color:fd.typeLivraison===dtype?'var(--blue)':'var(--dim)',margin:0}}>
-                      {(dtype==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()}
-                      <span style={{fontSize:'11px',fontWeight:400,color:'var(--dim)',marginInlineStart:'3px'}}>{currency}</span>
-                    </p>}
+                    {selW && (orderFreeShipping ? (
+                      <p style={{fontSize:'1rem',fontWeight:700,color:fd.typeLivraison===dtype?'var(--blue)':'var(--dim)',margin:0}}>{t.freeShippingBadge}</p>
+                    ) : (
+                      <p style={{fontSize:'1rem',fontWeight:700,color:fd.typeLivraison===dtype?'var(--blue)':'var(--dim)',margin:0}}>
+                        {(dtype==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()}
+                        <span style={{fontSize:'11px',fontWeight:400,color:'var(--dim)',marginInlineStart:'3px'}}>{currency}</span>
+                      </p>
+                    ))}
                   </button>
                 ))}
               </div>
             </FR>
 
-            <FR label={t.qty}>
-              <div style={{display:'inline-flex',alignItems:'center',border:'1.5px solid var(--line)',backgroundColor:'var(--white)'}}>
-                <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderInlineStart:'1px solid var(--line)',background:'transparent',cursor:'pointer',color:'var(--navy)',transition:'background 0.18s'}}
-                  onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--off)';}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>
-                  <Minus style={{width:'12px',height:'12px'}}/>
-                </button>
-                <span style={{width:'44px',textAlign:'center',fontSize:'1.1rem',fontWeight:700,color:'var(--ink)'}}>{fd.quantity}</span>
-                <button type="button" onClick={()=>setFd(p=>({...p,quantity:p.quantity+1}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderInlineEnd:'1px solid var(--line)',background:'transparent',cursor:'pointer',color:'var(--navy)',transition:'background 0.18s'}}
-                  onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--off)';}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>
-                  <Plus style={{width:'12px',height:'12px'}}/>
-                </button>
-              </div>
-            </FR>
+            {supportQty && (
+              <FR label={t.qty}>
+                <div style={{display:'inline-flex',alignItems:'center',border:'1.5px solid var(--line)',backgroundColor:'var(--white)'}}>
+                  <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderInlineStart:'1px solid var(--line)',background:'transparent',cursor:'pointer',color:'var(--navy)',transition:'background 0.18s'}}
+                    onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--off)';}}
+                    onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>
+                    <Minus style={{width:'12px',height:'12px'}}/>
+                  </button>
+                  <span style={{width:'44px',textAlign:'center',fontSize:'1.1rem',fontWeight:700,color:'var(--ink)'}}>{fd.quantity}</span>
+                  <button type="button" onClick={()=>setFd(p=>({...p,quantity:p.quantity+1}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderInlineEnd:'1px solid var(--line)',background:'transparent',cursor:'pointer',color:'var(--navy)',transition:'background 0.18s'}}
+                    onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--off)';}}
+                    onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>
+                    <Plus style={{width:'12px',height:'12px'}}/>
+                  </button>
+                </div>
+              </FR>
+            )}
 
             {/* Summary */}
             <div style={{border:'1px solid var(--line)',marginBottom:'14px',overflow:'hidden'}}>
@@ -1444,7 +1495,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 <Package style={{width:'13px',height:'13px',color:'var(--blue)'}}/>
                 <span className="bc" style={{fontSize:'13px',fontWeight:700,letterSpacing:'0.14em',color:'rgba(255,255,255,0.7)'}}>{t.orderSummary}</span>
               </div>
-              {[{l:t.productLabel,v:product.name.slice(0,22)+(product.name.length>22?'...':'')},{l:t.price,v:`${fp.toLocaleString()} ${currency}`},{l:t.qty,v:`× ${fd.quantity}`},{l:t.delivery,v:selW?`${getLiv().toLocaleString()} ${currency}`:'—'}].map(row=>(
+              {[{l:t.productLabel,v:product.name.slice(0,22)+(product.name.length>22?'...':'')},{l:t.price,v:`${fp.toLocaleString()} ${currency}`},{l:t.qty,v:`× ${qty}`},{l:t.delivery,v: !selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${getLiv().toLocaleString()} ${currency}`}].map(row=>(
                 <div key={row.l} style={{display:'flex',justifyContent:'space-between',padding:'8px 14px',borderBottom:'1px solid var(--line)',backgroundColor:'var(--white)'}}>
                   <span style={{fontSize:'13px',color:'var(--dim)'}}>{row.l}</span>
                   <span style={{fontSize:'13px',fontWeight:600,color:'var(--ink)'}}>{row.v}</span>
@@ -1492,11 +1543,18 @@ export function Cart({ domain, store }: { domain:string; store:any }) {
   useEffect(()=>{ if(!fd.customerWelaya){setCommunes([]);return;} setLC(true); fetchCommunes(fd.customerWelaya).then(d=>{setCommunes(d);setLC(false);}); },[fd.customerWelaya]);
 
   const selW      = useMemo(()=>wilayas.find(w=>String(w.id)===String(fd.customerWelaya)),[wilayas,fd.customerWelaya]);
-  const getLiv    = ()=>{ if(!selW) return 0; return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice; };
   const cartTotal = items.reduce((a,i)=>a+(i.finalPrice*i.quantity),0);
+  const hasFreeShippingItem = items.some(i => i.product?.shippingFree || i.product?.offers?.find((o: any) => o.id === i.selectedOffer)?.shippingFree);
+  const freeShippingMin = store?.supportFreeShipping ? store?.freeShippingMinAmount : null;
+  const freeShippingReached = hasFreeShippingItem || (freeShippingMin != null && cartTotal >= Number(freeShippingMin));
+  const freeShippingRemainingAmt = freeShippingMin != null ? Number(freeShippingMin) - cartTotal : 0;
+  const getLiv    = ()=>{
+    if (freeShippingReached) return 0;
+    if(!selW) return 0;
+    return Number(fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice);
+  };
   const finalTotal = cartTotal + +getLiv();
   const update    = (n:any[])=>{ setItems(n); localStorage.setItem(domain,JSON.stringify(n)); initCount(n.length); };
-  const changeQty = (i:number,d:number)=>{ const n=[...items]; n[i].quantity=Math.max(1,n[i].quantity+d); update(n); };
 
   const handleSubmit = async (e:React.FormEvent)=>{
     e.preventDefault();
@@ -1545,6 +1603,11 @@ export function Cart({ domain, store }: { domain:string; store:any }) {
           <h1 className="bc" style={{fontSize:'clamp(1.75rem,4vw,2.5rem)',fontWeight:900,color:'var(--navy)',letterSpacing:'0.04em'}}>{t.cartTitle}</h1>
           <span style={{fontSize:'13px',color:'var(--dim)',fontWeight:500}}>{items.length} {t.itemUnit}</span>
         </div>
+        {freeShippingMin != null && (
+          <div style={{background: freeShippingReached ? 'rgba(58,134,255,0.06)' : 'var(--off)', border:`1px solid ${freeShippingReached ? 'var(--blue)' : 'var(--line)'}`, color: freeShippingReached ? 'var(--blue)' : 'var(--dim)', padding:'12px 16px', marginBottom:'1.5rem', fontWeight:700, fontSize:'13px', textAlign:'center'}}>
+            {freeShippingReached ? t.freeShippingReached : t.freeShippingRemaining.replace('{{amount}}', String(freeShippingRemainingAmt))}
+          </div>
+        )}
 
         <div className="cart-layout">
           {/* Items */}
@@ -1560,15 +1623,7 @@ export function Cart({ domain, store }: { domain:string; store:any }) {
                     <p style={{fontSize:'1.1rem',fontWeight:700,color:'var(--blue)'}}>{item.finalPrice?.toLocaleString()} {currency}</p>
                   </div>
                   <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:'8px'}}>
-                    <div style={{display:'inline-flex',alignItems:'center',border:'1px solid var(--line)'}}>
-                      <button onClick={()=>changeQty(i,-1)} style={{width:28,height:28,display:'flex',alignItems:'center',justifyContent:'center',background:'transparent',border:'none',cursor:'pointer',borderInlineStart:'1px solid var(--line)',transition:'background 0.15s'}}
-                        onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--off)';}}
-                        onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>-</button>
-                      <span style={{width:32,textAlign:'center',fontWeight:700,fontSize:'0.9rem',lineHeight:'28px'}}>{item.quantity}</span>
-                      <button onClick={()=>changeQty(i,1)} style={{width:28,height:28,display:'flex',alignItems:'center',justifyContent:'center',background:'transparent',border:'none',cursor:'pointer',borderInlineEnd:'1px solid var(--line)',transition:'background 0.15s'}}
-                        onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--off)';}}
-                        onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>+</button>
-                    </div>
+                    <span style={{fontSize:'0.9rem',fontWeight:700,color:'var(--dim)'}}>× {item.quantity}</span>
                     <button onClick={()=>update(items.filter((_,idx)=>idx!==i))} style={{display:'flex',alignItems:'center',gap:4,padding:'4px 8px',border:'none',background:'transparent',color:'var(--dim)',fontSize:'12px',fontWeight:600,cursor:'pointer',fontFamily:'inherit',transition:'color 0.15s'}}
                       onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='#C0392B';}}
                       onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--dim)';}}>
@@ -1623,7 +1678,7 @@ export function Cart({ domain, store }: { domain:string; store:any }) {
 
               {/* Summary */}
               <div style={{border:'1px solid var(--line)',marginBottom:'14px',overflow:'hidden'}}>
-                {[{l:t.subtotal,v:`${cartTotal.toLocaleString()} ${currency}`},{l:t.delivery,v:getLiv()?`${getLiv().toLocaleString()} ${currency}`:'—'}].map(row=>(
+                {[{l:t.subtotal,v:`${cartTotal.toLocaleString()} ${currency}`},{l:t.delivery,v: !selW ? '—' : freeShippingReached ? t.freeShippingBadge : `${getLiv().toLocaleString()} ${currency}`}].map(row=>(
                   <div key={row.l} style={{display:'flex',justifyContent:'space-between',padding:'8px 14px',borderBottom:'1px solid var(--line)',background:'var(--white)'}}>
                     <span style={{fontSize:'13px',color:'var(--dim)'}}>{row.l}</span>
                     <span style={{fontSize:'13px',fontWeight:600,color:'var(--ink)'}}>{row.v}</span>

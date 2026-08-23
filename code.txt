@@ -1,1 +1,1 @@
-node scripts/bundle-themes.mjs --slug=Marine-whitecap-marine-essentials-theme
+node scripts/bundle-themes.mjs --slug=animal-pet-lovers-paradise

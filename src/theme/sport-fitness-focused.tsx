@@ -150,7 +150,7 @@ const CSS = `
   .prod-grid  { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
   .cat-row    { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
   .trust-row  { display: grid; grid-template-columns: repeat(4,1fr); }
-  .footer-g   { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 48px; }
+  .footer-g   { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; }
   .details-g  { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
   .contact-g  { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
   .form-2c    { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -306,10 +306,11 @@ const jsonAr = {
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
   // Footer
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
+  cookies: 'الكوكيز',
   rightsReserved: 'جميع الحقوق محفوظة',
   // Navbar extra
   searchPhD: 'ابحث عن المعدات...',
@@ -453,10 +454,11 @@ const jsonFr = {
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
   // Footer
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
+  cookies: 'Cookies',
   rightsReserved: 'Tous droits réservés.',
   // Navbar extra
   searchPhD: 'Chercher des équipements...',
@@ -558,7 +560,7 @@ const jsonEn = {
   successTitle: 'Order confirmed', successDesc: 'Thank you for your order, our team will contact you soon.',
   backToShop: 'Back to store', checkoutTitle: 'Checkout',
   offersTitle: 'Bundle offers', descTitle: 'Description',
-  quickLinks: 'Navigation', contactSect: 'Contact', privacy: 'Privacy', terms: 'Terms',
+  quickLinks: 'Navigation', legalNav: 'Légal', contactSect: 'Contact', privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies',
   rightsReserved: 'All rights reserved.',
   // Navbar extra
   searchPhD: 'Search equipment...', searchPhM: 'Search...', shopCta: 'Shop Equipment Now',
@@ -807,7 +809,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Logo */}
           <Link href="/" style={{display:'flex', alignItems:'center', gap:'10px', flexShrink:0, textDecoration:'none'}}>
             {(store.design.logoUrl && store.design.logoUrl !== '/default-logo.png')
-              ? <img src={store.design.logoUrl} alt={store.name} style={{height:'32px', width:'auto', objectFit:'contain'}}/>
+              ? <img src={store.design.logoUrl} alt={store.name} style={{height:'32px', width:'auto', objectFit:'contain', maxWidth: 160}}/>
               : <span style={{fontSize:'1.4rem', fontWeight:900, color:'var(--white)', letterSpacing:'-0.02em', fontFamily:"'Barlow Condensed',sans-serif" , textTransform : 'uppercase'}}>
                   {(store?.name||'').split(' ')[0]}<span style={{color:'var(--fire)'}}>{' '}{(store?.name||'').split(' ').slice(1).join(' ')}</span>
                 </span>
@@ -946,7 +948,19 @@ export function Footer({ store }: any) {
           {/* قسم 2 — الروابط */}
           <div>
             <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'16px'}}>{t.footerLinks}</p>
-            {[{h:'/',l:t.home},{h:'/cart',l:t.footerCartLink},{h:'/contact',l:t.contact},{h:'/Privacy',l:t.privacy},{h:'/Terms',l:t.terms}].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk=>(
+            {[{h:'/',l:t.home},{h:'/cart',l:t.footerCartLink},{h:'/contact',l:t.contact}].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk=>(
+              <a key={lnk.h} href={lnk.h} style={{display:'block',fontSize:'13px',color:'var(--mid)',marginBottom:'8px',transition:'color 0.2s'}}
+                onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--fire)';}}
+                onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mid)';}}>
+                {lnk.l}
+              </a>
+            ))}
+          </div>
+
+          {/* قانوني */}
+          <div>
+            <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'16px'}}>{t.legalNav}</p>
+            {[{h:'/Privacy',l:t.privacy},{h:'/Terms',l:t.terms},{h:'/cookies',l:t.cookies}].map(lnk=>(
               <a key={lnk.h} href={lnk.h} style={{display:'block',fontSize:'13px',color:'var(--mid)',marginBottom:'8px',transition:'color 0.2s'}}
                 onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--fire)';}}
                 onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mid)';}}>
@@ -1331,23 +1345,24 @@ export function Details({ product, store: storeprop, toggleWishlist, isWishliste
                 <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'10px'}}>{attr.name}</p>
                 {attr.displayMode==='color' ? (
                   <div style={{display:'flex',flexWrap:'wrap',gap:'8px'}}>
-                    {attr.variants.map((v:any)=>(
-                      <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} title={v.name} style={{width:'28px',height:'28px',backgroundColor:v.value,border:'none',cursor:'pointer',outline:`3px solid ${selectedVariants[attr.name]===v.value?'var(--fire)':'transparent'}`,outlineOffset:'3px'}}/>
-                    ))}
+                    {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value;const available=!product.variantDetails?.length||product.variantDetails.some((vd:any)=>Object.entries({...selectedVariants,[attr.name]:v.value}).every(([n,val])=>vd.name.some((e:any)=>e.attrName===n&&e.value===val)));return(
+                      <button key={v.id} onClick={()=>available&&handleVariantSelection(attr.name,v.value)} title={v.name} style={{width:'28px',height:'28px',backgroundColor:v.value,border:'none',cursor:available?'pointer':'not-allowed',outline:`3px solid ${s?'var(--fire)':'transparent'}`,outlineOffset:'3px',opacity:available?1:0.35}}/>
+                    );})}
                   </div>
                 ) : attr.displayMode==='image' ? (
                   <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>
-                    {attr.variants.map((v:any)=>(
-                      <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} style={{width:'52px',height:'52px',overflow:'hidden',border:`2px solid ${selectedVariants[attr.name]===v.value?'var(--fire)':'var(--line)'}`,cursor:'pointer',padding:0}}>
+                    {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value;const available=!product.variantDetails?.length||product.variantDetails.some((vd:any)=>Object.entries({...selectedVariants,[attr.name]:v.value}).every(([n,val])=>vd.name.some((e:any)=>e.attrName===n&&e.value===val)));return(
+                      <button key={v.id} onClick={()=>available&&handleVariantSelection(attr.name,v.value)} style={{width:'52px',height:'52px',overflow:'hidden',border:`2px solid ${s?'var(--fire)':'var(--line)'}`,cursor:available?'pointer':'not-allowed',padding:0,opacity:available?1:0.35}}>
                         <img src={v.value} alt={v.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
                       </button>
-                    ))}
+                    );})}
                   </div>
                 ) : (
                   <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>
                     {attr.variants.map((v:any)=>{
                       const s=selectedVariants[attr.name]===v.value;
-                      return <button key={v.id} onClick={()=>handleVariantSelection(attr.name,v.value)} className="bc" style={{padding:'8px 16px',border:`1.5px solid ${s?'var(--fire)':'var(--dim)'}`,backgroundColor:s?'var(--fire)':'transparent',color:s?'white':'var(--mid)',fontSize:'13px',fontWeight:700,cursor:'pointer',letterSpacing:'0.08em',textTransform:'uppercase',transition:'all 0.2s'}}>
+                      const available=!product.variantDetails?.length||product.variantDetails.some((vd:any)=>Object.entries({...selectedVariants,[attr.name]:v.value}).every(([n,val])=>vd.name.some((e:any)=>e.attrName===n&&e.value===val)));
+                      return <button key={v.id} onClick={()=>available&&handleVariantSelection(attr.name,v.value)} className="bc" style={{padding:'8px 16px',border:`1.5px solid ${s?'var(--fire)':'var(--dim)'}`,backgroundColor:s?'var(--fire)':'transparent',color:s?'white':(available?'var(--mid)':'#555'),fontSize:'13px',fontWeight:700,cursor:available?'pointer':'not-allowed',letterSpacing:'0.08em',textTransform:'uppercase',transition:'all 0.2s',textDecoration:available?'none':'line-through'}}>
                         {v.name}
                       </button>;
                     })}
@@ -1436,7 +1451,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     try{
       await axios.post(`${API_URL}/orders/create`,{...fd,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});
       if(fd.customerId) localStorage.setItem('customerId',fd.customerId);
-      router.push(`/${domain}/successfully`);
+      router.push(`/successfully?productId=${product?.id}`);
     }catch{}finally{setSub(false);}
   };
 

@@ -91,7 +91,7 @@ const T = {
       { t: 'دفع آمن', s: 'حماية كاملة للبيانات' },
       { t: 'دعم 24/7', s: 'فريق متخصص للمساعدة' },
     ],
-    quickLinks: 'روابط سريعة', contactUs: 'تواصل معنا',
+    quickLinks: 'روابط سريعة', legalNav: 'قانوني', contactUs: 'تواصل معنا',
     privacy: 'الخصوصية', terms: 'الشروط', cookies: 'الكوكيز',
     rightsReserved: 'جميع الحقوق محفوظة',
     fullName: 'الاسم الكامل', fullNamePlaceholder: 'أدخل اسمك الكامل',
@@ -150,7 +150,7 @@ const T = {
       { t: 'Paiement Sécurisé', s: 'Vos données protégées' },
       { t: 'Support 24/7', s: 'Toujours disponible' },
     ],
-    quickLinks: 'Navigation', contactUs: 'Contact',
+    quickLinks: 'Navigation', legalNav: 'Légal', contactUs: 'Contact',
     privacy: 'Confidentialité', terms: 'Conditions', cookies: 'Cookies',
     rightsReserved: 'Tous droits réservés.',
     fullName: 'Nom complet', fullNamePlaceholder: 'Votre nom complet',
@@ -209,7 +209,7 @@ const T = {
       { t: 'Secure Payment', s: 'Full data protection' },
       { t: '24/7 Support', s: 'Expert team always here' },
     ],
-    quickLinks: 'Quick Links', contactUs: 'Contact Us',
+    quickLinks: 'Quick Links', legalNav: 'Legal', contactUs: 'Contact Us',
     privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies',
     rightsReserved: 'All rights reserved.',
     fullName: 'Full Name', fullNamePlaceholder: 'Enter your full name',
@@ -382,7 +382,7 @@ const THEME_CSS = `
 .rsp-footer-deco { height:1px; background:linear-gradient(to right, transparent, ${GOLD}, transparent); }
 .rsp-footer-grid { display:grid; grid-template-columns:1fr; gap:2rem; padding:3rem 0 2rem; }
 @media (min-width:560px) { .rsp-footer-grid { grid-template-columns:1fr 1fr; } .rsp-footer-brand { grid-column:1/-1; } }
-@media (min-width:768px) { .rsp-footer-grid { grid-template-columns:1.5fr 1fr 1fr; } .rsp-footer-brand { grid-column:auto; } }
+@media (min-width:768px) { .rsp-footer-grid { grid-template-columns:1.5fr 1fr 1fr 1fr; } .rsp-footer-brand { grid-column:auto; } }
 .rsp-footer-link { color:${MUTED}; font-size:0.85rem; text-decoration:none; display:block; padding:4px 0; transition:color 0.2s; }
 .rsp-footer-link:hover { color:${GOLD_LIGHT}; }
 .rsp-footer-bottom { text-align:center; color:${MUTED}; font-size:0.75rem; border-top:1px solid ${BORDER}; padding-top:20px; padding-bottom:0.5rem; }
@@ -612,8 +612,6 @@ export function Footer({ store }: any) {
     { h: '/', l: t.home },
     { h: '/cart', l: t.cart },
     { h: '/contact', l: t.contactUs },
-    { h: '/privacy', l: t.privacy },
-    { h: '/terms', l: t.terms },
   ].filter((lnk) => lnk.h !== '/cart' || store?.cart !== false);
 
   return (
@@ -639,7 +637,19 @@ export function Footer({ store }: any) {
               <Link key={lnk.h} href={lnk.h} className="rsp-footer-link">{lnk.l}</Link>
             ))}
           </div>
+          
+          {/* قانوني */}
           <div>
+            <p style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '1rem' }}>{t.legalNav}</p>
+            {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', opacity: 0.6, transition: 'opacity 0.15s' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.6')}>
+              {lnk.l}
+            </Link>
+            ))}
+          </div>
+<div>
             <h4 style={{ color: CREAM, fontSize: '0.82rem', margin: '0 0 14px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               {t.contactUs}
             </h4>
@@ -833,11 +843,11 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               <>
                 <button onClick={() => setSel((s) => (s - 1 + images.length) % images.length)}
                   style={{ position: 'absolute', top: '50%', insetInlineStart: 10, transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.5)', border: 'none', color: '#fff', borderRadius: '50%', width: 38, height: 38, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ChevronLeft size={18} />
+                  {t.dir === 'rtl' ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
                 </button>
                 <button onClick={() => setSel((s) => (s + 1) % images.length)}
                   style={{ position: 'absolute', top: '50%', insetInlineEnd: 10, transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.5)', border: 'none', color: '#fff', borderRadius: '50%', width: 38, height: 38, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ChevronRight size={18} />
+                  {t.dir === 'rtl' ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
                 </button>
               </>
             )}
@@ -888,23 +898,28 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {attr.variants.map((v) => {
                   const isSel = selectedVariants?.[attr.name] === v.value;
+                  const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                    Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(
+                      ([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)
+                    )
+                  );
                   if (attr.displayMode === 'color') {
                     return (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                        style={{ width: 34, height: 34, borderRadius: '50%', background: v.value, border: isSel ? `2px solid ${GOLD}` : `1px solid ${BORDER}`, cursor: 'pointer' }} />
+                      <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
+                        style={{ width: 34, height: 34, borderRadius: '50%', background: v.value, border: isSel ? `2px solid ${GOLD}` : `1px solid ${BORDER}`, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }} />
                     );
                   }
                   if (attr.displayMode === 'image') {
                     return (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                        style={{ width: 48, height: 48, borderRadius: 4, overflow: 'hidden', border: isSel ? `2px solid ${GOLD}` : `1px solid ${BORDER}`, padding: 0, cursor: 'pointer' }}>
+                      <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
+                        style={{ width: 48, height: 48, borderRadius: 4, overflow: 'hidden', border: isSel ? `2px solid ${GOLD}` : `1px solid ${BORDER}`, padding: 0, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}>
                         <img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </button>
                     );
                   }
                   return (
-                    <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                      style={{ padding: '8px 16px', borderRadius: 4, border: isSel ? `2px solid ${GOLD}` : `1px solid ${BORDER}`, color: isSel ? GOLD_LIGHT : CREAM, background: 'none', cursor: 'pointer', fontSize: '0.82rem' }}>
+                    <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
+                      style={{ padding: '8px 16px', borderRadius: 4, border: isSel ? `2px solid ${GOLD}` : `1px solid ${BORDER}`, color: isSel ? GOLD_LIGHT : (available ? CREAM : '#555'), background: 'none', cursor: available ? 'pointer' : 'not-allowed', fontSize: '0.82rem', textDecoration: available ? 'none' : 'line-through' }}>
                       {v.name}
                     </button>
                   );

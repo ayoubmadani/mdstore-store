@@ -206,7 +206,7 @@ const CSS = `
   .prod-grid  { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
   .cat-grid   { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
   .trust-bar  { display:grid; grid-template-columns:repeat(4,1fr); }
-  .footer-g   { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; }
+  .footer-g   { display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:48px; }
   .details-g  { display:grid; grid-template-columns:1fr 1fr; }
   .details-L  { padding:20px 0; position:sticky; top:70px; height:calc(100vh - 70px); overflow:hidden; }
   .details-R  { padding:20px 32px; overflow-y:auto; }
@@ -428,7 +428,7 @@ const jsonAr = {
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
   // Footer
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
@@ -613,7 +613,7 @@ const jsonFr = {
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
   // Footer
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
@@ -700,7 +700,7 @@ const jsonEn = {
   successTitle: 'Order received!', successDesc: "Thank you for your trust. We'll contact you soon to confirm your order 🎮",
   backToShop: 'Back to store', checkoutTitle: 'Complete order',
   offersTitle: 'Available offers', descTitle: 'Description',
-  quickLinks: 'Quick links', contactSect: 'Contact us', privacy: 'Privacy', terms: 'Terms', rightsReserved: 'All rights reserved.',
+  quickLinks: 'Quick links', legalNav: 'Legal', contactSect: 'Contact us', privacy: 'Privacy', terms: 'Terms', rightsReserved: 'All rights reserved.',
   legalSub: '// Legal', privacyTitle: 'Privacy Policy', termsTitle: 'Terms of Use', cookiesTitle: 'Cookie Policy',
   privDataTitle: 'Data we collect', privDataBody: 'Only your name, phone number and delivery address — the minimum necessary to process your order.',
   privUseTitle: 'How we use it', privUseBody: 'Exclusively to fulfill and deliver your purchases.',
@@ -936,7 +936,7 @@ export function Footer({ store }: any) {
       <div style={{ position: 'absolute', bottom: 0, left: 0, width: '300px', height: '300px', background: `radial-gradient(circle, ${cyan}05 0%, transparent 70%)`, pointerEvents: 'none' }} />
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '60px 20px 30px' }}>
         <div className="footer-g" style={{ paddingBottom: '40px', borderBottom: '1px solid var(--line)' }}>
-          <div style={{ gridColumn: 'span 2' }}>
+          <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <div style={{ padding: '8px', border: `1px solid ${cyan}`, borderRadius: '4px', background: `${cyan}05` }}>
                 <Gamepad2 style={{ width: '24px', height: '24px', color: cyan }} />
@@ -962,7 +962,8 @@ export function Footer({ store }: any) {
             </div>
           </div>
           {[
-            { title: t.quickLinks, links: [['/', t.footerHomeLink], ['/cart', t.cart], ['/contact', t.footerSupportLink], ['/Privacy', t.privacy], ['/Terms', t.terms]] },
+            { title: t.quickLinks, links: [['/', t.footerHomeLink], ['/cart', t.cart], ['/contact', t.footerSupportLink]] },
+            { title: t.legalNav, links: [['/Privacy', t.privacy], ['/Terms', t.terms], ['/cookies', t.cookies]] },
             { title: t.contactSect, links: [[`tel:${store.contact.phone}`, store.contact.phone], ['#', [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')], [`mailto:${store.contact.email}`, store.contact.email]] },
           ].map(col => (
             <div key={col.title}>
@@ -1409,15 +1410,15 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                 <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', marginBottom: '10px', textTransform: 'uppercase' }}>{attr.name}</p>
                 {attr.displayMode === 'color' ? (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: '28px', height: '28px', backgroundColor: v.value, border: 'none', cursor: 'pointer', borderRadius: '4px', outline: s ? '2px solid var(--cyan)' : '2px solid transparent', outlineOffset: '3px', boxShadow: s ? 'var(--glow-c)' : 'none' }} />; })}
+                    {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val))); return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: '28px', height: '28px', backgroundColor: v.value, border: 'none', cursor: available ? 'pointer' : 'not-allowed', borderRadius: '4px', outline: s ? '2px solid var(--cyan)' : '2px solid transparent', outlineOffset: '3px', boxShadow: s ? 'var(--glow-c)' : 'none', opacity: available ? 1 : 0.35 }} />; })}
                   </div>
                 ) : attr.displayMode === 'image' ? (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                    {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ width: '52px', height: '52px', overflow: 'hidden', border: `2px solid ${s ? 'var(--cyan)' : 'var(--line)'}`, cursor: 'pointer', padding: 0, borderRadius: '4px', boxShadow: s ? 'var(--glow-c)' : 'none' }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>; })}
+                    {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val))); return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: '52px', height: '52px', overflow: 'hidden', border: `2px solid ${s ? 'var(--cyan)' : 'var(--line)'}`, cursor: available ? 'pointer' : 'not-allowed', padding: 0, borderRadius: '4px', boxShadow: s ? 'var(--glow-c)' : 'none', opacity: available ? 1 : 0.35 }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>; })}
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                    {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ padding: '8px 16px', border: `1px solid ${s ? 'var(--cyan)' : 'var(--line)'}`, backgroundColor: s ? 'rgba(0,212,255,0.1)' : 'transparent', color: s ? 'var(--cyan)' : 'var(--mid)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', borderRadius: '4px', transition: 'all 0.2s', boxShadow: s ? 'var(--glow-c)' : 'none' }}>{v.name}</button>; })}
+                    {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val))); return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ padding: '8px 16px', border: `1px solid ${s ? 'var(--cyan)' : 'var(--line)'}`, backgroundColor: s ? 'rgba(0,212,255,0.1)' : 'transparent', color: s ? 'var(--cyan)' : (available ? 'var(--mid)' : '#555'), fontSize: '13px', fontWeight: 600, cursor: available ? 'pointer' : 'not-allowed', borderRadius: '4px', transition: 'all 0.2s', boxShadow: s ? 'var(--glow-c)' : 'none', textDecoration: available ? 'none' : 'line-through' }}>{v.name}</button>; })}
                   </div>
                 )}
               </div>
@@ -1521,7 +1522,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     try {
       await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVariantDetailId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (typeof window !== 'undefined' && fd.customerId) localStorage.setItem('customerId', fd.customerId);
-      router.push(`/${domain}/successfully`);
+      router.push(`/successfully?productId=${product?.id}`);
     } catch (err) { console.error(err); } finally { setSub(false); }
   };
 

@@ -161,7 +161,7 @@ const THEME_CSS = `
     padding-bottom: 2.5rem;
     border-bottom: 1px solid rgba(255,255,255,0.15);
   }
-  @media (min-width: 768px) { .footer-cols { grid-template-columns: 1.8fr 1fr 1fr; } }
+  @media (min-width: 768px) { .footer-cols { grid-template-columns: 1.8fr 1fr 1fr 1fr; } }
 
   .hero-actions { display: flex; flex-direction: column; gap: 0.875rem; }
   @media (min-width: 540px) { .hero-actions { flex-direction: row; align-items: center; } }
@@ -198,7 +198,7 @@ const PawDeco = ({ style = {} as any }) => (
 );
 
 /* ─── TYPES ─── */
-interface Offer { id: string; name: string; quantity: number; price: number; }
+interface Offer { id: string; name: string; subTitle?: string; quantity: number; price: number; shippingFree?: boolean; }
 interface Variant { id: string; name: string; value: string; }
 interface Attribute { id: string; type: string; name: string; displayMode?: 'color' | 'image' | 'text' | null; variants: Variant[]; }
 interface ProductImage { id: string; imageUrl: string; }
@@ -209,11 +209,11 @@ interface Commune { id: string; name: string; ar_name: string; wilayaId: string;
 export interface Product {
     id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
     productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
-    variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-    store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
+    variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+    store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 export interface ProductFormProps {
-    product: Product; userId: string; domain: string; redirectPath?: string;
+    product: Product; store?: any; userId: string; domain: string; redirectPath?: string;
     selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
     selectedVariants: Record<string, string>; platform?: string; priceLoss?: number;
 }
@@ -281,13 +281,14 @@ const T = {
     bannerDesc: 'منتجات مختارة بعناية فائقة لصحة وسعادة رفيقك الأليف في كل يوم',
     shopNow: 'تسوق الآن 🐾',
     footerDesc: '🐾 كل ما يحتاجه حيوانك الأليف بأمان وحب. منتجات مختارة بعناية لرفيق حياتك.',
-    quickLinks: 'روابط سريعة', contactSect: 'تواصل معنا',
+    quickLinks: 'روابط سريعة', legalNav: 'قانوني', contactSect: 'تواصل معنا',
     footerHome: 'الرئيسية', footerCart: 'سلة التسوق', footerContact: 'تواصل معنا',
-    footerPrivacy: 'سياسة الخصوصية', footerTerms: 'الشروط والأحكام',
+    footerPrivacy: 'سياسة الخصوصية', footerTerms: 'الشروط والأحكام', footerCookies: 'الكوكيز',
     footerOnline: 'نرد بكل اهتمام 🐾', footerResponseTime: 'خلال 24 ساعة',
     rightsReserved: 'جميع الحقوق محفوظة',
     priceLabel: 'السعر', discountLabel: 'خصم', descTitle: 'وصف المنتج',
     stockLabel: 'في المخزون', offerQty: 'الكمية',
+    freeShippingBadge: '🚚 توصيل مجاني', freeShippingRemaining: 'أضف {{amount}} دج أخرى للحصول على توصيل مجاني', freeShippingReached: '🎉 حصلت على توصيل مجاني!', freeShippingThreshold: '🚚 توصيل مجاني للطلبات بـ {{amount}} دج أو أكثر',
     addedMsg: 'تمت الإضافة 🐾', addToCart: 'أضف للسلة', orderNow: 'اطلب الآن 🐾',
     orderInfoTitle: 'بيانات التوصيل', cancelBtn: 'إلغاء',
     fullName: 'الاسم الكامل', fullNamePh: 'الاسم',
@@ -354,13 +355,14 @@ const T = {
     bannerDesc: "Des produits soigneusement sélectionnés pour la santé et le bonheur de votre animal chaque jour",
     shopNow: 'Acheter maintenant 🐾',
     footerDesc: '🐾 Tout ce dont votre animal a besoin en toute sécurité et avec amour. Des produits soigneusement sélectionnés.',
-    quickLinks: 'Navigation', contactSect: 'Contact',
+    quickLinks: 'Navigation', legalNav: 'Légal', contactSect: 'Contact',
     footerHome: 'Accueil', footerCart: 'Panier', footerContact: 'Contact',
-    footerPrivacy: 'Politique de confidentialité', footerTerms: "Conditions générales",
+    footerPrivacy: 'Politique de confidentialité', footerTerms: "Conditions générales", footerCookies: 'Cookies',
     footerOnline: 'Nous répondons avec soin 🐾', footerResponseTime: 'Dans les 24 heures',
     rightsReserved: 'Tous droits réservés',
     priceLabel: 'Prix', discountLabel: 'Remise', descTitle: 'Description du produit',
     stockLabel: 'En stock', offerQty: 'Quantité',
+    freeShippingBadge: '🚚 Livraison gratuite', freeShippingRemaining: 'Ajoutez {{amount}} DZD de plus pour la livraison gratuite', freeShippingReached: '🎉 Livraison gratuite obtenue !', freeShippingThreshold: '🚚 Livraison gratuite dès {{amount}} DZD d\'achat',
     addedMsg: 'Ajouté 🐾', addToCart: 'Ajouter au panier', orderNow: 'Commander 🐾',
     orderInfoTitle: 'Informations de livraison', cancelBtn: 'Annuler',
     fullName: 'Nom complet', fullNamePh: 'Votre nom',
@@ -427,13 +429,14 @@ const T = {
     bannerDesc: 'Carefully selected products for the health and happiness of your pet every day',
     shopNow: 'Shop now 🐾',
     footerDesc: '🐾 Everything your pet needs, safely and with love. Carefully selected products for your companion.',
-    quickLinks: 'Quick links', contactSect: 'Contact Us',
+    quickLinks: 'Quick links', legalNav: 'Legal', contactSect: 'Contact Us',
     footerHome: 'Home', footerCart: 'Shopping Cart', footerContact: 'Contact Us',
-    footerPrivacy: 'Privacy Policy', footerTerms: 'Terms & Conditions',
+    footerPrivacy: 'Privacy Policy', footerTerms: 'Terms & Conditions', footerCookies: 'Cookie Policy',
     footerOnline: 'We respond with care 🐾', footerResponseTime: 'Within 24 hours',
     rightsReserved: 'All rights reserved',
     priceLabel: 'Price', discountLabel: 'Discount', descTitle: 'Product Description',
     stockLabel: 'In stock', offerQty: 'Quantity',
+    freeShippingBadge: '🚚 Free Delivery', freeShippingRemaining: 'Add {{amount}} DZD more for free delivery', freeShippingReached: '🎉 You got free delivery!', freeShippingThreshold: '🚚 Free Delivery on orders over {{amount}} DZD',
     addedMsg: 'Added 🐾', addToCart: 'Add to Cart', orderNow: 'Order now 🐾',
     orderInfoTitle: 'Delivery information', cancelBtn: 'Cancel',
     fullName: 'Full Name', fullNamePh: 'Your full name',
@@ -591,12 +594,16 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
                 {/* Logo */}
                 <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 14, background: 'linear-gradient(135deg, #FBBF24 0%, #FB923C 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                        {(store.design?.logoUrl && store.design.logoUrl !== '/default-logo.png')
-                            ? <img src={store.design.logoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
-                            : <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.2rem', fontWeight: 700, color: '#fff' }}>{(store?.name || 'P')[0]}</span>}
-                    </div>
-                    <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.35rem', fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.01em' }}>{store?.name}</span>
+                    {(store.design?.logoUrl && store.design.logoUrl !== '/default-logo.png') ? (
+                        <img src={store.design.logoUrl} style={{ height: 44, width: 'auto', maxWidth: 160, objectFit: 'contain' }} alt={store?.name || ''} />
+                    ) : (
+                        <>
+                            <div style={{ width: 44, height: 44, borderRadius: 14, background: 'linear-gradient(135deg, #FBBF24 0%, #FB923C 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.2rem', fontWeight: 700, color: '#fff' }}>{(store?.name || 'P')[0]}</span>
+                            </div>
+                            <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.35rem', fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.01em' }}>{store?.name}</span>
+                        </>
+                    )}
                 </Link>
 
                 {/* Desktop search */}
@@ -707,7 +714,7 @@ export function Footer({ store }: any) {
                     {/* قسم 2 */}
                     <div>
                         <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--amber)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>{t.quickLinks}</h4>
-                        {[{ h: '/', l: t.footerHome }, { h: '/cart', l: t.footerCart }, { h: '/contact', l: t.footerContact }, { h: '/Privacy', l: t.footerPrivacy }, { h: '/Terms', l: t.footerTerms }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
+                        {[{ h: '/', l: t.footerHome }, { h: '/cart', l: t.footerCart }, { h: '/contact', l: t.footerContact }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
                             <a key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
                                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = '#fff'; el.style.paddingRight = '8px'; }}
                                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(255,255,255,0.6)'; el.style.paddingRight = '0'; }}>
@@ -715,7 +722,18 @@ export function Footer({ store }: any) {
                             </a>
                         ))}
                     </div>
-                    {/* قسم 3 */}
+                    {/* قسم 3 — قانوني */}
+                    <div>
+                        <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--amber)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>{t.legalNav}</h4>
+                        {[{ h: '/privacy', l: t.footerPrivacy }, { h: '/terms', l: t.footerTerms }, { h: '/cookies', l: t.footerCookies }].map((lnk, i) => (
+                            <a key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.9rem', fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
+                                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = '#fff'; el.style.paddingRight = '8px'; }}
+                                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(255,255,255,0.6)'; el.style.paddingRight = '0'; }}>
+                                {lnk.l}
+                            </a>
+                        ))}
+                    </div>
+                    {/* قسم 4 */}
                     <div>
                         <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--amber)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>{t.contactSect}</h4>
                         {[
@@ -769,6 +787,11 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
                 {discount > 0 && (
                     <div style={{ position: 'absolute', top: 10, right: 10, background: pal.accent, color: '#fff', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 50 }}>
                         -{discount}%
+                    </div>
+                )}
+                {product.shippingFree && (
+                    <div style={{ position: 'absolute', bottom: 10, right: 10, background: 'var(--green-dk)', color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 9px', borderRadius: 50 }}>
+                        🚚
                     </div>
                 )}
                 <button style={{ position: 'absolute', top: 10, left: 10, width: 34, height: 34, borderRadius: '50%', background: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--orange)' }}>
@@ -1008,8 +1031,14 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
                                 </div>
                             </div>
                             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '0.4rem 1rem', borderRadius: 50, fontWeight: 700, fontSize: '0.82rem', marginBottom: '1.5rem', background: autoGen ? 'var(--amber-lt)' : inStock ? 'var(--green-lt)' : '#FFE4E6', color: autoGen ? 'var(--amber-dk)' : inStock ? 'var(--green-dk)' : '#E11D48' }}>
-                                
+
                             </div>
+
+                            {(product.shippingFree || (product.store?.supportFreeShipping && product.store?.freeShippingMinAmount != null)) && (
+                                <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--green-dk)', marginBottom: '1.25rem' }}>
+                                    {product.shippingFree ? t.freeShippingBadge : t.freeShippingThreshold.replace('{{amount}}', String(product.store.freeShippingMinAmount))}
+                                </p>
+                            )}
 
                             {product.offers?.length > 0 && (
                                 <div style={{ marginBottom: '1.5rem' }}>
@@ -1022,7 +1051,9 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
                                                 <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
                                                 <div>
                                                     <p style={{ fontWeight: 700, fontSize: '0.9rem' }}>{o.name}</p>
+                                                    {o.subTitle && <p style={{ fontSize: '0.75rem', color: 'var(--text-soft)', fontWeight: 600, marginTop: 2 }}>{o.subTitle}</p>}
                                                     <p style={{ fontSize: '0.72rem', color: 'var(--text-soft)', fontWeight: 600 }}>{t.offerQty}: {o.quantity}</p>
+                                                    {o.shippingFree && <p style={{ fontSize: '0.7rem', color: 'var(--green-dk)', fontWeight: 700, marginTop: 2 }}>{t.freeShippingBadge}</p>}
                                                 </div>
                                             </div>
                                             <span className="font-serif" style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--amber-dk)' }}>{o.price.toLocaleString()} دج</span>
@@ -1037,22 +1068,27 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
                                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                                         {attr.variants.map((v: any) => {
                                             const isSelected = selectedVariants[attr.name] === v.value;
+                                            const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                                                Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(
+                                                    ([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)
+                                                )
+                                            );
                                             if (attr.displayMode === 'color') {
                                                 return (
-                                                    <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                                                        style={{ width: 32, height: 32, borderRadius: '50%', background: v.value, border: '1px solid rgba(0,0,0,0.1)', cursor: 'pointer', outline: `2px solid ${isSelected ? 'var(--amber-dk)' : 'transparent'}`, outlineOffset: 2, transition: '0.2s all' }}
+                                                    <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
+                                                        style={{ width: 32, height: 32, borderRadius: '50%', background: v.value, border: '1px solid rgba(0,0,0,0.1)', cursor: available ? 'pointer' : 'not-allowed', outline: `2px solid ${isSelected ? 'var(--amber-dk)' : 'transparent'}`, outlineOffset: 2, transition: '0.2s all', opacity: available ? 1 : 0.35 }}
                                                         title={v.name} />
                                                 );
                                             }
                                             if (attr.displayMode === 'image') {
                                                 return (
-                                                    <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                                                        style={{ width: 40, height: 40, borderRadius: 10, backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center', border: isSelected ? '2px solid var(--amber-dk)' : '2px solid var(--border)', cursor: 'pointer', transition: '0.2s all' }} />
+                                                    <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
+                                                        style={{ width: 40, height: 40, borderRadius: 10, backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center', border: isSelected ? '2px solid var(--amber-dk)' : '2px solid var(--border)', cursor: available ? 'pointer' : 'not-allowed', transition: '0.2s all', opacity: available ? 1 : 0.35 }} />
                                                 );
                                             }
                                             return (
-                                                <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                                                    style={{ padding: '0.4rem 1.125rem', border: `2px solid ${isSelected ? 'var(--amber-dk)' : 'var(--border)'}`, borderRadius: 50, fontWeight: 700, fontSize: '0.85rem', background: isSelected ? 'var(--amber-lt)' : '#fff', color: isSelected ? 'var(--amber-dk)' : 'var(--text-mid)', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
+                                                <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
+                                                    style={{ padding: '0.4rem 1.125rem', border: `2px solid ${isSelected ? 'var(--amber-dk)' : 'var(--border)'}`, borderRadius: 50, fontWeight: 700, fontSize: '0.85rem', background: isSelected ? 'var(--amber-lt)' : '#fff', color: isSelected ? 'var(--amber-dk)' : (available ? 'var(--text-mid)' : '#bbb'), cursor: available ? 'pointer' : 'not-allowed', fontFamily: 'inherit', transition: 'all 0.2s', textDecoration: available ? 'none' : 'line-through' }}>
                                                     {v.name}
                                                 </button>
                                             );
@@ -1112,9 +1148,19 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
         }
         return base;
     }, [product, selectedOffer, selectedVariants]);
-    const getLiv = useCallback((): number => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; }, [selW, fd.typeLivraison]);
+    const supportQty = (storeprop?.supportQty ?? product.store?.supportQty) !== false;
     const fp = getFP();
-    const total = () => fp * fd.quantity + +getLiv();
+    const qty = supportQty ? fd.quantity : 1;
+    const selOffer = product.offers?.find((o: any) => o.id === selectedOffer);
+    const storeInfo = storeprop || product.store;
+    const orderFreeShipping = !!(product.shippingFree || selOffer?.shippingFree ||
+        (storeInfo?.supportFreeShipping && storeInfo?.freeShippingMinAmount != null && (fp * qty) >= Number(storeInfo.freeShippingMinAmount)));
+    const getLiv = useCallback((): number => {
+        if (orderFreeShipping) return 0;
+        if (!selW) return 0;
+        return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice;
+    }, [selW, fd.typeLivraison, orderFreeShipping]);
+    const total = () => fp * qty + +getLiv();
     const validate = () => {
         const e: Record<string, string> = {};
         if (!fd.customerName.trim()) e.customerName = t.errName;
@@ -1131,7 +1177,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     const addToCart = () => {
         setIsAdded(true);
         const cart = JSON.parse(localStorage.getItem(domain) || '[]');
-        cart.push({ ...fd, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
+        cart.push({ ...fd, quantity: qty, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
         localStorage.setItem(domain, JSON.stringify(cart));
         initCount(cart.length);
         setTimeout(() => setIsAdded(false), 2000);
@@ -1142,9 +1188,9 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
         const er = validate(); if (Object.keys(er).length) { setErrors(er); return; }
         setErrors({}); setSub(true);
         try {
-            await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+            await axios.post(`${API_URL}/orders/create`, { ...fd, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
             if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
-            router.push(`/${domain}/successfully`);
+            router.push(`/successfully?productId=${product?.id}`);
         } catch { } finally { setSub(false); }
     };
 
@@ -1206,27 +1252,29 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
                                     <button key={dtype} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: dtype }))} style={{ padding: '0.875rem', border: `2px solid ${fd.typeLivraison === dtype ? 'var(--amber-dk)' : 'var(--border)'}`, borderRadius: 16, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === dtype ? 'var(--amber-lt)' : '#fff', fontFamily: 'inherit', transition: 'all 0.2s' }}>
                                         <span style={{ display: 'block', fontSize: '1.375rem', marginBottom: 4 }}>{dtype === 'home' ? '🏠' : '🏢'}</span>
                                         <p style={{ fontWeight: 700, fontSize: '0.82rem', color: fd.typeLivraison === dtype ? 'var(--amber-dk)' : 'var(--text-soft)' }}>{dtype === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
-                                        {selW && <p className="font-serif" style={{ fontSize: '1rem', fontWeight: 700, color: fd.typeLivraison === dtype ? 'var(--amber-dk)' : 'var(--text-soft)' }}>{(dtype === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج</p>}
+                                        {selW && <p className="font-serif" style={{ fontSize: '1rem', fontWeight: 700, color: fd.typeLivraison === dtype ? 'var(--amber-dk)' : 'var(--text-soft)' }}>{orderFreeShipping ? t.freeShippingBadge : `${(dtype === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج`}</p>}
                                     </button>
                                 ))}
                             </div>
                         </div>
 
-                        <div style={{ marginBottom: '0.875rem' }}>
-                            <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.5rem' }}>{t.qty}</p>
-                            <div style={{ display: 'inline-flex', alignItems: 'center', border: '2px solid var(--amber-lt)', borderRadius: 50, overflow: 'hidden', background: '#fff' }}>
-                                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--amber-dk)' }}><Minus size={14} /></button>
-                                <span style={{ width: 44, textAlign: 'center', fontFamily: "'Playfair Display', serif", fontSize: '1.25rem', fontWeight: 700 }}>{fd.quantity}</span>
-                                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--amber-dk)' }}><Plus size={14} /></button>
+                        {supportQty && (
+                            <div style={{ marginBottom: '0.875rem' }}>
+                                <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.5rem' }}>{t.qty}</p>
+                                <div style={{ display: 'inline-flex', alignItems: 'center', border: '2px solid var(--amber-lt)', borderRadius: 50, overflow: 'hidden', background: '#fff' }}>
+                                    <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--amber-dk)' }}><Minus size={14} /></button>
+                                    <span style={{ width: 44, textAlign: 'center', fontFamily: "'Playfair Display', serif", fontSize: '1.25rem', fontWeight: 700 }}>{fd.quantity}</span>
+                                    <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--amber-dk)' }}><Plus size={14} /></button>
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Summary */}
                         <div style={{ background: 'var(--amber-lt)', borderRadius: 20, padding: '1.125rem', marginBottom: '1.25rem' }}>
                             <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--amber-dk)', marginBottom: '0.75rem' }}>{t.orderSummary}</p>
                             {[
                                 { l: t.productLabel, v: product.name.slice(0, 26) + (product.name.length > 26 ? '...' : '') },
-                                { l: t.delivery, v: selW ? `${getLiv().toLocaleString()} دج` : '—' },
+                                { l: t.delivery, v: !selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${getLiv().toLocaleString()} دج` },
                             ].map(r => (
                                 <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px solid rgba(251,191,36,0.3)' }}>
                                     <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-mid)' }}>{r.l}</span>
@@ -1271,8 +1319,12 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     useEffect(() => { if (!fd.customerWelaya) { setCommunes([]); return; } setLC(true); fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLC(false); }); }, [fd.customerWelaya]);
 
     const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
-    const getLiv = () => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; };
     const cartTotal = items.reduce((a, i) => a + (i.finalPrice * i.quantity), 0);
+    const hasFreeShippingItem = items.some(i => i.product?.shippingFree || i.product?.offers?.find((o: any) => o.id === i.selectedOffer)?.shippingFree);
+    const freeShippingMin = store?.supportFreeShipping ? store?.freeShippingMinAmount : null;
+    const freeShippingReached = hasFreeShippingItem || (freeShippingMin != null && cartTotal >= Number(freeShippingMin));
+    const freeShippingRemainingAmt = freeShippingMin != null ? Number(freeShippingMin) - cartTotal : 0;
+    const getLiv = () => { if (freeShippingReached) return 0; if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; };
     const finalTotal = cartTotal + +getLiv();
     const update = (n: any[]) => { setItems(n); localStorage.setItem(domain, JSON.stringify(n)); initCount(n.length); };
 
@@ -1316,6 +1368,11 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         <div dir={t.dir} style={{ minHeight: '100vh', background: 'var(--bg)', padding: '2.5rem 1.5rem 5rem' }}>
             <div style={{ maxWidth: 1200, margin: '0 auto' }}>
                 <h1 className="font-serif" style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700, color: 'var(--text)', marginBottom: '2rem' }}>{t.cartTitle}</h1>
+                {freeShippingMin != null && (
+                    <div style={{ background: freeShippingReached ? 'var(--green-lt)' : 'var(--amber-lt)', color: freeShippingReached ? 'var(--green-dk)' : 'var(--amber-dk)', borderRadius: 16, padding: '0.75rem 1.125rem', marginBottom: '1.5rem', fontWeight: 700, fontSize: '0.85rem', textAlign: 'center' }}>
+                        {freeShippingReached ? t.freeShippingReached : t.freeShippingRemaining.replace('{{amount}}', String(freeShippingRemainingAmt))}
+                    </div>
+                )}
                 <div className="cart-layout">
                     {/* Items */}
                     <div style={{ background: '#fff', borderRadius: 24, border: '2px solid var(--amber-lt)', overflow: 'hidden', alignSelf: 'start' }}>
@@ -1379,7 +1436,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                                             style={{ padding: '0.875rem', border: `2px solid ${fd.typeLivraison === dtype ? 'var(--amber)' : 'var(--amber-lt)'}`, borderRadius: 16, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === dtype ? 'var(--amber-lt)' : '#fff', fontFamily: 'inherit', transition: 'all 0.2s' }}>
                                             <span style={{ display: 'block', fontSize: '1.5rem', marginBottom: 4 }}>{dtype === 'home' ? '🏠' : '🏢'}</span>
                                             <p style={{ fontWeight: 700, fontSize: '0.8rem', color: fd.typeLivraison === dtype ? 'var(--amber-dk)' : 'var(--text-soft)' }}>{dtype === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
-                                            {selW && <p className="font-serif" style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--amber-dk)', marginTop: 3 }}>{(dtype === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج</p>}
+                                            {selW && <p className="font-serif" style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--amber-dk)', marginTop: 3 }}>{freeShippingReached ? t.freeShippingBadge : `${(dtype === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج`}</p>}
                                         </button>
                                     ))}
                                 </div>
@@ -1392,7 +1449,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.625rem', marginBottom: '0.625rem', borderBottom: '1px solid rgba(251,191,36,0.35)' }}>
                                     <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-mid)' }}>{t.delivery}</span>
-                                    <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{getLiv() ? `${getLiv().toLocaleString()} دج` : '—'}</span>
+                                    <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{!selW ? '—' : freeShippingReached ? t.freeShippingBadge : `${getLiv().toLocaleString()} دج`}</span>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                                     <span style={{ fontWeight: 700, color: 'var(--amber-dk)' }}>{t.total}</span>

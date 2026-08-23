@@ -193,7 +193,7 @@ const THEME_CSS = `
     border-bottom: 1px solid rgba(255,255,255,0.06);
   }
   @media (min-width: 768px) {
-    .footer-inner { grid-template-columns: 2fr 1fr 1fr; }
+    .footer-inner { grid-template-columns: 2fr 1fr 1fr 1fr; }
   }
 
   .hero-actions { display: flex; flex-direction: column; gap: 0.75rem; }
@@ -234,7 +234,7 @@ const THEME_CSS = `
 `;
 
 /* ─── TYPES ─── */
-interface Offer { id: string; name: string; quantity: number; price: number; }
+interface Offer { id: string; name: string; quantity: number; price: number; subTitle?: string; shippingFree?: boolean; }
 interface Variant { id: string; name: string; value: string; }
 interface Attribute { id: string; type: string; name: string; displayMode?: 'color' | 'image' | 'text' | null; variants: Variant[]; }
 interface ProductImage { id: string; imageUrl: string; }
@@ -245,8 +245,8 @@ interface Commune { id: string; name: string; ar_name: string; wilayaId: string;
 export interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
-  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 export interface ProductFormProps {
   product: Product; userId: string; domain: string; redirectPath?: string;
@@ -357,6 +357,10 @@ const jsonAr = {
   // Product extra
   totalPrice: 'السعر الإجمالي',
   discountLabel: 'خصم',
+  freeShippingBadge: '🚚 توصيل مجاني',
+  freeShippingThreshold: '🚚 توصيل مجاني للطلبات بـ {{amount}} دج أو أكثر',
+  freeShippingRemaining: 'أضف {{amount}} دج أخرى للحصول على توصيل مجاني',
+  freeShippingReached: '🎉 حصلت على توصيل مجاني!',
   // Home sections
   categories: 'الفئات',
   products: 'المنتجات',
@@ -373,10 +377,11 @@ const jsonAr = {
   // Footer
   replyNow: 'نرد الآن',
   footerDesc: 'تجربة تسوق عصرية وسريعة. توصيل لجميع الولايات الجزائرية.',
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
+  cookies: 'الكوكيز',
   rightsReserved: 'جميع الحقوق محفوظة',
   // Static pages
   pages: {
@@ -480,6 +485,10 @@ const jsonFr = {
   // Product extra
   totalPrice: 'Prix Total',
   discountLabel: 'OFF',
+  freeShippingBadge: '🚚 Livraison gratuite',
+  freeShippingThreshold: '🚚 Livraison gratuite dès {{amount}} DZD d\'achat',
+  freeShippingRemaining: 'Ajoutez {{amount}} DZD de plus pour la livraison gratuite',
+  freeShippingReached: '🎉 Livraison gratuite obtenue !',
   // Home sections
   categories: 'Catégories',
   products: 'Produits',
@@ -496,7 +505,7 @@ const jsonFr = {
   // Footer
   replyNow: 'Disponible',
   footerDesc: 'Shopping moderne et rapide. Livraison dans toutes les wilayas algériennes.',
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
@@ -564,6 +573,10 @@ const jsonEn = {
   email: 'Email', message: 'Your message',
   messagePh: 'How can we help you?', sendMsg: 'Send Message',
   totalPrice: 'Total Price', discountLabel: 'OFF',
+  freeShippingBadge: '🚚 Free Delivery',
+  freeShippingThreshold: '🚚 Free Delivery on orders over {{amount}} DZD',
+  freeShippingRemaining: 'Add {{amount}} DZD more for free delivery',
+  freeShippingReached: '🎉 You got free delivery!',
   categories: 'Categories', products: 'Products',
   trust: [
     { t: 'Nationwide Delivery', d: 'All 58 wilayas' },
@@ -575,8 +588,8 @@ const jsonEn = {
   heroSubtitle: 'Authentic products at great prices. Fast delivery across Algeria.',
   replyNow: 'Online now',
   footerDesc: 'Modern and fast shopping experience. Delivery across all Algerian wilayas.',
-  quickLinks: 'Quick Links', contactSect: 'Contact Us',
-  privacy: 'Privacy', terms: 'Terms', rightsReserved: 'All rights reserved.',
+  quickLinks: 'Quick Links', legalNav: 'Legal', contactSect: 'Contact Us',
+  privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies', rightsReserved: 'All rights reserved.',
   pages: {
     privacy: {
       title: 'Privacy Policy',
@@ -869,7 +882,19 @@ export function Footer({ store }: any) {
           {/* قسم 2 — الروابط */}
           <div>
             <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1.25rem' }}>{t.quickLinks}</h4>
-            {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }, { h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
+            {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: '#666', marginBottom: '0.625rem', transition: 'color 0.15s' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#7C3AED')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#666')}>
+                {lnk.l}
+              </Link>
+            ))}
+          </div>
+
+          {/* قانوني */}
+          <div>
+            <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1.25rem' }}>{t.legalNav}</h4>
+            {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
               <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: '#666', marginBottom: '0.625rem', transition: 'color 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#7C3AED')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#666')}>
@@ -929,6 +954,11 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         {discount > 0 && (
           <div style={{ position: 'absolute', top: 10, right: 10, background: '#7C3AED', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 9px', borderRadius: 4 }}>
             -{discount}%
+          </div>
+        )}
+        {product.shippingFree && (
+          <div style={{ position: 'absolute', top: 10, left: 10, background: '#111', color: '#fff', fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 4 }}>
+            🚚
           </div>
         )}
       </div>
@@ -1224,6 +1254,12 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               </div>
             </div>
 
+            {(product.shippingFree || ((store || product?.store)?.supportFreeShipping && (store || product?.store)?.freeShippingMinAmount != null)) && (
+              <p style={{ fontSize: '0.8rem', fontWeight: 700, color: '#7C3AED', marginBottom: '1.25rem' }}>
+                {product.shippingFree ? t.freeShippingBadge : t.freeShippingThreshold.replace('{{amount}}', String((store || product?.store).freeShippingMinAmount))}
+              </p>
+            )}
+
             {/* Offers - تم تغيير اللون للأحمر المتناسق */}
             {product.offers?.length > 0 && (
               <div style={{ marginBottom: '1.25rem' }}>
@@ -1236,7 +1272,9 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                       <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
                       <div>
                         <p style={{ fontWeight: 600, color: '#111', fontSize: '0.875rem' }}>{o.name}</p>
+                        {o.subTitle && <p style={{ fontSize: '0.75rem', color: '#999', marginTop: 2 }}>{o.subTitle}</p>}
                         <p style={{ fontSize: '0.72rem', color: '#999' }}>{t.qty}: {o.quantity}</p>
+                        {o.shippingFree && <p style={{ fontSize: '0.7rem', fontWeight: 700, color: '#7C3AED', marginTop: 2 }}>{t.freeShippingBadge}</p>}
                       </div>
                     </div>
                     <span className="price-mono" style={{ fontWeight: 800, color: '#7C3AED', fontSize: '1.1rem' }}>{o.price.toLocaleString()} { 'DZD'}</span>
@@ -1253,23 +1291,29 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                   {attr.variants.map((v: any) => {
                     const isSelected = selectedVariants[attr.name] === v.value;
                     const isImgUrl = /^https?:\/\/|^\//.test(v.value);
+                    const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                      Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) =>
+                        vd.name.some((e: any) => e.attrName === n && e.value === val)
+                      )
+                    );
 
                     return (
                       <button
                         key={v.id}
-                        onClick={() => handleVariantSelection(attr.name, v.value)}
+                        onClick={() => available && handleVariantSelection(attr.name, v.value)}
                         style={
                           attr.displayMode === 'color' ? {
-                            width: 32, height: 32, borderRadius: '50%', background: isImgUrl ? `url(${v.value}) center/cover` : v.value, border: '1px solid #eee', cursor: 'pointer', overflow: 'hidden',
+                            width: 32, height: 32, borderRadius: '50%', background: isImgUrl ? `url(${v.value}) center/cover` : v.value, border: '1px solid #eee', cursor: available ? 'pointer' : 'not-allowed', overflow: 'hidden', opacity: available ? 1 : 0.35,
                             outline: `2.5px solid ${isSelected ? '#7C3AED' : 'transparent'}`, outlineOffset: 3
                           } : attr.displayMode === 'image' ? {
                             width: 44, height: 44, borderRadius: 10, backgroundImage: `url(${v.value})`, backgroundSize: 'cover',
-                            backgroundPosition: 'center', border: `2px solid ${isSelected ? '#7C3AED' : '#E8E8E8'}`,
-                            cursor: 'pointer', transition: 'all 0.18s'
+                            backgroundPosition: 'center', opacity: available ? 1 : 0.35, border: `2px solid ${isSelected ? '#7C3AED' : '#E8E8E8'}`,
+                            cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.18s'
                           } : {
                             padding: '0.45rem 1.1rem', border: `1.5px solid ${isSelected ? '#7C3AED' : '#E8E8E8'}`, borderRadius: 8,
                             fontSize: '0.85rem', fontWeight: 600, background: isSelected ? 'rgba(124, 58, 237, 0.05)' : '#fff',
-                            color: isSelected ? '#7C3AED' : '#555', cursor: 'pointer', transition: 'all 0.18s'
+                            color: isSelected ? '#7C3AED' : (available ? '#555' : '#bbb'), cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.18s',
+                            textDecoration: available ? 'none' : 'line-through'
                           }
                         }
                       >
@@ -1343,9 +1387,19 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     }
     return base;
   }, [product, selectedOffer, selectedVariants]);
-  const getLiv = useCallback((): number => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; }, [selW, fd.typeLivraison]);
+  const supportQty = (store?.supportQty ?? product.store?.supportQty) !== false;
   const fp = getFP();
-  const total = () => fp * fd.quantity + +getLiv();
+  const qty = supportQty ? fd.quantity : 1;
+  const selOfferObj = product.offers?.find((o: any) => o.id === selectedOffer);
+  const storeInfo = store || product.store;
+  const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
+    (storeInfo?.supportFreeShipping && storeInfo?.freeShippingMinAmount != null && (fp * qty) >= Number(storeInfo.freeShippingMinAmount)));
+  const getLiv = useCallback((): number => {
+    if (orderFreeShipping) return 0;
+    if (!selW) return 0;
+    return Number(fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice);
+  }, [selW, fd.typeLivraison, orderFreeShipping]);
+  const total = () => fp * qty + +getLiv();
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = t.errName;
@@ -1362,7 +1416,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const addToCart = () => {
     setIsAdded(true);
     const cart = JSON.parse(localStorage.getItem(domain) || '[]');
-    cart.push({ ...fd, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
+    cart.push({ ...fd, quantity: qty, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
     localStorage.setItem(domain, JSON.stringify(cart));
     initCount(cart.length);
     setTimeout(() => setIsAdded(false), 2000);
@@ -1373,7 +1427,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const er = validate(); if (Object.keys(er).length) { setErrors(er); return; }
     setErrors({}); setSub(true); setSubmitError(null);
     try {
-      await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+      await axios.post(`${API_URL}/orders/create`, { ...fd, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
       router.push(`${window.location.origin}/successfully?productId=${product.id}`);
     } catch { setSubmitError(t.errSubmit); } finally { setSub(false); }
@@ -1438,27 +1492,29 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 {(['home', 'office'] as const).map(dt => (
                   <button key={dt} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: dt }))} style={{ padding: '0.875rem', border: `1.5px solid ${fd.typeLivraison === dt ? '#7C3AED' : '#E8E8E8'}`, borderRadius: 10, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === dt ? 'rgba(124,58,237,0.05)' : '#fff', transition: 'all 0.18s', fontFamily: 'inherit' }}>
                     <p style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: 4, color: fd.typeLivraison === dt ? '#7C3AED' : '#555' }}>{dt === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
-                    {selW && <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 800, color: fd.typeLivraison === dt ? '#111' : '#ccc' }}>{(dt === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} { 'DZD'}</p>}
+                    {selW && <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 800, color: fd.typeLivraison === dt ? '#111' : '#ccc' }}>{orderFreeShipping ? t.freeShippingBadge : `${(dt === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} DZD`}</p>}
                   </button>
                 ))}
               </div>
             </div>
 
-            <div style={{ marginBottom: '0.875rem' }}>
-              <p style={{ fontSize: '0.775rem', fontWeight: 700, color: '#555', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.qty}</p>
-              <div style={{ display: 'inline-flex', alignItems: 'center', border: '1.5px solid #E8E8E8', borderRadius: 8, overflow: 'hidden', background: '#fff' }}>
-                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#111' }}><Minus size={14} /></button>
-                <span style={{ width: 40, textAlign: 'center', fontWeight: 800, fontSize: '0.9rem' }}>{fd.quantity}</span>
-                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#111' }}><Plus size={14} /></button>
+            {supportQty && (
+              <div style={{ marginBottom: '0.875rem' }}>
+                <p style={{ fontSize: '0.775rem', fontWeight: 700, color: '#555', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.qty}</p>
+                <div style={{ display: 'inline-flex', alignItems: 'center', border: '1.5px solid #E8E8E8', borderRadius: 8, overflow: 'hidden', background: '#fff' }}>
+                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#111' }}><Minus size={14} /></button>
+                  <span style={{ width: 40, textAlign: 'center', fontWeight: 800, fontSize: '0.9rem' }}>{fd.quantity}</span>
+                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#111' }}><Plus size={14} /></button>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Summary */}
             <div style={{ background: '#F8F8F6', border: '1.5px solid #EBEBEB', borderRadius: 10, padding: '1rem 1.125rem', marginBottom: '1rem' }}>
               <p style={{ fontWeight: 800, fontSize: '0.8rem', marginBottom: '0.75rem', color: '#111', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.orderInfo}</p>
               {[
                 { l: t.price, v: product.name.slice(0, 26) + (product.name.length > 26 ? '...' : '') },
-                { l: t.delivery, v: selW ? `${getLiv().toLocaleString()} ${ 'DZD'}` : '—' },
+                { l: t.delivery, v: !selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${getLiv().toLocaleString()} DZD` },
               ].map(r => (
                 <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px solid #E8E8E8' }}>
                   <span style={{ fontSize: '0.85rem', color: '#888' }}>{r.l}</span>
@@ -1520,12 +1576,18 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 
   const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
 
+  const cartTotal = items.reduce((a, i) => a + (i.finalPrice * i.quantity), 0);
+  const hasFreeShippingItem = items.some(i => i.product?.shippingFree || i.product?.offers?.find((o: any) => o.id === i.selectedOffer)?.shippingFree);
+  const freeShippingMin = store?.supportFreeShipping ? store?.freeShippingMinAmount : null;
+  const freeShippingReached = hasFreeShippingItem || (freeShippingMin != null && cartTotal >= Number(freeShippingMin));
+  const freeShippingRemainingAmt = freeShippingMin != null ? Number(freeShippingMin) - cartTotal : 0;
+
   const getLiv = () => {
+    if (freeShippingReached) return 0;
     if (!selW) return 0;
-    return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice;
+    return Number(fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice);
   };
 
-  const cartTotal = items.reduce((a, i) => a + (i.finalPrice * i.quantity), 0);
   const finalTotal = cartTotal + +getLiv();
   const update = (n: any[]) => { setItems(n); localStorage.setItem(domain, JSON.stringify(n)); initCount(n.length); };
 
@@ -1587,6 +1649,11 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} style={{ padding: '2.5rem 1.5rem', maxWidth: 1280, margin: '0 auto', minHeight: '100vh' }}>
       <h1 style={{ fontSize: 'clamp(1.75rem,5vw,2.75rem)', fontWeight: 800, color: '#111', letterSpacing: '-0.03em', marginBottom: '2rem' }}>{t.myCart}</h1>
+      {freeShippingMin != null && (
+        <div style={{ background: freeShippingReached ? 'rgba(124,58,237,0.06)' : '#F8F8F6', border: `1.5px solid ${freeShippingReached ? '#7C3AED' : '#E8E8E8'}`, color: freeShippingReached ? '#7C3AED' : '#555', borderRadius: 10, padding: '0.75rem 1.125rem', marginBottom: '1.5rem', fontWeight: 700, fontSize: '0.85rem', textAlign: 'center' }}>
+          {freeShippingReached ? t.freeShippingReached : t.freeShippingRemaining.replace('{{amount}}', String(freeShippingRemainingAmt))}
+        </div>
+      )}
       <div className="cart-inner">
         {/* Products */}
         <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #E8E8E8', overflow: 'hidden', alignSelf: 'start' }}>
@@ -1660,7 +1727,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   >
                     <span style={{ display: 'block', fontSize: '1.25rem', marginBottom: 3 }}>{dt === 'home' ? '🏠' : '🏢'}</span>
                     <p style={{ fontWeight: 700, fontSize: '0.78rem', color: fd.typeLivraison === dt ? '#7C3AED' : '#888' }}>{dt === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
-                    {selW && <p style={{ fontWeight: 800, fontSize: '0.875rem', color: '#111', marginTop: 2 }}>{(dt === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} {store.currency || 'DZD'}</p>}
+                    {selW && <p style={{ fontWeight: 800, fontSize: '0.875rem', color: '#111', marginTop: 2 }}>{freeShippingReached ? t.freeShippingBadge : `${(dt === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} ${store.currency || 'DZD'}`}</p>}
                   </button>
                 ))}
               </div>
@@ -1673,7 +1740,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.625rem', marginBottom: '0.625rem', borderBottom: '1px solid #E8E8E8' }}>
                 <span style={{ fontSize: '0.85rem', color: '#888' }}>{t.delivery}</span>
-                <span style={{ fontWeight: 700, color: '#111', fontSize: '0.875rem' }}>{getLiv() ? `${getLiv().toLocaleString()} ${store.currency || 'DZD'}` : '—'}</span>
+                <span style={{ fontWeight: 700, color: '#111', fontSize: '0.875rem' }}>{!selW ? '—' : freeShippingReached ? t.freeShippingBadge : `${getLiv().toLocaleString()} ${store.currency || 'DZD'}`}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontWeight: 800, color: '#111' }}>{t.total}</span>

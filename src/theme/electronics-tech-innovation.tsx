@@ -85,7 +85,7 @@ const T = {
       { t: 'دفع آمن', s: 'حماية كاملة للبيانات' },
       { t: 'دعم 24/7', s: 'فريق متخصص للمساعدة' },
     ],
-    quickLinks: 'روابط سريعة', contactUs: 'تواصل معنا',
+    quickLinks: 'روابط سريعة', legalNav: 'قانوني', contactUs: 'تواصل معنا',
     privacy: 'الخصوصية', terms: 'الشروط', cookies: 'الكوكيز',
     rightsReserved: 'جميع الحقوق محفوظة',
     fullName: 'الاسم الكامل', fullNamePlaceholder: 'أدخل اسمك الكامل',
@@ -140,7 +140,7 @@ const T = {
       { t: 'Paiement Sécurisé', s: 'Vos données protégées' },
       { t: 'Support 24/7', s: 'Toujours disponible' },
     ],
-    quickLinks: 'Navigation', contactUs: 'Contact',
+    quickLinks: 'Navigation', legalNav: 'Légal', contactUs: 'Contact',
     privacy: 'Confidentialité', terms: 'Conditions', cookies: 'Cookies',
     rightsReserved: 'Tous droits réservés.',
     fullName: 'Nom complet', fullNamePlaceholder: 'Votre nom complet',
@@ -195,7 +195,7 @@ const T = {
       { t: 'Secure Payment', s: 'Full data protection' },
       { t: '24/7 Support', s: 'Expert team always here' },
     ],
-    quickLinks: 'Quick Links', contactUs: 'Contact Us',
+    quickLinks: 'Quick Links', legalNav: 'Legal', contactUs: 'Contact Us',
     privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies',
     rightsReserved: 'All rights reserved.',
     fullName: 'Full Name', fullNamePlaceholder: 'Enter your full name',
@@ -419,7 +419,7 @@ const THEME_CSS = `
 .ti-cart-inner { display: grid; grid-template-columns: 1fr; gap: 2rem; }
 @media (min-width: 1024px) { .ti-cart-inner { grid-template-columns: 1.2fr 1fr; } }
 .ti-footer-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-@media (min-width: 768px) { .ti-footer-grid { grid-template-columns: 1.4fr 1fr 1fr; } }
+@media (min-width: 768px) { .ti-footer-grid { grid-template-columns: 1.4fr 1fr 1fr 1fr; } }
 .ti-contact-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
 @media (min-width: 900px) { .ti-contact-grid { grid-template-columns: 1fr 1.4fr; } }
 
@@ -760,8 +760,6 @@ export function Footer({ store }: any) {
     { h: '/', l: t.home },
     { h: '/cart', l: t.cart },
     { h: '/contact', l: t.contact },
-    { h: '/privacy', l: t.privacy },
-    { h: '/terms', l: t.terms },
   ].filter((lnk) => lnk.h !== '/cart' || store?.cart !== false);
 
   return (
@@ -791,7 +789,19 @@ export function Footer({ store }: any) {
               ))}
             </ul>
           </div>
+          
+          {/* قانوني */}
           <div>
+            <p style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '1rem' }}>{t.legalNav}</p>
+            {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', opacity: 0.6, transition: 'opacity 0.15s' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.6')}>
+              {lnk.l}
+            </Link>
+            ))}
+          </div>
+<div>
             <h4 className="ti-mono" style={{ color: TXT, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem' }}>{t.contactUs}</h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
               {store?.contact?.phone && (
@@ -1080,18 +1090,18 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
             {images.length > 1 && (
               <>
                 <button onClick={prev} aria-label="previous image" style={{
-                  position: 'absolute', top: '50%', left: 10, transform: 'translateY(-50%)',
+                  position: 'absolute', top: '50%', insetInlineStart: 10, transform: 'translateY(-50%)',
                   background: 'rgba(8,13,24,0.75)', border: `1px solid ${BD}`, borderRadius: 4, color: TXT,
                   cursor: 'pointer', minWidth: 44, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <ChevronLeft size={20} />
+                  {t.dir === 'rtl' ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
                 </button>
                 <button onClick={next} aria-label="next image" style={{
-                  position: 'absolute', top: '50%', right: 10, transform: 'translateY(-50%)',
+                  position: 'absolute', top: '50%', insetInlineEnd: 10, transform: 'translateY(-50%)',
                   background: 'rgba(8,13,24,0.75)', border: `1px solid ${BD}`, borderRadius: 4, color: TXT,
                   cursor: 'pointer', minWidth: 44, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <ChevronRight size={20} />
+                  {t.dir === 'rtl' ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
                 </button>
               </>
             )}
@@ -1166,33 +1176,38 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {attr.variants.map((v: Variant) => {
                   const active = selectedVariants?.[attr.name] === v.value;
+                  const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                    Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(
+                      ([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)
+                    )
+                  );
                   if (attr.displayMode === 'color') {
                     return (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} aria-label={v.value} title={v.value} style={{
-                        width: 40, height: 40, borderRadius: '50%', cursor: 'pointer', background: v.value,
+                      <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} aria-label={v.value} title={v.value} style={{
+                        width: 40, height: 40, borderRadius: '50%', cursor: available ? 'pointer' : 'not-allowed', background: v.value,
                         border: active ? `3px solid ${A}` : `2px solid ${BD}`,
                         outline: active ? `2px solid ${BG}` : 'none', outlineOffset: -6,
                         transition: 'border-color 0.2s, transform 0.15s',
-                        transform: active ? 'scale(1.1)' : 'none',
+                        transform: active ? 'scale(1.1)' : 'none', opacity: available ? 1 : 0.35,
                       }} />
                     );
                   }
                   if (attr.displayMode === 'image') {
                     return (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} aria-label={v.value} style={{
-                        width: 56, height: 56, borderRadius: 4, overflow: 'hidden', cursor: 'pointer', padding: 0,
-                        border: active ? `2px solid ${A}` : `1px solid ${BD}`, background: CARD,
+                      <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} aria-label={v.value} style={{
+                        width: 56, height: 56, borderRadius: 4, overflow: 'hidden', cursor: available ? 'pointer' : 'not-allowed', padding: 0,
+                        border: active ? `2px solid ${A}` : `1px solid ${BD}`, background: CARD, opacity: available ? 1 : 0.35,
                       }}>
                         <img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                       </button>
                     );
                   }
                   return (
-                    <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{
-                      padding: '0.55rem 1rem', minHeight: 44, cursor: 'pointer', fontFamily: 'inherit',
+                    <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{
+                      padding: '0.55rem 1rem', minHeight: 44, cursor: available ? 'pointer' : 'not-allowed', fontFamily: 'inherit',
                       border: active ? `2px solid ${A}` : `1px solid ${BD}`, borderRadius: 4,
-                      background: active ? AL : SRF, color: active ? A : TXT, fontWeight: 700, fontSize: '0.85rem',
-                      transition: 'border-color 0.2s, color 0.2s, background 0.2s',
+                      background: active ? AL : SRF, color: active ? A : (available ? TXT : '#555'), fontWeight: 700, fontSize: '0.85rem',
+                      transition: 'border-color 0.2s, color 0.2s, background 0.2s', textDecoration: available ? 'none' : 'line-through',
                     }}>
                       {v.value}
                     </button>

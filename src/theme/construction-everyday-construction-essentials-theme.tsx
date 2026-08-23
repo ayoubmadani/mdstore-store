@@ -82,7 +82,7 @@ const THEME_CSS = `
   @media (min-width: 1024px) { .contact-inner { grid-template-columns: 1fr 2fr; } }
 
   .footer-inner { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding-bottom: 2.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.07); }
-  @media (min-width: 768px) { .footer-inner { grid-template-columns: 2fr 1fr 1fr; } }
+  @media (min-width: 768px) { .footer-inner { grid-template-columns: 2fr 1fr 1fr 1fr; } }
 
   .hero-actions { display: flex; flex-direction: column; gap: 0.625rem; }
   @media (min-width: 500px) { .hero-actions { flex-direction: row; align-items: center; } }
@@ -116,7 +116,7 @@ const THEME_CSS = `
   .glb-search-card-info { padding: 0.625rem 0.75rem; direction: rtl; }
 `;
 
-interface Offer { id: string; name: string; quantity: number; price: number; }
+interface Offer { id: string; name: string; quantity: number; price: number; subTitle?: string; shippingFree?: boolean; }
 interface Variant { id: string; name: string; value: string; }
 interface Attribute { id: string; type: string; name: string; displayMode?: 'color' | 'image' | 'text' | null; variants: Variant[]; }
 interface ProductImage { id: string; imageUrl: string; }
@@ -127,8 +127,8 @@ interface Commune { id: string; name: string; ar_name: string; wilayaId: string;
 export interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
-  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 export interface ProductFormProps {
   product: Product; userId: string; domain: string; redirectPath?: string;
@@ -208,11 +208,16 @@ const jsonAr = {
   // Product
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
+  freeShippingBadge: '🚚 توصيل مجاني',
+  freeShippingThreshold: '🚚 توصيل مجاني للطلبات بـ {{amount}} دج أو أكثر',
+  freeShippingRemaining: 'أضف {{amount}} دج أخرى للحصول على توصيل مجاني',
+  freeShippingReached: '🎉 حصلت على توصيل مجاني!',
   // Footer
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
+  cookies: 'الكوكيز',
   rightsReserved: 'جميع الحقوق محفوظة',
   privacyTitle: 'سياسة الخصوصية',
   privacy1T: 'البيانات التي نجمعها', privacy1D: 'نجمع فقط المعلومات الضرورية لمعالجة طلباتكم، مثل الاسم، رقم الهاتف، وعنوان التوصيل.',
@@ -285,11 +290,16 @@ const jsonFr = {
   // Product
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
+  freeShippingBadge: '🚚 Livraison gratuite',
+  freeShippingThreshold: '🚚 Livraison gratuite dès {{amount}} DZD d\'achat',
+  freeShippingRemaining: 'Ajoutez {{amount}} DZD de plus pour la livraison gratuite',
+  freeShippingReached: '🎉 Livraison gratuite obtenue !',
   // Footer
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
+  cookies: 'Cookies',
   rightsReserved: 'Tous droits réservés.',
   privacyTitle: 'Politique de confidentialité',
   privacy1T: 'Données collectées', privacy1D: 'Nous collectons uniquement les informations nécessaires au traitement de vos commandes : nom, téléphone et adresse de livraison.',
@@ -322,7 +332,11 @@ const jsonEn = {
   successTitle: 'Order sent successfully!', successDesc: 'We will contact you soon to confirm the details',
   backToShop: 'Back to Shopping', checkoutTitle: 'Complete Order',
   offersTitle: 'Available Offers', descTitle: 'Description',
-  quickLinks: 'Quick Links', contactSect: 'Contact Us', privacy: 'Privacy', terms: 'Terms', rightsReserved: 'All rights reserved',
+  freeShippingBadge: '🚚 Free Delivery',
+  freeShippingThreshold: '🚚 Free Delivery on orders over {{amount}} DZD',
+  freeShippingRemaining: 'Add {{amount}} DZD more for free delivery',
+  freeShippingReached: '🎉 You got free delivery!',
+  quickLinks: 'Quick Links', legalNav: 'Legal', contactSect: 'Contact Us', privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies', rightsReserved: 'All rights reserved',
   privacyTitle: 'Privacy Policy',
   privacy1T: 'Data We Collect', privacy1D: 'We only collect information necessary to process your orders: name, phone number, and delivery address.',
   privacy2T: 'Data Protection', privacy2D: 'All data is stored encrypted using certified security protocols.',
@@ -415,7 +429,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
           <Link href="/" style={{ flexShrink: 0 }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <img src={store.design.logoUrl} style={{ height: 32, objectFit: 'contain', display: 'block' }} alt={store?.name || ''} onError={() => setImgError(true)} />
+              <img src={store.design.logoUrl} style={{ height: 32, objectFit: 'contain', maxWidth: 160, display: 'block' }} alt={store?.name || ''} onError={() => setImgError(true)} />
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ width: 8, height: 28, background: E, borderRadius: 2 }} />
@@ -534,7 +548,7 @@ export function Footer({ store }: any) {
           </div>
           <div>
             <h4 style={{ fontSize: '0.72rem', fontWeight: 700, color: E, textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: '1rem' }}>{t.quickLinks}</h4>
-            {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }, { h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
+            {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
               <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'rgba(255,255,255,0.4)', marginBottom: '0.5rem', transition: 'color 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = E)}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
@@ -542,7 +556,19 @@ export function Footer({ store }: any) {
               </Link>
             ))}
           </div>
+          
+          {/* قانوني */}
           <div>
+            <p style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '1rem' }}>{t.legalNav}</p>
+            {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', opacity: 0.6, transition: 'opacity 0.15s' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.6')}>
+              {lnk.l}
+            </Link>
+            ))}
+          </div>
+<div>
             <h4 style={{ fontSize: '0.72rem', fontWeight: 700, color: E, textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: '1rem' }}>{t.contactSect}</h4>
             {[
               { icon: <Phone size={13} />, val: store?.contact?.phone },
@@ -577,6 +603,9 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         }
         {discount > 0 && (
           <div style={{ position: 'absolute', top: 8, right: 8, background: E, color: '#fff', fontSize: 10, fontWeight: 800, padding: '2px 7px', borderRadius: 2 }}>-{discount}%</div>
+        )}
+        {product.shippingFree && (
+          <div style={{ position: 'absolute', top: 8, left: 8, background: INK, color: '#fff', fontSize: 10, fontWeight: 800, padding: '2px 7px', borderRadius: 2 }}>🚚</div>
         )}
       </div>
       <div style={{ padding: '0.75rem 0.875rem 0.625rem', display: 'flex', flexDirection: 'column', flex: 1, borderTop: `1px solid ${BD}` }}>
@@ -782,6 +811,11 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                 <span style={{ fontSize: '0.9rem', fontWeight: 700, color: SUB }}>{store?.currency || 'DZD'}</span>
               </div>
             </div>
+            {(product.shippingFree || (store?.supportFreeShipping && store?.freeShippingMinAmount != null)) && (
+              <p style={{ fontSize: '0.8rem', fontWeight: 700, color: ED, marginBottom: '1.25rem' }}>
+                {product.shippingFree ? t.freeShippingBadge : t.freeShippingThreshold.replace('{{amount}}', String(store.freeShippingMinAmount))}
+              </p>
+            )}
             {product.offers?.length > 0 && (
               <div style={{ marginBottom: '1.25rem' }}>
                 {product.offers.map((o: any) => (
@@ -793,7 +827,9 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                       <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
                       <div>
                         <p style={{ fontWeight: 600, color: INK, fontSize: '0.875rem' }}>{o.name}</p>
+                        {o.subTitle && <p style={{ fontSize: '0.72rem', color: SUB, marginTop: 2 }}>{o.subTitle}</p>}
                         <p style={{ fontSize: '0.7rem', color: SUB }}>{t.qty}: {o.quantity}</p>
+                        {o.shippingFree && <p style={{ fontSize: '0.68rem', fontWeight: 700, color: ED, marginTop: 2 }}>{t.freeShippingBadge}</p>}
                       </div>
                     </div>
                     <span className="price-mono" style={{ fontWeight: 800, color: ED }}>{o.price.toLocaleString()} {store?.currency || 'DZD'}</span>
@@ -807,11 +843,16 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {attr.variants.map((v: any) => {
                     const isSelected = selectedVariants[attr.name] === v.value;
+                    const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                      Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(
+                        ([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)
+                      )
+                    );
                     return (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={
-                        attr.displayMode === 'color' ? { width: 26, height: 26, borderRadius: '50%', background: v.value, border: `1px solid ${BD}`, cursor: 'pointer', outline: `2px solid ${isSelected ? E : 'transparent'}`, outlineOffset: 2 }
-                        : attr.displayMode === 'image' ? { width: 40, height: 40, backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center', border: `2px solid ${isSelected ? E : BD}`, cursor: 'pointer', transition: 'all 0.15s' }
-                        : { padding: '0.35rem 0.75rem', border: `1px solid ${isSelected ? E : BD}`, fontSize: '0.8rem', fontWeight: 600, background: isSelected ? EL : CARD, color: isSelected ? ED : SUB, cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit' }
+                      <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={
+                        attr.displayMode === 'color' ? { width: 26, height: 26, borderRadius: '50%', background: v.value, border: `1px solid ${BD}`, cursor: available ? 'pointer' : 'not-allowed', outline: `2px solid ${isSelected ? E : 'transparent'}`, outlineOffset: 2, opacity: available ? 1 : 0.35 }
+                        : attr.displayMode === 'image' ? { width: 40, height: 40, backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center', border: `2px solid ${isSelected ? E : BD}`, cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.15s', opacity: available ? 1 : 0.35 }
+                        : { padding: '0.35rem 0.75rem', border: `1px solid ${isSelected ? E : BD}`, fontSize: '0.8rem', fontWeight: 600, background: isSelected ? EL : CARD, color: isSelected ? ED : (available ? SUB : '#bbb'), cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.15s', fontFamily: 'inherit', textDecoration: available ? 'none' : 'line-through' }
                       }>{attr.displayMode !== 'color' && attr.displayMode !== 'image' && v.name}</button>
                     );
                   })}
@@ -871,9 +912,19 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     }
     return base;
   }, [product, selectedOffer, selectedVariants]);
-  const getLiv = useCallback((): number => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; }, [selW, fd.typeLivraison]);
+  const supportQty = (store?.supportQty ?? product.store?.supportQty) !== false;
   const fp = getFP();
-  const total = () => fp * fd.quantity + +getLiv();
+  const qty = supportQty ? fd.quantity : 1;
+  const selOfferObj = product.offers?.find((o: any) => o.id === selectedOffer);
+  const storeInfo = store || product.store;
+  const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
+    (storeInfo?.supportFreeShipping && storeInfo?.freeShippingMinAmount != null && (fp * qty) >= Number(storeInfo.freeShippingMinAmount)));
+  const getLiv = useCallback((): number => {
+    if (orderFreeShipping) return 0;
+    if (!selW) return 0;
+    return Number(fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice);
+  }, [selW, fd.typeLivraison, orderFreeShipping]);
+  const total = () => fp * qty + +getLiv();
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = t.errName;
@@ -890,7 +941,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const addToCart = () => {
     setIsAdded(true);
     const cart = JSON.parse(localStorage.getItem(domain) || '[]');
-    cart.push({ ...fd, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
+    cart.push({ ...fd, quantity: qty, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
     localStorage.setItem(domain, JSON.stringify(cart));
     initCount(cart.length);
     setTimeout(() => setIsAdded(false), 2000);
@@ -901,7 +952,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const er = validate(); if (Object.keys(er).length) { setErrors(er); return; }
     setErrors({}); setSub(true);
     try {
-      await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+      await axios.post(`${API_URL}/orders/create`, { ...fd, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
       router.push(`${window.location.origin}/successfully?productId=${product.id}`);
     } catch { } finally { setSub(false); }
@@ -960,23 +1011,25 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 {(['home', 'office'] as const).map(dtype => (
                   <button key={dtype} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: dtype }))} style={{ padding: '0.7rem', border: `1px solid ${fd.typeLivraison === dtype ? E : BD}`, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === dtype ? EL : CARD, transition: 'all 0.15s', fontFamily: 'inherit' }}>
                     <p style={{ fontWeight: 600, fontSize: '0.8rem', marginBottom: 3, color: fd.typeLivraison === dtype ? ED : SUB }}>{dtype === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
-                    {selW && <p className="price-mono" style={{ fontSize: '0.95rem', fontWeight: 800, color: fd.typeLivraison === dtype ? ED : '#9CA3AF' }}>{(dtype === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} {store?.currency || 'DZD'}</p>}
+                    {selW && <p className="price-mono" style={{ fontSize: '0.95rem', fontWeight: 800, color: fd.typeLivraison === dtype ? ED : '#9CA3AF' }}>{orderFreeShipping ? t.freeShippingBadge : `${(dtype === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} ${store?.currency || 'DZD'}`}</p>}
                   </button>
                 ))}
               </div>
             </div>
-            <div style={{ marginBottom: '0.875rem' }}>
-              <p style={{ fontSize: '0.7rem', fontWeight: 700, color: SUB, marginBottom: '0.5rem', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>{t.qty}</p>
-              <div style={{ display: 'inline-flex', alignItems: 'center', border: `1px solid ${BD}`, overflow: 'hidden', background: CARD }}>
-                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: SUB, borderLeft: `1px solid ${BD}` }}><Minus size={12} /></button>
-                <span style={{ width: 38, textAlign: 'center', fontWeight: 700, fontSize: '0.9rem', color: INK }}>{fd.quantity}</span>
-                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: E, borderRight: `1px solid ${BD}` }}><Plus size={12} /></button>
+            {supportQty && (
+              <div style={{ marginBottom: '0.875rem' }}>
+                <p style={{ fontSize: '0.7rem', fontWeight: 700, color: SUB, marginBottom: '0.5rem', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>{t.qty}</p>
+                <div style={{ display: 'inline-flex', alignItems: 'center', border: `1px solid ${BD}`, overflow: 'hidden', background: CARD }}>
+                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: SUB, borderLeft: `1px solid ${BD}` }}><Minus size={12} /></button>
+                  <span style={{ width: 38, textAlign: 'center', fontWeight: 700, fontSize: '0.9rem', color: INK }}>{fd.quantity}</span>
+                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: E, borderRight: `1px solid ${BD}` }}><Plus size={12} /></button>
+                </div>
               </div>
-            </div>
+            )}
             <div style={{ background: EL, border: `1px solid rgba(16,185,129,0.2)`, padding: '0.875rem 1rem', marginBottom: '1rem' }}>
               {[
                 { l: t.orderInfo, v: product.name.slice(0, 26) + (product.name.length > 26 ? '...' : '') },
-                { l: t.delivery, v: selW ? `${getLiv().toLocaleString()} ${store?.currency || 'DZD'}` : '—' },
+                { l: t.delivery, v: !selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${getLiv().toLocaleString()} ${store?.currency || 'DZD'}` },
               ].map(r => (
                 <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.4rem', marginBottom: '0.4rem', borderBottom: `1px solid rgba(16,185,129,0.15)` }}>
                   <span style={{ fontSize: '0.8rem', color: SUB }}>{r.l}</span>
@@ -1021,8 +1074,16 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   }, [fd.customerWelaya]);
 
   const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
-  const getLiv = () => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; };
   const cartTotal = items.reduce((a, i) => a + (i.finalPrice * i.quantity), 0);
+  const hasFreeShippingItem = items.some(i => i.product?.shippingFree || i.product?.offers?.find((o: any) => o.id === i.selectedOffer)?.shippingFree);
+  const freeShippingMin = store?.supportFreeShipping ? store?.freeShippingMinAmount : null;
+  const freeShippingReached = hasFreeShippingItem || (freeShippingMin != null && cartTotal >= Number(freeShippingMin));
+  const freeShippingRemainingAmt = freeShippingMin != null ? Number(freeShippingMin) - cartTotal : 0;
+  const getLiv = () => {
+    if (freeShippingReached) return 0;
+    if (!selW) return 0;
+    return Number(fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice);
+  };
   const finalTotal = cartTotal + +getLiv();
   const update = (n: any[]) => { setItems(n); localStorage.setItem(domain, JSON.stringify(n)); initCount(n.length); };
 
@@ -1070,6 +1131,11 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         <span style={{ width: 3, height: 20, background: E, borderRadius: 1, display: 'inline-block' }} />
         <h1 style={{ fontSize: 'clamp(1.375rem,5vw,2rem)', fontWeight: 800, color: INK }}>{t.myCart}</h1>
       </div>
+      {freeShippingMin != null && (
+        <div style={{ background: freeShippingReached ? EL : BG, border: `1px solid ${freeShippingReached ? 'rgba(16,185,129,0.3)' : BD}`, color: freeShippingReached ? ED : SUB, borderRadius: 4, padding: '0.75rem 1.125rem', marginBottom: '1.5rem', fontWeight: 700, fontSize: '0.85rem', textAlign: 'center' }}>
+          {freeShippingReached ? t.freeShippingReached : t.freeShippingRemaining.replace('{{amount}}', String(freeShippingRemainingAmt))}
+        </div>
+      )}
       <div className="cart-inner">
         <div style={{ background: CARD, border: `1px solid ${BD}`, alignSelf: 'start', borderTop: `2px solid ${E}` }}>
           {items.map((item, i) => (
@@ -1123,13 +1189,13 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 {(['home', 'office'] as const).map(dtype => (
                   <button key={dtype} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: dtype }))} style={{ padding: '0.7rem', border: `1px solid ${fd.typeLivraison === dtype ? E : BD}`, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === dtype ? EL : CARD, fontFamily: 'inherit', transition: 'all 0.15s' }}>
                     <p style={{ fontWeight: 600, fontSize: '0.78rem', color: fd.typeLivraison === dtype ? ED : SUB, marginBottom: 3 }}>{dtype === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
-                    {selW && <p style={{ fontWeight: 800, fontSize: '0.9rem', color: fd.typeLivraison === dtype ? ED : '#9CA3AF' }}>{(dtype === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} {store?.currency || 'DZD'}</p>}
+                    {selW && <p style={{ fontWeight: 800, fontSize: '0.9rem', color: fd.typeLivraison === dtype ? ED : '#9CA3AF' }}>{freeShippingReached ? t.freeShippingBadge : `${(dtype === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} ${store?.currency || 'DZD'}`}</p>}
                   </button>
                 ))}
               </div>
             </div>
             <div style={{ background: EL, border: `1px solid rgba(16,185,129,0.2)`, padding: '0.875rem 1rem', margin: '1rem 0' }}>
-              {[{ l: t.subtotal, v: `${cartTotal.toLocaleString()} ${store?.currency || 'DZD'}` }, { l: t.delivery, v: getLiv() ? `${getLiv().toLocaleString()} ${store?.currency || 'DZD'}` : '—' }].map(r => (
+              {[{ l: t.subtotal, v: `${cartTotal.toLocaleString()} ${store?.currency || 'DZD'}` }, { l: t.delivery, v: !selW ? '—' : freeShippingReached ? t.freeShippingBadge : `${getLiv().toLocaleString()} ${store?.currency || 'DZD'}` }].map(r => (
                 <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.4rem', marginBottom: '0.4rem', borderBottom: `1px solid rgba(16,185,129,0.15)` }}>
                   <span style={{ fontSize: '0.78rem', color: SUB }}>{r.l}</span>
                   <span style={{ fontWeight: 600, color: INK, fontSize: '0.875rem' }}>{r.v}</span>

@@ -108,7 +108,7 @@ const CSS = `
   .prod-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
   .cat-grid  { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
   .trust-row { display:grid; grid-template-columns:repeat(4,1fr); }
-  .footer-g  { display:grid; grid-template-columns:2fr 1fr 1fr; gap:48px; }
+  .footer-g  { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; }
   .details-g { display:grid; grid-template-columns:1fr 1fr; gap:32px; }
   .contact-g { display:grid; grid-template-columns:1fr 1fr; gap:48px; }
   .form-2c   { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
@@ -253,10 +253,11 @@ const jsonAr = {
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
   // Footer
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
+  cookies: 'الكوكيز',
   rightsReserved: 'جميع الحقوق محفوظة',
   // Home hero
   heroBadge: 'متجر الصحة والطب #1 في الجزائر',
@@ -283,7 +284,7 @@ const jsonAr = {
   footerSub: 'متجرك الموثوق للمعدات الطبية، منتجات الصحة والعناية. نوفر لك الأصالة والجودة.',
   footerDelivery: 'توصيل سريع وآمن إلى جميع الولايات',
   footerHome: 'الرئيسية', footerCart: 'سلة التسوق', footerContact: 'اتصل بنا',
-  footerPrivacy: 'سياسة الخصوصية', footerTerms: 'شروط الاستخدام',
+  footerPrivacy: 'سياسة الخصوصية', footerTerms: 'شروط الاستخدام', footerCookies: 'الكوكيز',
   contactSectTitle: 'معلومات الاتصال',
   teamLabel: 'فريق طبي متخصص', replyTime: 'نرد خلال 24 ساعة',
   // Card
@@ -401,7 +402,7 @@ const jsonFr = {
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
   // Footer
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
@@ -431,7 +432,7 @@ const jsonFr = {
   footerSub: 'Votre boutique de confiance pour les équipements médicaux et produits de santé.',
   footerDelivery: 'Livraison rapide et sécurisée dans toutes les wilayas',
   footerHome: 'Accueil', footerCart: 'Mon Panier', footerContact: 'Contact',
-  footerPrivacy: 'Politique de confidentialité', footerTerms: 'Conditions d\'utilisation',
+  footerPrivacy: 'Politique de confidentialité', footerTerms: 'Conditions d\'utilisation', footerCookies: 'Cookies',
   contactSectTitle: 'Informations de contact',
   teamLabel: 'Équipe médicale spécialisée', replyTime: 'Réponse sous 24h',
   // Card
@@ -511,8 +512,8 @@ const jsonEn = {
   successTitle: 'Order confirmed', successDesc: 'Thank you, our team will contact you soon.',
   backToShop: 'Back to shop', checkoutTitle: 'Checkout',
   offersTitle: 'Bundle offers', descTitle: 'Description',
-  quickLinks: 'Navigation', contactSect: 'Contact',
-  privacy: 'Privacy', terms: 'Terms', rightsReserved: 'All rights reserved.',
+  quickLinks: 'Navigation', legalNav: 'Légal', contactSect: 'Contact',
+  privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies', rightsReserved: 'All rights reserved.',
   heroBadge: 'Health & Medical Store #1 in Algeria',
   heroTitleDefault: 'Your health <span style="color:var(--sky)">first</span><br/>We are here to help you',
   heroSubtitleDefault: 'Medical equipment, telemedicine devices and digital health products. Trusted quality, fast delivery.',
@@ -536,7 +537,7 @@ const jsonEn = {
   footerSub: 'Your trusted store for medical equipment and health products.',
   footerDelivery: 'Fast and secure delivery across all wilayas',
   footerHome: 'Home', footerCart: 'Cart', footerContact: 'Contact',
-  footerPrivacy: 'Privacy policy', footerTerms: 'Terms of service',
+  footerPrivacy: 'Privacy policy', footerTerms: 'Terms of service', footerCookies: 'Cookies',
   contactSectTitle: 'Contact information',
   teamLabel: 'Specialized medical team', replyTime: 'Reply within 24h',
   viewDetails: 'View details',
@@ -722,7 +723,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         }}>
           <Link href="/" style={{ display:'flex', alignItems:'center', gap:'10px', flexShrink:0 }}>
             {(store.design?.logoUrl && store.design.logoUrl !== '/default-logo.png')
-              ? <img src={store.design.logoUrl} alt={store.name} style={{ height:'32px', width:'auto', objectFit:'contain' }} />
+              ? <img src={store.design.logoUrl} alt={store.name} style={{ height:'32px', width:'auto', objectFit:'contain', maxWidth: 160 }} />
               : <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
                   <HeartPulse size={26} style={{ color:'var(--sky)' }} />
                   <span className="pjs" style={{ fontSize:'1.2rem', fontWeight:800, color:'var(--ink)' }}>
@@ -865,7 +866,23 @@ export function Footer({ store }: any) {
             <p className="pjs" style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.04em', color:'var(--sky)', marginBottom:'16px' }}>
               {t.quickLinks}
             </p>
-            {[{ h:'/', l:t.footerHome }, { h:'/cart', l:t.footerCart }, { h:'/contact', l:t.footerContact }, { h:'/Privacy', l:t.footerPrivacy }, { h:'/Terms', l:t.footerTerms }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk => (
+            {[{ h:'/', l:t.footerHome }, { h:'/cart', l:t.footerCart }, { h:'/contact', l:t.footerContact }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk => (
+              <a key={lnk.h} href={lnk.h} style={{
+                display:'block', fontSize:'13px', color:'var(--dim)',
+                marginBottom:'8px', transition:'color 0.2s'
+              }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--sky)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--dim)'; }}>
+                {lnk.l}
+              </a>
+            ))}
+          </div>
+
+          <div>
+            <p className="pjs" style={{ fontSize:'12px', fontWeight:700, letterSpacing:'0.04em', color:'var(--sky)', marginBottom:'16px' }}>
+              {t.legalNav}
+            </p>
+            {[{ h:'/Privacy', l:t.footerPrivacy }, { h:'/Terms', l:t.footerTerms }, { h:'/cookies', l:t.footerCookies }].map(lnk => (
               <a key={lnk.h} href={lnk.h} style={{
                 display:'block', fontSize:'13px', color:'var(--dim)',
                 marginBottom:'8px', transition:'color 0.2s'
@@ -1362,31 +1379,39 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                 <p className="pjs" style={{ fontSize:'11px', fontWeight:700, color:'var(--sky)', marginBottom:'10px', letterSpacing:'0.08em' }}>{attr.name}</p>
                 {attr.displayMode === 'color' ? (
                   <div style={{ display:'flex', flexWrap:'wrap', gap:'8px' }}>
-                    {attr.variants.map((v: any) => (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name}
-                        style={{ width:'28px', height:'28px', borderRadius:'8px', backgroundColor:v.value, border:'none', cursor:'pointer', outline:`3px solid ${selectedVariants[attr.name]===v.value?'var(--sky)':'transparent'}`, outlineOffset:'3px' }} />
-                    ))}
+                    {attr.variants.map((v: any) => {
+                      const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)));
+                      return (
+                        <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.name}
+                          style={{ width:'28px', height:'28px', borderRadius:'8px', backgroundColor:v.value, border:'none', cursor: available ? 'pointer' : 'not-allowed', outline:`3px solid ${selectedVariants[attr.name]===v.value?'var(--sky)':'transparent'}`, outlineOffset:'3px', opacity: available ? 1 : 0.35 }} />
+                      );
+                    })}
                   </div>
                 ) : attr.displayMode === 'image' ? (
                   <div style={{ display:'flex', flexWrap:'wrap', gap:'6px' }}>
-                    {attr.variants.map((v: any) => (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ width:'52px', height:'52px', overflow:'hidden', borderRadius:'8px', border:`2px solid ${selectedVariants[attr.name]===v.value?'var(--sky)':'var(--line)'}`, cursor:'pointer', padding:0 }}>
-                        <img src={v.value} alt={v.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
-                      </button>
-                    ))}
+                    {attr.variants.map((v: any) => {
+                      const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)));
+                      return (
+                        <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width:'52px', height:'52px', overflow:'hidden', borderRadius:'8px', border:`2px solid ${selectedVariants[attr.name]===v.value?'var(--sky)':'var(--line)'}`, cursor: available ? 'pointer' : 'not-allowed', padding:0, opacity: available ? 1 : 0.35 }}>
+                          <img src={v.value} alt={v.name} style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} />
+                        </button>
+                      );
+                    })}
                   </div>
                 ) : (
                   <div style={{ display:'flex', flexWrap:'wrap', gap:'6px' }}>
                     {attr.variants.map((v: any) => {
                       const s = selectedVariants[attr.name] === v.value;
+                      const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)));
                       return (
-                        <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
+                        <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
                           className="pjs" style={{
                             padding:'8px 16px', borderRadius:'6px',
                             border:`1.5px solid ${s?'var(--sky)':'var(--line)'}`,
                             background:s?'var(--sky)':'transparent',
-                            color:s?'white':'var(--mid)', fontSize:'13px', fontWeight:700,
-                            cursor:'pointer', transition:'all 0.2s'
+                            color:s?'white':(available ? 'var(--mid)' : '#bbb'), fontSize:'13px', fontWeight:700,
+                            cursor: available ? 'pointer' : 'not-allowed', transition:'all 0.2s',
+                            textDecoration: available ? 'none' : 'line-through'
                           }}>
                           {v.name}
                         </button>
@@ -1479,7 +1504,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     try{
       await axios.post(`${API_URL}/orders/create`,{...fd,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});
       if(fd.customerId) localStorage.setItem('customerId',fd.customerId);
-      router.push(`/${domain}/successfully`);
+      router.push(`/successfully?productId=${product?.id}`);
     }catch{}finally{setSub(false);}
   };
 

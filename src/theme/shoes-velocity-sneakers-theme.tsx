@@ -1,0 +1,2012 @@
+'use client';
+
+/**
+ * DESIGN BRIEF — shoes-velocity-sneakers-theme
+ * Niche: أحذية رياضية / سنيكرز / أحذية الجري (performance sneakers)
+ * Audience: 16-35، رياضيون وهواة ستريت-وير، يتصفحون بسرعة على الهاتف، يقارنون المقاسات
+ *           والألوان أكثر من الحرفة، ويتفاعلون مع الطاقة البصرية والحركة.
+ * Mood (3): كهربائي (electric) — سريع (kinetic) — ليلي/عدواني (nocturnal)
+ * Navbar decision:  كبسولة عائمة (floating pill) بـ backdrop-blur منفصلة عن حافة الشاشة على
+ *                   الديسكتوب + شريط تنقّل سفلي ثابت (bottom bar) على الهاتف بأربع وجهات.
+ *                   السبب: تصفّح السنيكرز نشاط إبهام واحد على الهاتف — الوجهات في متناول الإبهام
+ *                   لا في أعلى الشاشة. الكبسولة تعطي إحساس "تطبيق" لا "متجر ورقي".
+ *                   (النقيض المتعمّد من ثيم الأحذية الفاخرة: مِسْتَهَد طباعي بطبقتين)
+ * Hero decision:    كتلة مركزية ضخمة بخط عريض مضغوط + شريط marquee متحرك أسفل الهيرو + قطاع
+ *                   إحصائيات (3 أرقام). مائل ومتحرك لأن الطاقة هي المنتج نفسه هنا.
+ * Card decision:    بطاقة overlay — الصورة تملأ المربع كاملاً والمعلومات فوق تدرّج داكن في الأسفل،
+ *                   شارة خصم مائلة، زر "+" دائري يظهر عند hover. (النقيض: بيانات تحت خط شعري)
+ * Product decision: شريط مصغّرات عمودي جانب الصورة + لوحة شراء لاصقة + تبويبات (الوصف / التوصيل)
+ *                   + شريط CTA ثابت أسفل الشاشة على الهاتف فوق شريط التنقّل.
+ * Type: Anton + Cairo (display) · Inter + Cairo (body)
+ */
+
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import DOMPurify from 'dompurify';
+import { useCartStore } from '@/store/useCartStore';
+import {
+  Search, ShoppingBag, Menu, X, ChevronLeft, ChevronRight, ChevronDown, Home as HomeIcon,
+  Phone, Mail, MapPin, Star, Trash2, Minus, Plus, Check, AlertCircle, Zap,
+  Truck, ShieldCheck, Headphones, Send, Footprints, ArrowRight, Flame, PackageCheck,
+} from 'lucide-react';
+
+/* ============================ TOKENS ============================ */
+const A = '#D9FF39';        // volt
+const AD = '#BCE022';       // volt pressed
+const AL = 'rgba(217,255,57,0.12)';
+const A2 = '#FF4D2E';       // blaze (discount / alerts)
+const BG = '#0B0D10';
+const CARD = '#14181D';
+const CARD2 = '#1B2027';
+const INK = '#F2F4F6';
+const SUB = '#98A2AC';
+const BD = '#262E36';
+const ERR = '#FF6B52';
+
+const FD = "'Anton','Cairo',Impact,sans-serif";
+const FB = "'Inter','Cairo',system-ui,-apple-system,sans-serif";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
+
+/* ============================ TYPES ============================ */
+interface Offer { id: string; name: string; quantity: number; price: number; }
+interface Variant { id: string; name: string; value: string; }
+interface Attribute { id: string; type: string; name: string; displayMode?: 'color' | 'image' | 'text' | null; variants: Variant[]; }
+interface ProductImage { id: string; imageUrl: string; }
+interface VariantAttributeEntry { attrId: string; attrName: string; displayMode: 'color' | 'image' | 'text'; value: string; }
+interface VariantDetail { id: string | number; name: VariantAttributeEntry[]; price: number; stock: number; autoGenerate: boolean; }
+interface Wilaya { id: string; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
+interface Commune { id: string; name: string; ar_name: string; wilayaId: string; }
+
+interface Product {
+  id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
+  productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; slug?: string;
+  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
+}
+
+/* ============================ I18N ============================ */
+type Lang = 'ar' | 'fr' | 'en';
+
+const getLang = (store?: any): Lang => {
+  if (store?.language === 'fr') return 'fr';
+  if (store?.language === 'en') return 'en';
+  return 'ar';
+};
+
+const T = {
+  ar: {
+    dir: 'rtl' as const,
+    home: 'الرئيسية', contact: 'تواصل معنا', cart: 'السلة', shop: 'المتجر', menu: 'القائمة',
+    search: 'ابحث عن حذاء رياضي...', searching: 'جاري البحث...', noResults: 'لا توجد نتائج',
+    showAll: 'عرض كل النتائج',
+    all: 'الكل', noProducts: 'لا توجد منتجات متاحة حالياً', shopNow: 'تسوّق الآن',
+    ticker: 'شحن سريع لكل الولايات · الدفع عند الاستلام · منتجات أصلية',
+    heroEyebrow: 'أداء بلا حدود',
+    heroTitle: 'اركض أسرع',
+    heroSub: 'أحذية رياضية مصمّمة للسرعة والراحة — من التمرين اليومي إلى السباق.',
+    stats: [
+      { n: '58', l: 'ولاية مغطاة' },
+      { n: '24h', l: 'تحضير الطلب' },
+      { n: '100%', l: 'منتجات أصلية' },
+    ],
+    trust: [
+      { t: 'توصيل سريع', s: 'لكل الولايات' },
+      { t: 'جودة مضمونة', s: 'منتجات أصلية 100%' },
+      { t: 'دفع آمن', s: 'الدفع عند الاستلام' },
+      { t: 'دعم 24/7', s: 'فريق متخصص للمساعدة' },
+    ],
+    collection: 'المجموعة', product: 'منتج', viewProduct: 'عرض المنتج', newDrop: 'وصل حديثاً',
+    quickLinks: 'روابط سريعة', legalNav: 'قانوني', contactUs: 'تواصل معنا',
+    privacy: 'الخصوصية', terms: 'الشروط', cookies: 'الكوكيز',
+    rightsReserved: 'جميع الحقوق محفوظة',
+    fullName: 'الاسم الكامل', fullNamePlaceholder: 'أدخل اسمك الكامل',
+    phone: 'رقم الهاتف', phonePlaceholder: '05xxxxxxxx',
+    email: 'البريد الإلكتروني', emailPlaceholder: 'name@mail.com',
+    wilaya: 'الولاية', wilayaPlaceholder: 'اختر الولاية', wilayaUnavailable: 'التوصيل غير متاح حالياً',
+    commune: 'البلدية', communePlaceholder: 'اختر البلدية', communeLoading: 'جاري التحميل...',
+    deliveryHome: 'توصيل للمنزل', deliveryOffice: 'مكتب التوصيل',
+    qty: 'الكمية', price: 'السعر', delivery: 'التوصيل', total: 'الإجمالي',
+    orderNow: 'اطلب الآن', addToCart: 'أضف إلى السلة', added: 'تمت الإضافة',
+    confirmOrder: 'تأكيد الطلب', sending: 'جاري الإرسال...', cancel: 'إلغاء',
+    successTitle: 'تم إرسال طلبك بنجاح!', successDesc: 'سنتواصل معك قريباً لتأكيد التفاصيل.',
+    backToShop: 'العودة للتسوق',
+    cartEmpty: 'السلة فارغة', cartEmptyDesc: 'لم تتم إضافة أي منتجات بعد.',
+    myCart: 'سلتي', subtotal: 'المجموع الفرعي', items: 'عنصر', remove: 'حذف',
+    errSubmit: 'حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مجدداً.',
+    errName: 'الاسم الكامل مطلوب (3 أحرف على الأقل)',
+    errPhone: 'رقم هاتف جزائري صحيح مطلوب (مثال: 0550123456)',
+    errWilaya: 'اختر الولاية', errCommune: 'اختر البلدية',
+    privacyTitle: 'سياسة الخصوصية', termsTitle: 'الشروط والأحكام',
+    cookiesTitle: 'سياسة الكوكيز', contactTitle: 'تواصل معنا',
+    offersTitle: 'العروض المتاحة', descTitle: 'الوصف', optionsTitle: 'الخيارات',
+    shippingTab: 'التوصيل والإرجاع',
+    shippingBody: 'نوصل لكل ولايات الوطن خلال 2 إلى 5 أيام عمل. الدفع عند الاستلام متاح، ويمكن استبدال المقاس بعد الاستلام مباشرة إن لم يكن مناسباً.',
+    searchResultsFor: 'نتائج البحث عن:',
+    msg: 'رسالتك', msgPlaceholder: 'اكتب رسالتك هنا...', send: 'إرسال الرسالة',
+    sendAgain: 'إرسال رسالة أخرى', contactSuccess: 'تم استلام رسالتك، سنرد عليك قريباً.',
+    callUs: 'الهاتف', writeUs: 'البريد', ourAddress: 'العنوان',
+    pPrivacy: [
+      { t: 'البيانات التي نجمعها', b: 'نجمع الاسم ورقم الهاتف والولاية والبلدية فقط، وهي البيانات اللازمة لتحضير الطلب وتسليمه.' },
+      { t: 'كيف نستخدمها', b: 'تُستخدم بياناتك لتأكيد الطلب والتنسيق مع شركة التوصيل، ولا تُستعمل لأي غرض آخر.' },
+      { t: 'المشاركة مع الغير', b: 'لا نبيع بياناتك. تُشارك فقط مع شركة التوصيل المكلّفة بطلبك.' },
+      { t: 'حقوقك', b: 'يمكنك طلب تعديل أو حذف بياناتك في أي وقت عبر صفحة التواصل.' },
+    ],
+    pTerms: [
+      { t: 'الطلب والتأكيد', b: 'يُعتبر الطلب مؤكداً بعد اتصال فريقنا بك هاتفياً للتحقق من التفاصيل والمقاس.' },
+      { t: 'الأسعار والتوصيل', b: 'الأسعار بالدينار الجزائري، وسعر التوصيل يُحسب حسب الولاية ونوع التسليم المختار.' },
+      { t: 'استبدال المقاس', b: 'يمكن استبدال المقاس بعد الاستلام مباشرة شرط بقاء المنتج وعلبته بحالتهما الأصلية.' },
+      { t: 'الإلغاء', b: 'يمكن إلغاء الطلب مجاناً قبل تسليمه لشركة التوصيل.' },
+    ],
+    pCookies: [
+      { t: 'ما هي الكوكيز', b: 'ملفات صغيرة تُحفظ في متصفحك لتذكّر سلة التسوق وتفضيلات العرض.' },
+      { t: 'الكوكيز الضرورية', b: 'تُستعمل لحفظ محتوى السلة، ولا يمكن تعطيلها دون تعطّل عملية الشراء.' },
+      { t: 'كوكيز القياس', b: 'تساعدنا على فهم الصفحات الأكثر زيارة لتحسين المتجر.' },
+      { t: 'التحكم', b: 'يمكنك حذف الكوكيز من إعدادات متصفحك في أي وقت.' },
+    ],
+  },
+  fr: {
+    dir: 'ltr' as const,
+    home: 'Accueil', contact: 'Contact', cart: 'Panier', shop: 'Boutique', menu: 'Menu',
+    search: 'Rechercher une sneaker...', searching: 'Recherche...', noResults: 'Aucun résultat',
+    showAll: 'Voir tous les résultats',
+    all: 'Tout', noProducts: 'Aucun produit disponible pour le moment.', shopNow: 'Acheter',
+    ticker: 'Livraison rapide partout · Paiement à la livraison · Produits authentiques',
+    heroEyebrow: 'Performance sans limite',
+    heroTitle: 'Cours plus vite',
+    heroSub: 'Des sneakers pensées pour la vitesse et le confort — de l’entraînement à la course.',
+    stats: [
+      { n: '58', l: 'wilayas couvertes' },
+      { n: '24h', l: 'préparation' },
+      { n: '100%', l: 'produits authentiques' },
+    ],
+    trust: [
+      { t: 'Livraison Rapide', s: 'Partout en Algérie' },
+      { t: 'Qualité Garantie', s: 'Produits authentiques' },
+      { t: 'Paiement Sécurisé', s: 'Paiement à la livraison' },
+      { t: 'Support 24/7', s: 'Toujours disponible' },
+    ],
+    collection: 'La collection', product: 'produits', viewProduct: 'Voir le produit', newDrop: 'Nouveau',
+    quickLinks: 'Navigation', legalNav: 'Légal', contactUs: 'Contact',
+    privacy: 'Confidentialité', terms: 'Conditions', cookies: 'Cookies',
+    rightsReserved: 'Tous droits réservés.',
+    fullName: 'Nom complet', fullNamePlaceholder: 'Votre nom complet',
+    phone: 'Téléphone', phonePlaceholder: '0555 12 34 56',
+    email: 'Email', emailPlaceholder: 'nom@mail.com',
+    wilaya: 'Wilaya', wilayaPlaceholder: 'Choisir la wilaya', wilayaUnavailable: 'Livraison indisponible',
+    commune: 'Commune', communePlaceholder: 'Choisir la commune', communeLoading: 'Chargement...',
+    deliveryHome: 'À domicile', deliveryOffice: 'Point relais',
+    qty: 'Quantité', price: 'Prix', delivery: 'Livraison', total: 'Total',
+    orderNow: 'Commander', addToCart: 'Ajouter au panier', added: 'Ajouté',
+    confirmOrder: 'Confirmer la commande', sending: 'Envoi en cours...', cancel: 'Annuler',
+    successTitle: 'Commande confirmée !', successDesc: 'Notre équipe vous contactera bientôt.',
+    backToShop: 'Retour à la boutique',
+    cartEmpty: 'Votre panier est vide', cartEmptyDesc: 'Découvrez notre sélection.',
+    myCart: 'Mon Panier', subtotal: 'Sous-total', items: 'article(s)', remove: 'Retirer',
+    errSubmit: 'Une erreur est survenue. Veuillez réessayer.',
+    errName: 'Nom complet requis (3 caractères minimum)',
+    errPhone: 'Numéro de téléphone algérien valide requis (ex: 0550123456)',
+    errWilaya: 'Veuillez choisir une wilaya', errCommune: 'Veuillez choisir une commune',
+    privacyTitle: 'Politique de confidentialité', termsTitle: 'Conditions générales',
+    cookiesTitle: 'Politique des cookies', contactTitle: 'Nous contacter',
+    offersTitle: 'Offres groupées', descTitle: 'Description', optionsTitle: 'Options',
+    shippingTab: 'Livraison & retour',
+    shippingBody: 'Nous livrons dans toutes les wilayas sous 2 à 5 jours ouvrables. Paiement à la livraison disponible, et échange de pointure possible dès réception.',
+    searchResultsFor: 'Résultats pour :',
+    msg: 'Votre message', msgPlaceholder: 'Écrivez votre message ici...', send: 'Envoyer le message',
+    sendAgain: 'Envoyer un autre message', contactSuccess: 'Message bien reçu, nous vous répondrons rapidement.',
+    callUs: 'Téléphone', writeUs: 'Email', ourAddress: 'Adresse',
+    pPrivacy: [
+      { t: 'Données collectées', b: 'Nous collectons uniquement le nom, le téléphone, la wilaya et la commune, nécessaires à la préparation et à la livraison.' },
+      { t: 'Utilisation', b: 'Vos données servent à confirmer la commande et à la coordonner avec le transporteur, rien de plus.' },
+      { t: 'Partage', b: 'Nous ne vendons aucune donnée. Elle est transmise uniquement au livreur en charge de votre colis.' },
+      { t: 'Vos droits', b: 'Vous pouvez demander la modification ou la suppression de vos données via la page contact.' },
+    ],
+    pTerms: [
+      { t: 'Commande', b: 'La commande est confirmée après un appel de notre équipe pour vérifier les détails et la pointure.' },
+      { t: 'Prix et livraison', b: 'Les prix sont en dinar algérien ; les frais de livraison dépendent de la wilaya et du mode choisi.' },
+      { t: 'Échange de pointure', b: 'L’échange est possible dès réception, produit et boîte dans leur état d’origine.' },
+      { t: 'Annulation', b: 'La commande peut être annulée gratuitement avant remise au transporteur.' },
+    ],
+    pCookies: [
+      { t: 'Définition', b: 'Petits fichiers enregistrés par votre navigateur pour mémoriser le panier et vos préférences.' },
+      { t: 'Cookies essentiels', b: 'Ils conservent le contenu du panier ; les désactiver empêche l’achat.' },
+      { t: 'Mesure d’audience', b: 'Ils nous aident à comprendre les pages les plus consultées pour améliorer la boutique.' },
+      { t: 'Contrôle', b: 'Vous pouvez supprimer les cookies depuis les réglages de votre navigateur.' },
+    ],
+  },
+  en: {
+    dir: 'ltr' as const,
+    home: 'Home', contact: 'Contact', cart: 'Cart', shop: 'Shop', menu: 'Menu',
+    search: 'Search for sneakers...', searching: 'Searching...', noResults: 'No results found',
+    showAll: 'Show all results',
+    all: 'All', noProducts: 'No products available at the moment.', shopNow: 'Shop Now',
+    ticker: 'Fast shipping nationwide · Cash on delivery · Authentic products',
+    heroEyebrow: 'Performance unlimited',
+    heroTitle: 'Run faster',
+    heroSub: 'Sneakers engineered for speed and comfort — from daily training to race day.',
+    stats: [
+      { n: '58', l: 'wilayas covered' },
+      { n: '24h', l: 'order prep' },
+      { n: '100%', l: 'authentic products' },
+    ],
+    trust: [
+      { t: 'Fast Delivery', s: 'Across all wilayas' },
+      { t: 'Quality Guaranteed', s: '100% authentic products' },
+      { t: 'Secure Payment', s: 'Cash on delivery' },
+      { t: '24/7 Support', s: 'Expert team always here' },
+    ],
+    collection: 'The collection', product: 'products', viewProduct: 'View product', newDrop: 'New drop',
+    quickLinks: 'Quick Links', legalNav: 'Legal', contactUs: 'Contact Us',
+    privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies',
+    rightsReserved: 'All rights reserved.',
+    fullName: 'Full Name', fullNamePlaceholder: 'Enter your full name',
+    phone: 'Phone Number', phonePlaceholder: '0555 12 34 56',
+    email: 'Email', emailPlaceholder: 'name@mail.com',
+    wilaya: 'Wilaya', wilayaPlaceholder: 'Select wilaya', wilayaUnavailable: 'Delivery unavailable',
+    commune: 'Commune', communePlaceholder: 'Select commune', communeLoading: 'Loading...',
+    deliveryHome: 'Home Delivery', deliveryOffice: 'Pickup Point',
+    qty: 'Quantity', price: 'Price', delivery: 'Delivery', total: 'Total',
+    orderNow: 'Order Now', addToCart: 'Add to Cart', added: 'Added',
+    confirmOrder: 'Confirm Order', sending: 'Sending...', cancel: 'Cancel',
+    successTitle: 'Order placed successfully!', successDesc: 'We will contact you shortly to confirm the details.',
+    backToShop: 'Back to Shop',
+    cartEmpty: 'Your cart is empty', cartEmptyDesc: 'Start shopping now.',
+    myCart: 'My Cart', subtotal: 'Subtotal', items: 'item(s)', remove: 'Remove',
+    errSubmit: 'An error occurred. Please try again.',
+    errName: 'Full name is required (at least 3 characters)',
+    errPhone: 'Valid Algerian phone number required (e.g. 0550123456)',
+    errWilaya: 'Please select a wilaya', errCommune: 'Please select a commune',
+    privacyTitle: 'Privacy Policy', termsTitle: 'Terms & Conditions',
+    cookiesTitle: 'Cookie Policy', contactTitle: 'Contact Us',
+    offersTitle: 'Available Offers', descTitle: 'Description', optionsTitle: 'Options',
+    shippingTab: 'Shipping & returns',
+    shippingBody: 'We deliver to every wilaya within 2 to 5 business days. Cash on delivery is available, and size exchange is possible right after delivery.',
+    searchResultsFor: 'Results for:',
+    msg: 'Your message', msgPlaceholder: 'Write your message here...', send: 'Send message',
+    sendAgain: 'Send another message', contactSuccess: 'Your message was received, we will reply shortly.',
+    callUs: 'Phone', writeUs: 'Email', ourAddress: 'Address',
+    pPrivacy: [
+      { t: 'Data we collect', b: 'We only collect name, phone, wilaya and commune — the data required to prepare and deliver your order.' },
+      { t: 'How we use it', b: 'Your data is used to confirm the order and coordinate with the courier, nothing else.' },
+      { t: 'Sharing', b: 'We never sell your data. It is shared only with the courier handling your parcel.' },
+      { t: 'Your rights', b: 'You may request correction or deletion of your data at any time via the contact page.' },
+    ],
+    pTerms: [
+      { t: 'Orders', b: 'An order is confirmed once our team calls you to verify the details and your size.' },
+      { t: 'Prices & delivery', b: 'Prices are in Algerian dinar; delivery cost depends on the wilaya and the chosen method.' },
+      { t: 'Size exchange', b: 'Exchange is possible right after delivery, provided product and box are in original condition.' },
+      { t: 'Cancellation', b: 'Orders can be cancelled free of charge before hand-off to the courier.' },
+    ],
+    pCookies: [
+      { t: 'What cookies are', b: 'Small files stored by your browser to remember your cart and display preferences.' },
+      { t: 'Essential cookies', b: 'They keep your cart contents; disabling them breaks the checkout flow.' },
+      { t: 'Analytics cookies', b: 'They help us understand which pages are most visited so we can improve the store.' },
+      { t: 'Control', b: 'You can delete cookies from your browser settings at any time.' },
+    ],
+  },
+} as const;
+
+/* ============================ HELPERS ============================ */
+const clean = (html?: string): string => {
+  const raw = String(html || '');
+  try {
+    if (typeof window !== 'undefined' && (DOMPurify as any)?.sanitize) return (DOMPurify as any).sanitize(raw);
+  } catch (e) { /* noop */ }
+  return raw.replace(/<script[\s\S]*?<\/script>/gi, '');
+};
+
+// Wrapped in LTR-isolate marks (U+2066/U+2069) so the space-separated thousands
+// groups don't get bidi-reordered (e.g. "3 180" flipping to "180 3") when this
+// string lands inside RTL (Arabic) text.
+const fmt = (n: number): string => `\u2066${Number(n || 0).toLocaleString('en-US').replace(/,/g, ' ')}\u2069`;
+const cur = (store?: any): string => store?.currency || 'DA';
+
+function variantMatches(d: VariantDetail, sel: Record<string, string>) {
+  return Object.entries(sel || {}).every(([n, v]) => d.name?.some((e) => e.attrName === n && e.value === v));
+}
+
+const fetchWilayas = async (uid: string): Promise<Wilaya[]> => {
+  try {
+    const r = await fetch(`${API_URL}/shipping/public/get-shipping/${uid}`);
+    if (!r.ok) return [];
+    const d = await r.json();
+    return Array.isArray(d) ? d : (d?.data || []);
+  } catch (e) { return []; }
+};
+
+const fetchCommunes = async (wid: string): Promise<Commune[]> => {
+  try {
+    const r = await fetch(`${API_URL}/shipping/get-communes/${wid}`);
+    if (!r.ok) return [];
+    const d = await r.json();
+    return Array.isArray(d) ? d : (d?.data || []);
+  } catch (e) { return []; }
+};
+
+const imgOf = (p: any): string | undefined => p?.productImage || p?.imagesProduct?.[0]?.imageUrl;
+
+/* ============================ STYLE FLOOR ============================ */
+const inputBase: React.CSSProperties = {
+  width: '100%', padding: '0.8rem 1rem', fontSize: '0.9rem', minHeight: 48,
+  border: `1px solid ${BD}`, borderRadius: 12, background: BG, color: INK,
+  outline: 'none', appearance: 'none', transition: 'border-color .2s, box-shadow .2s',
+  fontFamily: 'inherit',
+};
+const btnPrimary: React.CSSProperties = {
+  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 9,
+  padding: '0.95rem 1.6rem', minHeight: 50, background: A, color: '#0B0D10',
+  fontWeight: 800, fontSize: '0.84rem', letterSpacing: '0.04em',
+  border: `1px solid ${A}`, borderRadius: 999, cursor: 'pointer', fontFamily: FB,
+  transition: 'background .2s, transform .15s, box-shadow .25s', textDecoration: 'none', width: '100%',
+};
+const btnGhost: React.CSSProperties = {
+  ...btnPrimary, background: 'transparent', color: INK, border: `1px solid ${BD}`,
+};
+const label: React.CSSProperties = {
+  display: 'block', fontSize: '0.72rem', color: SUB, marginBottom: 7, fontWeight: 600, letterSpacing: '.02em',
+};
+const eyebrow: React.CSSProperties = {
+  display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: '0.7rem', letterSpacing: '0.14em',
+  textTransform: 'uppercase', color: A, fontWeight: 700,
+};
+
+/* ============================ CSS ============================ */
+const THEME_CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=Cairo:wght@400;600;700;900&display=swap');
+
+.vx-root, .vx-root button, .vx-root input, .vx-root select, .vx-root textarea { font-family: ${FB}; }
+.vx-root { background: ${BG}; color: ${INK}; }
+.vx-root *, .vx-root *::before, .vx-root *::after { box-sizing: border-box; }
+.vx-disp { font-family: ${FD}; font-weight: 400; letter-spacing: .01em; }
+.vx-wrap { max-width: 1280px; margin: 0 auto; padding: 0 1rem; }
+@media (min-width: 768px) { .vx-wrap { padding: 0 2rem; } }
+
+@keyframes vxUp { from { opacity:0; transform: translateY(26px);} to { opacity:1; transform:none; } }
+@keyframes vxIn { from { opacity:0; } to { opacity:1; } }
+@keyframes vxPop { from { opacity:0; transform: scale(.9);} to { opacity:1; transform:none; } }
+@keyframes vxSheet { from { transform: translateY(100%);} to { transform: translateY(0);} }
+@keyframes vxMq { from { transform: translateX(0);} to { transform: translateX(-50%);} }
+@keyframes vxShim { 0% { background-position: -420px 0; } 100% { background-position: 420px 0; } }
+@keyframes vxBadge { 0%{transform:scale(1)} 40%{transform:scale(1.45)} 70%{transform:scale(.88)} 100%{transform:scale(1)} }
+@keyframes vxGlow { 0%,100% { box-shadow: 0 0 0 0 rgba(217,255,57,.36); } 50% { box-shadow: 0 0 0 12px rgba(217,255,57,0); } }
+@keyframes vxFloat { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-9px);} }
+
+/* ---- ticker ---- */
+.vx-ticker { background: ${A}; color: #0B0D10; overflow: hidden; height: 32px; display:flex; align-items:center; }
+.vx-mq { display:inline-flex; white-space: nowrap; animation: vxMq 26s linear infinite; will-change: transform; }
+.vx-mq span { padding: 0 34px; display:inline-flex; align-items:center; gap:8px; font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+
+/* ---- floating pill navbar ---- */
+.vx-head { position: sticky; top: 0; z-index: 200; }
+.vx-headpad { padding: 12px 0; transition: padding .28s ease; }
+.vx-head.is-scrolled .vx-headpad { padding: 7px 0; }
+.vx-pill { display:flex; align-items:center; gap: 10px; background: rgba(20,24,29,.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid ${BD}; border-radius: 999px; padding: 8px 10px 8px 16px; transition: box-shadow .3s, background .3s; }
+@media (max-width: 899px) { .vx-pill { justify-content:center; padding: 10px 18px; } }
+.vx-head.is-scrolled .vx-pill { box-shadow: 0 12px 34px rgba(0,0,0,.55); background: rgba(20,24,29,.95); }
+.vx-logo { display:flex; align-items:center; gap:9px; text-decoration:none; color:${INK}; flex-shrink:0; }
+.vx-logo-tx { font-family:${FD}; font-size: clamp(1.05rem,3.6vw,1.4rem); text-transform:uppercase; letter-spacing:.03em; white-space:nowrap; }
+.vx-plinks { display:flex; align-items:center; gap: 4px; margin-inline-start: 14px; }
+.vx-plink { position:relative; padding: 9px 15px; border-radius:999px; font-size:.82rem; font-weight:600; color:${SUB}; text-decoration:none; transition: color .2s, background .2s; }
+.vx-plink:hover { color:${INK}; background: ${CARD2}; }
+.vx-plink.is-active { color:#0B0D10; background:${A}; }
+.vx-ico { width:44px; height:44px; border-radius:999px; display:flex; align-items:center; justify-content:center; background:transparent; border:none; cursor:pointer; color:${INK}; position:relative; transition: background .2s, color .2s; text-decoration:none; flex-shrink:0; }
+.vx-ico:hover { background:${CARD2}; color:${A}; }
+
+/* ---- bottom nav (mobile) ---- */
+.vx-bnav { position: fixed; inset-inline: 0; bottom: 0; z-index: 210; background: rgba(20,24,29,.96); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid ${BD}; display:grid; grid-template-columns: repeat(4,1fr); padding-bottom: env(safe-area-inset-bottom); }
+.vx-bitem { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; min-height:60px; background:transparent; border:none; cursor:pointer; color:${SUB}; text-decoration:none; font-size:.62rem; font-weight:600; white-space:nowrap; position:relative; transition: color .2s; font-family:inherit; }
+.vx-bitem.is-active { color:${A}; }
+.vx-bitem.is-active::before { content:''; position:absolute; top:0; inset-inline-start:22%; width:56%; height:2px; background:${A}; }
+
+/* ---- responsive show/hide ---- */
+.vx-d { display:none; }
+.vx-m { display:flex; }
+@media (min-width: 900px) {
+  .vx-d { display:flex !important; }
+  .vx-m { display:none !important; }
+  .vx-bnav { display:none !important; }
+}
+
+/* ---- search ---- */
+.vx-searchwrap { position:relative; flex:1; min-width:0; max-width: 320px; margin-inline-start:auto; }
+.vx-searchin { width:100%; height:42px; background:${BG}; border:1px solid ${BD}; border-radius:999px; padding-inline: 38px 34px; font-size:.84rem; color:${INK}; outline:none; transition: border-color .22s, box-shadow .22s; }
+.vx-searchin:focus { border-color:${A}; box-shadow: 0 0 0 3px rgba(217,255,57,.14); }
+.vx-drop { position:absolute; top: calc(100% + 10px); inset-inline-end:0; width:100%; min-width: 320px; background:${CARD}; border:1px solid ${BD}; border-radius:18px; box-shadow: 0 22px 50px rgba(0,0,0,.6); z-index: 500; max-height: 400px; overflow-y:auto; overflow-x:hidden; animation: vxPop .18s ease both; }
+.vx-srow { display:flex; gap:12px; align-items:center; padding: 10px 12px; border-bottom:1px solid ${BD}; text-decoration:none; color:${INK}; transition: background .18s; }
+.vx-srow:hover { background:${CARD2}; }
+
+/* ---- overlays / sheets ---- */
+.vx-ovl { position:fixed; inset:0; z-index:600; background: rgba(11,13,16,.86); backdrop-filter: blur(6px); display:flex; flex-direction:column; animation: vxIn .2s ease both; }
+.vx-scrim { position:fixed; inset:0; z-index:300; background: rgba(11,13,16,.7); animation: vxIn .2s ease both; }
+.vx-sheet { position:absolute; inset-inline:0; bottom:0; background:${CARD}; border-top:1px solid ${BD}; border-radius: 26px 26px 0 0; padding: 12px 18px calc(22px + env(safe-area-inset-bottom)); animation: vxSheet .3s cubic-bezier(.22,.68,0,1.1) both; }
+.vx-grab { width:44px; height:4px; border-radius:99px; background:${BD}; margin: 4px auto 16px; }
+
+/* ---- hero ---- */
+.vx-hero { position:relative; overflow:hidden; background:${CARD}; }
+.vx-hero-in { position:relative; z-index:2; text-align:center; padding: clamp(54px,9vw,104px) 0 clamp(30px,5vw,54px); min-height: clamp(500px,72vh,760px); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.vx-hero-title { font-family:${FD}; font-size: clamp(2.9rem, 12vw, 7.5rem); line-height:.94; text-transform:uppercase; margin:.7rem 0 1.1rem; max-width: 980px; word-break: break-word; animation: vxUp .75s ease .08s both; }
+.vx-hero-sub { font-size: clamp(.95rem,2.3vw,1.1rem); line-height:1.7; color:${SUB}; max-width: 560px; margin: 0 auto; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; animation: vxUp .75s ease .2s both; }
+.vx-hero-cta { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top: 2rem; animation: vxUp .75s ease .32s both; }
+.vx-stats { display:grid; grid-template-columns: repeat(3,1fr); gap:10px; margin-top: clamp(34px,6vw,58px); width:100%; max-width: 660px; animation: vxUp .75s ease .44s both; }
+.vx-stat { background: rgba(11,13,16,.55); border:1px solid ${BD}; border-radius:16px; padding: 14px 8px; }
+.vx-heromq { position:relative; z-index:2; border-block:1px solid ${BD}; background:${BG}; overflow:hidden; height:64px; display:flex; align-items:center; }
+.vx-heromq .vx-mq { animation-duration: 22s; }
+.vx-heromq .vx-mq span { font-family:${FD}; font-size: clamp(1.5rem,4vw,2.4rem); text-transform:uppercase; color: transparent; -webkit-text-stroke: 1px ${BD}; padding: 0 26px; }
+.vx-heromq .vx-mq span:nth-child(2n) { color:${A}; -webkit-text-stroke: 0; }
+
+/* ---- trust ---- */
+.vx-trust { display:grid; grid-template-columns: repeat(2,1fr); gap:10px; }
+@media (min-width: 900px) { .vx-trust { grid-template-columns: repeat(4,1fr); gap:14px; } }
+.vx-trust-i { display:flex; align-items:center; gap:12px; padding: 16px 14px; background:${CARD}; border:1px solid ${BD}; border-radius:16px; }
+.vx-tico { width:38px; height:38px; border-radius:12px; background:${AL}; display:grid; place-items:center; flex-shrink:0; }
+
+/* ---- categories ---- */
+.vx-cats { display:flex; gap: 9px; overflow-x:auto; padding: 2px 0 6px; scrollbar-width:none; }
+.vx-cats::-webkit-scrollbar { display:none; }
+.vx-cat { white-space:nowrap; font-size:.82rem; font-weight:600; color:${SUB}; text-decoration:none; padding: 11px 18px; border-radius:999px; border:1px solid ${BD}; background:${CARD}; transition: all .22s; }
+.vx-cat:hover { color:${INK}; border-color:${SUB}; }
+.vx-cat.is-active { background:${A}; color:#0B0D10; border-color:${A}; }
+
+/* ---- grid + card ---- */
+.vx-grid { display:grid; grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 640px)  { .vx-grid { grid-template-columns: repeat(2,1fr); } }
+@media (min-width: 1024px) { .vx-grid { grid-template-columns: repeat(3,1fr); } }
+@media (min-width: 1280px) { .vx-grid { grid-template-columns: repeat(4,1fr); } }
+
+.vx-card { position:relative; display:block; border-radius:20px; overflow:hidden; background:${CARD}; border:1px solid ${BD}; text-decoration:none; color:${INK}; aspect-ratio: 1/1; animation: vxUp .5s ease both; transition: transform .3s cubic-bezier(.22,.68,0,1.2), border-color .3s, box-shadow .3s; will-change: transform; }
+.vx-card:hover { transform: translateY(-6px); border-color:${A}; box-shadow: 0 22px 44px rgba(0,0,0,.5); }
+.vx-cimg { width:100%; height:100%; object-fit:cover; display:block; transition: transform .7s cubic-bezier(.22,.68,0,1); }
+.vx-card:hover .vx-cimg { transform: scale(1.09); }
+.vx-cshade { position:absolute; inset:0; background: linear-gradient(180deg, rgba(11,13,16,0) 34%, rgba(11,13,16,.82) 74%, rgba(11,13,16,.96) 100%); }
+.vx-cinfo { position:absolute; inset-inline:0; bottom:0; padding: 14px 15px 15px; }
+.vx-cname { font-size:.92rem; font-weight:600; line-height:1.45; margin:0 0 7px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.vx-ctag { position:absolute; top:12px; inset-inline-start:12px; background:${A2}; color:#fff; font-size:.7rem; font-weight:800; padding: 6px 11px; border-radius:8px; transform: rotate(-4deg); z-index:2; }
+.vx-cadd { position:absolute; top:12px; inset-inline-end:12px; width:38px; height:38px; border-radius:999px; background:${A}; color:#0B0D10; display:grid; place-items:center; z-index:2; opacity:0; transform: scale(.7); transition: opacity .25s, transform .25s cubic-bezier(.22,.68,0,1.4); }
+.vx-card:hover .vx-cadd { opacity:1; transform: scale(1); }
+
+/* ---- pagination ---- */
+.vx-pg { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top: 40px; }
+.vx-pgb { min-width:46px; height:46px; display:grid; place-items:center; border:1px solid ${BD}; border-radius:999px; background:${CARD}; color:${INK}; text-decoration:none; font-size:.85rem; font-weight:600; transition: all .2s; }
+.vx-pgb:hover { border-color:${A}; color:${A}; }
+.vx-pgb.is-active { background:${A}; border-color:${A}; color:#0B0D10; }
+
+/* ---- product page ---- */
+.vx-pd { display:grid; grid-template-columns:1fr; gap: 26px; }
+@media (min-width: 1024px) { .vx-pd { grid-template-columns: 1.08fr .92fr; gap: 44px; align-items:start; } }
+.vx-galwrap { display:flex; flex-direction: column-reverse; gap:10px; }
+@media (min-width: 640px) { .vx-galwrap { flex-direction: row; } }
+.vx-film { display:flex; gap:9px; overflow:auto; scrollbar-width:none; }
+.vx-film::-webkit-scrollbar { display:none; }
+@media (min-width: 640px) { .vx-film { flex-direction:column; flex: 0 0 78px; max-height: 560px; } }
+.vx-thumb { width:74px; height:74px; flex:0 0 auto; border:1px solid ${BD}; border-radius:14px; background:${CARD}; padding:0; cursor:pointer; overflow:hidden; opacity:.55; transition: all .2s; }
+@media (min-width: 640px) { .vx-thumb { width:78px; height:78px; } }
+.vx-thumb.is-active { border-color:${A}; opacity:1; }
+.vx-gal { position:relative; flex:1; min-width:0; aspect-ratio: 1/1; border-radius:22px; overflow:hidden; background:${CARD}; border:1px solid ${BD}; }
+.vx-galnav { position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; border-radius:999px; display:grid; place-items:center; background: rgba(11,13,16,.72); border:1px solid ${BD}; color:${INK}; cursor:pointer; z-index:3; transition: background .2s; }
+.vx-galnav:hover { background:${A}; color:#0B0D10; border-color:${A}; }
+@media (min-width: 1024px) { .vx-buy { position: sticky; top: 96px; } }
+.vx-tabs { display:flex; gap:6px; border-bottom:1px solid ${BD}; margin-bottom: 16px; }
+.vx-tab { padding: 12px 4px; margin-inline-end: 20px; background:transparent; border:none; border-bottom:2px solid transparent; color:${SUB}; font-size:.85rem; font-weight:600; cursor:pointer; font-family:inherit; transition: color .2s, border-color .2s; }
+.vx-tab.is-active { color:${A}; border-bottom-color:${A}; }
+.vx-rte { font-size:.92rem; line-height:1.85; color:${SUB}; }
+.vx-rte img { max-width:100%; height:auto; border-radius:12px; }
+.vx-desc-d { display:none; }
+.vx-desc-m { display:block; }
+@media (min-width: 1024px) { .vx-desc-d { display:block !important; } .vx-desc-m { display:none !important; } }
+.vx-mobar { position:fixed; inset-inline:0; bottom:60px; z-index:190; background: rgba(20,24,29,.97); backdrop-filter: blur(12px); border-top:1px solid ${BD}; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); display:flex; align-items:center; gap:12px; }
+@media (min-width: 900px) { .vx-mobar { display:none !important; } }
+.vx-offer { display:flex; align-items:center; gap:12px; width:100%; text-align:start; padding: 13px 14px; margin-bottom:9px; background:${BG}; border:1px solid ${BD}; border-radius:14px; cursor:pointer; transition: border-color .2s, background .2s; font-family:inherit; }
+.vx-offer:hover { border-color:${SUB}; }
+.vx-offer.is-active { border-color:${A}; background:${AL}; }
+.vx-swatch { min-width:48px; height:48px; border-radius:12px; border:1px solid ${BD}; background:${CARD}; cursor:pointer; display:grid; place-items:center; padding:0; font-size:.82rem; font-weight:600; color:${INK}; transition: all .2s; font-family:inherit; overflow:hidden; }
+.vx-swatch.is-active { border-color:${A}; box-shadow: 0 0 0 3px rgba(217,255,57,.2); }
+
+/* ---- cart ---- */
+.vx-cartlay { display:flex; flex-direction:column; gap: 1.4rem; }
+@media (min-width: 1024px) {
+  .vx-cartlay { flex-direction: row; align-items: flex-start; gap: 1.8rem; }
+  .vx-cartlay > *:first-child { flex: 1.3; min-width: 0; }
+  .vx-cartlay > *:last-child { flex: 1; min-width: 340px; position: sticky; top: 96px; }
+}
+
+/* ---- footer ---- */
+.vx-foot { background:${CARD}; border-top:1px solid ${BD}; margin-top: 70px; }
+.vx-footgrid { display:grid; grid-template-columns:1fr; gap: 30px; padding: 48px 0 34px; }
+@media (min-width: 768px) { .vx-footgrid { grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 44px; } }
+.vx-footlink { display:block; color:${SUB}; text-decoration:none; font-size:.85rem; padding: 7px 0; transition: color .2s, padding-inline-start .2s; }
+.vx-footlink:hover { color:${A}; padding-inline-start: 6px; }
+
+/* ---- misc ---- */
+.vx-skel { background: linear-gradient(90deg, ${CARD} 25%, ${CARD2} 50%, ${CARD} 75%); background-size: 420px 100%; animation: vxShim 1.4s infinite linear; border-radius:14px; }
+.vx-badge { animation: vxBadge .42s ease; }
+.vx-form-2 { display:grid; grid-template-columns:1fr; gap: .85rem; }
+@media (min-width: 520px) { .vx-form-2 { grid-template-columns: 1fr 1fr; } }
+.vx-ct2 { display:grid; grid-template-columns:1fr; gap: 30px; }
+@media (min-width: 860px) { .vx-ct2 { grid-template-columns: .8fr 1.2fr; gap: 40px; align-items:start; } }
+.vx-btnp:hover { background:${AD} !important; border-color:${AD} !important; transform: translateY(-2px); box-shadow: 0 10px 26px rgba(217,255,57,.22); }
+.vx-btnp:active { transform: translateY(0) scale(.985); }
+.vx-btnp:disabled { opacity:.55; cursor:default; transform:none; box-shadow:none; }
+.vx-btng:hover { border-color:${A} !important; color:${A} !important; }
+.vx-fade { animation: vxIn .32s ease both; }
+.vx-pulse { animation: vxGlow 2.4s infinite; }
+.vx-root select option { background: ${CARD}; color: ${INK}; }
+
+@media (prefers-reduced-motion: reduce) {
+  .vx-root *, .vx-root *::before, .vx-root *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important; scroll-behavior: auto !important;
+  }
+}
+`;
+
+/* ============================ SHARED BITS ============================ */
+function Stars({ n = 5, size = 11 }: { n?: number; size?: number }) {
+  return (
+    <span style={{ display: 'inline-flex', gap: 2 }} aria-hidden="true">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Star key={i} size={size} fill={i < n ? A : 'none'} color={i < n ? A : BD} strokeWidth={1.6} />
+      ))}
+    </span>
+  );
+}
+
+function Placeholder({ size = 40 }: { size?: number }) {
+  return (
+    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: CARD2 }}>
+      <Footprints size={size} color={BD} strokeWidth={1.3} />
+    </div>
+  );
+}
+
+function Row({ l, v, strong }: { l: string; v: string; strong?: boolean }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 14, padding: '9px 0', borderBottom: strong ? 'none' : `1px solid ${BD}` }}>
+      <span style={{ flexShrink: 0, fontSize: strong ? '.86rem' : '.82rem', color: strong ? INK : SUB, fontWeight: strong ? 700 : 500 }}>{l}</span>
+      <span className={strong ? 'vx-disp' : ''} style={{ whiteSpace: 'nowrap', fontWeight: strong ? 400 : 600, fontSize: strong ? '1.45rem' : '.88rem', color: strong ? A : INK }}>{v}</span>
+    </div>
+  );
+}
+
+function ErrLine({ msg }: { msg?: string }) {
+  if (!msg) return null;
+  return (
+    <p style={{ fontSize: '.73rem', color: ERR, marginTop: '.35rem', display: 'flex', alignItems: 'center', gap: 5 }}>
+      <AlertCircle size={11} /> {msg}
+    </p>
+  );
+}
+
+/* ============================ MAIN ============================ */
+export default function Main({ store, children, domain }: any) {
+  const t = T[getLang(store)];
+  const pathname = usePathname();
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  useEffect(() => {
+    setVisible(false);
+    const id = setTimeout(() => setVisible(true), 40);
+    return () => clearTimeout(id);
+  }, [pathname]);
+
+  return (
+    <div className="vx-root" dir={t.dir} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <style dangerouslySetInnerHTML={{ __html: THEME_CSS }} />
+      <Navbar store={store} domain={domain} />
+      <main style={{ flex: 1, opacity: visible ? 1 : 0, transition: 'opacity .34s ease' }}>{children}</main>
+      <Footer store={store} />
+      <div className="vx-m" style={{ height: 60 }} />
+    </div>
+  );
+}
+
+/* ============================ NAVBAR ============================ */
+export function Navbar({ store, domain }: any) {
+  const t = T[getLang(store)];
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [listSearch, setListSearch] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [bump, setBump] = useState(false);
+
+  const count = useCartStore((s: any) => s.count);
+  const initCount = useCartStore((s: any) => s.initCount);
+  const firstCount = useRef(true);
+
+  useEffect(() => {
+    try {
+      const arr = JSON.parse(localStorage.getItem(domain) || '[]');
+      initCount(Array.isArray(arr) ? arr.length : 0);
+    } catch (e) { initCount(0); }
+  }, [domain, initCount]);
+
+  useEffect(() => {
+    if (firstCount.current) { firstCount.current = false; return; }
+    setBump(true);
+    const id = setTimeout(() => setBump(false), 460);
+    return () => clearTimeout(id);
+  }, [count]);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => { setOpen(false); setShowSearch(false); }, [pathname]);
+
+  useEffect(() => {
+    if (searchQuery.trim().length < 2) { setListSearch([]); setLoading(false); return; }
+    setLoading(true);
+    const id = setTimeout(async () => {
+      try {
+        const r = await fetch(`${API_URL}/products/public/${domain}?search=${encodeURIComponent(searchQuery.trim())}`);
+        const d = await r.json();
+        const arr = Array.isArray(d) ? d : (d?.products || d?.data || []);
+        setListSearch(arr.slice(0, 6));
+      } catch (e) { setListSearch([]); }
+      setLoading(false);
+    }, 380);
+    return () => clearTimeout(id);
+  }, [searchQuery, domain]);
+
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    setShowSearch(false);
+    setSearchFocused(false);
+    router.push(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+  };
+
+  const closeSearch = () => { setShowSearch(false); setSearchQuery(''); setListSearch([]); };
+
+  const pageLinks = [
+    { h: '/', l: t.home },
+    { h: '/contact', l: t.contact },
+    { h: '/terms', l: t.terms },
+    { h: '/privacy', l: t.privacy },
+    { h: '/cookies', l: t.cookies },
+  ];
+
+  const logo = store?.design?.logoUrl;
+
+  const resultRows = (onPick: () => void) => (
+    <>
+      {loading && (
+        <div style={{ padding: 12, display: 'grid', gap: 8 }}>
+          {[0, 1, 2].map((i) => <div key={i} className="vx-skel" style={{ height: 56 }} />)}
+        </div>
+      )}
+      {!loading && listSearch.length === 0 && searchQuery.trim().length >= 2 && (
+        <p style={{ padding: '1.5rem', textAlign: 'center', color: SUB, fontSize: '.85rem' }}>{t.noResults}</p>
+      )}
+      {!loading && listSearch.map((p: any) => {
+        const im = imgOf(p);
+        return (
+          <Link key={p.id} href={`/product/${p.slug || p.id}`} className="vx-srow" onClick={onPick}>
+            <span style={{ width: 52, height: 52, flexShrink: 0, overflow: 'hidden', borderRadius: 12, background: CARD2, display: 'block' }}>
+              {im ? <img src={im} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : <Placeholder size={20} />}
+            </span>
+            <span style={{ minWidth: 0, flex: 1 }}>
+              <span style={{ display: 'block', fontSize: '.86rem', fontWeight: 500, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
+              <span style={{ display: 'block', fontSize: '.82rem', color: A, fontWeight: 700 }}>{fmt(Number(p.price))} {cur(store)}</span>
+            </span>
+          </Link>
+        );
+      })}
+      {!loading && listSearch.length > 0 && (
+        <Link href={`/?search=${encodeURIComponent(searchQuery.trim())}`} onClick={onPick}
+          style={{ display: 'block', padding: '14px', textAlign: 'center', fontSize: '.8rem', fontWeight: 700, color: A, textDecoration: 'none', background: CARD2 }}>
+          {t.showAll}
+        </Link>
+      )}
+    </>
+  );
+
+  return (
+    <>
+      <header className={`vx-head${scrolled ? ' is-scrolled' : ''}`}>
+        <div className="vx-ticker">
+          <div className="vx-mq">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <span key={i}><Zap size={12} strokeWidth={2.4} />{store?.topBar?.text || t.ticker}</span>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ background: `linear-gradient(180deg, ${BG} 55%, rgba(11,13,16,0) 100%)` }}>
+          <div className="vx-wrap vx-headpad">
+            <div className="vx-pill">
+              <Link href="/" className="vx-logo" aria-label={store?.name || 'store'}>
+                {logo && !imgError ? (
+                  <img src={logo} alt={store?.name || 'logo'} onError={() => setImgError(true)}
+                    style={{ height: scrolled ? 28 : 34, width: 'auto', objectFit: 'contain', display: 'block', transition: 'height .28s' }} />
+                ) : (
+                  <>
+                    <span style={{ width: 30, height: 30, borderRadius: 9, background: A, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+                      <Zap size={16} color="#0B0D10" strokeWidth={2.6} />
+                    </span>
+                    <span className="vx-logo-tx">{store?.name || 'VELOCITY'}</span>
+                  </>
+                )}
+              </Link>
+
+              <nav className="vx-plinks vx-d" aria-label="main">
+                <Link href="/" className={`vx-plink${pathname === '/' ? ' is-active' : ''}`}>{t.home}</Link>
+                <Link href="/#collection" className="vx-plink">{t.shop}</Link>
+                <Link href="/contact" className={`vx-plink${pathname === '/contact' ? ' is-active' : ''}`}>{t.contact}</Link>
+              </nav>
+
+              <form onSubmit={submitSearch} className="vx-searchwrap vx-d">
+                <Search size={15} color={SUB} style={{ position: 'absolute', insetInlineStart: 14, top: 13, pointerEvents: 'none' }} />
+                <input
+                  className="vx-searchin" value={searchQuery} placeholder={t.search} aria-label={t.search}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
+                />
+                {searchQuery && (
+                  <button type="button" aria-label={t.cancel}
+                    onMouseDown={(e) => { e.preventDefault(); setSearchQuery(''); setListSearch([]); setSearchFocused(false); }}
+                    style={{ position: 'absolute', insetInlineEnd: 10, top: 11, width: 22, height: 22, borderRadius: 999, display: 'grid', placeItems: 'center', background: CARD2, border: 'none', cursor: 'pointer' }}>
+                    <X size={12} color={INK} />
+                  </button>
+                )}
+                {searchFocused && searchQuery.trim().length >= 2 && (
+                  <div className="vx-drop">{resultRows(() => { setSearchQuery(''); setListSearch([]); })}</div>
+                )}
+              </form>
+
+              {store?.cart !== false && (
+                <Link href="/cart" className="vx-ico vx-d" aria-label={t.cart} style={{ marginInlineStart: 4 }}>
+                  <ShoppingBag size={20} strokeWidth={1.8} />
+                  {count > 0 && (
+                    <span className={bump ? 'vx-badge' : ''} style={{ position: 'absolute', top: 4, insetInlineEnd: 2, minWidth: 18, height: 18, padding: '0 4px', borderRadius: 999, background: A, color: '#0B0D10', fontSize: '.62rem', display: 'grid', placeItems: 'center', fontWeight: 800 }}>
+                      {count}
+                    </span>
+                  )}
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <nav className="vx-bnav" aria-label="mobile">
+        <Link href="/" className={`vx-bitem${pathname === '/' ? ' is-active' : ''}`}>
+          <HomeIcon size={19} strokeWidth={1.9} /> {t.home}
+        </Link>
+        <button type="button" className="vx-bitem" onClick={() => setShowSearch(true)}>
+          <Search size={19} strokeWidth={1.9} /> {t.shop}
+        </button>
+        {store?.cart !== false ? (
+          <Link href="/cart" className={`vx-bitem${pathname === '/cart' ? ' is-active' : ''}`} style={{ position: 'relative' }}>
+            <span style={{ position: 'relative', display: 'grid', placeItems: 'center' }}>
+              <ShoppingBag size={19} strokeWidth={1.9} />
+              {count > 0 && (
+                <span className={bump ? 'vx-badge' : ''} style={{ position: 'absolute', top: -6, insetInlineEnd: -10, minWidth: 16, height: 16, padding: '0 4px', borderRadius: 999, background: A, color: '#0B0D10', fontSize: '.58rem', display: 'grid', placeItems: 'center', fontWeight: 800 }}>
+                  {count}
+                </span>
+              )}
+            </span>
+            {t.cart}
+          </Link>
+        ) : (
+          <Link href="/contact" className={`vx-bitem${pathname === '/contact' ? ' is-active' : ''}`}>
+            <Phone size={19} strokeWidth={1.9} /> {t.contact}
+          </Link>
+        )}
+        <button type="button" className="vx-bitem" onClick={() => setOpen(true)}>
+          <Menu size={19} strokeWidth={1.9} /> {t.menu}
+        </button>
+      </nav>
+
+      {open && (
+        <div className="vx-scrim" onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}>
+          <div className="vx-sheet">
+            <div className="vx-grab" />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+              <span className="vx-disp" style={{ fontSize: '1.2rem', textTransform: 'uppercase' }}>{t.menu}</span>
+              <button className="vx-ico" onClick={() => setOpen(false)} aria-label={t.cancel} type="button"><X size={20} /></button>
+            </div>
+            {pageLinks.map((l) => (
+              <Link key={l.h} href={l.h} onClick={() => setOpen(false)}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px 2px', borderBottom: `1px solid ${BD}`, color: INK, textDecoration: 'none', fontSize: '.92rem', fontWeight: 600 }}>
+                {l.l}
+                <ChevronRight size={16} color={SUB} style={{ transform: t.dir === 'rtl' ? 'rotate(180deg)' : 'none' }} />
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {showSearch && (
+        <div className="vx-ovl" onClick={(e) => { if (e.target === e.currentTarget) closeSearch(); }}>
+          <form onSubmit={submitSearch} style={{ background: CARD, padding: '14px 14px', display: 'flex', alignItems: 'center', gap: 10, borderBottom: `1px solid ${BD}` }}>
+            <Search size={19} color={SUB} />
+            <input autoFocus value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t.search} aria-label={t.search}
+              style={{ flex: 1, border: 'none', outline: 'none', fontSize: '1rem', background: 'transparent', color: INK, minHeight: 44 }} />
+            <button type="button" onClick={closeSearch} aria-label={t.cancel}
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer', width: 44, height: 44, display: 'grid', placeItems: 'center', color: INK }}>
+              <X size={21} />
+            </button>
+          </form>
+          <div style={{ flex: 1, overflowY: 'auto', background: BG }}>{resultRows(closeSearch)}</div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ============================ FOOTER ============================ */
+export function Footer({ store }: any) {
+  const t = T[getLang(store)];
+  const year = new Date().getFullYear();
+  const links = [
+    { h: '/', l: t.home },
+    { h: '/cart', l: t.cart },
+    { h: '/contact', l: t.contact },
+  ].filter((lnk) => lnk.h !== '/cart' || store?.cart !== false);
+
+  const c = store?.contact || {};
+
+  return (
+    <footer className="vx-foot">
+      <div className="vx-wrap">
+        <div className="vx-footgrid">
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+              <span style={{ width: 32, height: 32, borderRadius: 10, background: A, display: 'grid', placeItems: 'center' }}>
+                <Zap size={17} color="#0B0D10" strokeWidth={2.6} />
+              </span>
+              <span className="vx-disp" style={{ fontSize: '1.4rem', textTransform: 'uppercase' }}>{store?.name || 'VELOCITY'}</span>
+            </div>
+            <p dir="auto" style={{ fontSize: '.87rem', lineHeight: 1.8, color: SUB, maxWidth: 350, margin: 0, marginInlineEnd: 'auto' }}>
+              {store?.hero?.subtitle || t.heroSub}
+            </p>
+          </div>
+
+          <div>
+            <p style={{ ...eyebrow, marginBottom: 12 }}>{t.quickLinks}</p>
+            {links.map((l) => <Link key={l.h} href={l.h} className="vx-footlink">{l.l}</Link>)}
+          </div>
+
+          
+          {/* قانوني */}
+          <div>
+            <p style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '1rem' }}>{t.legalNav}</p>
+            {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', opacity: 0.6, transition: 'opacity 0.15s' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.6')}>
+              {lnk.l}
+            </Link>
+            ))}
+          </div>
+<div>
+            <p style={{ ...eyebrow, marginBottom: 12 }}>{t.contactUs}</p>
+            {c.phone && (
+              <a href={`tel:${c.phone}`} className="vx-footlink" style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+                <Phone size={14} strokeWidth={1.8} /> <span dir="ltr">{c.phone}</span>
+              </a>
+            )}
+            {c.email && (
+              <a href={`mailto:${c.email}`} className="vx-footlink" style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+                <Mail size={14} strokeWidth={1.8} /> {c.email}
+              </a>
+            )}
+            {(c.wilaya || c.address) && (
+              <span className="vx-footlink" style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
+                <MapPin size={14} strokeWidth={1.8} style={{ marginTop: 3, flexShrink: 0 }} />
+                <span>{[c.wilaya, c.address].filter(Boolean).join(' — ')}</span>
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div style={{ borderTop: `1px solid ${BD}`, padding: '18px 0 22px', fontSize: '.76rem', color: SUB }}>
+          © {year} {store?.name || 'VELOCITY'} — {t.rightsReserved}
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+/* ============================ CARD ============================ */
+export function Card({ product, displayImage, discount, store, viewDetails, index }: any) {
+  const t = T[getLang(store)];
+  const [imgErr, setImgErr] = useState(false);
+  const img = displayImage || product?.productImage || product?.imagesProduct?.[0]?.imageUrl;
+  const price = Number(product?.price) || 0;
+  const orig = Number(product?.priceOriginal) || 0;
+
+  return (
+    <Link
+      href={`/product/${product?.slug || product?.id}`}
+      className="vx-card"
+      style={{ animationDelay: `${Math.min(Number(index) || 0, 11) * 0.06}s` }}
+      aria-label={product?.name}
+    >
+      {discount > 0 && <span className="vx-ctag">−{discount}%</span>}
+      <span className="vx-cadd" aria-hidden="true"><Plus size={19} strokeWidth={2.6} /></span>
+
+      {img && !imgErr ? (
+        <img src={img} alt={product?.name || ''} loading="lazy" className="vx-cimg" onError={() => setImgErr(true)} />
+      ) : (
+        <Placeholder size={46} />
+      )}
+
+      <span className="vx-cshade" />
+
+      <div className="vx-cinfo">
+        <p className="vx-cname" dir="auto">{product?.name}</p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+          <Stars n={5} />
+          <span style={{ display: 'flex', alignItems: 'baseline', gap: 7, whiteSpace: 'nowrap' }}>
+            {orig > price && (
+              <span style={{ fontSize: '.75rem', color: SUB, textDecoration: 'line-through' }}>{fmt(orig)}</span>
+            )}
+            <span className="vx-disp" style={{ fontSize: '1.25rem', color: A }}>
+              {fmt(price)} <span style={{ fontSize: '.68rem', fontFamily: FB, fontWeight: 600, color: SUB }}>{cur(store)}</span>
+            </span>
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+/* ============================ HOME ============================ */
+export function Home({ store, page }: any) {
+  const t = T[getLang(store)];
+  const searchParams = useSearchParams();
+  const activeCategory = searchParams?.get('category') || '';
+  const searchTerm = searchParams?.get('search') || '';
+
+  const products: any[] = store?.products || [];
+  const cats: any[] = store?.categories || [];
+  const heroImg = store?.hero?.imageUrl;
+
+  const curPage = Number(page) || 1;
+  const countPage = Math.max(1, Math.ceil((Number(store?.count) || products.length) / 48));
+
+  const trustIcons = [Truck, PackageCheck, ShieldCheck, Headphones];
+
+  return (
+    <div>
+      <section className="vx-hero">
+        {heroImg && (
+          <img src={heroImg} alt="" aria-hidden="true"
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block', zIndex: 0 }} />
+        )}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: heroImg ? 'linear-gradient(180deg, rgba(11,13,16,.72) 0%, rgba(11,13,16,.84) 60%, rgba(11,13,16,.95) 100%)' : `radial-gradient(120% 80% at 50% 0%, ${CARD2} 0%, ${BG} 72%)` }} />
+        <div style={{ position: 'absolute', top: '18%', insetInlineStart: '-10%', width: 320, height: 320, borderRadius: '50%', background: 'rgba(217,255,57,.09)', filter: 'blur(70px)', zIndex: 1, animation: 'vxFloat 7s ease-in-out infinite' }} />
+
+        <div className="vx-wrap" style={{ position: 'relative', zIndex: 2 }}>
+          <div className="vx-hero-in">
+            <span style={{ ...eyebrow, background: AL, border: `1px solid ${BD}`, padding: '8px 16px', borderRadius: 999, animation: 'vxPop .5s ease both' }}>
+              <Flame size={13} /> {t.heroEyebrow}
+            </span>
+
+            <h1 dir="auto" className="vx-hero-title"
+              dangerouslySetInnerHTML={{ __html: clean(store?.hero?.title || t.heroTitle) }} />
+
+            <p dir="auto" className="vx-hero-sub">{store?.hero?.subtitle || t.heroSub}</p>
+
+            <div className="vx-hero-cta">
+              <a href="#collection" className="vx-btnp vx-pulse" style={{ ...btnPrimary, width: 'auto' }}>
+                {t.shopNow} <ArrowRight size={16} style={{ transform: t.dir === 'rtl' ? 'rotate(180deg)' : 'none' }} />
+              </a>
+              {store?.cart !== false && (
+                <Link href="/cart" className="vx-btng" style={{ ...btnGhost, width: 'auto' }}>
+                  <ShoppingBag size={16} /> {t.cart}
+                </Link>
+              )}
+            </div>
+
+            <div className="vx-stats">
+              {t.stats.map((s: any, i: number) => (
+                <div key={i} className="vx-stat">
+                  <p className="vx-disp" style={{ fontSize: 'clamp(1.5rem,5vw,2.2rem)', color: A, margin: 0, lineHeight: 1 }}>{s.n}</p>
+                  <p style={{ fontSize: '.7rem', color: SUB, margin: '6px 0 0', fontWeight: 500 }}>{s.l}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="vx-heromq" aria-hidden="true">
+        <div className="vx-mq">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <span key={i}>{store?.name || 'VELOCITY'}</span>
+          ))}
+        </div>
+      </div>
+
+      <section style={{ padding: '30px 0 6px' }}>
+        <div className="vx-wrap">
+          <div className="vx-trust">
+            {t.trust.map((item: any, i: number) => {
+              const Ico = trustIcons[i] || Truck;
+              return (
+                <div key={i} className="vx-trust-i">
+                  <span className="vx-tico"><Ico size={19} color={A} strokeWidth={2} /></span>
+                  <span style={{ minWidth: 0 }}>
+                    <span style={{ display: 'block', fontSize: '.82rem', fontWeight: 700 }}>{item.t}</span>
+                    <span style={{ display: 'block', fontSize: '.72rem', color: SUB, marginTop: 2 }}>{item.s}</span>
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section id="collection" style={{ padding: '40px 0 70px' }}>
+        <div className="vx-wrap">
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap', marginBottom: 20 }}>
+            <div>
+              <span style={eyebrow}>{searchTerm ? t.searchResultsFor : t.newDrop}</span>
+              <h2 dir="auto" className="vx-disp" style={{ fontSize: 'clamp(1.9rem,6vw,3.2rem)', textTransform: 'uppercase', margin: '.3rem 0 0', lineHeight: 1 }}>
+                {searchTerm || t.collection}
+              </h2>
+            </div>
+            <span style={{ fontSize: '.8rem', color: SUB, fontWeight: 600 }}>
+              {(Number(store?.count) || products.length)} {t.product}
+            </span>
+          </div>
+
+          {cats.length > 0 && (
+            <div style={{ marginBottom: 26 }}>
+              <div className="vx-cats">
+                <Link href="/" className={`vx-cat${!activeCategory ? ' is-active' : ''}`}>{t.all}</Link>
+                {cats.map((cat: any) => (
+                  <Link key={cat.id} href={`?category=${cat.id}`}
+                    className={`vx-cat${String(activeCategory) === String(cat.id) ? ' is-active' : ''}`}>
+                    {cat.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {products.length === 0 ? (
+            <div style={{ padding: '70px 20px', textAlign: 'center', border: `1px solid ${BD}`, borderRadius: 22, background: CARD }}>
+              <Footprints size={44} color={BD} strokeWidth={1.2} />
+              <p style={{ marginTop: 16, color: SUB, fontSize: '.9rem' }}>{t.noProducts}</p>
+            </div>
+          ) : (
+            <div className="vx-grid">
+              {products.map((p: any, i: number) => {
+                const price = Number(p.price) || 0;
+                const orig = Number(p.priceOriginal) || 0;
+                const discount = orig > price && orig > 0 ? Math.round(((orig - price) / orig) * 100) : 0;
+                return (
+                  <Card key={p.id} product={p} index={i} displayImage={imgOf(p)} discount={discount} store={store} viewDetails={undefined} />
+                );
+              })}
+            </div>
+          )}
+
+          {countPage > 1 && (
+            <div className="vx-pg">
+              {Array.from({ length: countPage }).map((_, i) => {
+                const n = i + 1;
+                return (
+                  <Link key={n} href={{ query: { page: n } }} scroll={false}
+                    className={`vx-pgb${n === curPage ? ' is-active' : ''}`}>
+                    {n}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ============================ DETAILS ============================ */
+export function Details({
+  product, discount, allImages, allAttrs, finalPrice, selectedVariants,
+  setSelectedOffer, selectedOffer, handleVariantSelection, domain, store: storeprop, userId, platform,
+}: any) {
+  const store = storeprop || product?.store;
+  const t = T[getLang(storeprop || product?.store)];
+  const [sel, setSel] = useState(0);
+  const [imgErr, setImgErr] = useState(false);
+  const [tab, setTab] = useState<'desc' | 'ship'>('desc');
+
+  const imgs: string[] = useMemo(() => Array.from(new Set([
+    product?.productImage,
+    ...(product?.imagesProduct?.map((i: any) => i?.imageUrl) || []),
+    ...(Array.isArray(allImages) ? allImages.map((i: any) => (typeof i === 'string' ? i : i?.imageUrl)) : []),
+  ].filter(Boolean) as string[])), [product, allImages]);
+
+  const attrs: Attribute[] = (Array.isArray(allAttrs) && allAttrs.length ? allAttrs : product?.attributes) || [];
+  const offers: Offer[] = product?.offers || [];
+  const price = Number(finalPrice ?? product?.price) || 0;
+  const orig = Number(product?.priceOriginal) || 0;
+
+  const go = (dir: number) => {
+    if (imgs.length < 2) return;
+    setImgErr(false);
+    setSel((s) => (s + dir + imgs.length) % imgs.length);
+  };
+
+  const scrollToBuy = () => {
+    if (typeof document === 'undefined') return;
+    const el = document.getElementById('vx-buy');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const tabsBlock = (cls: string) => (
+    <div className={cls}>
+      <div className="vx-tabs">
+        <button type="button" className={`vx-tab${tab === 'desc' ? ' is-active' : ''}`} onClick={() => setTab('desc')}>{t.descTitle}</button>
+        <button type="button" className={`vx-tab${tab === 'ship' ? ' is-active' : ''}`} onClick={() => setTab('ship')}>{t.shippingTab}</button>
+      </div>
+      {tab === 'desc' ? (
+        <div className="vx-rte" dir="auto" dangerouslySetInnerHTML={{ __html: clean(product?.desc) }} />
+      ) : (
+        <p className="vx-rte" style={{ margin: 0 }}>{t.shippingBody}</p>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="vx-wrap" style={{ paddingTop: '20px', paddingBottom: '90px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '.75rem', color: SUB, marginBottom: 16 }}>
+        <Link href="/" style={{ color: SUB, textDecoration: 'none' }}>{t.home}</Link>
+        <ChevronRight size={13} style={{ transform: t.dir === 'rtl' ? 'rotate(180deg)' : 'none' }} />
+        <span dir="auto" style={{ color: INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product?.name}</span>
+      </div>
+
+      <div className="vx-pd">
+        <div>
+          <div className="vx-galwrap">
+            {imgs.length > 1 && (
+              <div className="vx-film">
+                {imgs.map((u, i) => (
+                  <button key={i} type="button" onClick={() => { setSel(i); setImgErr(false); }}
+                    className={`vx-thumb${i === sel ? ' is-active' : ''}`} aria-label={`${i + 1}`}>
+                    <img src={u} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="vx-gal">
+              {imgs.length > 0 && !imgErr ? (
+                <img src={imgs[sel] || ''} alt={product?.name || ''} onError={() => setImgErr(true)}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              ) : (
+                <Placeholder size={56} />
+              )}
+
+              {discount > 0 && (
+                <span style={{ position: 'absolute', top: 14, insetInlineStart: 14, background: A2, color: '#fff', fontSize: '.76rem', fontWeight: 800, padding: '7px 12px', borderRadius: 9, transform: 'rotate(-4deg)', zIndex: 3 }}>
+                  −{discount}%
+                </span>
+              )}
+
+              {imgs.length > 1 && (
+                <button type="button" className="vx-galnav" style={{ insetInlineStart: 12 }} onClick={() => go(-1)} aria-label="prev">
+                  {t.dir === 'rtl' ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+                </button>
+              )}
+              {imgs.length > 1 && (
+                <button type="button" className="vx-galnav" style={{ insetInlineEnd: 12 }} onClick={() => go(1)} aria-label="next">
+                  {t.dir === 'rtl' ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {product?.desc && (
+            <div style={{ marginTop: 34 }}>
+              {tabsBlock('vx-desc-d')}
+            </div>
+          )}
+        </div>
+
+        <div className="vx-buy" id="vx-buy">
+          <h1 dir="auto" className="vx-disp" style={{ fontSize: 'clamp(1.7rem,5.4vw,2.7rem)', textTransform: 'uppercase', lineHeight: 1.05, margin: '0 0 12px' }}>
+            {product?.name}
+          </h1>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+            <Stars n={5} size={13} />
+            <span style={{ fontSize: '.76rem', color: SUB }}>{t.trust[1].s}</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, paddingBottom: 18, borderBottom: `1px solid ${BD}`, marginBottom: 20 }}>
+            <span className="vx-disp" style={{ fontSize: 'clamp(1.9rem,6vw,2.7rem)', color: A, whiteSpace: 'nowrap' }}>
+              {fmt(price)} <span style={{ fontSize: '.85rem', fontFamily: FB, fontWeight: 700, color: SUB }}>{cur(store)}</span>
+            </span>
+            {orig > price && (
+              <span style={{ fontSize: '1rem', color: SUB, textDecoration: 'line-through', whiteSpace: 'nowrap' }}>{fmt(orig)}</span>
+            )}
+          </div>
+
+          {offers.length > 0 && (
+            <div style={{ marginBottom: 22 }}>
+              <p style={{ ...eyebrow, marginBottom: 10 }}>{t.offersTitle}</p>
+              {offers.map((o: Offer) => {
+                const active = String(selectedOffer) === String(o.id);
+                return (
+                  <button key={o.id} type="button" className={`vx-offer${active ? ' is-active' : ''}`}
+                    onClick={() => setSelectedOffer(active ? null : o.id)}>
+                    <span style={{ width: 20, height: 20, borderRadius: 999, border: `2px solid ${active ? A : BD}`, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+                      {active && <span style={{ width: 9, height: 9, borderRadius: 999, background: A, display: 'block' }} />}
+                    </span>
+                    <span style={{ flex: 1, minWidth: 0 }}>
+                      <span dir="auto" style={{ display: 'block', fontSize: '.88rem', fontWeight: 600, color: INK }}>{o.name}</span>
+                      <span style={{ display: 'block', fontSize: '.73rem', color: SUB, marginTop: 2 }}>× {o.quantity}</span>
+                    </span>
+                    <span className="vx-disp" style={{ fontSize: '1.15rem', color: active ? A : INK, whiteSpace: 'nowrap' }}>
+                      {fmt(Number(o.price))} {cur(store)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {attrs.length > 0 && (
+            <div style={{ marginBottom: 22 }}>
+              <p style={{ ...eyebrow, marginBottom: 12 }}>{t.optionsTitle}</p>
+              {attrs.map((attr: Attribute) => (
+                <div key={attr.id} style={{ marginBottom: 18 }}>
+                  <p style={label}>{attr.name}</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 9 }}>
+                    {(attr.variants || []).map((v: Variant) => {
+                      const active = selectedVariants?.[attr.name] === v.value;
+                      const mode = attr.displayMode || 'text';
+                      const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                        Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(
+                          ([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)
+                        )
+                      );
+                      return (
+                        <button key={v.id} type="button" className={`vx-swatch${active ? ' is-active' : ''}`}
+                          onClick={() => available && handleVariantSelection && handleVariantSelection(attr.name, v.value)}
+                          title={v.name || v.value} aria-label={v.name || v.value}
+                          style={(mode === 'color' || mode === 'image') ? { width: 48, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 } : { cursor: available ? 'pointer' : 'not-allowed', color: available ? undefined : '#bbb', textDecoration: available ? 'none' : 'line-through' }}>
+                          {mode === 'color' && (/^https?:\/\//.test(v.value) ? <img src={v.value} alt={v.name || v.value} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : <span style={{ width: '100%', height: '100%', background: v.value, display: 'block' }} />)}
+                          {mode === 'image' && <img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}
+                          {mode !== 'color' && mode !== 'image' && <span style={{ padding: '0 13px', whiteSpace: 'nowrap' }}>{v.name || v.value}</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 20, padding: '20px 18px' }}>
+            <ProductForm
+              product={product}
+              store={store}
+              userId={userId || product?.store?.userId}
+              domain={domain}
+              selectedOffer={selectedOffer}
+              setSelectedOffer={setSelectedOffer}
+              selectedVariants={selectedVariants}
+              platform={platform}
+            />
+          </div>
+
+          {product?.desc && (
+            <div style={{ marginTop: 26 }}>
+              {tabsBlock('vx-desc-m')}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="vx-mobar">
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: '.68rem', color: SUB, margin: 0 }}>{t.price}</p>
+          <p className="vx-disp" style={{ fontSize: '1.25rem', color: A, margin: 0, whiteSpace: 'nowrap' }}>{fmt(price)} {cur(store)}</p>
+        </div>
+        <button type="button" className="vx-btnp" style={{ ...btnPrimary, width: 'auto', minHeight: 46, padding: '0 22px' }} onClick={scrollToBuy}>
+          {t.orderNow}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ============================ PRODUCT FORM ============================ */
+export function ProductForm({
+  product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store: storeprop,
+}: any) {
+  const store = storeprop || product?.store;
+  const t = T[getLang(store)];
+  const router = useRouter();
+  const initCount = useCartStore((s: any) => s.initCount);
+
+  const uid = userId || product?.store?.userId;
+
+  const [wilayas, setWilayas] = useState<Wilaya[]>([]);
+  const [communes, setCommunes] = useState<Commune[]>([]);
+  const [loadingC, setLoadingC] = useState(false);
+  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [added, setAdded] = useState(false);
+  const [errs, setErrs] = useState<Record<string, string>>({});
+  const [globalErr, setGlobalErr] = useState('');
+
+  const [fd, setFd] = useState({
+    customerId: '', customerName: '', customerPhone: '',
+    customerWelaya: '', customerCommune: '',
+    quantity: 1, priceLoss: 0,
+    typeLivraison: 'home' as 'home' | 'office',
+  });
+
+  useEffect(() => { if (uid) fetchWilayas(uid).then(setWilayas); }, [uid]);
+
+  useEffect(() => {
+    if (!fd.customerWelaya) { setCommunes([]); return; }
+    setLoadingC(true);
+    fetchCommunes(fd.customerWelaya).then((d) => { setCommunes(d); setLoadingC(false); });
+  }, [fd.customerWelaya]);
+
+  const selW = wilayas.find((w) => String(w.id) === String(fd.customerWelaya));
+
+  const getFP = (): number => {
+    const off = selectedOffer ? product?.offers?.find((o: Offer) => String(o.id) === String(selectedOffer)) : undefined;
+    if (off) return Number(off.price);
+    const vd = product?.variantDetails?.find((d: VariantDetail) => variantMatches(d, selectedVariants || {}));
+    if (vd && Number(vd.price) !== -1) return Number(vd.price);
+    return Number(product?.price) || 0;
+  };
+
+  const getLiv = useCallback((): number => {
+    if (!selW) return 0;
+    return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
+  }, [selW, fd.typeLivraison]);
+
+  const getVarId = (): any => {
+    const vd = product?.variantDetails?.find((d: VariantDetail) => variantMatches(d, selectedVariants || {}));
+    return vd ? vd.id : null;
+  };
+
+  const fp = getFP();
+  const total = () => fp * fd.quantity + getLiv();
+
+  const validate = (): boolean => {
+    const e: Record<string, string> = {};
+    if (!fd.customerName || fd.customerName.trim().length < 3) e.customerName = t.errName;
+    if (!/^(0|\+213)[5-7]\d{8}$/.test((fd.customerPhone || '').replace(/\s/g, ''))) e.customerPhone = t.errPhone;
+    if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
+    if (!fd.customerCommune) e.customerCommune = t.errCommune;
+    setErrs(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const payload = () => ({
+    ...fd,
+    product,
+    productId: product?.id,
+    storeId: product?.store?.id || store?.id,
+    userId: uid,
+    variantDetailId: getVarId(),
+    selectedOffer: selectedOffer || null,
+    selectedVariants: selectedVariants || {},
+    platform: platform || 'web',
+    finalPrice: fp,
+    totalPrice: total(),
+    priceLivraison: getLiv(),
+  });
+
+  const addToCart = () => {
+    try {
+      const arr = JSON.parse(localStorage.getItem(domain) || '[]');
+      const next = Array.isArray(arr) ? arr : [];
+      next.push({ ...payload(), addedAt: new Date().toISOString() });
+      localStorage.setItem(domain, JSON.stringify(next));
+      initCount(next.length);
+      setAdded(true);
+      setTimeout(() => setAdded(false), 1800);
+    } catch (e) { setGlobalErr(t.errSubmit); }
+  };
+
+  const submitOrder = async () => {
+    setGlobalErr('');
+    if (!validate()) return;
+    setSubmitting(true);
+    try {
+      const r = await fetch(`${API_URL}/orders/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload()),
+      });
+      if (!r.ok) throw new Error('failed');
+      const d = await r.json().catch(() => ({}));
+      const cid = d?.customerId || d?.data?.customerId;
+      if (cid) { try { localStorage.setItem('customerId', String(cid)); } catch (e) { /* noop */ } }
+      router.push(`/successfully?productId=${product?.id}`);
+    } catch (e) {
+      setGlobalErr(t.errSubmit);
+      setSubmitting(false);
+    }
+  };
+
+  const set = (k: string, v: any) => setFd((s) => ({ ...s, [k]: v }));
+
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16 }}>
+        <span style={{ fontSize: '.82rem', fontWeight: 700 }}>{t.qty}</span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', border: `1px solid ${BD}`, borderRadius: 999, background: BG }}>
+          <button type="button" onClick={() => set('quantity', Math.max(1, fd.quantity - 1))} aria-label="-"
+            style={{ width: 42, height: 42, borderRadius: 999, display: 'grid', placeItems: 'center', background: 'transparent', border: 'none', cursor: 'pointer', color: INK }}>
+            <Minus size={15} />
+          </button>
+          <span className="vx-disp" style={{ minWidth: 40, textAlign: 'center', fontSize: '1.15rem' }}>{fd.quantity}</span>
+          <button type="button" onClick={() => set('quantity', fd.quantity + 1)} aria-label="+"
+            style={{ width: 42, height: 42, borderRadius: 999, display: 'grid', placeItems: 'center', background: 'transparent', border: 'none', cursor: 'pointer', color: INK }}>
+            <Plus size={15} />
+          </button>
+        </span>
+      </div>
+
+      {!isOrderNow && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <button type="button" className="vx-btnp" style={btnPrimary} onClick={() => setIsOrderNow(true)}>
+            <Zap size={16} strokeWidth={2.4} /> {t.orderNow}
+          </button>
+          {store?.cart !== false && (
+            <button type="button" className="vx-btng" style={btnGhost} onClick={addToCart}>
+              {added ? <><Check size={16} /> {t.added}</> : <><ShoppingBag size={16} /> {t.addToCart}</>}
+            </button>
+          )}
+        </div>
+      )}
+
+      {isOrderNow && (
+        <div className="vx-fade">
+          <div style={{ marginBottom: 13 }}>
+            <label style={label} htmlFor="vx-name">{t.fullName}</label>
+            <input id="vx-name" style={{ ...inputBase, ...(errs.customerName ? { borderColor: ERR } : {}) }}
+              value={fd.customerName} placeholder={t.fullNamePlaceholder}
+              onChange={(e) => set('customerName', e.target.value)} />
+            <ErrLine msg={errs.customerName} />
+          </div>
+
+          <div style={{ marginBottom: 13 }}>
+            <label style={label} htmlFor="vx-phone">{t.phone}</label>
+            <input id="vx-phone" type="tel" dir="ltr" inputMode="tel"
+              style={{ ...inputBase, ...(errs.customerPhone ? { borderColor: ERR } : {}) }}
+              value={fd.customerPhone} placeholder={t.phonePlaceholder}
+              onChange={(e) => set('customerPhone', e.target.value)} />
+            <ErrLine msg={errs.customerPhone} />
+          </div>
+
+          <div className="vx-form-2" style={{ marginBottom: 13 }}>
+            <div>
+              <label style={label} htmlFor="vx-wil">{t.wilaya}</label>
+              <div style={{ position: 'relative' }}>
+                <ChevronDown size={14} color={SUB} style={{ position: 'absolute', insetInlineEnd: 13, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                <select id="vx-wil" disabled={wilayas.length === 0}
+                  style={{ ...inputBase, paddingInlineEnd: 38, ...(errs.customerWelaya ? { borderColor: ERR } : {}) }}
+                  value={fd.customerWelaya}
+                  onChange={(e) => setFd((s) => ({ ...s, customerWelaya: e.target.value, customerCommune: '' }))}>
+                  <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
+                  {wilayas.map((w) => (
+                    <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>
+                  ))}
+                </select>
+              </div>
+              <ErrLine msg={errs.customerWelaya} />
+            </div>
+
+            <div>
+              <label style={label} htmlFor="vx-com">{t.commune}</label>
+              <div style={{ position: 'relative' }}>
+                <ChevronDown size={14} color={SUB} style={{ position: 'absolute', insetInlineEnd: 13, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                <select id="vx-com" disabled={!fd.customerWelaya || loadingC}
+                  style={{ ...inputBase, paddingInlineEnd: 38, ...(errs.customerCommune ? { borderColor: ERR } : {}) }}
+                  value={fd.customerCommune}
+                  onChange={(e) => set('customerCommune', e.target.value)}>
+                  <option value="">{loadingC ? t.communeLoading : t.communePlaceholder}</option>
+                  {communes.map((c) => (
+                    <option key={c.id} value={c.id}>{t.dir === 'rtl' ? c.ar_name : c.name}</option>
+                  ))}
+                </select>
+              </div>
+              <ErrLine msg={errs.customerCommune} />
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 16 }}>
+            <span style={label}>{t.delivery}</span>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              {([['home', t.deliveryHome], ['office', t.deliveryOffice]] as const).map(([k, l]) => {
+                const active = fd.typeLivraison === k;
+                return (
+                  <button key={k} type="button" onClick={() => set('typeLivraison', k)}
+                    style={{
+                      minHeight: 48, padding: '0 10px', cursor: 'pointer', fontFamily: 'inherit', fontSize: '.8rem',
+                      borderRadius: 12, background: active ? AL : 'transparent',
+                      border: `1px solid ${active ? A : BD}`, color: active ? A : SUB,
+                      fontWeight: active ? 700 : 500, transition: 'all .2s',
+                    }}>
+                    {l}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 16, padding: '4px 14px 12px', background: BG, border: `1px solid ${BD}`, borderRadius: 16 }}>
+            <Row l={t.price} v={`${fmt(fp)} ${cur(store)}`} />
+            <Row l={t.qty} v={`× ${fd.quantity}`} />
+            <Row l={t.delivery} v={selW ? `${fmt(getLiv())} ${cur(store)}` : '—'} />
+            <Row l={t.total} v={`${fmt(total())} ${cur(store)}`} strong />
+          </div>
+
+          {globalErr && (
+            <p style={{ fontSize: '.8rem', color: ERR, marginBottom: 12, display: 'flex', gap: 6, alignItems: 'center' }}>
+              <AlertCircle size={13} /> {globalErr}
+            </p>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+            <button type="button" className="vx-btnp" style={btnPrimary} onClick={submitOrder} disabled={submitting}>
+              {submitting ? t.sending : t.confirmOrder}
+            </button>
+            <button type="button" className="vx-btng" style={{ ...btnGhost, color: SUB }}
+              onClick={() => setIsOrderNow(false)} disabled={submitting}>
+              {t.cancel}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ============================ CART ============================ */
+export function Cart({ domain, store }: any) {
+  const t = T[getLang(store)];
+  const initCount = useCartStore((s: any) => s.initCount);
+
+  const [items, setItems] = useState<any[]>([]);
+  const [wilayas, setWilayas] = useState<Wilaya[]>([]);
+  const [communes, setCommunes] = useState<Commune[]>([]);
+  const [loadingC, setLoadingC] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState(false);
+  const [errs, setErrs] = useState<Record<string, string>>({});
+  const [globalErr, setGlobalErr] = useState('');
+
+  const [fd, setFd] = useState({
+    customerId: '', customerName: '', customerPhone: '',
+    customerWelaya: '', customerCommune: '',
+    typeLivraison: 'home' as 'home' | 'office',
+  });
+
+  useEffect(() => {
+    try {
+      const arr = JSON.parse(localStorage.getItem(domain) || '[]');
+      setItems(Array.isArray(arr) ? arr : []);
+    } catch (e) { setItems([]); }
+  }, [domain]);
+
+  useEffect(() => { if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas); }, [store]);
+
+  useEffect(() => {
+    if (!fd.customerWelaya) { setCommunes([]); return; }
+    setLoadingC(true);
+    fetchCommunes(fd.customerWelaya).then((d) => { setCommunes(d); setLoadingC(false); });
+  }, [fd.customerWelaya]);
+
+  const selW = wilayas.find((w) => String(w.id) === String(fd.customerWelaya));
+  const getLiv = useCallback((): number => {
+    if (!selW) return 0;
+    return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
+  }, [selW, fd.typeLivraison]);
+
+  const cartTotal = items.reduce((s, it) => s + (Number(it.finalPrice) || 0) * (Number(it.quantity) || 1), 0);
+  const finalTotal = cartTotal + getLiv();
+
+  const removeItem = (i: number) => {
+    const next = items.filter((_, idx) => idx !== i);
+    setItems(next);
+    try { localStorage.setItem(domain, JSON.stringify(next)); } catch (e) { /* noop */ }
+    initCount(next.length);
+  };
+
+  const set = (k: string, v: any) => setFd((s) => ({ ...s, [k]: v }));
+
+  const validate = (): boolean => {
+    const e: Record<string, string> = {};
+    if (!fd.customerName || fd.customerName.trim().length < 3) e.customerName = t.errName;
+    if (!/^(0|\+213)[5-7]\d{8}$/.test((fd.customerPhone || '').replace(/\s/g, ''))) e.customerPhone = t.errPhone;
+    if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
+    if (!fd.customerCommune) e.customerCommune = t.errCommune;
+    setErrs(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const submitOrder = async () => {
+    setGlobalErr('');
+    if (!validate() || items.length === 0) return;
+    setSubmitting(true);
+    try {
+      const body = items.map((it) => ({
+        ...fd,
+        product: it.product,
+        productId: it.productId || it.product?.id,
+        storeId: it.storeId || store?.id,
+        userId: it.userId || store?.user?.id,
+        variantDetailId: it.variantDetailId ?? null,
+        selectedOffer: it.selectedOffer || null,
+        selectedVariants: it.selectedVariants || {},
+        platform: it.platform || 'web',
+        quantity: Number(it.quantity) || 1,
+        priceLoss: 0,
+        finalPrice: Number(it.finalPrice) || 0,
+        totalPrice: (Number(it.finalPrice) || 0) * (Number(it.quantity) || 1) + getLiv(),
+        priceLivraison: getLiv(),
+      }));
+      const r = await fetch(`${API_URL}/orders/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!r.ok) throw new Error('failed');
+      try { localStorage.setItem(domain, '[]'); } catch (e) { /* noop */ }
+      initCount(0);
+      setItems([]);
+      setDone(true);
+      setSubmitting(false);
+    } catch (e) {
+      setGlobalErr(t.errSubmit);
+      setSubmitting(false);
+    }
+  };
+
+  if (done) {
+    return (
+      <div className="vx-wrap" style={{ paddingTop: '80px', paddingBottom: '110px', textAlign: 'center' }}>
+        <div style={{ width: 74, height: 74, margin: '0 auto 22px', borderRadius: 999, background: AL, border: `1px solid ${A}`, display: 'grid', placeItems: 'center', animation: 'vxPop .45s ease both' }}>
+          <Check size={32} color={A} strokeWidth={2.2} />
+        </div>
+        <h1 className="vx-disp" style={{ fontSize: 'clamp(1.7rem,5.4vw,2.6rem)', textTransform: 'uppercase', margin: '0 0 12px' }}>{t.successTitle}</h1>
+        <p style={{ color: SUB, fontSize: '.92rem', marginBottom: 28 }}>{t.successDesc}</p>
+        <Link href="/" className="vx-btnp" style={{ ...btnPrimary, width: 'auto' }}>{t.backToShop}</Link>
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="vx-wrap" style={{ paddingTop: '80px', paddingBottom: '110px', textAlign: 'center' }}>
+        <ShoppingBag size={48} color={BD} strokeWidth={1.2} />
+        <h1 className="vx-disp" style={{ fontSize: 'clamp(1.6rem,5vw,2.4rem)', textTransform: 'uppercase', margin: '18px 0 10px' }}>{t.cartEmpty}</h1>
+        <p style={{ color: SUB, fontSize: '.9rem', marginBottom: 26 }}>{t.cartEmptyDesc}</p>
+        <Link href="/" className="vx-btnp" style={{ ...btnPrimary, width: 'auto' }}>{t.shopNow}</Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="vx-wrap" style={{ paddingTop: '30px', paddingBottom: '80px' }}>
+      <span style={eyebrow}>{items.length} {t.items}</span>
+      <h1 className="vx-disp" style={{ fontSize: 'clamp(1.9rem,6vw,3rem)', textTransform: 'uppercase', margin: '.25rem 0 26px' }}>{t.myCart}</h1>
+
+      <div className="vx-cartlay">
+        <div>
+          <div style={{ display: 'grid', gap: 12 }}>
+            {items.map((it, i) => {
+              const img = it.product?.productImage || it.product?.imagesProduct?.[0]?.imageUrl;
+              const qty = Number(it.quantity) || 1;
+              const line = (Number(it.finalPrice) || 0) * qty;
+              return (
+                <div key={i} style={{ display: 'flex', gap: 13, padding: 12, background: CARD, border: `1px solid ${BD}`, borderRadius: 18 }}>
+                  <div style={{ width: 92, height: 92, flexShrink: 0, overflow: 'hidden', borderRadius: 14, background: CARD2 }}>
+                    {img ? <img src={img} alt={it.product?.name || ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : <Placeholder size={22} />}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <div>
+                      <p dir="auto" style={{ fontSize: '.9rem', fontWeight: 600, margin: '0 0 5px', lineHeight: 1.5 }}>{it.product?.name}</p>
+                      <p style={{ fontSize: '.75rem', color: SUB, margin: 0 }}>{t.qty}: {qty}</p>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                      <span className="vx-disp" style={{ fontSize: '1.2rem', color: A, whiteSpace: 'nowrap' }}>
+                        {fmt(line)} {cur(store)}
+                      </span>
+                      <button type="button" onClick={() => removeItem(i)} aria-label={t.remove}
+                        style={{ width: 42, height: 42, borderRadius: 999, display: 'grid', placeItems: 'center', background: 'transparent', border: `1px solid ${BD}`, cursor: 'pointer', color: SUB }}>
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div>
+          <div style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 22, padding: '22px 18px' }}>
+            <p style={{ ...eyebrow, marginBottom: 16 }}>{t.confirmOrder}</p>
+
+            <div style={{ marginBottom: 13 }}>
+              <label style={label} htmlFor="vxc-name">{t.fullName}</label>
+              <input id="vxc-name" style={{ ...inputBase, ...(errs.customerName ? { borderColor: ERR } : {}) }}
+                value={fd.customerName} placeholder={t.fullNamePlaceholder}
+                onChange={(e) => set('customerName', e.target.value)} />
+              <ErrLine msg={errs.customerName} />
+            </div>
+
+            <div style={{ marginBottom: 13 }}>
+              <label style={label} htmlFor="vxc-phone">{t.phone}</label>
+              <input id="vxc-phone" type="tel" dir="ltr" inputMode="tel"
+                style={{ ...inputBase, ...(errs.customerPhone ? { borderColor: ERR } : {}) }}
+                value={fd.customerPhone} placeholder={t.phonePlaceholder}
+                onChange={(e) => set('customerPhone', e.target.value)} />
+              <ErrLine msg={errs.customerPhone} />
+            </div>
+
+            <div className="vx-form-2" style={{ marginBottom: 13 }}>
+              <div>
+                <label style={label} htmlFor="vxc-wil">{t.wilaya}</label>
+                <div style={{ position: 'relative' }}>
+                  <ChevronDown size={14} color={SUB} style={{ position: 'absolute', insetInlineEnd: 13, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                  <select id="vxc-wil" disabled={wilayas.length === 0}
+                    style={{ ...inputBase, paddingInlineEnd: 38, ...(errs.customerWelaya ? { borderColor: ERR } : {}) }}
+                    value={fd.customerWelaya}
+                    onChange={(e) => setFd((s) => ({ ...s, customerWelaya: e.target.value, customerCommune: '' }))}>
+                    <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
+                    {wilayas.map((w) => (
+                      <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <ErrLine msg={errs.customerWelaya} />
+              </div>
+
+              <div>
+                <label style={label} htmlFor="vxc-com">{t.commune}</label>
+                <div style={{ position: 'relative' }}>
+                  <ChevronDown size={14} color={SUB} style={{ position: 'absolute', insetInlineEnd: 13, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                  <select id="vxc-com" disabled={!fd.customerWelaya || loadingC}
+                    style={{ ...inputBase, paddingInlineEnd: 38, ...(errs.customerCommune ? { borderColor: ERR } : {}) }}
+                    value={fd.customerCommune}
+                    onChange={(e) => set('customerCommune', e.target.value)}>
+                    <option value="">{loadingC ? t.communeLoading : t.communePlaceholder}</option>
+                    {communes.map((c) => (
+                      <option key={c.id} value={c.id}>{t.dir === 'rtl' ? c.ar_name : c.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <ErrLine msg={errs.customerCommune} />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <span style={label}>{t.delivery}</span>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                {([['home', t.deliveryHome], ['office', t.deliveryOffice]] as const).map(([k, l]) => {
+                  const active = fd.typeLivraison === k;
+                  return (
+                    <button key={k} type="button" onClick={() => set('typeLivraison', k)}
+                      style={{
+                        minHeight: 48, padding: '0 10px', cursor: 'pointer', fontFamily: 'inherit', fontSize: '.8rem',
+                        borderRadius: 12, background: active ? AL : 'transparent',
+                        border: `1px solid ${active ? A : BD}`, color: active ? A : SUB,
+                        fontWeight: active ? 700 : 500, transition: 'all .2s',
+                      }}>
+                      {l}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 16, padding: '4px 14px 12px', background: BG, border: `1px solid ${BD}`, borderRadius: 16 }}>
+              <Row l={t.subtotal} v={`${fmt(cartTotal)} ${cur(store)}`} />
+              <Row l={t.delivery} v={selW ? `${fmt(getLiv())} ${cur(store)}` : '—'} />
+              <Row l={t.total} v={`${fmt(finalTotal)} ${cur(store)}`} strong />
+            </div>
+
+            {globalErr && (
+              <p style={{ fontSize: '.8rem', color: ERR, marginBottom: 12, display: 'flex', gap: 6, alignItems: 'center' }}>
+                <AlertCircle size={13} /> {globalErr}
+              </p>
+            )}
+
+            <button type="button" className="vx-btnp" style={btnPrimary} onClick={submitOrder} disabled={submitting}>
+              {submitting ? t.sending : t.confirmOrder}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================ STATIC PAGES ============================ */
+function Shell({ title, eyebrowTxt, children }: any) {
+  return (
+    <div>
+      <div style={{ background: CARD, borderBottom: `1px solid ${BD}`, padding: '46px 0 40px' }}>
+        <div className="vx-wrap">
+          <span style={eyebrow}>{eyebrowTxt}</span>
+          <h1 className="vx-disp" style={{ fontSize: 'clamp(1.9rem,6vw,3.2rem)', textTransform: 'uppercase', margin: '.35rem 0 0' }}>{title}</h1>
+        </div>
+      </div>
+      <div className="vx-wrap" style={{ paddingTop: '38px', paddingBottom: '70px', maxWidth: 900 }}>{children}</div>
+    </div>
+  );
+}
+
+function InfoBlock({ title, body, i }: any) {
+  return (
+    <div style={{ padding: 18, marginBottom: 12, background: CARD, border: `1px solid ${BD}`, borderRadius: 18, animation: 'vxUp .5s ease both', animationDelay: `${i * 0.06}s` }}>
+      <h2 style={{ fontSize: '.96rem', fontWeight: 700, margin: '0 0 8px', display: 'flex', alignItems: 'center', gap: 9 }}>
+        <span style={{ width: 24, height: 24, borderRadius: 8, background: AL, color: A, display: 'grid', placeItems: 'center', fontSize: '.72rem', fontWeight: 800, flexShrink: 0 }}>{i + 1}</span>
+        {title}
+      </h2>
+      <p style={{ fontSize: '.88rem', lineHeight: 1.85, color: SUB, margin: 0 }}>{body}</p>
+    </div>
+  );
+}
+
+export function Privacy({ store }: any) {
+  const t = T[getLang(store)];
+  return (
+    <Shell title={t.privacyTitle} eyebrowTxt={store?.name || 'VELOCITY'}>
+      {t.pPrivacy.map((b: any, i: number) => <InfoBlock key={i} i={i} title={b.t} body={b.b} />)}
+    </Shell>
+  );
+}
+
+export function Terms({ store }: any) {
+  const t = T[getLang(store)];
+  return (
+    <Shell title={t.termsTitle} eyebrowTxt={store?.name || 'VELOCITY'}>
+      {t.pTerms.map((b: any, i: number) => <InfoBlock key={i} i={i} title={b.t} body={b.b} />)}
+    </Shell>
+  );
+}
+
+export function Cookies({ store }: any) {
+  const t = T[getLang(store)];
+  return (
+    <Shell title={t.cookiesTitle} eyebrowTxt={store?.name || 'VELOCITY'}>
+      {t.pCookies.map((b: any, i: number) => <InfoBlock key={i} i={i} title={b.t} body={b.b} />)}
+    </Shell>
+  );
+}
+
+export function Contact({ store }: any) {
+  const t = T[getLang(store)];
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [sending, setSending] = useState(false);
+  const [ok, setOk] = useState(false);
+  const [err, setErr] = useState('');
+  const c = store?.contact || {};
+
+  const send = async () => {
+    setErr('');
+    if (!form.name || !form.message) { setErr(t.errName); return; }
+    setSending(true);
+    try {
+      const r = await fetch(`${API_URL}/user/contact-user/message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, storeId: store?.id }),
+      });
+      if (!r.ok) throw new Error('failed');
+      setOk(true);
+    } catch (e) { setErr(t.errSubmit); }
+    setSending(false);
+  };
+
+  const info = [
+    c.phone ? { ico: Phone, l: t.callUs, v: c.phone, href: `tel:${c.phone}`, ltr: true } : null,
+    c.email ? { ico: Mail, l: t.writeUs, v: c.email, href: `mailto:${c.email}`, ltr: false } : null,
+    (c.wilaya || c.address) ? { ico: MapPin, l: t.ourAddress, v: [c.wilaya, c.address].filter(Boolean).join(' — '), href: '', ltr: false } : null,
+  ].filter(Boolean) as { ico: any; l: string; v: string; href: string; ltr: boolean }[];
+
+  return (
+    <Shell title={t.contactTitle} eyebrowTxt={store?.name || 'VELOCITY'}>
+      <div className="vx-ct2">
+        <div style={{ display: 'grid', gap: 10 }}>
+          {info.map((it, i) => {
+            const Ico = it.ico;
+            return (
+              <div key={i} style={{ display: 'flex', gap: 13, alignItems: 'center', padding: 16, background: CARD, border: `1px solid ${BD}`, borderRadius: 16 }}>
+                <span className="vx-tico"><Ico size={18} color={A} strokeWidth={2} /></span>
+                <span style={{ minWidth: 0 }}>
+                  <span style={{ ...label, marginBottom: 2 }}>{it.l}</span>
+                  {it.href ? (
+                    <a href={it.href} style={{ color: INK, textDecoration: 'none', fontSize: '.9rem', fontWeight: 600 }}><span dir={it.ltr ? 'ltr' : undefined}>{it.v}</span></a>
+                  ) : (
+                    <span style={{ fontSize: '.9rem', fontWeight: 600 }}>{it.v}</span>
+                  )}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 22, padding: '24px 20px' }}>
+          {ok ? (
+            <div style={{ textAlign: 'center', padding: '24px 0' }}>
+              <div style={{ width: 62, height: 62, margin: '0 auto 16px', borderRadius: 999, background: AL, border: `1px solid ${A}`, display: 'grid', placeItems: 'center' }}>
+                <Check size={28} color={A} strokeWidth={2.2} />
+              </div>
+              <p style={{ fontSize: '.95rem', marginBottom: 20 }}>{t.contactSuccess}</p>
+              <button type="button" className="vx-btng" style={{ ...btnGhost, width: 'auto' }}
+                onClick={() => { setOk(false); setForm({ name: '', email: '', phone: '', message: '' }); }}>
+                {t.sendAgain}
+              </button>
+            </div>
+          ) : (
+            <div>
+              <div style={{ marginBottom: 13 }}>
+                <label style={label} htmlFor="vxk-n">{t.fullName}</label>
+                <input id="vxk-n" style={inputBase} value={form.name} placeholder={t.fullNamePlaceholder}
+                  onChange={(e) => setForm((s) => ({ ...s, name: e.target.value }))} />
+              </div>
+              <div className="vx-form-2" style={{ marginBottom: 13 }}>
+                <div>
+                  <label style={label} htmlFor="vxk-e">{t.email}</label>
+                  <input id="vxk-e" type="email" dir="ltr" style={inputBase} value={form.email} placeholder={t.emailPlaceholder}
+                    onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))} />
+                </div>
+                <div>
+                  <label style={label} htmlFor="vxk-p">{t.phone}</label>
+                  <input id="vxk-p" type="tel" dir="ltr" style={inputBase} value={form.phone} placeholder={t.phonePlaceholder}
+                    onChange={(e) => setForm((s) => ({ ...s, phone: e.target.value }))} />
+                </div>
+              </div>
+              <div style={{ marginBottom: 15 }}>
+                <label style={label} htmlFor="vxk-m">{t.msg}</label>
+                <textarea id="vxk-m" rows={5} style={{ ...inputBase, resize: 'none' }} value={form.message} placeholder={t.msgPlaceholder}
+                  onChange={(e) => setForm((s) => ({ ...s, message: e.target.value }))} />
+              </div>
+              {err && (
+                <p style={{ fontSize: '.78rem', color: ERR, marginBottom: 12, display: 'flex', gap: 5, alignItems: 'center' }}>
+                  <AlertCircle size={12} /> {err}
+                </p>
+              )}
+              <button type="button" className="vx-btnp" style={btnPrimary} onClick={send} disabled={sending}>
+                {sending ? t.sending : <>{t.send} <Send size={15} /></>}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </Shell>
+  );
+}
+
+export function StaticPage({ staticPage, page, store }: any) {
+  const p = (staticPage || page || '').toLowerCase();
+  if (p === 'privacy') return <Privacy store={store} />;
+  if (p === 'terms') return <Terms store={store} />;
+  if (p === 'cookies') return <Cookies store={store} />;
+  if (p === 'contact') return <Contact store={store} />;
+  return <Privacy store={store} />;
+}

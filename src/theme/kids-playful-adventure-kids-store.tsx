@@ -169,7 +169,7 @@ const CSS = `
     padding-bottom: 2.5rem;
     border-bottom: 1px solid rgba(255,255,255,0.08);
   }
-  @media (min-width: 768px) { .footer-cols { grid-template-columns: 1.8fr 1fr 1fr; } }
+  @media (min-width: 768px) { .footer-cols { grid-template-columns: 1.8fr 1fr 1fr 1fr; } }
 
   .hero-layout {
     display: grid;
@@ -333,10 +333,11 @@ const jsonAr = {
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
   // Footer
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
+  cookies: 'الكوكيز',
   rightsReserved: 'جميع الحقوق محفوظة',
   readyNow: 'جاهزون الآن!',
   replyHours: 'نرد خلال ساعات',
@@ -411,10 +412,11 @@ const jsonFr = {
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
   // Footer
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
+  cookies: 'Cookies',
   rightsReserved: 'Tous droits réservés.',
   readyNow: 'Disponible maintenant !',
   replyHours: 'Réponse en quelques heures',
@@ -448,7 +450,7 @@ const jsonEn = {
   successTitle: 'Order sent successfully!', successDesc: 'We will contact you soon to confirm the details',
   backToShop: 'Back to Shopping', checkoutTitle: 'Complete Order',
   offersTitle: 'Available Offers', descTitle: 'Description',
-  quickLinks: 'Quick Links', contactSect: 'Contact Us', privacy: 'Privacy', terms: 'Terms', rightsReserved: 'All rights reserved',
+  quickLinks: 'Quick Links', legalNav: 'Legal', contactSect: 'Contact Us', privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies', rightsReserved: 'All rights reserved',
   readyNow: 'Available now!',
   replyHours: 'Reply within hours',
   categoriesTitle: 'Categories',
@@ -736,7 +738,7 @@ export function Footer({ store }: any) {
                     {/* قسم 2 */}
                     <div>
                         <h4 style={{ fontFamily: "'Boogaloo',cursive", fontSize: '1.1rem', color: 'var(--yellow)', marginBottom: '1.25rem' }}>🗺️ {t.quickLinks}</h4>
-                        {[{ h: '/', l: t.home, e: '🏠' }, { h: '/cart', l: t.cart, e: '🛒' }, { h: '/contact', l: t.contact, e: '📞' }, { h: '/Privacy', l: t.privacy, e: '🔒' }, { h: '/Terms', l: t.terms, e: '📋' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
+                        {[{ h: '/', l: t.home, e: '🏠' }, { h: '/cart', l: t.cart, e: '🛒' }, { h: '/contact', l: t.contact, e: '📞' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
                             <a key={i} href={lnk.h} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
                                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--yellow)'; el.style.transform = 'translateX(-4px)'; }}
                                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(255,255,255,0.5)'; el.style.transform = ''; }}>
@@ -745,7 +747,19 @@ export function Footer({ store }: any) {
                         ))}
                     </div>
 
-                    {/* قسم 3 */}
+                    {/* قسم 3 — قانوني */}
+                    <div>
+                        <h4 style={{ fontFamily: "'Boogaloo',cursive", fontSize: '1.1rem', color: 'var(--yellow)', marginBottom: '1.25rem' }}>⚖️ {t.legalNav}</h4>
+                        {[{ h: '/Privacy', l: t.privacy, e: '🔒' }, { h: '/Terms', l: t.terms, e: '📋' }, { h: '/cookies', l: t.cookies, e: '🍪' }].map((lnk, i) => (
+                            <a key={i} href={lnk.h} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: 700, color: 'rgba(255,255,255,0.5)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
+                                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--yellow)'; el.style.transform = 'translateX(-4px)'; }}
+                                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(255,255,255,0.5)'; el.style.transform = ''; }}>
+                                <span>{lnk.e}</span>{lnk.l}
+                            </a>
+                        ))}
+                    </div>
+
+                    {/* قسم 4 */}
                     <div>
                         <h4 style={{ fontFamily: "'Boogaloo',cursive", fontSize: '1.1rem', color: 'var(--yellow)', marginBottom: '1.25rem' }}>📡 {t.contactSect}</h4>
                         {[{ e: '📞', v: store?.contact?.phone }, { e: '📍', v: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') }, { e: '📧', v: store?.contact?.email }].filter(r => r.v).map((r, i) => (
@@ -1136,34 +1150,36 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                                         {attr.variants.map((v: any) => {
                                             const isSelected = selectedVariants[attr.name] === v.value;
+                                            const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                                                Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(
+                                                    ([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)
+                                                )
+                                            );
 
-                                            // حالة الألوان
                                             if (attr.displayMode === 'color') {
                                                 return (
-                                                    <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                                                        style={{ width: 30, height: 30, borderRadius: 8, background: v.value, border: 'none', cursor: 'pointer', outline: `3px solid ${isSelected ? pal.border : 'transparent'}`, outlineOffset: 3, transition: 'outline 0.2s' }}
+                                                    <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
+                                                        style={{ width: 30, height: 30, borderRadius: 8, background: v.value, border: 'none', cursor: available ? 'pointer' : 'not-allowed', outline: `3px solid ${isSelected ? pal.border : 'transparent'}`, outlineOffset: 3, transition: 'outline 0.2s', opacity: available ? 1 : 0.35 }}
                                                     />
                                                 );
                                             }
 
-                                            // حالة الصور (جديد)
                                             if (attr.displayMode === 'image') {
                                                 return (
-                                                    <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
+                                                    <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
                                                         style={{
                                                             width: 45, height: 45, borderRadius: 8,
                                                             backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center',
-                                                            border: 'none', cursor: 'pointer',
-                                                            outline: `3px solid ${isSelected ? pal.border : 'transparent'}`, outlineOffset: 3, transition: 'all 0.2s'
+                                                            border: 'none', cursor: available ? 'pointer' : 'not-allowed',
+                                                            outline: `3px solid ${isSelected ? pal.border : 'transparent'}`, outlineOffset: 3, transition: 'all 0.2s', opacity: available ? 1 : 0.35
                                                         }}
                                                     />
                                                 );
                                             }
 
-                                            // الحالة الافتراضية (نصوص)
                                             return (
-                                                <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                                                    style={{ padding: '0.4rem 1rem', border: `2.5px solid ${isSelected ? pal.border : 'var(--border)'}`, borderRadius: 8, fontWeight: 800, fontSize: '0.85rem', background: isSelected ? pal.bg : '#fff', color: isSelected ? pal.accent : 'var(--mid)', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
+                                                <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
+                                                    style={{ padding: '0.4rem 1rem', border: `2.5px solid ${isSelected ? pal.border : 'var(--border)'}`, borderRadius: 8, fontWeight: 800, fontSize: '0.85rem', background: isSelected ? pal.bg : '#fff', color: isSelected ? pal.accent : (available ? 'var(--mid)' : '#bbb'), cursor: available ? 'pointer' : 'not-allowed', fontFamily: 'inherit', transition: 'all 0.2s', textDecoration: available ? 'none' : 'line-through' }}>
                                                     {v.name}
                                                 </button>
                                             );
@@ -1254,7 +1270,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         try {
             await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
             if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
-            router.push(`/${domain}/successfully`);
+            router.push(`/successfully?productId=${product?.id}`);
         } catch { } finally { setSub(false); }
     };
 

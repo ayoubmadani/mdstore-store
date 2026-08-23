@@ -94,7 +94,7 @@ const THEME_CSS = `
   @media (min-width: 1024px) { .contact-inner { grid-template-columns: 1fr 2fr; } }
 
   .footer-cols { display: grid; grid-template-columns: 1fr; gap: 2.5rem; }
-  @media (min-width: 768px) { .footer-cols { grid-template-columns: 2fr 1fr 1fr; } }
+  @media (min-width: 768px) { .footer-cols { grid-template-columns: 2fr 1fr 1fr 1fr; } }
 
   .oa-hero-grid { grid-template-columns: 1fr; }
   @media (min-width: 900px) {
@@ -127,7 +127,7 @@ const THEME_CSS = `
   .glb-search-card-info { padding: 0.625rem 0.75rem; direction: rtl; }
 `;
 
-interface Offer { id: string; name: string; quantity: number; price: number; }
+interface Offer { id: string; name: string; subTitle?: string; quantity: number; price: number; shippingFree?: boolean; }
 interface Variant { id: string; name: string; value: string; }
 interface Attribute { id: string; type: string; name: string; displayMode?: 'color' | 'image' | 'text' | null; variants: Variant[]; }
 interface ProductImage { id: string; imageUrl: string; }
@@ -138,11 +138,11 @@ interface Commune { id: string; name: string; ar_name: string; wilayaId: string;
 export interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
-  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 export interface ProductFormProps {
-  product: Product; userId: string; domain: string; redirectPath?: string;
+  product: Product; store?: any; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
   selectedVariants: Record<string, string>; platform?: string; priceLoss?: number;
 }
@@ -197,6 +197,10 @@ const jsonAr = {
   deliveryOffice: 'مكتب بريد',
   qty: 'الكمية',
   price: 'السعر',
+  freeShippingBadge: '🚚 توصيل مجاني',
+  freeShippingThreshold: '🚚 توصيل مجاني للطلبات بـ {{amount}} دج أو أكثر',
+  freeShippingRemaining: 'أضف {{amount}} دج أخرى للحصول على توصيل مجاني',
+  freeShippingReached: '🎉 حصلت على توصيل مجاني!',
   delivery: 'التوصيل',
   total: 'الإجمالي',
   subtotal: 'المجموع الفرعي',
@@ -224,6 +228,7 @@ const jsonAr = {
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
+  cookies: 'الكوكيز',
   rightsReserved: 'جميع الحقوق محفوظة',
   heroBadge: 'مغامرات في الهواء الطلق',
   heroTitle: 'اكتشف<br/><em style="color:#D4622A;font-style:normal">المجهول</em>',
@@ -236,7 +241,7 @@ const jsonAr = {
   trust4T: 'مقاومة للطقس', trust4S: 'جودة عالية',
   categories: 'الفئات', allProducts: 'جميع المنتجات', productUnit: 'منتج', viewDetails: 'استكشف',
   outdoorBadge: 'معدات خارجية',
-  pagesTitle: 'الصفحات',
+  pagesTitle: 'الصفحات', legalNav: 'قانوني',
   contactReply: 'نرد في غضون ساعة',
   contactPhone: 'الهاتف', contactLocation: 'الموقع',
   contactSentTitle: 'تم الإرسال!', contactSentDesc: 'سنرد عليك في أقرب وقت.', contactSendAnother: 'إرسال رسالة أخرى',
@@ -289,6 +294,10 @@ const jsonFr = {
   deliveryOffice: 'Point relais',
   qty: 'Quantité',
   price: 'Prix',
+  freeShippingBadge: '🚚 Livraison gratuite',
+  freeShippingThreshold: '🚚 Livraison gratuite dès {{amount}} DZD d\'achat',
+  freeShippingRemaining: 'Ajoutez {{amount}} DZD de plus pour la livraison gratuite',
+  freeShippingReached: '🎉 Livraison gratuite obtenue !',
   delivery: 'Livraison',
   total: 'Total',
   subtotal: 'Sous-total',
@@ -316,6 +325,7 @@ const jsonFr = {
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
+  cookies: 'Cookies',
   rightsReserved: 'Tous droits réservés.',
   heroBadge: 'Aventures en plein air',
   heroTitle: 'Explore<br/><em style="color:#D4622A;font-style:normal">l\'Inconnu</em>',
@@ -328,7 +338,7 @@ const jsonFr = {
   trust4T: 'Résistant aux intempéries', trust4S: 'Haute qualité',
   categories: 'Catégories', allProducts: 'Tous les produits', productUnit: 'produit', viewDetails: 'Explorer',
   outdoorBadge: 'Équipement extérieur',
-  pagesTitle: 'Pages',
+  pagesTitle: 'Pages', legalNav: 'Légal',
   contactReply: 'Réponse sous une heure',
   contactPhone: 'Téléphone', contactLocation: 'Localisation',
   contactSentTitle: 'Envoyé !', contactSentDesc: 'Nous vous répondrons dans les plus brefs délais.', contactSendAnother: 'Envoyer un autre message',
@@ -356,6 +366,10 @@ const jsonEn = {
   commune: 'Commune', errCommune: 'Commune is required', communePh: 'Choose Commune', communeLoading: 'Loading...',
   deliveryType: 'Delivery Type', deliveryHome: 'Home Delivery', deliveryOffice: 'Post Office',
   qty: 'Quantity', price: 'Price', delivery: 'Delivery', total: 'Total',
+  freeShippingBadge: '🚚 Free Delivery',
+  freeShippingThreshold: '🚚 Free Delivery on orders over {{amount}} DZD',
+  freeShippingRemaining: 'Add {{amount}} DZD more for free delivery',
+  freeShippingReached: '🎉 You got free delivery!',
   subtotal: 'Subtotal', orderInfo: 'Order Info',
   addToCart: 'Add to Cart', orderNow: 'Order Now', confirmOrder: 'Confirm Order',
   sending: 'Sending...', back: 'Back', addedMsg: 'Added to cart!', errSubmit: 'An error occurred',
@@ -363,7 +377,7 @@ const jsonEn = {
   successTitle: 'Order sent!', successDesc: 'We will contact you soon',
   backToShop: 'Back to Shopping', checkoutTitle: 'Complete Order',
   offersTitle: 'Available Offers', descTitle: 'Description',
-  quickLinks: 'Quick Links', contactSect: 'Contact Us', privacy: 'Privacy', terms: 'Terms', rightsReserved: 'All rights reserved',
+  quickLinks: 'Quick Links', contactSect: 'Contact Us', privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies', rightsReserved: 'All rights reserved',
   heroBadge: 'Outdoor Adventures', heroTitle: 'Explore<br/><em style="color:#D4622A;font-style:normal">The Unknown</em>',
   heroSubtitle: 'Camping gear and outdoor adventure equipment. Ready for every terrain and every journey.',
   exploreBtn: 'Explore Products', stat1L: 'products', stat2L: 'wilayas', stat3L: 'guaranteed',
@@ -373,7 +387,7 @@ const jsonEn = {
   trust4T: 'Weather resistant', trust4S: 'High quality',
   categories: 'Categories', allProducts: 'All Products', productUnit: 'product', viewDetails: 'Explore',
   outdoorBadge: 'Outdoor Equipment',
-  pagesTitle: 'Pages',
+  pagesTitle: 'Pages', legalNav: 'Legal',
   contactReply: 'We reply within an hour',
   contactPhone: 'Phone', contactLocation: 'Location',
   contactSentTitle: 'Sent!', contactSentDesc: 'We will reply as soon as possible.', contactSendAnother: 'Send another message',
@@ -475,7 +489,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Logo */}
           <Link href="/" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <img src={store.design.logoUrl} style={{ height: 32, objectFit: 'contain', display: 'block' }} alt={store?.name || ''} onError={() => setImgError(true)} />
+              <img src={store.design.logoUrl} style={{ height: 32, objectFit: 'contain', maxWidth: 160, display: 'block' }} alt={store?.name || ''} onError={() => setImgError(true)} />
             ) : (
               <>
                 <div style={{ width: 32, height: 32, background: OR, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -606,7 +620,17 @@ export function Footer({ store }: any) {
           </div>
           <div>
             <h4 style={{ fontSize: '0.65rem', fontWeight: 700, color: OR, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1rem' }}>{t.pagesTitle}</h4>
-            {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }, { h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
+            {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'rgba(255,255,255,0.4)', marginBottom: '0.55rem', transition: 'color 0.15s' }}
+                onMouseEnter={e => (e.currentTarget.style.color = OR)}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
+                {lnk.l}
+              </Link>
+            ))}
+          </div>
+          <div>
+            <h4 style={{ fontSize: '0.65rem', fontWeight: 700, color: OR, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1rem' }}>{t.legalNav}</h4>
+            {[{ h: '/privacy', l: t.privacy }, { h: '/terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
               <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'rgba(255,255,255,0.4)', marginBottom: '0.55rem', transition: 'color 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = OR)}
                 onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
@@ -654,6 +678,9 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         </div>
         {discount > 0 && (
           <div style={{ position: 'absolute', top: 0, left: 0, background: OR, color: '#fff', fontSize: '0.68rem', fontWeight: 800, padding: '5px 10px', fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.04em' }}>-{discount}%</div>
+        )}
+        {product.shippingFree && (
+          <div style={{ position: 'absolute', top: 0, right: 0, background: GD, color: '#fff', fontSize: '0.62rem', fontWeight: 800, padding: '4px 9px', fontFamily: "'Barlow Condensed', sans-serif" }}>🚚</div>
         )}
       </div>
       {/* Info */}
@@ -856,6 +883,11 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                 <span style={{ fontSize: '0.9rem', fontWeight: 600, color: SUB }}>{store?.currency || 'DZD'}</span>
               </div>
             </div>
+            {(product.shippingFree || (store?.supportFreeShipping && store?.freeShippingMinAmount != null)) && (
+              <p style={{ fontSize: '0.8rem', fontWeight: 700, color: GD, marginBottom: '1.25rem' }}>
+                {product.shippingFree ? t.freeShippingBadge : t.freeShippingThreshold.replace('{{amount}}', String(store.freeShippingMinAmount))}
+              </p>
+            )}
             {product.offers?.length > 0 && (
               <div style={{ marginBottom: '1.25rem' }}>
                 {product.offers.map((o: any) => (
@@ -867,7 +899,9 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                       <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
                       <div>
                         <p style={{ fontWeight: 600, color: INK, fontSize: '0.875rem' }}>{o.name}</p>
+                        {o.subTitle && <p style={{ fontSize: '0.72rem', color: SUB, marginTop: 2 }}>{o.subTitle}</p>}
                         <p style={{ fontSize: '0.7rem', color: SUB }}>{t.qty}: {o.quantity}</p>
+                        {o.shippingFree && <p style={{ fontSize: '0.68rem', color: GD, fontWeight: 700, marginTop: 2 }}>{t.freeShippingBadge}</p>}
                       </div>
                     </div>
                     <span className="price-mono" style={{ fontWeight: 700, color: GD }}>{o.price.toLocaleString()} دج</span>
@@ -881,11 +915,16 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
                   {attr.variants.map((v: any) => {
                     const isSel = selectedVariants[attr.name] === v.value;
+                    const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                      Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(
+                        ([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)
+                      )
+                    );
                     return (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={
-                        attr.displayMode === 'color' ? { width: 28, height: 28, borderRadius: '50%', background: v.value, border: `2px solid ${BD}`, cursor: 'pointer', outline: `2.5px solid ${isSel ? OR : 'transparent'}`, outlineOffset: 2 }
-                        : attr.displayMode === 'image' ? { width: 44, height: 44, backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 6, border: `2px solid ${isSel ? OR : BD}`, cursor: 'pointer' }
-                        : { padding: '0.4rem 0.875rem', border: `1.5px solid ${isSel ? OR : BD}`, borderRadius: 6, fontSize: '0.8rem', fontWeight: 600, background: isSel ? 'rgba(212,98,42,0.08)' : CARD, color: isSel ? ORD : SUB, cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit' }
+                      <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={
+                        attr.displayMode === 'color' ? { width: 28, height: 28, borderRadius: '50%', background: v.value, border: `2px solid ${BD}`, cursor: available ? 'pointer' : 'not-allowed', outline: `2.5px solid ${isSel ? OR : 'transparent'}`, outlineOffset: 2, opacity: available ? 1 : 0.35 }
+                        : attr.displayMode === 'image' ? { width: 44, height: 44, backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 6, border: `2px solid ${isSel ? OR : BD}`, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }
+                        : { padding: '0.4rem 0.875rem', border: `1.5px solid ${isSel ? OR : BD}`, borderRadius: 6, fontSize: '0.8rem', fontWeight: 600, background: isSel ? 'rgba(212,98,42,0.08)' : CARD, color: isSel ? ORD : (available ? SUB : '#bbb'), cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.15s', fontFamily: 'inherit', textDecoration: available ? 'none' : 'line-through' }
                       }>{attr.displayMode !== 'color' && attr.displayMode !== 'image' && v.name}</button>
                     );
                   })}
@@ -913,7 +952,7 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
   </div>
 );
 
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: ProductFormProps) {
+export function ProductForm({ product, store, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: ProductFormProps) {
   const router = useRouter();
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -943,9 +982,19 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     }
     return base;
   }, [product, selectedOffer, selectedVariants]);
-  const getLiv = useCallback((): number => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; }, [selW, fd.typeLivraison]);
+  const supportQty = (store?.supportQty ?? product.store?.supportQty) !== false;
   const fp = getFP();
-  const total = () => fp * fd.quantity + +getLiv();
+  const qty = supportQty ? fd.quantity : 1;
+  const selOfferObj = product.offers?.find((o: any) => o.id === selectedOffer);
+  const storeInfo = store || product.store;
+  const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
+    (storeInfo?.supportFreeShipping && storeInfo?.freeShippingMinAmount != null && (fp * qty) >= Number(storeInfo.freeShippingMinAmount)));
+  const getLiv = useCallback((): number => {
+    if (orderFreeShipping) return 0;
+    if (!selW) return 0;
+    return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice;
+  }, [selW, fd.typeLivraison, orderFreeShipping]);
+  const total = () => fp * qty + +getLiv();
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'مطلوب';
@@ -962,7 +1011,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const addToCart = () => {
     setIsAdded(true);
     const cart = JSON.parse(localStorage.getItem(domain) || '[]');
-    cart.push({ ...fd, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
+    cart.push({ ...fd, quantity: qty, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
     localStorage.setItem(domain, JSON.stringify(cart));
     initCount(cart.length);
     setTimeout(() => setIsAdded(false), 2000);
@@ -973,7 +1022,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const er = validate(); if (Object.keys(er).length) { setErrors(er); return; }
     setErrors({}); setSub(true);
     try {
-      await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+      await axios.post(`${API_URL}/orders/create`, { ...fd, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
       router.push(`${window.location.origin}/successfully?productId=${product.id}`);
     } catch { } finally { setSub(false); }
@@ -1032,23 +1081,25 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 {(['home', 'office'] as const).map(t => (
                   <button key={t} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: t }))} style={{ padding: '0.75rem', border: `1.5px solid ${fd.typeLivraison === t ? OR : BD}`, borderRadius: 8, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === t ? 'rgba(212,98,42,0.07)' : CARD, transition: 'all 0.18s', fontFamily: 'inherit' }}>
                     <p style={{ fontWeight: 700, fontSize: '0.78rem', marginBottom: 3, color: fd.typeLivraison === t ? ORD : SUB }}>{t === 'home' ? 'للبيت' : 'للمكتب'}</p>
-                    {selW && <p className="price-mono" style={{ fontSize: '1rem', fontWeight: 700, color: fd.typeLivraison === t ? ORD : SUB }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج</p>}
+                    {selW && <p className="price-mono" style={{ fontSize: '1rem', fontWeight: 700, color: fd.typeLivraison === t ? ORD : SUB }}>{orderFreeShipping ? '🚚 توصيل مجاني' : `${(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج`}</p>}
                   </button>
                 ))}
               </div>
             </div>
-            <div style={{ marginBottom: '0.875rem' }}>
-              <p style={{ fontSize: '0.65rem', fontWeight: 700, color: SUB, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.07em' }}>الكمية</p>
-              <div style={{ display: 'inline-flex', alignItems: 'center', border: `1.5px solid ${BD}`, borderRadius: 8, overflow: 'hidden', background: CARD }}>
-                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: SUB, borderLeft: `1px solid ${BD}` }}><Minus size={12} /></button>
-                <span style={{ width: 40, textAlign: 'center', fontWeight: 700, fontSize: '0.9rem', color: INK }}>{fd.quantity}</span>
-                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: OR, borderRight: `1px solid ${BD}` }}><Plus size={12} /></button>
+            {supportQty && (
+              <div style={{ marginBottom: '0.875rem' }}>
+                <p style={{ fontSize: '0.65rem', fontWeight: 700, color: SUB, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.07em' }}>الكمية</p>
+                <div style={{ display: 'inline-flex', alignItems: 'center', border: `1.5px solid ${BD}`, borderRadius: 8, overflow: 'hidden', background: CARD }}>
+                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: SUB, borderLeft: `1px solid ${BD}` }}><Minus size={12} /></button>
+                  <span style={{ width: 40, textAlign: 'center', fontWeight: 700, fontSize: '0.9rem', color: INK }}>{fd.quantity}</span>
+                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: OR, borderRight: `1px solid ${BD}` }}><Plus size={12} /></button>
+                </div>
               </div>
-            </div>
+            )}
             <div style={{ background: GL, borderRadius: 10, border: '1px solid rgba(61,107,53,0.15)', padding: '1rem 1.125rem', marginBottom: '1rem' }}>
               {[
                 { l: 'المنتج', v: product.name.slice(0, 26) + (product.name.length > 26 ? '...' : '') },
-                { l: 'التوصيل', v: selW ? `${getLiv().toLocaleString()} دج` : '—' },
+                { l: 'التوصيل', v: !selW ? '—' : orderFreeShipping ? '🚚 توصيل مجاني' : `${getLiv().toLocaleString()} دج` },
               ].map(r => (
                 <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px solid rgba(61,107,53,0.12)' }}>
                   <span style={{ fontSize: '0.78rem', color: SUB }}>{r.l}</span>
@@ -1090,8 +1141,12 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   }, [fd.customerWelaya]);
 
   const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
-  const getLiv = () => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; };
   const cartTotal = items.reduce((a, i) => a + (i.finalPrice * i.quantity), 0);
+  const hasFreeShippingItem = items.some(i => i.product?.shippingFree || i.product?.offers?.find((o: any) => o.id === i.selectedOffer)?.shippingFree);
+  const freeShippingMin = store?.supportFreeShipping ? store?.freeShippingMinAmount : null;
+  const freeShippingReached = hasFreeShippingItem || (freeShippingMin != null && cartTotal >= Number(freeShippingMin));
+  const freeShippingRemainingAmt = freeShippingMin != null ? Number(freeShippingMin) - cartTotal : 0;
+  const getLiv = () => { if (freeShippingReached) return 0; if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; };
   const finalTotal = cartTotal + +getLiv();
   const update = (n: any[]) => { setItems(n); localStorage.setItem(domain, JSON.stringify(n)); initCount(n.length); };
 
@@ -1139,6 +1194,11 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         <ShoppingCart size={18} style={{ color: OR }} />
         <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 'clamp(1.75rem,5vw,2.5rem)', fontWeight: 800, color: INK, textTransform: 'uppercase', letterSpacing: '0.04em' }}>سلة التسوق</h1>
       </div>
+      {freeShippingMin != null && (
+        <div style={{ background: freeShippingReached ? GL : 'rgba(212,98,42,0.08)', color: freeShippingReached ? GD : ORD, borderRadius: 8, padding: '0.75rem 1.125rem', marginBottom: '1.5rem', fontWeight: 700, fontSize: '0.85rem', textAlign: 'center' }}>
+          {freeShippingReached ? '🎉 حصلت على توصيل مجاني!' : `أضف ${freeShippingRemainingAmt.toLocaleString()} دج أخرى للحصول على توصيل مجاني`}
+        </div>
+      )}
       <div className="cart-inner">
         <div style={{ background: CARD, borderRadius: 12, border: `1px solid ${BD}`, alignSelf: 'start', overflow: 'hidden' }}>
           {items.map((item, i) => (
@@ -1192,13 +1252,13 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 {(['home', 'office'] as const).map(t => (
                   <button key={t} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: t }))} style={{ padding: '0.75rem', border: `1.5px solid ${fd.typeLivraison === t ? OR : BD}`, borderRadius: 8, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === t ? 'rgba(212,98,42,0.07)' : CARD, fontFamily: 'inherit', transition: 'all 0.18s' }}>
                     <p style={{ fontWeight: 700, fontSize: '0.78rem', color: fd.typeLivraison === t ? ORD : SUB, marginBottom: 3 }}>{t === 'home' ? 'للبيت' : 'للمكتب'}</p>
-                    {selW && <p style={{ fontWeight: 700, fontSize: '0.95rem', color: fd.typeLivraison === t ? ORD : SUB }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج</p>}
+                    {selW && <p style={{ fontWeight: 700, fontSize: '0.95rem', color: fd.typeLivraison === t ? ORD : SUB }}>{freeShippingReached ? '🚚 توصيل مجاني' : `${(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج`}</p>}
                   </button>
                 ))}
               </div>
             </div>
             <div style={{ background: GL, borderRadius: 10, border: '1px solid rgba(61,107,53,0.15)', padding: '1rem', margin: '1rem 0' }}>
-              {[{ l: 'المجموع الفرعي', v: `${cartTotal.toLocaleString()} دج` }, { l: 'التوصيل', v: getLiv() ? `${getLiv().toLocaleString()} دج` : '—' }].map(r => (
+              {[{ l: 'المجموع الفرعي', v: `${cartTotal.toLocaleString()} دج` }, { l: 'التوصيل', v: !selW ? '—' : freeShippingReached ? '🚚 توصيل مجاني' : `${getLiv().toLocaleString()} دج` }].map(r => (
                 <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px solid rgba(61,107,53,0.1)' }}>
                   <span style={{ fontSize: '0.78rem', color: SUB }}>{r.l}</span>
                   <span style={{ fontWeight: 600, color: INK }}>{r.v}</span>

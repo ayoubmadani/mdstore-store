@@ -230,7 +230,7 @@ const CSS = `
     display: grid; grid-template-columns: 1fr; gap: 2.5rem;
     padding-bottom: 2.5rem; border-bottom: 1px solid rgba(255,255,255,0.06);
   }
-  @media (min-width: 768px) { .footer-cols { grid-template-columns: 1.8fr 1fr 1fr; } }
+  @media (min-width: 768px) { .footer-cols { grid-template-columns: 1.8fr 1fr 1fr 1fr; } }
 
   .hero-layout {
     display: grid; grid-template-columns: 1fr; gap: 2rem;
@@ -386,10 +386,11 @@ const jsonAr = {
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
   // Footer
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
+  cookies: 'الكوكيز',
   rightsReserved: 'جميع الحقوق محفوظة',
   // Hero
   heroBadge1: '✅ شحن سريع',
@@ -561,10 +562,11 @@ const jsonFr = {
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
   // Footer
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
+  cookies: 'Cookies',
   rightsReserved: 'Tous droits réservés.',
   // Hero
   heroBadge1: '✅ Livraison rapide',
@@ -730,10 +732,11 @@ const jsonEn = {
   checkoutTitle: 'Complete order',
   offersTitle: 'Available offers',
   descTitle: 'Description',
-  quickLinks: 'Quick Links',
+  quickLinks: 'Quick Links', legalNav: 'Legal',
   contactSect: 'Contact Us',
   privacy: 'Privacy',
   terms: 'Terms',
+  cookies: 'Cookies',
   rightsReserved: 'All rights reserved.',
   // Hero
   heroBadge1: '✅ Fast shipping',
@@ -1111,7 +1114,7 @@ export function Footer({ store }: any) {
           {/* قسم 2 — الروابط */}
           <div>
             <h4 className="oswald" style={{ fontSize: '1rem', fontWeight: 600, color: '#fff', marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>{t.quickLinks}</h4>
-            {[{ h: '/', l: t.footerHome }, { h: '/cart', l: t.footerCart }, { h: '/contact', l: t.footerContact }, { h: '/Privacy', l: t.footerPrivacy }, { h: '/Terms', l: t.footerTerms }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
+            {[{ h: '/', l: t.footerHome }, { h: '/cart', l: t.footerCart }, { h: '/contact', l: t.footerContact }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
               <a key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', fontWeight: 400, color: 'var(--g500)', marginBottom: '0.75rem', transition: 'all 0.2s' }}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--accent)'; el.style.paddingRight = '5px'; }}
                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--g500)'; el.style.paddingRight = '0'; }}>
@@ -1121,7 +1124,19 @@ export function Footer({ store }: any) {
           </div>
 
           {/* قسم 3 — التواصل */}
+          
+          {/* قانوني */}
           <div>
+            <p style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '1rem' }}>{t.legalNav}</p>
+            {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', opacity: 0.6, transition: 'opacity 0.15s' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.6')}>
+              {lnk.l}
+            </Link>
+            ))}
+          </div>
+<div>
             <h4 className="oswald" style={{ fontSize: '1rem', fontWeight: 600, color: '#fff', marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>{t.contactSect}</h4>
             {[
               { icon: <Phone size={13} />, val: store?.contact?.phone },
@@ -1490,47 +1505,50 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                   {attr.variants.map((v: any) => {
                     const isSelected = selectedVariants[attr.name] === v.value;
+                    const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                      Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(
+                        ([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)
+                      )
+                    );
 
-                    // حالة الألوان
                     if (attr.displayMode === 'color') {
                       return (
                         <button
                           key={v.id}
-                          onClick={() => handleVariantSelection(attr.name, v.value)}
+                          onClick={() => available && handleVariantSelection(attr.name, v.value)}
                           style={{
-                            width: 28, height: 28, borderRadius: '50%', background: v.value, border: 'none', cursor: 'pointer',
-                            outline: `3px solid ${isSelected ? 'var(--accent)' : 'transparent'}`, outlineOffset: 3, transition: 'outline 0.2s'
+                            width: 28, height: 28, borderRadius: '50%', background: v.value, border: 'none', cursor: available ? 'pointer' : 'not-allowed',
+                            outline: `3px solid ${isSelected ? 'var(--accent)' : 'transparent'}`, outlineOffset: 3, transition: 'outline 0.2s', opacity: available ? 1 : 0.35
                           }}
                         />
                       );
                     }
 
-                    // حالة الصور (جديد)
                     if (attr.displayMode === 'image') {
                       return (
                         <button
                           key={v.id}
-                          onClick={() => handleVariantSelection(attr.name, v.value)}
+                          onClick={() => available && handleVariantSelection(attr.name, v.value)}
                           style={{
                             width: 40, height: 40, borderRadius: 'var(--radius-s)',
                             backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center',
-                            border: 'none', cursor: 'pointer',
-                            outline: `3px solid ${isSelected ? 'var(--accent)' : 'transparent'}`, outlineOffset: 2, transition: 'all 0.2s'
+                            border: 'none', cursor: available ? 'pointer' : 'not-allowed',
+                            outline: `3px solid ${isSelected ? 'var(--accent)' : 'transparent'}`, outlineOffset: 2, transition: 'all 0.2s', opacity: available ? 1 : 0.35
                           }}
                         />
                       );
                     }
 
-                    // الحالة الافتراضية (نصوص مثل المقاسات)
                     return (
                       <button
                         key={v.id}
-                        onClick={() => handleVariantSelection(attr.name, v.value)}
+                        onClick={() => available && handleVariantSelection(attr.name, v.value)}
                         style={{
                           padding: '7px 16px', border: `1px solid ${isSelected ? 'var(--accent)' : 'var(--g300)'}`,
                           borderRadius: 'var(--radius-s)', fontWeight: 500, fontSize: '0.85rem',
-                          background: isSelected ? 'var(--accent)' : '#fff', color: isSelected ? '#fff' : 'var(--g700)',
-                          cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s'
+                          background: isSelected ? 'var(--accent)' : '#fff', color: isSelected ? '#fff' : (available ? 'var(--g700)' : '#bbb'),
+                          cursor: available ? 'pointer' : 'not-allowed', fontFamily: 'inherit', transition: 'all 0.2s',
+                          textDecoration: available ? 'none' : 'line-through'
                         }}
                       >
                         {v.name}
@@ -1619,7 +1637,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     try {
       await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
-      router.push(`/${domain}/successfully`);
+      router.push(`/successfully?productId=${product?.id}`);
     } catch { } finally { setSub(false); }
   };
 

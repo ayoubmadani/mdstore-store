@@ -19,7 +19,7 @@ import { useCartStore } from '@/store/useCartStore';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
 /* ---------------- Types ---------------- */
-interface Offer { id: string; name: string; quantity: number; price: number; }
+interface Offer { id: string; name: string; subTitle?: string; quantity: number; price: number; shippingFree?: boolean; }
 interface Variant { id: string; name: string; value: string; }
 interface Attribute { id: string; type: string; name: string; displayMode?: 'color' | 'image' | 'text' | null; variants: Variant[]; }
 interface ProductImage { id: string; imageUrl: string; }
@@ -31,15 +31,15 @@ interface Commune { id: string; name: string; ar_name: string; wilayaId: string;
 interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
-  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
   slug?: string;
 }
 
 interface ProductFormProps {
   product: Product; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
-  selectedVariants: Record<string, string>; platform?: string; priceLoss?: number;
+  selectedVariants: Record<string, string>; platform?: string; priceLoss?: number; store?: any;
 }
 
 /* ---------------- Helpers ---------------- */
@@ -137,6 +137,33 @@ function ThemeStyle() {
       @media (min-width: 769px) {
         .pc-hide-desktop { display: none !important; }
       }
+
+      .pc-det-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+      @media (min-width: 768px) {
+        .pc-det-grid { grid-template-columns: 1.1fr 1fr; gap: 44px; }
+      }
+
+      .pc-cart-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      @media (min-width: 800px) {
+        .pc-cart-grid { grid-template-columns: 1.3fr 1fr; gap: 36px; }
+      }
+
+      .pc-contact-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+      @media (min-width: 768px) {
+        .pc-contact-grid { grid-template-columns: 1fr 1.2fr; gap: 40px; }
+      }
     `}</style>
   );
 }
@@ -205,11 +232,71 @@ const jsonAr = {
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
   // Footer
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
   rightsReserved: 'جميع الحقوق محفوظة',
+  currency: 'دج',
+  heroBadge: 'قطن ١٠٠٪ — أساسيات يومية',
+  heroTitleFallback: 'بساطة تلامس الجلد',
+  trust: [
+    { t: 'شحن لكل الولايات', d: 'توصيل سريع وآمن' },
+    { t: 'قطن طبيعي ١٠٠٪', d: 'جودة فائقة، نسيج مريح' },
+    { t: 'دفع عند الاستلام', d: 'ادفع وأنت مطمئن' },
+    { t: 'دعم العملاء', d: 'نجيبك في أي وقت' },
+  ],
+  browseCategory: 'تسوّق حسب الفئة',
+  noProductsNow: 'لا توجد منتجات حالياً',
+  footerDesc: 'قطع قطنية بسيطة، مريحة، وصُنعت لتدوم.',
+  rightsReservedFull: 'جميع الحقوق محفوظة.',
+  links: 'روابط',
+  privacyLabel: 'سياسة الخصوصية',
+  termsLabel: 'الشروط والأحكام',
+  cookiesLabel: 'الكوكيز',
+  offersLabel: 'العروض',
+  freeShippingBadge: '🚚 توصيل مجاني',
+  freeShippingThreshold: '🚚 توصيل مجاني للطلبات بـ {{amount}} دج أو أكثر',
+  freeShippingRemaining: 'أضف {{amount}} دج أخرى للحصول على توصيل مجاني',
+  freeShippingReached: '🎉 حصلت على توصيل مجاني!',
+  orderFormTitle: 'إتمام الطلب',
+  addToCartBtn: 'إضافة إلى السلة',
+  forHome: 'للمنزل',
+  forOffice: 'للمكتب',
+  qtyLabel: 'الكمية',
+  qtyItem: 'الكمية:',
+  totalLabel: 'المجموع',
+  deliveryInfoTitle: 'معلومات التوصيل',
+  cartPageTitle: 'سلة التسوق',
+  cartOrderDone: 'تم استلام طلبك',
+  cartOrderDoneDesc: 'سنتواصل معك قريباً لتأكيد الطلب.',
+  continueShopping: 'متابعة التسوق',
+  cartEmptyTitle: 'سلتك فارغة',
+  cartEmptyMsg: 'لم تقم بإضافة أي منتج بعد.',
+  sendingAlt: 'جارٍ الإرسال...',
+  completeOrder: 'إتمام الطلب',
+  contactTitle: 'اتصل بنا',
+  contactIntro: 'يسعدنا تواصلك معنا لأي استفسار حول منتجاتنا أو طلبك.',
+  contactSentTitle: 'تم إرسال رسالتك',
+  contactSentDesc: 'سنتواصل معك في أقرب وقت.',
+  sendAnotherMsg: 'إرسال رسالة أخرى',
+  namePh: 'الاسم',
+  emailPh: 'البريد الإلكتروني',
+  phonePh2: 'رقم الهاتف',
+  messagePh: 'رسالتك',
+  sendMsgBtn: 'إرسال الرسالة',
+  privacyTitle: 'سياسة الخصوصية',
+  priv1t: 'جمع المعلومات', priv1b: 'نقوم بجمع المعلومات الضرورية فقط لإتمام طلبك وتحسين تجربتك معنا، مثل الاسم ورقم الهاتف وعنوان التوصيل.',
+  priv2t: 'استخدام البيانات', priv2b: 'تُستخدم بياناتك حصراً لمعالجة الطلبات والتواصل بخصوصها، ولا تتم مشاركتها مع أي طرف ثالث دون موافقتك.',
+  priv3t: 'حماية المعلومات', priv3b: 'نتخذ كافة الإجراءات التقنية لحماية بياناتك من أي وصول غير مصرح به.',
+  termsTitle: 'الشروط والأحكام',
+  terms1t: 'استخدام المتجر', terms1b: 'باستخدامك لهذا المتجر فإنك توافق على الشروط والأحكام المذكورة هنا، والالتزام بالاستخدام السليم للمنصة.',
+  terms2t: 'الطلبات والدفع', terms2b: 'يتم تأكيد الطلب بعد التواصل الهاتفي، والدفع يكون عند الاستلام ما لم يُذكر خلاف ذلك.',
+  terms3t: 'الإرجاع والاستبدال', terms3b: 'يمكن إرجاع أو استبدال المنتج خلال مدة محددة في حال وجود عيب أو خطأ في الطلب.',
+  cookiesTitle: 'سياسة ملفات تعريف الارتباط',
+  cook1t: 'ما هي الكوكيز', cook1b: 'هي ملفات صغيرة تُخزَّن في متصفحك لتحسين تجربة تصفحك للمتجر.',
+  cook2t: 'كيفية استخدامها', cook2b: 'نستخدمها لحفظ محتوى سلة التسوق وتذكر تفضيلاتك أثناء التصفح.',
+  cook3t: 'التحكم بالكوكيز', cook3b: 'يمكنك تعطيل الكوكيز من إعدادات المتصفح، إلا أن ذلك قد يؤثر على بعض وظائف المتجر.',
 };
 
 const jsonFr = {
@@ -271,18 +358,87 @@ const jsonFr = {
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
   // Footer
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
   rightsReserved: 'Tous droits réservés.',
+  currency: 'DZD',
+  heroBadge: 'Coton 100% — Basiques quotidiens',
+  heroTitleFallback: 'La simplicité qui touche la peau',
+  trust: [
+    { t: 'Livraison partout', d: 'Rapide et sécurisée' },
+    { t: 'Coton naturel 100%', d: 'Qualité supérieure, tissu doux' },
+    { t: 'Paiement à la réception', d: 'Payez en toute confiance' },
+    { t: 'Support client', d: 'Disponible à tout moment' },
+  ],
+  browseCategory: 'Acheter par catégorie',
+  noProductsNow: 'Aucun produit disponible',
+  footerDesc: "Basiques en coton, simples, confortables et durables.",
+  rightsReservedFull: 'Tous droits réservés.',
+  links: 'Navigation',
+  privacyLabel: 'Politique de confidentialité',
+  termsLabel: "Conditions générales",
+  cookiesLabel: 'Cookies',
+  offersLabel: 'Offres',
+  freeShippingBadge: '🚚 Livraison gratuite',
+  freeShippingThreshold: '🚚 Livraison gratuite dès {{amount}} DZD d\'achat',
+  freeShippingRemaining: 'Ajoutez {{amount}} DZD de plus pour la livraison gratuite',
+  freeShippingReached: '🎉 Livraison gratuite obtenue !',
+  orderFormTitle: 'Finaliser la commande',
+  addToCartBtn: 'Ajouter au panier',
+  forHome: 'À domicile',
+  forOffice: 'Point relais',
+  qtyLabel: 'Quantité',
+  qtyItem: 'Quantité :',
+  totalLabel: 'Total',
+  deliveryInfoTitle: 'Informations de livraison',
+  cartPageTitle: 'Mon Panier',
+  cartOrderDone: 'Commande reçue',
+  cartOrderDoneDesc: 'Nous vous contacterons bientôt pour confirmer.',
+  continueShopping: 'Continuer les achats',
+  cartEmptyTitle: 'Votre panier est vide',
+  cartEmptyMsg: "Vous n'avez pas encore ajouté de produit.",
+  sendingAlt: 'Envoi en cours...',
+  completeOrder: 'Finaliser la commande',
+  contactTitle: 'Nous contacter',
+  contactIntro: "Nous sommes heureux de vous aider pour toute question sur nos produits.",
+  contactSentTitle: 'Message envoyé',
+  contactSentDesc: 'Nous vous contacterons dans les meilleurs délais.',
+  sendAnotherMsg: 'Envoyer un autre message',
+  namePh: 'Nom',
+  emailPh: 'Adresse e-mail',
+  phonePh2: 'Téléphone',
+  messagePh: 'Votre message',
+  sendMsgBtn: 'Envoyer le message',
+  privacyTitle: 'Politique de confidentialité',
+  priv1t: 'Collecte', priv1b: 'Nous collectons uniquement les informations nécessaires pour traiter votre commande.',
+  priv2t: 'Utilisation', priv2b: 'Vos données sont utilisées exclusivement pour traiter les commandes.',
+  priv3t: 'Protection', priv3b: 'Nous prenons toutes les mesures techniques pour protéger vos données.',
+  termsTitle: "Conditions d'utilisation",
+  terms1t: 'Utilisation', terms1b: "En utilisant cette boutique, vous acceptez les conditions d'utilisation.",
+  terms2t: 'Commandes et paiement', terms2b: 'La commande est confirmée après contact téléphonique. Paiement à la réception.',
+  terms3t: 'Retours et échanges', terms3b: 'Retours possibles dans un délai défini en cas de défaut ou erreur.',
+  cookiesTitle: 'Politique des cookies',
+  cook1t: "Qu'est-ce que les cookies", cook1b: 'Ce sont de petits fichiers stockés dans votre navigateur.',
+  cook2t: 'Utilisation', cook2b: 'Utilisés pour sauvegarder le panier et vos préférences.',
+  cook3t: 'Contrôle', cook3b: 'Vous pouvez désactiver les cookies dans les paramètres du navigateur.',
 };
 
+type Lang = 'ar' | 'fr' | 'en';
+const getLang = (store?: any): Lang => {
+  if (store?.language === 'fr') return 'fr';
+  if (store?.language === 'en') return 'en';
+  return 'ar';
+};
+const T: Record<Lang, typeof jsonAr> = { ar: jsonAr, fr: jsonFr as any, en: jsonFr as any };
+
 export default function Main({ store, children, domain }: any) {
+  const t = T[getLang(store)];
   const pathname = usePathname();
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
-    <div className="pc-root" dir="rtl" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="pc-root" dir={t.dir} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <ThemeStyle />
       <Navbar store={store} domain={domain} />
       <main style={{ flex: 1 }}>{children}</main>
@@ -295,6 +451,7 @@ export default function Main({ store, children, domain }: any) {
    NAVBAR
    ============================================================ */
 export function Navbar({ store, domain }: any) {
+  const t = T[getLang(store)];
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -365,7 +522,7 @@ export function Navbar({ store, domain }: any) {
           {/* logo */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
             {store?.design?.logoUrl && !imgError ? (
-              <img src={store.design.logoUrl} alt={store?.name} onError={() => setImgError(true)} style={{ height: 38, objectFit: 'contain' }} />
+              <img src={store.design.logoUrl} alt={store?.name} onError={() => setImgError(true)} style={{ height: 38, objectFit: 'contain', maxWidth: 160 }} />
             ) : (
               <span className="pc-display" style={{ fontSize: 21, fontWeight: 900, color: 'var(--thread-ink)' }}>
                 {store?.name || 'متجر'}
@@ -375,8 +532,8 @@ export function Navbar({ store, domain }: any) {
 
           {/* desktop links */}
           <nav className="pc-hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
-            <Link href="/" style={{ color: 'var(--thread-ink)', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>الرئيسية</Link>
-            <Link href="/contact" style={{ color: 'var(--thread-ink)', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>اتصل بنا</Link>
+            <Link href="/" style={{ color: 'var(--thread-ink)', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>{t.home}</Link>
+            <Link href="/contact" style={{ color: 'var(--thread-ink)', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>{t.contact}</Link>
           </nav>
 
           {/* desktop search */}
@@ -386,24 +543,29 @@ export function Navbar({ store, domain }: any) {
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && submitSearch()}
-                placeholder="ابحث عن منتج..."
-                style={{ border: 'none', outline: 'none', flex: 1, marginRight: 8, fontSize: 13.5, background: 'transparent', fontFamily: 'inherit' }}
+                onKeyDown={(e) => { if (e.key === 'Enter') submitSearch(); if (e.key === 'Escape') setSearchQuery(''); }}
+                placeholder={t.search}
+                style={{ border: 'none', outline: 'none', flex: 1, marginInline: 8, fontSize: 13.5, background: 'transparent', fontFamily: 'inherit' }}
               />
+              {searchQuery.length > 0 && (
+                <button className="pc-btn" onClick={() => setSearchQuery('')} style={{ background: 'none', padding: 2, display: 'flex', alignItems: 'center' }}>
+                  <X size={15} color="var(--thread-soft)" />
+                </button>
+              )}
             </div>
             {searchQuery.length >= 2 && (
               <div style={{ position: 'absolute', top: '110%', insetInlineStart: 0, insetInlineEnd: 0, background: '#fff', border: '1.5px solid var(--cotton-200)', borderRadius: 2, boxShadow: '0 12px 24px rgba(0,0,0,.08)', maxHeight: 360, overflowY: 'auto', zIndex: 60 }}>
-                {loading && <div style={{ padding: 14, fontSize: 13, color: 'var(--thread-soft)' }}>جارٍ البحث...</div>}
-                {!loading && listSearch.length === 0 && <div style={{ padding: 14, fontSize: 13, color: 'var(--thread-soft)' }}>لا توجد نتائج</div>}
+                {loading && <div style={{ padding: 14, fontSize: 13, color: 'var(--thread-soft)' }}>{t.searching}</div>}
+                {!loading && listSearch.length === 0 && <div style={{ padding: 14, fontSize: 13, color: 'var(--thread-soft)' }}>{t.noResults}</div>}
                 {!loading && listSearch.slice(0, 6).map((p) => (
                   <Link key={p.id} href={`/product/${p.slug || p.id}`} style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '10px 12px', textDecoration: 'none', color: 'var(--thread-ink)', borderBottom: '1px dashed var(--cotton-200)' }}>
-                    <img src={p.productImage} alt={p.name} style={{ width: 38, height: 38, objectFit: 'cover', borderRadius: 2 }} />
+                    <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} alt={p.name} style={{ width: 38, height: 38, objectFit: 'cover', borderRadius: 2 }} />
                     <span style={{ fontSize: 13, fontWeight: 500 }}>{p.name}</span>
                   </Link>
                 ))}
                 {listSearch.length > 0 && (
                   <Link href={`/?search=${encodeURIComponent(searchQuery)}`} style={{ display: 'block', padding: 12, textAlign: 'center', fontSize: 12.5, fontWeight: 700, color: 'var(--thread-red)', textDecoration: 'none' }}>
-                    عرض كل النتائج
+                    {t.showAll}
                   </Link>
                 )}
               </div>
@@ -435,18 +597,23 @@ export function Navbar({ store, domain }: any) {
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && submitSearch()}
-                placeholder="ابحث عن منتج..."
+                onKeyDown={(e) => { if (e.key === 'Enter') submitSearch(); if (e.key === 'Escape') setSearchQuery(''); }}
+                placeholder={t.search}
                 autoFocus
-                style={{ border: 'none', outline: 'none', flex: 1, marginRight: 8, fontSize: 13.5, background: 'transparent', fontFamily: 'inherit' }}
+                style={{ border: 'none', outline: 'none', flex: 1, marginInline: 8, fontSize: 13.5, background: 'transparent', fontFamily: 'inherit' }}
               />
+              {searchQuery.length > 0 && (
+                <button className="pc-btn" onClick={() => setSearchQuery('')} style={{ background: 'none', padding: 2, display: 'flex', alignItems: 'center' }}>
+                  <X size={15} color="var(--thread-soft)" />
+                </button>
+              )}
             </div>
             {searchQuery.length >= 2 && (
               <div style={{ marginTop: 8, background: '#fff', border: '1.5px solid var(--cotton-200)', borderRadius: 2, maxHeight: 300, overflowY: 'auto' }}>
-                {loading && <div style={{ padding: 12, fontSize: 13 }}>جارٍ البحث...</div>}
+                {loading && <div style={{ padding: 12, fontSize: 13 }}>{t.searching}</div>}
                 {!loading && listSearch.slice(0, 6).map((p) => (
                   <Link key={p.id} href={`/product/${p.slug || p.id}`} style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '10px 12px', textDecoration: 'none', color: 'var(--thread-ink)' }}>
-                    <img src={p.productImage} alt={p.name} style={{ width: 34, height: 34, objectFit: 'cover' }} />
+                    <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} alt={p.name} style={{ width: 34, height: 34, objectFit: 'cover' }} />
                     <span style={{ fontSize: 13 }}>{p.name}</span>
                   </Link>
                 ))}
@@ -461,9 +628,9 @@ export function Navbar({ store, domain }: any) {
         <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,.4)' }} onClick={() => setOpen(false)}>
           <div onClick={(e) => e.stopPropagation()} style={{ position: 'absolute', top: 0, insetInlineStart: 0, width: '78%', maxWidth: 300, height: '100%', background: 'var(--cotton-50)', padding: 22, display: 'flex', flexDirection: 'column', gap: 22 }}>
             <button className="pc-btn" onClick={() => setOpen(false)} style={{ background: 'none', alignSelf: 'flex-end' }}><X size={22} /></button>
-            <Link href="/" onClick={() => setOpen(false)} style={{ color: 'var(--thread-ink)', textDecoration: 'none', fontSize: 16, fontWeight: 600 }}>الرئيسية</Link>
-            <Link href="/contact" onClick={() => setOpen(false)} style={{ color: 'var(--thread-ink)', textDecoration: 'none', fontSize: 16, fontWeight: 600 }}>اتصل بنا</Link>
-            {showCart && <Link href="/cart" onClick={() => setOpen(false)} style={{ color: 'var(--thread-ink)', textDecoration: 'none', fontSize: 16, fontWeight: 600 }}>السلة</Link>}
+            <Link href="/" onClick={() => setOpen(false)} style={{ color: 'var(--thread-ink)', textDecoration: 'none', fontSize: 16, fontWeight: 600 }}>{t.home}</Link>
+            <Link href="/contact" onClick={() => setOpen(false)} style={{ color: 'var(--thread-ink)', textDecoration: 'none', fontSize: 16, fontWeight: 600 }}>{t.contact}</Link>
+            {showCart && <Link href="/cart" onClick={() => setOpen(false)} style={{ color: 'var(--thread-ink)', textDecoration: 'none', fontSize: 16, fontWeight: 600 }}>{t.cart}</Link>}
           </div>
         </div>
       )}
@@ -475,29 +642,36 @@ export function Navbar({ store, domain }: any) {
    FOOTER
    ============================================================ */
 export function Footer({ store }: any) {
+  const t = T[getLang(store)];
   const showCart = store?.cart !== false;
   return (
     <footer style={{ background: 'var(--cotton-100)', borderTop: '2px dashed var(--cotton-300)', marginTop: 60 }}>
       <div style={{ maxWidth: 1240, margin: '0 auto', padding: '48px 20px 28px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 32 }}>
         <div>
-          <span className="pc-display" style={{ fontSize: 19, fontWeight: 900 }}>{store?.name || 'متجر'}</span>
+          <span className="pc-display" style={{ fontSize: 19, fontWeight: 900 }}>{store?.name}</span>
           <p style={{ marginTop: 10, fontSize: 13.5, color: 'var(--thread-soft)', lineHeight: 1.9, maxWidth: 280 }}>
-            {store?.hero?.subtitle || 'قطع قطنية بسيطة، مريحة، وصُنعت لتدوم.'}
+            {store?.hero?.subtitle || t.footerDesc}
           </p>
-          <p style={{ marginTop: 14, fontSize: 12, color: 'var(--thread-soft)' }}>© {new Date().getFullYear()} {store?.name}. جميع الحقوق محفوظة.</p>
+          <p style={{ marginTop: 14, fontSize: 12, color: 'var(--thread-soft)' }}>© {new Date().getFullYear()} {store?.name}. {t.rightsReservedFull}</p>
         </div>
         <div>
-          <h4 style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, letterSpacing: .4 }}>روابط</h4>
+          <h4 style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, letterSpacing: .4 }}>{t.links}</h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <Link href="/" style={{ fontSize: 13.5, color: 'var(--thread-soft)', textDecoration: 'none' }}>الرئيسية</Link>
-            {showCart && <Link href="/cart" style={{ fontSize: 13.5, color: 'var(--thread-soft)', textDecoration: 'none' }}>السلة</Link>}
-            <Link href="/contact" style={{ fontSize: 13.5, color: 'var(--thread-soft)', textDecoration: 'none' }}>اتصل بنا</Link>
-            <Link href="/privacy" style={{ fontSize: 13.5, color: 'var(--thread-soft)', textDecoration: 'none' }}>سياسة الخصوصية</Link>
-            <Link href="/terms" style={{ fontSize: 13.5, color: 'var(--thread-soft)', textDecoration: 'none' }}>الشروط والأحكام</Link>
+            <Link href="/" style={{ fontSize: 13.5, color: 'var(--thread-soft)', textDecoration: 'none' }}>{t.home}</Link>
+            {showCart && <Link href="/cart" style={{ fontSize: 13.5, color: 'var(--thread-soft)', textDecoration: 'none' }}>{t.cart}</Link>}
+            <Link href="/contact" style={{ fontSize: 13.5, color: 'var(--thread-soft)', textDecoration: 'none' }}>{t.contact}</Link>
           </div>
         </div>
         <div>
-          <h4 style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, letterSpacing: .4 }}>تواصل معنا</h4>
+          <h4 style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, letterSpacing: .4 }}>{t.legalNav}</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <Link href="/privacy" style={{ fontSize: 13.5, color: 'var(--thread-soft)', textDecoration: 'none' }}>{t.privacyLabel}</Link>
+            <Link href="/terms" style={{ fontSize: 13.5, color: 'var(--thread-soft)', textDecoration: 'none' }}>{t.termsLabel}</Link>
+            <Link href="/cookies" style={{ fontSize: 13.5, color: 'var(--thread-soft)', textDecoration: 'none' }}>{t.cookiesLabel}</Link>
+          </div>
+        </div>
+        <div>
+          <h4 style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, letterSpacing: .4 }}>{t.contactSect}</h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13.5, color: 'var(--thread-soft)' }}>
             {store?.contact?.phone && <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Phone size={14} /> {store.contact.phone}</span>}
             {store?.contact?.email && <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Mail size={14} /> {store.contact.email}</span>}
@@ -531,6 +705,11 @@ export function Card({ product, displayImage, discount, store }: any) {
               -{discount}%
             </span>
           )}
+          {product.shippingFree && (
+            <span style={{ position: 'absolute', top: 10, insetInlineEnd: 10, background: 'var(--thread-ink)', color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 8px', borderRadius: 2 }}>
+              🚚
+            </span>
+          )}
         </div>
         <div style={{ padding: '14px 14px 16px' }}>
           <p style={{ fontSize: 14, fontWeight: 600, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', minHeight: 42 }}>
@@ -557,6 +736,7 @@ export function Card({ product, displayImage, discount, store }: any) {
    HOME
    ============================================================ */
 export function Home({ store, page }: any) {
+  const t = T[getLang(store)];
   const searchParams = useSearchParams();
   const category = searchParams.get('category');
   const products: Product[] = store?.products || [];
@@ -571,18 +751,18 @@ export function Home({ store, page }: any) {
           <img src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: .22 }} />
         )}
         <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', padding: '90px 20px 70px', textAlign: 'center' }}>
-          <span style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: 2, color: 'var(--thread-red)', textTransform: 'uppercase' }}>قطن ١٠٠٪ — أساسيات يومية</span>
+          <span style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: 2, color: 'var(--thread-red)', textTransform: 'uppercase' }}>{t.heroBadge}</span>
           <h1
             className="pc-display"
             style={{ fontSize: 'clamp(30px,5vw,52px)', fontWeight: 900, margin: '16px 0', lineHeight: 1.25 }}
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store?.hero?.title || 'بساطة تلامس الجلد') }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store?.hero?.title || t.heroTitleFallback) }}
           />
           {store?.hero?.subtitle && (
             <p style={{ fontSize: 16, color: 'var(--thread-soft)', maxWidth: 520, margin: '0 auto 30px', lineHeight: 1.8 }}>{store.hero.subtitle}</p>
           )}
           <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="#products" className="pc-btn pc-btn-primary">تسوق الآن</a>
-            {store?.cart !== false && <Link href="/cart" className="pc-btn pc-btn-outline">السلة</Link>}
+            <a href="#products" className="pc-btn pc-btn-primary">{t.shopNow}</a>
+            {store?.cart !== false && <Link href="/cart" className="pc-btn pc-btn-outline">{t.cart}</Link>}
           </div>
         </div>
         <hr className="pc-seam" />
@@ -591,12 +771,7 @@ export function Home({ store, page }: any) {
       {/* TRUST BAR */}
       <section style={{ borderBottom: '2px dashed var(--cotton-300)' }}>
         <div style={{ maxWidth: 1240, margin: '0 auto', padding: '26px 20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px,1fr))', gap: 18, textAlign: 'center' }}>
-          {[
-            { t: 'شحن لكل الولايات', d: 'توصيل سريع وآمن' },
-            { t: 'قطن طبيعي ١٠٠٪', d: 'جودة فائقة، نسيج مريح' },
-            { t: 'دفع عند الاستلام', d: 'ادفع وأنت مطمئن' },
-            { t: 'دعم العملاء', d: 'نجيبك في أي وقت' },
-          ].map((it, i) => (
+          {t.trust.map((it, i) => (
             <div key={i}>
               <p style={{ fontSize: 13.5, fontWeight: 700 }}>{it.t}</p>
               <p style={{ fontSize: 12, color: 'var(--thread-soft)', marginTop: 4 }}>{it.d}</p>
@@ -608,10 +783,10 @@ export function Home({ store, page }: any) {
       {/* CATEGORIES */}
       {store?.categories?.length > 0 && (
         <section style={{ maxWidth: 1240, margin: '0 auto', padding: '40px 20px 10px' }}>
-          <h2 className="pc-display" style={{ fontSize: 22, fontWeight: 800, marginBottom: 18 }}>تسوّق حسب الفئة</h2>
+          <h2 className="pc-display" style={{ fontSize: 22, fontWeight: 800, marginBottom: 18 }}>{t.browseCategory}</h2>
           <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 6 }}>
             <Link href="/" className="pc-btn-outline pc-btn" style={{ whiteSpace: 'nowrap', textDecoration: 'none', display: 'inline-block', padding: '9px 18px', fontSize: 13, borderColor: !category ? 'var(--thread-red)' : undefined }}>
-              الكل
+              {t.all}
             </Link>
             {store.categories.map((c: any) => (
               <Link key={c.id} href={`/?category=${c.id}`} className="pc-btn-outline pc-btn" style={{ whiteSpace: 'nowrap', textDecoration: 'none', display: 'inline-block', padding: '9px 18px', fontSize: 13, borderColor: category === c.id ? 'var(--thread-red)' : undefined }}>
@@ -629,11 +804,11 @@ export function Home({ store, page }: any) {
             const discount = p.priceOriginal && Number(p.priceOriginal) > Number(p.price)
               ? Math.round(((Number(p.priceOriginal) - Number(p.price)) / Number(p.priceOriginal)) * 100)
               : 0;
-            return <Card key={p.id} product={p} displayImage={p.productImage} discount={discount} store={store} viewDetails />;
+            return <Card key={p.id} product={p} displayImage={p.productImage || p.imagesProduct?.[0]?.imageUrl} discount={discount} store={store} viewDetails />;
           })}
         </div>
         {products.length === 0 && (
-          <p style={{ textAlign: 'center', color: 'var(--thread-soft)', padding: '60px 0' }}>لا توجد منتجات حالياً</p>
+          <p style={{ textAlign: 'center', color: 'var(--thread-soft)', padding: '60px 0' }}>{t.noProductsNow}</p>
         )}
 
         {/* PAGINATION */}
@@ -668,12 +843,13 @@ export function Home({ store, page }: any) {
 /* ============================================================
    DETAILS
    ============================================================ */
-export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
+export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
+  const t = T[getLang(store || product?.store)];
   const [sel, setSel] = useState(0);
   const images: string[] = allImages?.length ? allImages : [product?.productImage].filter(Boolean);
 
   return (
-    <div style={{ maxWidth: 1240, margin: '0 auto', padding: '36px 20px 70px', display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: 44 }}>
+    <div className="pc-det-grid" style={{ maxWidth: 1240, margin: '0 auto', padding: '36px 20px 70px' }}>
       {/* GALLERY */}
       <div>
         <div className="pc-stitch-border" style={{ position: 'relative', aspectRatio: '4/5', background: 'var(--cotton-100)', borderRadius: 3, overflow: 'hidden' }}>
@@ -707,14 +883,24 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
         </div>
         <div style={{ fontSize: 28, fontWeight: 900, marginBottom: 22 }}>{finalPrice} {product?.store ? '' : ''}</div>
 
+        {(product?.shippingFree || ((store || product?.store)?.supportFreeShipping && (store || product?.store)?.freeShippingMinAmount != null)) && (
+          <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--thread-red)', marginBottom: 16 }}>
+            {product?.shippingFree ? t.freeShippingBadge : t.freeShippingThreshold.replace('{{amount}}', String((store || product?.store).freeShippingMinAmount))}
+          </p>
+        )}
+
         {product?.offers?.length > 0 && (
           <div style={{ marginBottom: 22 }}>
-            <p style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>العروض</p>
+            <p style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>{t.offersLabel}</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {product.offers.map((o: Offer) => (
                 <label key={o.id} className="pc-stitch-border" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderRadius: 2, cursor: 'pointer', borderColor: selectedOffer === o.id ? 'var(--thread-red)' : undefined }}>
                   <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} />
-                  <span style={{ fontSize: 13.5 }}>{o.name} — {o.quantity} × {o.price}</span>
+                  <span style={{ fontSize: 13.5 }}>
+                    {o.name} — {o.quantity} × {o.price}
+                    {o.subTitle && <span style={{ display: 'block', fontSize: 11.5, opacity: 0.7 }}>{o.subTitle}</span>}
+                    {o.shippingFree && <span style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--thread-red)' }}>{t.freeShippingBadge}</span>}
+                  </span>
                 </label>
               ))}
             </div>
@@ -727,14 +913,19 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               {attr.variants.map((v) => {
                 const active = selectedVariants?.[attr.name] === v.value;
+                const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                  Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(
+                    ([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)
+                  )
+                );
                 if (attr.displayMode === 'color') {
-                  return <button key={v.id} className="pc-btn" onClick={() => handleVariantSelection(attr.name, v.value)} style={{ width: 32, height: 32, borderRadius: '50%', background: v.value, border: active ? '2.5px solid var(--thread-red)' : '1.5px solid var(--cotton-300)' }} />;
+                  return <button key={v.id} className="pc-btn" onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: 32, height: 32, borderRadius: '50%', background: v.value, border: active ? '2.5px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }} />;
                 }
                 if (attr.displayMode === 'image') {
-                  return <button key={v.id} className="pc-btn" onClick={() => handleVariantSelection(attr.name, v.value)} style={{ width: 50, height: 50, padding: 0, border: active ? '2.5px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', overflow: 'hidden' }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>;
+                  return <button key={v.id} className="pc-btn" onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: 50, height: 50, padding: 0, border: active ? '2.5px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', overflow: 'hidden', cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>;
                 }
                 return (
-                  <button key={v.id} className="pc-btn" onClick={() => handleVariantSelection(attr.name, v.value)} style={{ padding: '8px 16px', fontSize: 13, border: active ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: active ? 'var(--cotton-100)' : 'transparent' }}>
+                  <button key={v.id} className="pc-btn" onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ padding: '8px 16px', fontSize: 13, border: active ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: active ? 'var(--cotton-100)' : 'transparent', cursor: available ? 'pointer' : 'not-allowed', color: available ? 'inherit' : '#bbb', textDecoration: available ? 'none' : 'line-through' }}>
                     {v.name}
                   </button>
                 );
@@ -750,6 +941,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           selectedOffer={selectedOffer}
           setSelectedOffer={setSelectedOffer}
           selectedVariants={selectedVariants}
+          store={store || product?.store}
         />
 
         {product?.desc && (
@@ -765,7 +957,9 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 /* ============================================================
    PRODUCT FORM
    ============================================================ */
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: ProductFormProps) {
+export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: ProductFormProps) {
+  const t = T[getLang(store || product?.store)];
+  const cur = (store || product?.store)?.currency || t.currency;
   const router = useRouter();
   const initCount = useCartStore((s: any) => s.initCount);
 
@@ -807,32 +1001,41 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     return Number(product.price);
   };
 
+  const supportQty = ((store || product.store)?.supportQty) !== false;
+  const fp = getFP();
+  const qty = supportQty ? fd.quantity : 1;
+  const selOfferObj = product.offers?.find((o) => o.id === selectedOffer);
+  const storeInfo = store || product.store;
+  const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
+    (storeInfo?.supportFreeShipping && storeInfo?.freeShippingMinAmount != null && (fp * qty) >= Number(storeInfo.freeShippingMinAmount)));
+
   const getLiv = (): number => {
-    const w = wilayas.find((x) => x.id === fd.customerWelaya);
+    if (orderFreeShipping) return 0;
+    const w = wilayas.find((x) => String(x.id) === String(fd.customerWelaya));
     if (!w) return 0;
-    return fd.typeLivraison === 'home' ? w.livraisonHome : w.livraisonOfice;
+    return Number(fd.typeLivraison === 'home' ? w.livraisonHome : w.livraisonOfice);
   };
 
-  const fp = getFP();
-  const total = () => fp * fd.quantity + getLiv();
+  const total = () => fp * qty + getLiv();
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!fd.customerName.trim()) e.customerName = 'الاسم مطلوب';
-    if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone)) e.customerPhone = 'رقم هاتف غير صالح';
-    if (!fd.customerWelaya) e.customerWelaya = 'الولاية مطلوبة';
-    if (!fd.customerCommune) e.customerCommune = 'البلدية مطلوبة';
+    if (!fd.customerName.trim()) e.customerName = t.errName;
+    if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone)) e.customerPhone = t.errPhoneInvalid;
+    if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
+    if (!fd.customerCommune) e.customerCommune = t.errCommune;
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
   const addToCart = () => {
-    if (product.store?.cart !== true) return;
+    if (product.store?.cart === false) return;
     try {
       const raw = localStorage.getItem(domain);
       const arr = raw ? JSON.parse(raw) : [];
       const item = {
         ...fd,
+        quantity: qty,
         product,
         variantDetailId: getVarId(),
         productId: product.id,
@@ -842,7 +1045,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         selectedVariants,
         platform,
         finalPrice: fp,
-        totalPrice: fp * fd.quantity,
+        totalPrice: fp * qty,
         priceLivraison: getLiv(),
         addedAt: new Date().toISOString(),
       };
@@ -858,6 +1061,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     try {
       const payload = {
         ...fd,
+        quantity: qty,
         product,
         variantDetailId: getVarId(),
         productId: product.id,
@@ -867,7 +1071,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         selectedVariants,
         platform,
         finalPrice: fp,
-        totalPrice: fp * fd.quantity,
+        totalPrice: fp * qty,
         priceLivraison: getLiv(),
       };
       const r = await fetch(`${API_URL}/orders/create`, {
@@ -888,26 +1092,26 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     <div style={{ marginTop: 24 }}>
       {!isOrderNow ? (
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-          {product.store?.cart === true && (
-            <button className="pc-btn pc-btn-outline" onClick={addToCart} style={{ flex: 1, minWidth: 160 }}>إضافة إلى السلة</button>
+          {product.store?.cart !== false && (
+            <button className="pc-btn pc-btn-outline" onClick={addToCart} style={{ flex: 1, minWidth: 160 }}>{t.addToCartBtn}</button>
           )}
-          <button className="pc-btn pc-btn-primary" onClick={() => setIsOrderNow(true)} style={{ flex: 1, minWidth: 160 }}>اطلب الآن</button>
+          <button className="pc-btn pc-btn-primary" onClick={() => setIsOrderNow(true)} style={{ flex: 1, minWidth: 160 }}>{t.orderNow}</button>
         </div>
       ) : (
         <div className="pc-stitch-border" style={{ padding: 20, borderRadius: 3, background: '#fff' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <p style={{ fontWeight: 700, fontSize: 14.5 }}>إتمام الطلب</p>
+            <p style={{ fontWeight: 700, fontSize: 14.5 }}>{t.orderFormTitle}</p>
             <button className="pc-btn" onClick={() => setIsOrderNow(false)} style={{ background: 'none' }}><X size={18} /></button>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <div>
-              <input placeholder="الاسم الكامل" value={fd.customerName} onChange={(e) => setFd({ ...fd, customerName: e.target.value })}
+              <input placeholder={t.fullNamePh} value={fd.customerName} onChange={(e) => setFd({ ...fd, customerName: e.target.value })}
                 style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }} />
               {errors.customerName && <p style={{ color: 'var(--thread-red)', fontSize: 12, marginTop: 4 }}>{errors.customerName}</p>}
             </div>
             <div>
-              <input placeholder="رقم الهاتف" value={fd.customerPhone} onChange={(e) => setFd({ ...fd, customerPhone: e.target.value })}
+              <input placeholder={t.phonePh} value={fd.customerPhone} onChange={(e) => setFd({ ...fd, customerPhone: e.target.value })}
                 style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }} />
               {errors.customerPhone && <p style={{ color: 'var(--thread-red)', fontSize: 12, marginTop: 4 }}>{errors.customerPhone}</p>}
             </div>
@@ -915,7 +1119,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <div>
                 <select value={fd.customerWelaya} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}
                   style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }}>
-                  <option value="">الولاية</option>
+                  <option value="">{t.wilayaPh}</option>
                   {wilayas.map((w) => <option key={w.id} value={w.id}>{w.ar_name || w.name}</option>)}
                 </select>
                 {errors.customerWelaya && <p style={{ color: 'var(--thread-red)', fontSize: 12, marginTop: 4 }}>{errors.customerWelaya}</p>}
@@ -923,7 +1127,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <div>
                 <select value={fd.customerCommune} onChange={(e) => setFd({ ...fd, customerCommune: e.target.value })}
                   style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }}>
-                  <option value="">البلدية</option>
+                  <option value="">{t.communePh}</option>
                   {communes.map((c) => <option key={c.id} value={c.id}>{c.ar_name || c.name}</option>)}
                 </select>
                 {errors.customerCommune && <p style={{ color: 'var(--thread-red)', fontSize: 12, marginTop: 4 }}>{errors.customerCommune}</p>}
@@ -931,27 +1135,29 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
 
             <div style={{ display: 'flex', gap: 10 }}>
-              <button className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'home' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'home' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'home' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>للمنزل</button>
-              <button className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'office' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'office' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'office' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>للمكتب</button>
+              <button className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'home' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'home' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'home' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forHome}</button>
+              <button className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'office' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'office' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'office' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forOffice}</button>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 13 }}>الكمية</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <button className="pc-btn" onClick={() => setFd({ ...fd, quantity: Math.max(1, fd.quantity - 1) })} style={{ width: 30, height: 30, border: '1.5px solid var(--cotton-300)', background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={14} /></button>
-                <span style={{ minWidth: 20, textAlign: 'center', fontWeight: 700 }}>{fd.quantity}</span>
-                <button className="pc-btn" onClick={() => setFd({ ...fd, quantity: fd.quantity + 1 })} style={{ width: 30, height: 30, border: '1.5px solid var(--cotton-300)', background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={14} /></button>
+            {supportQty && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 13 }}>{t.qtyLabel}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <button className="pc-btn" onClick={() => setFd({ ...fd, quantity: Math.max(1, fd.quantity - 1) })} style={{ width: 30, height: 30, border: '1.5px solid var(--cotton-300)', background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={14} /></button>
+                  <span style={{ minWidth: 20, textAlign: 'center', fontWeight: 700 }}>{fd.quantity}</span>
+                  <button className="pc-btn" onClick={() => setFd({ ...fd, quantity: fd.quantity + 1 })} style={{ width: 30, height: 30, border: '1.5px solid var(--cotton-300)', background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={14} /></button>
+                </div>
               </div>
-            </div>
+            )}
 
             <div style={{ borderTop: '2px dashed var(--cotton-300)', paddingTop: 12, fontSize: 13.5, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>{product.name}</span><span>{fp} × {fd.quantity}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>التوصيل</span><span>{getLiv()}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: 15.5 }}><span>المجموع</span><span>{total()}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>{product.name}</span><span>{fp} {cur} × {qty}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>{t.delivery}</span><span>{!wilayas.find((x) => String(x.id) === String(fd.customerWelaya)) ? '—' : orderFreeShipping ? t.freeShippingBadge : `${getLiv()} ${cur}`}</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: 15.5 }}><span>{t.totalLabel}</span><span>{total()} {cur}</span></div>
             </div>
 
             <button className="pc-btn pc-btn-primary" onClick={submitOrder} disabled={submitting} style={{ marginTop: 6 }}>
-              {submitting ? 'جارٍ الإرسال...' : 'تأكيد الطلب'}
+              {submitting ? t.sendingAlt : t.confirmOrder}
             </button>
           </div>
         </div>
@@ -964,6 +1170,8 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
    CART
    ============================================================ */
 export function Cart({ domain, store }: any) {
+  const t = T[getLang(store)];
+  const cur = store?.currency || t.currency;
   const router = useRouter();
   const initCount = useCartStore((s: any) => s.initCount);
   const [items, setItems] = useState<any[]>([]);
@@ -994,13 +1202,20 @@ export function Cart({ domain, store }: any) {
     else setCommunes([]);
   }, [fd.customerWelaya]);
 
+  const cartTotal = items.reduce((s, it) => s + (it.finalPrice || 0) * (it.quantity || 1), 0);
+  const hasFreeShippingItem = items.some((i) => i.product?.shippingFree || i.product?.offers?.find((o: any) => o.id === i.selectedOffer)?.shippingFree);
+  const freeShippingMin = store?.supportFreeShipping ? store?.freeShippingMinAmount : null;
+  const freeShippingReached = hasFreeShippingItem || (freeShippingMin != null && cartTotal >= Number(freeShippingMin));
+  const freeShippingRemainingAmt = freeShippingMin != null ? Number(freeShippingMin) - cartTotal : 0;
+
+  const selW = wilayas.find((x) => String(x.id) === String(fd.customerWelaya));
+
   const getLiv = () => {
-    const w = wilayas.find((x) => x.id === fd.customerWelaya);
-    if (!w) return 0;
-    return fd.typeLivraison === 'home' ? w.livraisonHome : w.livraisonOfice;
+    if (freeShippingReached) return 0;
+    if (!selW) return 0;
+    return Number(fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice);
   };
 
-  const cartTotal = items.reduce((s, it) => s + (it.finalPrice || 0) * (it.quantity || 1), 0);
   const finalTotal = cartTotal + getLiv();
 
   const removeItem = (idx: number) => {
@@ -1012,10 +1227,10 @@ export function Cart({ domain, store }: any) {
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!fd.customerName.trim()) e.customerName = 'الاسم مطلوب';
-    if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone)) e.customerPhone = 'رقم هاتف غير صالح';
-    if (!fd.customerWelaya) e.customerWelaya = 'الولاية مطلوبة';
-    if (!fd.customerCommune) e.customerCommune = 'البلدية مطلوبة';
+    if (!fd.customerName.trim()) e.customerName = t.errName;
+    if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone)) e.customerPhone = t.errPhoneInvalid;
+    if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
+    if (!fd.customerCommune) e.customerCommune = t.errCommune;
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -1046,9 +1261,9 @@ export function Cart({ domain, store }: any) {
         <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--thread-red)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
           <Check size={30} color="#fff" />
         </div>
-        <h2 className="pc-display" style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>تم استلام طلبك</h2>
-        <p style={{ color: 'var(--thread-soft)', fontSize: 14 }}>سنتواصل معك قريباً لتأكيد الطلب.</p>
-        <Link href="/" className="pc-btn pc-btn-primary" style={{ marginTop: 24, display: 'inline-block', textDecoration: 'none' }}>متابعة التسوق</Link>
+        <h2 className="pc-display" style={{ fontSize: 22, fontWeight: 800, marginBottom: 10 }}>{t.cartOrderDone}</h2>
+        <p style={{ color: 'var(--thread-soft)', fontSize: 14 }}>{t.cartOrderDoneDesc}</p>
+        <Link href="/" className="pc-btn pc-btn-primary" style={{ marginTop: 24, display: 'inline-block', textDecoration: 'none' }}>{t.continueShopping}</Link>
       </div>
     );
   }
@@ -1057,24 +1272,29 @@ export function Cart({ domain, store }: any) {
     return (
       <div style={{ maxWidth: 560, margin: '0 auto', padding: '90px 20px', textAlign: 'center' }}>
         <ShoppingBag size={48} color="var(--cotton-300)" style={{ margin: '0 auto 16px' }} />
-        <h2 className="pc-display" style={{ fontSize: 20, fontWeight: 800, marginBottom: 8 }}>سلتك فارغة</h2>
-        <p style={{ color: 'var(--thread-soft)', fontSize: 14, marginBottom: 24 }}>لم تقم بإضافة أي منتج بعد.</p>
-        <Link href="/" className="pc-btn pc-btn-primary" style={{ textDecoration: 'none' }}>تسوق الآن</Link>
+        <h2 className="pc-display" style={{ fontSize: 20, fontWeight: 800, marginBottom: 8 }}>{t.cartEmptyTitle}</h2>
+        <p style={{ color: 'var(--thread-soft)', fontSize: 14, marginBottom: 24 }}>{t.cartEmptyMsg}</p>
+        <Link href="/" className="pc-btn pc-btn-primary" style={{ textDecoration: 'none' }}>{t.shopNow}</Link>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: 1000, margin: '0 auto', padding: '40px 20px 80px', display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 36 }}>
+    <div dir={t.dir} className="pc-cart-grid" style={{ maxWidth: 1000, margin: '0 auto', padding: '40px 20px 80px' }}>
       <div>
-        <h1 className="pc-display" style={{ fontSize: 22, fontWeight: 800, marginBottom: 20 }}>سلة التسوق</h1>
+        <h1 className="pc-display" style={{ fontSize: 22, fontWeight: 800, marginBottom: 20 }}>{t.cartPageTitle}</h1>
+        {freeShippingMin != null && (
+          <div style={{ background: freeShippingReached ? 'var(--cotton-100)' : '#fff', border: '1.5px dashed var(--cotton-300)', color: freeShippingReached ? 'var(--thread-red)' : 'var(--thread-ink)', borderRadius: 2, padding: '10px 14px', marginBottom: 16, fontWeight: 700, fontSize: 13, textAlign: 'center' }}>
+            {freeShippingReached ? t.freeShippingReached : t.freeShippingRemaining.replace('{{amount}}', String(freeShippingRemainingAmt))}
+          </div>
+        )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {items.map((it, idx) => (
             <div key={idx} className="pc-stitch-border" style={{ display: 'flex', gap: 14, padding: 14, borderRadius: 2, background: '#fff' }}>
-              <img src={it.product?.productImage} alt={it.product?.name} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 2 }} />
+              <img src={it.product?.productImage || it.product?.imagesProduct?.[0]?.imageUrl} alt={it.product?.name} style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 2 }} />
               <div style={{ flex: 1 }}>
                 <p style={{ fontWeight: 600, fontSize: 13.5 }}>{it.product?.name}</p>
-                <p style={{ fontSize: 12.5, color: 'var(--thread-soft)', marginTop: 4 }}>الكمية: {it.quantity} × {it.finalPrice}</p>
+                <p style={{ fontSize: 12.5, color: 'var(--thread-soft)', marginTop: 4 }}>{t.qtyItem} {it.quantity} × {it.finalPrice} {cur}</p>
               </div>
               <button className="pc-btn" onClick={() => removeItem(idx)} style={{ background: 'none', alignSelf: 'flex-start' }}><Trash2 size={17} color="var(--thread-red)" /></button>
             </div>
@@ -1083,45 +1303,45 @@ export function Cart({ domain, store }: any) {
       </div>
 
       <div className="pc-stitch-border" style={{ padding: 20, borderRadius: 3, background: '#fff', height: 'fit-content' }}>
-        <p style={{ fontWeight: 700, marginBottom: 16 }}>معلومات التوصيل</p>
+        <p style={{ fontWeight: 700, marginBottom: 16 }}>{t.deliveryInfoTitle}</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div>
-            <input placeholder="الاسم الكامل" value={fd.customerName} onChange={(e) => setFd({ ...fd, customerName: e.target.value })}
+            <input placeholder={t.fullNamePh} value={fd.customerName} onChange={(e) => setFd({ ...fd, customerName: e.target.value })}
               style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }} />
             {errors.customerName && <p style={{ color: 'var(--thread-red)', fontSize: 12, marginTop: 4 }}>{errors.customerName}</p>}
           </div>
           <div>
-            <input placeholder="رقم الهاتف" value={fd.customerPhone} onChange={(e) => setFd({ ...fd, customerPhone: e.target.value })}
+            <input placeholder={t.phonePh} value={fd.customerPhone} onChange={(e) => setFd({ ...fd, customerPhone: e.target.value })}
               style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }} />
             {errors.customerPhone && <p style={{ color: 'var(--thread-red)', fontSize: 12, marginTop: 4 }}>{errors.customerPhone}</p>}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <select value={fd.customerWelaya} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}
               style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }}>
-              <option value="">الولاية</option>
+              <option value="">{t.wilayaPh}</option>
               {wilayas.map((w) => <option key={w.id} value={w.id}>{w.ar_name || w.name}</option>)}
             </select>
             <select value={fd.customerCommune} onChange={(e) => setFd({ ...fd, customerCommune: e.target.value })}
               style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }}>
-              <option value="">البلدية</option>
+              <option value="">{t.communePh}</option>
               {communes.map((c) => <option key={c.id} value={c.id}>{c.ar_name || c.name}</option>)}
             </select>
           </div>
           {(errors.customerWelaya || errors.customerCommune) && <p style={{ color: 'var(--thread-red)', fontSize: 12 }}>{errors.customerWelaya || errors.customerCommune}</p>}
 
           <div style={{ display: 'flex', gap: 10 }}>
-            <button className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'home' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'home' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'home' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>للمنزل</button>
-            <button className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'office' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'office' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'office' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>للمكتب</button>
+            <button className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'home' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'home' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'home' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forHome}</button>
+            <button className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'office' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'office' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'office' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forOffice}</button>
           </div>
 
           <div style={{ borderTop: '2px dashed var(--cotton-300)', paddingTop: 12, fontSize: 13.5, display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>المجموع الفرعي</span><span>{cartTotal}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>التوصيل</span><span>{getLiv()}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: 15.5 }}><span>المجموع</span><span>{finalTotal}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>{t.subtotal}</span><span>{cartTotal} {cur}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>{t.delivery}</span><span>{!selW ? '—' : freeShippingReached ? t.freeShippingBadge : `${getLiv()} ${cur}`}</span></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: 15.5 }}><span>{t.totalLabel}</span><span>{finalTotal} {cur}</span></div>
           </div>
 
           <button className="pc-btn pc-btn-primary" onClick={submitOrder} disabled={submitting}>
-            {submitting ? 'جارٍ الإرسال...' : 'إتمام الطلب'}
+            {submitting ? t.sendingAlt : t.completeOrder}
           </button>
         </div>
       </div>
@@ -1132,9 +1352,9 @@ export function Cart({ domain, store }: any) {
 /* ============================================================
    STATIC PAGES
    ============================================================ */
-function Shell({ title, children }: { title: string; children: React.ReactNode }) {
+function Shell({ title, dir, children }: { title: string; dir?: string; children: React.ReactNode }) {
   return (
-    <div>
+    <div dir={dir}>
       <div style={{ background: 'var(--thread-ink)', color: 'var(--cotton-50)', padding: '60px 20px', textAlign: 'center' }}>
         <h1 className="pc-display" style={{ fontSize: 28, fontWeight: 800 }}>{title}</h1>
       </div>
@@ -1154,37 +1374,41 @@ function InfoBlock({ title, body }: { title: string; body: string }) {
   );
 }
 
-export function Privacy() {
+export function Privacy({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="سياسة الخصوصية">
-      <InfoBlock title="جمع المعلومات" body="نقوم بجمع المعلومات الضرورية فقط لإتمام طلبك وتحسين تجربتك معنا، مثل الاسم ورقم الهاتف وعنوان التوصيل." />
-      <InfoBlock title="استخدام البيانات" body="تُستخدم بياناتك حصراً لمعالجة الطلبات والتواصل بخصوصها، ولا تتم مشاركتها مع أي طرف ثالث دون موافقتك." />
-      <InfoBlock title="حماية المعلومات" body="نتخذ كافة الإجراءات التقنية لحماية بياناتك من أي وصول غير مصرح به." />
+    <Shell title={t.privacyTitle} dir={t.dir}>
+      <InfoBlock title={t.priv1t} body={t.priv1b} />
+      <InfoBlock title={t.priv2t} body={t.priv2b} />
+      <InfoBlock title={t.priv3t} body={t.priv3b} />
     </Shell>
   );
 }
 
-export function Terms() {
+export function Terms({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="الشروط والأحكام">
-      <InfoBlock title="استخدام المتجر" body="باستخدامك لهذا المتجر فإنك توافق على الشروط والأحكام المذكورة هنا، والالتزام بالاستخدام السليم للمنصة." />
-      <InfoBlock title="الطلبات والدفع" body="يتم تأكيد الطلب بعد التواصل الهاتفي، والدفع يكون عند الاستلام ما لم يُذكر خلاف ذلك." />
-      <InfoBlock title="الإرجاع والاستبدال" body="يمكن إرجاع أو استبدال المنتج خلال مدة محددة في حال وجود عيب أو خطأ في الطلب." />
+    <Shell title={t.termsTitle} dir={t.dir}>
+      <InfoBlock title={t.terms1t} body={t.terms1b} />
+      <InfoBlock title={t.terms2t} body={t.terms2b} />
+      <InfoBlock title={t.terms3t} body={t.terms3b} />
     </Shell>
   );
 }
 
-export function Cookies() {
+export function Cookies({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="سياسة ملفات تعريف الارتباط">
-      <InfoBlock title="ما هي الكوكيز" body="هي ملفات صغيرة تُخزَّن في متصفحك لتحسين تجربة تصفحك للمتجر." />
-      <InfoBlock title="كيفية استخدامها" body="نستخدمها لحفظ محتوى سلة التسوق وتذكر تفضيلاتك أثناء التصفح." />
-      <InfoBlock title="التحكم بالكوكيز" body="يمكنك تعطيل الكوكيز من إعدادات المتصفح، إلا أن ذلك قد يؤثر على بعض وظائف المتجر." />
+    <Shell title={t.cookiesTitle} dir={t.dir}>
+      <InfoBlock title={t.cook1t} body={t.cook1b} />
+      <InfoBlock title={t.cook2t} body={t.cook2b} />
+      <InfoBlock title={t.cook3t} body={t.cook3b} />
     </Shell>
   );
 }
 
 export function Contact({ store }: any) {
+  const t = T[getLang(store)];
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -1206,33 +1430,33 @@ export function Contact({ store }: any) {
     return (
       <div style={{ maxWidth: 520, margin: '0 auto', padding: '100px 20px', textAlign: 'center' }}>
         <Check size={40} color="var(--thread-red)" style={{ margin: '0 auto 16px' }} />
-        <h2 className="pc-display" style={{ fontSize: 21, fontWeight: 800, marginBottom: 10 }}>تم إرسال رسالتك</h2>
-        <p style={{ color: 'var(--thread-soft)', fontSize: 14, marginBottom: 22 }}>سنتواصل معك في أقرب وقت.</p>
-        <button className="pc-btn pc-btn-outline" onClick={() => { setSent(false); setForm({ name: '', email: '', phone: '', message: '' }); }}>إرسال رسالة أخرى</button>
+        <h2 className="pc-display" style={{ fontSize: 21, fontWeight: 800, marginBottom: 10 }}>{t.contactSentTitle}</h2>
+        <p style={{ color: 'var(--thread-soft)', fontSize: 14, marginBottom: 22 }}>{t.contactSentDesc}</p>
+        <button className="pc-btn pc-btn-outline" onClick={() => { setSent(false); setForm({ name: '', email: '', phone: '', message: '' }); }}>{t.sendAnotherMsg}</button>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: 1000, margin: '0 auto', padding: '50px 20px 80px', display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 40 }}>
+    <div dir={t.dir} className="pc-contact-grid" style={{ maxWidth: 1000, margin: '0 auto', padding: '50px 20px 80px' }}>
       <div>
-        <h1 className="pc-display" style={{ fontSize: 24, fontWeight: 800, marginBottom: 14 }}>اتصل بنا</h1>
-        <p style={{ color: 'var(--thread-soft)', fontSize: 14, lineHeight: 1.9, marginBottom: 26 }}>يسعدنا تواصلك معنا لأي استفسار حول منتجاتنا أو طلبك.</p>
+        <h1 className="pc-display" style={{ fontSize: 24, fontWeight: 800, marginBottom: 14 }}>{t.contactTitle}</h1>
+        <p style={{ color: 'var(--thread-soft)', fontSize: 14, lineHeight: 1.9, marginBottom: 26 }}>{t.contactIntro}</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14, fontSize: 14 }}>
           {store?.contact?.phone && <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}><Phone size={16} color="var(--thread-red)" /> {store.contact.phone}</span>}
           <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}><MapPin size={16} color="var(--thread-red)" /> {store?.contact?.wilaya} {store?.contact?.address}</span>
         </div>
       </div>
       <div className="pc-stitch-border" style={{ padding: 22, borderRadius: 3, background: '#fff', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <input placeholder="الاسم" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
+        <input placeholder={t.namePh} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
           style={{ padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }} />
-        <input placeholder="البريد الإلكتروني" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
+        <input placeholder={t.emailPh} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
           style={{ padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }} />
-        <input placeholder="رقم الهاتف" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
+        <input placeholder={t.phonePh2} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
           style={{ padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }} />
-        <textarea placeholder="رسالتك" rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })}
+        <textarea placeholder={t.messagePh} rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })}
           style={{ padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit', resize: 'vertical' }} />
-        <button className="pc-btn pc-btn-primary" onClick={submit} disabled={submitting}>{submitting ? 'جارٍ الإرسال...' : 'إرسال الرسالة'}</button>
+        <button className="pc-btn pc-btn-primary" onClick={submit} disabled={submitting}>{submitting ? t.sendingAlt : t.sendMsgBtn}</button>
       </div>
     </div>
   );
@@ -1240,9 +1464,9 @@ export function Contact({ store }: any) {
 
 export function StaticPage({ staticPage, page, store }: any) {
   const p = (staticPage || page || '').toLowerCase();
-  if (p === 'privacy') return <Privacy />;
-  if (p === 'terms') return <Terms />;
-  if (p === 'cookies') return <Cookies />;
+  if (p === 'privacy') return <Privacy store={store} />;
+  if (p === 'terms') return <Terms store={store} />;
+  if (p === 'cookies') return <Cookies store={store} />;
   if (p === 'contact') return <Contact store={store} />;
   return null;
 }

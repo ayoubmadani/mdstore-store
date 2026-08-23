@@ -1,0 +1,805 @@
+---
+name: theme-dev-v2
+description: "v2 — دليل تطوير ثيمات MdStore: بنية الملفات، أنماط i18n (ar/fr/en)، أخطاء BiDi/RTL، CSS في flex containers، variant filtering، image attr display، bundle command، قواعد ثابتة للـ Navbar/Footer/Hero، وحقول Free Shipping / Qty Support على store وproduct وoffer."
+---
+
+# Theme Dev v2 — دليل تطوير ثيمات MdStore
+
+دليل مرجعي شامل لكل ما يخص إنشاء وتعديل ثيمات متجر MdStore: بنية الكود، أنماط الترجمة، أخطاء متكررة وحلولها، variant filtering، وقواعد ثابتة يجب احترامها في كل ثيم.
+
+---
+
+## When to Apply
+
+استخدم هذا الـ Skill عند:
+- إنشاء ثيم جديد من الصفر
+- إضافة i18n لثيم موجود
+- تصحيح مشاكل اتجاه النص (RTL/LTR)
+- تعديل Hero أو Navbar أو Footer
+- تصحيح أخطاء بصرية في الثيم (محاذاة، overflow، ألوان)
+- إضافة فلترة المتغيرات (variant filtering)
+- تصحيح عرض الـ attributes (صور/ألوان/نص)
+
+---
+
+## 1. بنية الملف الأساسية
+
+كل ثيم ملف `.tsx` واحد في `src/theme/` يصدّر:
+
+```ts
+export default Main         // الـ layout الرئيسي
+export { Navbar, Footer, Card, Home, Details, ProductForm, Cart,
+         Privacy, Terms, Cookies, Contact, StaticPage }
+```
+
+### نمط اللغة (getLang + T lookup)
+
+```ts
+type Lang = 'ar' | 'fr' | 'en';
+
+const getLang = (store?: any): Lang => {
+  if (store?.language === 'fr') return 'fr';
+  if (store?.language === 'en') return 'en';
+  return 'ar';
+};
+
+const T: Record<Lang, typeof jsonAr> = {
+  ar: jsonAr,
+  fr: jsonFr as any,
+  en: jsonEn as any,
+};
+```
+
+### Triplet في كل Component
+
+```ts
+const t = T[getLang(store)];
+const isRTL = t.dir === 'rtl';
+const currency = store?.currency || 'DZD';
+```
+
+### تعارض اسم `t` — أخطاء شائعة
+
+```ts
+// ✗ خطأ — const t = setTimeout(...) يتعارض مع translation t
+const t = setTimeout(() => setShow(false), 3000);
+
+// ✓ صحيح — أعد التسمية
+const timer = setTimeout(() => setShow(false), 3000);
+
+// ✗ خطأ — .map((t) => ...) يظلل translation t
+attrs.map((t) => t.name)
+
+// ✓ صحيح
+attrs.map((typ) => typ.name)
+```
+
+---
+
+## 2. JSON الترجمة — المفاتيح الإلزامية
+
+يجب أن يحتوي كل ملف ترجمة (ar/fr/en) على هذه المفاتيح كحد أدنى:
+
+| مجموعة | المفاتيح |
+|--------|---------|
+| **التوجيه** | `dir` (`'rtl'` أو `'ltr'`) |
+| **Navbar** | `home, contact, cart, search, searching, noResults, showAll` |
+| **الصفحة الرئيسية** | `all, noProducts, shopNow, searchFor, heroBadge, heroTitle, heroSub` |
+| **Trust bar** | `trust` (array من `{title, desc}`) |
+| **نموذج الطلب** | `fullName, fullNamePh, errName, phone, phonePh, errPhone, errPhoneInvalid, wilaya, errWilaya, wilayaPh, wilayaNA, commune, errCommune, communePh, communeLoading, deliveryType, deliveryHome, deliveryOffice, qty, price, delivery, total, subtotal, addToCart, orderNow, confirmOrder, sending, back, addedMsg, errSubmit` |
+| **السلة** | `myCart, cartEmpty, cartEmptyDesc, successTitle, successDesc, backToShop, checkoutTitle` |
+| **Footer** | `quickLinks, contactSect, privacy, terms, rightsReserved, footerDesc` |
+| **صفحات ثابتة** | `privacyTitle, termsTitle, cookiesTitle` + أقسامها الفرعية |
+| **اتصل بنا** | `contactTitle, contactInfoTitle, contactFormTitle, namePh, emailPh, phonePh2, messagePh, sendBtn, sentTitle, sentDesc, sendAnother, contactErr` |
+
+---
+
+## 3. قواعد BiDi/RTL — الأكثر تسبباً في أخطاء
+
+### القاعدة الذهبية: الخاصية الفيزيائية تتغلب على BiDi
+
+عندما يحتوي عنصر LTR على نص عربي (RTL)، يكتشف المتصفح اتجاه الفقرة تلقائياً ويجعلها RTL حتى لو كان `dir="ltr"`. الحل:
+
+```tsx
+// ✗ خطأ — 'start' يتبع اتجاه الفقرة (RTL للعربي = يمين)
+style={{ textAlign: 'start' }}
+
+// ✓ صحيح — قيمة فيزيائية لا تتأثر بـ BiDi
+style={{ textAlign: t.dir === 'rtl' ? 'right' : 'left' }}
+```
+
+### dir على العنصر نفسه لا يكفي وحده
+
+```tsx
+// ✗ dir على الـ container فقط لا يضمن المحاذاة الصحيحة
+<div dir={t.dir}>
+  <h1 style={{ textAlign: 'start' }}>...</h1>
+</div>
+
+// ✓ dir + textAlign فيزيائي على العنصر نفسه
+<div dir={t.dir}>
+  <h1 dir={t.dir} style={{ textAlign: t.dir === 'rtl' ? 'right' : 'left' }}>
+    ...
+  </h1>
+</div>
+```
+
+### أيقونات الأسهم في RTL
+
+```tsx
+// ArrowLeft يصبح ArrowRight في LTR
+<ArrowLeft style={{ transform: t.dir === 'ltr' ? 'scaleX(-1)' : 'none' }} />
+```
+
+### الـ gradient في Hero
+
+```tsx
+// يجب أن يعتمد على الاتجاه
+background: `linear-gradient(to ${t.dir === 'rtl' ? 'left' : 'right'}, ...)`
+// أو بالدرجات:
+background: `linear-gradient(${t.dir === 'rtl' ? '270deg' : '90deg'}, ...)`
+```
+
+### CSS direction في Search Panel
+
+```tsx
+// ✗ لا تضع direction: rtl hardcoded في CSS classes
+.glb-search-panel { direction: rtl; }
+.glb-search-input { direction: rtl; }
+
+// ✓ احذف direction من CSS، وأضف dir dynamically على العنصر
+<div className="glb-search-panel" dir={t.dir}>
+  <input className="glb-search-input" dir={t.dir} />
+</div>
+```
+
+---
+
+## 4. CSS في Flex Containers — مشكلة شائعة
+
+### المشكلة: `hn-container` داخل `display: flex`
+
+عندما تكون الـ `section` الخاصة بـ Hero تستخدم `display: flex; alignItems: center`، فإن الـ container الداخلي يصبح **flex item** ويأخذ عرض المحتوى فقط بدلاً من `100%`:
+
+```tsx
+// ✗ خطأ — hn-container سيأخذ عرض المحتوى فقط داخل الـ flex
+<section style={{ display: 'flex', alignItems: 'center' }}>
+  <div className="hn-container" style={{ padding: '3rem 1.5rem' }}>
+
+// ✓ صحيح — إضافة width: '100%' تجبره على ملء العرض الكامل
+<section style={{ display: 'flex', alignItems: 'center' }}>
+  <div className="hn-container" style={{ padding: '3rem 1.5rem', width: '100%' }}>
+```
+
+**السبب:** `max-width + margin: 0 auto` في الـ CSS class لا يعملان بشكل صحيح في flex context إلا مع `width: 100%`.
+
+---
+
+## 5. Hero Section — القواعد الثابتة
+
+```tsx
+// ✓ عرض عنوان Hero — نص عادي، لا dangerouslySetInnerHTML للعناوين الطويلة
+<h1 style={{ wordBreak: 'break-word' }}>
+  {store?.hero?.title || t.heroTitle}
+</h1>
+
+// ✓ إذا دعمت HTML markup — استخدم DOMPurify مع dir فيزيائي
+<h1
+  dir={t.dir}
+  style={{ textAlign: t.dir === 'rtl' ? 'right' : 'left' }}
+  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroTitle) }}
+/>
+
+// ✓ container الـ Hero داخل flex section يحتاج width: '100%'
+<div className="hn-container" style={{ width: '100%', padding: '3rem 1.5rem' }}>
+```
+
+---
+
+## 6. Variant Filtering — تعطيل المتغيرات غير المتاحة
+
+### المشكلة
+
+عندما يحدد المستخدم لوناً معيناً، بعض المقاسات لا تكون متاحة لذلك اللون. يجب تعطيلها بصرياً.
+
+### البيانات: `product.variantDetails`
+
+```ts
+// variantDetails: مصفوفة من كل التركيبات المتاحة فعلاً
+product.variantDetails = [
+  { name: [{ attrName: 'اللون', value: 'أحمر' }, { attrName: 'المقاس', value: 'M' }] },
+  { name: [{ attrName: 'اللون', value: 'أزرق' }, { attrName: 'المقاس', value: 'S' }] },
+  // ...
+]
+```
+
+### نمط الفلترة الكامل
+
+داخل حلقة رسم الـ attributes، احسب `available` قبل رسم كل زر:
+
+```tsx
+const available = !product.variantDetails?.length ||
+  product.variantDetails.some((vd: any) =>
+    Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(
+      ([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)
+    )
+  );
+```
+
+**المنطق:** إذا كانت `variantDetails` فارغة → كل المتغيرات متاحة. وإلا، ابحث عن أي تركيبة في `variantDetails` تشمل الاختيار الحالي + قيمة هذا المتغير.
+
+### تطبيق الـ `available` على الأزرار
+
+```tsx
+// onClick — منع التحديد إذا كان غير متاح
+onClick={() => available && handleVariantSelection(attr.name, v.value)}
+
+// نمط اللون (color swatch)
+style={{
+  opacity: available ? 1 : 0.35,
+  cursor: available ? 'pointer' : 'not-allowed',
+  // ... باقي الـ styles
+}}
+
+// نمط الصورة (image mode)
+style={{
+  opacity: available ? 1 : 0.35,
+  cursor: available ? 'pointer' : 'not-allowed',
+  // ... باقي الـ styles
+}}
+
+// نمط النص (text button) — الأهم: textDecoration للتشطيب
+style={{
+  color: isSelected ? ACCENT : (available ? '#555' : '#bbb'),
+  cursor: available ? 'pointer' : 'not-allowed',
+  transition: 'all 0.18s',
+  textDecoration: available ? 'none' : 'line-through',
+  // ... باقي الـ styles
+}}
+```
+
+> **تنبيه:** كل ثيم له لون accent مختلف في `isSelected ? ACCENT`. تأكد من استخدام اللون الصحيح:
+> - bold-red: `#E63946` | energetic-orange: `#F97316` | golden-touch: `#D4AF37`
+> - playful-pink: `#EC4899` | royal-purple: `#7C3AED` | vibrant-green: `#16A34A`
+> - electric-blue: `#1D4ED8`
+
+---
+
+## 7. Image Attribute Display — عرض صورة الـ Attribute
+
+### المشكلة
+
+`attr.displayMode` قد يكون `'image'` لكن `v.value` يحتوي أحياناً على الـ URL وأحياناً `v.name`. إذا لم يُكتشف الـ URL صح يظهر النص الخام (URL كـ text).
+
+### كشف URL من كلا الحقلين
+
+```tsx
+// احسب imgSrc بفحص v.value أولاً ثم v.name
+const imgSrc = (v.value || '').startsWith('http')
+  ? v.value
+  : (v.name || '').startsWith('http')
+    ? v.name
+    : null;
+
+// اعتبر الـ attr صورة إذا كان displayMode === 'image' أو وجد URL
+const isImg = attr.displayMode === 'image' || (attr.displayMode !== 'color' && !!imgSrc);
+
+// مفتاح الاختيار يكون imgSrc (لا v.value)
+const selKey = isImg ? imgSrc! : v.value;
+const isSelected = selectedVariants[attr.name] === selKey;
+```
+
+### رسم زر الصورة
+
+```tsx
+{attr.displayMode === 'color' ? (
+  // color swatch كالمعتاد
+) : isImg ? (
+  <button
+    key={v.id}
+    onClick={() => available && handleVariantSelection(attr.name, imgSrc!)}
+    title={v.name}
+    style={{
+      width: 52, height: 52, padding: 0, overflow: 'hidden',
+      border: `2px solid ${isSelected ? '#111' : '#ddd'}`,
+      borderRadius: 4, cursor: available ? 'pointer' : 'not-allowed',
+      opacity: available ? 1 : 0.35, flexShrink: 0,
+    }}
+  >
+    <img src={imgSrc!} alt={v.name}
+      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+  </button>
+) : (
+  // text button
+)}
+```
+
+---
+
+## 8. أخطاء متكررة وحلولها
+
+| الخطأ | السبب | الحل |
+|-------|-------|------|
+| نص Hero يمين-محاذاة في متجر LTR | BiDi يتجاوز `dir="ltr"` عند وجود عربي | `textAlign: t.dir === 'rtl' ? 'right' : 'left'` |
+| Hero text لا يتمحاذى مع الـ categories | `hn-container` داخل flex يأخذ عرض المحتوى | أضف `width: '100%'` للـ container |
+| نص عربي يظهر مقلوباً في hero overflow | `dangerouslySetInnerHTML` + نص طويل جداً | استخدم plain text + `wordBreak: 'break-word'` |
+| `cite` text مرئي | `content: attr(cite)` في CSS | احذف خاصية cite أو استخدم `data-*` بدلاً منها |
+| JSX comment داخل `&& ()` | `{/* comment */}` داخل تعبير شرطي | ضع التعليق خارج الـ expression أو احذفه |
+| `WebKitLineClamp` لا يعمل | `overflow: visible` | أضف `overflow: 'hidden'` للـ container |
+| `pt` (points) بدلاً من `px` في CSS | وحدة خاطئة | استخدم `px` أو `rem` دائماً في web |
+| URL يظهر كـ text في attr الصورة | فحص `v.value` فقط والـ URL في `v.name` | افحص كلاهما: `(v.value\|\|'').startsWith('http') \|\| (v.name\|\|'').startsWith('http')` |
+| تشطيب لا يظهر على المتغير المعطّل | `textDecoration` غائبة من نمط النص | أضف `textDecoration: available ? 'none' : 'line-through'` |
+| مقاس غير متاح لا يُعطَّل | لا يوجد فلترة `variantDetails` | أضف نمط `available` بفحص `product.variantDetails` |
+| `t` variable conflict في Navbar | `const t = setTimeout(...)` يحجب translation | أعد تسمية الـ timer: `const timer = setTimeout(...)` |
+| search direction hardcoded | `direction: rtl` في CSS class | احذفه واستخدم `dir={t.dir}` على العنصر |
+| أزرار slider مقلوبة في العربية | `insetInlineStart` + `ChevronLeft` لـ prev | انظر §16 — استخدم `{t.dir === 'rtl' ? <ChevronRight/> : <ChevronLeft/>}` |
+| URL مكرر في success page | `router.push(\`/${domain}/successfully\`)` | استخدم `/successfully?productId=${product?.id}` بدون domain |
+| URL صورة يظهر كـ نص في label اللون | `selectedVariants[attr.name]` يحتوي URL | استخدم `attr.variants.find(v => v.value === val)?.name \|\| val` |
+| gridTemplateColumns inline يتغلب على media query | inline style له أولوية CSS أعلى من class | احذف `gridTemplateColumns` من inline style وابقِه في CSS class فقط |
+| color swatch لا يعرض صورة URL | `background: v.value` لا يقبل URL بدون `url()` | افحص URL: `{/^https?:\/\//.test(v.value) ? <img .../> : <span style={{background: v.value}}/>}` |
+
+---
+
+## 9. أنماط CSS الثابتة (Classes بدل Inline)
+
+استخدم CSS classes للتخطيطات المتكررة بدلاً من inline styles معقدة:
+
+```css
+/* Product grid */
+.pgrid { display:grid; grid-template-columns:repeat(2,1fr); gap:1rem }
+@media(min-width:768px){ .pgrid { grid-template-columns:repeat(3,1fr) } }
+@media(min-width:1200px){ .pgrid { grid-template-columns:repeat(4,1fr) } }
+
+/* Form 2-column */
+.form2 { display:grid; grid-template-columns:1fr 1fr; gap:.875rem }
+@media(max-width:500px){ .form2 { grid-template-columns:1fr } }
+
+/* Cart layout */
+.cart-layout { display:grid; grid-template-columns:1fr; gap:2rem }
+@media(min-width:900px){ .cart-layout { grid-template-columns:1.3fr 1fr } }
+
+/* Product detail layout */
+.det-layout { display:grid; grid-template-columns:1fr; gap:2rem }
+@media(min-width:768px){ .det-layout { grid-template-columns:1fr 1fr } }
+
+/* Navbar */
+.nav-desktop { display:flex; align-items:center; gap:24px }
+.nav-mobile-btn { display:none }
+@media(max-width:720px){ .nav-desktop{display:none} .nav-mobile-btn{display:flex} }
+
+/* Trust bar */
+.trust-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.25rem }
+@media(min-width:640px){ .trust-grid { grid-template-columns:repeat(4,1fr) } }
+```
+
+---
+
+## 10. Navbar — القواعد الثابتة
+
+```tsx
+// ✓ زر الـ mobile يجب أن يكون display:none بـ CSS class وليس inline
+<button className="nav-mobile-btn" onClick={() => setOpen(true)}>...</button>
+
+// ✓ Category active state
+const isActive = selectedCat === cat.id || (selectedCat === '' && cat.id === 'all');
+style={{ borderBottom: isActive ? `2px solid ${ACCENT}` : '2px solid transparent' }}
+
+// ✓ store prop على Shell
+<Shell store={store} dir={t.dir}>
+```
+
+---
+
+## 11. Footer — القواعد الثابتة
+
+```tsx
+// ✓ حقل البريد الإلكتروني
+<input type="email" placeholder={t.emailPlaceholder || 'email@example.com'} />
+
+// ✓ store prop يُمرر دائماً
+<Footer store={store} />
+
+// ✓ Privacy/Terms/Cookies تستقبل store
+export function Privacy({ store }: { store: any }) { ... }
+```
+
+---
+
+## 12. Trust Items — نمطان مقبولان
+
+```ts
+// نمط 1: inline في JSON
+trust: [
+  { title: 'شحن سريع', desc: 'خلال 24-48 ساعة' },
+  ...
+]
+// الاستخدام:
+const trustIcons = [Truck, Shield, Zap, Headphones];
+t.trust.map((item, i) => { const Icon = trustIcons[i]; ... })
+
+// نمط 2: مفاتيح منفصلة
+trust1Title: '...', trust1Desc: '...'
+// أقل مرونة، تجنبه في الثيمات الجديدة
+```
+
+---
+
+## 13. Bundle Command
+
+بعد كل تعديل على ثيم:
+
+```bash
+node scripts/bundle-themes.mjs --slug=<theme-slug>
+```
+
+مثال:
+```bash
+node scripts/bundle-themes.mjs --slug=ecom-commercial-fast-response-theme
+node scripts/bundle-themes.mjs --slug=gaming-esports-epic-store-theme
+```
+
+للـ bundle الكامل (كل الثيمات):
+```bash
+node scripts/bundle-themes.mjs
+```
+
+---
+
+## 14. خصائص CSS الاتجاهية — Logical vs Physical
+
+| الخاصية | Logical (يتأثر بـ BiDi) | Physical (لا يتأثر) |
+|---------|------------------------|---------------------|
+| المحاذاة | `textAlign: 'start'` | `textAlign: 'left'` أو `'right'` |
+| الهامش | `marginInlineStart` | `marginLeft` / `marginRight` |
+| الـ padding | `paddingInlineStart` | `paddingLeft` / `paddingRight` |
+| الموضع | `insetInlineStart` | `left` / `right` |
+
+**القاعدة:** في الثيمات متعددة اللغات، فضّل الـ Logical للـ RTL/LTR الطبيعي، واستخدم Physical لتجاوز BiDi عند الضرورة.
+
+---
+
+## 15. قائمة تحقق قبل الـ Bundle
+
+- [ ] كل مفاتيح JSON موجودة في ar/fr/en (أو كـ fallback)
+- [ ] `dir` صحيح في كل JSON (`'rtl'` للعربي، `'ltr'` للفرنسي/الإنجليزي)
+- [ ] Hero container له `width: '100%'` إذا كان داخل flex section
+- [ ] نصوص Hero تستخدم `textAlign` فيزيائي (ليس 'start')
+- [ ] `store` prop يُمرر لـ Navbar, Footer, Privacy, Terms, Cookies, Contact
+- [ ] لا يوجد JSX comment داخل `&& ()`
+- [ ] لا يوجد `cite` attribute مرئي
+- [ ] لا يوجد `direction: rtl` hardcoded في CSS للـ search
+- [ ] لا يوجد تعارض في اسم `t` (setTimeout, .map param)
+- [ ] Variant filtering: `available` مطبق على onClick + opacity/cursor + textDecoration
+- [ ] Image attr: يفحص `v.value` و `v.name` معاً للـ URL
+- [ ] أزرار slider تستخدم أيقونات RTL-aware (انظر §16) — ليس ChevronLeft ثابت لـ prev
+- [ ] Success redirect يستخدم `/successfully?productId=...` بدون domain في المسار (انظر §17)
+- [ ] Color swatches تفحص URL وتعرض `<img>` بدلاً من `background:` (انظر §18)
+- [ ] لا يوجد `gridTemplateColumns` inline يتغلب على media query للـ 2-column layout
+- [ ] الـ quantity stepper في `ProductForm` يُخفى/يُقفل على 1 إذا `store.supportQty === false` (انظر §19)
+- [ ] `Cart` لا يحتوي أي أزرار +/- لتعديل الكمية إطلاقاً — كمية كل عنصر تُعرض كنص ثابت `× {item.quantity}` بغض النظر عن `supportQty` (انظر §19)
+- [ ] شارة "شحن مجاني" تحسب الأولوية الصحيحة: offer.shippingFree > product.shippingFree > عتبة store (انظر §19)
+- [ ] `wilayas.find(...)` يقارن بـ `String(w.id) === String(fd.customerWelaya)` — ليس `===` مباشرة (انظر §20)
+- [ ] `getLiv()`/الحساب النهائي يحوّل نتيجة livraisonHome/livraisonOfice إلى رقم بـ `Number(...)` أو `+` — القيم القادمة من الـ API نصوص (انظر §20)
+- [ ] `getLiv()` في كل من ProductForm وCart تُرجع `0` فعلياً عند تحقق الشحن المجاني — ليس فقط شارة نصية (انظر §19 ⚠️)
+- [ ] كل مكان يعرض `selW.livraisonHome`/`livraisonOfice` مباشرة (أزرار home/office) يعرض `t.freeShippingBadge` بدل السعر الخام عند تحقق الشحن المجاني
+- [ ] `offer.subTitle` يُعرض تحت اسم العرض إذا موجود (انظر §19)
+- [ ] تم تشغيل `node scripts/bundle-themes.mjs --slug=<name>`
+
+---
+
+## 16. Slider Arrow RTL Fix
+
+### المشكلة
+
+`insetInlineStart` يقلب **موضع** الزر تلقائياً في RTL، لكنه لا يقلب **الأيقونة**. النتيجة: الأيقونة تشير لليسار وهي في الجانب الأيسر RTL = خطأ منطقي (يجب أن تشير لليمين).
+
+```tsx
+// ✗ خطأ — ChevronLeft ثابت يظهر معكوساً في العربية
+<button style={{ insetInlineStart: 10 }}><ChevronLeft size={20} /></button>
+<button style={{ insetInlineEnd: 10 }}><ChevronRight size={20} /></button>
+```
+
+### الحل: تبديل الأيقونة حسب `t.dir`
+
+```tsx
+// ✓ prev button (insetInlineStart = يمين في RTL)
+<button style={{ position: 'absolute', top: '50%', insetInlineStart: 10 }}>
+  {t.dir === 'rtl' ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+</button>
+
+// ✓ next button (insetInlineEnd = يسار في RTL)
+<button style={{ position: 'absolute', top: '50%', insetInlineEnd: 10 }}>
+  {t.dir === 'rtl' ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+</button>
+```
+
+### نمط ArrowRight بالـ Rotation (Cosmetics-luxe وما شابهه)
+
+```tsx
+// ✓ prev — ArrowRight مقلوب 180° = سهم يسار، في RTL لا تقلبه
+<button className="luxe-gallery-prev">
+  <ArrowRight size={20} style={{ transform: t.dir === 'rtl' ? 'none' : 'rotate(180deg)' }} />
+</button>
+
+// ✓ next — ArrowRight طبيعي = سهم يمين، في RTL اقلبه
+<button className="luxe-gallery-next">
+  <ArrowRight size={20} style={{ transform: t.dir === 'rtl' ? 'rotate(180deg)' : 'none' }} />
+</button>
+```
+
+### نمط Physical Positions (لا يحتاج إصلاح)
+
+```tsx
+// ✓ هذا النمط صحيح بالفعل — right + ChevronRight للـ prev
+<button style={{ right: 10 }}><ChevronRight size={20} /></button>
+<button style={{ left: 10 }}><ChevronLeft size={20} /></button>
+```
+
+---
+
+## 17. Success URL Redirect Fix
+
+### المشكلة
+
+```tsx
+// ✗ خطأ — يُنشئ URL مكرر: https://sido.mdstore.top/sido.mdstore.top/successfully
+router.push(`/${domain}/successfully`)
+window.location.href = `/${domain}/successfully`
+router.push(`/lp/${domain}/successfully`)
+```
+
+### الحل
+
+```tsx
+// ✓ مسار نسبي بدون domain
+router.push(`/successfully?productId=${product?.id}`)
+window.location.href = `/successfully?productId=${product?.id}`
+```
+
+لماذا؟ `domain` (مثل `sido.mdstore.top`) هو اسم النطاق وليس مقطعاً في المسار. الـ Next.js router يُضيفه ضمن hostname تلقائياً فيُصبح مكرراً.
+
+---
+
+## 18. Color Swatch Image URL Detection
+
+### المشكلة
+
+```tsx
+// ✗ خطأ — `background: 'https://...'` غير صالح كقيمة CSS
+<span style={{ background: v.value }} />
+// النتيجة: لا يظهر لون ولا صورة
+```
+
+### الحل
+
+```tsx
+// ✓ افحص إذا كانت القيمة URL واعرض <img> بدلاً من background
+{/^https?:\/\//.test(v.value)
+  ? <img
+      src={v.value}
+      alt={v.name || v.value}
+      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+    />
+  : <span style={{ width: '100%', height: '100%', background: v.value, display: 'block' }} />
+}
+```
+
+### إضافة: الزر يحتاج عرضاً ثابتاً ليكون مربعاً
+
+```tsx
+// إذا كان الـ CSS class يعطي `min-width: 48px` فقط، أضف width ثابت:
+style={{
+  width: 48,   // أو 46 حسب الـ CSS class
+  height: 48,
+  cursor: available ? 'pointer' : 'not-allowed',
+  opacity: available ? 1 : 0.35,
+}}
+```
+
+### لا تعرض قيمة variant كـ text في label
+
+```tsx
+// ✗ خطأ — قد يظهر URL طويل في الـ label
+{attr.name}: <span>{selectedVariants?.[attr.name]}</span>
+
+// ✓ إما اعرض فقط اسم الـ variant
+{attr.name}: <span>{attr.variants?.find(v => v.value === selectedVariants?.[attr.name])?.name}</span>
+
+// ✓ أو لا تعرض القيمة المختارة أبداً
+{attr.name}
+```
+
+---
+
+## 19. حقول جديدة على store / product / offer (Qty Support & Free Shipping)
+
+أُضيفت هذه الحقول من الـ API (2026-08-22). كلها اختيارية عند القراءة — إذا كان الثيم لا يتعامل معها، يبقى يعمل بسلوكه القديم (fallback للقيم الافتراضية أدناه).
+
+| الكائن | الحقل | النوع | Default | المعنى |
+|--------|-------|-------|---------|--------|
+| `store` | `supportQty` | `boolean` | `true` | هل يظهر selector للكمية في `ProductForm`/`Details`، أم تُقفل الكمية على 1 |
+| `store` | `supportFreeShipping` | `boolean` | `false` | هل يفعّل المتجر عتبة شحن مجاني عامة |
+| `store` | `freeShippingMinAmount` | `number \| null` | `null` | الحد الأدنى لسلة المشتريات (بعملة المتجر) ليصبح الشحن مجانياً |
+| `product` | `shippingFree` | `boolean` | `false` | هذا المنتج بالذات يشحن مجاناً دائماً، بغض النظر عن عتبة المتجر |
+| `offer` (داخل `product.offers[]`) | `subTitle` | `string?` | — | نص فرعي/وصف قصير للعرض، يُعرض تحت اسم العرض |
+| `offer` (داخل `product.offers[]`) | `shippingFree` | `boolean` | `false` | هذا العرض (bundle) بالذات يشحن مجاناً إذا اختاره المستخدم |
+
+### Qty Selector — إخفاء/تعطيل حسب `store.supportQty`
+
+```tsx
+// ✓ إذا كان false — لا تعرض stepper الكمية، وارسل quantity = 1 دائماً
+const supportQty = store?.supportQty ?? true;
+
+{supportQty ? (
+  <div className="qty-stepper">
+    <button onClick={() => setQty(q => Math.max(1, q - 1))}>-</button>
+    <span>{qty}</span>
+    <button onClick={() => setQty(q => q + 1)}>+</button>
+  </div>
+) : null}
+
+// عند الإرسال:
+const finalQty = supportQty ? qty : 1;
+```
+
+> **⚠️ قرار تصميم مؤكَّد من صاحب المشروع (2026-08-23): لا تُعدَّل الكمية من صفحة `Cart` إطلاقاً.** الكمية تُختار فقط في `ProductForm` قبل الإضافة للسلة؛ بمجرد أن يصبح العنصر في السلة، تُعرض كميته كنص ثابت `× {item.quantity}` بدون أي أزرار +/-، **بغض النظر عن قيمة `store.supportQty`** (لا تشرط هذا بـ supportQty، فهو يتحكم فقط بـ stepper `ProductForm`).
+>
+> إذا وجدت في ثيم قديم أزرار +/- داخل `Cart` تُعدّل `item.quantity`/`n[i].quantity` مباشرة (`Math.max(1, item.quantity - 1)` أو ما شابه، غالباً مع دالة مساعدة اسمها `changeQty`) — **احذفها بالكامل** (الأزرار + أي دالة `changeQty` تصبح غير مستخدَمة) واستبدلها بنص ثابت:
+> ```tsx
+> // ✗ احذف أي شيء بهذا الشكل من Cart
+> <button onClick={() => changeQty(i, -1)}>-</button>
+> <span>{item.quantity}</span>
+> <button onClick={() => changeQty(i, 1)}>+</button>
+>
+> // ✓ استبدله بهذا فقط
+> <span>× {item.quantity}</span>
+> ```
+> ثيمات كثيرة تعرض `item.quantity` كنص ثابت أصلاً في الـ Cart (بلا أزرار) — هذه صحيحة كما هي ولا تحتاج تعديلاً. ابحث أولاً قبل افتراض وجود المشكلة.
+
+### شارة/عتبة الشحن المجاني — أولوية الحساب
+
+الترتيب الصحيح للفحص (الأخص أولاً):
+
+1. إذا كان هناك عرض (offer) محدد وله `shippingFree === true` → شحن مجاني.
+2. وإلا إذا كان `product.shippingFree === true` → شحن مجاني.
+3. وإلا إذا `store.supportFreeShipping === true` و`store.freeShippingMinAmount` محدد ومجموع السلة `>= freeShippingMinAmount` → شحن مجاني.
+4. غير ذلك → شحن عادي (يُحسب حسب الولاية/البلدية كالمعتاد).
+
+> **⚠️ الأهم — لا تكتفِ بشارة نصية:** عرض شارة "🚚 شحن مجاني" وحدها بدون تصفير سعر التوصيل الفعلي **لا يعني شيئاً للزبون** — سيظل يُحاسَب على سعر الولاية/البلدية كالمعتاد. يجب أن يُطبَّق نفس فحص الأولوية أعلاه **داخل `getLiv()`** (في كل من `ProductForm` و`Cart`) بحيث تُرجع الدالة `0` عندما يتحقق الشحن المجاني، وليس فقط في نص العرض. هذا الخطأ حدث فعلياً في أول ثيم عُدِّل (`animal-pet-lovers-paradise.tsx`) — الشارة كانت تظهر لكن التوصيل بقي محسوباً بالسعر الكامل في المجموع والطلب المُرسَل فعلياً.
+
+```tsx
+// ✓ ProductForm — orderFreeShipping يُحسب على مستوى هذا الطلب (fp * qty)، وليس على مستوى السلة كلها
+const selOffer = product.offers?.find((o: any) => o.id === selectedOffer);
+const storeInfo = storeprop || product.store;
+const orderFreeShipping = !!(product.shippingFree || selOffer?.shippingFree ||
+  (storeInfo?.supportFreeShipping && storeInfo?.freeShippingMinAmount != null &&
+   (fp * qty) >= Number(storeInfo.freeShippingMinAmount)));
+
+const getLiv = useCallback((): number => {
+  if (orderFreeShipping) return 0;
+  if (!selW) return 0;
+  return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice;
+}, [selW, fd.typeLivraison, orderFreeShipping]);
+```
+
+```tsx
+// ✓ Cart — freeShippingReached يُحسب على مجموع السلة (cartTotal)، ويُستخدم أيضاً داخل getLiv()
+const hasFreeShippingItem = items.some(i =>
+  i.product?.shippingFree || i.product?.offers?.find((o: any) => o.id === i.selectedOffer)?.shippingFree
+);
+const freeShippingMin = store?.supportFreeShipping ? store?.freeShippingMinAmount : null;
+const freeShippingReached = hasFreeShippingItem || (freeShippingMin != null && cartTotal >= Number(freeShippingMin));
+
+const getLiv = () => {
+  if (freeShippingReached) return 0;
+  if (!selW) return 0;
+  return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice;
+};
+```
+
+بما أن `total()`/`finalTotal` و`priceLivraison` المُرسَلة في `axios.post(.../orders/create, ...)` تعتمد جميعها على `getLiv()`، فإن تصفيرها هناك وحده كافٍ لتصحيح كل مكان آخر يعرض أو يرسل سعر التوصيل تلقائياً — **باستثناء** أي مكان يعرض `selW.livraisonHome`/`livraisonOfice` مباشرة (مثل أزرار اختيار "توصيل للبيت/للمكتب" التي تعرض سعر كل خيار قبل اختياره) — هذه تحتاج فحصاً يدوياً منفصلاً لعرض `t.freeShippingBadge` بدل السعر الخام. ابحث عن كل تكرار لـ `selW.livraisonHome` و`selW.livraisonOfice` في كل من `ProductForm` و`Cart` وتأكد من تغطيتها.
+
+```tsx
+function isShippingFree({
+  store, product, selectedOffer, cartTotal,
+}: { store: any; product?: any; selectedOffer?: any; cartTotal: number }) {
+  if (selectedOffer?.shippingFree) return true;
+  if (product?.shippingFree) return true;
+  if (store?.supportFreeShipping && store?.freeShippingMinAmount != null) {
+    return cartTotal >= Number(store.freeShippingMinAmount);
+  }
+  return false;
+}
+```
+
+```tsx
+// ✓ شارة على بطاقة/تفاصيل المنتج (لا تحتاج cartTotal — فحص على مستوى المنتج فقط)
+{(product?.shippingFree) && (
+  <span className="free-shipping-badge">{t.freeShippingBadge || '🚚 توصيل مجاني'}</span>
+)}
+
+// ✓ progress bar في الـ Cart نحو عتبة الشحن المجاني على مستوى المتجر
+{store?.supportFreeShipping && store?.freeShippingMinAmount != null && (
+  (() => {
+    const remaining = Number(store.freeShippingMinAmount) - cartTotal;
+    return remaining > 0 ? (
+      <p className="free-shipping-hint">
+        {t.freeShippingRemaining
+          ? t.freeShippingRemaining.replace('{{amount}}', String(remaining))
+          : `أضف ${remaining} ${currency} أخرى للحصول على توصيل مجاني`}
+      </p>
+    ) : (
+      <p className="free-shipping-reached">{t.freeShippingReached || '🎉 حصلت على توصيل مجاني!'}</p>
+    );
+  })()
+)}
+```
+
+> **ملاحظة i18n:** أضف مفاتيح `freeShippingBadge`, `freeShippingRemaining` (بها `{{amount}}`), `freeShippingReached` إلى ملفات الترجمة الثلاث إذا استخدمتها — ليست إلزامية بعد ضمن §2، فاستخدم fallback نصي كما بالمثال أعلاه إذا لم تُضف.
+>
+> **⚠️ اختيار الكلمة (تعديل 2026-08-23):** في النص المعروض للزبون استخدم "**توصيل مجاني**" في العربية (وليس "شحن مجاني")، و"**Free Delivery**" في الإنجليزية (وليس "Free shipping")، والفرنسية تبقى "**Livraison gratuite**" كما هي (لا تغيير). هذا يخص فقط نصوص الشارة/الرسائل الأربعة (`freeShippingBadge/Threshold/Remaining/Reached`) — لا يخص كلمة "shipping" في سياقات أخرى غير متعلقة (مثل مسار API `/shipping/...` أو نصوص "confirmed by phone before shipping" في صفحة الشروط، والتي تبقى دون تغيير).
+
+### عرض `offer.subTitle`
+
+```tsx
+// ✓ تحت اسم العرض مباشرة، اختياري
+<div className="offer-card">
+  <span className="offer-name">{offer.name}</span>
+  {offer.subTitle && <span className="offer-subtitle">{offer.subTitle}</span>}
+  {offer.shippingFree && (
+    <span className="offer-shipping-free-tag">{t.freeShippingBadge || '🚚'}</span>
+  )}
+</div>
+```
+
+---
+
+## 20. عطلان الشحن — نوعان من الأخطاء الحقيقية اكتُشفا أثناء الاختبار الفعلي (2026-08-23)
+
+هذان الخطآن **موجودان مسبقاً في عدد كبير من الثيمات القديمة** (ليسا ناتجَين عن التعديلات في §19) — لكنهما يُصلحان بسهولة أثناء المرور على كل ثيم لإضافة حقول §19، فطبّقهما كلما وجدتهما.
+
+### 20.1 — مقارنة `wilaya.id` بدون `String()` → التوصيل يبقى دائماً 0
+
+```tsx
+// ✗ خطأ — w.id رقم قادم من الـ API، fd.customerWelaya نص دائماً (من <select> value)
+// 3 === "3" ← false في JS، فلا تُطابَق أي ولاية أبداً مهما اختار الزبون
+const w = wilayas.find((x) => x.id === fd.customerWelaya);
+
+// ✓ صحيح
+const w = wilayas.find((x) => String(x.id) === String(fd.customerWelaya));
+```
+
+**الأثر:** `getLiv()` يدخل دائماً في فرع `if (!w) return 0` — التوصيل يظهر 0 دج ثابتاً بغض النظر عن الولاية المختارة، وهذا **يُشبه تماماً** أثر خطأ الشحن المجاني في §19 (نفس العرض المرئي: "0 دج")، لكنه خطأ مختلف تماماً وغير متعلق بـ `shippingFree`. لا تفترض أن التوصيل=0 يعني بالضرورة مشكلة في منطق الشحن المجاني — تحقق من أن `selW`/`w` يُطابَق فعلاً أولاً (أضف نقطة تحقق: هل تتغير قيمة التوصيل إطلاقاً عند تغيير الولاية؟ إن لم تتغير أبداً حتى بلا شحن مجاني مفعّل، فالمشكلة في المطابقة لا في §19).
+
+### 20.2 — جمع `getLiv()` بدون تحويل رقمي → Total يصبح دمج نصوص
+
+```tsx
+// ✗ خطأ — livraisonHome/livraisonOfice تُرجَع من الـ API كنصوص ("600.00" وليس 600)
+// رغم أن TS type يقول number! (كذبة على مستوى النوع، القيمة الفعلية string وقت التشغيل)
+// fp * qty (رقم) + getLiv() (نص) === "5400" + "600.00" === "5400600.00" (دمج نصوص، ليس جمعاً!)
+const total = () => fp * qty + getLiv();
+
+// ✓ الأصلح — صحّح عند المصدر داخل getLiv() نفسها، يُصلح كل الاستخدامات اللاحقة دفعة واحدة
+const getLiv = (): number => {
+  if (orderFreeShipping) return 0;
+  const w = wilayas.find((x) => String(x.id) === String(fd.customerWelaya));
+  if (!w) return 0;
+  return Number(fd.typeLivraison === 'home' ? w.livraisonHome : w.livraisonOfice);
+};
+
+// ✓ بديل مقبول إن كانت getLiv تُستخدم في أماكن كثيرة ولا تريد تعديلها: أجبر التحويل عند الجمع
+const total = () => fp * qty + +getLiv();          // unary + يحوّل النص لرقم
+const total = () => Number(fp) * Number(qty) + Number(getLiv()); // أو صريح بالكامل
+```
+
+**كيف تكتشفه بسرعة:** افتح نموذج الطلب، اختر ولاية، وانظر لرقم الـ Total — إذا ظهر شيء مثل `5400600.00` بدل `6000.00` (يبدو وكأن الرقمين *التصقا* ببعض بدل أن يُجمعا)، فهذا هو الخطأ بالضبط. ابحث في الملف عن كل تعريف لـ `const total = () => ...` وتأكد أنه يستخدم إما `+getLiv()` (unary plus) أو `Number(getLiv())` — وليس `+ getLiv()` بدون تحويل.
+
+**النطاق:** هذا الخطأ ليس في كل الثيمات — بعضها كان يستخدم `+getLiv()` أو `Number(...)` مسبقاً وهو سليم. تحقق دائماً عند كل ثيم بدل افتراض وجوده أو غيابه.
+
+### قائمة تحقق إضافية (أضِفها لقائمة §15 عند العمل على أي ثيم قديم)
+
+- [ ] `wilayas.find(...)` يقارن بـ `String(...)` على الطرفين
+- [ ] كل تعريف لـ `const total = () => ...` يحوّل `getLiv()` لرقم قبل الجمع (`+getLiv()` أو `Number(getLiv())`)
+- [ ] نفس الفحص يتكرر في كل من `ProductForm` **و** `Cart` — كل منهما له `getLiv`/`total` مستقلان
+
+---

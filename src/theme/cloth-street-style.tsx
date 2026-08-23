@@ -133,7 +133,7 @@ const CSS = `
   .stats-grid      { display:grid; grid-template-columns:repeat(4,1fr); }
   .details-split   { display:grid; grid-template-columns:1fr 1fr; }
   .details-img     { border-right:1px solid var(--ink); position:sticky; top:52px; height:calc(100vh - 52px); overflow:hidden; }
-  .details-info    { padding:28px 26px; overflow-y:auto; }
+  .details-info    { padding:28px 26px; }
   .form-2c         { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .dlv-2c          { display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--ink); }
   .cart-layout     { display:grid; grid-template-columns:1.2fr 1fr; gap:40px; align-items:start; }
@@ -144,7 +144,7 @@ const CSS = `
   @media (max-width:1024px) { .cart-layout { grid-template-columns:1fr; } }
   @media (max-width:900px) {
     .details-split { grid-template-columns:1fr; }
-    .details-img   { position:static; height:60vw; min-height:280px; border-right:none; border-bottom:1px solid var(--ink); }
+    .details-img   { position:static; aspect-ratio:3/4; height:auto; width:100%; border-right:none; border-bottom:1px solid var(--ink); }
     .details-info  { padding:20px 16px; }
     .contact-grid  { grid-template-columns:1fr; gap:24px; }
   }
@@ -163,11 +163,11 @@ const CSS = `
   }
 
   .footer-cols { display:grid; grid-template-columns:1fr; gap:2rem; }
-  @media(min-width:768px){.footer-cols{grid-template-columns:2fr 1fr 1fr;gap:40px;}}
+  @media(min-width:768px){.footer-cols{grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;}}
 `;
 
 /* ─── TYPES ─── */
-interface Offer { id: string; name: string; quantity: number; price: number; }
+interface Offer { id: string; name: string; subTitle?: string; quantity: number; price: number; shippingFree?: boolean; }
 interface Variant { id: string; name: string; value: string; }
 interface Attribute { id: string; type: string; name: string; displayMode?: 'color' | 'image' | 'text' | null; variants: Variant[]; }
 interface ProductImage { id: string; imageUrl: string; }
@@ -178,13 +178,14 @@ interface Commune { id: string; name: string; ar_name: string; wilayaId: string;
 export interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
-  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 export interface ProductFormProps {
   product: Product; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
   selectedVariants: Record<string, string>; platform?: string; priceLoss?: number;
+  store?: any;
 }
 
 const vm = (d: VariantDetail, s: Record<string, string>) =>
@@ -212,6 +213,14 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
 
 /* ─── Full-screen menu overlay ─── */
 function MenuOverlay({ store, onClose }: { store: any; onClose: () => void }) {
+  const t = T[getLang(store)];
+  const yr = new Date().getFullYear();
+  const links = [
+    { h: '/', l: t.home },
+    { h: '/contact', l: t.contact },
+    { h: '/Privacy', l: t.privacy },
+    { h: '/Terms', l: t.terms },
+  ];
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'var(--ink)', display: 'flex', flexDirection: 'column', animation: 'menu-in 0.45s cubic-bezier(0.22,1,0.36,1) forwards' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 32px', borderBottom: '1px solid rgba(242,239,232,0.1)' }}>
@@ -221,7 +230,7 @@ function MenuOverlay({ store, onClose }: { store: any; onClose: () => void }) {
         </button>
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 32px' }}>
-        {[{ h: '/', l: 'الرئيسية' }, { h: '/contact', l: 'تواصل معنا' }, { h: '/Privacy', l: 'الخصوصية' }, { h: '/Terms', l: 'الشروط' }].map(lnk => (
+        {links.map(lnk => (
           <Link key={lnk.h} href={lnk.h} onClick={onClose}
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 0', borderBottom: '1px solid rgba(242,239,232,0.07)', transition: 'padding-right 0.25s' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.paddingRight = '16px'; }}
@@ -232,8 +241,8 @@ function MenuOverlay({ store, onClose }: { store: any; onClose: () => void }) {
         ))}
       </div>
       <div style={{ padding: '16px 32px', borderTop: '1px solid rgba(242,239,232,0.1)', display: 'flex', justifyContent: 'space-between' }}>
-        <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'rgba(242,239,232,0.25)' }}>ZINE DROP · {new Date().getFullYear()} · الجزائر</span>
-        <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--punch)' }}>© {new Date().getFullYear()}</span>
+        <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'rgba(242,239,232,0.25)' }}>{t.menuBottomText} · {yr}</span>
+        <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--punch)' }}>© {yr}</span>
       </div>
     </div>
   );
@@ -280,6 +289,10 @@ const jsonAr = {
   deliveryOffice: 'مكتب بريد',
   qty: 'الكمية',
   price: 'السعر',
+  freeShippingBadge: '🚚 توصيل مجاني',
+  freeShippingThreshold: '🚚 توصيل مجاني للطلبات بـ {{amount}} دج أو أكثر',
+  freeShippingRemaining: 'أضف {{amount}} دج أخرى للحصول على توصيل مجاني',
+  freeShippingReached: '🎉 حصلت على توصيل مجاني!',
   delivery: 'التوصيل',
   total: 'الإجمالي',
   subtotal: 'المجموع الفرعي',
@@ -303,11 +316,86 @@ const jsonAr = {
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
   // Footer
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
+  cookies: 'الكوكيز',
   rightsReserved: 'جميع الحقوق محفوظة',
+  // Extended
+  currency: 'دج',
+  heroSubFallback: 'مجموعة ملابس الشارع الأصيلة. كل قطعة بقصة. توصيل سريع لجميع الولايات.',
+  shopCollection: '↓ شوف الكولكشن',
+  categoriesLabel: 'تصفح حسب الستايل',
+  productCountSuffix: 'قطعة',
+  viewProduct: 'شوف القطعة',
+  footerDesc: 'متجر الستايل الأصيل. كل قطعة بقصة. توصيل سريع لجميع الولايات.',
+  footerLinksTitle: '// الروابط',
+  footerContactTitle: '// تواصل',
+  footerAvailable: 'متاحون الآن ↗',
+  menuBottomText: 'ZINE DROP · الجزائر',
+  offerQtyLabel: 'كمية:',
+  addedToCartMsg: 'أُضيف للسلة',
+  cancelLabel: 'إلغاء',
+  secureText: 'آمن · مشفر',
+  deleteLabel: 'حذف',
+  contactTitle: 'تواصل معنا.',
+  contactSubtitle: 'نرد خلال 24 ساعة',
+  contactInfoLabel: '/ معلومات الاتصال',
+  contactPhoneLabel: 'الهاتف',
+  contactLocationLabel: 'الموقع',
+  contactEmailLabel: 'البريد',
+  contactFormLabel: '/ أرسل رسالة',
+  contactNamePh: 'الاسم',
+  contactPhonePh: 'الهاتف',
+  contactEmailPh: 'البريد الإلكتروني',
+  contactMessagePh: 'كيف يمكننا مساعدتك؟',
+  contactSend: 'إرسال الرسالة',
+  contactSentMsg: 'سنرد خلال 24 ساعة',
+  contactSending: 'جاري...',
+  contactErr: 'حدث خطأ',
+  privacyTitle: 'الخصوصية',
+  priv1t: 'البيانات التي نجمعها',
+  priv1b: 'الاسم ورقم الهاتف وعنوان التوصيل فقط — الحد الأدنى اللازم لمعالجة طلبك.',
+  priv2t: 'كيف نستخدمها',
+  priv2b: 'حصرياً لمعالجة وتوصيل طلبك. لا تسويق، لا بيع بيانات.',
+  priv3t: 'الأمان',
+  priv3b: 'تشفير عالي المستوى. بياناتك محمية في جميع الأوقات.',
+  priv4t: 'مشاركة البيانات',
+  priv4b: 'لا نبيع بياناتك أبداً. تُشارك فقط مع شركاء التوصيل.',
+  priv4tag: 'مضمون',
+  termsTitle: 'الشروط',
+  terms1t: 'الطلبات',
+  terms1b: 'لا رسوم خفية. السعر المعروض هو السعر النهائي.',
+  terms2t: 'المنتجات الأصيلة',
+  terms2b: 'منتجات أصيلة فقط. السلع المقلدة ممنوعة.',
+  terms2tag: 'صارم',
+  terms3t: 'القانون المعمول به',
+  terms3b: 'تخضع هذه الشروط لقوانين الجمهورية الجزائرية الديمقراطية الشعبية.',
+  cookiesTitle: 'الكوكيز',
+  cook1t: 'ضرورية',
+  cook1b: 'مطلوبة للجلسات والسلة وإتمام الطلب. لا يمكن تعطيلها.',
+  cook1tag: 'دائماً مفعلة',
+  cook2t: 'التفضيلات',
+  cook2b: 'تحفظ إعداداتك لتجربة أفضل.',
+  cook2tag: 'اختياري',
+  cook3t: 'التحليلات',
+  cook3b: 'بيانات مجمعة لتحسين المنصة. لا بيانات شخصية.',
+  cook3tag: 'اختياري',
+  cookManage: 'MANAGE YOUR COOKIES',
+  cookManageDesc: 'يمكنك إدارة أو حذف ملفات الارتباط من إعدادات المتصفح الخاص بك في أي وقت.',
+  // Hero & Home extras
+  heroTag: 'الإصدار الأول · ملابس الشارع',
+  heroTitle1: 'ارتدِ',
+  heroTitle2: 'هويتك',
+  categoriesBtn: 'الأقسام',
+  stat1: 'أصيل',
+  stat2: 'قطعة',
+  stat3: 'توصيل',
+  stat4: 'محلي',
+  manifestoLine1: 'ما تلبسه',
+  manifestoLine2: 'يقول من أنت.',
+  contactCulture: 'DROP CULTURE · الجزائر',
 };
 
 const jsonFr = {
@@ -346,6 +434,10 @@ const jsonFr = {
   deliveryOffice: 'Point relais',
   qty: 'Quantité',
   price: 'Prix',
+  freeShippingBadge: '🚚 Livraison gratuite',
+  freeShippingThreshold: '🚚 Livraison gratuite dès {{amount}} DZD d\'achat',
+  freeShippingRemaining: 'Ajoutez {{amount}} DZD de plus pour la livraison gratuite',
+  freeShippingReached: '🎉 Livraison gratuite obtenue !',
   delivery: 'Livraison',
   total: 'Total',
   subtotal: 'Sous-total',
@@ -369,12 +461,95 @@ const jsonFr = {
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
   // Footer
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
+  cookies: 'Cookies',
   rightsReserved: 'Tous droits réservés.',
+  // Extended
+  currency: 'DZD',
+  heroSubFallback: "La collection streetwear authentique. Chaque pièce raconte une histoire. Livraison rapide dans toutes les wilayas.",
+  shopCollection: '↓ Voir la collection',
+  categoriesLabel: 'Parcourir par style',
+  productCountSuffix: 'pièce(s)',
+  viewProduct: 'Voir la pièce',
+  footerDesc: "Boutique de style authentique. Chaque pièce raconte une histoire. Livraison rapide dans toutes les wilayas.",
+  footerLinksTitle: '// Navigation',
+  footerContactTitle: '// Contact',
+  footerAvailable: 'Disponibles maintenant ↗',
+  menuBottomText: 'ZINE DROP · Algérie',
+  offerQtyLabel: 'Qté:',
+  addedToCartMsg: 'Ajouté ✓',
+  cancelLabel: 'Annuler',
+  secureText: 'Sécurisé · Chiffré',
+  deleteLabel: 'Supprimer',
+  contactTitle: 'Contactez-nous.',
+  contactSubtitle: 'Réponse sous 24h',
+  contactInfoLabel: '/ Informations de contact',
+  contactPhoneLabel: 'Téléphone',
+  contactLocationLabel: 'Adresse',
+  contactEmailLabel: 'E-mail',
+  contactFormLabel: '/ Envoyer un message',
+  contactNamePh: 'Nom',
+  contactPhonePh: 'Téléphone',
+  contactEmailPh: 'Adresse e-mail',
+  contactMessagePh: 'Comment pouvons-nous vous aider ?',
+  contactSend: 'Envoyer le message',
+  contactSentMsg: 'Nous vous répondrons sous 24h',
+  contactSending: 'Envoi...',
+  contactErr: 'Une erreur est survenue',
+  privacyTitle: 'Confidentialité',
+  priv1t: 'Données collectées',
+  priv1b: "Nom, téléphone et adresse de livraison uniquement — le minimum requis pour traiter votre commande.",
+  priv2t: 'Utilisation des données',
+  priv2b: 'Uniquement pour traiter et livrer votre commande. Pas de marketing, pas de vente de données.',
+  priv3t: 'Sécurité',
+  priv3b: 'Chiffrement de haut niveau. Vos données sont protégées en permanence.',
+  priv4t: 'Partage des données',
+  priv4b: "Nous ne vendons jamais vos données. Partagées uniquement avec nos partenaires de livraison.",
+  priv4tag: 'Garanti',
+  termsTitle: 'Conditions',
+  terms1t: 'Commandes',
+  terms1b: 'Aucun frais caché. Le prix affiché est le prix final.',
+  terms2t: 'Produits authentiques',
+  terms2b: 'Produits authentiques uniquement. Les contrefaçons sont interdites.',
+  terms2tag: 'Strict',
+  terms3t: 'Droit applicable',
+  terms3b: "Ces conditions sont régies par les lois de la République Algérienne Démocratique et Populaire.",
+  cookiesTitle: 'Cookies',
+  cook1t: 'Nécessaires',
+  cook1b: 'Requis pour les sessions, le panier et la validation de commande. Ne peuvent pas être désactivés.',
+  cook1tag: 'Toujours actifs',
+  cook2t: 'Préférences',
+  cook2b: 'Sauvegarde vos paramètres pour une meilleure expérience.',
+  cook2tag: 'Optionnel',
+  cook3t: 'Analytiques',
+  cook3b: 'Données agrégées pour améliorer la plateforme. Aucune donnée personnelle.',
+  cook3tag: 'Optionnel',
+  cookManage: 'GÉRER VOS COOKIES',
+  cookManageDesc: 'Vous pouvez gérer ou supprimer les cookies depuis les paramètres de votre navigateur à tout moment.',
+  // Hero & Home extras
+  heroTag: 'Édition 1 · Streetwear',
+  heroTitle1: 'Exprime',
+  heroTitle2: 'ton style',
+  categoriesBtn: 'Catégories',
+  stat1: 'Authentique',
+  stat2: 'pièce(s)',
+  stat3: 'Livraison',
+  stat4: 'Local',
+  manifestoLine1: 'Ce que tu portes',
+  manifestoLine2: 'dit qui tu es.',
+  contactCulture: 'DROP CULTURE · Algérie',
 };
+
+type Lang = 'ar' | 'fr' | 'en';
+const getLang = (store?: any): Lang => {
+  if (store?.language === 'fr') return 'fr';
+  if (store?.language === 'en') return 'en';
+  return 'ar';
+};
+const T: Record<Lang, typeof jsonAr> = { ar: jsonAr, fr: jsonFr as any, en: jsonFr as any };
 
 export default function Main({ store, children, domain }: any) {
   const pathname = usePathname();
@@ -395,6 +570,8 @@ export default function Main({ store, children, domain }: any) {
    NAVBAR
 ══════════════════════════════════════════════════════════════ */
 export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: string; onMenuOpen?: () => void }) {
+  const t = T[getLang(store)];
+  const cur = store?.currency || t.currency;
   const [sq, setSq] = useState('');
   const [ls, setLs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -461,7 +638,7 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
 
       {loading ? (
         <div style={{ padding: '1.5rem', textAlign: 'center', fontSize: '9px', letterSpacing: '0.2em', color: 'var(--ash)', fontWeight: 700 }}>
-          جاري البحث...
+          {t.searching}
         </div>
       ) : ls.length > 0 ? (
         <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
@@ -506,13 +683,12 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
                   color: 'var(--punch)',
                   marginTop: '2px'
                 }}>
-                  {p.price} دج
+                  {p.price} {cur}
                 </div>
               </div>
             </Link>
           ))}
 
-          {/* زر عرض المزيد بأسلوب Neo-Brutalism */}
           <button
             onClick={() => doSearch()}
             style={{
@@ -532,12 +708,12 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
               gap: '8px'
             }}
           >
-            عرض جميع النتائج <ArrowLeft size={12} />
+            {t.showAll} <ArrowLeft size={12} />
           </button>
         </div>
       ) : sq.length >= 2 && (
         <div style={{ padding: '1.5rem', textAlign: 'center', fontSize: '9px', letterSpacing: '0.15em', color: 'var(--mist)' }}>
-          لا توجد نتائج مطابقة
+          {t.noResults}
         </div>
       )}
     </div>
@@ -545,11 +721,11 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
 
   return (
     <>
-      <header dir="rtl" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, height: '52px', backgroundColor: 'var(--paper)', borderBottom: '1px solid var(--ink)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', fontFamily: "'Space Mono',monospace" }}>
+      <header dir={t.dir} style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, height: '52px', backgroundColor: 'var(--paper)', borderBottom: '1px solid var(--ink)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', fontFamily: "'Space Mono',monospace" }}>
       {/* Logo */}
       <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
         {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
-          ? <img src={store.design.logoUrl} alt={store.name} style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />
+          ? <img src={store.design.logoUrl} alt={store.name} style={{ height: '28px', width: 'auto', objectFit: 'contain', maxWidth: 160 }} />
           : <span className="ub" style={{ fontWeight: 900, fontSize: '1rem', color: 'var(--ink)', letterSpacing: '0.02em' }}>{store?.name?.toUpperCase()}</span>
         }
       </Link>
@@ -571,11 +747,11 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
             <Search style={{ width: '13px', height: '13px' }} />
           </button>
           {showSearch && (
-            <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, width: '260px', zIndex: 100 }}>
+            <div style={{ position: 'absolute', top: 'calc(100% + 4px)', ...(t.dir === 'rtl' ? { left: 0 } : { right: 0 }), width: '260px', zIndex: 100 }}>
               <form onSubmit={doSearch} style={{ position: 'relative' }}>
-                <input autoFocus type="text" placeholder="ابحث..." value={sq} onChange={e => setSq(e.target.value)}
-                  style={IS()} onFocus={onF} onBlur={e => onB(e)} />
-                <Search size={12} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--mist)' }} />
+                <input autoFocus dir={t.dir} type="text" placeholder={t.search} value={sq} onChange={e => setSq(e.target.value)}
+                  style={{ ...IS(), ...(t.dir === 'rtl' ? { paddingLeft: '36px' } : { paddingRight: '36px' }) }} onFocus={onF} onBlur={e => onB(e)} />
+                <Search size={12} style={{ position: 'absolute', ...(t.dir === 'rtl' ? { left: 10 } : { right: 10 }), top: '50%', transform: 'translateY(-50%)', color: 'var(--mist)' }} />
               </form>
               {sq.length >= 2 && <Drop />}
             </div>
@@ -608,9 +784,10 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
    FOOTER — 3 أقسام
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
+  const t = T[getLang(store)];
   const yr = new Date().getFullYear();
   return (
-    <footer dir="rtl" className="noise-ov" style={{ backgroundColor: 'var(--ink)', color: 'var(--paper)', position: 'relative', overflow: 'hidden', fontFamily: "'Space Mono',monospace" }}>
+    <footer dir={t.dir} className="noise-ov" style={{ backgroundColor: 'var(--ink)', color: 'var(--paper)', position: 'relative', overflow: 'hidden', fontFamily: "'Space Mono',monospace" }}>
       {/* Ghost watermark */}
       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', overflow: 'hidden' }}>
         <span className="ub" style={{ fontWeight: 900, fontSize: 'clamp(6rem,22vw,20rem)', color: 'rgba(242,239,232,0.025)', letterSpacing: '-0.05em', whiteSpace: 'nowrap', lineHeight: 1 }}>
@@ -632,15 +809,27 @@ export function Footer({ store }: any) {
         {/* قسم 1 — الهوية */}
         <div>
           <p style={{ fontSize: '13px', lineHeight: '1.8', letterSpacing: '0.05em', color: 'rgba(242,239,232,0.45)', maxWidth: '300px', marginBottom: '20px' }}>
-            {store?.hero?.subtitle?.substring(0, 90) || 'متجر الستايل الأصيل. كل قطعة بقصة. توصيل سريع لجميع الولايات.'}
+            {store?.hero?.subtitle?.substring(0, 90) || t.footerDesc}
           </p>
-          <p style={{ fontSize: '10px', letterSpacing: '0.08em', color: 'rgba(242,239,232,0.2)' }}>© {yr} {store?.name}. جميع الحقوق محفوظة.</p>
+          <p style={{ fontSize: '10px', letterSpacing: '0.08em', color: 'rgba(242,239,232,0.2)' }}>© {yr} {store?.name}. {t.rightsReserved}.</p>
         </div>
 
         {/* قسم 2 — روابط */}
         <div>
-          <p style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--punch)', marginBottom: '14px', textTransform: 'uppercase' }}>// الروابط</p>
-          {[{ h: '/', l: 'الرئيسية' }, { h: '/cart', l: 'السلة' }, { h: '/contact', l: 'تواصل معنا' }, { h: '/Privacy', l: 'الخصوصية' }, { h: '/Terms', l: 'الشروط' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk => (
+          <p style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--punch)', marginBottom: '14px', textTransform: 'uppercase' }}>{t.footerLinksTitle}</p>
+          {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map(lnk => (
+            <a key={lnk.h} href={lnk.h} style={{ display: 'block', fontSize: '10px', color: 'rgba(242,239,232,0.35)', marginBottom: '8px', transition: 'color 0.2s', letterSpacing: '0.08em' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--punch)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(242,239,232,0.35)'; }}>
+              {lnk.l} ↗
+            </a>
+          ))}
+        </div>
+
+        {/* قسم — قانوني */}
+        <div>
+          <p style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--punch)', marginBottom: '14px', textTransform: 'uppercase' }}>{t.legalNav}</p>
+          {[{ h: '/privacy', l: t.privacy }, { h: '/terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map(lnk => (
             <a key={lnk.h} href={lnk.h} style={{ display: 'block', fontSize: '10px', color: 'rgba(242,239,232,0.35)', marginBottom: '8px', transition: 'color 0.2s', letterSpacing: '0.08em' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--punch)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(242,239,232,0.35)'; }}>
@@ -651,7 +840,7 @@ export function Footer({ store }: any) {
 
         {/* قسم 3 — تواصل */}
         <div>
-          <p style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--punch)', marginBottom: '14px', textTransform: 'uppercase' }}>// تواصل</p>
+          <p style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--punch)', marginBottom: '14px', textTransform: 'uppercase' }}>{t.footerContactTitle}</p>
           {[
             { e: '📞', v: store?.contact?.phone },
             { e: '📍', v: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
@@ -663,7 +852,7 @@ export function Footer({ store }: any) {
             </div>
           ))}
           <div style={{ marginTop: '14px', padding: '12px 14px', border: '1px solid var(--punch)', background: 'rgba(255,45,0,0.08)' }}>
-            <p className="ub" style={{ fontSize: '12px', fontWeight: 900, color: 'var(--punch)', marginBottom: 2 }}>متاحون الآن ↗</p>
+            <p className="ub" style={{ fontSize: '12px', fontWeight: 900, color: 'var(--punch)', marginBottom: 2 }}>{t.footerAvailable}</p>
             <p style={{ fontSize: '8px', color: 'rgba(242,239,232,0.3)', letterSpacing: '0.1em' }}>REPLY WITHIN 24H</p>
           </div>
         </div>
@@ -682,6 +871,8 @@ export function Footer({ store }: any) {
    CARD — Zine Cell
 ══════════════════════════════════════════════════════════════ */
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
+  const t = T[getLang(store)];
+  const cur = store?.currency || t.currency;
   const [hov, setHov] = useState(false);
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
   const orig = product.originalPrice ? (typeof product.originalPrice === 'string' ? parseFloat(product.originalPrice) : product.originalPrice) : 0;
@@ -701,9 +892,14 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
             -{discount}%
           </div>
         )}
+        {product.shippingFree && (
+          <div className="sm" style={{ position: 'absolute', top: 10, left: 10, background: 'var(--ink)', color: 'var(--paper)', fontWeight: 700, fontSize: '10px', padding: '3px 8px' }}>
+            🚚
+          </div>
+        )}
         {/* Quick view on hover */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'var(--ink)', color: 'var(--paper)', textAlign: 'center', padding: '10px', fontSize: '10px', letterSpacing: '0.2em', fontWeight: 700, fontFamily: 'inherit', transform: hov ? 'translateY(0)' : 'translateY(100%)', transition: 'transform 0.28s cubic-bezier(0.22,1,0.36,1)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-          <span className="sm">{viewDetails || 'عرض المنتج'}</span>
+          <span className="sm">{viewDetails || t.viewProduct}</span>
           <ArrowUpRight size={11} />
         </div>
       </div>
@@ -715,7 +911,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 'auto' }}>
           <span className="ub" style={{ fontWeight: 900, fontSize: '1rem', color: hov ? 'var(--punch)' : 'var(--ink)', letterSpacing: '-0.02em', transition: 'color 0.2s' }}>
             {price.toLocaleString()}
-            <span style={{ fontWeight: 400, fontSize: '0.6em', marginRight: 3, opacity: 0.6 }}>{store?.currency || 'دج'}</span>
+            <span style={{ fontWeight: 400, fontSize: '0.6em', marginRight: 3, opacity: 0.6 }}>{cur}</span>
           </span>
           {orig > price && (
             <span className="sm" style={{ fontSize: '0.72rem', color: 'rgba(10,9,6,0.35)', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>
@@ -733,13 +929,14 @@ const COUNTS = [2, 3, 1, 2, 3, 1, 2];
 const CLASSES = ['zs-half', 'zs-third', 'zs-wide', 'zs-half', 'zs-third', 'zs-wide', 'zs-flip'];
 
 export function Home({ store, page }: any) {
+  const t = T[getLang(store)];
   const products: any[] = store.products || [];
   const cats: any[] = store.categories || [];
   if (!page) page = 1;
   const countPage = Math.ceil((store.count || products.length) / 48);
 
   return (
-    <div dir="rtl" style={{ backgroundColor: 'var(--paper)' }}>
+    <div dir={t.dir} style={{ backgroundColor: 'var(--paper)' }}>
 
       {/* ── POSTER HERO ── */}
       <section className="noise-ov" style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--ink)', overflow: 'hidden' }}>
@@ -759,27 +956,27 @@ export function Home({ store, page }: any) {
           {/* Issue tag */}
           <div className="rise" style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '28px' }}>
             <div style={{ width: '36px', height: '1.5px', background: 'var(--punch)' }} />
-            <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.28em', color: 'var(--punch)' }}>الإصدار الأول · ملابس الشارع · {new Date().getFullYear()}</span>
+            <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.28em', color: 'var(--punch)' }}>{t.heroTag} · {new Date().getFullYear()}</span>
           </div>
 
           <h1 className="ub rise rise-1" style={{ fontWeight: 900, fontSize: 'clamp(4rem,15vw,14rem)', letterSpacing: '-0.04em', lineHeight: 0.86, color: 'var(--paper)', textTransform: 'uppercase', marginBottom: 0 }}>
             {store.hero?.title
               ? store.hero.title.toUpperCase()
-              : <><span>ارتدِ</span><br /><span style={{ color: 'var(--punch)' }}>هويتك</span></>
+              : <><span>{t.heroTitle1}</span><br /><span style={{ color: 'var(--punch)' }}>{t.heroTitle2}</span></>
             }
           </h1>
 
           <div className="rise rise-2" style={{ marginTop: '40px', paddingTop: '24px', borderTop: '1px solid rgba(242,239,232,0.14)', display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: '20px' }}>
             <p className="sm" style={{ fontSize: '11px', lineHeight: '1.9', color: 'rgba(242,239,232,0.5)', maxWidth: '400px', letterSpacing: '0.05em' }}>
-              {store.hero?.subtitle || 'مجموعة ملابس الشارع الأصيلة. كل قطعة بقصة. توصيل سريع لجميع الولايات.'}
+              {store.hero?.subtitle || t.heroSubFallback}
             </p>
             <div className="rise rise-3" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              <a href="#drops" className="btn-z">↓ شوف الكولكشن</a>
+              <a href="#drops" className="btn-z">{t.shopCollection}</a>
               {cats.length > 0 && (
                 <a href="#cats" className="sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '9px', letterSpacing: '0.18em', color: 'rgba(242,239,232,0.35)', border: '1px solid rgba(242,239,232,0.14)', padding: '14px 22px', transition: 'all 0.22s' }}
                   onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--paper)'; el.style.borderColor = 'rgba(242,239,232,0.4)'; }}
                   onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(242,239,232,0.35)'; el.style.borderColor = 'rgba(242,239,232,0.14)'; }}>
-                  الأقسام <ArrowLeft style={{ width: '12px', height: '12px' }} />
+                  {t.categoriesBtn} <ArrowLeft style={{ width: '12px', height: '12px' }} />
                 </a>
               )}
             </div>
@@ -788,7 +985,7 @@ export function Home({ store, page }: any) {
 
         {/* Stats row */}
         <div className="stats-grid" style={{ position: 'relative', zIndex: 4, borderTop: '1px solid rgba(242,239,232,0.1)', marginTop: '40px' }}>
-          {[{ n: '100%', l: 'أصيل' }, { n: `${products.length || '∞'}`, l: 'قطعة' }, { n: '48H', l: 'توصيل' }, { n: 'DZ', l: 'محلي' }].map((s, i) => (
+          {[{ n: '100%', l: t.stat1 }, { n: `${products.length || '∞'}`, l: t.stat2 }, { n: '48H', l: t.stat3 }, { n: 'DZ', l: t.stat4 }].map((s, i) => (
             <div key={i} style={{ padding: '16px 20px', borderRight: i < 3 ? '1px solid rgba(242,239,232,0.08)' : 'none' }}>
               <div className="ub" style={{ fontWeight: 900, fontSize: 'clamp(1.2rem,2.5vw,2.2rem)', color: i === 0 ? 'var(--punch)' : 'var(--paper)', letterSpacing: '-0.02em', lineHeight: 1 }}>{s.n}</div>
               <div className="sm" style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'rgba(242,239,232,0.28)', marginTop: '4px' }}>{s.l}</div>
@@ -801,14 +998,11 @@ export function Home({ store, page }: any) {
       {cats.length > 0 && (
         <div id="cats" style={{ borderBottom: '1px solid var(--ink)', display: 'flex', alignItems: 'stretch', overflowX: 'auto' }}>
           <div style={{ flexShrink: 0, padding: '10px 18px', borderRight: '1px solid var(--ink)', display: 'flex', alignItems: 'center' }}>
-            <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)', whiteSpace: 'nowrap' }}>تصفح حسب الستايل</span>
+            <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)', whiteSpace: 'nowrap' }}>{t.categoriesLabel}</span>
           </div>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', padding: '10px 22px', borderRight: '1px solid var(--ink)', fontSize: '8px', letterSpacing: '0.18em', backgroundColor: 'var(--ink)', color: 'var(--punch)', whiteSpace: 'nowrap', flexShrink: 0, textTransform: 'uppercase' }}>
-            ★ الكل
+            ★ {t.all}
           </Link>
-                        <Link href="?" style={{ display:'inline-flex', alignItems:'center', padding:'0.5rem 1.25rem', borderRadius:999, border:'1.5px solid #ccc', background:'transparent', fontSize:'0.82rem', fontWeight:600, cursor:'pointer' }}>
-                الكل
-              </Link>
               {cats.map((cat: any) => (
             <Link key={cat.id} href={`?category=${cat.id}`} style={{ display: 'flex', alignItems: 'center', padding: '10px 22px', borderRight: '1px solid var(--ink)', fontSize: '8px', letterSpacing: '0.18em', color: 'var(--ink)', whiteSpace: 'nowrap', flexShrink: 0, textTransform: 'uppercase', transition: 'background 0.2s,color 0.2s' }}
               onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'var(--ink)'; el.style.color = 'var(--punch)'; }}
@@ -822,21 +1016,21 @@ export function Home({ store, page }: any) {
       {/* ── PRODUCTS — Zine strips ── */}
       <section id="drops">
         <div className="sec-bar">
-          <span className="ub" style={{ fontWeight: 900, fontSize: 'clamp(0.7rem,1.4vw,0.95rem)', color: 'var(--paper)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>الكولكشن الكاملة</span>
-          <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'rgba(242,239,232,0.4)' }}>{products.length} قطعة</span>
+          <span className="ub" style={{ fontWeight: 900, fontSize: 'clamp(0.7rem,1.4vw,0.95rem)', color: 'var(--paper)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>{t.all}</span>
+          <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'rgba(242,239,232,0.4)' }}>{products.length} {t.productCountSuffix}</span>
         </div>
 
         {products.length === 0 ? (
           <div style={{ minHeight: '420px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--ink)', margin: '1px' }}>
             <span className="ub" style={{ fontWeight: 900, fontSize: 'clamp(4rem,12vw,10rem)', color: 'rgba(10,9,6,0.05)', letterSpacing: '-0.04em' }}>SOON</span>
-            <p className="sm" style={{ fontSize: '9px', letterSpacing: '0.2em', color: 'var(--mist)', marginTop: '16px' }}>قريباً...</p>
+            <p className="sm" style={{ fontSize: '9px', letterSpacing: '0.2em', color: 'var(--mist)', marginTop: '16px' }}>{t.noProducts}</p>
           </div>
         ) : (
           <div className="products-grid">
             {products.map((p: any) => {
               const img = p.productImage || p.imagesProduct?.[0]?.imageUrl;
               const disc = p.priceOriginal ? Math.round(((p.priceOriginal - p.price) / p.priceOriginal) * 100) : 0;
-              return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails="شوف القطعة" />;
+              return <Card key={p.id} product={p} displayImage={img} discount={disc} store={store} viewDetails={t.viewProduct} />;
             })}
           </div>
         )}
@@ -868,12 +1062,12 @@ export function Home({ store, page }: any) {
         </div>
         <div style={{ position: 'relative', zIndex: 2 }}>
           <p className="ub" style={{ fontWeight: 900, fontSize: 'clamp(2.2rem,6vw,5.5rem)', color: 'var(--paper)', letterSpacing: '-0.03em', lineHeight: 0.88, marginBottom: '28px', textTransform: 'uppercase' }}>
-            <span>ما تلبسه</span><br /><span>يقول من أنت.</span>
+            <span>{t.manifestoLine1}</span><br /><span>{t.manifestoLine2}</span>
           </p>
           <a href="#drops" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '10px', letterSpacing: '0.18em', color: 'var(--punch)', background: 'var(--paper)', padding: '14px 28px', textTransform: 'uppercase', clipPath: 'polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%)', transition: 'background 0.2s' }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--ink)'; (e.currentTarget as HTMLElement).style.color = 'var(--paper)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--paper)'; (e.currentTarget as HTMLElement).style.color = 'var(--punch)'; }}>
-            تسوق الآن <ArrowUpRight style={{ width: '14px', height: '14px' }} />
+            {t.shopNow} <ArrowUpRight style={{ width: '14px', height: '14px' }} />
           </a>
         </div>
       </section>
@@ -884,11 +1078,13 @@ export function Home({ store, page }: any) {
 /* ══════════════════════════════════════════════════════════════
    DETAILS
 ══════════════════════════════════════════════════════════════ */
-export function Details({ product, toggleWishlist, isWishlisted, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
+export function Details({ product, store, toggleWishlist, isWishlisted, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
+  const t = T[getLang(store)];
+  const cur = store?.currency || t.currency;
   const [sel, setSel] = useState(0);
   if (!product) return null;
   return (
-    <div dir="rtl" style={{ backgroundColor: 'var(--paper)', fontFamily: "'Space Mono',monospace" }}>
+    <div dir={t.dir} style={{ backgroundColor: 'var(--paper)', fontFamily: "'Space Mono',monospace" }}>
       
 
       <div className="details-split">
@@ -905,7 +1101,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
               {discount > 0 && <div className="ub" style={{ display: 'inline-block', background: 'var(--punch)', color: 'var(--paper)', fontWeight: 900, fontSize: '11px', padding: '3px 12px', marginBottom: '10px', transform: 'rotate(-1.5deg)' }}>-{discount}% OFF</div>}
               <div className="ub" style={{ fontWeight: 900, fontSize: 'clamp(2rem,5vw,4rem)', color: 'var(--paper)', letterSpacing: '-0.03em', lineHeight: 1 }}>
                 {finalPrice.toLocaleString()}
-                <span className="sm" style={{ fontWeight: 400, fontSize: '1rem', marginLeft: '8px', opacity: 0.65 }}>دج</span>
+                <span className="sm" style={{ fontWeight: 400, fontSize: '1rem', marginLeft: '8px', opacity: 0.65 }}>{cur}</span>
               </div>
             </div>
             {allImages.length > 1 && (
@@ -933,12 +1129,18 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
             <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)', marginBottom: '4px' }}>RETAIL PRICE</p>
             <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: '10px' }}>
               <span className="ub" style={{ fontWeight: 900, fontSize: '3.2rem', color: 'var(--punch)', letterSpacing: '-0.03em', lineHeight: 1 }}>{finalPrice.toLocaleString()}</span>
-              <span className="sm" style={{ fontSize: '1rem', color: 'var(--ash)' }}>دج</span>
+              <span className="sm" style={{ fontSize: '1rem', color: 'var(--ash)' }}>{cur}</span>
               {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
                 <span className="sm" style={{ fontSize: '11px', textDecoration: 'line-through', color: 'var(--mist)' }}>{parseFloat(product.priceOriginal).toLocaleString()}</span>
               )}
             </div>
           </div>
+
+          {(product.shippingFree || (store?.supportFreeShipping && store?.freeShippingMinAmount != null)) && (
+            <p className="sm" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--punch)', marginBottom: '18px' }}>
+              {product.shippingFree ? t.freeShippingBadge : t.freeShippingThreshold.replace('{{amount}}', String(store.freeShippingMinAmount))}
+            </p>
+          )}
 
           {/* Offers */}
           {product.offers?.length > 0 && (
@@ -953,10 +1155,12 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
                     <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
                     <div>
                       <p className="sm" style={{ fontSize: '10px', fontWeight: 700, color: selectedOffer === o.id ? 'var(--paper)' : 'var(--ink)', letterSpacing: '0.08em' }}>{o.name}</p>
-                      <p className="sm" style={{ fontSize: '8px', color: selectedOffer === o.id ? 'rgba(242,239,232,0.5)' : 'var(--ash)', letterSpacing: '0.12em' }}>كمية: {o.quantity}</p>
+                      {o.subTitle && <p className="sm" style={{ fontSize: '8px', color: selectedOffer === o.id ? 'rgba(242,239,232,0.5)' : 'var(--ash)', letterSpacing: '0.1em', marginTop: '2px' }}>{o.subTitle}</p>}
+                      <p className="sm" style={{ fontSize: '8px', color: selectedOffer === o.id ? 'rgba(242,239,232,0.5)' : 'var(--ash)', letterSpacing: '0.12em' }}>{t.offerQtyLabel} {o.quantity}</p>
+                      {o.shippingFree && <p className="sm" style={{ fontSize: '8px', fontWeight: 700, color: 'var(--punch)', letterSpacing: '0.1em', marginTop: '2px' }}>{t.freeShippingBadge}</p>}
                     </div>
                   </div>
-                  <span className="ub" style={{ fontWeight: 900, fontSize: '1.1rem', color: selectedOffer === o.id ? 'var(--punch)' : 'var(--ink)', letterSpacing: '-0.02em' }}>{o.price.toLocaleString()}<span className="sm" style={{ fontWeight: 400, fontSize: '9px', marginLeft: '3px' }}>دج</span></span>
+                  <span className="ub" style={{ fontWeight: 900, fontSize: '1.1rem', color: selectedOffer === o.id ? 'var(--punch)' : 'var(--ink)', letterSpacing: '-0.02em' }}>{o.price.toLocaleString()}<span className="sm" style={{ fontWeight: 400, fontSize: '9px', marginLeft: '3px' }}>{cur}</span></span>
                 </label>
               ))}
             </div>
@@ -968,21 +1172,21 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
               <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)', marginBottom: '9px' }}>/ {attr.name.toUpperCase()}</p>
               {attr.displayMode === 'color' ? (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px' }}>
-                  {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: '30px', height: '30px', backgroundColor: v.value, border: `3px solid ${s ? 'var(--ink)' : 'transparent'}`, cursor: 'pointer', outline: s ? '2px solid var(--punch)' : 'none', outlineOffset: '2px' }} />; })}
+                  {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val))); return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: '30px', height: '30px', backgroundColor: v.value, border: `3px solid ${s ? 'var(--ink)' : 'transparent'}`, cursor: available ? 'pointer' : 'not-allowed', outline: s ? '2px solid var(--punch)' : 'none', outlineOffset: '2px', opacity: available ? 1 : 0.35 }} />; })}
                 </div>
               ) : attr.displayMode === 'image' ? (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                  {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ width: '48px', height: '48px', overflow: 'hidden', border: `2px solid ${s ? 'var(--punch)' : 'var(--paper-dk)'}`, cursor: 'pointer', padding: 0 }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>; })}
+                  {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val))); return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: '48px', height: '48px', overflow: 'hidden', border: `2px solid ${s ? 'var(--punch)' : 'var(--paper-dk)'}`, cursor: available ? 'pointer' : 'not-allowed', padding: 0, opacity: available ? 1 : 0.35 }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>; })}
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                  {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} className="sm" style={{ padding: '7px 14px', border: `1px solid ${s ? 'var(--ink)' : 'var(--paper-dk)'}`, backgroundColor: s ? 'var(--ink)' : 'transparent', color: s ? 'var(--paper)' : 'var(--ink)', fontSize: '10px', letterSpacing: '0.12em', cursor: 'pointer', transition: 'all 0.18s' }}>{v.name}</button>; })}
+                  {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val))); return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} className="sm" style={{ padding: '7px 14px', border: `1px solid ${s ? 'var(--ink)' : 'var(--paper-dk)'}`, backgroundColor: s ? 'var(--ink)' : 'transparent', color: s ? 'var(--paper)' : (available ? 'var(--ink)' : '#bbb'), fontSize: '10px', letterSpacing: '0.12em', cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.18s', textDecoration: available ? 'none' : 'line-through' }}>{v.name}</button>; })}
                 </div>
               )}
             </div>
           ))}
 
-          <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
+          <ProductForm product={product} store={store} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
 
           {product.desc && (
             <div style={{ marginTop: '28px', paddingTop: '22px', borderTop: '1px solid var(--ink)' }}>
@@ -1000,7 +1204,9 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
 /* ══════════════════════════════════════════════════════════════
    PRODUCT FORM
 ══════════════════════════════════════════════════════════════ */
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0 }: ProductFormProps) {
+export function ProductForm({ product, store, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0 }: ProductFormProps) {
+  const t = T[getLang(store)];
+  const cur = store?.currency || t.currency;
   const router = useRouter();
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -1025,15 +1231,25 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     }
     return base;
   }, [product, selectedOffer, selectedVariants]);
-  const getLiv = useCallback((): number => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; }, [selW, fd.typeLivraison]);
+  const supportQty = (store?.supportQty ?? product.store?.supportQty) !== false;
   const fp = getFP();
-  const total = () => fp * fd.quantity + +getLiv();
+  const qty = supportQty ? fd.quantity : 1;
+  const selOfferObj = product.offers?.find((o: any) => o.id === selectedOffer);
+  const storeInfo = store || product.store;
+  const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
+    (storeInfo?.supportFreeShipping && storeInfo?.freeShippingMinAmount != null && (fp * qty) >= Number(storeInfo.freeShippingMinAmount)));
+  const getLiv = useCallback((): number => {
+    if (orderFreeShipping) return 0;
+    if (!selW) return 0;
+    return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice;
+  }, [selW, fd.typeLivraison, orderFreeShipping]);
+  const total = () => fp * qty + +getLiv();
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!fd.customerName.trim()) e.customerName = 'الاسم مطلوب';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
-    if (!fd.customerWelaya) e.customerWelaya = 'الولاية مطلوبة';
-    if (!fd.customerCommune) e.customerCommune = 'البلدية مطلوبة';
+    if (!fd.customerName.trim()) e.customerName = t.errName;
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
+    if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
+    if (!fd.customerCommune) e.customerCommune = t.errCommune;
     return e;
   };
   const getVarId = useCallback(() => {
@@ -1044,7 +1260,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const addToCart = () => {
     setIsAdded(true);
     const cart = JSON.parse(localStorage.getItem(domain) || '[]');
-    cart.push({ ...fd, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
+    cart.push({ ...fd, quantity: qty, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
     localStorage.setItem(domain, JSON.stringify(cart)); initCount(cart.length);
     setTimeout(() => setIsAdded(false), 2000);
   };
@@ -1053,40 +1269,40 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     e.preventDefault(); const er = validate(); if (Object.keys(er).length) { setErrors(er); return; }
     setErrors({}); setSub(true);
     try {
-      await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+      await axios.post(`${API_URL}/orders/create`, { ...fd, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
-      router.push(`/lp/${domain}/successfully`);
+      router.push(`/successfully?productId=${product?.id}`);
     } catch { } finally { setSub(false); }
   };
 
   return (
-    <div dir="rtl" style={{ marginTop: '22px', paddingTop: '22px', borderTop: '2px solid var(--ink)' }}>
-        {product.store?.cart && (
+    <div dir={t.dir} style={{ marginTop: '22px', paddingTop: '22px', borderTop: '2px solid var(--ink)' }}>
+        {product.store?.cart !== false && (
         <div className="cart-add-btns" style={{ marginBottom: '14px' }}>
           <button onClick={addToCart} disabled={isAdded} className="sm" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px', cursor: isAdded ? 'default' : 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', border: `1px solid ${isAdded ? '#22c55e' : 'var(--ink)'}`, background: isAdded ? 'rgba(34,197,94,0.08)' : 'transparent', color: isAdded ? '#22c55e' : 'var(--ink)', transition: 'all 0.25s' }}>
-            {isAdded ? <><CheckCircle2 size={12} className="anim-check" />أُضيف للسلة</> : <><ShoppingCart size={12} />أضف للسلة</>}
+            {isAdded ? <><CheckCircle2 size={12} className="anim-check" />{t.addedToCartMsg}</> : <><ShoppingCart size={12} />{t.addToCart}</>}
           </button>
           <button onClick={() => setIsOrderNow(true)} className="btn-punch" style={{ flex: 1, clipPath: 'none', padding: '12px' }}>
-            اطلب الآن ↗
+            {t.orderNow} ↗
           </button>
         </div>
       )}
 
-      {(isOrderNow || !product.store?.cart) && (
+      {(isOrderNow || product.store?.cart === false) && (
         <div>
-          {product.store?.cart && (
+          {product.store?.cart !== false && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--punch)', textTransform: 'uppercase', margin: 0 }}>/ ORDER FORM</p>
               <button onClick={() => setIsOrderNow(false)} className="sm" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', border: '1px solid var(--ink)', background: 'transparent', color: 'var(--ash)', fontSize: '8px', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'inherit' }}>
-                <X style={{ width: '9px', height: '9px' }} /> إلغاء
+                <X style={{ width: '9px', height: '9px' }} /> {t.cancelLabel}
               </button>
             </div>
           )}
-          {!product.store?.cart && <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)', marginBottom: '14px' }}>/ ORDER FORM</p>}
+          {product.store?.cart === false && <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)', marginBottom: '14px' }}>/ ORDER FORM</p>}
           <form onSubmit={handleSubmit}>
             <div className="form-2c">
               <FR error={errors.customerName} label="NAME">
-                <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder="الاسم الكامل" style={IS(!!errors.customerName)} onFocus={onF} onBlur={e => onB(e, !!errors.customerName)} />
+                <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder={t.fullNamePh} style={IS(!!errors.customerName)} onFocus={onF} onBlur={e => onB(e, !!errors.customerName)} />
               </FR>
               <FR error={errors.customerPhone} label="PHONE">
                 <input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} placeholder="0X XX XX XX XX" style={IS(!!errors.customerPhone)} onFocus={onF} onBlur={e => onB(e, !!errors.customerPhone)} />
@@ -1097,7 +1313,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 <div style={{ position: 'relative' }}>
                   <ChevronDown style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '11px', height: '11px', color: 'var(--mist)', pointerEvents: 'none' }} />
                   <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...IS(!!errors.customerWelaya), paddingLeft: '28px' }} onFocus={onF} onBlur={e => onB(e, !!errors.customerWelaya)}>
-                    <option value="">اختر الولاية</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                    <option value="">{t.wilayaPh}</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
@@ -1105,7 +1321,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 <div style={{ position: 'relative' }}>
                   <ChevronDown style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '11px', height: '11px', color: 'var(--mist)', pointerEvents: 'none' }} />
                   <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...IS(!!errors.customerCommune), paddingLeft: '28px', opacity: !fd.customerWelaya ? 0.4 : 1 }} onFocus={onF} onBlur={e => onB(e, !!errors.customerCommune)}>
-                    <option value="">{loadingC ? '...' : 'اختر البلدية'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                    <option value="">{loadingC ? t.communeLoading : t.communePh}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
@@ -1116,37 +1332,39 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 {(['home', 'office'] as const).map((type, i) => (
                   <button key={type} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: type }))}
                     style={{ padding: '13px 10px', border: 'none', borderRight: i === 0 ? '1px solid var(--ink)' : 'none', backgroundColor: fd.typeLivraison === type ? 'var(--ink)' : 'transparent', cursor: 'pointer', textAlign: 'right', borderTop: `3px solid ${fd.typeLivraison === type ? 'var(--punch)' : 'transparent'}`, transition: 'all 0.18s', fontFamily: 'inherit' }}>
-                    <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.16em', color: fd.typeLivraison === type ? 'var(--paper)' : 'var(--ash)', marginBottom: '3px' }}>{type === 'home' ? 'للمنزل' : 'للمكتب'}</p>
+                    <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.16em', color: fd.typeLivraison === type ? 'var(--paper)' : 'var(--ash)', marginBottom: '3px' }}>{type === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
                     {selW && <p className="ub" style={{ fontSize: '1rem', fontWeight: 900, color: fd.typeLivraison === type ? 'var(--punch)' : 'var(--mist)', letterSpacing: '-0.02em', lineHeight: 1 }}>
-                      {(type === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()}<span className="sm" style={{ fontWeight: 400, fontSize: '8px', marginLeft: '3px' }}>دج</span>
+                      {(type === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()}<span className="sm" style={{ fontWeight: 400, fontSize: '8px', marginLeft: '3px' }}>{cur}</span>
                     </p>}
                   </button>
                 ))}
               </div>
             </FR>
 
-            <FR label="QUANTITY">
-              <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid var(--ink)' }}>
-                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderRight: '1px solid var(--ink)', background: 'transparent', cursor: 'pointer', color: 'var(--ink)', transition: 'all 0.18s' }}
-                  onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'var(--punch)'; el.style.color = 'var(--paper)'; }}
-                  onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.color = 'var(--ink)'; }}>
-                  <Minus style={{ width: '11px', height: '11px' }} />
-                </button>
-                <span className="ub" style={{ width: '44px', textAlign: 'center', fontWeight: 900, fontSize: '1.1rem', letterSpacing: '-0.02em', lineHeight: '38px', display: 'inline-block' }}>{fd.quantity}</span>
-                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderLeft: '1px solid var(--ink)', background: 'transparent', cursor: 'pointer', color: 'var(--ink)', transition: 'all 0.18s' }}
-                  onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'var(--punch)'; el.style.color = 'var(--paper)'; }}
-                  onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.color = 'var(--ink)'; }}>
-                  <Plus style={{ width: '11px', height: '11px' }} />
-                </button>
-              </div>
-            </FR>
+            {supportQty && (
+              <FR label="QUANTITY">
+                <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid var(--ink)' }}>
+                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderRight: '1px solid var(--ink)', background: 'transparent', cursor: 'pointer', color: 'var(--ink)', transition: 'all 0.18s' }}
+                    onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'var(--punch)'; el.style.color = 'var(--paper)'; }}
+                    onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.color = 'var(--ink)'; }}>
+                    <Minus style={{ width: '11px', height: '11px' }} />
+                  </button>
+                  <span className="ub" style={{ width: '44px', textAlign: 'center', fontWeight: 900, fontSize: '1.1rem', letterSpacing: '-0.02em', lineHeight: '38px', display: 'inline-block' }}>{fd.quantity}</span>
+                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderLeft: '1px solid var(--ink)', background: 'transparent', cursor: 'pointer', color: 'var(--ink)', transition: 'all 0.18s' }}
+                    onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'var(--punch)'; el.style.color = 'var(--paper)'; }}
+                    onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.color = 'var(--ink)'; }}>
+                    <Plus style={{ width: '11px', height: '11px' }} />
+                  </button>
+                </div>
+              </FR>
+            )}
 
             {/* Summary */}
             <div style={{ border: '1px solid var(--ink)', marginBottom: '12px' }}>
               <div style={{ padding: '8px 13px', background: 'var(--ink)' }}>
                 <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'rgba(242,239,232,0.55)' }}>ORDER MANIFEST</span>
               </div>
-              {[{ l: 'ITEM', v: product.name.slice(0, 20) + (product.name.length > 20 ? '...' : '') }, { l: 'UNIT', v: `${fp.toLocaleString()} دج` }, { l: '× QTY', v: fd.quantity }, { l: 'SHIP', v: selW ? `${getLiv().toLocaleString()} دج` : 'TBD' }].map(row => (
+              {[{ l: 'ITEM', v: product.name.slice(0, 20) + (product.name.length > 20 ? '...' : '') }, { l: 'UNIT', v: `${fp.toLocaleString()} ${cur}` }, { l: '× QTY', v: qty }, { l: 'SHIP', v: !selW ? 'TBD' : orderFreeShipping ? 'FREE' : `${getLiv().toLocaleString()} ${cur}` }].map(row => (
                 <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 13px', borderTop: '1px solid var(--paper-dk)' }}>
                   <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.18em', color: 'var(--ash)' }}>{row.l}</span>
                   <span className="sm" style={{ fontSize: '9px', fontWeight: 700, color: 'var(--ink)' }}>{row.v}</span>
@@ -1155,16 +1373,16 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '10px 13px', borderTop: '2px solid var(--ink)', background: 'var(--paper-dk)' }}>
                 <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)' }}>TOTAL</span>
                 <span className="ub" style={{ fontWeight: 900, fontSize: '1.7rem', color: 'var(--punch)', letterSpacing: '-0.03em', lineHeight: 1 }}>
-                  {total().toLocaleString()}<span className="sm" style={{ fontWeight: 400, fontSize: '10px', marginLeft: '4px' }}>دج</span>
+                  {total().toLocaleString()}<span className="sm" style={{ fontWeight: 400, fontSize: '10px', marginLeft: '4px' }}>{cur}</span>
                 </span>
               </div>
             </div>
 
             <button type="submit" disabled={sub} className="btn-z" style={{ width: '100%', justifyContent: 'center', fontSize: '10px', cursor: sub ? 'not-allowed' : 'pointer', opacity: sub ? 0.7 : 1, clipPath: 'none' }}>
-              {sub ? <><Loader2 style={{ width: '13px', height: '13px', animation: 'spin 1s linear infinite' }} /> PROCESSING...</> : <>LOCK IN ORDER <ArrowUpRight style={{ width: '13px', height: '13px' }} /></>}
+              {sub ? <><Loader2 style={{ width: '13px', height: '13px', animation: 'spin 1s linear infinite' }} /> {t.sending}</> : <>{t.confirmOrder} <ArrowUpRight style={{ width: '13px', height: '13px' }} /></>}
             </button>
             <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.16em', color: 'var(--mist)', textAlign: 'center', marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
-              <Shield style={{ width: '9px', height: '9px', color: 'var(--ink)' }} /> آمن · مشفر
+              <Shield style={{ width: '9px', height: '9px', color: 'var(--ink)' }} /> {t.secureText}
             </p>
           </form>
         </div>
@@ -1177,6 +1395,8 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
    CART
 ══════════════════════════════════════════════════════════════ */
 export function Cart({ domain, store }: { domain: string; store: any }) {
+  const t = T[getLang(store)];
+  const cur = store?.currency || t.currency;
   const [items, setItems] = useState<any[]>([]);
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -1191,19 +1411,22 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   useEffect(() => { if (!fd.customerWelaya) { setCommunes([]); return; } setLC(true); fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLC(false); }); }, [fd.customerWelaya]);
 
   const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
-  const getLiv = () => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; };
   const cartTotal = items.reduce((a, i) => a + (i.finalPrice * i.quantity), 0);
+  const hasFreeShippingItem = items.some(i => i.product?.shippingFree || i.product?.offers?.find((o: any) => o.id === i.selectedOffer)?.shippingFree);
+  const freeShippingMin = store?.supportFreeShipping ? store?.freeShippingMinAmount : null;
+  const freeShippingReached = hasFreeShippingItem || (freeShippingMin != null && cartTotal >= Number(freeShippingMin));
+  const freeShippingRemainingAmt = freeShippingMin != null ? Number(freeShippingMin) - cartTotal : 0;
+  const getLiv = () => { if (freeShippingReached) return 0; if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; };
   const finalTotal = cartTotal + +getLiv();
   const update = (n: any[]) => { setItems(n); localStorage.setItem(domain, JSON.stringify(n)); initCount(n.length); };
-  const changeQty = (i: number, d: number) => { const n = [...items]; n[i].quantity = Math.max(1, n[i].quantity + d); update(n); };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const er: Record<string, string> = {};
-    if (!fd.customerName.trim()) er.name = 'الاسم مطلوب';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم هاتف غير صالح (مثال: 0550123456)';
-    if (!fd.customerWelaya) er.w = 'الولاية مطلوبة';
-    if (!fd.customerCommune) er.c = 'البلدية مطلوبة';
+    if (!fd.customerName.trim()) er.name = t.errName;
+    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = t.errPhoneInvalid;
+    if (!fd.customerWelaya) er.w = t.errWilaya;
+    if (!fd.customerCommune) er.c = t.errCommune;
     if (Object.keys(er).length) { setErrors(er); return; }
     setErrors({}); setSubmitting(true);
     try {
@@ -1213,33 +1436,38 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   };
 
   if (success) return (
-    <div dir="rtl" style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--paper)', fontFamily: "'Space Mono',monospace" }}>
+    <div dir={t.dir} style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--paper)', fontFamily: "'Space Mono',monospace" }}>
       <div style={{ textAlign: 'center', padding: '4rem 2.5rem', border: '2px solid var(--ink)', borderTop: '4px solid var(--punch)', maxWidth: 460, width: '100%' }}>
         <CheckCircle2 style={{ width: '40px', height: '40px', color: 'var(--punch)', display: 'block', margin: '0 auto 1.25rem' }} />
         <h2 className="ub" style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--ink)', marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>CONFIRMED.</h2>
-        <p style={{ fontSize: '10px', letterSpacing: '0.1em', color: 'var(--ash)', marginBottom: '2rem', lineHeight: 1.8 }}>شكراً. سنتواصل معك قريباً.</p>
-        <Link href="/" className="btn-z" style={{ display: 'inline-flex', clipPath: 'none', padding: '13px 28px' }}>العودة للمتجر</Link>
+        <p style={{ fontSize: '10px', letterSpacing: '0.1em', color: 'var(--ash)', marginBottom: '2rem', lineHeight: 1.8 }}>{t.successDesc}</p>
+        <Link href="/" className="btn-z" style={{ display: 'inline-flex', clipPath: 'none', padding: '13px 28px' }}>{t.backToShop}</Link>
       </div>
     </div>
   );
 
   if (!items.length) return (
-    <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--paper)', fontFamily: "'Space Mono',monospace" }}>
+    <div dir={t.dir} style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--paper)', fontFamily: "'Space Mono',monospace" }}>
       <div style={{ textAlign: 'center', padding: '4rem 2rem', border: '1px solid var(--ink)', maxWidth: 400, width: '100%' }}>
         <span className="ub" style={{ fontWeight: 900, fontSize: '4rem', color: 'rgba(10,9,6,0.08)', letterSpacing: '-0.04em', display: 'block', marginBottom: '1rem' }}>EMPTY.</span>
-        <p style={{ fontSize: '9px', letterSpacing: '0.2em', color: 'var(--mist)', marginBottom: '1.75rem' }}>السلة فارغة</p>
-        <Link href="/" className="btn-z" style={{ display: 'inline-flex', clipPath: 'none', padding: '13px 28px' }}>تسوق الآن</Link>
+        <p style={{ fontSize: '9px', letterSpacing: '0.2em', color: 'var(--mist)', marginBottom: '1.75rem' }}>{t.cartEmpty}</p>
+        <Link href="/" className="btn-z" style={{ display: 'inline-flex', clipPath: 'none', padding: '13px 28px' }}>{t.shopNow}</Link>
       </div>
     </div>
   );
 
   return (
-    <div dir="rtl" style={{ minHeight: '100vh', background: 'var(--paper)', padding: '2.5rem 1.5rem 5rem', fontFamily: "'Space Mono',monospace" }}>
+    <div dir={t.dir} style={{ minHeight: '100vh', background: 'var(--paper)', padding: '2.5rem 1.5rem 5rem', fontFamily: "'Space Mono',monospace" }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '2px solid var(--ink)' }}>
           <h1 className="ub" style={{ fontSize: 'clamp(2rem,5vw,4rem)', fontWeight: 900, letterSpacing: '-0.03em', color: 'var(--ink)' }}>CART.</h1>
           <p style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)' }}>{items.length} PIECE{items.length !== 1 ? 'S' : ''}</p>
         </div>
+        {freeShippingMin != null && (
+          <div style={{ border: '1px solid var(--ink)', background: freeShippingReached ? 'var(--ink)' : 'var(--paper-dk)', color: freeShippingReached ? 'var(--paper)' : 'var(--ink)', padding: '10px 16px', marginBottom: '1.5rem', fontWeight: 700, fontSize: '10px', letterSpacing: '0.08em', textAlign: 'center' }}>
+            {freeShippingReached ? t.freeShippingReached : t.freeShippingRemaining.replace('{{amount}}', String(freeShippingRemainingAmt))}
+          </div>
+        )}
         <div className="cart-layout">
           {/* Items */}
           <div style={{ border: '1px solid var(--ink)', borderTop: '3px solid var(--punch)', alignSelf: 'start' }}>
@@ -1251,22 +1479,14 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div>
                     <h4 className="ub" style={{ fontWeight: 700, fontSize: '10px', letterSpacing: '0.02em', textTransform: 'uppercase', marginBottom: '4px' }}>{item.product?.name?.slice(0, 30)}</h4>
-                    <p className="ub" style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--punch)', letterSpacing: '-0.02em' }}>{item.finalPrice?.toLocaleString()} دج</p>
+                    <p className="ub" style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--punch)', letterSpacing: '-0.02em' }}>{item.finalPrice?.toLocaleString()} {cur}</p>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '8px' }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid var(--ink)' }}>
-                      <button onClick={() => changeQty(i, -1)} style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: 'none', cursor: 'pointer', borderRight: '1px solid var(--ink)', transition: 'all 0.15s' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--punch)'; (e.currentTarget as HTMLElement).style.color = 'white'; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'inherit'; }}>-</button>
-                      <span className="ub" style={{ width: 32, textAlign: 'center', fontWeight: 900, fontSize: '0.95rem', lineHeight: '28px' }}>{item.quantity}</span>
-                      <button onClick={() => changeQty(i, 1)} style={{ width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: 'none', cursor: 'pointer', borderLeft: '1px solid var(--ink)', transition: 'all 0.15s' }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--punch)'; (e.currentTarget as HTMLElement).style.color = 'white'; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'inherit'; }}>+</button>
-                    </div>
+                    <span className="ub" style={{ fontWeight: 900, fontSize: '0.85rem', color: 'var(--ash)' }}>× {item.quantity}</span>
                     <button onClick={() => update(items.filter((_, idx) => idx !== i))} className="sm" style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', border: 'none', background: 'transparent', color: 'var(--mist)', fontSize: '8px', letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'inherit', transition: 'color 0.15s' }}
                       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--punch)'; }}
                       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--mist)'; }}>
-                      <Trash2 size={11} /> حذف
+                      <Trash2 size={11} /> {t.deleteLabel}
                     </button>
                   </div>
                 </div>
@@ -1274,7 +1494,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             ))}
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '14px', background: 'var(--paper-dk)' }}>
               <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)' }}>SUBTOTAL</span>
-              <span className="ub" style={{ fontSize: '1.375rem', fontWeight: 900, letterSpacing: '-0.02em' }}>{cartTotal.toLocaleString()} دج</span>
+              <span className="ub" style={{ fontSize: '1.375rem', fontWeight: 900, letterSpacing: '-0.02em' }}>{cartTotal.toLocaleString()} {cur}</span>
             </div>
           </div>
 
@@ -1295,7 +1515,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   <div style={{ position: 'relative' }}>
                     <ChevronDown style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '11px', height: '11px', color: 'var(--mist)', pointerEvents: 'none' }} />
                     <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...IS(!!errors.w), paddingLeft: '28px' }} onFocus={onF} onBlur={e => onB(e, !!errors.w)}>
-                      <option value="">اختر</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                      <option value="">{t.wilayaPh}</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                     </select>
                   </div>
                 </FR>
@@ -1303,14 +1523,14 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   <div style={{ position: 'relative' }}>
                     <ChevronDown style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '11px', height: '11px', color: 'var(--mist)', pointerEvents: 'none' }} />
                     <select value={fd.customerCommune} disabled={loadingC || !fd.customerWelaya} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...IS(!!errors.c), paddingLeft: '28px', opacity: !fd.customerWelaya ? 0.4 : 1 }} onFocus={onF} onBlur={e => onB(e, !!errors.c)}>
-                      <option value="">{loadingC ? '...' : 'اختر'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                      <option value="">{loadingC ? t.communeLoading : t.communePh}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                     </select>
                   </div>
                 </FR>
               </div>
               {/* Summary */}
               <div style={{ border: '1px solid var(--ink)', marginBottom: '12px' }}>
-                {[{ l: 'SUBTOTAL', v: `${cartTotal.toLocaleString()} دج` }, { l: 'SHIP', v: getLiv() ? `${getLiv().toLocaleString()} دج` : 'TBD' }].map(row => (
+                {[{ l: 'SUBTOTAL', v: `${cartTotal.toLocaleString()} ${cur}` }, { l: 'SHIP', v: !selW ? 'TBD' : freeShippingReached ? 'FREE' : `${getLiv().toLocaleString()} ${cur}` }].map(row => (
                   <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 13px', borderBottom: '1px solid var(--paper-dk)' }}>
                     <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.18em', color: 'var(--ash)' }}>{row.l}</span>
                     <span className="sm" style={{ fontSize: '9px', fontWeight: 700 }}>{row.v}</span>
@@ -1319,12 +1539,12 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '10px 13px', borderTop: '2px solid var(--ink)', background: 'var(--paper-dk)' }}>
                   <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)' }}>TOTAL</span>
                   <span className="ub" style={{ fontWeight: 900, fontSize: '1.7rem', color: 'var(--punch)', letterSpacing: '-0.03em', lineHeight: 1 }}>
-                    {finalTotal.toLocaleString()}<span className="sm" style={{ fontWeight: 400, fontSize: '10px', marginLeft: '4px' }}>دج</span>
+                    {finalTotal.toLocaleString()}<span className="sm" style={{ fontWeight: 400, fontSize: '10px', marginLeft: '4px' }}>{cur}</span>
                   </span>
                 </div>
               </div>
               <button type="submit" disabled={submitting} className="btn-z" style={{ width: '100%', justifyContent: 'center', fontSize: '10px', cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1, clipPath: 'none' }}>
-                {submitting ? <><Loader2 style={{ width: '13px', height: '13px', animation: 'spin 1s linear infinite' }} /> PROCESSING...</> : <>LOCK IN ORDER <ArrowUpRight style={{ width: '13px', height: '13px' }} /></>}
+                {submitting ? <><Loader2 style={{ width: '13px', height: '13px', animation: 'spin 1s linear infinite' }} /> {t.sending}</> : <>{t.confirmOrder} <ArrowUpRight style={{ width: '13px', height: '13px' }} /></>}
               </button>
             </form>
           </div>
@@ -1341,16 +1561,16 @@ export function StaticPage({ staticPage, page, store }: any) {
   const p = (staticPage || page || '').toLowerCase();
   return (
     <>
-      {p === 'privacy' && <Privacy />}
-      {p === 'terms' && <Terms />}
-      {p === 'cookies' && <Cookies />}
+      {p === 'privacy' && <Privacy store={store} />}
+      {p === 'terms' && <Terms store={store} />}
+      {p === 'cookies' && <Cookies store={store} />}
       {p === 'contact' && <Contact store={store} />}
     </>
   );
 }
 
-const PageShell = ({ children, title, code }: { children: React.ReactNode; title: string; code: string }) => (
-  <div dir="rtl" style={{ backgroundColor: 'var(--paper)', fontFamily: "'Space Mono',monospace", minHeight: '100vh' }}>
+const PageShell = ({ children, title, code, dir }: { children: React.ReactNode; title: string; code: string; dir?: string }) => (
+  <div dir={dir || 'rtl'} style={{ backgroundColor: 'var(--paper)', fontFamily: "'Space Mono',monospace", minHeight: '100vh' }}>
     <div style={{ backgroundColor: 'var(--ink)', padding: '80px 6vw 40px', position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', right: '-3%', bottom: '-20%', pointerEvents: 'none', userSelect: 'none', opacity: 0.04 }}>
         <span className="ub" style={{ fontWeight: 900, fontSize: 'clamp(10rem,28vw,26rem)', color: 'var(--paper)', letterSpacing: '-0.05em', lineHeight: 1, whiteSpace: 'nowrap' }}>{title.toUpperCase()}</span>
@@ -1375,38 +1595,41 @@ const IB = ({ title, body, tag, tagColor = 'var(--punch)' }: { title: string; bo
   </div>
 );
 
-export function Privacy() {
+export function Privacy({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <PageShell title="الخصوصية" code="DOC-001">
-      <IB title="البيانات التي نجمعها" body="الاسم ورقم الهاتف وعنوان التوصيل فقط — الحد الأدنى اللازم لمعالجة طلبك." />
-      <IB title="كيف نستخدمها" body="حصرياً لمعالجة وتوصيل طلبك. لا تسويق، لا بيع بيانات." />
-      <IB title="الأمان" body="تشفير عالي المستوى. بياناتك محمية في جميع الأوقات." />
-      <IB title="مشاركة البيانات" body="لا نبيع بياناتك أبداً. تُشارك فقط مع شركاء التوصيل." tag="مضمون" />
+    <PageShell title={t.privacyTitle} code="DOC-001" dir={t.dir}>
+      <IB title={t.priv1t} body={t.priv1b} />
+      <IB title={t.priv2t} body={t.priv2b} />
+      <IB title={t.priv3t} body={t.priv3b} />
+      <IB title={t.priv4t} body={t.priv4b} tag={t.priv4tag} />
     </PageShell>
   );
 }
 
-export function Terms() {
+export function Terms({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <PageShell title="الشروط" code="DOC-002">
-      <IB title="الطلبات" body="لا رسوم خفية. السعر المعروض هو السعر النهائي." />
-      <IB title="المنتجات الأصيلة" body="منتجات أصيلة فقط. السلع المقلدة ممنوعة." tag="صارم" />
-      <IB title="القانون المعمول به" body="تخضع هذه الشروط لقوانين الجمهورية الجزائرية الديمقراطية الشعبية." />
+    <PageShell title={t.termsTitle} code="DOC-002" dir={t.dir}>
+      <IB title={t.terms1t} body={t.terms1b} />
+      <IB title={t.terms2t} body={t.terms2b} tag={t.terms2tag} />
+      <IB title={t.terms3t} body={t.terms3b} />
     </PageShell>
   );
 }
 
-export function Cookies() {
+export function Cookies({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   return (
-    <PageShell title="الكوكيز" code="DOC-003">
-      <IB title="ضرورية" body="مطلوبة للجلسات والسلة وإتمام الطلب. لا يمكن تعطيلها." tag="دائماً مفعلة" tagColor="var(--ink)" />
-      <IB title="التفضيلات" body="تحفظ إعداداتك لتجربة أفضل." tag="اختياري" />
-      <IB title="التحليلات" body="بيانات مجمعة لتحسين المنصة. لا بيانات شخصية." tag="اختياري" />
+    <PageShell title={t.cookiesTitle} code="DOC-003" dir={t.dir}>
+      <IB title={t.cook1t} body={t.cook1b} tag={t.cook1tag} tagColor="var(--ink)" />
+      <IB title={t.cook2t} body={t.cook2b} tag={t.cook2tag} />
+      <IB title={t.cook3t} body={t.cook3b} tag={t.cook3tag} />
       <div style={{ marginTop: '20px', padding: '14px', border: '1px solid var(--ink)', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
         <ToggleRight style={{ width: '16px', height: '16px', color: 'var(--punch)', flexShrink: 0, marginTop: '2px' }} />
         <div>
-          <p className="sm" style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.14em', color: 'var(--ink)', marginBottom: '5px' }}>MANAGE YOUR COOKIES</p>
-          <p className="sm" style={{ fontSize: '10px', lineHeight: '1.8', color: 'var(--ash)' }}>يمكنك إدارة أو حذف ملفات الارتباط من إعدادات المتصفح الخاص بك في أي وقت.</p>
+          <p className="sm" style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.14em', color: 'var(--ink)', marginBottom: '5px' }}>{t.cookManage}</p>
+          <p className="sm" style={{ fontSize: '10px', lineHeight: '1.8', color: 'var(--ash)' }}>{t.cookManageDesc}</p>
         </div>
       </div>
     </PageShell>
@@ -1414,33 +1637,34 @@ export function Cookies() {
 }
 
 export function Contact({ store }: { store?: any }) {
+  const t = T[getLang(store)];
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     try { await axios.post(`${API_URL}/user/contact-user/message`, { ...form, storeId: store?.id }); setSent(true); }
-    catch { showError('حدث خطأ'); } finally { setLoading(false); }
+    catch { showError(t.contactErr); } finally { setLoading(false); }
   };
 
   return (
-    <div dir="rtl" style={{ backgroundColor: 'var(--paper)', fontFamily: "'Space Mono',monospace", minHeight: '100vh' }}>
+    <div dir={t.dir} style={{ backgroundColor: 'var(--paper)', fontFamily: "'Space Mono',monospace", minHeight: '100vh' }}>
       <div style={{ backgroundColor: 'var(--punch)', padding: '80px 6vw 40px', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', right: '-3%', bottom: '-15%', pointerEvents: 'none', userSelect: 'none', opacity: 0.1 }}>
           <span className="ub" style={{ fontWeight: 900, fontSize: 'clamp(10rem,28vw,26rem)', color: 'var(--paper)', letterSpacing: '-0.05em', lineHeight: 1 }}>HIT</span>
         </div>
-        <h1 className="ub" style={{ fontWeight: 900, fontSize: 'clamp(3rem,9vw,9rem)', color: 'var(--paper)', letterSpacing: '-0.04em', lineHeight: 0.88, position: 'relative', zIndex: 2 }}>تواصل معنا.</h1>
-        <p className="sm" style={{ fontSize: '9px', letterSpacing: '0.2em', color: 'rgba(242,239,232,0.55)', marginTop: '14px', position: 'relative', zIndex: 2 }}>نرد خلال 24 ساعة</p>
+        <h1 className="ub" style={{ fontWeight: 900, fontSize: 'clamp(3rem,9vw,9rem)', color: 'var(--paper)', letterSpacing: '-0.04em', lineHeight: 0.88, position: 'relative', zIndex: 2 }}>{t.contactTitle}</h1>
+        <p className="sm" style={{ fontSize: '9px', letterSpacing: '0.2em', color: 'rgba(242,239,232,0.55)', marginTop: '14px', position: 'relative', zIndex: 2 }}>{t.contactSubtitle}</p>
       </div>
 
       <div className="contact-grid" style={{ maxWidth: '860px', margin: '0 auto', padding: '44px 24px 80px' }}>
         {/* Info */}
         <div>
-          <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--ash)', marginBottom: '14px' }}>/ معلومات الاتصال</p>
+          <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--ash)', marginBottom: '14px' }}>{t.contactInfoLabel}</p>
           {[
-            { emoji: '📞', label: 'الهاتف', val: store?.contact?.phone },
-            { emoji: '📍', label: 'الموقع', val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
-            { emoji: '✉️', label: 'البريد', val: store?.contact?.email },
+            { emoji: '📞', label: t.contactPhoneLabel, val: store?.contact?.phone },
+            { emoji: '📍', label: t.contactLocationLabel, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
+            { emoji: '✉️', label: t.contactEmailLabel, val: store?.contact?.email },
           ].filter(r => r.val).map(item => (
             <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderBottom: '1px solid var(--paper-dk)', transition: 'background 0.18s' }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--paper-dk)'; }}
@@ -1454,41 +1678,41 @@ export function Contact({ store }: { store?: any }) {
           ))}
           <div style={{ marginTop: '20px', padding: '18px', background: 'var(--ink)', position: 'relative', overflow: 'hidden' }}>
             <p className="ub" style={{ fontWeight: 900, fontSize: '1.2rem', color: 'var(--punch)', letterSpacing: '-0.01em', lineHeight: 1.1, position: 'relative', zIndex: 2 }}>STAY FRESH.<br />STAY REAL.</p>
-            <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.18em', color: 'rgba(242,239,232,0.35)', marginTop: '8px', position: 'relative', zIndex: 2 }}>DROP CULTURE · الجزائر</p>
+            <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.18em', color: 'rgba(242,239,232,0.35)', marginTop: '8px', position: 'relative', zIndex: 2 }}>{t.contactCulture}</p>
           </div>
         </div>
 
         {/* Form */}
         <div>
-          <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--ash)', marginBottom: '14px' }}>/ أرسل رسالة</p>
+          <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--ash)', marginBottom: '14px' }}>{t.contactFormLabel}</p>
           {sent ? (
             <div style={{ minHeight: '260px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--ink)', textAlign: 'center' }}>
               <CheckCircle2 style={{ width: '32px', height: '32px', color: 'var(--punch)', marginBottom: '10px' }} />
               <p className="ub" style={{ fontWeight: 900, fontSize: '1.1rem', color: 'var(--ink)', letterSpacing: '-0.01em', marginBottom: '4px' }}>SENT.</p>
-              <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)' }}>سنرد خلال 24 ساعة</p>
+              <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)' }}>{t.contactSentMsg}</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div className="form-2c">
                 <div>
-                  <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--ash)', marginBottom: '5px' }}>الاسم</p>
+                  <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--ash)', marginBottom: '5px' }}>{t.contactNamePh}</p>
                   <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required style={{ ...IS() }} onFocus={onF} onBlur={e => onB(e)} />
                 </div>
                 <div>
-                  <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--ash)', marginBottom: '5px' }}>الهاتف</p>
+                  <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--ash)', marginBottom: '5px' }}>{t.contactPhonePh}</p>
                   <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} required style={{ ...IS() }} onFocus={onF} onBlur={e => onB(e)} />
                 </div>
               </div>
               <div>
-                <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--ash)', marginBottom: '5px' }}>البريد الإلكتروني</p>
+                <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--ash)', marginBottom: '5px' }}>{t.contactEmailPh}</p>
                 <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required style={{ ...IS() }} onFocus={onF} onBlur={e => onB(e)} />
               </div>
               <div>
-                <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--ash)', marginBottom: '5px' }}>رسالتك</p>
-                <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder="كيف يمكننا مساعدتك؟" rows={4} required style={{ ...IS(), resize: 'none' }} onFocus={onF} onBlur={e => onB(e)} />
+                <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.22em', color: 'var(--ash)', marginBottom: '5px' }}>{t.contactMessagePh}</p>
+                <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder={t.contactMessagePh} rows={4} required style={{ ...IS(), resize: 'none' }} onFocus={onF} onBlur={e => onB(e)} />
               </div>
               <button type="submit" disabled={loading} className="btn-z" style={{ justifyContent: 'center', width: '100%', clipPath: 'none', opacity: loading ? 0.7 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}>
-                {loading ? <><Loader2 style={{ width: '13px', height: '13px', animation: 'spin 1s linear infinite' }} /> جاري...</> : <>إرسال الرسالة <ArrowUpRight style={{ width: '13px', height: '13px' }} /></>}
+                {loading ? <><Loader2 style={{ width: '13px', height: '13px', animation: 'spin 1s linear infinite' }} /> {t.contactSending}</> : <>{t.contactSend} <ArrowUpRight style={{ width: '13px', height: '13px' }} /></>}
               </button>
             </form>
           )}

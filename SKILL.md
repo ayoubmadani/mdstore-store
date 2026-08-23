@@ -1088,32 +1088,6 @@ phones-gaming-*      → NAVBAR:B + CARD:3   ✗ (مطابق لـ smart-tech —
 
 **اختبار التمايز الكافي:** إذا أزلت الألوان والخطوط من ثيمين في نفس الفئة، هل لا تزال قادراً على التمييز بينهما من الهيكل وحده؟ إذا لا — الهيكل هو المشكلة، ليس الألوان.
 
-**Hero layout** — choose one structural pattern, not just a new background image:
-- Full-bleed image with bottom-anchored text overlay (gradient scrim).
-- Split-screen: text block on one half, product/image collage on the other.
-- Asymmetric grid: oversized headline typography overlapping a smaller image tile.
-- Marquee/ticker strip above a centered, image-free headline (good for minimal/luxury themes).
-
-**Card shape** — the product card silhouette should match the theme's personality:
-- Sharp rectangular, no radius (editorial/luxury).
-- Soft rounded with floating shadow (playful/kids/beauty).
-- Borderless, image-only with text reveal on hover (gallery/fashion).
-- Bordered with a visible SKU/category eyebrow label (technical/sport/outdoor).
-
-**Typography pairing** — pick a deliberate contrast, not a single default font at different sizes:
-- Display serif headline + grotesk sans body (luxury/fragrance/cosmetics).
-- Condensed uppercase headline + monospace price/labels (sport/gaming/streetwear).
-- Rounded friendly headline + simple sans body (kids/home/pets).
-
-**Motion** — optional, but should be consistent with the theme's pace, not decorative noise:
-- Luxury/cosmetics: slow fades, subtle scale on hover.
-- Sport/gaming: snappy transitions, sharp easing, no fade-ins.
-- Kids/playful: bounce/spring easing on interactive elements only.
-
-**Category/nav chrome** — vary the shape, not just the color, of active states: underline vs. filled pill vs. bordered chip vs. uppercase letter-spacing shift. A theme that only swaps `background-color` on the active category against an otherwise identical layout will read as a re-skin, not a new theme.
-
-**اختبار التمايز الكافي:** إذا أزلت الألوان والخطوط من ثيمين في نفس الفئة، هل لا تزال قادراً على التمييز بينهما من الهيكل وحده؟ إذا لا — الهيكل هو المشكلة، ليس الألوان.
-
 ---
 
 ## 17. Wilaya API — Empty State & Fallback

@@ -91,7 +91,7 @@ const T = {
       { t: 'دفع آمن', s: 'حماية كاملة للبيانات' },
       { t: 'دعم 24/7', s: 'فريق متخصص للمساعدة' },
     ],
-    quickLinks: 'روابط سريعة', contactUs: 'تواصل معنا',
+    quickLinks: 'روابط سريعة', legalNav: 'قانوني', contactUs: 'تواصل معنا',
     privacy: 'الخصوصية', terms: 'الشروط', cookies: 'الكوكيز',
     rightsReserved: 'جميع الحقوق محفوظة',
     fullName: 'الاسم الكامل', fullNamePlaceholder: 'أدخل اسمك الكامل',
@@ -127,7 +127,7 @@ const T = {
       { t: 'Paiement Sécurisé', s: 'Vos données protégées' },
       { t: 'Support 24/7', s: 'Toujours disponible' },
     ],
-    quickLinks: 'Navigation', contactUs: 'Contact',
+    quickLinks: 'Navigation', legalNav: 'Légal', contactUs: 'Contact',
     privacy: 'Confidentialité', terms: 'Conditions', cookies: 'Cookies',
     rightsReserved: 'Tous droits réservés.',
     fullName: 'Nom complet', fullNamePlaceholder: 'Votre nom complet',
@@ -163,7 +163,7 @@ const T = {
       { t: 'Secure Payment', s: 'Full data protection' },
       { t: '24/7 Support', s: 'Expert team always here' },
     ],
-    quickLinks: 'Quick Links', contactUs: 'Contact Us',
+    quickLinks: 'Quick Links', legalNav: 'Legal', contactUs: 'Contact Us',
     privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies',
     rightsReserved: 'All rights reserved.',
     fullName: 'Full Name', fullNamePlaceholder: 'Enter your full name',
@@ -513,14 +513,12 @@ export function Footer({ store }: any) {
     { h: '/', l: t.home },
     { h: '/cart', l: t.cart },
     { h: '/contact', l: t.contactUs },
-    { h: '/privacy', l: t.privacy },
-    { h: '/terms', l: t.terms },
   ].filter((lnk) => lnk.h !== '/cart' || store?.cart !== false);
 
   return (
     <footer style={{ background: BG_ALT, borderTop: `1px solid ${BORDER}`, padding: '3.5rem 0 1.75rem' }}>
       <div className="pbf-container">
-        <div className="pbf-footer-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
+        <div className="pbf-footer-grid" style={{ gap: '2rem' }}>
           <div>
             <h3 className="pbf-display" style={{ color: INK, fontSize: '1.4rem', margin: '0 0 10px', display: 'flex', alignItems: 'center', gap: 8 }}>
               <Leaf size={18} color={SAGE_DARK} /> {store?.name || 'Pure Botanical'}
@@ -535,7 +533,19 @@ export function Footer({ store }: any) {
               ))}
             </div>
           </div>
+          
+          {/* قانوني */}
           <div>
+            <p style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '1rem' }}>{t.legalNav}</p>
+            {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', opacity: 0.6, transition: 'opacity 0.15s' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.6')}>
+              {lnk.l}
+            </Link>
+            ))}
+          </div>
+<div>
             <h4 style={{ color: INK, fontSize: '0.9rem', marginBottom: 14, letterSpacing: '0.03em', textTransform: 'uppercase' }}>{t.contactUs}</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {store?.contact?.phone && (
@@ -560,7 +570,8 @@ export function Footer({ store }: any) {
           © {year} {store?.name || 'Pure Botanical'} — {t.rightsReserved}
         </p>
       </div>
-      <style dangerouslySetInnerHTML={{ __html: `@media (min-width:768px){ .pbf-footer-grid{ grid-template-columns: 1.4fr 1fr 1fr; } }` }} />
+      <style dangerouslySetInnerHTML={{ __html: `.pbf-footer-grid{ display:grid; grid-template-columns:1fr; }
+@media (min-width:768px){ .pbf-footer-grid{ grid-template-columns: 1.4fr 1fr 1fr 1fr; } }` }} />
     </footer>
   );
 }
@@ -724,7 +735,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 
   return (
     <div className="pbf-container" style={{ padding: '2.5rem 1.5rem' }}>
-      <div className="pbf-details-inner" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2.5rem' }}>
+      <div className="pbf-details-inner" style={{ display: 'grid', gap: '2.5rem' }}>
         {/* Gallery */}
         <div>
           <div style={{ position: 'relative', aspectRatio: '1/1', borderRadius: 6, overflow: 'hidden', background: BG_ALT, border: `1px solid ${BORDER}` }}>
@@ -733,11 +744,11 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               <>
                 <button onClick={() => setSel((s) => (s - 1 + images.length) % images.length)}
                   style={{ position: 'absolute', top: '50%', insetInlineStart: 10, transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.85)', border: 'none', color: INK, borderRadius: '50%', width: 38, height: 38, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ChevronLeft size={18} />
+                  {t.dir === 'rtl' ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
                 </button>
                 <button onClick={() => setSel((s) => (s + 1) % images.length)}
                   style={{ position: 'absolute', top: '50%', insetInlineEnd: 10, transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.85)', border: 'none', color: INK, borderRadius: '50%', width: 38, height: 38, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ChevronRight size={18} />
+                  {t.dir === 'rtl' ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
                 </button>
               </>
             )}
@@ -788,23 +799,28 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {attr.variants.map((v) => {
                   const isSel = selectedVariants?.[attr.name] === v.value;
+                  const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                    Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(
+                      ([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)
+                    )
+                  );
                   if (attr.displayMode === 'color') {
                     return (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                        style={{ width: 34, height: 34, borderRadius: '50%', background: v.value, border: isSel ? `2px solid ${SAGE_DARK}` : `1px solid ${BORDER}`, cursor: 'pointer' }} />
+                      <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
+                        style={{ width: 34, height: 34, borderRadius: '50%', background: v.value, border: isSel ? `2px solid ${SAGE_DARK}` : `1px solid ${BORDER}`, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }} />
                     );
                   }
                   if (attr.displayMode === 'image') {
                     return (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                        style={{ width: 48, height: 48, borderRadius: 4, overflow: 'hidden', border: isSel ? `2px solid ${SAGE_DARK}` : `1px solid ${BORDER}`, padding: 0, cursor: 'pointer' }}>
+                      <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
+                        style={{ width: 48, height: 48, borderRadius: 4, overflow: 'hidden', border: isSel ? `2px solid ${SAGE_DARK}` : `1px solid ${BORDER}`, padding: 0, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}>
                         <img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </button>
                     );
                   }
                   return (
-                    <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                      style={{ padding: '8px 16px', borderRadius: 4, border: isSel ? `2px solid ${SAGE_DARK}` : `1px solid ${BORDER}`, color: isSel ? SAGE_DARK : INK, background: 'none', cursor: 'pointer', fontSize: '0.82rem' }}>
+                    <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
+                      style={{ padding: '8px 16px', borderRadius: 4, border: isSel ? `2px solid ${SAGE_DARK}` : `1px solid ${BORDER}`, color: isSel ? SAGE_DARK : (available ? INK : '#bbb'), background: 'none', cursor: available ? 'pointer' : 'not-allowed', fontSize: '0.82rem', textDecoration: available ? 'none' : 'line-through' }}>
                       {v.name}
                     </button>
                   );

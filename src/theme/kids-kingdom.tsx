@@ -32,8 +32,8 @@ const T = {
     nav_home: 'الرئيسية', nav_contact: 'تواصل', nav_contact_full: '📞 تواصل معنا', nav_home_full: '🏠 الرئيسية',
     search_ph_desktop: 'ابحث عن ألعابك... 🎮', search_ph_mobile: 'ابحث هنا... 🎯',
     searching: '🔍 جاري البحث...', view_all: 'عرض جميع النتائج 🚀', no_results: 'لا توجد نتائج 🧩',
-    footer_links: '🗺️ روابط سريعة', footer_contact: '📡 تواصل معنا', footer_cart: 'سلة التسوق',
-    footer_privacy: 'الخصوصية', footer_terms: 'الشروط', footer_rights: 'جميع الحقوق محفوظة.',
+    footer_links: '🗺️ روابط سريعة', footer_legal: '⚖️ قانوني', footer_contact: '📡 تواصل معنا', footer_cart: 'سلة التسوق',
+    footer_privacy: 'الخصوصية', footer_terms: 'الشروط', footer_cookies: 'الكوكيز', footer_rights: 'جميع الحقوق محفوظة.',
     footer_tagline: 'لأن كل طفل يستحق الأفضل!', footer_safe: 'منتجات آمنة وممتعة ✅',
     footer_desc_fallback: 'ألعاب وملابس أطفال بجودة عالية وأسعار مناسبة!',
     view_details: 'اعرف المزيد',
@@ -92,8 +92,8 @@ const T = {
     nav_home: 'Accueil', nav_contact: 'Contact', nav_contact_full: '📞 Contactez-nous', nav_home_full: '🏠 Accueil',
     search_ph_desktop: 'Cherche tes jouets... 🎮', search_ph_mobile: 'Cherche ici... 🎯',
     searching: '🔍 Recherche en cours...', view_all: 'Voir tous les résultats 🚀', no_results: 'Aucun résultat 🧩',
-    footer_links: '🗺️ Liens rapides', footer_contact: '📡 Contactez-nous', footer_cart: 'Panier',
-    footer_privacy: 'Confidentialité', footer_terms: 'Conditions', footer_rights: 'Tous droits réservés.',
+    footer_links: '🗺️ Liens rapides', footer_legal: '⚖️ Légal', footer_contact: '📡 Contactez-nous', footer_cart: 'Panier',
+    footer_privacy: 'Confidentialité', footer_terms: 'Conditions', footer_cookies: 'Cookies', footer_rights: 'Tous droits réservés.',
     footer_tagline: 'Parce que chaque enfant mérite le meilleur !', footer_safe: 'Produits sûrs et amusants ✅',
     footer_desc_fallback: 'Jouets et vêtements enfants de qualité à prix abordable !',
     view_details: 'En savoir plus',
@@ -153,8 +153,8 @@ const T = {
     nav_home: 'Home', nav_contact: 'Contact', nav_contact_full: '📞 Contact Us', nav_home_full: '🏠 Home',
     search_ph_desktop: 'Search for toys... 🎮', search_ph_mobile: 'Search here... 🎯',
     searching: '🔍 Searching...', view_all: 'View all results 🚀', no_results: 'No results found 🧩',
-    footer_links: '🗺️ Quick Links', footer_contact: '📡 Contact Us', footer_cart: 'Cart',
-    footer_privacy: 'Privacy', footer_terms: 'Terms', footer_rights: 'All rights reserved.',
+    footer_links: '🗺️ Quick Links', footer_legal: '⚖️ Legal', footer_contact: '📡 Contact Us', footer_cart: 'Cart',
+    footer_privacy: 'Privacy', footer_terms: 'Terms', footer_cookies: 'Cookies', footer_rights: 'All rights reserved.',
     footer_tagline: 'Because every child deserves the best!', footer_safe: 'Safe and fun products ✅',
     footer_desc_fallback: 'High quality kids toys and clothing at great prices!',
     view_details: 'Learn More',
@@ -372,7 +372,7 @@ const THEME_CSS = `
     padding-bottom: 2.5rem;
     border-bottom: 1px solid rgba(255,255,255,0.1);
   }
-  @media (min-width: 768px) { .footer-cols { grid-template-columns: 1.6fr 1fr 1fr; } }
+  @media (min-width: 768px) { .footer-cols { grid-template-columns: 1.6fr 1fr 1fr 1fr; } }
 
   /* ── Responsive: Hero actions ── */
   .hero-actions { display: flex; flex-direction: column; gap: 0.875rem; align-items: flex-start; }
@@ -760,7 +760,19 @@ export function Footer({ store }: any) {
           {/* قسم 2 — الروابط */}
           <div>
             <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--sun)', marginBottom: '1.25rem' }}>{t.footer_links}</h4>
-            {[{ h: '/', l: t.nav_home, e: '🏠' }, { h: '/cart', l: t.footer_cart, e: '🛒' }, { h: '/contact', l: t.nav_contact_full.replace('📞 ', ''), e: '📞' }, { h: '/Privacy', l: t.footer_privacy, e: '🔒' }, { h: '/Terms', l: t.footer_terms, e: '📋' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
+            {[{ h: '/', l: t.nav_home, e: '🏠' }, { h: '/cart', l: t.footer_cart, e: '🛒' }, { h: '/contact', l: t.nav_contact_full.replace('📞 ', ''), e: '📞' }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
+              <a key={i} href={lnk.h} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--sky)'; el.style.transform = `translateX(${isRTL ? '-4px' : '4px'})`; }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(255,255,255,0.5)'; el.style.transform = ''; }}>
+                <span>{lnk.e}</span>{lnk.l}
+              </a>
+            ))}
+          </div>
+
+          {/* قانوني */}
+          <div>
+            <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--sun)', marginBottom: '1.25rem' }}>{t.footer_legal}</h4>
+            {[{ h: '/Privacy', l: t.footer_privacy, e: '🔒' }, { h: '/Terms', l: t.footer_terms, e: '📋' }, { h: '/cookies', l: t.footer_cookies, e: '🍪' }].map((lnk, i) => (
               <a key={i} href={lnk.h} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.625rem', transition: 'all 0.2s' }}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--sky)'; el.style.transform = `translateX(${isRTL ? '-4px' : '4px'})`; }}
                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'rgba(255,255,255,0.5)'; el.style.transform = ''; }}>
@@ -1145,25 +1157,37 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                   {attr.variants.map((v: any) => {
                     const isImgUrl = /^https?:\/\/|^\//.test(v.value);
                     const active = selectedVariants[attr.name] === v.value;
-                    return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: 34, height: 34, borderRadius: '50%', background: isImgUrl ? `url(${v.value}) center/cover` : v.value, border: 'none', cursor: 'pointer', overflow: 'hidden', outline: `3px solid ${active ? accent : 'transparent'}`, outlineOffset: 3, transition: 'all 0.2s' }} />;
+                    const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                      Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val))
+                    );
+                    return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: 34, height: 34, borderRadius: '50%', background: isImgUrl ? `url(${v.value}) center/cover` : v.value, border: 'none', cursor: available ? 'pointer' : 'not-allowed', overflow: 'hidden', outline: `3px solid ${active ? accent : 'transparent'}`, outlineOffset: 3, transition: 'all 0.2s', opacity: available ? 1 : 0.35 }} />;
                   })}
                 </div>
               ) : attr.displayMode === 'image' ? (
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {attr.variants.map((v: any) => {
                     const active = selectedVariants[attr.name] === v.value;
-                    return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: 52, height: 52, borderRadius: 12, overflow: 'hidden', border: `3px solid ${active ? accent : 'var(--border)'}`, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.2s' }}>
+                    const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                      Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val))
+                    );
+                    return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: 52, height: 52, borderRadius: 12, overflow: 'hidden', border: `3px solid ${active ? accent : 'var(--border)'}`, cursor: available ? 'pointer' : 'not-allowed', padding: 0, background: 'none', transition: 'all 0.2s', opacity: available ? 1 : 0.35 }}>
                       <img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                     </button>;
                   })}
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {attr.variants.map((v: any) => (
-                    <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ padding: '0.35rem 0.875rem', border: `2.5px solid ${selectedVariants[attr.name] === v.value ? accent : 'var(--border)'}`, borderRadius: 50, fontWeight: 700, fontSize: '0.82rem', background: selectedVariants[attr.name] === v.value ? `${accent}15` : '#fff', color: selectedVariants[attr.name] === v.value ? accent : 'var(--text-mid)', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
-                      {v.name}
-                    </button>
-                  ))}
+                  {attr.variants.map((v: any) => {
+                    const sel = selectedVariants[attr.name] === v.value;
+                    const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                      Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val))
+                    );
+                    return (
+                      <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ padding: '0.35rem 0.875rem', border: `2.5px solid ${sel ? accent : 'var(--border)'}`, borderRadius: 50, fontWeight: 700, fontSize: '0.82rem', background: sel ? `${accent}15` : '#fff', color: sel ? accent : (available ? 'var(--text-mid)' : '#bbb'), cursor: available ? 'pointer' : 'not-allowed', fontFamily: 'inherit', transition: 'all 0.2s', textDecoration: available ? 'none' : 'line-through' }}>
+                        {v.name}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>

@@ -19,7 +19,7 @@ import { useCartStore } from '@/store/useCartStore';
 // TYPES
 // ─────────────────────────────────────────────────────────────
 
-interface Offer               { id: string; name: string; quantity: number; price: number; }
+interface Offer               { id: string; name: string; quantity: number; price: number; subTitle?: string; shippingFree?: boolean; }
 interface Variant             { id: string; name: string; value: string; }
 interface Attribute           { id: string; type: string; name: string; displayMode?: 'color' | 'image' | 'text' | null; variants: Variant[]; }
 interface ProductImage        { id: string; imageUrl: string; }
@@ -33,8 +33,8 @@ export interface Product {
   priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[];
   offers?: Offer[]; attributes?: Attribute[];
-  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 
 export interface ProductFormProps {
@@ -47,6 +47,7 @@ export interface ProductFormProps {
   selectedVariants: Record<string, string>;
   platform?:        string;
   priceLoss?:       number;
+  store?:           any;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -162,7 +163,7 @@ const jsonAr = {
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
   // Footer
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
@@ -228,7 +229,7 @@ const jsonFr = {
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
   // Footer
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
@@ -343,10 +344,20 @@ export function Footer({ store }: any) {
           <p style={{ fontWeight: 700, marginBottom: '0.75rem', fontSize: '0.85rem', color: '#444' }}>{isRTL ? 'روابط' : 'Links'}</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
             {[
-              { href: '/',        label: isRTL ? 'الرئيسية'         : 'Home'    },
-              { href: '/contact', label: isRTL ? 'تواصل معنا'        : 'Contact' },
-              { href: '/Privacy', label: isRTL ? 'سياسة الخصوصية'   : 'Privacy' },
-              { href: '/Terms',   label: isRTL ? 'الشروط والأحكام'  : 'Terms'   },
+              { href: '/',        label: isRTL ? 'الرئيسية'   : 'Home'    },
+              { href: '/contact', label: isRTL ? 'تواصل معنا' : 'Contact' },
+            ].map(l => (
+              <Link key={l.href} href={l.href} style={{ fontSize: '0.82rem', color: '#555', textDecoration: 'none' }}>{l.label}</Link>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p style={{ fontWeight: 700, marginBottom: '0.75rem', fontSize: '0.85rem', color: '#444' }}>{isRTL ? 'قانوني' : 'Legal'}</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            {[
+              { href: '/privacy', label: isRTL ? 'سياسة الخصوصية'  : 'Privacy' },
+              { href: '/terms',   label: isRTL ? 'الشروط والأحكام' : 'Terms'   },
+              { href: '/cookies', label: isRTL ? 'الكوكيز'          : 'Cookies' },
             ].map(l => (
               <Link key={l.href} href={l.href} style={{ fontSize: '0.82rem', color: '#555', textDecoration: 'none' }}>{l.label}</Link>
             ))}
@@ -402,6 +413,11 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
         {discount > 0 && (
           <span style={{ position: 'absolute', top: 8, right: 8, background: '#111', color: '#fff', fontSize: 10, padding: '2px 6px', borderRadius: 2, fontWeight: 700 }}>
             -{discount}%
+          </span>
+        )}
+        {product.shippingFree && (
+          <span style={{ position: 'absolute', top: 8, left: 8, background: '#111', color: '#fff', fontSize: 10, padding: '2px 6px', borderRadius: 2, fontWeight: 700 }}>
+            🚚
           </span>
         )}
       </div>
@@ -498,7 +514,7 @@ export const Home = ({ store }: any) => {
 // DETAILS
 // ─────────────────────────────────────────────────────────────
 
-export function Details({ product, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, toggleWishlist, isWishlisted, handleShare }: any) {
+export function Details({ product, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, toggleWishlist, isWishlisted, handleShare, store }: any) {
   const [selImg, setSelImg] = useState(0);
   const isRTL = true;
 
@@ -547,6 +563,12 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
               {(inStock || autoGen) ? 'متوفر' : 'غير متوفر'}
             </div>
 
+            {(product.shippingFree || ((store || product?.store)?.supportFreeShipping && (store || product?.store)?.freeShippingMinAmount != null)) && (
+              <p style={{ fontSize: '0.82rem', fontWeight: 700, color: '#111', marginBottom: '1.25rem' }}>
+                {product.shippingFree ? '🚚 توصيل مجاني' : `🚚 توصيل مجاني للطلبات بـ ${(store || product?.store).freeShippingMinAmount} دج أو أكثر`}
+              </p>
+            )}
+
             {/* Offers */}
             {product.offers?.length > 0 && (
               <div style={{ marginBottom: '1.25rem' }}>
@@ -556,7 +578,11 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                     <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.75rem', border: `1px solid ${selectedOffer === o.id ? '#111' : '#ddd'}`, borderRadius: 4, cursor: 'pointer', background: selectedOffer === o.id ? '#f8f8f8' : '#fff' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <input type="radio" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ accentColor: '#111' }} />
-                        <span style={{ fontSize: '0.85rem' }}>{o.name} <span style={{ color: '#888', fontSize: '0.8rem' }}>({o.quantity} قطع)</span></span>
+                        <span style={{ fontSize: '0.85rem' }}>
+                          {o.name} <span style={{ color: '#888', fontSize: '0.8rem' }}>({o.quantity} قطع)</span>
+                          {o.subTitle && <><br /><span style={{ color: '#888', fontSize: '0.78rem' }}>{o.subTitle}</span></>}
+                          {o.shippingFree && <><br /><span style={{ color: '#111', fontSize: '0.75rem', fontWeight: 700 }}>🚚 توصيل مجاني</span></>}
+                        </span>
                       </div>
                       <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{o.price.toLocaleString()} دج</span>
                     </label>
@@ -571,13 +597,26 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                 <p style={{ fontSize: '0.82rem', fontWeight: 600, color: '#444', marginBottom: '0.5rem' }}>{attr.name}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
                   {attr.variants.map((v: any) => {
-                    const sel = selectedVariants[attr.name] === v.value;
+                    const imgSrc = (v.value || '').startsWith('http') ? v.value : (v.name || '').startsWith('http') ? v.name : null;
+                    const isImg = attr.displayMode === 'image' || (attr.displayMode !== 'color' && !!imgSrc);
+                    const selKey = isImg ? imgSrc! : v.value;
+                    const sel = selectedVariants[attr.name] === selKey;
+                    const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                      Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(
+                        ([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)
+                      )
+                    );
                     return attr.displayMode === 'color' ? (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name}
-                        style={{ width: 28, height: 28, borderRadius: '50%', background: v.value, border: sel ? '2px solid #111' : '2px solid #ddd', cursor: 'pointer', outline: sel ? '2px solid #111' : 'none', outlineOffset: 2 }} />
+                      <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.name}
+                        style={{ width: 28, height: 28, borderRadius: '50%', background: v.value, border: sel ? '2px solid #111' : '2px solid #ddd', cursor: available ? 'pointer' : 'not-allowed', outline: sel ? '2px solid #111' : 'none', outlineOffset: 2, opacity: available ? 1 : 0.35 }} />
+                    ) : isImg ? (
+                      <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, imgSrc!)} title={v.name}
+                        style={{ width: 52, height: 52, padding: 0, overflow: 'hidden', border: `2px solid ${sel ? '#111' : '#ddd'}`, borderRadius: 4, cursor: available ? 'pointer' : 'not-allowed', flexShrink: 0, opacity: available ? 1 : 0.35 }}>
+                        <img src={imgSrc!} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      </button>
                     ) : (
-                      <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)}
-                        style={{ padding: '0.35rem 0.8rem', border: `1px solid ${sel ? '#111' : '#ddd'}`, borderRadius: 3, background: sel ? '#111' : '#fff', color: sel ? '#fff' : '#333', fontSize: '0.82rem', cursor: 'pointer', fontFamily: 'inherit', fontWeight: sel ? 600 : 400 }}>
+                      <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
+                        style={{ padding: '0.35rem 0.8rem', border: `1px solid ${sel ? '#111' : '#ddd'}`, borderRadius: 3, background: sel ? '#111' : '#fff', color: sel ? '#fff' : (available ? '#333' : '#bbb'), fontSize: '0.82rem', cursor: available ? 'pointer' : 'not-allowed', fontFamily: 'inherit', fontWeight: sel ? 600 : 400, textDecoration: available ? 'none' : 'line-through' }}>
                         {v.name}
                       </button>
                     );
@@ -586,7 +625,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
               </div>
             ))}
 
-            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
+            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store} />
 
             {product.desc && (
               <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #e5e5e5' }}>
@@ -605,7 +644,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
 // PRODUCT FORM
 // ─────────────────────────────────────────────────────────────
 
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0 }: ProductFormProps) {
+export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0, store }: ProductFormProps) {
   const router = useRouter();
   const [wilayas,         setWilayas]         = useState<Wilaya[]>([]);
   const [communes,        setCommunes]        = useState<Commune[]>([]);
@@ -637,8 +676,18 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     return base;
   }, [product, selectedOffer, selectedVariants]);
 
-  const getLiv = useCallback(() => selW ? (fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice) : 0, [selW, fd.typeLivraison]);
-  const getTotal = useCallback(() => getFP() * fd.quantity + getLiv(), [getFP, fd.quantity, getLiv]);
+  const supportQty = (store?.supportQty ?? product.store?.supportQty) !== false;
+  const qty = supportQty ? fd.quantity : 1;
+  const selOfferObj = product.offers?.find(o => o.id === selectedOffer);
+  const storeInfo = store || product.store;
+  const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
+    (storeInfo?.supportFreeShipping && storeInfo?.freeShippingMinAmount != null && (getFP() * qty) >= Number(storeInfo.freeShippingMinAmount)));
+  const getLiv = useCallback((): number => {
+    if (orderFreeShipping) return 0;
+    if (!selW) return 0;
+    return Number(fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice);
+  }, [selW, fd.typeLivraison, orderFreeShipping]);
+  const getTotal = useCallback(() => getFP() * qty + getLiv(), [getFP, qty, getLiv]);
 
   const getVariantId = useCallback(() => {
     if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
@@ -657,7 +706,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   const addToCart = () => {
     const cart = JSON.parse(localStorage.getItem(domain) || '[]');
-    cart.push({ ...fd, product, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, finalPrice: getFP(), quantity: fd.quantity });
+    cart.push({ ...fd, product, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, finalPrice: getFP(), quantity: qty });
     localStorage.setItem(domain, JSON.stringify(cart));
     initCount(cart.length);
     setIsAdded(true);
@@ -672,14 +721,14 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       const res = await axios.post(`${API_URL}/orders`, {
         productId: product.id, variantDetailId: getVariantId(), domain,
         storeId: product.store.id, offerId: selectedOffer ?? undefined, platform,
-        quantity: fd.quantity, totalPrice: getTotal(), typeShip: fd.typeLivraison,
+        quantity: qty, totalPrice: getTotal(), typeShip: fd.typeLivraison,
         priceShip: getLiv(), priceLoss: fd.priceLoss, customerId: fd.customerId,
         customerName: fd.customerName, customerPhone: fd.customerPhone,
         customerWilayaId: fd.customerWelaya, customerCommuneId: fd.customerCommune,
       });
       if (res.status === 200 || res.status === 201) {
         if (typeof window !== 'undefined' && res.data?.customerId) localStorage.setItem('customerId', res.data.customerId);
-        router.push(`/${domain}/successfully`);
+        router.push(`/successfully?productId=${product?.id}`);
       }
     } catch { showError('حدث خطأ في الاتصال بالخادم'); } finally { setSubmitting(false); }
   };
@@ -733,19 +782,21 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 style={{ ...S.btnOutline, justifyContent: 'center', flexDirection: 'column', gap: 2, padding: '0.6rem', borderColor: fd.typeLivraison === t ? '#111' : '#ddd', background: fd.typeLivraison === t ? '#111' : '#fff', color: fd.typeLivraison === t ? '#fff' : '#333' }}>
                 {t === 'home' ? <HomeIcon size={14} /> : <Building2 size={14} />}
                 <span style={{ fontSize: '0.75rem' }}>{t === 'home' ? 'المنزل' : 'المكتب'}</span>
-                {selW && <span style={{ fontSize: '0.72rem', opacity: 0.7 }}>{(t === 'home' ? selW.livraisonHome : selW.livraisonOfice)} دج</span>}
+                {selW && <span style={{ fontSize: '0.72rem', opacity: 0.7 }}>{orderFreeShipping ? '🚚 توصيل مجاني' : `${(t === 'home' ? selW.livraisonHome : selW.livraisonOfice)} دج`}</span>}
               </button>
             ))}
           </div>
         </FR>
 
-        <FR label="الكمية">
-          <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: 4, width: 'fit-content', background: '#fff', overflow: 'hidden' }}>
-            <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={14} /></button>
-            <span style={{ width: 36, textAlign: 'center', fontWeight: 700 }}>{fd.quantity}</span>
-            <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 36, height: 36, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={14} /></button>
-          </div>
-        </FR>
+        {supportQty && (
+          <FR label="الكمية">
+            <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: 4, width: 'fit-content', background: '#fff', overflow: 'hidden' }}>
+              <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={14} /></button>
+              <span style={{ width: 36, textAlign: 'center', fontWeight: 700 }}>{fd.quantity}</span>
+              <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 36, height: 36, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={14} /></button>
+            </div>
+          </FR>
+        )}
 
         {/* Summary */}
         <div style={{ background: '#f8f8f8', padding: '0.75rem', borderRadius: 4, marginBottom: '1rem', fontSize: '0.82rem', color: '#555' }}>
@@ -753,11 +804,11 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <span>سعر القطعة</span><span style={{ fontWeight: 600, color: '#111' }}>{fp.toLocaleString()} دج</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-            <span>الكمية</span><span>× {fd.quantity}</span>
+            <span>الكمية</span><span>× {qty}</span>
           </div>
           {selW && (
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-              <span>التوصيل</span><span>{getLiv()} دج</span>
+              <span>التوصيل</span><span>{orderFreeShipping ? '🚚 توصيل مجاني' : `${getLiv()} دج`}</span>
             </div>
           )}
           <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 6, borderTop: '1px solid #e5e5e5', fontWeight: 700, fontSize: '0.95rem', color: '#111' }}>
@@ -801,6 +852,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   };
 
   const total = items.reduce((acc, it) => acc + (it.finalPrice * it.quantity), 0);
+  const hasFreeShippingItem = items.some(it => it.product?.shippingFree || it.product?.offers?.find((o: any) => o.id === it.selectedOffer)?.shippingFree);
+  const freeShippingMin = store?.supportFreeShipping ? store?.freeShippingMinAmount : null;
+  const freeShippingReached = hasFreeShippingItem || (freeShippingMin != null && total >= Number(freeShippingMin));
+  const freeShippingRemainingAmt = freeShippingMin != null ? Number(freeShippingMin) - total : 0;
 
   if (!items.length) return (
     <div dir={isRTL ? 'rtl' : 'ltr'} style={{ ...S.body, textAlign: 'center', padding: '5rem 1rem', minHeight: '50vh' }}>
@@ -815,6 +870,13 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{ ...S.container, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', alignItems: 'start' }}>
         <div>
           <h1 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '1.5rem' }}>{isRTL ? 'سلة المشتريات' : 'Cart'}</h1>
+          {freeShippingMin != null && (
+            <div style={{ background: freeShippingReached ? '#f0fdf4' : '#f8f8f8', border: `1px solid ${freeShippingReached ? '#111' : '#e5e5e5'}`, color: '#111', borderRadius: 4, padding: '0.65rem 1rem', marginBottom: '1.25rem', fontWeight: 600, fontSize: '0.8rem', textAlign: 'center' }}>
+              {freeShippingReached
+                ? (isRTL ? '🎉 حصلت على توصيل مجاني!' : '🎉 You got free delivery!')
+                : (isRTL ? `أضف ${freeShippingRemainingAmt.toLocaleString()} دج أخرى للحصول على توصيل مجاني` : `Add ${freeShippingRemainingAmt.toLocaleString()} DZD more for free delivery`)}
+            </div>
+          )}
           {items.map((item, i) => (
             <div key={i} style={{ display: 'flex', gap: '0.75rem', padding: '0.75rem', border: '1px solid #e5e5e5', borderRadius: 4, marginBottom: '0.75rem', background: '#fff' }}>
               <img src={item.product?.productImage} alt="" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 3, background: '#f5f5f5' }} />

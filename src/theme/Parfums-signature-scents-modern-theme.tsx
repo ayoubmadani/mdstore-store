@@ -151,7 +151,7 @@ body { font-family: ${FONT_BODY}; background: ${BG}; color: ${TXT}; margin: 0; }
 @media (min-width: 900px) { .hero-grid { grid-template-columns: 1.2fr 0.8fr; } }
 
 .footer-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-@media (min-width: 768px) { .footer-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 768px) { .footer-grid { grid-template-columns: 1.5fr 1fr 1fr 1fr; } }
 
 .search-dropdown { position: absolute; top: calc(100% + 10px); left: 0; width: 340px; }
 @media (max-width: 480px) { .search-dropdown { position: fixed; left: 12px; right: 12px; width: auto; top: 70px; } }
@@ -168,7 +168,7 @@ function StoreLogo({ store, size = 40 }: any) {
   const [err, setErr] = useState(false);
   const url = store?.design?.logoUrl;
   if (url && !err) {
-    return <img src={url} alt={store?.name} onError={() => setErr(true)} style={{ height: size, width: size, objectFit: 'contain', borderRadius: 10 }} />;
+    return <img src={url} alt={store?.name} onError={() => setErr(true)} style={{ height: 48, width: 'auto', maxWidth: 160, objectFit: 'contain' }} />;
   }
   const initials = (store?.name || 'S').trim().slice(0, 2);
   return (
@@ -242,11 +242,53 @@ const jsonAr = {
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
   // Footer
-  quickLinks: 'روابط سريعة',
+  quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
   privacy: 'الخصوصية',
   terms: 'الشروط',
+  cookies: 'الكوكيز',
   rightsReserved: 'جميع الحقوق محفوظة',
+  // Hero fallbacks
+  heroTitle: 'عطورك المُوقّعة، كل يوم',
+  heroSub: 'مجموعة مختارة من العطور اليومية ومجموعات الهدايا المميزة، بجودة عالية وأسعار مناسبة.',
+  heroBadgeItems: ['الأكثر مبيعاً', 'مجموعات هدايا', 'عطور يومية', 'إصدار جديد', 'عروض محدودة'],
+  trustItems: ['توصيل سريع لكل الولايات', 'جودة أصلية مضمونة', 'تغليف هدايا فاخر', 'دعم متواصل'],
+  // Extra UI
+  discountPre: 'خصم',
+  offerLabel: 'اختر العرض',
+  addBtn: 'أضف للسلة',
+  addedBtn: 'أُضيف للسلة',
+  cancelBtn: 'إلغاء',
+  cartTitle: 'سلة المشتريات',
+  subtotalLbl: 'المجموع',
+  deliveryInfoTitle: 'معلومات التوصيل',
+  continueShop: 'متابعة التسوق',
+  qtyShort: 'الكمية',
+  emailPh: 'البريد الإلكتروني',
+  messagePh: 'رسالتك',
+  sendBtn: 'إرسال',
+  sentMsg: 'تم إرسال رسالتك بنجاح، سنتواصل معك قريباً.',
+  sendAnother: 'إرسال رسالة أخرى',
+  // Static pages
+  privacyTitle: 'سياسة الخصوصية',
+  privacyData: 'البيانات التي نجمعها',
+  privacyDataBody: 'نجمع فقط المعلومات الضرورية لمعالجة طلباتكم، مثل الاسم، رقم الهاتف، وعنوان التوصيل.',
+  privacyProtect: 'حماية البيانات',
+  privacyProtectBody: 'تُخزن جميع البيانات بشكل مشفر ونستخدم بروتوكولات حماية معتمدة.',
+  privacyShare: 'مشاركة المعلومات',
+  privacyShareBody: 'لا نقوم ببيع أو مشاركة بياناتكم مع أي جهات خارجية باستثناء شركاء التوصيل.',
+  termsTitle: 'شروط الاستخدام',
+  termsAccount: 'الحساب والمسؤولية',
+  termsAccountBody: 'المستخدم مسؤول عن دقة البيانات المدخلة وعن الحفاظ على سرية حسابه.',
+  termsOrders: 'الطلبات والمدفوعات',
+  termsOrdersBody: 'يتم تأكيد الطلبات عبر الهاتف قبل الشحن. الأسعار المعلنة هي الأسعار النهائية.',
+  termsLaw: 'القانون الحاكم',
+  termsLawBody: 'تخضع كافة التعاملات للقوانين المعمول بها في جمهورية الجزائر الديمقراطية الشعبية.',
+  cookiesTitle: 'ملفات الارتباط',
+  cookiesEssential: 'الملفات الأساسية',
+  cookiesEssentialBody: 'نستخدم ملفات تعريف الارتباط الضرورية لضمان عمل سلة المشتريات وأمان جلسة الدخول.',
+  cookiesExp: 'تحسين التجربة',
+  cookiesExpBody: 'نستخدم بعض الملفات لفهم كيفية استخدام الموقع وتطوير تجربة التصفح.',
 };
 
 const jsonFr = {
@@ -308,26 +350,140 @@ const jsonFr = {
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
   // Footer
-  quickLinks: 'Navigation',
+  quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
   privacy: 'Confidentialité',
   terms: 'Conditions',
+  cookies: 'Cookies',
   rightsReserved: 'Tous droits réservés.',
+  // Hero fallbacks
+  heroTitle: 'Vos Parfums Signature, Chaque Jour',
+  heroSub: 'Une sélection de parfums quotidiens et de coffrets cadeaux, de haute qualité à des prix accessibles.',
+  heroBadgeItems: ['Best-sellers', 'Coffrets cadeaux', 'Parfums du quotidien', 'Nouvelle sortie', 'Offres limitées'],
+  trustItems: ['Livraison rapide dans toutes les wilayas', 'Qualité authentique garantie', 'Emballage cadeau luxueux', 'Support disponible'],
+  // Extra UI
+  discountPre: 'Réd.',
+  offerLabel: 'Choisir une offre',
+  addBtn: 'Ajouter au panier',
+  addedBtn: 'Ajouté ✓',
+  cancelBtn: 'Annuler',
+  cartTitle: 'Mon Panier',
+  subtotalLbl: 'Sous-total',
+  deliveryInfoTitle: 'Informations de livraison',
+  continueShop: 'Continuer mes achats',
+  qtyShort: 'Qté',
+  emailPh: 'Votre e-mail',
+  messagePh: 'Votre message',
+  sendBtn: 'Envoyer',
+  sentMsg: 'Message envoyé avec succès, nous vous contacterons bientôt.',
+  sendAnother: 'Envoyer un autre message',
+  // Static pages
+  privacyTitle: 'Politique de confidentialité',
+  privacyData: 'Données collectées',
+  privacyDataBody: "Nous collectons uniquement les informations nécessaires pour traiter vos commandes.",
+  privacyProtect: 'Protection des données',
+  privacyProtectBody: "Toutes les données sont stockées de manière chiffrée avec des protocoles de sécurité certifiés.",
+  privacyShare: "Partage d'informations",
+  privacyShareBody: "Nous ne vendons pas vos données et ne les partageons pas avec des tiers, sauf avec nos partenaires de livraison.",
+  termsTitle: "Conditions d'utilisation",
+  termsAccount: 'Compte et responsabilité',
+  termsAccountBody: "L'utilisateur est responsable de l'exactitude des données saisies et de la confidentialité de son compte.",
+  termsOrders: 'Commandes et paiements',
+  termsOrdersBody: 'Les commandes sont confirmées par téléphone avant expédition. Les prix affichés sont les prix finaux.',
+  termsLaw: 'Droit applicable',
+  termsLawBody: 'Toutes les transactions sont soumises aux lois en vigueur en Algérie.',
+  cookiesTitle: 'Politique de cookies',
+  cookiesEssential: 'Cookies essentiels',
+  cookiesEssentialBody: 'Nous utilisons des cookies nécessaires pour le panier et la sécurité de votre session.',
+  cookiesExp: "Amélioration de l'expérience",
+  cookiesExpBody: 'Nous utilisons certains cookies pour analyser la navigation et améliorer nos services.',
 };
+
+const jsonEn = {
+  dir: 'ltr',
+  home: 'Home', contact: 'Contact', cart: 'Cart',
+  search: 'Search...', searching: 'Searching...', noResults: 'No results', showAll: 'Show all results',
+  all: 'All', noProducts: 'No products available.', shopNow: 'Shop Now', searchResultsFor: 'Results for:',
+  fullName: 'Full Name', fullNamePh: 'Your name', errName: 'Name is required',
+  phone: 'Phone', phonePh: '0555 12 34 56', errPhone: 'Phone is required', errPhoneInvalid: 'Invalid phone number',
+  wilaya: 'Wilaya', errWilaya: 'Select a wilaya', wilayaPh: 'Choose wilaya', wilayaNA: 'Delivery unavailable',
+  commune: 'Commune', errCommune: 'Select a commune', communePh: 'Choose commune', communeLoading: 'Loading...',
+  deliveryType: 'Delivery type', deliveryHome: 'Home delivery', deliveryOffice: 'Pickup point',
+  qty: 'Qty', price: 'Price', delivery: 'Delivery', total: 'Total', subtotal: 'Subtotal',
+  orderInfo: 'Order info', addToCart: 'Add to cart', orderNow: 'Order now',
+  confirmOrder: 'Confirm order', sending: 'Sending...', back: 'Cancel',
+  addedMsg: 'Added to cart ✓', errSubmit: 'An error occurred, please try again.',
+  myCart: 'My Cart', cartEmpty: 'Your cart is empty', cartEmptyDesc: 'Discover our collection.',
+  successTitle: 'Order confirmed', successDesc: 'Thank you! Our team will contact you soon.',
+  backToShop: 'Back to shop', checkoutTitle: 'Checkout',
+  offersTitle: 'Available offers', descTitle: 'Description',
+  quickLinks: 'Navigation', legalNav: 'Legal',
+  contactSect: 'Contact',
+  privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies',
+  rightsReserved: 'All rights reserved.',
+  heroTitle: 'Your Signature Scents, Every Day',
+  heroSub: 'A curated selection of everyday fragrances and gift sets, premium quality at great prices.',
+  heroBadgeItems: ['Best Sellers', 'Gift Sets', 'Everyday Scents', 'New Release', 'Limited Offers'],
+  trustItems: ['Fast delivery to all wilayas', 'Authentic quality guaranteed', 'Luxurious gift wrapping', 'Continuous support'],
+  discountPre: 'Off',
+  offerLabel: 'Choose an offer',
+  addBtn: 'Add to cart',
+  addedBtn: 'Added ✓',
+  cancelBtn: 'Cancel',
+  cartTitle: 'My Cart',
+  subtotalLbl: 'Subtotal',
+  deliveryInfoTitle: 'Delivery information',
+  continueShop: 'Continue shopping',
+  qtyShort: 'Qty',
+  emailPh: 'Your e-mail',
+  messagePh: 'Your message',
+  sendBtn: 'Send',
+  sentMsg: 'Message sent successfully, we will contact you soon.',
+  sendAnother: 'Send another message',
+  // Static pages
+  privacyTitle: 'Privacy Policy',
+  privacyData: 'Data we collect',
+  privacyDataBody: 'We collect only the information necessary to process your orders, such as name, phone, and delivery address.',
+  privacyProtect: 'Data Protection',
+  privacyProtectBody: 'All data is stored encrypted using certified security protocols to ensure your information is safe.',
+  privacyShare: 'Information Sharing',
+  privacyShareBody: 'We do not sell or share your data with third parties, except with delivery partners.',
+  termsTitle: 'Terms of Use',
+  termsAccount: 'Account & Responsibility',
+  termsAccountBody: 'Users are responsible for the accuracy of data entered and the security of their account.',
+  termsOrders: 'Orders & Payments',
+  termsOrdersBody: 'Orders are confirmed by phone before shipping. Listed prices are final.',
+  termsLaw: 'Governing Law',
+  termsLawBody: 'All transactions are subject to the laws in force in Algeria.',
+  cookiesTitle: 'Cookie Policy',
+  cookiesEssential: 'Essential Cookies',
+  cookiesEssentialBody: 'We use essential cookies to ensure cart functionality and session security.',
+  cookiesExp: 'Experience Improvement',
+  cookiesExpBody: 'We use some cookies to understand how the site is used and improve the browsing experience.',
+};
+
+type Lang = 'ar' | 'fr' | 'en';
+const getLang = (store?: any): Lang => {
+  if (store?.language === 'fr') return 'fr';
+  if (store?.language === 'en') return 'en';
+  return 'ar';
+};
+const T: Record<Lang, typeof jsonAr> = { ar: jsonAr, fr: jsonFr as any, en: jsonEn as any };
 
 export default function Main({ store, children, domain }: any) {
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
+  const t = T[getLang(store)];
 
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   useEffect(() => {
     setVisible(false);
-    const t = setTimeout(() => setVisible(true), 50);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setVisible(true), 50);
+    return () => clearTimeout(timer);
   }, [pathname]);
 
   return (
-    <div dir="rtl" style={{ fontFamily: FONT_BODY, background: BG, color: TXT, minHeight: '100vh' }}>
+    <div dir={t.dir} style={{ fontFamily: FONT_BODY, background: BG, color: TXT, minHeight: '100vh' }}>
       <GlobalStyle />
       <Navbar store={store} domain={domain} />
       <div style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.3s ease' }}>
@@ -342,6 +498,8 @@ export default function Main({ store, children, domain }: any) {
    Navbar
    ============================================================ */
 export function Navbar({ store, domain }: any) {
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -370,7 +528,7 @@ export function Navbar({ store, domain }: any) {
   useEffect(() => {
     if (searchQuery.trim().length < 2) { setListSearch([]); return; }
     setLoading(true);
-    const t = setTimeout(async () => {
+    const timer = setTimeout(async () => {
       try {
         const r = await fetch(`${API_URL}/products/public/${domain}?search=${encodeURIComponent(searchQuery)}`);
         const d = await r.json();
@@ -378,14 +536,14 @@ export function Navbar({ store, domain }: any) {
       } catch { setListSearch([]); }
       setLoading(false);
     }, 380);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [searchQuery, domain]);
 
   const showCart = store?.cart !== false;
 
   const mobileLinks = [
-    { h: '/', l: 'الرئيسية' },
-    { h: '/contact', l: 'تواصل معنا' },
+    { h: '/', l: t.home },
+    { h: '/contact', l: t.contact },
   ];
 
   const submitSearch = (e?: React.FormEvent) => {
@@ -395,7 +553,8 @@ export function Navbar({ store, domain }: any) {
   };
 
   return (
-    <header style={{
+  <>
+    <header dir={t.dir} style={{
       position: 'sticky', top: 0, zIndex: 200, background: scrolled ? 'rgba(255,248,243,0.92)' : BG,
       backdropFilter: scrolled ? 'blur(10px)' : 'none', borderBottom: `1px solid ${BD}`,
       transition: 'background 0.3s ease',
@@ -408,27 +567,27 @@ export function Navbar({ store, domain }: any) {
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 74 }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
           <StoreLogo store={store} />
-          <span style={{ fontFamily: FONT_HEAD, fontWeight: 700, fontSize: 20, color: TXT }}>{store?.name}</span>
+          {!store?.design?.logoUrl && <span style={{ fontFamily: FONT_HEAD, fontWeight: 700, fontSize: 20, color: TXT }}>{store?.name}</span>}
         </Link>
 
         <nav className="nav-links">
-          <Link href="/" className="nav-link" style={{ textDecoration: 'none', color: TXT, fontWeight: 600, fontSize: 15 }}>الرئيسية</Link>
-          <Link href="/contact" className="nav-link" style={{ textDecoration: 'none', color: TXT, fontWeight: 600, fontSize: 15 }}>تواصل معنا</Link>
+          <Link href="/" className="nav-link" style={{ textDecoration: 'none', color: TXT, fontWeight: 600, fontSize: 15 }}>{t.home}</Link>
+          <Link href="/contact" className="nav-link" style={{ textDecoration: 'none', color: TXT, fontWeight: 600, fontSize: 15 }}>{t.contact}</Link>
         </nav>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative' }}>
-          <button onClick={() => setShowSearch((s) => !s)} aria-label="بحث" style={{ background: 'none', border: 'none', cursor: 'pointer', color: TXT, display: 'flex', minHeight: 44, minWidth: 44, alignItems: 'center', justifyContent: 'center' }}>
+          <button onClick={() => setShowSearch((s) => !s)} aria-label={t.search} style={{ background: 'none', border: 'none', cursor: 'pointer', color: TXT, display: 'flex', minHeight: 44, minWidth: 44, alignItems: 'center', justifyContent: 'center' }}>
             <Search size={20} />
           </button>
 
           {showSearch && (
-            <div className="search-dropdown" style={{ background: CARD, borderRadius: 16, boxShadow: '0 20px 50px rgba(36,18,32,0.18)', border: `1px solid ${BD}`, padding: 14, zIndex: 250 }}>
+            <div className="search-dropdown" style={{ background: CARD, borderRadius: 16, boxShadow: '0 20px 50px rgba(36,18,32,0.18)', border: `1px solid ${BD}`, padding: 14, zIndex: 250, ...(isRTL ? { left: 0 } : { right: 0, left: 'auto' }) }}>
               <form onSubmit={submitSearch} style={{ display: 'flex', gap: 8 }}>
                 <input
                   autoFocus
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="ابحث عن عطرك..."
+                  placeholder={t.search}
                   className="input-field"
                   style={{ flex: 1, padding: '10px 14px', border: `1px solid ${BD}`, borderRadius: 10, fontFamily: 'inherit', fontSize: 14, background: BG, color: TXT }}
                 />
@@ -436,7 +595,7 @@ export function Navbar({ store, domain }: any) {
                   <Search size={16} />
                 </button>
               </form>
-              {loading && <div style={{ padding: 10, fontSize: 13, color: SUB }}>جاري البحث...</div>}
+              {loading && <div style={{ padding: 10, fontSize: 13, color: SUB }}>{t.searching}</div>}
               {!loading && listSearch.length > 0 && (
                 <div style={{ marginTop: 10, maxHeight: 320, overflowY: 'auto' }}>
                   {listSearch.slice(0, 5).map((p) => (
@@ -450,7 +609,7 @@ export function Navbar({ store, domain }: any) {
                     </Link>
                   ))}
                   <Link href={`/?search=${encodeURIComponent(searchQuery)}`} onClick={() => setShowSearch(false)} style={{ display: 'block', textAlign: 'center', padding: 10, color: A, fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>
-                    عرض كل النتائج
+                    {t.showAll}
                   </Link>
                 </div>
               )}
@@ -458,7 +617,7 @@ export function Navbar({ store, domain }: any) {
           )}
 
           {showCart && (
-            <Link href="/cart" aria-label="السلة" style={{ position: 'relative', color: TXT, display: 'flex', minHeight: 44, minWidth: 44, alignItems: 'center', justifyContent: 'center' }}>
+            <Link href="/cart" aria-label={t.cart} style={{ position: 'relative', color: TXT, display: 'flex', minHeight: 44, minWidth: 44, alignItems: 'center', justifyContent: 'center' }}>
               <ShoppingBag size={20} />
               {count > 0 && (
                 <span className="cart-badge-animate" style={{ position: 'absolute', top: 2, right: 2, background: A, color: '#fff', fontSize: 10, fontWeight: 700, borderRadius: 999, minWidth: 17, height: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>
@@ -474,24 +633,25 @@ export function Navbar({ store, domain }: any) {
         </div>
       </div>
 
-      {open && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(36,18,32,0.4)' }} onClick={() => setOpen(false)}>
-          <div onClick={(e) => e.stopPropagation()} style={{ position: 'absolute', top: 0, right: 0, height: '100%', width: 280, background: CARD, padding: 24, boxShadow: '-10px 0 40px rgba(0,0,0,0.2)', animation: 'fadeIn 0.25s ease' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
-              <StoreLogo store={store} size={36} />
-              <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: TXT }}><X size={22} /></button>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {mobileLinks.map((l) => (
-                <Link key={l.h} href={l.h} onClick={() => setOpen(false)} style={{ padding: '14px 10px', textDecoration: 'none', color: TXT, fontWeight: 700, fontSize: 16, borderBottom: `1px solid ${BD}` }}>
-                  {l.l}
-                </Link>
-              ))}
-            </div>
+    </header>
+    {open && (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(36,18,32,0.4)' }} onClick={() => setOpen(false)}>
+        <div onClick={(e) => e.stopPropagation()} style={{ position: 'absolute', top: 0, [isRTL ? 'right' : 'left']: 0, height: '100%', width: 280, background: CARD, padding: 24, boxShadow: isRTL ? '-10px 0 40px rgba(0,0,0,0.2)' : '10px 0 40px rgba(0,0,0,0.2)', animation: 'fadeIn 0.25s ease', zIndex: 10000 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
+            <StoreLogo store={store} size={36} />
+            <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: TXT }}><X size={22} /></button>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {mobileLinks.map((l) => (
+              <Link key={l.h} href={l.h} onClick={() => setOpen(false)} style={{ padding: '14px 10px', textDecoration: 'none', color: TXT, fontWeight: 700, fontSize: 16, borderBottom: `1px solid ${BD}` }}>
+                {l.l}
+              </Link>
+            ))}
           </div>
         </div>
-      )}
-    </header>
+      </div>
+    )}
+  </>
   );
 }
 
@@ -499,37 +659,49 @@ export function Navbar({ store, domain }: any) {
    Footer
    ============================================================ */
 export function Footer({ store }: any) {
+  const t = T[getLang(store)];
   const year = new Date().getFullYear();
-  const links = [
-    { h: '/', l: 'الرئيسية' },
-    { h: '/cart', l: 'السلة' },
-    { h: '/contact', l: 'تواصل معنا' },
-    { h: '/privacy', l: 'سياسة الخصوصية' },
-    { h: '/terms', l: 'الشروط والأحكام' },
+  const navLinks = [
+    { h: '/', l: t.home },
+    { h: '/cart', l: t.cart },
+    { h: '/contact', l: t.contactSect },
   ].filter((lnk) => lnk.h !== '/cart' || store?.cart !== false);
+  const legalLinks = [
+    { h: '/Privacy', l: t.privacy },
+    { h: '/Terms', l: t.terms },
+    { h: '/cookies', l: t.cookies },
+  ];
 
   return (
-    <footer style={{ background: TXT, color: '#fff', marginTop: 60 }}>
+    <footer dir={t.dir} style={{ background: TXT, color: '#fff', marginTop: 60 }}>
       <div className="container" style={{ padding: '3.5rem 1.5rem 2rem' }}>
         <div className="footer-grid">
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
               <StoreLogo store={store} size={38} />
-              <span style={{ fontFamily: FONT_HEAD, fontWeight: 700, fontSize: 19 }}>{store?.name}</span>
+              {!store?.design?.logoUrl && <span style={{ fontFamily: FONT_HEAD, fontWeight: 700, fontSize: 19 }}>{store?.name}</span>}
             </div>
             <p style={{ color: '#C9B8C4', fontSize: 14, lineHeight: 1.8, maxWidth: 280 }}>{store?.hero?.subtitle}</p>
-            <p style={{ color: '#8A7A85', fontSize: 12, marginTop: 18 }}>© {year} {store?.name}. جميع الحقوق محفوظة.</p>
+            <p style={{ color: '#8A7A85', fontSize: 12, marginTop: 18 }}>© {year} {store?.name}. {t.rightsReserved}</p>
           </div>
           <div>
-            <h4 style={{ fontFamily: FONT_HEAD, fontSize: 16, marginBottom: 16, color: GOLD }}>روابط سريعة</h4>
+            <h4 style={{ fontFamily: FONT_HEAD, fontSize: 16, marginBottom: 16, color: GOLD }}>{t.quickLinks}</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {links.map((l) => (
+              {navLinks.map((l) => (
                 <Link key={l.h} href={l.h} style={{ color: '#C9B8C4', textDecoration: 'none', fontSize: 14 }}>{l.l}</Link>
               ))}
             </div>
           </div>
           <div>
-            <h4 style={{ fontFamily: FONT_HEAD, fontSize: 16, marginBottom: 16, color: GOLD }}>تواصل معنا</h4>
+            <h4 style={{ fontFamily: FONT_HEAD, fontSize: 16, marginBottom: 16, color: GOLD }}>{t.legalNav}</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {legalLinks.map((l) => (
+                <Link key={l.h} href={l.h} style={{ color: '#C9B8C4', textDecoration: 'none', fontSize: 14 }}>{l.l}</Link>
+              ))}
+            </div>
+          </div>
+          <div>
+            <h4 style={{ fontFamily: FONT_HEAD, fontSize: 16, marginBottom: 16, color: GOLD }}>{t.contactSect}</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {store?.contact?.phone && (
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#C9B8C4', fontSize: 14 }}><Phone size={15} /> {store.contact.phone}</span>
@@ -565,7 +737,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div className="card-img" style={{ position: 'relative', aspectRatio: '1/1', background: AL }}>
           {discount > 0 && (
             <span style={{ position: 'absolute', top: 12, right: 12, zIndex: 2, background: A, color: '#fff', fontSize: 11, fontWeight: 800, padding: '5px 10px', borderRadius: 999 }}>
-              {`خصم %${discount}`}
+              -{discount}%
             </span>
           )}
           {img && !imgErr ? (
@@ -587,7 +759,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
             {product.name}
           </h3>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={{ fontWeight: 800, fontSize: 17, color: A }}>{fmt(price)} {store?.currency || 'دج'}</span>
+            <span style={{ fontWeight: 800, fontSize: 17, color: A }}>{fmt(price)} {store?.currency || 'DZD'}</span>
             {priceOriginal && priceOriginal > price && (
               <span style={{ fontSize: 13, color: SUB, textDecoration: 'line-through' }}>{fmt(priceOriginal)}</span>
             )}
@@ -602,6 +774,8 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
    Home
    ============================================================ */
 export function Home({ store, page }: any) {
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
   const searchParams = useSearchParams();
   const activeCategory = searchParams.get('category');
   const products: Product[] = store?.products || [];
@@ -612,16 +786,16 @@ export function Home({ store, page }: any) {
   return (
     <div>
       {/* Hero */}
-      <section style={{ position: 'relative', overflow: 'hidden', background: `linear-gradient(135deg, ${AL} 0%, ${GOLD_L} 100%)`, minHeight: 'clamp(480px, 68vh, 760px)', display: 'flex', alignItems: 'center' }}>
+      <section dir={t.dir} style={{ position: 'relative', overflow: 'hidden', background: `linear-gradient(135deg, ${AL} 0%, ${GOLD_L} 100%)`, minHeight: 'clamp(480px, 68vh, 760px)', display: 'flex', alignItems: 'center' }}>
         <div className="container" style={{ width: '100%', padding: '3rem 1.5rem' }}>
           {/* Marquee ticker */}
           <div className="hero-badge" style={{ overflow: 'hidden', whiteSpace: 'nowrap', marginBottom: 24, borderTop: `1px solid ${BD}`, borderBottom: `1px solid ${BD}`, padding: '8px 0' }}>
             <div style={{ display: 'inline-flex', gap: 40, animation: 'marquee 18s linear infinite', width: 'max-content' }}>
               {[...Array(2)].map((_, i) => (
                 <React.Fragment key={i}>
-                  {['الأكثر مبيعاً', 'مجموعات هدايا', 'عطور يومية', 'إصدار جديد', 'عروض محدودة'].map((t) => (
-                    <span key={t} style={{ fontFamily: FONT_HEAD, fontWeight: 700, fontSize: 13, letterSpacing: 1, color: AD, display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <Sparkles size={13} color={GOLD} /> {t}
+                  {(t.heroBadgeItems as string[]).map((item) => (
+                    <span key={item} style={{ fontFamily: FONT_HEAD, fontWeight: 700, fontSize: 13, letterSpacing: 1, color: AD, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Sparkles size={13} color={GOLD} /> {item}
                     </span>
                   ))}
                 </React.Fragment>
@@ -633,19 +807,19 @@ export function Home({ store, page }: any) {
             <div>
               <h1
                 className="hero-title"
-                style={{ fontFamily: FONT_HEAD, fontWeight: 700, fontSize: 'clamp(2rem, 6vw, 3.6rem)', lineHeight: 1.15, margin: '0 0 18px', color: TXT }}
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store?.hero?.title || 'عطورك المُوقّعة، كل يوم') }}
+                style={{ fontFamily: FONT_HEAD, fontWeight: 700, fontSize: 'clamp(2rem, 6vw, 3.6rem)', lineHeight: 1.15, margin: '0 0 18px', color: TXT, textAlign: isRTL ? 'right' : 'left' }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store?.hero?.title || t.heroTitle) }}
               />
-              <p className="hero-sub" style={{ fontSize: 'clamp(1rem, 2vw, 1.15rem)', color: SUB, lineHeight: 1.8, margin: '0 0 30px', maxWidth: 460 }}>
-                {store?.hero?.subtitle || 'مجموعة مختارة من العطور اليومية ومجموعات الهدايا المميزة، بجودة عالية وأسعار مناسبة.'}
+              <p className="hero-sub" style={{ fontSize: 'clamp(1rem, 2vw, 1.15rem)', color: SUB, lineHeight: 1.8, margin: '0 0 30px', maxWidth: 460, textAlign: isRTL ? 'right' : 'left' }}>
+                {store?.hero?.subtitle || t.heroSub}
               </p>
-              <div className="hero-cta" style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+              <div className="hero-cta" style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: isRTL ? 'flex-start' : 'flex-start' }}>
                 <a href="#products" className="btn-primary" style={{ background: A, color: '#fff', fontWeight: 700, padding: '15px 30px', borderRadius: 999, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 44 }}>
-                  تسوّق الآن <ChevronLeft size={16} />
+                  {t.shopNow} {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
                 </a>
                 {store?.cart !== false && (
                   <Link href="/cart" style={{ border: `1.5px solid ${TXT}`, color: TXT, fontWeight: 700, padding: '15px 30px', borderRadius: 999, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 44 }}>
-                    <ShoppingBag size={16} /> السلة
+                    <ShoppingBag size={16} /> {t.cart}
                   </Link>
                 )}
               </div>
@@ -666,15 +840,10 @@ export function Home({ store, page }: any) {
       {/* Trust bar */}
       <section style={{ borderBottom: `1px solid ${BD}`, background: CARD }}>
         <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 20, padding: '2rem 1.5rem' }}>
-          {[
-            { icon: <Truck size={20} color={A} />, t: 'توصيل سريع لكل الولايات' },
-            { icon: <ShieldCheck size={20} color={A} />, t: 'جودة أصلية مضمونة' },
-            { icon: <Gift size={20} color={A} />, t: 'تغليف هدايا فاخر' },
-            { icon: <Headphones size={20} color={A} />, t: 'دعم متواصل' },
-          ].map((it, i) => (
+          {[Truck, ShieldCheck, Gift, Headphones].map((Icon, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 42, height: 42, borderRadius: 12, background: AL, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{it.icon}</div>
-              <span style={{ fontSize: 13, fontWeight: 600 }}>{it.t}</span>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: AL, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><Icon size={20} color={A} /></div>
+              <span style={{ fontSize: 13, fontWeight: 600 }}>{(t.trustItems as string[])[i]}</span>
             </div>
           ))}
         </div>
@@ -685,7 +854,7 @@ export function Home({ store, page }: any) {
         <section className="container" style={{ padding: '2.5rem 1.5rem 0' }}>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <Link href="/" className={`cat-chip ${!activeCategory ? 'active' : ''}`} style={{ padding: '10px 20px', borderRadius: 999, border: `1.5px solid ${BD}`, textDecoration: 'none', color: TXT, fontWeight: 700, fontSize: 13.5 }}>
-              الكل
+              {t.all}
             </Link>
             {cats.map((cat: any) => (
               <Link key={cat.id} href={`?category=${cat.id}`} className={`cat-chip ${activeCategory === String(cat.id) ? 'active' : ''}`} style={{ padding: '10px 20px', borderRadius: 999, border: `1.5px solid ${BD}`, textDecoration: 'none', color: TXT, fontWeight: 700, fontSize: 13.5 }}>
@@ -711,7 +880,7 @@ export function Home({ store, page }: any) {
           })}
         </div>
         {products.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '4rem 1rem', color: SUB }}>لا توجد منتجات متاحة حالياً.</div>
+          <div style={{ textAlign: 'center', padding: '4rem 1rem', color: SUB }}>{t.noProducts}</div>
         )}
 
         {countPage > 1 && (
@@ -736,7 +905,8 @@ export function Home({ store, page }: any) {
 /* ============================================================
    Details
    ============================================================ */
-export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
+export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
+  const t = T[getLang(store || product?.store)];
   const [sel, setSel] = useState(0);
   const images: string[] = allImages?.length ? allImages : (product.imagesProduct?.map((i: ProductImage) => i.imageUrl) || (product.productImage ? [product.productImage] : []));
 
@@ -752,7 +922,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Sparkles size={60} color={GOLD} /></div>
             )}
             {discount > 0 && (
-              <span style={{ position: 'absolute', top: 14, right: 14, background: A, color: '#fff', fontSize: 12, fontWeight: 800, padding: '6px 12px', borderRadius: 999 }}>{`خصم %${discount}`}</span>
+              <span style={{ position: 'absolute', top: 14, right: 14, background: A, color: '#fff', fontSize: 12, fontWeight: 800, padding: '6px 12px', borderRadius: 999 }}>{t.discountPre} {discount}%</span>
             )}
             {images.length > 1 && (
               <>
@@ -776,17 +946,17 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
         <div>
           <div style={{ display: 'flex', gap: 3, marginBottom: 10 }}>{[...Array(5)].map((_, i) => <Star key={i} size={15} fill={GOLD} color={GOLD} />)}</div>
           <h1 style={{ fontFamily: FONT_HEAD, fontSize: 'clamp(1.5rem,3vw,2.1rem)', fontWeight: 700, margin: '0 0 14px' }}>{product.name}</h1>
-          <div style={{ fontSize: 26, fontWeight: 800, color: A, marginBottom: 20 }}>{fmt(finalPrice)} {product.store && (product as any).currency || 'دج'}</div>
+          <div style={{ fontSize: 26, fontWeight: 800, color: A, marginBottom: 20 }}>{fmt(finalPrice)} {store?.currency || product?.store?.currency || 'DZD'}</div>
 
           {product.offers && product.offers.length > 0 && (
             <div style={{ marginBottom: 22 }}>
-              <div style={{ fontWeight: 700, marginBottom: 10, fontSize: 14 }}>اختر العرض</div>
+              <div style={{ fontWeight: 700, marginBottom: 10, fontSize: 14 }}>{t.offerLabel}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {product.offers.map((o: Offer) => (
                   <label key={o.id} style={{ display: 'flex', alignItems: 'center', gap: 10, border: `1.5px solid ${selectedOffer === o.id ? A : BD}`, borderRadius: 14, padding: '12px 16px', cursor: 'pointer', background: selectedOffer === o.id ? AL : CARD }}>
                     <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} />
                     <span style={{ fontWeight: 600, fontSize: 14, flex: 1 }}>{o.name} ({o.quantity})</span>
-                    <span style={{ fontWeight: 800, color: A }}>{fmt(o.price)} دج</span>
+                    <span style={{ fontWeight: 800, color: A }}>{fmt(o.price)} {store?.currency || 'DZD'}</span>
                   </label>
                 ))}
               </div>
@@ -799,23 +969,28 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                 {attr.variants.map((v) => {
                   const active = selectedVariants[attr.name] === v.value;
+                  const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
+                    Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(
+                      ([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)
+                    )
+                  );
                   if (attr.displayMode === 'color') {
-                    return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: 34, height: 34, borderRadius: '50%', background: v.value, border: `2px solid ${active ? A : BD}`, cursor: 'pointer', boxShadow: active ? `0 0 0 3px ${AL}` : 'none' }} />;
+                    return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: 34, height: 34, borderRadius: '50%', background: v.value, border: `2px solid ${active ? A : BD}`, cursor: available ? 'pointer' : 'not-allowed', boxShadow: active ? `0 0 0 3px ${AL}` : 'none', opacity: available ? 1 : 0.35 }} />;
                   }
                   if (attr.displayMode === 'image') {
-                    return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ width: 54, height: 54, borderRadius: 10, overflow: 'hidden', border: `2px solid ${active ? A : BD}`, padding: 0, cursor: 'pointer' }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>;
+                    return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: 54, height: 54, borderRadius: 10, overflow: 'hidden', border: `2px solid ${active ? A : BD}`, padding: 0, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>;
                   }
-                  return <button key={v.id} onClick={() => handleVariantSelection(attr.name, v.value)} style={{ padding: '9px 18px', borderRadius: 999, border: `1.5px solid ${active ? A : BD}`, background: active ? AL : CARD, color: active ? A : TXT, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>{v.name}</button>;
+                  return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ padding: '9px 18px', borderRadius: 999, border: `1.5px solid ${active ? A : BD}`, background: active ? AL : CARD, color: active ? A : (available ? TXT : '#bbb'), fontWeight: 700, fontSize: 13, cursor: available ? 'pointer' : 'not-allowed', textDecoration: available ? 'none' : 'line-through' }}>{v.name}</button>;
                 })}
               </div>
             </div>
           ))}
 
-          <ProductForm product={product} userId={product.store?.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
+          <ProductForm product={product} userId={product.store?.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store} />
 
           {product.desc && (
             <div style={{ marginTop: 30, paddingTop: 26, borderTop: `1px solid ${BD}` }}>
-              <h3 style={{ fontFamily: FONT_HEAD, fontSize: 17, marginBottom: 12 }}>الوصف</h3>
+              <h3 style={{ fontFamily: FONT_HEAD, fontSize: 17, marginBottom: 12 }}>{t.descTitle}</h3>
               <div style={{ fontSize: 14, lineHeight: 1.9, color: SUB }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc) }} />
             </div>
           )}
@@ -828,7 +1003,8 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 /* ============================================================
    ProductForm
    ============================================================ */
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
+export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: any) {
+  const t = T[getLang(store || product?.store)];
   const router = useRouter();
   const initCount = useCartStore((s: any) => s.initCount);
 
@@ -877,10 +1053,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!fd.customerName.trim()) e.customerName = 'الاسم مطلوب';
-    if (!PHONE_RE.test(fd.customerPhone)) e.customerPhone = 'رقم هاتف غير صحيح';
-    if (!fd.customerWelaya) e.customerWelaya = 'اختر الولاية';
-    if (!fd.customerCommune) e.customerCommune = 'اختر البلدية';
+    if (!fd.customerName.trim()) e.customerName = t.errName;
+    if (!PHONE_RE.test(fd.customerPhone)) e.customerPhone = t.errPhoneInvalid;
+    if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
+    if (!fd.customerCommune) e.customerCommune = t.errCommune;
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -942,21 +1118,21 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         {canCart && (
           <button onClick={addToCart} className="btn-primary" style={{ ...btnPrimary, background: 'transparent', color: A, border: `1.5px solid ${A}`, flex: 1 }}>
-            {added ? <><Check size={17} /> أُضيف للسلة</> : <><ShoppingBag size={17} /> أضف للسلة</>}
+            {added ? <><Check size={17} /> {t.addedBtn}</> : <><ShoppingBag size={17} /> {t.addBtn}</>}
           </button>
         )}
-        <button onClick={() => setIsOrderNow(true)} className="btn-primary" style={{ ...btnPrimary, flex: 1 }}>اطلب الآن</button>
+        <button onClick={() => setIsOrderNow(true)} className="btn-primary" style={{ ...btnPrimary, flex: 1 }}>{t.orderNow}</button>
       </div>
 
       {isOrderNow && (
         <div style={{ marginTop: 24, padding: 22, borderRadius: 18, background: CARD, border: `1px solid ${BD}` }}>
           <div className="form-row-2">
             <div>
-              <input placeholder="الاسم الكامل" value={fd.customerName} onChange={(e) => setFd((s) => ({ ...s, customerName: e.target.value }))} className="input-field" style={{ ...inputBase, ...(errors.customerName ? { borderColor: '#EF4444' } : {}) }} />
+              <input placeholder={t.fullName} value={fd.customerName} onChange={(e) => setFd((s) => ({ ...s, customerName: e.target.value }))} className="input-field" style={{ ...inputBase, ...(errors.customerName ? { borderColor: '#EF4444' } : {}) }} />
               {errors.customerName && <p style={{ fontSize: 12, color: '#EF4444', marginTop: 5, display: 'flex', alignItems: 'center', gap: 4 }}><AlertCircle size={11} /> {errors.customerName}</p>}
             </div>
             <div>
-              <input placeholder="رقم الهاتف" value={fd.customerPhone} onChange={(e) => setFd((s) => ({ ...s, customerPhone: e.target.value }))} className="input-field" style={{ ...inputBase, ...(errors.customerPhone ? { borderColor: '#EF4444' } : {}) }} />
+              <input placeholder={t.phonePh} value={fd.customerPhone} onChange={(e) => setFd((s) => ({ ...s, customerPhone: e.target.value }))} className="input-field" style={{ ...inputBase, ...(errors.customerPhone ? { borderColor: '#EF4444' } : {}) }} />
               {errors.customerPhone && <p style={{ fontSize: 12, color: '#EF4444', marginTop: 5, display: 'flex', alignItems: 'center', gap: 4 }}><AlertCircle size={11} /> {errors.customerPhone}</p>}
             </div>
           </div>
@@ -965,36 +1141,36 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <div style={{ position: 'relative' }}>
               <ChevronDown size={12} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
               <select disabled={wilayas.length === 0} value={fd.customerWelaya} onChange={(e) => setFd((s) => ({ ...s, customerWelaya: e.target.value, customerCommune: '' }))} className="input-field" style={{ ...inputBase, paddingLeft: 36, ...(errors.customerWelaya ? { borderColor: '#EF4444' } : {}) }}>
-                <option value="">{wilayas.length === 0 ? 'التوصيل غير متاح حالياً' : 'اختر الولاية'}</option>
+                <option value="">{wilayas.length === 0 ? t.wilayaNA : t.wilayaPh}</option>
                 {wilayas.map((w) => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
               </select>
             </div>
             <div style={{ position: 'relative' }}>
               <ChevronDown size={12} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
               <select disabled={!fd.customerWelaya || loadingC} value={fd.customerCommune} onChange={(e) => setFd((s) => ({ ...s, customerCommune: e.target.value }))} className="input-field" style={{ ...inputBase, paddingLeft: 36, ...(errors.customerCommune ? { borderColor: '#EF4444' } : {}) }}>
-                <option value="">{loadingC ? 'جاري التحميل...' : 'اختر البلدية'}</option>
+                <option value="">{loadingC ? t.communeLoading : t.communePh}</option>
                 {communes.map((c) => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
             </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
-            {(['home', 'office'] as const).map((t) => (
-              <button key={t} onClick={() => setFd((s) => ({ ...s, typeLivraison: t }))} style={{
+            {(['home', 'office'] as const).map((typ) => (
+              <button key={typ} onClick={() => setFd((s) => ({ ...s, typeLivraison: typ }))} style={{
                 padding: '12px', borderRadius: 12, fontWeight: 700, fontSize: 13.5, cursor: 'pointer', minHeight: 44,
-                background: fd.typeLivraison === t ? AL : 'transparent', border: `1.5px solid ${fd.typeLivraison === t ? A : BD}`, color: fd.typeLivraison === t ? A : TXT,
+                background: fd.typeLivraison === typ ? AL : 'transparent', border: `1.5px solid ${fd.typeLivraison === typ ? A : BD}`, color: fd.typeLivraison === typ ? A : TXT,
               }}>
-                {t === 'home' ? 'توصيل للمنزل' : 'توصيل للمكتب'}
+                {typ === 'home' ? t.deliveryHome : t.deliveryOffice}
               </button>
             ))}
           </div>
 
           <div style={{ background: BG, borderRadius: 14, padding: 16, marginBottom: 18 }}>
             {[
-              { l: 'السعر', v: `${fmt(fp)} دج` },
-              { l: 'الكمية', v: `× ${fd.quantity}` },
-              { l: 'التوصيل', v: selW ? `${fmt(getLiv())} دج` : '—' },
-              { l: 'الإجمالي', v: `${fmt(total())} دج`, bold: true },
+              { l: t.price, v: `${fmt(fp)} ${store?.currency || 'DZD'}` },
+              { l: t.qty, v: `× ${fd.quantity}` },
+              { l: t.delivery, v: selW ? `${fmt(getLiv())} ${store?.currency || 'DZD'}` : '—' },
+              { l: t.total, v: `${fmt(total())} ${store?.currency || 'DZD'}`, bold: true },
             ].map((row) => (
               <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '6px 0' }}>
                 <span style={{ flexShrink: 0, fontSize: row.bold ? 15 : 13.5, fontWeight: row.bold ? 800 : 500, color: row.bold ? TXT : SUB }}>{row.l}</span>
@@ -1005,10 +1181,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
           <div style={{ display: 'flex', gap: 10 }}>
             <button onClick={submitOrder} disabled={submitting} className="btn-primary" style={{ ...btnPrimary, flex: 1, opacity: submitting ? 0.65 : 1, cursor: submitting ? 'default' : 'pointer' }}>
-              {submitting ? 'جاري الإرسال...' : 'تأكيد الطلب'}
+              {submitting ? t.sending : t.confirmOrder}
             </button>
             <button onClick={() => setIsOrderNow(false)} disabled={submitting} style={{ padding: '0.9rem 1.5rem', minHeight: 44, background: 'transparent', color: TXT, border: `1.5px solid ${BD}`, borderRadius: 14, fontWeight: 700, cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.65 : 1, fontFamily: 'inherit' }}>
-              إلغاء
+              {t.cancelBtn}
             </button>
           </div>
         </div>
@@ -1021,6 +1197,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
    Cart
    ============================================================ */
 export function Cart({ domain, store }: any) {
+  const t = T[getLang(store)];
   const router = useRouter();
   const initCount = useCartStore((s: any) => s.initCount);
   const [items, setItems] = useState<any[]>([]);
@@ -1062,10 +1239,10 @@ export function Cart({ domain, store }: any) {
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!fd.customerName.trim()) e.customerName = 'الاسم مطلوب';
-    if (!PHONE_RE.test(fd.customerPhone)) e.customerPhone = 'رقم هاتف غير صحيح';
-    if (!fd.customerWelaya) e.customerWelaya = 'اختر الولاية';
-    if (!fd.customerCommune) e.customerCommune = 'اختر البلدية';
+    if (!fd.customerName.trim()) e.customerName = t.errName;
+    if (!PHONE_RE.test(fd.customerPhone)) e.customerPhone = t.errPhoneInvalid;
+    if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
+    if (!fd.customerCommune) e.customerCommune = t.errCommune;
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -1099,9 +1276,9 @@ export function Cart({ domain, store }: any) {
         <div style={{ width: 80, height: 80, borderRadius: '50%', background: AL, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
           <Check size={36} color={A} />
         </div>
-        <h2 style={{ fontFamily: FONT_HEAD, fontSize: 24, marginBottom: 10 }}>تم إرسال طلبك بنجاح</h2>
-        <p style={{ color: SUB, marginBottom: 26 }}>سيتم التواصل معك قريباً لتأكيد الطلب.</p>
-        <Link href="/" style={{ background: A, color: '#fff', padding: '14px 30px', borderRadius: 999, textDecoration: 'none', fontWeight: 700 }}>متابعة التسوق</Link>
+        <h2 style={{ fontFamily: FONT_HEAD, fontSize: 24, marginBottom: 10 }}>{t.successTitle}</h2>
+        <p style={{ color: SUB, marginBottom: 26 }}>{t.successDesc}</p>
+        <Link href="/" style={{ background: A, color: '#fff', padding: '14px 30px', borderRadius: 999, textDecoration: 'none', fontWeight: 700 }}>{t.continueShop}</Link>
       </div>
     );
   }
@@ -1110,16 +1287,16 @@ export function Cart({ domain, store }: any) {
     return (
       <div className="container" style={{ padding: '6rem 1.5rem', textAlign: 'center' }}>
         <ShoppingBag size={48} color={BD} style={{ marginBottom: 16 }} />
-        <h2 style={{ fontFamily: FONT_HEAD, fontSize: 22, marginBottom: 10 }}>سلتك فارغة</h2>
-        <p style={{ color: SUB, marginBottom: 26 }}>لم تقم بإضافة أي عطر بعد.</p>
-        <Link href="/" style={{ background: A, color: '#fff', padding: '14px 30px', borderRadius: 999, textDecoration: 'none', fontWeight: 700 }}>تسوّق الآن</Link>
+        <h2 style={{ fontFamily: FONT_HEAD, fontSize: 22, marginBottom: 10 }}>{t.cartEmpty}</h2>
+        <p style={{ color: SUB, marginBottom: 26 }}>{t.cartEmptyDesc}</p>
+        <Link href="/" style={{ background: A, color: '#fff', padding: '14px 30px', borderRadius: 999, textDecoration: 'none', fontWeight: 700 }}>{t.shopNow}</Link>
       </div>
     );
   }
 
   return (
     <div className="container" style={{ padding: '2.5rem 1.5rem 4rem' }}>
-      <h1 style={{ fontFamily: FONT_HEAD, fontSize: 26, marginBottom: 26 }}>سلة المشتريات</h1>
+      <h1 style={{ fontFamily: FONT_HEAD, fontSize: 26, marginBottom: 26 }}>{t.cartTitle}</h1>
       <div className="cart-inner">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {items.map((it, idx) => {
@@ -1131,8 +1308,8 @@ export function Cart({ domain, store }: any) {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 700, fontSize: 14.5, marginBottom: 4 }}>{it.product?.name}</div>
-                  <div style={{ fontSize: 13, color: SUB }}>الكمية: {it.quantity}</div>
-                  <div style={{ fontWeight: 800, color: A, marginTop: 4 }}>{fmt(Number(it.finalPrice) * Number(it.quantity))} دج</div>
+                  <div style={{ fontSize: 13, color: SUB }}>{t.qtyShort}: {it.quantity}</div>
+                  <div style={{ fontWeight: 800, color: A, marginTop: 4 }}>{fmt(Number(it.finalPrice) * Number(it.quantity))} {store?.currency || 'DZD'}</div>
                 </div>
                 <button onClick={() => removeItem(idx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', alignSelf: 'flex-start', minHeight: 44, minWidth: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Trash2 size={18} /></button>
               </div>
@@ -1142,52 +1319,52 @@ export function Cart({ domain, store }: any) {
 
         <div>
           <div style={{ background: CARD, borderRadius: 18, padding: 22, border: `1px solid ${BD}` }}>
-            <h3 style={{ fontFamily: FONT_HEAD, fontSize: 17, marginBottom: 16 }}>معلومات التوصيل</h3>
+            <h3 style={{ fontFamily: FONT_HEAD, fontSize: 17, marginBottom: 16 }}>{t.deliveryInfoTitle}</h3>
             <div className="form-row-2">
               <div>
-                <input placeholder="الاسم الكامل" value={fd.customerName} onChange={(e) => setFd((s) => ({ ...s, customerName: e.target.value }))} className="input-field" style={{ ...inputBase, ...(errors.customerName ? { borderColor: '#EF4444' } : {}) }} />
+                <input placeholder={t.fullName} value={fd.customerName} onChange={(e) => setFd((s) => ({ ...s, customerName: e.target.value }))} className="input-field" style={{ ...inputBase, ...(errors.customerName ? { borderColor: '#EF4444' } : {}) }} />
                 {errors.customerName && <p style={{ fontSize: 12, color: '#EF4444', marginTop: 5 }}>{errors.customerName}</p>}
               </div>
               <div>
-                <input placeholder="رقم الهاتف" value={fd.customerPhone} onChange={(e) => setFd((s) => ({ ...s, customerPhone: e.target.value }))} className="input-field" style={{ ...inputBase, ...(errors.customerPhone ? { borderColor: '#EF4444' } : {}) }} />
+                <input placeholder={t.phonePh} value={fd.customerPhone} onChange={(e) => setFd((s) => ({ ...s, customerPhone: e.target.value }))} className="input-field" style={{ ...inputBase, ...(errors.customerPhone ? { borderColor: '#EF4444' } : {}) }} />
                 {errors.customerPhone && <p style={{ fontSize: 12, color: '#EF4444', marginTop: 5 }}>{errors.customerPhone}</p>}
               </div>
             </div>
             <div className="form-row-2">
               <select disabled={wilayas.length === 0} value={fd.customerWelaya} onChange={(e) => setFd((s) => ({ ...s, customerWelaya: e.target.value, customerCommune: '' }))} className="input-field" style={inputBase}>
-                <option value="">{wilayas.length === 0 ? 'التوصيل غير متاح حالياً' : 'اختر الولاية'}</option>
+                <option value="">{wilayas.length === 0 ? t.wilayaNA : t.wilayaPh}</option>
                 {wilayas.map((w) => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
               </select>
               <select disabled={!fd.customerWelaya || loadingC} value={fd.customerCommune} onChange={(e) => setFd((s) => ({ ...s, customerCommune: e.target.value }))} className="input-field" style={inputBase}>
-                <option value="">{loadingC ? 'جاري التحميل...' : 'اختر البلدية'}</option>
+                <option value="">{loadingC ? t.communeLoading : t.communePh}</option>
                 {communes.map((c) => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
-              {(['home', 'office'] as const).map((t) => (
-                <button key={t} onClick={() => setFd((s) => ({ ...s, typeLivraison: t }))} style={{ padding: '12px', borderRadius: 12, fontWeight: 700, fontSize: 13.5, cursor: 'pointer', minHeight: 44, background: fd.typeLivraison === t ? AL : 'transparent', border: `1.5px solid ${fd.typeLivraison === t ? A : BD}`, color: fd.typeLivraison === t ? A : TXT }}>
-                  {t === 'home' ? 'توصيل للمنزل' : 'توصيل للمكتب'}
+              {(['home', 'office'] as const).map((typ) => (
+                <button key={typ} onClick={() => setFd((s) => ({ ...s, typeLivraison: typ }))} style={{ padding: '12px', borderRadius: 12, fontWeight: 700, fontSize: 13.5, cursor: 'pointer', minHeight: 44, background: fd.typeLivraison === typ ? AL : 'transparent', border: `1.5px solid ${fd.typeLivraison === typ ? A : BD}`, color: fd.typeLivraison === typ ? A : TXT }}>
+                  {typ === 'home' ? t.deliveryHome : t.deliveryOffice}
                 </button>
               ))}
             </div>
 
             <div style={{ background: BG, borderRadius: 14, padding: 16, marginBottom: 18 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '6px 0' }}>
-                <span style={{ flexShrink: 0, fontSize: 13.5, color: SUB }}>المجموع</span>
-                <span style={{ whiteSpace: 'nowrap', fontWeight: 600 }}>{fmt(cartTotal)} دج</span>
+                <span style={{ flexShrink: 0, fontSize: 13.5, color: SUB }}>{t.subtotalLbl}</span>
+                <span style={{ whiteSpace: 'nowrap', fontWeight: 600 }}>{fmt(cartTotal)} {store?.currency || 'DZD'}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '6px 0' }}>
-                <span style={{ flexShrink: 0, fontSize: 13.5, color: SUB }}>التوصيل</span>
-                <span style={{ whiteSpace: 'nowrap', fontWeight: 600 }}>{selW ? `${fmt(getLiv())} دج` : '—'}</span>
+                <span style={{ flexShrink: 0, fontSize: 13.5, color: SUB }}>{t.delivery}</span>
+                <span style={{ whiteSpace: 'nowrap', fontWeight: 600 }}>{selW ? `${fmt(getLiv())} ${store?.currency || 'DZD'}` : '—'}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '10px 0 0', borderTop: `1px solid ${BD}`, marginTop: 6 }}>
-                <span style={{ flexShrink: 0, fontSize: 15, fontWeight: 800 }}>الإجمالي</span>
-                <span style={{ whiteSpace: 'nowrap', fontWeight: 800, fontSize: 16, color: A }}>{fmt(finalTotal)} دج</span>
+                <span style={{ flexShrink: 0, fontSize: 15, fontWeight: 800 }}>{t.total}</span>
+                <span style={{ whiteSpace: 'nowrap', fontWeight: 800, fontSize: 16, color: A }}>{fmt(finalTotal)} {store?.currency || 'DZD'}</span>
               </div>
             </div>
 
             <button onClick={submit} disabled={submitting} style={{ width: '100%', minHeight: 44, background: A, color: '#fff', fontWeight: 700, border: 'none', borderRadius: 14, padding: '14px', cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.65 : 1, fontFamily: 'inherit' }}>
-              {submitting ? 'جاري الإرسال...' : 'تأكيد الطلب'}
+              {submitting ? t.sending : t.confirmOrder}
             </button>
           </div>
         </div>
@@ -1199,9 +1376,10 @@ export function Cart({ domain, store }: any) {
 /* ============================================================
    Static Pages
    ============================================================ */
-function Shell({ title, children }: any) {
+function Shell({ title, children, store }: any) {
+  const t = T[getLang(store)];
   return (
-    <div>
+    <div dir={t.dir}>
       <div style={{ background: `linear-gradient(135deg, ${TXT}, #3a1f33)`, color: '#fff', padding: '4rem 1.5rem', textAlign: 'center' }}>
         <h1 style={{ fontFamily: FONT_HEAD, fontSize: 'clamp(1.8rem,4vw,2.6rem)' }}>{title}</h1>
       </div>
@@ -1218,35 +1396,38 @@ function InfoBlock({ title, body }: any) {
   );
 }
 
-export function Privacy() {
+export function Privacy({ store }: any) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="سياسة الخصوصية">
-      <InfoBlock title="جمع المعلومات" body="نقوم بجمع المعلومات الضرورية فقط لإتمام عملية الشراء وتوصيل طلبك، مثل الاسم ورقم الهاتف والعنوان." />
-      <InfoBlock title="استخدام المعلومات" body="تُستخدم بياناتك حصرياً لمعالجة الطلبات والتواصل معك بخصوصها، ولا تتم مشاركتها مع أي طرف ثالث." />
-      <InfoBlock title="حماية البيانات" body="نتخذ إجراءات أمنية معقولة لحماية معلوماتك الشخصية من أي وصول غير مصرح به." />
+    <Shell title={t.privacyTitle} store={store}>
+      <InfoBlock title={t.privacyData} body={t.privacyDataBody} />
+      <InfoBlock title={t.privacyProtect} body={t.privacyProtectBody} />
+      <InfoBlock title={t.privacyShare} body={t.privacyShareBody} />
     </Shell>
   );
 }
-export function Terms() {
+export function Terms({ store }: any) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="الشروط والأحكام">
-      <InfoBlock title="الطلبات" body="يتم تأكيد الطلب بعد التواصل الهاتفي مع العميل، ويحق للمتجر إلغاء أي طلب مشبوه." />
-      <InfoBlock title="الأسعار" body="جميع الأسعار المعروضة تشمل المنتج فقط، ويُضاف سعر التوصيل حسب الولاية المختارة." />
-      <InfoBlock title="الإرجاع والاستبدال" body="يمكن إرجاع المنتج في حال وجود عيب مصنعي خلال مدة محددة من الاستلام." />
+    <Shell title={t.termsTitle} store={store}>
+      <InfoBlock title={t.termsAccount} body={t.termsAccountBody} />
+      <InfoBlock title={t.termsOrders} body={t.termsOrdersBody} />
+      <InfoBlock title={t.termsLaw} body={t.termsLawBody} />
     </Shell>
   );
 }
-export function Cookies() {
+export function Cookies({ store }: any) {
+  const t = T[getLang(store)];
   return (
-    <Shell title="سياسة ملفات تعريف الارتباط">
-      <InfoBlock title="ما هي الكوكيز" body="هي ملفات صغيرة تُخزَّن في متصفحك لتحسين تجربة تصفحك للموقع." />
-      <InfoBlock title="كيف نستخدمها" body="نستخدمها لحفظ محتوى سلتك ولتحليل استخدام الموقع لتحسين خدماتنا." />
-      <InfoBlock title="التحكم بالكوكيز" body="يمكنك تعطيل الكوكيز من إعدادات متصفحك، مع العلم أن ذلك قد يؤثر على بعض الوظائف." />
+    <Shell title={t.cookiesTitle} store={store}>
+      <InfoBlock title={t.cookiesEssential} body={t.cookiesEssentialBody} />
+      <InfoBlock title={t.cookiesExp} body={t.cookiesExpBody} />
     </Shell>
   );
 }
 
 export function Contact({ store }: any) {
+  const t = T[getLang(store)];
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
@@ -1266,7 +1447,7 @@ export function Contact({ store }: any) {
   };
 
   return (
-    <Shell title="تواصل معنا">
+    <Shell title={t.contactSect} store={store}>
       <div className="details-inner">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           {store?.contact?.phone && <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><div style={{ width: 42, height: 42, borderRadius: 12, background: AL, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Phone size={18} color={A} /></div><span>{store.contact.phone}</span></div>}
@@ -1277,17 +1458,17 @@ export function Contact({ store }: any) {
         {sent ? (
           <div style={{ background: CARD, borderRadius: 18, padding: 30, border: `1px solid ${BD}`, textAlign: 'center' }}>
             <Check size={36} color={A} style={{ marginBottom: 12 }} />
-            <p style={{ marginBottom: 18 }}>تم إرسال رسالتك بنجاح، سنتواصل معك قريباً.</p>
-            <button onClick={() => { setSent(false); setForm({ name: '', email: '', phone: '', message: '' }); }} style={{ background: A, color: '#fff', border: 'none', borderRadius: 12, padding: '12px 22px', fontWeight: 700, cursor: 'pointer' }}>إرسال رسالة أخرى</button>
+            <p style={{ marginBottom: 18 }}>{t.sentMsg}</p>
+            <button onClick={() => { setSent(false); setForm({ name: '', email: '', phone: '', message: '' }); }} style={{ background: A, color: '#fff', border: 'none', borderRadius: 12, padding: '12px 22px', fontWeight: 700, cursor: 'pointer' }}>{t.sendAnother}</button>
           </div>
         ) : (
           <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 14, background: CARD, borderRadius: 18, padding: 24, border: `1px solid ${BD}` }}>
-            <input required placeholder="الاسم" value={form.name} onChange={(e) => setForm((s) => ({ ...s, name: e.target.value }))} className="input-field" style={inputBase} />
-            <input required type="email" placeholder="البريد الإلكتروني" value={form.email} onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))} className="input-field" style={inputBase} />
-            <input placeholder="رقم الهاتف" value={form.phone} onChange={(e) => setForm((s) => ({ ...s, phone: e.target.value }))} className="input-field" style={inputBase} />
-            <textarea required rows={5} placeholder="رسالتك" value={form.message} onChange={(e) => setForm((s) => ({ ...s, message: e.target.value }))} className="input-field" style={{ ...inputBase, resize: 'none' }} />
+            <input required placeholder={t.fullName} value={form.name} onChange={(e) => setForm((s) => ({ ...s, name: e.target.value }))} className="input-field" style={inputBase} />
+            <input required type="email" placeholder={t.emailPh} value={form.email} onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))} className="input-field" style={inputBase} />
+            <input placeholder={t.phone} value={form.phone} onChange={(e) => setForm((s) => ({ ...s, phone: e.target.value }))} className="input-field" style={inputBase} />
+            <textarea required rows={5} placeholder={t.messagePh} value={form.message} onChange={(e) => setForm((s) => ({ ...s, message: e.target.value }))} className="input-field" style={{ ...inputBase, resize: 'none' }} />
             <button type="submit" disabled={sending} style={{ background: A, color: '#fff', border: 'none', borderRadius: 12, padding: '13px', fontWeight: 700, cursor: sending ? 'default' : 'pointer', opacity: sending ? 0.65 : 1, minHeight: 44 }}>
-              {sending ? 'جاري الإرسال...' : 'إرسال'}
+              {sending ? t.sending : t.sendBtn}
             </button>
           </form>
         )}
@@ -1298,9 +1479,9 @@ export function Contact({ store }: any) {
 
 export function StaticPage({ staticPage, page, store }: any) {
   const p = (staticPage || page || '').toLowerCase();
-  if (p === 'privacy') return <Privacy />;
-  if (p === 'terms') return <Terms />;
-  if (p === 'cookies') return <Cookies />;
+  if (p === 'privacy') return <Privacy store={store} />;
+  if (p === 'terms') return <Terms store={store} />;
+  if (p === 'cookies') return <Cookies store={store} />;
   if (p === 'contact') return <Contact store={store} />;
   return null;
 }
