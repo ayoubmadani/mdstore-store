@@ -242,7 +242,7 @@ const CSS = `
 `;
 
 /* ── TYPES ──────────────────────────────────────────────────── */
-interface Offer { id: string; name: string; quantity: number; price: number; }
+interface Offer { id: string; name: string; quantity: number; price: number; subTitle?: string; shippingFree?: boolean; }
 interface Variant { id: string; name: string; value: string; }
 interface Attribute { id: string; type: string; name: string; displayMode?: 'color' | 'image' | 'text' | null; variants: Variant[]; }
 interface ProductImage { id: string; imageUrl: string; }
@@ -253,8 +253,8 @@ interface Commune { id: string; name: string; ar_name: string; wilayaId: string;
 export interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
-  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-  store: { id: string; name: string; subdomain: string; userId: string; cart: boolean; };
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+  store: { id: string; name: string; subdomain: string; userId: string; cart: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 export interface ProductFormProps {
   product: Product; userId: string; domain: string; redirectPath?: string;
@@ -423,10 +423,20 @@ const jsonAr = {
   successTitle: 'تم استلام طلبك!',
   successDesc: 'شكراً لثقتك. سنتصل بك قريباً لتأكيد الطلب وترتيب التوصيل 🎮',
   backToShop: 'العودة للمتجر',
+  successSteps: [
+    { title: 'تم استلام طلبك', desc: 'تم تسجيل طلبك بنجاح في نظامنا' },
+    { title: 'تأكيد الطلب', desc: 'سنتصل بك خلال 24 ساعة' },
+    { title: 'التجهيز والتغليف', desc: 'يتم تجهيز طلبك بعناية' },
+    { title: 'الشحن والتوصيل', desc: '2-5 أيام عمل' },
+  ],
   checkoutTitle: 'إتمام الطلب',
   // Product
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
+  freeShippingBadge: 'توصيل مجاني',
+  freeShippingThreshold: 'توصيل مجاني عند الشراء بأكثر من {{amount}}',
+  freeShippingRemaining: 'أضف {{amount}} لتحصل على توصيل مجاني',
+  freeShippingReached: 'مبروك! لديك توصيل مجاني 🎉',
   // Footer
   quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
@@ -608,10 +618,20 @@ const jsonFr = {
   successTitle: 'Commande reçue !',
   successDesc: 'Merci pour votre confiance. Nous vous contacterons bientôt pour confirmer la commande 🎮',
   backToShop: 'Retour à la boutique',
+  successSteps: [
+    { title: 'Commande reçue', desc: 'Votre commande a été enregistrée avec succès' },
+    { title: 'Confirmation', desc: 'Nous vous appellerons sous 24h' },
+    { title: 'Préparation', desc: 'Votre commande est préparée avec soin' },
+    { title: 'Livraison', desc: '2-5 jours ouvrables' },
+  ],
   checkoutTitle: 'Finaliser la commande',
   // Product
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
+  freeShippingBadge: 'Livraison gratuite',
+  freeShippingThreshold: 'Livraison gratuite à partir de {{amount}}',
+  freeShippingRemaining: 'Ajoutez {{amount}} pour bénéficier de la livraison gratuite',
+  freeShippingReached: 'Bravo ! Vous avez la livraison gratuite 🎉',
   // Footer
   quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
@@ -699,7 +719,17 @@ const jsonEn = {
   myCart: 'Cart', cartEmpty: 'Your cart is empty', cartEmptyDesc: "Add products to start shopping.",
   successTitle: 'Order received!', successDesc: "Thank you for your trust. We'll contact you soon to confirm your order 🎮",
   backToShop: 'Back to store', checkoutTitle: 'Complete order',
+  successSteps: [
+    { title: 'Order received', desc: 'Your order has been registered successfully' },
+    { title: 'Confirmation', desc: "We'll call you within 24 hours" },
+    { title: 'Packaging', desc: 'Your order is being prepared with care' },
+    { title: 'Shipping', desc: '2-5 business days' },
+  ],
   offersTitle: 'Available offers', descTitle: 'Description',
+  freeShippingBadge: 'Free Delivery',
+  freeShippingThreshold: 'Free delivery on orders over {{amount}}',
+  freeShippingRemaining: 'Add {{amount}} more to get free delivery',
+  freeShippingReached: 'Congrats! You have free delivery 🎉',
   quickLinks: 'Quick links', legalNav: 'Legal', contactSect: 'Contact us', privacy: 'Privacy', terms: 'Terms', rightsReserved: 'All rights reserved.',
   legalSub: '// Legal', privacyTitle: 'Privacy Policy', termsTitle: 'Terms of Use', cookiesTitle: 'Cookie Policy',
   privDataTitle: 'Data we collect', privDataBody: 'Only your name, phone number and delivery address — the minimum necessary to process your order.',
@@ -1012,6 +1042,11 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         {discount > 0 && (
           <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'var(--pink)', color: 'var(--white)', fontSize: '11px', fontWeight: 900, padding: '3px 10px', borderRadius: '2px', boxShadow: '0 0 10px rgba(255,0,128,0.4)', zIndex: 10 }}>
             -{discount}%
+          </div>
+        )}
+        {product.shippingFree && (
+          <div style={{ position: 'absolute', top: '10px', left: '10px', background: 'var(--cyan)', color: 'var(--navy-3)', fontSize: '11px', fontWeight: 900, padding: '3px 10px', borderRadius: '2px', boxShadow: '0 0 10px rgba(0,255,255,0.4)', zIndex: 10 }}>
+            🚚
           </div>
         )}
       </div>
@@ -1380,6 +1415,12 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
               </div>
             </div>
 
+            {(product.shippingFree || (store?.supportFreeShipping && store?.freeShippingMinAmount != null)) && (
+              <div style={{ marginBottom: '20px', padding: '10px 14px', border: '1px solid var(--cyan)', borderRadius: '6px', background: 'rgba(0,212,255,0.06)', fontSize: '12px', fontWeight: 700, color: 'var(--cyan)' }}>
+                🚚 {product.shippingFree ? t.freeShippingBadge : t.freeShippingThreshold.replace('{{amount}}', `${Number(store.freeShippingMinAmount).toLocaleString()} ${currency}`)}
+              </div>
+            )}
+
             {/* Offers */}
             {product.offers?.length > 0 && (
               <div style={{ marginBottom: '20px', paddingBottom: '20px', borderBottom: '1px solid var(--line)' }}>
@@ -1393,7 +1434,9 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                       <input type="radio" name="offer" value={offer.id} checked={selectedOffer === offer.id} onChange={() => setSelectedOffer(offer.id)} style={{ display: 'none' }} />
                       <div>
                         <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--white)', margin: 0 }}>{offer.name}</p>
+                        {offer.subTitle && <p style={{ fontSize: '11px', color: 'var(--mid)', margin: 0 }}>{offer.subTitle}</p>}
                         <p style={{ fontSize: '11px', color: 'var(--mid)', margin: 0 }}>{t.qtyLabel}: {offer.quantity}</p>
+                        {offer.shippingFree && <p style={{ fontSize: '11px', color: 'var(--cyan)', fontWeight: 700, margin: 0 }}>🚚 {t.freeShippingBadge}</p>}
                       </div>
                     </div>
                     <span className="neon-cyan orb" style={{ fontSize: '1.1rem', fontWeight: 900, textShadow: 'none' }}>
@@ -1481,11 +1524,20 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     }
     return base;
   }, [product, selectedOffer, selectedVariants]);
-  const getLiv = useCallback((): number => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; }, [selW, fd.typeLivraison]);
   useEffect(() => { if (selW) setFd(f => ({ ...f, priceLoss: selW.livraisonReturn })); }, [selW]);
 
   const fp = getFP();
-  const total = () => fp * fd.quantity + +getLiv();
+  const supportQty = (store?.supportQty ?? product?.store?.supportQty) !== false;
+  const qty = supportQty ? fd.quantity : 1;
+  const selOfferObj = product.offers?.find((o: any) => o.id === selectedOffer);
+  const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
+    (store?.supportFreeShipping && store?.freeShippingMinAmount != null && (fp * qty) >= Number(store.freeShippingMinAmount)));
+  const getLiv = useCallback((): number => {
+    if (orderFreeShipping) return 0;
+    if (!selW) return 0;
+    return Number(fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice);
+  }, [selW, fd.typeLivraison, orderFreeShipping]);
+  const total = () => fp * qty + getLiv();
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = t.errName;
@@ -1505,7 +1557,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const existing = localStorage.getItem(domain);
     const cart = existing ? JSON.parse(existing) : [];
     cart.push({
-      ...fd, product, variantDetailId: getVariantDetailId(),
+      ...fd, quantity: qty, product, variantDetailId: getVariantDetailId(),
       productId: product.id, storeId: product.store.id, userId,
       selectedOffer, selectedVariants,
       platform: platform || 'store',
@@ -1520,7 +1572,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); const er = validate(); if (Object.keys(er).length) { setErrors(er); return; } setErrors({}); setSub(true);
     try {
-      await axios.post(`${API_URL}/orders/create`, { ...fd, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVariantDetailId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+      await axios.post(`${API_URL}/orders/create`, { ...fd, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVariantDetailId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (typeof window !== 'undefined' && fd.customerId) localStorage.setItem('customerId', fd.customerId);
       router.push(`/successfully?productId=${product?.id}`);
     } catch (err) { console.error(err); } finally { setSub(false); }
@@ -1641,31 +1693,35 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                       {dtype === 'home' ? t.deliveryHome : t.deliveryOffice}
                     </p>
                     {selW && <p className="orb" style={{ fontSize: '1rem', fontWeight: 900, color: fd.typeLivraison === dtype ? 'var(--cyan)' : 'var(--dim)', margin: 0 }}>
-                      {(dtype === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()}
-                      <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '11px', marginInlineStart: '3px', color: 'var(--mid)' }}>{currency}</span>
+                      {orderFreeShipping ? t.freeShippingBadge : <>
+                        {Number(dtype === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()}
+                        <span style={{ fontFamily: "'Tajawal',sans-serif", fontWeight: 400, fontSize: '11px', marginInlineStart: '3px', color: 'var(--mid)' }}>{currency}</span>
+                      </>}
                     </p>}
                   </button>
                 ))}
               </div>
             </FR>
 
-            <FR label={t.qty}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid var(--line)', borderRadius: '6px', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }}>
-                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
-                  style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderInlineEnd: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.18s' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
-                  <Minus style={{ width: '12px', height: '12px' }} />
-                </button>
-                <span className="orb" style={{ width: '44px', textAlign: 'center', fontSize: '1.1rem', fontWeight: 900, color: 'var(--white)' }}>{fd.quantity}</span>
-                <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))}
-                  style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderInlineStart: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.18s' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
-                  <Plus style={{ width: '12px', height: '12px' }} />
-                </button>
-              </div>
-            </FR>
+            {supportQty && (
+              <FR label={t.qty}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid var(--line)', borderRadius: '6px', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }}>
+                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
+                    style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderInlineEnd: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.18s' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                    <Minus style={{ width: '12px', height: '12px' }} />
+                  </button>
+                  <span className="orb" style={{ width: '44px', textAlign: 'center', fontSize: '1.1rem', fontWeight: 900, color: 'var(--white)' }}>{fd.quantity}</span>
+                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))}
+                    style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderInlineStart: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.18s' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
+                    <Plus style={{ width: '12px', height: '12px' }} />
+                  </button>
+                </div>
+              </FR>
+            )}
 
             {/* Summary */}
             <div style={{ border: '1px solid var(--line)', borderRadius: '6px', marginBottom: '14px', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }}>
@@ -1676,8 +1732,8 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               {[
                 { l: t.productLabel, v: product.name.slice(0, 22) },
                 { l: t.price, v: `${fp.toLocaleString()} ${currency}` },
-                { l: t.qty, v: `× ${fd.quantity}` },
-                { l: t.delivery, v: selW ? `${getLiv().toLocaleString()} ${currency}` : '—' },
+                { l: t.qty, v: `× ${qty}` },
+                { l: t.delivery, v: !selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${getLiv().toLocaleString()} ${currency}` },
               ].map(row => (
                 <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 14px', borderBottom: '1px solid var(--line)' }}>
                   <span style={{ fontSize: '12px', color: 'var(--mid)' }}>{row.l}</span>
@@ -1734,13 +1790,22 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   }, [fd.customerWelaya]);
 
   const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
-  const getLivPrice = useCallback(() => { if (!selW) return 0; return fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice; }, [selW, fd.typeLivraison]);
   const cartTotal = cartItems.reduce((acc, item) => acc + (item.finalPrice * item.quantity), 0);
-  const finalTotal = cartTotal + +getLivPrice();
+
+  const hasFreeShippingItem = cartItems.some((it) => it.product?.shippingFree || it.product?.offers?.find((o: any) => o.id === it.selectedOffer)?.shippingFree);
+  const freeShippingMin = store?.supportFreeShipping ? store?.freeShippingMinAmount : null;
+  const freeShippingReached = hasFreeShippingItem || (freeShippingMin != null && cartTotal >= Number(freeShippingMin));
+  const freeShippingRemainingAmt = freeShippingMin != null ? Number(freeShippingMin) - cartTotal : 0;
+
+  const getLivPrice = useCallback(() => {
+    if (freeShippingReached) return 0;
+    if (!selW) return 0;
+    return Number(fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice);
+  }, [selW, fd.typeLivraison, freeShippingReached]);
+  const finalTotal = cartTotal + getLivPrice();
 
   const updateCart = (newItems: any[]) => { setCartItems(newItems); localStorage.setItem(domain, JSON.stringify(newItems)); initCount(newItems.length); };
   const removeItem = (i: number) => updateCart(cartItems.filter((_, idx) => idx !== i));
-  const changeQty = (i: number, delta: number) => { const n = [...cartItems]; n[i].quantity = Math.max(1, n[i].quantity + delta); updateCart(n); };
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -1763,7 +1828,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         storeId: item.storeId, userId: item.userId,
         selectedOffer: item.selectedOffer, selectedVariants: item.selectedVariants,
         platform: item.platform || 'store', finalPrice: item.finalPrice,
-        totalPrice: finalTotal, priceLivraison: +getLivPrice(),
+        totalPrice: finalTotal, priceLivraison: getLivPrice(),
       }));
       await axios.post(`${API_URL}/orders/create`, payload);
       setSuccess(true); localStorage.removeItem(domain); setCartItems([]); initCount(0);
@@ -1833,6 +1898,15 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             {t.cartTitle} <span className="neon-cyan">{t.cartHighlight}</span>
           </h1>
           <NeonDivider color="cyan" />
+          {freeShippingMin != null && (
+            <div style={{
+              border: `1px solid ${freeShippingReached ? 'var(--green)' : 'var(--line)'}`, borderRadius: '6px',
+              background: freeShippingReached ? 'rgba(0,255,136,0.06)' : 'var(--panel)', padding: '12px 16px', marginTop: '12px',
+              color: freeShippingReached ? 'var(--green)' : 'var(--mid)', fontSize: '13px', fontWeight: 700,
+            }}>
+              {freeShippingReached ? t.freeShippingReached : t.freeShippingRemaining.replace('{{amount}}', `${Number(freeShippingRemainingAmt).toLocaleString()} ${currency}`)}
+            </div>
+          )}
         </div>
 
         <div className="cart-g fu fu-1">
@@ -1864,19 +1938,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     </p>
                     {/* Qty + Delete */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: 'auto' }}>
-                      <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid var(--line)', borderRadius: '4px', overflow: 'hidden', background: 'var(--navy-3)' }}>
-                        <button onClick={() => changeQty(index, -1)} style={{ width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderInlineEnd: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.15s' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
-                          <Minus size={12} />
-                        </button>
-                        <span className="orb" style={{ width: '38px', textAlign: 'center', fontSize: '14px', fontWeight: 900, color: 'var(--white)' }}>{item.quantity}</span>
-                        <button onClick={() => changeQty(index, 1)} style={{ width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderInlineStart: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.15s' }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
-                          <Plus size={12} />
-                        </button>
-                      </div>
+                      <span className="orb" style={{ fontSize: '13px', fontWeight: 900, color: 'var(--white)' }}>× {item.quantity}</span>
                       <button onClick={() => removeItem(index)} style={{ marginInlineStart: 'auto', background: 'transparent', border: '1px solid rgba(255,68,68,0.3)', borderRadius: '4px', color: 'var(--red)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', fontWeight: 600, padding: '5px 10px', transition: 'all 0.2s' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,68,68,0.1)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--red)'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,68,68,0.3)'; }}>
@@ -1970,7 +2032,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                           {dtype === 'home' ? `🏠 ${t.deliveryHome}` : `🏢 ${t.deliveryOffice}`}
                         </div>
                         <div className="orb" style={{ fontSize: '1rem', fontWeight: 900, color: fd.typeLivraison === dtype ? 'var(--cyan)' : 'var(--dim)' }}>
-                          {selW ? `${(dtype === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} ${currency}` : '---'}
+                          {!selW ? '---' : freeShippingReached ? t.freeShippingBadge : `${Number(dtype === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} ${currency}`}
                         </div>
                       </button>
                     ))}
@@ -1984,7 +2046,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   </div>
                   {[
                     { l: t.subtotal, v: `${cartTotal.toLocaleString()} ${currency}` },
-                    { l: t.delivery, v: getLivPrice() ? `${getLivPrice().toLocaleString()} ${currency}` : '---' },
+                    { l: t.delivery, v: !selW ? '---' : freeShippingReached ? t.freeShippingBadge : `${getLivPrice().toLocaleString()} ${currency}` },
                   ].map(row => (
                     <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 14px', borderBottom: '1px solid var(--line)' }}>
                       <span style={{ fontSize: '12px', color: 'var(--mid)' }}>{row.l}</span>
@@ -2023,6 +2085,69 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               </form>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function Success({ store, order }: { store: any; domain: string; order: any }) {
+  const t = T[getLang(store)];
+  const currency = store?.currency || 'DZD';
+  const stepIcons = [CheckCircle2, Phone, Package, Truck];
+
+  return (
+    <div dir={t.dir} style={{ minHeight: '100vh', background: 'var(--navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
+      <div style={{ maxWidth: 480, width: '100%' }}>
+        <div style={{ textAlign: 'center', background: 'var(--panel)', border: '1px solid var(--cyan)', borderRadius: 12, padding: '48px 40px', boxShadow: 'var(--glow-c)', marginBottom: 24 }}>
+          <div style={{ width: 80, height: 80, borderRadius: '50%', border: '2px solid var(--cyan)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: 'var(--glow-c)', background: 'rgba(0,212,255,0.06)' }}>
+            <CheckCircle2 size={40} style={{ color: 'var(--cyan)' }} />
+          </div>
+          <p style={{ fontFamily: "'Orbitron',monospace", fontSize: 10, color: 'var(--pink)', letterSpacing: '0.2em', marginBottom: 12, textTransform: 'uppercase' }}>// ORDER CONFIRMED</p>
+          <h2 className="orb" style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--white)', marginBottom: 10 }}>{t.successTitle}</h2>
+          <p style={{ color: 'var(--mid)', fontSize: 14, lineHeight: 1.7 }}>{t.successDesc}</p>
+        </div>
+
+        {order && (order.productName || order.total != null) && (
+          <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: 12, padding: '20px 24px', marginBottom: 24 }}>
+            <p style={{ fontFamily: "'Orbitron',monospace", fontSize: 10, fontWeight: 700, color: 'var(--cyan)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 12 }}>{t.orderInfo}</p>
+            {order.productName && (
+              <div style={{ paddingBottom: 10, marginBottom: 10, borderBottom: '1px solid var(--line)', fontSize: 14, fontWeight: 700, color: 'var(--white)' }}>{order.productName}</div>
+            )}
+            {order.total != null && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 13, color: 'var(--mid)' }}>{t.total}</span>
+                <span className="orb" style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--cyan)' }}>{Number(order.total).toLocaleString()} {currency}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{ background: 'var(--panel)', border: '1px solid var(--line)', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
+          {t.successSteps.map((step, i) => {
+            const Icon = stepIcons[i] ?? CheckCircle2;
+            const done = i === 0;
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderBottom: i < t.successSteps.length - 1 ? '1px solid var(--line)' : 'none', background: done ? 'rgba(0,212,255,0.06)' : 'transparent' }}>
+                <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? 'var(--cyan)' : 'var(--navy-2)', color: done ? 'var(--navy)' : 'var(--dim)' }}>
+                  <Icon size={16} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '0.85rem', fontWeight: 700, color: done ? 'var(--white)' : 'var(--dim)', marginBottom: 2 }}>{step.title}</p>
+                  <p style={{ fontSize: '0.76rem', color: 'var(--mid)' }}>{step.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <Link href="/" className="btn-cyan" style={{ textDecoration: 'none', justifyContent: 'center' }}>
+            <Gamepad2 size={16} /> {t.shopNow}
+          </Link>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.8rem', borderRadius: 8, border: '1px solid var(--line)', color: 'var(--mid)', fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none' }}>
+            {t.backToShop}
+          </Link>
         </div>
       </div>
     </div>

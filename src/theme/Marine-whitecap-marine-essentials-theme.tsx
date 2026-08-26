@@ -17,7 +17,7 @@ import { useCartStore } from '@/store/useCartStore';
 // =============================================================================
 
 /* ─── Types (must be preserved as-is) ─── */
-interface Offer { id: string; name: string; quantity: number; price: number; }
+interface Offer { id: string; name: string; quantity: number; price: number; subTitle?: string; shippingFree?: boolean; }
 interface Variant { id: string; name: string; value: string; }
 interface Attribute { id: string; type: string; name: string; displayMode?: 'color' | 'image' | 'text' | null; variants: Variant[]; }
 interface ProductImage { id: string; imageUrl: string; }
@@ -29,14 +29,14 @@ interface Commune { id: string; name: string; ar_name: string; wilayaId: string;
 interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
-  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 
 interface ProductFormProps {
   product: Product; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
-  selectedVariants: Record<string, string>; platform?: string; priceLoss?: number;
+  selectedVariants: Record<string, string>; platform?: string; priceLoss?: number; store?: any;
 }
 
 /* ─── API ─── */
@@ -77,6 +77,13 @@ const T = {
     confirmOrder: 'تأكيد الطلب', sending: 'جاري الإرسال...', cancel: 'إلغاء',
     successTitle: 'تم إرسال طلبك بنجاح!', successDesc: 'سنتواصل معك قريباً لتأكيد التفاصيل.',
     backToShop: 'العودة للتسوق',
+    orderInfo: 'معلومات الطلب',
+    successSteps: [
+      { title: 'تم استلام طلبك', desc: 'تم تسجيل طلبك بنجاح في نظامنا' },
+      { title: 'تأكيد الطلب', desc: 'سنتصل بك خلال 24 ساعة' },
+      { title: 'التجهيز والتغليف', desc: 'يتم تجهيز طلبك بعناية' },
+      { title: 'الشحن والتوصيل', desc: '2-5 أيام عمل' },
+    ],
     cartEmpty: 'السلة فارغة', cartEmptyDesc: 'لم تتم إضافة أي منتجات بعد.',
     myCart: 'سلتي', subtotal: 'المجموع الفرعي',
     errSubmit: 'حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مجدداً.',
@@ -86,6 +93,10 @@ const T = {
     privacyTitle: 'سياسة الخصوصية', termsTitle: 'الشروط والأحكام',
     cookiesTitle: 'سياسة الكوكيز', contactTitle: 'تواصل معنا',
     offersTitle: 'العروض المتاحة', descTitle: 'الوصف',
+    freeShippingBadge: 'توصيل مجاني',
+    freeShippingThreshold: 'توصيل مجاني عند الشراء بأكثر من {{amount}}',
+    freeShippingRemaining: 'أضف {{amount}} لتحصل على توصيل مجاني',
+    freeShippingReached: 'مبروك! لديك توصيل مجاني 🎉',
     searchResultsFor: 'نتائج البحث عن:',
   },
   fr: {
@@ -113,6 +124,13 @@ const T = {
     confirmOrder: 'Confirmer la commande', sending: 'Envoi en cours...', cancel: 'Annuler',
     successTitle: 'Commande confirmée !', successDesc: 'Notre équipe vous contactera bientôt.',
     backToShop: 'Retour à la boutique',
+    orderInfo: 'Informations de commande',
+    successSteps: [
+      { title: 'Commande reçue', desc: 'Votre commande a été enregistrée avec succès' },
+      { title: 'Confirmation', desc: 'Nous vous appellerons sous 24h' },
+      { title: 'Préparation', desc: 'Votre commande est préparée avec soin' },
+      { title: 'Livraison', desc: '2-5 jours ouvrables' },
+    ],
     cartEmpty: 'Votre panier est vide', cartEmptyDesc: 'Découvrez notre sélection.',
     myCart: 'Mon Panier', subtotal: 'Sous-total',
     errSubmit: 'Une erreur est survenue. Veuillez réessayer.',
@@ -122,6 +140,10 @@ const T = {
     privacyTitle: 'Politique de confidentialité', termsTitle: 'Conditions générales',
     cookiesTitle: 'Politique des cookies', contactTitle: 'Nous contacter',
     offersTitle: 'Offres groupées', descTitle: 'Description',
+    freeShippingBadge: 'Livraison gratuite',
+    freeShippingThreshold: 'Livraison gratuite à partir de {{amount}}',
+    freeShippingRemaining: 'Ajoutez {{amount}} pour bénéficier de la livraison gratuite',
+    freeShippingReached: 'Bravo ! Vous avez la livraison gratuite 🎉',
     searchResultsFor: 'Résultats pour :',
   },
   en: {
@@ -149,6 +171,13 @@ const T = {
     confirmOrder: 'Confirm Order', sending: 'Sending...', cancel: 'Cancel',
     successTitle: 'Order placed successfully!', successDesc: 'We will contact you shortly to confirm the details.',
     backToShop: 'Back to Shop',
+    orderInfo: 'Order Info',
+    successSteps: [
+      { title: 'Order received', desc: 'Your order has been registered successfully' },
+      { title: 'Confirmation', desc: "We'll call you within 24 hours" },
+      { title: 'Packaging', desc: 'Your order is being prepared with care' },
+      { title: 'Shipping', desc: '2-5 business days' },
+    ],
     cartEmpty: 'Your cart is empty', cartEmptyDesc: 'Start shopping now.',
     myCart: 'My Cart', subtotal: 'Subtotal',
     errSubmit: 'An error occurred. Please try again.',
@@ -158,6 +187,10 @@ const T = {
     privacyTitle: 'Privacy Policy', termsTitle: 'Terms & Conditions',
     cookiesTitle: 'Cookie Policy', contactTitle: 'Contact Us',
     offersTitle: 'Available Offers', descTitle: 'Description',
+    freeShippingBadge: 'Free Delivery',
+    freeShippingThreshold: 'Free delivery on orders over {{amount}}',
+    freeShippingRemaining: 'Add {{amount}} more to get free delivery',
+    freeShippingReached: 'Congrats! You have free delivery 🎉',
     searchResultsFor: 'Results for:',
   },
 } as const;
@@ -598,6 +631,11 @@ export function Card({ product, displayImage, discount, store: storeProp, viewDe
             -{discount}%
           </span>
         )}
+        {product?.shippingFree && (
+          <span style={{ position: 'absolute', top: 8, insetInlineStart: 8, background: A, color: '#fff', fontSize: '0.7rem', fontWeight: 800, padding: '3px 8px', borderRadius: 4 }}>
+            🚚
+          </span>
+        )}
       </div>
       {/* Body */}
       <div style={{ padding: '0.75rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
@@ -830,6 +868,12 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               )}
             </div>
 
+            {(product?.shippingFree || ((storeprop || product?.store)?.supportFreeShipping && (storeprop || product?.store)?.freeShippingMinAmount != null)) && (
+              <div style={{ marginBottom: 20, padding: '10px 14px', border: `1px solid ${A}`, borderRadius: 6, background: AL, fontSize: '0.85rem', fontWeight: 700, color: AD }}>
+                🚚 {product.shippingFree ? t.freeShippingBadge : t.freeShippingThreshold.replace('{{amount}}', `${Number((storeprop || product?.store).freeShippingMinAmount).toLocaleString()} ${product?.store?.currency}`)}
+              </div>
+            )}
+
             {/* Offers */}
             {product?.offers && product.offers.length > 0 && (
               <div style={{ marginBottom: 20 }}>
@@ -841,6 +885,8 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                       <div style={{ flex: 1 }}>
                         <span style={{ fontWeight: 700, fontSize: '0.85rem', color: TXT }}>{o.name}</span>
                         <span style={{ fontSize: '0.8rem', color: SUB, marginInlineStart: 8 }}>×{o.quantity}</span>
+                        {o.subTitle && <div style={{ fontSize: '0.78rem', color: SUB }}>{o.subTitle}</div>}
+                        {o.shippingFree && <div style={{ fontSize: '0.78rem', color: A, fontWeight: 700 }}>🚚 {t.freeShippingBadge}</div>}
                       </div>
                       <span style={{ fontWeight: 800, color: A, fontSize: '0.9rem', whiteSpace: 'nowrap' }}>{Number(o.price).toLocaleString()} {product?.store?.currency}</span>
                     </label>
@@ -945,12 +991,6 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
   /* Resolve selected wilaya — ALWAYS use String() */
   const selW = wilayas.find((w) => String(w.id) === String(fd.customerWelaya));
 
-  /* getLiv — ALWAYS wrap in Number() */
-  const getLiv = useCallback((): number => {
-    if (!selW) return 0;
-    return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
-  }, [selW, fd.typeLivraison]);
-
   /* getFP */
   const getFP = useCallback((): number => {
     if (selectedOffer) {
@@ -970,7 +1010,21 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
     return match ? match.id : null;
   }, [product, selectedVariants]);
 
-  const total = () => getFP() * fd.quantity + getLiv();
+  const fp = getFP();
+  const supportQty = (store?.supportQty ?? product?.store?.supportQty) !== false;
+  const qty = supportQty ? fd.quantity : 1;
+  const selOfferObj = product?.offers?.find((o: Offer) => o.id === selectedOffer);
+  const orderFreeShipping = !!(product?.shippingFree || selOfferObj?.shippingFree ||
+    (store?.supportFreeShipping && store?.freeShippingMinAmount != null && (fp * qty) >= Number(store.freeShippingMinAmount)));
+
+  /* getLiv — ALWAYS wrap in Number() */
+  const getLiv = useCallback((): number => {
+    if (orderFreeShipping) return 0;
+    if (!selW) return 0;
+    return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
+  }, [selW, fd.typeLivraison, orderFreeShipping]);
+
+  const total = () => fp * qty + getLiv();
 
   const validate = () => {
     const errs: Record<string, string> = {};
@@ -983,9 +1037,9 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
   };
 
   const addToCart = () => {
-    const fp = getFP();
     const payload = {
       ...fd,
+      quantity: qty,
       product,
       variantDetailId: getVarId(),
       productId: product?.id,
@@ -995,7 +1049,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
       selectedVariants,
       platform,
       finalPrice: fp,
-      totalPrice: fp * fd.quantity,
+      totalPrice: fp * qty,
       priceLivraison: 0,
       addedAt: new Date().toISOString(),
     };
@@ -1013,9 +1067,9 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
     if (!validate()) return;
     setSubmitting(true);
     try {
-      const fp = getFP();
       const payload = {
         ...fd,
+        quantity: qty,
         product,
         variantDetailId: getVarId(),
         productId: product?.id,
@@ -1058,18 +1112,20 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
   return (
     <div style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 10, padding: '1.25rem' }}>
       {/* Quantity */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, paddingBottom: 16, borderBottom: `1px solid ${BD}` }}>
-        <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{t.qty}</span>
-        <div style={{ display: 'inline-flex', alignItems: 'center', border: `1px solid ${BD}`, borderRadius: 6, overflow: 'hidden' }}>
-          <button onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: BG, border: 'none', cursor: 'pointer' }}>
-            <IconMinus size={14} color={TXT} />
-          </button>
-          <span style={{ width: 40, textAlign: 'center', fontWeight: 700, fontSize: '0.9rem' }}>{fd.quantity}</span>
-          <button onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: BG, border: 'none', cursor: 'pointer' }}>
-            <IconPlus size={14} color={TXT} />
-          </button>
+      {supportQty && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, paddingBottom: 16, borderBottom: `1px solid ${BD}` }}>
+          <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{t.qty}</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', border: `1px solid ${BD}`, borderRadius: 6, overflow: 'hidden' }}>
+            <button onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: BG, border: 'none', cursor: 'pointer' }}>
+              <IconMinus size={14} color={TXT} />
+            </button>
+            <span style={{ width: 40, textAlign: 'center', fontWeight: 700, fontSize: '0.9rem' }}>{fd.quantity}</span>
+            <button onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: BG, border: 'none', cursor: 'pointer' }}>
+              <IconPlus size={14} color={TXT} />
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Buttons */}
       {!isOrderNow ? (
@@ -1153,9 +1209,9 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
           {/* Summary */}
           <div style={{ background: BG, borderRadius: 8, padding: '1rem', marginBottom: 16 }}>
             {[
-              { l: t.price, v: `${getFP().toLocaleString()} ${store?.currency}` },
-              { l: t.qty, v: `× ${fd.quantity}` },
-              { l: t.delivery, v: selW ? `${getLiv().toLocaleString()} ${store?.currency}` : '—' },
+              { l: t.price, v: `${fp.toLocaleString()} ${store?.currency}` },
+              { l: t.qty, v: `× ${qty}` },
+              { l: t.delivery, v: !selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${getLiv().toLocaleString()} ${store?.currency}` },
             ].map(row => (
               <div key={row.l} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: `1px solid ${BD}` }}>
                 <span style={{ fontSize: '0.85rem', color: SUB, flexShrink: 0 }}>{row.l}</span>
@@ -1221,13 +1277,19 @@ export function Cart({ domain, store }: any) {
   }, [fd.customerWelaya]);
 
   const selW = wilayas.find((w) => String(w.id) === String(fd.customerWelaya));
+  const cartTotal = items.reduce((sum, it) => sum + (Number(it.finalPrice || it.product?.price || 0) * (it.quantity || 1)), 0);
+
+  const hasFreeShippingItem = items.some((it) => it.product?.shippingFree || it.product?.offers?.find((o: Offer) => o.id === it.selectedOffer)?.shippingFree);
+  const freeShippingMin = store?.supportFreeShipping ? store?.freeShippingMinAmount : null;
+  const freeShippingReached = hasFreeShippingItem || (freeShippingMin != null && cartTotal >= Number(freeShippingMin));
+  const freeShippingRemainingAmt = freeShippingMin != null ? Number(freeShippingMin) - cartTotal : 0;
 
   const getLiv = useCallback((): number => {
+    if (freeShippingReached) return 0;
     if (!selW) return 0;
     return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
-  }, [selW, fd.typeLivraison]);
+  }, [selW, fd.typeLivraison, freeShippingReached]);
 
-  const cartTotal = items.reduce((sum, it) => sum + (Number(it.finalPrice || it.product?.price || 0) * (it.quantity || 1)), 0);
   const finalTotal = cartTotal + getLiv();
 
   const removeItem = (idx: number) => {
@@ -1316,6 +1378,15 @@ export function Cart({ domain, store }: any) {
     <div style={{ background: BG, padding: '2.5rem 0', minHeight: '60vh' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: TXT, margin: '0 0 1.5rem' }}>{t.myCart}</h1>
+        {freeShippingMin != null && (
+          <div style={{
+            border: `1px solid ${freeShippingReached ? A : BD}`, borderRadius: 8,
+            background: freeShippingReached ? AL : '#fff', padding: '0.875rem 1.125rem', marginBottom: '1.5rem',
+            color: freeShippingReached ? AD : SUB, fontSize: '0.85rem', fontWeight: 700,
+          }}>
+            {freeShippingReached ? t.freeShippingReached : t.freeShippingRemaining.replace('{{amount}}', `${Number(freeShippingRemainingAmt).toLocaleString()} ${store?.currency}`)}
+          </div>
+        )}
         <div className="wc-cart-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
           {/* Items */}
           <div style={{ minWidth: 0 }}>
@@ -1414,7 +1485,7 @@ export function Cart({ domain, store }: any) {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: `1px solid ${BD}` }}>
                   <span style={{ fontSize: '0.85rem', color: SUB, flexShrink: 0 }}>{t.delivery}</span>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 700, color: TXT, whiteSpace: 'nowrap' }}>{selW ? `${getLiv().toLocaleString()} ${store?.currency}` : '—'}</span>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 700, color: TXT, whiteSpace: 'nowrap' }}>{!selW ? '—' : freeShippingReached ? t.freeShippingBadge : `${getLiv().toLocaleString()} ${store?.currency}`}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, marginTop: 4 }}>
                   <span style={{ fontSize: '0.95rem', fontWeight: 800, color: TXT }}>{t.total}</span>
@@ -1429,6 +1500,67 @@ export function Cart({ domain, store }: any) {
               </button>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/*  SUCCESS                                                                    */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+export function Success({ store, order }: { store: any; domain: string; order: any }) {
+  const t = T[getLang(store)];
+  const currency = store?.currency || 'DZD';
+
+  return (
+    <div style={{ minHeight: '100vh', background: BG, padding: '3rem 1.25rem' }}>
+      <div style={{ maxWidth: 480, margin: '0 auto' }}>
+        <div style={{ background: AL, border: `1px solid ${A}`, borderRadius: 10, padding: '2.5rem 2rem', textAlign: 'center', marginBottom: '1.5rem' }}>
+          <div style={{ width: 64, height: 64, borderRadius: '50%', background: A, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem', fontSize: '1.75rem' }}>✓</div>
+          <h2 style={{ margin: '0 0 0.5rem', color: TXT }}>{t.successTitle}</h2>
+          <p style={{ color: SUB, margin: 0 }}>{t.successDesc}</p>
+        </div>
+
+        {order && (order.productName || order.total != null) && (
+          <div style={{ background: CARD, borderRadius: 10, border: `1px solid ${BD}`, padding: '1.25rem 1.5rem', marginBottom: '1.5rem' }}>
+            <p style={{ fontWeight: 700, fontSize: '0.75rem', color: TXT, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>{t.orderInfo}</p>
+            {order.productName && (
+              <div style={{ paddingBottom: 10, marginBottom: 10, borderBottom: `1px solid ${BD}`, fontSize: 14, fontWeight: 700, color: TXT }}>{order.productName}</div>
+            )}
+            {order.total != null && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 13, color: SUB }}>{t.total}</span>
+                <span style={{ fontSize: '1.2rem', fontWeight: 800, color: A }}>{Number(order.total).toLocaleString()} {currency}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{ background: CARD, borderRadius: 10, border: `1px solid ${BD}`, overflow: 'hidden', marginBottom: '1.5rem' }}>
+          {t.successSteps.map((step, i) => {
+            const done = i === 0;
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '1rem 1.25rem', borderBottom: i < t.successSteps.length - 1 ? `1px solid ${BD}` : 'none', background: done ? AL : 'transparent' }}>
+                <div style={{ width: 32, height: 32, flexShrink: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? A : BG, color: done ? '#fff' : SUB, fontWeight: 700, fontSize: '0.85rem' }}>
+                  {i + 1}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '0.85rem', fontWeight: 700, color: done ? TXT : SUB, marginBottom: 2 }}>{step.title}</p>
+                  <p style={{ fontSize: '0.76rem', color: SUB }}>{step.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+          <Link href="/" style={{ background: A, color: '#fff', padding: '0.875rem 2rem', borderRadius: 6, textDecoration: 'none', fontWeight: 700, textAlign: 'center' }}>
+            {t.shopNow}
+          </Link>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.8rem', borderRadius: 6, border: `1px solid ${BD}`, color: SUB, fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none' }}>
+            {t.backToShop}
+          </Link>
         </div>
       </div>
     </div>

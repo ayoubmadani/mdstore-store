@@ -50,6 +50,39 @@ function makeRequire() {
 const moduleCache = new Map<string, Promise<Record<string, any>>>();
 const bundleCache = new Map<string, React.ComponentType<any>>();
 
+// يجلب حزمة الثيم ويُقيّمها (أو يعيد نفس الـ promise المخزّن إن كانت مطلوبة من قبل
+// لنفس bundleUrl عبر ThemeRunner) ويرجّع كل الـ exports الخام — مفيد لقراءة قيم بيانات
+// عادية من الثيم (وليس فقط مكوّنات React)، مثل قائمة صفحات إضافية يُعرّفها الثيم نفسه.
+export function loadThemeModule(bundleUrl: string): Promise<Record<string, any>> {
+  let modPromise = moduleCache.get(bundleUrl);
+  if (!modPromise) {
+    modPromise = fetch(bundleUrl)
+      .then((r) => {
+        if (!r.ok) throw new Error(`R2 ${r.status}`);
+        return r.text();
+      })
+      .then((code) => {
+        const mod = { exports: {} as Record<string, any> };
+        // eslint-disable-next-line no-new-func
+        const fn = new Function('module', 'exports', 'require', 'React', 'console', 'process', code);
+        fn(mod, mod.exports, makeRequire(), patchedReact, console, {
+          env: {
+            NEXT_PUBLIC_API_URL:      process.env.NEXT_PUBLIC_API_URL      ?? '',
+            NEXT_PUBLIC_ROOT_DOMAIN:  process.env.NEXT_PUBLIC_ROOT_DOMAIN  ?? '',
+            NODE_ENV:                 process.env.NODE_ENV                  ?? 'production',
+          },
+        });
+        return mod.exports;
+      })
+      .catch((err) => {
+        moduleCache.delete(bundleUrl);
+        throw err;
+      });
+    moduleCache.set(bundleUrl, modPromise);
+  }
+  return modPromise;
+}
+
 interface ThemeRunnerProps {
   bundleUrl: string;
   exportName?: string;
@@ -77,34 +110,7 @@ export default function ThemeRunner({
       return;
     }
 
-    let modPromise = moduleCache.get(bundleUrl);
-    if (!modPromise) {
-      modPromise = fetch(bundleUrl)
-        .then((r) => {
-          if (!r.ok) throw new Error(`R2 ${r.status}`);
-          return r.text();
-        })
-        .then((code) => {
-          const mod = { exports: {} as Record<string, any> };
-          // eslint-disable-next-line no-new-func
-          const fn = new Function('module', 'exports', 'require', 'React', 'console', 'process', code);
-          fn(mod, mod.exports, makeRequire(), patchedReact, console, {
-            env: {
-              NEXT_PUBLIC_API_URL:      process.env.NEXT_PUBLIC_API_URL      ?? '',
-              NEXT_PUBLIC_ROOT_DOMAIN:  process.env.NEXT_PUBLIC_ROOT_DOMAIN  ?? '',
-              NODE_ENV:                 process.env.NODE_ENV                  ?? 'production',
-            },
-          });
-          return mod.exports;
-        })
-        .catch((err) => {
-          moduleCache.delete(bundleUrl);
-          throw err;
-        });
-      moduleCache.set(bundleUrl, modPromise);
-    }
-
-    modPromise
+    loadThemeModule(bundleUrl)
       .then((exports) => {
         const comp: React.ComponentType<any> =
           exports[exportName] ?? exports['default'] ?? exports['Main'];

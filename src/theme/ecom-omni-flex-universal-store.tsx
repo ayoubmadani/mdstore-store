@@ -251,6 +251,12 @@ const jsonAr = {
   successTitle: 'تم إرسال طلبك بنجاح!',
   successDesc: 'سنتواصل معك قريباً لتأكيد التفاصيل',
   backToShop: 'العودة للتسوق',
+  successSteps: [
+    { title: 'تم استلام طلبك', desc: 'تم تسجيل طلبك بنجاح في نظامنا' },
+    { title: 'تأكيد الطلب', desc: 'سنتصل بك خلال 24 ساعة' },
+    { title: 'التجهيز والتغليف', desc: 'يتم تجهيز طلبك بعناية' },
+    { title: 'الشحن والتوصيل', desc: '2-5 أيام عمل' },
+  ],
   checkoutTitle: 'إتمام الطلب',
   // Product
   offersTitle: 'العروض المتاحة',
@@ -412,6 +418,12 @@ const jsonFr = {
   successTitle: 'Commande confirmée',
   successDesc: 'Merci pour votre commande, notre équipe vous contactera bientôt.',
   backToShop: 'Retour à la boutique',
+  successSteps: [
+    { title: 'Commande reçue', desc: 'Votre commande a été enregistrée avec succès' },
+    { title: 'Confirmation', desc: 'Nous vous appellerons sous 24h' },
+    { title: 'Préparation', desc: 'Votre commande est préparée avec soin' },
+    { title: 'Livraison', desc: '2-5 jours ouvrables' },
+  ],
   checkoutTitle: 'Finaliser la commande',
   // Product
   offersTitle: 'Offres groupées',
@@ -573,6 +585,12 @@ const jsonEn = {
   successTitle: 'Order confirmed!',
   successDesc: 'Thank you for your order. Our team will contact you soon.',
   backToShop: 'Back to Shop',
+  successSteps: [
+    { title: 'Order received', desc: 'Your order has been registered successfully' },
+    { title: 'Confirmation', desc: "We'll call you within 24 hours" },
+    { title: 'Packaging', desc: 'Your order is being prepared with care' },
+    { title: 'Shipping', desc: '2-5 business days' },
+  ],
   checkoutTitle: 'Complete your order',
   // Product
   offersTitle: 'Bundle Offers',
@@ -1697,6 +1715,66 @@ export function Cart({ domain, store }: { domain:string; store:any }) {
               </button>
             </form>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function Success({ store, order }: { store: any; domain: string; order: any }) {
+  const t = T[getLang(store)];
+  const currency = store?.currency || 'DZD';
+  const stepIcons = [CheckCircle2, Phone, Package, Truck];
+
+  return (
+    <div dir={t.dir} style={{ minHeight: '100vh', background: 'var(--off)', padding: '3rem 1.25rem' }}>
+      <div style={{ maxWidth: 480, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', background: '#fff', padding: '3rem 2rem', borderRadius: 16, border: '1px solid var(--line)', marginBottom: '1.5rem' }}>
+          <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'rgba(58,134,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem' }}>
+            <CheckCircle2 size={30} style={{ color: 'var(--blue)' }} />
+          </div>
+          <h2 className="bc" style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--navy)', marginBottom: '0.5rem', letterSpacing: '0.04em' }}>{t.successTitle}</h2>
+          <p style={{ color: 'var(--mid)', lineHeight: 1.7, fontSize: 14 }}>{t.successDesc}</p>
+        </div>
+
+        {order && (order.productName || order.total != null) && (
+          <div style={{ background: '#fff', borderRadius: 16, border: '1px solid var(--line)', padding: '1.25rem 1.5rem', marginBottom: '1.5rem' }}>
+            <p style={{ fontWeight: 800, fontSize: '0.75rem', marginBottom: '0.75rem', color: 'var(--navy)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.orderInfo}</p>
+            {order.productName && (
+              <div style={{ paddingBottom: 10, marginBottom: 10, borderBottom: '1px solid var(--line)', fontSize: 14, fontWeight: 700, color: 'var(--navy)' }}>{order.productName}</div>
+            )}
+            {order.total != null && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 13, color: 'var(--mid)' }}>{t.total}</span>
+                <span className="bc" style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--blue)' }}>{Number(order.total).toLocaleString()} {currency}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{ background: '#fff', borderRadius: 16, border: '1px solid var(--line)', overflow: 'hidden', marginBottom: '1.5rem' }}>
+          {t.successSteps.map((step, i) => {
+            const Icon = stepIcons[i] ?? CheckCircle2;
+            const done = i === 0;
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '1rem 1.25rem', borderBottom: i < t.successSteps.length - 1 ? '1px solid var(--line)' : 'none', background: done ? 'rgba(58,134,255,0.06)' : 'transparent' }}>
+                <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? 'var(--blue)' : 'rgba(58,134,255,0.08)', color: done ? '#fff' : 'var(--mid)' }}>
+                  <Icon size={16} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '0.85rem', fontWeight: 700, color: done ? 'var(--navy)' : 'var(--mid)', marginBottom: 2 }}>{step.title}</p>
+                  <p style={{ fontSize: '0.76rem', color: 'var(--mid)' }}>{step.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+          <Link href="/" className="btn-blue" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 32px', textDecoration: 'none' }}>{t.shopNow}</Link>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.8rem', borderRadius: 10, border: '1px solid var(--line)', color: 'var(--mid)', fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none' }}>
+            {t.backToShop}
+          </Link>
         </div>
       </div>
     </div>

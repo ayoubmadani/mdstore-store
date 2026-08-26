@@ -207,6 +207,12 @@ const jsonAr = {
   successTitle: 'تم إرسال طلبك بنجاح!',
   successDesc: 'سنتواصل معك قريباً لتأكيد التفاصيل',
   backToShop: 'العودة للتسوق',
+  successSteps: [
+    { title: 'تم استلام طلبك', desc: 'تم تسجيل طلبك بنجاح في نظامنا' },
+    { title: 'تأكيد الطلب', desc: 'سنتصل بك خلال 24 ساعة' },
+    { title: 'التجهيز والتغليف', desc: 'يتم تجهيز طلبك بعناية' },
+    { title: 'الشحن والتوصيل', desc: '2-5 أيام عمل' },
+  ],
   checkoutTitle: 'إتمام الطلب',
   // Product
   offersTitle: 'العروض المتاحة',
@@ -295,6 +301,12 @@ const jsonFr = {
   successTitle: 'Commande confirmée',
   successDesc: 'Merci pour votre commande, notre équipe vous contactera bientôt.',
   backToShop: 'Retour à la boutique',
+  successSteps: [
+    { title: 'Commande reçue', desc: 'Votre commande a été enregistrée avec succès' },
+    { title: 'Confirmation', desc: 'Nous vous appellerons sous 24h' },
+    { title: 'Préparation', desc: 'Votre commande est préparée avec soin' },
+    { title: 'Livraison', desc: '2-5 jours ouvrables' },
+  ],
   checkoutTitle: 'Finaliser la commande',
   // Product
   offersTitle: 'Offres groupées',
@@ -346,6 +358,12 @@ const jsonEn = {
   myCart: 'My Cart', cartEmpty: 'Cart is empty', cartEmptyDesc: 'You have not added any products yet',
   successTitle: 'Order sent successfully!', successDesc: 'We will contact you soon to confirm the details',
   backToShop: 'Back to Shopping', checkoutTitle: 'Complete Order',
+  successSteps: [
+    { title: 'Order received', desc: 'Your order has been registered successfully' },
+    { title: 'Confirmation', desc: "We'll call you within 24 hours" },
+    { title: 'Packaging', desc: 'Your order is being prepared with care' },
+    { title: 'Shipping', desc: '2-5 business days' },
+  ],
   offersTitle: 'Available Offers', descTitle: 'Description',
   freeShippingBadge: '🚚 Free Delivery',
   freeShippingThreshold: '🚚 Free Delivery on orders over {{amount}} DZD',
@@ -1253,6 +1271,68 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               {submitting ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />{t.sending}</> : t.confirmOrder}
             </button>
           </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function Success({ store, order }: { store: any; domain: string; order: any }) {
+  const t = T[getLang(store)];
+  const currency = store?.currency || 'DZD';
+  const stepIcons = [CheckCircle2, Phone, Package, Truck];
+
+  return (
+    <div dir={t.dir} style={{ minHeight: '100vh', background: BG, padding: '3rem 1.25rem' }}>
+      <div style={{ maxWidth: 480, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', background: CARD, padding: '3rem 2rem', border: `1px solid ${BD}`, marginBottom: '1.5rem' }}>
+          <div style={{ width: 64, height: 64, background: BG, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem' }}>
+            <CheckCircle2 size={32} style={{ color: R }} />
+          </div>
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: INK, marginBottom: '0.5rem', fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase' }}>{t.successTitle}</h2>
+          <p style={{ color: SUB, lineHeight: 1.7, fontSize: '0.9rem' }}>{t.successDesc}</p>
+        </div>
+
+        {order && (order.productName || order.total != null) && (
+          <div style={{ background: CARD, border: `1px solid ${BD}`, padding: '1.25rem 1.5rem', marginBottom: '1.5rem' }}>
+            <p style={{ fontWeight: 700, fontSize: '0.7rem', marginBottom: '0.75rem', color: SUB, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.orderInfo}</p>
+            {order.productName && (
+              <div style={{ paddingBottom: 10, marginBottom: 10, borderBottom: `1px solid ${BD}`, fontSize: 14, fontWeight: 700, color: INK }}>{order.productName}</div>
+            )}
+            {order.total != null && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                <span style={{ fontWeight: 700, color: INK, textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '0.78rem' }}>{t.total}</span>
+                <span className="price-mono" style={{ fontSize: '1.4rem', fontWeight: 800, color: R, fontFamily: "'Barlow Condensed', sans-serif" }}>{Number(order.total).toLocaleString()} {currency}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{ background: CARD, border: `1px solid ${BD}`, overflow: 'hidden', marginBottom: '1.5rem' }}>
+          {t.successSteps.map((step, i) => {
+            const Icon = stepIcons[i] ?? CheckCircle2;
+            const done = i === 0;
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '1rem 1.25rem', borderBottom: i < t.successSteps.length - 1 ? `1px solid ${BD}` : 'none', background: done ? BG : 'transparent' }}>
+                <div style={{ width: 36, height: 36, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? R : BG, color: done ? '#fff' : SUB }}>
+                  <Icon size={16} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '0.85rem', fontWeight: 700, color: done ? INK : SUB, textTransform: 'uppercase', letterSpacing: '0.03em', marginBottom: 2 }}>{step.title}</p>
+                  <p style={{ fontSize: '0.76rem', color: SUB }}>{step.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: R, color: '#fff', padding: '0.875rem 2rem', fontWeight: 700, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.06em', textDecoration: 'none' }}>
+            <ShoppingBag size={17} /> {t.shopNow}
+          </Link>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.8rem', border: `1px solid ${BD}`, color: SUB, fontWeight: 700, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.06em', textDecoration: 'none' }}>
+            {t.backToShop}
+          </Link>
         </div>
       </div>
     </div>

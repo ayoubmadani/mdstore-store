@@ -1,6 +1,6 @@
 ---
 name: theme-dev-v2
-description: "v2 — دليل تطوير ثيمات MdStore: بنية الملفات، أنماط i18n (ar/fr/en)، أخطاء BiDi/RTL، CSS في flex containers، variant filtering، image attr display، bundle command، قواعد ثابتة للـ Navbar/Footer/Hero، وحقول Free Shipping / Qty Support على store وproduct وoffer."
+description: "v2 — دليل تطوير ثيمات MdStore: بنية الملفات، أنماط i18n (ar/fr/en)، أخطاء BiDi/RTL، CSS في flex containers، variant filtering، image attr display، bundle command، قواعد ثابتة للـ Navbar/Footer/Hero، حقول Free Shipping / Qty Support على store وproduct وoffer، وصفحات static إضافية (additionalPages) خارج الأربع الأساسية."
 ---
 
 # Theme Dev v2 — دليل تطوير ثيمات MdStore
@@ -801,5 +801,91 @@ const total = () => Number(fp) * Number(qty) + Number(getLiv()); // أو صري�
 - [ ] `wilayas.find(...)` يقارن بـ `String(...)` على الطرفين
 - [ ] كل تعريف لـ `const total = () => ...` يحوّل `getLiv()` لرقم قبل الجمع (`+getLiv()` أو `Number(getLiv())`)
 - [ ] نفس الفحص يتكرر في كل من `ProductForm` **و** `Cart` — كل منهما له `getLiv`/`total` مستقلان
+
+---
+
+## 21. صفحات Static إضافية (`additionalPages`) — خارج الأربع الأساسية
+
+### الفكرة
+
+كل ثيم يدعم أربع صفحات static أساسية عبر `StaticPage`: `privacy` / `terms` / `cookies` / `contact`. إذا احتاج ثيم معيّن صفحة إضافية (مثل "من نحن"، "الشحن والتوصيل"، "الأسئلة الشائعة")، أضِفها بنفس الآلية **بدون أي تعديل على بنية المتجر الحقيقي**:
+
+1. أضف branch جديد داخل `StaticPage` لهذا الـ slug.
+2. صدّر export اختياري باسم `additionalPages` يصف اسم/رابط كل صفحة إضافية — تقرأه أداة معاينة الثيم `/show/[theme]` تلقائياً لعرضها في الـ sidebar.
+
+### مسار الصفحة الحقيقي — لا تغيير مطلوب
+
+`src/app/[domain]/(store)/[page]/page.tsx` يقبل أي slug ديناميكياً ويمرره لـ `StaticPage` مباشرة. أي صفحة تضيفها بهذه الطريقة تعمل فوراً على `/{domain}/<slug>` في الإنتاج الحقيقي — الراوت المشترك لا يحتاج أي تعديل.
+
+### التطبيق داخل الثيم
+
+```tsx
+// 1) component جديد بنفس نمط Privacy/Terms/Cookies (يعيد استخدام Shell/InfoBlock إن وُجدا في الملف)
+export function About({ store }: { store?: any }) {
+  const lang = getLang(store); const t = T[lang]; const pg = t.pages.about;
+  return (
+    <Shell title={pg.title} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+      <div style={{ background: '#fff', padding: '2rem', borderRadius: 14, border: '1.5px solid #E8E8E8' }}>
+        {pg.blocks.map((b, i) => <InfoBlock key={i} title={b.title} body={b.body} />)}
+      </div>
+    </Shell>
+  );
+}
+
+// 2) سجّله داخل StaticPage
+export function StaticPage({ staticPage, page, store }: any) {
+  const p = (staticPage || page || '').toLowerCase();
+  return (
+    <>
+      {p === 'privacy' && <Privacy store={store} />}
+      {p === 'terms' && <Terms store={store} />}
+      {p === 'cookies' && <Cookies store={store} />}
+      {p === 'contact' && <Contact store={store} />}
+      {p === 'about' && <About store={store} />}   {/* ← جديد */}
+    </>
+  );
+}
+
+// 3) صدّر additionalPages — name لكل لغة + link (المسار الحقيقي، بدون domain)
+export const additionalPages = [
+  { name_ar: 'من نحن', name_fr: 'À propos de nous', name_en: 'About Us', link: '/about' },
+];
+```
+
+### الترجمة (إن استُخدم نمط `t.pages.*`)
+
+```ts
+// أضف مفتاح pages.about لكل من jsonAr/jsonFr/jsonEn — إلزامي إذا كان T مُعرَّفاً
+// Record<Lang, typeof jsonAr> بدون as any (فحص TS بنيوي حقيقي، وإلا TS2741)
+pages: {
+  privacy: { title: '...', blocks: [...] },
+  terms:   { title: '...', blocks: [...] },
+  cookies: { title: '...', blocks: [...] },
+  about: {
+    title: 'من نحن',
+    blocks: [{ title: '...', body: '...' }],
+  },
+},
+```
+
+### كيف تقرأها أداة المعاينة `/show/[theme]`
+
+`src/app/show/[theme]/PreviewClient.tsx` يجلب `additionalPages` تلقائياً عند تحميل الثيم عبر `loadThemeModule(bundleUrl)` — export مساعد في `src/components/ThemeRunner.tsx` (شارك نفس الـ cache مع `ThemeRunner` العادي، لكنه يُرجع كل exports الحزمة الخام بدل مكوّن واحد فقط). النتيجة تُضاف كأزرار تحت قسم "صفحات إضافية" في الـ sidebar، والاسم المعروض يتغيّر حسب اللغة المختارة (`name_ar`/`name_fr`/`name_en`).
+
+> **اختياري تماماً:** ثيم بلا `additionalPages` export يستمر بالعمل عادياً (fallback لمصفوفة فارغة، لا شيء يُعرض في القسم). أضِف هذا التصدير فقط للثيمات التي تحتاج فعلاً صفحات إضافية غير الأربع الأساسية — **لا تُضِف export فارغ لكل الثيمات دفعاً للعادة**.
+>
+> **لا حاجة لتعديل أداة المعاينة عند إضافة صفحة جديدة لثيم** — فقط أضف/عدّل `additionalPages` داخل ملف الثيم نفسه، وستظهر في الـ sidebar تلقائياً بعد `bundle-themes.mjs`.
+
+### مثال حي مطبَّق
+
+`color-electric-blue-rush-theme.tsx` — صفحة "من نحن" (`/about`) مطبَّقة بالكامل كنموذج جاهز للنسخ (component + StaticPage branch + ترجمة 3 لغات + `additionalPages`).
+
+### قائمة تحقق إضافية (فقط إذا أضفت additionalPages لثيم)
+
+- [ ] الـ component الجديد مُسجَّل داخل `StaticPage` بنفس الـ slug الموجود في `link`
+- [ ] `link` يبدأ بـ `/` ولا يحتوي `domain` (نفس قاعدة §17)
+- [ ] إذا استُخدم `t.pages.*`، أُضيف مفتاح الصفحة الجديدة لكل من ar/fr/en
+- [ ] `additionalPages` يحتوي `name_ar` + `name_fr` + `name_en` + `link` لكل عنصر (وليس `name` مفرد)
+- [ ] تم تشغيل `node scripts/bundle-themes.mjs --slug=<name>` بعد الإضافة
 
 ---

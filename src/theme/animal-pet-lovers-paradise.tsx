@@ -307,6 +307,12 @@ const T = {
     successTitle: 'تم استلام طلبك!',
     successDesc: 'شكراً لثقتك بنا. سنتواصل معك قريباً لتأكيد الطلب 🐾',
     backToShop: 'العودة للمتجر',
+    successSteps: [
+        { title: 'تم استلام طلبك', desc: 'تم تسجيل طلبك بنجاح في نظامنا' },
+        { title: 'تأكيد الطلب', desc: 'سنتصل بك خلال 24 ساعة' },
+        { title: 'التحضير والتغليف', desc: 'يتم تجهيز طلبك بعناية' },
+        { title: 'الشحن والتوصيل', desc: '2-5 أيام عمل' },
+    ],
     cartEmpty: 'السلة فارغة 🐾', cartEmptyDesc: 'ابدأ التسوق الآن.',
     contactTitle: 'تواصل معنا', contactSubtitle: 'نحن هنا دائماً لمساعدتك 🐾',
     contactPhoneLabel: 'الهاتف', contactLocationLabel: 'الموقع', contactEmailLabel: 'البريد',
@@ -381,6 +387,12 @@ const T = {
     successTitle: 'Commande reçue !',
     successDesc: 'Merci pour votre confiance. Nous vous contacterons bientôt 🐾',
     backToShop: 'Retour à la boutique',
+    successSteps: [
+        { title: 'Commande reçue', desc: 'Votre commande a été enregistrée avec succès' },
+        { title: 'Confirmation', desc: 'Nous vous appellerons sous 24h' },
+        { title: 'Préparation', desc: 'Votre commande est préparée avec soin' },
+        { title: 'Livraison', desc: '2-5 jours ouvrables' },
+    ],
     cartEmpty: 'Votre panier est vide 🐾', cartEmptyDesc: 'Commencez vos achats maintenant.',
     contactTitle: 'Contactez-nous', contactSubtitle: 'Nous sommes toujours là pour vous aider 🐾',
     contactPhoneLabel: 'Téléphone', contactLocationLabel: 'Adresse', contactEmailLabel: 'E-mail',
@@ -455,6 +467,12 @@ const T = {
     successTitle: 'Order received!',
     successDesc: 'Thank you for your trust. We will contact you shortly to confirm your order 🐾',
     backToShop: 'Back to shop',
+    successSteps: [
+        { title: 'Order received', desc: 'Your order has been registered successfully' },
+        { title: 'Confirmation', desc: "We'll call you within 24 hours" },
+        { title: 'Packaging', desc: 'Your order is being prepared with care' },
+        { title: 'Shipping', desc: '2-5 business days' },
+    ],
     cartEmpty: 'Your cart is empty 🐾', cartEmptyDesc: 'Start shopping now.',
     contactTitle: 'Contact Us', contactSubtitle: "We're always here to help you 🐾",
     contactPhoneLabel: 'Phone', contactLocationLabel: 'Location', contactEmailLabel: 'Email',
@@ -1462,6 +1480,71 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                             </button>
                         </form>
                     </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SUCCESS
+══════════════════════════════════════════════════════════════ */
+export function Success({ store, order }: { store: any; domain: string; order: any }) {
+    const t = T[getLang(store)];
+    const currency = store?.currency || 'DZD';
+    const stepIcons = [Check, Phone, Package, Truck];
+
+    return (
+        <div dir={t.dir} style={{ minHeight: '100vh', background: 'var(--bg)', padding: '3rem 1.5rem' }}>
+            <div style={{ maxWidth: 480, margin: '0 auto' }}>
+                <div className="anim-fade" style={{ textAlign: 'center', background: '#fff', padding: '3rem 2rem', borderRadius: 28, border: '2px solid var(--amber-lt)', boxShadow: '0 12px 40px var(--shadow)', marginBottom: '1.5rem' }}>
+                    <span className="anim-bounce" style={{ fontSize: '3.5rem', display: 'block', marginBottom: '1rem' }}>🐾</span>
+                    <h2 className="font-serif" style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--amber-dk)', marginBottom: '0.625rem' }}>{t.successTitle}</h2>
+                    <p style={{ color: 'var(--text-mid)', fontWeight: 600, lineHeight: 1.7 }}>{t.successDesc}</p>
+                </div>
+
+                {order && (order.productName || order.total != null) && (
+                    <div style={{ background: '#fff', borderRadius: 20, border: '2px solid var(--border)', padding: '1.25rem 1.5rem', marginBottom: '1.5rem' }}>
+                        {order.productName && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, paddingBottom: 10, marginBottom: 10, borderBottom: '1px solid var(--border)', fontSize: '0.85rem' }}>
+                                <span style={{ color: 'var(--text-mid)', fontWeight: 700 }}>{t.productLabel}</span>
+                                <span style={{ fontWeight: 800, color: 'var(--text)' }}>{order.productName}</span>
+                            </div>
+                        )}
+                        {order.total != null && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800 }}>
+                                <span style={{ color: 'var(--text-mid)' }}>{t.total}</span>
+                                <span style={{ color: 'var(--amber-dk)', fontSize: '1.15rem' }}>{Number(order.total).toLocaleString()} {currency}</span>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                <div style={{ background: '#fff', borderRadius: 20, border: '2px solid var(--border)', overflow: 'hidden', marginBottom: '1.5rem' }}>
+                    {t.successSteps.map((step, i) => {
+                        const Icon = stepIcons[i] ?? Check;
+                        const done = i === 0;
+                        return (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '1rem 1.25rem', borderBottom: i < t.successSteps.length - 1 ? '1px solid var(--border)' : 'none', background: done ? 'var(--amber-lt)' : '#fff' }}>
+                                <div style={{ width: 38, height: 38, flexShrink: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? 'var(--amber-dk)' : 'var(--cream)', color: done ? '#fff' : 'var(--text-soft)' }}>
+                                    <Icon size={17} />
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <p style={{ fontSize: '0.85rem', fontWeight: 800, color: done ? 'var(--text)' : 'var(--text-soft)', marginBottom: 2 }}>{step.title}</p>
+                                    <p style={{ fontSize: '0.76rem', color: 'var(--text-mid)' }}>{step.desc}</p>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+                    <Link href="/" className="btn-warm" style={{ ...BTN_PRI, textDecoration: 'none', width: '100%' }}>
+                        <ShoppingBag size={17} /> {t.shopNow}
+                    </Link>
+                    <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.8rem', borderRadius: 50, border: '2px solid var(--border)', color: 'var(--text-mid)', fontWeight: 700, fontSize: '0.88rem', textDecoration: 'none' }}>
+                        {t.backToShop}
+                    </Link>
                 </div>
             </div>
         </div>

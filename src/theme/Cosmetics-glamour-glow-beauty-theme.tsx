@@ -6,7 +6,7 @@ import axios from 'axios';
 import {
   ShoppingBag, Search, X, ChevronDown, Heart, Star, Sparkles,
   CheckCircle2, Loader2, Trash2, ArrowLeft, Menu, Phone, Mail,
-  MapPin, ToggleRight, ChevronLeft, ChevronRight, ZoomIn,
+  MapPin, ToggleRight, ChevronLeft, ChevronRight, ZoomIn, Package, Truck,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { showError } from '@/lib/showError';
@@ -275,6 +275,12 @@ const jsonAr = {
   myCart: 'السلة', cartEmpty: 'السلة فارغة', cartEmptyDesc: 'لم تقم بإضافة أي منتجات بعد',
   successTitle: 'تم استلام طلبك! ✨', successDesc: 'شكراً لاختيارك إيانا. سنتواصل معك قريباً.',
   backToShop: 'العودة للمتجر', checkoutTitle: 'إتمام الطلب',
+  successSteps: [
+    { title: 'تم استلام طلبك', desc: 'تم تسجيل طلبك بنجاح في نظامنا' },
+    { title: 'تأكيد الطلب', desc: 'سنتصل بك خلال 24 ساعة' },
+    { title: 'التجهيز والتغليف', desc: 'يتم تجهيز طلبك بعناية' },
+    { title: 'الشحن والتوصيل', desc: '2-5 أيام عمل' },
+  ],
   deleteLabel: 'حذف', continueShopping: 'متابعة التسوق', checkoutInfoTitle: 'معلومات التوصيل',
   offersTitle: 'العروض المتاحة', descTitle: 'الوصف',
   freeShippingBadge: '🚚 توصيل مجاني',
@@ -332,6 +338,12 @@ const jsonFr = {
   myCart: 'Mon Panier', cartEmpty: 'Votre panier est vide', cartEmptyDesc: 'Découvrez notre sélection.',
   successTitle: 'Commande confirmée ! ✨', successDesc: 'Merci, notre équipe vous contactera bientôt.',
   backToShop: 'Retour à la boutique', checkoutTitle: 'Finaliser la commande',
+  successSteps: [
+    { title: 'Commande reçue', desc: 'Votre commande a été enregistrée avec succès' },
+    { title: 'Confirmation', desc: 'Nous vous appellerons sous 24h' },
+    { title: 'Préparation', desc: 'Votre commande est préparée avec soin' },
+    { title: 'Livraison', desc: '2-5 jours ouvrables' },
+  ],
   deleteLabel: 'Supprimer', continueShopping: 'Continuer', checkoutInfoTitle: 'Infos de livraison',
   offersTitle: 'Offres groupées', descTitle: 'Description',
   freeShippingBadge: '🚚 Livraison gratuite',
@@ -389,6 +401,12 @@ const jsonEn = {
   myCart: 'My Cart', cartEmpty: 'Your cart is empty', cartEmptyDesc: 'Discover our selection.',
   successTitle: 'Order confirmed! ✨', successDesc: 'Thank you! Our team will contact you soon.',
   backToShop: 'Back to shop', checkoutTitle: 'Complete order',
+  successSteps: [
+    { title: 'Order received', desc: 'Your order has been registered successfully' },
+    { title: 'Confirmation', desc: "We'll call you within 24 hours" },
+    { title: 'Packaging', desc: 'Your order is being prepared with care' },
+    { title: 'Shipping', desc: '2-5 business days' },
+  ],
   deleteLabel: 'Remove', continueShopping: 'Continue', checkoutInfoTitle: 'Delivery information',
   offersTitle: 'Bundle offers', descTitle: 'Description',
   freeShippingBadge: '🚚 Free Delivery',
@@ -1371,6 +1389,66 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               {submitting ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> {t.sending}</> : `🛒 ${t.confirmOrder}`}
             </button>
           </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function Success({ store, order }: { store: any; domain: string; order: any }) {
+  const t = T[getLang(store)];
+  const currency = store?.currency || 'DZD';
+  const stepIcons = [CheckCircle2, Phone, Package, Truck];
+
+  return (
+    <div dir={t.dir} style={{ minHeight: '100vh', background: 'var(--bg)', padding: '3rem 1.25rem' }}>
+      <div style={{ maxWidth: 480, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', background: '#fff', padding: '3rem 2rem', borderRadius: 16, border: '1px solid rgba(255,31,142,0.15)', marginBottom: '1.5rem' }}>
+          <CheckCircle2 size={40} style={{ color: 'var(--pink)', display: 'block', margin: '0 auto 16px' }} />
+          <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.9rem', fontStyle: 'italic', color: 'var(--ink)', marginBottom: 8 }}>{t.successTitle}</h2>
+          <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 14, color: 'var(--dim)', lineHeight: 1.7 }}>{t.successDesc}</p>
+        </div>
+
+        {order && (order.productName || order.total != null) && (
+          <div style={{ background: '#fff', borderRadius: 16, border: '1px solid rgba(255,31,142,0.15)', padding: '1.25rem 1.5rem', marginBottom: '1.5rem' }}>
+            <p style={{ fontWeight: 700, fontSize: '0.75rem', marginBottom: '0.75rem', color: 'var(--ink)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.orderInfo}</p>
+            {order.productName && (
+              <div style={{ paddingBottom: 10, marginBottom: 10, borderBottom: '1px solid rgba(255,31,142,0.12)', fontSize: 14, fontWeight: 700, color: 'var(--ink)' }}>{order.productName}</div>
+            )}
+            {order.total != null && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 13, color: 'var(--dim)' }}>{t.total}</span>
+                <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.3rem', fontStyle: 'italic', color: 'var(--pink)' }}>{Number(order.total).toLocaleString()} {currency}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{ background: '#fff', borderRadius: 16, border: '1px solid rgba(255,31,142,0.15)', overflow: 'hidden', marginBottom: '1.5rem' }}>
+          {t.successSteps.map((step, i) => {
+            const Icon = stepIcons[i] ?? CheckCircle2;
+            const done = i === 0;
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '1rem 1.25rem', borderBottom: i < t.successSteps.length - 1 ? '1px solid rgba(255,31,142,0.1)' : 'none', background: done ? 'rgba(255,31,142,0.05)' : 'transparent' }}>
+                <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? 'var(--pink)' : '#FBEAF2', color: done ? '#fff' : 'var(--dim)' }}>
+                  <Icon size={16} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '0.85rem', fontWeight: 700, color: done ? 'var(--ink)' : 'var(--dim)', marginBottom: 2 }}>{step.title}</p>
+                  <p style={{ fontSize: '0.76rem', color: 'var(--dim)' }}>{step.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+          <Link href="/" className="gg-btn gg-btn-pink" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <ShoppingBag size={17} /> {t.shopNow}
+          </Link>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.8rem', borderRadius: 999, border: '1px solid rgba(255,31,142,0.2)', color: 'var(--dim)', fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none' }}>
+            {t.backToShop}
+          </Link>
         </div>
       </div>
     </div>

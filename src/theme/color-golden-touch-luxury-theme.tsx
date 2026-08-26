@@ -10,7 +10,7 @@ import {
   AlertCircle, X, Phone,
   CheckCircle2, ArrowLeft, ArrowRight, Zap,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
-  Trash2, Loader2, MapPin, Shield, Truck,
+  Trash2, Loader2, MapPin, Shield, Truck, Package,
   Mail,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
@@ -338,6 +338,12 @@ const jsonAr = {
   successTitle: 'تم إرسال طلبك بنجاح!',
   successDesc: 'سنتواصل معك قريباً لتأكيد التفاصيل',
   backToShop: 'العودة للتسوق',
+  successSteps: [
+    { title: 'تم استلام طلبك', desc: 'تم تسجيل طلبك بنجاح في نظامنا' },
+    { title: 'تأكيد الطلب', desc: 'سنتصل بك خلال 24 ساعة' },
+    { title: 'التجهيز والتغليف', desc: 'يتم تجهيز طلبك بعناية' },
+    { title: 'الشحن والتوصيل', desc: '2-5 أيام عمل' },
+  ],
   checkoutTitle: 'إتمام الطلب',
   // Product
   offersTitle: 'العروض المتاحة',
@@ -466,6 +472,12 @@ const jsonFr = {
   successTitle: 'Commande confirmée',
   successDesc: 'Merci pour votre commande, notre équipe vous contactera bientôt.',
   backToShop: 'Retour à la boutique',
+  successSteps: [
+    { title: 'Commande reçue', desc: 'Votre commande a été enregistrée avec succès' },
+    { title: 'Confirmation', desc: 'Nous vous appellerons sous 24h' },
+    { title: 'Préparation', desc: 'Votre commande est préparée avec soin' },
+    { title: 'Livraison', desc: '2-5 jours ouvrables' },
+  ],
   checkoutTitle: 'Finaliser la commande',
   // Product
   offersTitle: 'Offres groupées',
@@ -565,6 +577,12 @@ const jsonEn = {
   successTitle: 'Order placed successfully!',
   successDesc: 'We will contact you shortly to confirm the details.',
   backToShop: 'Back to Shop', checkoutTitle: 'Checkout',
+  successSteps: [
+    { title: 'Order received', desc: 'Your order has been registered successfully' },
+    { title: 'Confirmation', desc: "We'll call you within 24 hours" },
+    { title: 'Packaging', desc: 'Your order is being prepared with care' },
+    { title: 'Shipping', desc: '2-5 business days' },
+  ],
   offersTitle: 'Available Offers', descTitle: 'Description',
   contactTagline: 'We are here to answer your questions',
   contactInfoTitle: 'Contact Information',
@@ -1755,6 +1773,69 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               {submitting ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> {t.sending}</> : t.confirmOrder}
             </button>
           </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function Success({ store, order }: { store: any; domain: string; order: any }) {
+  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const currency = store?.currency || 'DZD';
+  const ACCENT = '#D4AF37';
+  const stepIcons = [CheckCircle2, Phone, Package, Truck];
+
+  return (
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ minHeight: '100vh', background: '#0D0D0D', padding: '3rem 1.25rem' }}>
+      <div style={{ maxWidth: 480, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', background: '#1C1C1C', padding: '3rem 2rem', borderRadius: 16, border: '1.5px solid #2E2E2E', marginBottom: '1.5rem' }}>
+          <div style={{ width: 64, height: 64, background: '#141414', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem' }}>
+            <CheckCircle2 size={32} style={{ color: ACCENT }} />
+          </div>
+          <h2 style={{ fontSize: '1.625rem', fontWeight: 800, color: '#F0F0F0', marginBottom: '0.625rem' }}>{t.successTitle}</h2>
+          <p style={{ color: '#999999', lineHeight: 1.7, fontSize: '0.9375rem' }}>{t.successDesc}</p>
+        </div>
+
+        {order && (order.productName || order.total != null) && (
+          <div style={{ background: '#1C1C1C', borderRadius: 16, border: '1.5px solid #2E2E2E', padding: '1.25rem 1.5rem', marginBottom: '1.5rem' }}>
+            <p style={{ fontWeight: 800, fontSize: '0.8rem', marginBottom: '0.75rem', color: '#F0F0F0', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.orderInfo}</p>
+            {order.productName && (
+              <div style={{ paddingBottom: 10, marginBottom: 10, borderBottom: '1px solid #2E2E2E', fontSize: 14, fontWeight: 700, color: '#F0F0F0' }}>{order.productName}</div>
+            )}
+            {order.total != null && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 13, color: '#999999' }}>{t.total}</span>
+                <span style={{ fontSize: '1.2rem', fontWeight: 800, color: ACCENT }}>{Number(order.total).toLocaleString()} {currency}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{ background: '#1C1C1C', borderRadius: 16, border: '1.5px solid #2E2E2E', overflow: 'hidden', marginBottom: '1.5rem' }}>
+          {t.successSteps.map((step, i) => {
+            const Icon = stepIcons[i] ?? CheckCircle2;
+            const done = i === 0;
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '1rem 1.25rem', borderBottom: i < t.successSteps.length - 1 ? '1px solid #2E2E2E' : 'none', background: done ? '#141414' : 'transparent' }}>
+                <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? ACCENT : '#262626', color: done ? '#0D0D0D' : '#777' }}>
+                  <Icon size={16} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '0.85rem', fontWeight: 700, color: done ? '#F0F0F0' : '#777', marginBottom: 2 }}>{step.title}</p>
+                  <p style={{ fontSize: '0.76rem', color: '#999999' }}>{step.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: ACCENT, color: '#0D0D0D', padding: '0.875rem 2rem', borderRadius: 10, fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none' }}>
+            <ShoppingBag size={17} /> {t.shopNow}
+          </Link>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.8rem', borderRadius: 10, border: '1.5px solid #2E2E2E', color: '#999999', fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none' }}>
+            {t.backToShop}
+          </Link>
         </div>
       </div>
     </div>

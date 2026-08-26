@@ -5,7 +5,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
-import { Star, ChevronDown, AlertCircle, X, CheckCircle2, Shield, ArrowLeft, Plus, Minus, Search, ShoppingCart, Trash2, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, ChevronDown, AlertCircle, X, CheckCircle2, Shield, ArrowLeft, Plus, Minus, Search, ShoppingCart, Trash2, Loader2, ChevronLeft, ChevronRight, Phone, Package, Truck } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
@@ -165,6 +165,12 @@ const jsonAr = {
   successTitle: 'تم إرسال طلبك بنجاح!',
   successDesc: 'سنتواصل معك قريباً لتأكيد التفاصيل',
   backToShop: 'العودة للتسوق',
+  successSteps: [
+    { title: 'تم استلام طلبك', desc: 'تم تسجيل طلبك بنجاح في نظامنا' },
+    { title: 'تأكيد الطلب', desc: 'سنتصل بك خلال 24 ساعة' },
+    { title: 'التجهيز والتغليف', desc: 'يتم تجهيز طلبك بعناية' },
+    { title: 'الشحن والتوصيل', desc: '2-5 أيام عمل' },
+  ],
   checkoutTitle: 'إتمام الطلب',
   // Product
   offersTitle: 'العروض المتاحة',
@@ -280,6 +286,12 @@ const jsonFr = {
   successTitle: 'Commande confirmée',
   successDesc: 'Merci pour votre commande, notre équipe vous contactera bientôt.',
   backToShop: 'Retour à la boutique',
+  successSteps: [
+    { title: 'Commande reçue', desc: 'Votre commande a été enregistrée avec succès' },
+    { title: 'Confirmation', desc: 'Nous vous appellerons sous 24h' },
+    { title: 'Préparation', desc: 'Votre commande est préparée avec soin' },
+    { title: 'Livraison', desc: '2-5 jours ouvrables' },
+  ],
   checkoutTitle: 'Finaliser la commande',
   // Product
   offersTitle: 'Offres groupées',
@@ -1010,6 +1022,69 @@ export function Cart({domain,store}:{domain:string;store:any}){
               {sub?<><Loader2 style={{width:13,height:13,animation:'sp 1s linear infinite'}}/>{t.sending}</>:<>{t.confirmOrder} <ArrowLeft style={{width:13,height:13,transform:t.dir==='ltr'?'scaleX(-1)':'none'}}/></>}
             </button>
           </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function Success({store,order}:{store:any;domain:string;order:any}){
+  const t=T[getLang(store)];
+  const cur=store?.currency||'DZD';
+  const steps=[
+    {icon:CheckCircle2,title:t.successSteps[0].title,desc:t.successSteps[0].desc},
+    {icon:Phone,title:t.successSteps[1].title,desc:t.successSteps[1].desc},
+    {icon:Package,title:t.successSteps[2].title,desc:t.successSteps[2].desc},
+    {icon:Truck,title:t.successSteps[3].title,desc:t.successSteps[3].desc},
+  ];
+  return(
+    <div dir={t.dir} style={{minHeight:'100vh',background:'var(--bg)',padding:'3rem 1.25rem'}}>
+      <div style={{maxWidth:480,margin:'0 auto'}}>
+        <div style={{textAlign:'center',background:'var(--s1)',border:'1px solid var(--br)',padding:'3rem 2rem',marginBottom:'1.5rem'}}>
+          <CheckCircle2 style={{width:40,height:40,color:'var(--cp)',display:'block',margin:'0 auto 16px'}}/>
+          <h2 className="bn" style={{fontSize:'2.5rem',color:'var(--tx)',letterSpacing:'0.06em',marginBottom:8}}>{t.successTitle}</h2>
+          <p style={{fontSize:'12px',color:'var(--mu)',letterSpacing:'0.05em',lineHeight:1.8}}>{t.successDesc}</p>
+        </div>
+
+        {order&&(order.productName||order.total!=null)&&(
+          <div style={{background:'var(--s1)',border:'1px solid var(--br)',padding:'1.25rem 1.5rem',marginBottom:'1.5rem'}}>
+            <span className="lbl">{t.orderInfo}</span>
+            {order.productName&&(
+              <div style={{paddingTop:8,paddingBottom:8,borderBottom:'1px solid var(--br)',fontSize:13,color:'var(--tx)',fontWeight:600}}>{order.productName}</div>
+            )}
+            {order.total!=null&&(
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingTop:10}}>
+                <span style={{fontSize:'11px',fontWeight:700,color:'var(--tx)',letterSpacing:'0.12em',textTransform:'uppercase'}}>{t.total}</span>
+                <span style={{fontSize:'1.2rem',fontWeight:800,color:'var(--cp)'}}>{Number(order.total).toLocaleString()} {cur}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{background:'var(--s1)',border:'1px solid var(--br)',marginBottom:'1.5rem'}}>
+          {steps.map((step,i)=>{
+            const Icon=step.icon; const done=i===0;
+            return(
+              <div key={i} style={{display:'flex',alignItems:'center',gap:14,padding:'1rem 1.25rem',borderBottom:i<steps.length-1?'1px solid var(--br)':'none',background:done?'var(--cl)':'transparent'}}>
+                <div style={{width:34,height:34,flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',background:done?'var(--cp)':'var(--s2)',color:done?'var(--bg)':'var(--mu)'}}>
+                  <Icon size={15}/>
+                </div>
+                <div style={{flex:1,minWidth:0}}>
+                  <p style={{fontSize:13,fontWeight:700,color:done?'var(--tx)':'var(--mu)',letterSpacing:'0.03em',marginBottom:2}}>{step.title}</p>
+                  <p style={{fontSize:11,color:'var(--mu)'}}>{step.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{display:'flex',flexDirection:'column',gap:10}}>
+          <Link href="/" className="btn-dark" style={{textDecoration:'none'}}>
+            <ShoppingCart style={{width:14,height:14}}/> {t.shopNow}
+          </Link>
+          <Link href="/" className="btn-ghost" style={{textDecoration:'none'}}>
+            {t.cartContinueShopping}
+          </Link>
         </div>
       </div>
     </div>

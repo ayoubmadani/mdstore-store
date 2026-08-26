@@ -903,6 +903,82 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// SUCCESS
+// ─────────────────────────────────────────────────────────────
+
+export function Success({ store, order }: { store: any; domain: string; order: any }) {
+  const isRTL = (store?.language || 'ar') === 'ar';
+  const currency = store?.currency || (isRTL ? 'دج' : 'DZD');
+
+  const steps = [
+    { icon: Check,   title: isRTL ? 'تم استلام طلبك'    : 'Order received', desc: isRTL ? 'تم تسجيل طلبك بنجاح في نظامنا' : 'Your order has been registered successfully', done: true },
+    { icon: Phone,   title: isRTL ? 'تأكيد الطلب'        : 'Confirmation',   desc: isRTL ? 'سنتصل بك خلال 24 ساعة'         : "We'll call you within 24 hours",             done: false },
+    { icon: Package, title: isRTL ? 'التجهيز والتغليف'   : 'Packaging',      desc: isRTL ? 'يتم تجهيز طلبك بعناية'          : 'Your order is being prepared with care',     done: false },
+    { icon: Truck,   title: isRTL ? 'الشحن والتوصيل'     : 'Shipping',       desc: isRTL ? '2-5 أيام عمل'                   : '2-5 business days',                          done: false },
+  ];
+
+  return (
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ ...S.body, padding: '3rem 1rem', minHeight: '70vh' }}>
+      <div style={{ ...S.container, maxWidth: 560 }}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <div style={{ width: 64, height: 64, margin: '0 auto 1.25rem', borderRadius: '50%', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Check size={30} color="#fff" />
+          </div>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>{isRTL ? 'تم تأكيد طلبك!' : 'Order confirmed!'}</h1>
+          <p style={{ fontSize: '0.88rem', color: '#666', lineHeight: 1.7 }}>
+            {isRTL ? 'شكراً لثقتك بنا، سنتواصل معك قريباً لتأكيد التفاصيل.' : "Thank you for your order, we'll contact you soon to confirm the details."}
+          </p>
+        </div>
+
+        {order && (order.productName || order.total != null) && (
+          <div style={{ border: '1px solid #e5e5e5', borderRadius: 4, padding: '1rem 1.25rem', marginBottom: '1.5rem', background: '#f8f8f8' }}>
+            {order.productName && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, paddingBottom: 8, marginBottom: 8, borderBottom: '1px solid #e5e5e5', fontSize: '0.85rem' }}>
+                <span style={{ color: '#666', flexShrink: 0 }}>{isRTL ? 'المنتج' : 'Product'}</span>
+                <span style={{ fontWeight: 600, textAlign: isRTL ? 'left' : 'right' }}>{order.productName}</span>
+              </div>
+            )}
+            {order.total != null && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem', fontWeight: 700 }}>
+                <span>{isRTL ? 'الإجمالي' : 'Total'}</span>
+                <span>{Number(order.total).toLocaleString()} {currency}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{ border: '1px solid #e5e5e5', borderRadius: 4, overflow: 'hidden', marginBottom: '2rem' }}>
+          {steps.map((step, i) => {
+            const Icon = step.icon;
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0.85rem 1rem', borderBottom: i < steps.length - 1 ? '1px solid #e5e5e5' : 'none', background: step.done ? '#f8f8f8' : '#fff' }}>
+                <div style={{ width: 34, height: 34, flexShrink: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: step.done ? '#111' : '#f0f0f0', color: step.done ? '#fff' : '#bbb' }}>
+                  <Icon size={16} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '0.85rem', fontWeight: 600, color: step.done ? '#111' : '#999', marginBottom: 2 }}>{step.title}</p>
+                  <p style={{ fontSize: '0.78rem', color: '#999' }}>{step.desc}</p>
+                </div>
+                {step.done && <Check size={16} color="#111" />}
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+          <Link href="/" style={{ ...S.btnBlack, justifyContent: 'center', textDecoration: 'none' }}>
+            <ShoppingCart size={16} /> {isRTL ? 'تصفح المزيد من المنتجات' : 'Browse more products'}
+          </Link>
+          <Link href="/" style={{ ...S.btnOutline, justifyContent: 'center', textDecoration: 'none' }}>
+            {isRTL ? 'العودة إلى الصفحة الرئيسية' : 'Back to home'}
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
 // STATIC PAGES
 // ─────────────────────────────────────────────────────────────
 

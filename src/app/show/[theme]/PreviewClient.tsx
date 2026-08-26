@@ -1,10 +1,16 @@
 'use client'
 
-import { useEffect, useMemo, useState, type SyntheticEvent } from 'react'
-import ThemeRunner from '@/components/ThemeRunner'
-import { buildPreviewStore, PREVIEW_DOMAIN, PREVIEW_WILAYAS, PREVIEW_COMMUNES, type PreviewLang } from '@/lib/mock-preview-store'
-import { installPreviewMockApi, setPreviewSearchLang } from '@/lib/preview-mock-api'
-import type { Store } from '@/types/store'
+import { useEffect, useState } from 'react'
+import { loadThemeModule } from '@/components/ThemeRunner'
+import PreviewContent, { type PreviewPage } from './PreviewContent'
+import type { PreviewLang } from '@/lib/mock-preview-store'
+
+interface AdditionalPage {
+  name_ar: string
+  name_fr: string
+  name_en: string
+  link: string
+}
 
 const LANGS: { code: PreviewLang; label: string }[] = [
   { code: 'ar', label: 'AR' },
@@ -12,252 +18,298 @@ const LANGS: { code: PreviewLang; label: string }[] = [
   { code: 'en', label: 'EN' },
 ]
 
-type PreviewPage = 'home' | 'product' | 'cart' | 'contact'
+type ViewMode = 'desktop' | 'mobile'
+const MOBILE_WIDTH = 380
+const MOBILE_HEIGHT = 640
+
+// iframe بعرض ثابت حقيقي — الحل الوحيد لتفعيل media queries الفعلية للثيم بدل عرض
+// المتصفح الكامل الذي يبقى واسعاً حتى لو صندوق العرض ضيّق بصرياً.
+function MobileFrame({ theme, lang, page }: { theme: string; lang: PreviewLang; page: PreviewPage }) {
+  return (
+    <iframe
+      src={`/show/${theme}/embed?lang=${lang}&page=${page}`}
+      title="معاينة الموبايل"
+      style={{ width: MOBILE_WIDTH - 20, height: MOBILE_HEIGHT, border: 'none', display: 'block' }}
+    />
+  )
+}
+
 const PAGES: Record<PreviewLang, { code: PreviewPage; label: string }[]> = {
   ar: [
     { code: 'home', label: 'الرئيسية' },
     { code: 'product', label: 'صفحة المنتج' },
     { code: 'cart', label: 'السلة' },
+    { code: 'success', label: 'نجاح الطلب' },
     { code: 'contact', label: 'اتصل بنا' },
+    { code: 'privacy', label: 'الخصوصية' },
+    { code: 'terms', label: 'الشروط' },
+    { code: 'cookies', label: 'الكوكيز' },
   ],
   fr: [
     { code: 'home', label: 'Accueil' },
     { code: 'product', label: 'Page produit' },
     { code: 'cart', label: 'Panier' },
+    { code: 'success', label: 'Commande réussie' },
     { code: 'contact', label: 'Contact' },
+    { code: 'privacy', label: 'Confidentialité' },
+    { code: 'terms', label: 'Conditions' },
+    { code: 'cookies', label: 'Cookies' },
   ],
   en: [
     { code: 'home', label: 'Home' },
     { code: 'product', label: 'Product page' },
     { code: 'cart', label: 'Cart' },
+    { code: 'success', label: 'Order success' },
     { code: 'contact', label: 'Contact' },
+    { code: 'privacy', label: 'Privacy' },
+    { code: 'terms', label: 'Terms' },
+    { code: 'cookies', label: 'Cookies' },
   ],
 }
 
-// يمنع فقط التنقّل الحقيقي عبر روابط <a href> (Navbar/Footer/بطاقات المنتج) لأنها تقود
-// إلى مسارات /{domain}/... حقيقية غير موجودة (preview ليس دومين حقيقي فيُعطي 404) —
-// لكنه يترك كل الأزرار والنماذج (طلب الآن، أضف للسلة، الفلاتر...) تعمل بشكل طبيعي
-// لأن هذه صفحة عرض واحدة بدون توجيه حقيقي (Navbar/المنتج/السلة/تواصل كلها Tabs داخلية).
-function useBlockRealNavigation() {
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      const link = (e.target as HTMLElement)?.closest?.('a[href]')
-      if (link) {
-        e.preventDefault()
-        e.stopPropagation()
-      }
-    }
-    document.addEventListener('click', handler, true)
-    return () => document.removeEventListener('click', handler, true)
-  }, [])
-}
+const SIDEBAR_WIDTH = 208
 
-// يملأ سلة المعاينة بمنتج واحد عند أول تحميل فقط (وإذا كانت فارغة) حتى تعرض صفحة "السلة"
-// عنصراً مباشرة بدل شاشة "السلة فارغة" — بنفس شكل العنصر الذي تكتبه addToCart داخل الثيمات
-// (product/finalPrice/quantity/...)، ولا يطغى على أي تعديل يدوي يجريه المستخدم لاحقاً.
-function useSeedPreviewCart(store: any) {
-  useEffect(() => {
-    try {
-      const existing = JSON.parse(localStorage.getItem(PREVIEW_DOMAIN) || '[]')
-      if (Array.isArray(existing) && existing.length > 0) return
-      const product = store.products?.[0]
-      if (!product) return
-      const item = {
-        customerId: '', customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '',
-        quantity: 1, typeLivraison: 'home',
-        product,
-        productId: product.id,
-        storeId: product.store?.id,
-        userId: product.store?.userId,
-        selectedOffer: null,
-        selectedVariants: {},
-        platform: 'store',
-        finalPrice: product.price,
-        totalPrice: product.price,
-        priceLivraison: 0,
-        addedAt: Date.now(),
-      }
-      localStorage.setItem(PREVIEW_DOMAIN, JSON.stringify([item]))
-    } catch {}
-  }, [store])
-}
-
-const noop = () => {}
-
-// يعرض قسم "تفاصيل المنتج" لأول منتج وهمي — بنفس شكل الـ props التي يرسلها
-// src/app/[domain]/(store)/product/[id]/ProductClient.tsx للثيم الحقيقي. النموذج تفاعلي
-// فعلاً (يمكن فتح "اطلب الآن" وملء الحقول) — الإرسال الحقيقي مُعترَض ومُزيَّف عبر
-// installPreviewMockApi، وأي إعادة توجيه بعد النجاح تبقى محدودية معروفة ومقبولة.
-function PreviewProductDetails({ product, store, domain, bundleUrl }: { product: any; store: any; domain: string; bundleUrl: string }) {
-  const allImages = [product.productImage, ...(product.imagesProduct?.map((i: any) => i.imageUrl) || [])].filter(Boolean)
-  const discount = product.priceOriginal
-    ? Math.round(((product.priceOriginal - product.price) / product.priceOriginal) * 100)
-    : 0
-
-  return (
-    <ThemeRunner
-      bundleUrl={bundleUrl}
-      exportName="Details"
-      themeProps={{
-        product,
-        store,
-        domain,
-        allImages,
-        allAttrs: product.attributes || [],
-        finalPrice: product.price,
-        inStock: true,
-        autoGen: false,
-        discount,
-        selectedVariants: {},
-        selectedOffer: product.offers?.[0]?.id ?? null,
-        isWishlisted: false,
-        formData: { customerId: '', customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '', quantity: 1, typeLivraison: 'home' as const },
-        formErrors: {},
-        submitting: false,
-        wilayas: PREVIEW_WILAYAS,
-        communes: PREVIEW_COMMUNES,
-        loadingCommunes: false,
-        setFormData: noop,
-        setSelectedOffer: noop,
-        handleVariantSelection: noop,
-        handleSubmit: (e: SyntheticEvent) => e.preventDefault(),
-        handleShare: noop,
-        toggleWishlist: noop,
-        getTotalPrice: () => product.price,
-        getPriceLivraison: () => 0,
-        getFinalPrice: () => product.price,
-      }}
-    />
-  )
-}
-
-function PreviewBar({
-  lang, onLangChange, page, onPageChange,
+function PreviewSidebar({
+  lang, onLangChange, page, onPageChange, collapsed, onToggle, viewMode, onViewModeChange, additionalPages,
 }: {
   lang: PreviewLang
   onLangChange: (l: PreviewLang) => void
   page: PreviewPage
   onPageChange: (p: PreviewPage) => void
+  collapsed: boolean
+  onToggle: () => void
+  viewMode: ViewMode
+  onViewModeChange: (v: ViewMode) => void
+  additionalPages: AdditionalPage[]
 }) {
   return (
-    <div
-      dir="ltr"
-      style={{
-        position: 'fixed',
-        top: 0,
-        insetInline: 0,
-        zIndex: 1000000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 8,
-        flexWrap: 'wrap',
-        padding: '8px 16px',
-        background: 'rgba(17,17,17,0.92)',
-        backdropFilter: 'blur(6px)',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.25)',
-      }}
-    >
-      <div style={{ display: 'flex', gap: 4 }}>
-        {PAGES[lang].map(p => (
-          <button
-            key={p.code}
-            type="button"
-            onClick={() => onPageChange(p.code)}
-            style={{
-              padding: '6px 14px',
-              borderRadius: 999,
-              border: 'none',
-              fontSize: 12,
-              fontWeight: 700,
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              background: page === p.code ? '#fff' : 'transparent',
-              color: page === p.code ? '#111' : '#fff',
-            }}
-          >
-            {p.label}
-          </button>
-        ))}
+    <>
+      <div
+        dir="ltr"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          bottom: 0,
+          zIndex: 1000000,
+          width: SIDEBAR_WIDTH,
+          display: 'flex',
+          flexDirection: 'column',
+          background: 'rgba(17,17,17,0.95)',
+          backdropFilter: 'blur(6px)',
+          boxShadow: '2px 0 12px rgba(0,0,0,0.25)',
+          transform: collapsed ? `translateX(-${SIDEBAR_WIDTH}px)` : 'translateX(0)',
+          transition: 'transform 0.2s ease',
+        }}
+      >
+        <div style={{ padding: '18px 14px 10px', fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          معاينة الثيم
+        </div>
+
+        <div style={{ display: 'flex', gap: 6, padding: '0 10px 12px' }}>
+          {(['desktop', 'mobile'] as ViewMode[]).map(v => (
+            <button
+              key={v}
+              type="button"
+              onClick={() => onViewModeChange(v)}
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                padding: '8px 0',
+                borderRadius: 8,
+                border: '1px solid rgba(255,255,255,0.12)',
+                fontSize: 12,
+                fontWeight: 700,
+                cursor: 'pointer',
+                background: viewMode === v ? '#fff' : 'transparent',
+                color: viewMode === v ? '#111' : '#fff',
+              }}
+            >
+              {v === 'desktop' ? '🖥️' : '📱'} {v === 'desktop' ? 'Desktop' : 'Mobile'}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '0 10px', overflowY: 'auto', minHeight: 0 }}>
+          {PAGES[lang].map(p => (
+            <button
+              key={p.code}
+              type="button"
+              onClick={() => onPageChange(p.code)}
+              style={{
+                textAlign: 'left',
+                padding: '10px 12px',
+                borderRadius: 8,
+                border: 'none',
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: 'pointer',
+                background: page === p.code ? '#fff' : 'transparent',
+                color: page === p.code ? '#111' : '#fff',
+              }}
+            >
+              {p.label}
+            </button>
+          ))}
+
+          {additionalPages.length > 0 && (
+            <>
+              <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '10px 2px 2px' }}>
+                صفحات إضافية
+              </p>
+              {additionalPages.map(ap => {
+                const slug = ap.link.replace(/^\//, '')
+                const name = lang === 'ar' ? ap.name_ar : lang === 'fr' ? ap.name_fr : ap.name_en
+                return (
+                  <button
+                    key={ap.link}
+                    type="button"
+                    onClick={() => onPageChange(slug)}
+                    style={{
+                      textAlign: 'left',
+                      padding: '10px 12px',
+                      borderRadius: 8,
+                      border: 'none',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      background: page === slug ? '#fff' : 'transparent',
+                      color: page === slug ? '#111' : '#fff',
+                    }}
+                  >
+                    {name}
+                  </button>
+                )
+              })}
+            </>
+          )}
+        </div>
+
+        <div style={{ marginTop: 'auto', padding: 10, display: 'flex', gap: 6, borderTop: '1px solid rgba(255,255,255,0.12)' }}>
+          {LANGS.map(l => (
+            <button
+              key={l.code}
+              type="button"
+              onClick={() => onLangChange(l.code)}
+              style={{
+                flex: 1,
+                padding: '8px 0',
+                borderRadius: 6,
+                border: 'none',
+                fontSize: 11,
+                fontWeight: 700,
+                cursor: 'pointer',
+                background: lang === l.code ? '#fff' : 'transparent',
+                color: lang === l.code ? '#111' : '#fff',
+              }}
+            >
+              {l.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 4 }}>
-        {LANGS.map(l => (
-          <button
-            key={l.code}
-            type="button"
-            onClick={() => onLangChange(l.code)}
-            style={{
-              padding: '6px 14px',
-              borderRadius: 999,
-              border: 'none',
-              fontSize: 12,
-              fontWeight: 700,
-              cursor: 'pointer',
-              background: lang === l.code ? '#fff' : 'transparent',
-              color: lang === l.code ? '#111' : '#fff',
-            }}
-          >
-            {l.label}
-          </button>
-        ))}
-      </div>
-    </div>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-label={collapsed ? 'فتح لوحة المعاينة' : 'طي لوحة المعاينة'}
+        style={{
+          position: 'fixed',
+          top: 200,
+          left: collapsed ? 0 : SIDEBAR_WIDTH -0,
+          transform: 'translateY(-50%)',
+          zIndex: 1000001,
+          width: 15,
+          height: 80,
+          borderRadius: '0 10px 10px 0',
+          border: '1px solid rgba(255,255,255,0.15)',
+          cursor: 'pointer',
+          background: 'rgba(17,17,17,0.92)',
+          color: '#fff',
+          fontSize: 16,
+          lineHeight: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+          transition: 'left 0.2s ease',
+        }}
+      >
+        {collapsed ? '›' : '‹'}
+      </button>
+    </>
   )
 }
 
 export default function PreviewClient({ theme }: { theme: string }) {
   const [lang, setLang] = useState<PreviewLang>('fr')
   const [page, setPage] = useState<PreviewPage>('home')
-  useEffect(() => installPreviewMockApi(), [])
-  useBlockRealNavigation()
-  useEffect(() => setPreviewSearchLang(lang), [lang])
+  const [collapsed, setCollapsed] = useState(false)
+  const [viewMode, setViewMode] = useState<ViewMode>('desktop')
+  const [additionalPages, setAdditionalPages] = useState<AdditionalPage[]>([])
 
-  const store: Store = useMemo(() => buildPreviewStore(theme, lang), [theme, lang])
-  useSeedPreviewCart(store)
-  const bundleUrl = `/api/themes/${theme}`
-  const dir = lang === 'ar' ? 'rtl' : 'ltr'
+  // يقرأ export اختياري باسم additionalPages من حزمة الثيم نفسها (name/link لكل صفحة
+  // إضافية غير الأربع المعروفة) ليضيفها كروابط في الـ sidebar تلقائياً — بدون أي إدخال يدوي.
+  useEffect(() => {
+    let cancelled = false
+    loadThemeModule(`/api/themes/${theme}`)
+      .then((exports) => {
+        if (cancelled) return
+        setAdditionalPages(Array.isArray(exports.additionalPages) ? exports.additionalPages : [])
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [theme])
 
   return (
     <>
-      <div dir={dir} style={{ paddingTop: 44 }}>
-        <ThemeRunner
-          bundleUrl={bundleUrl}
-          exportName="default"
-          themeProps={{ store, domain: PREVIEW_DOMAIN }}
-          fallback={<p style={{ padding: 40, textAlign: 'center' }}>...جاري تحميل الثيم</p>}
+      {viewMode === 'mobile' ? (
+        <div
+          style={{
+            minHeight: '100vh',
+            background: '#e5e7eb',
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            paddingTop: 32,
+            paddingBottom: 32,
+          }}
         >
-          {page === 'home' && (
-            <ThemeRunner
-              bundleUrl={bundleUrl}
-              exportName="Home"
-              themeProps={{ store, domain: PREVIEW_DOMAIN, page: 1 }}
-            />
-          )}
+          <div
+            style={{
+              width: MOBILE_WIDTH,
+              maxWidth: '100%',
+              background: '#111',
+              borderRadius: 32,
+              border: '10px solid #111',
+              overflow: 'hidden',
+              boxShadow: '0 24px 60px rgba(0,0,0,0.35)',
+              flexShrink: 0,
+            }}
+          >
+            <MobileFrame theme={theme} lang={lang} page={page} />
+          </div>
+        </div>
+      ) : (
+        <div style={{ paddingLeft: collapsed ? 0 : SIDEBAR_WIDTH, transition: 'padding-left 0.2s ease' }}>
+          <PreviewContent theme={theme} lang={lang} page={page} />
+        </div>
+      )}
 
-          {page === 'product' && (
-            <PreviewProductDetails product={store.products![0]} store={store} domain={PREVIEW_DOMAIN} bundleUrl={bundleUrl} />
-          )}
-
-          {page === 'cart' && (
-            <ThemeRunner
-              bundleUrl={bundleUrl}
-              exportName="Cart"
-              themeProps={{ store, domain: PREVIEW_DOMAIN }}
-            />
-          )}
-
-          {page === 'contact' && (
-            <ThemeRunner
-              bundleUrl={bundleUrl}
-              exportName="StaticPage"
-              themeProps={{ store, domain: PREVIEW_DOMAIN, page: 'contact', staticPage: 'contact' }}
-            />
-          )}
-        </ThemeRunner>
-      </div>
-
-      <PreviewBar lang={lang} onLangChange={setLang} page={page} onPageChange={setPage} />
+      <PreviewSidebar
+        lang={lang}
+        onLangChange={setLang}
+        page={page}
+        onPageChange={setPage}
+        collapsed={collapsed}
+        onToggle={() => setCollapsed(c => !c)}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        additionalPages={additionalPages}
+      />
     </>
   )
 }

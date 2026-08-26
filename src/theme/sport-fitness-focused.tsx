@@ -200,7 +200,7 @@ function FireIcon({ size = 32 }: { size?: number }) {
 }
 
 /* ─── TYPES ─── */
-interface Offer     { id: string; name: string; quantity: number; price: number; }
+interface Offer     { id: string; name: string; quantity: number; price: number; subTitle?: string; shippingFree?: boolean; }
 interface Variant   { id: string; name: string; value: string; }
 interface Attribute { id: string; type: string; name: string; displayMode?: 'color'|'image'|'text'|null; variants: Variant[]; }
 interface ProductImage          { id: string; imageUrl: string; }
@@ -211,8 +211,8 @@ interface Commune { id: string; name: string; ar_name: string; wilayaId: string;
 export interface Product {
   id: string; name: string; price: string|number; priceOriginal?: string|number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
-  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
-  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 export interface ProductFormProps {
   product: Product; store?: any; userId: string; domain: string; redirectPath?: string;
@@ -302,9 +302,20 @@ const jsonAr = {
   successDesc: 'سنتواصل معك قريباً لتأكيد التفاصيل',
   backToShop: 'العودة للتسوق',
   checkoutTitle: 'إتمام الطلب',
+  successDoneBadge: 'مكتمل ✓',
+  successSteps: [
+    { title: 'تم استلام طلبك', desc: 'تم تسجيل طلبك بنجاح في نظامنا' },
+    { title: 'تأكيد الطلب', desc: 'سنتصل بك خلال 24 ساعة' },
+    { title: 'تجهيز وتغليف', desc: 'يتم تجهيز طلبك بعناية' },
+    { title: 'الشحن والتوصيل', desc: '48 ساعة عبر الجزائر' },
+  ],
   // Product
   offersTitle: 'العروض المتاحة',
   descTitle: 'الوصف',
+  freeShippingBadge: 'توصيل مجاني',
+  freeShippingThreshold: 'توصيل مجاني عند الشراء بأكثر من {{amount}}',
+  freeShippingRemaining: 'أضف {{amount}} لتحصل على توصيل مجاني',
+  freeShippingReached: 'مبروك! لديك توصيل مجاني 🎉',
   // Footer
   quickLinks: 'روابط سريعة', legalNav: 'قانوني',
   contactSect: 'تواصل معنا',
@@ -450,9 +461,20 @@ const jsonFr = {
   successDesc: 'Merci pour votre commande, notre équipe vous contactera bientôt.',
   backToShop: 'Retour à la boutique',
   checkoutTitle: 'Finaliser la commande',
+  successDoneBadge: 'Terminé ✓',
+  successSteps: [
+    { title: 'Commande reçue', desc: 'Votre commande a été enregistrée avec succès' },
+    { title: 'Confirmation', desc: 'Nous vous appellerons sous 24h' },
+    { title: 'Préparation', desc: 'Votre commande est préparée avec soin' },
+    { title: 'Livraison', desc: '48h partout en Algérie' },
+  ],
   // Product
   offersTitle: 'Offres groupées',
   descTitle: 'Description',
+  freeShippingBadge: 'Livraison gratuite',
+  freeShippingThreshold: 'Livraison gratuite dès {{amount}} d\'achat',
+  freeShippingRemaining: 'Ajoutez {{amount}} pour profiter de la livraison gratuite',
+  freeShippingReached: 'Bravo ! Vous avez la livraison gratuite 🎉',
   // Footer
   quickLinks: 'Navigation', legalNav: 'Légal',
   contactSect: 'Contact',
@@ -559,7 +581,18 @@ const jsonEn = {
   myCart: 'My Cart', cartEmpty: 'Your cart is empty', cartEmptyDesc: 'Discover our selection.',
   successTitle: 'Order confirmed', successDesc: 'Thank you for your order, our team will contact you soon.',
   backToShop: 'Back to store', checkoutTitle: 'Checkout',
+  successDoneBadge: 'Done ✓',
+  successSteps: [
+    { title: 'Order received', desc: 'Your order has been registered successfully' },
+    { title: 'Confirmation', desc: "We'll call you within 24h" },
+    { title: 'Packaging', desc: 'Your order is being prepared with care' },
+    { title: 'Shipping', desc: '48h across Algeria' },
+  ],
   offersTitle: 'Bundle offers', descTitle: 'Description',
+  freeShippingBadge: 'Free Delivery',
+  freeShippingThreshold: 'Free delivery on orders over {{amount}}',
+  freeShippingRemaining: 'Add {{amount}} more to get free delivery',
+  freeShippingReached: 'You unlocked free delivery! 🎉',
   quickLinks: 'Navigation', legalNav: 'Légal', contactSect: 'Contact', privacy: 'Privacy', terms: 'Terms', cookies: 'Cookies',
   rightsReserved: 'All rights reserved.',
   // Navbar extra
@@ -1010,6 +1043,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
               <Dumbbell style={{width:'40px',height:'40px',color:'var(--dim)'}}/>
             </div>}
         {discount > 0 && <span className="bc" style={{position:'absolute',top:10,right:10,backgroundColor:'var(--fire)',color:'white',fontSize:'10px',fontWeight:900,padding:'3px 10px',letterSpacing:'0.06em',clipPath:'polygon(0 0,100% 0,94% 100%,0 100%)'}}>-{discount}%</span>}
+        {product?.shippingFree && <span className="bc" style={{position:'absolute',top:10,left:10,backgroundColor:'var(--gold)',color:'var(--black)',fontSize:'10px',fontWeight:900,padding:'3px 9px'}}>🚚</span>}
         <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',background:'linear-gradient(90deg,var(--fire),var(--gold))'}}/>
       </div>
       <div style={{padding:'14px',flex:1,display:'flex',flexDirection:'column',gap:'8px'}}>
@@ -1317,6 +1351,13 @@ export function Details({ product, store: storeprop, toggleWishlist, isWishliste
               </div>
             </div>
 
+            {(product?.shippingFree || (storeprop?.supportFreeShipping && storeprop?.freeShippingMinAmount != null)) && (
+              <div style={{marginBottom:'22px',padding:'10px 14px',border:'1px solid var(--fire)',background:'rgba(255,69,0,0.06)',display:'flex',alignItems:'center',gap:8,fontSize:'13px',fontWeight:700,color:'var(--fire)'}}>
+                <Truck style={{width:'15px',height:'15px'}}/>
+                {product.shippingFree ? t.freeShippingBadge : t.freeShippingThreshold.replace('{{amount}}', `${Number(storeprop.freeShippingMinAmount).toLocaleString()} ${storeprop?.currency || 'DZD'}`)}
+              </div>
+            )}
+
             {/* Offers */}
             {product.offers?.length > 0 && (
               <div style={{marginBottom:'22px',paddingBottom:'22px',borderBottom:'1px solid var(--line)'}}>
@@ -1330,7 +1371,12 @@ export function Details({ product, store: storeprop, toggleWishlist, isWishliste
                       <input type="radio" name="offer" checked={selectedOffer===o.id} onChange={()=>setSelectedOffer(o.id)} style={{display:'none'}}/>
                       <div>
                         <p className="bc" style={{fontSize:'14px',fontWeight:700,color:'var(--white)',margin:0,letterSpacing:'0.04em',textTransform:'uppercase'}}>{o.name}</p>
-                        <p style={{fontSize:'11px',color:'var(--dim)',margin:0}}>{t.offerQtyLabel} {o.quantity}</p>
+                        <p style={{fontSize:'11px',color:'var(--dim)',margin:0}}>{t.offerQtyLabel} {o.quantity}{o.subTitle ? ` · ${o.subTitle}` : ''}</p>
+                        {o.shippingFree && (
+                          <p style={{display:'flex',alignItems:'center',gap:4,fontSize:'11px',color:'var(--fire)',fontWeight:700,margin:'3px 0 0'}}>
+                            <Truck style={{width:'11px',height:'11px'}}/> {t.freeShippingBadge}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <span className="bb" style={{fontSize:'1.3rem',color:'var(--fire)'}}>{o.price.toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'11px',color:'var(--dim)'}}>{storeprop?.currency || 'DZD'}</span></span>
@@ -1419,9 +1465,14 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     }
     return base;
   },[product,selectedOffer,selectedVariants]);
-  const getLiv = useCallback(():number=>{ if(!selW) return 0; return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice; },[selW,fd.typeLivraison]);
   const fp    = getFP();
-  const total = ()=> fp*fd.quantity + +getLiv();
+  const supportQty = (storeprop?.supportQty ?? product?.store?.supportQty) !== false;
+  const qty = supportQty ? fd.quantity : 1;
+  const selOfferObj = product.offers?.find((o:any)=>o.id===selectedOffer);
+  const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
+    (storeprop?.supportFreeShipping && storeprop?.freeShippingMinAmount != null && (fp*qty) >= Number(storeprop.freeShippingMinAmount)));
+  const getLiv = useCallback(():number=>{ if(orderFreeShipping) return 0; if(!selW) return 0; return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice; },[selW,fd.typeLivraison,orderFreeShipping]);
+  const total = ()=> fp*qty + +getLiv();
   const validate = ()=>{
     const e:Record<string,string>={};
     if(!fd.customerName.trim())  e.customerName=t.errName;
@@ -1438,7 +1489,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   const addToCart = ()=>{
     setIsAdded(true);
     const cart=JSON.parse(localStorage.getItem(domain)||'[]');
-    cart.push({...fd,product,variantDetailId:getVarId(),productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv(),addedAt:Date.now()});
+    cart.push({...fd,quantity:qty,product,variantDetailId:getVarId(),productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv(),addedAt:Date.now()});
     localStorage.setItem(domain,JSON.stringify(cart));
     initCount(cart.length);
     setTimeout(()=>setIsAdded(false),2000);
@@ -1449,7 +1500,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     const er=validate(); if(Object.keys(er).length){setErrors(er);return;}
     setErrors({}); setSub(true);
     try{
-      await axios.post(`${API_URL}/orders/create`,{...fd,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});
+      await axios.post(`${API_URL}/orders/create`,{...fd,quantity:qty,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});
       if(fd.customerId) localStorage.setItem('customerId',fd.customerId);
       router.push(`/successfully?productId=${product?.id}`);
     }catch{}finally{setSub(false);}
@@ -1521,19 +1572,21 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
                   <button key={dtype} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:dtype}))}
                     style={{padding:'12px 10px',border:`1.5px solid ${fd.typeLivraison===dtype?'var(--fire)':'var(--dim)'}`,backgroundColor:fd.typeLivraison===dtype?'rgba(255,69,0,0.1)':'transparent',cursor:'pointer',textAlign:'start',transition:'all 0.2s',fontFamily:'inherit'}}>
                     <p className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:fd.typeLivraison===dtype?'var(--fire)':'var(--mid)',margin:'0 0 4px'}}>{dtype==='home'?t.homeDelivLabel:t.officeDelivLabel}</p>
-                    {selW && <p className="bb" style={{fontSize:'1rem',color:fd.typeLivraison===dtype?'var(--fire)':'var(--dim)',margin:0}}>{(dtype==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'11px',color:'var(--dim)'}}>{storeprop?.currency || 'DZD'}</span></p>}
+                    {selW && (orderFreeShipping ? <p className="bb" style={{fontSize:'0.85rem',color:fd.typeLivraison===dtype?'var(--fire)':'var(--dim)',margin:0}}>{t.freeShippingBadge}</p> : <p className="bb" style={{fontSize:'1rem',color:fd.typeLivraison===dtype?'var(--fire)':'var(--dim)',margin:0}}>{(dtype==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'11px',color:'var(--dim)'}}>{storeprop?.currency || 'DZD'}</span></p>)}
                   </button>
                 ))}
               </div>
             </FR>
 
-            <FR label={t.qty}>
-              <div style={{display:'inline-flex',alignItems:'center',border:'1.5px solid var(--dim)',overflow:'hidden',backgroundColor:'var(--panel)'}}>
-                <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderRight:'1px solid var(--dim)',background:'transparent',cursor:'pointer',color:'var(--fire)',fontSize:'18px',fontWeight:700}}>-</button>
-                <span className="bb" style={{width:'44px',textAlign:'center',fontSize:'1.2rem',color:'var(--white)'}}>{fd.quantity}</span>
-                <button type="button" onClick={()=>setFd(p=>({...p,quantity:p.quantity+1}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderLeft:'1px solid var(--dim)',background:'transparent',cursor:'pointer',color:'var(--fire)',fontSize:'18px',fontWeight:700}}>+</button>
-              </div>
-            </FR>
+            {supportQty && (
+              <FR label={t.qty}>
+                <div style={{display:'inline-flex',alignItems:'center',border:'1.5px solid var(--dim)',overflow:'hidden',backgroundColor:'var(--panel)'}}>
+                  <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderRight:'1px solid var(--dim)',background:'transparent',cursor:'pointer',color:'var(--fire)',fontSize:'18px',fontWeight:700}}>-</button>
+                  <span className="bb" style={{width:'44px',textAlign:'center',fontSize:'1.2rem',color:'var(--white)'}}>{fd.quantity}</span>
+                  <button type="button" onClick={()=>setFd(p=>({...p,quantity:p.quantity+1}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderLeft:'1px solid var(--dim)',background:'transparent',cursor:'pointer',color:'var(--fire)',fontSize:'18px',fontWeight:700}}>+</button>
+                </div>
+              </FR>
+            )}
 
             {/* Summary */}
             <div style={{border:'1px solid var(--line)',borderRight:'3px solid var(--fire)',borderLeft:'none',marginBottom:'14px',overflow:'hidden',backgroundColor:'var(--panel)'}}>
@@ -1541,7 +1594,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
                 <Package style={{width:'13px',height:'13px',color:'var(--fire)'}}/>
                 <span className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)'}}>{t.summaryTitle}</span>
               </div>
-              {[{l:t.productLabel,v:product.name.slice(0,22)+(product.name.length>22?'...':'')},{l:t.price,v:`${fp.toLocaleString()} ${storeprop?.currency||'DZD'}`},{l:t.qty,v:`× ${fd.quantity}`},{l:t.delivery,v:selW?`${getLiv().toLocaleString()} ${storeprop?.currency||'DZD'}`:'—'}].map(row=>(
+              {[{l:t.productLabel,v:product.name.slice(0,22)+(product.name.length>22?'...':'')},{l:t.price,v:`${fp.toLocaleString()} ${storeprop?.currency||'DZD'}`},{l:t.qty,v:`× ${qty}`},{l:t.delivery,v:!selW?'—':orderFreeShipping?t.freeShippingBadge:`${getLiv().toLocaleString()} ${storeprop?.currency||'DZD'}`}].map(row=>(
                 <div key={row.l} style={{display:'flex',justifyContent:'space-between',padding:'7px 14px',borderBottom:'1px solid var(--line)'}}>
                   <span className="bc" style={{fontSize:'12px',color:'var(--dim)',letterSpacing:'0.06em',textTransform:'uppercase'}}>{row.l}</span>
                   <span style={{fontSize:'13px',fontWeight:600,color:'var(--mid)'}}>{row.v}</span>
@@ -1590,11 +1643,16 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   useEffect(()=>{ if(!fd.customerWelaya){setCommunes([]);return;} setLC(true); fetchCommunes(fd.customerWelaya).then(d=>{setCommunes(d);setLC(false);}); },[fd.customerWelaya]);
 
   const selW      = useMemo(()=>wilayas.find(w=>String(w.id)===String(fd.customerWelaya)),[wilayas,fd.customerWelaya]);
-  const getLiv    = ()=>{ if(!selW) return 0; return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice; };
   const cartTotal = items.reduce((a,i)=>a+(i.finalPrice*i.quantity),0);
+
+  const hasFreeShippingItem = items.some((i) => i.product?.shippingFree || i.product?.offers?.find((o: Offer) => o.id === i.selectedOffer)?.shippingFree);
+  const freeShippingMin = store?.supportFreeShipping ? store?.freeShippingMinAmount : null;
+  const freeShippingReached = hasFreeShippingItem || (freeShippingMin != null && cartTotal >= Number(freeShippingMin));
+  const freeShippingRemainingAmt = freeShippingMin != null ? Number(freeShippingMin) - cartTotal : 0;
+
+  const getLiv    = ()=>{ if(freeShippingReached) return 0; if(!selW) return 0; return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice; };
   const finalTotal = cartTotal + +getLiv();
   const update    = (n:any[])=>{ setItems(n); localStorage.setItem(domain,JSON.stringify(n)); initCount(n.length); };
-  const changeQty = (i:number,d:number)=>{ const n=[...items]; n[i].quantity=Math.max(1,n[i].quantity+d); update(n); };
 
   const handleSubmit = async (e:React.FormEvent)=>{
     e.preventDefault();
@@ -1639,6 +1697,20 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
           <h1 className="bb" style={{fontSize:'clamp(2rem,5vw,3rem)',color:'var(--white)'}}>{t.myCart}</h1>
           <p className="bc" style={{fontSize:'13px',color:'var(--dim)',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase'}}>{items.length} {t.cartItemsCount}</p>
         </div>
+
+        {freeShippingMin != null && (
+          <div style={{
+            border: `1px solid ${freeShippingReached ? 'var(--fire)' : 'var(--line)'}`,
+            background: freeShippingReached ? 'rgba(255,69,0,0.08)' : 'var(--panel)',
+            padding: '12px 16px', marginBottom: '2rem',
+            color: freeShippingReached ? 'var(--fire)' : 'var(--mid)', fontSize: '13px', fontWeight: 700,
+            display: 'flex', alignItems: 'center', gap: 9,
+          }}>
+            <Truck style={{width:'16px',height:'16px'}}/>
+            {freeShippingReached ? t.freeShippingReached : t.freeShippingRemaining.replace('{{amount}}', `${Number(freeShippingRemainingAmt).toLocaleString()} ${store?.currency || 'DZD'}`)}
+          </div>
+        )}
+
         <div className="cart-layout">
           {/* Items */}
           <div style={{background:'var(--panel)',border:'1px solid var(--line)',borderTop:'2px solid var(--fire)',alignSelf:'start'}}>
@@ -1653,11 +1725,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     <p className="bb" style={{fontSize:'1.2rem',color:'var(--fire)'}}>{item.finalPrice?.toLocaleString()} {store?.currency || 'DZD'}</p>
                   </div>
                   <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:'8px'}}>
-                    <div style={{display:'inline-flex',alignItems:'center',border:'1px solid var(--dim)',overflow:'hidden'}}>
-                      <button onClick={()=>changeQty(i,-1)} style={{width:28,height:28,display:'flex',alignItems:'center',justifyContent:'center',background:'var(--panel-2)',border:'none',cursor:'pointer',color:'var(--fire)',fontSize:'1.1rem'}}>-</button>
-                      <span className="bb" style={{width:32,textAlign:'center',fontSize:'1rem',color:'var(--white)',lineHeight:'28px'}}>{item.quantity}</span>
-                      <button onClick={()=>changeQty(i,1)} style={{width:28,height:28,display:'flex',alignItems:'center',justifyContent:'center',background:'var(--panel-2)',border:'none',cursor:'pointer',color:'var(--fire)',fontSize:'1.1rem'}}>+</button>
-                    </div>
+                    <span className="bb" style={{fontSize:'1rem',color:'var(--mid)'}}>× {item.quantity}</span>
                     <button onClick={()=>update(items.filter((_,idx)=>idx!==i))} className="bc" style={{display:'flex',alignItems:'center',gap:4,padding:'4px 8px',border:'none',background:'transparent',color:'var(--dim)',fontSize:'11px',fontWeight:700,cursor:'pointer',letterSpacing:'0.1em',textTransform:'uppercase',transition:'color 0.15s',fontFamily:'inherit'}}
                       onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.color='var(--fire)';}}
                       onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.color='var(--dim)';}}>
@@ -1729,7 +1797,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     >
                       <span style={{display:'block',fontSize:'1.5rem',marginBottom:'4px'}}>{dtype==='home'?'🏠':'🏢'}</span>
                       <p className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',color:fd.typeLivraison===dtype?'var(--white)':'var(--dim)'}}>{dtype==='home'?t.homeLabel:t.officeLabel}</p>
-                      {selW && <p className="bb" style={{fontSize:'1rem',color:'var(--fire)',marginTop:'3px'}}>{(dtype==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} {store?.currency || 'DZD'}</p>}
+                      {selW && (freeShippingReached ? <p className="bb" style={{fontSize:'0.85rem',color:'var(--fire)',marginTop:'3px'}}>{t.freeShippingBadge}</p> : <p className="bb" style={{fontSize:'1rem',color:'var(--fire)',marginTop:'3px'}}>{(dtype==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} {store?.currency || 'DZD'}</p>)}
                     </button>
                   ))}
                 </div>
@@ -1737,7 +1805,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 
               {/* Summary */}
               <div style={{border:'1px solid var(--line)',borderInlineStart:'3px solid var(--fire)',marginBottom:'14px',overflow:'hidden',background:'var(--panel-2)'}}>
-                {[{l:t.subtotal,v:`${cartTotal.toLocaleString()} ${store?.currency||'DZD'}`},{l:t.delivery,v:getLiv()?`${getLiv().toLocaleString()} ${store?.currency||'DZD'}`:'—'}].map(row=>(
+                {[{l:t.subtotal,v:`${cartTotal.toLocaleString()} ${store?.currency||'DZD'}`},{l:t.delivery,v:!selW?'—':freeShippingReached?t.freeShippingBadge:`${getLiv().toLocaleString()} ${store?.currency||'DZD'}`}].map(row=>(
                   <div key={row.l} style={{display:'flex',justifyContent:'space-between',padding:'7px 14px',borderBottom:'1px solid var(--line)'}}>
                     <span className="bc" style={{fontSize:'12px',color:'var(--dim)',letterSpacing:'0.06em',textTransform:'uppercase'}}>{row.l}</span>
                     <span style={{fontSize:'13px',fontWeight:600,color:'var(--mid)'}}>{row.v}</span>
@@ -1754,6 +1822,79 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               </button>
             </form>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SUCCESS
+══════════════════════════════════════════════════════════════ */
+export function Success({ store, order }: { store: any; domain: string; order: any }) {
+  const t = T[getLang(store)];
+  const isRTL = t.dir === 'rtl';
+  const currency = store?.currency || 'DZD';
+  const stepIcons = [CheckCircle2, Phone, Package, Truck];
+
+  return (
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{minHeight:'100vh',background:'var(--black)',display:'flex',alignItems:'center',justifyContent:'center',padding:'3rem 1.25rem'}}>
+      <div style={{maxWidth:560,width:'100%'}}>
+        <div style={{textAlign:'center',marginBottom:'2rem'}}>
+          <div style={{width:88,height:88,margin:'0 auto 1.5rem',borderRadius:'50%',background:'var(--panel)',border:'2px solid var(--fire)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+            <CheckCircle2 style={{width:44,height:44,color:'var(--fire)'}}/>
+          </div>
+          <p className="bc" style={{fontSize:12,fontWeight:800,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:10}}>
+            <Flame style={{width:13,height:13,display:'inline',verticalAlign:'-2px',marginInlineEnd:4}}/>{t.cartSuccessTitle}
+          </p>
+          <h1 className="bb" style={{fontSize:'clamp(2.2rem,6vw,3.2rem)',color:'var(--white)',marginBottom:12,lineHeight:1.1}}>{t.successTitle}</h1>
+          <p style={{color:'var(--mid)',lineHeight:1.7,maxWidth:380,margin:'0 auto'}}>{t.successDesc}</p>
+        </div>
+
+        {order && (order.productName || order.total != null) && (
+          <div style={{background:'var(--panel)',border:'1px solid var(--line)',borderTop:'2px solid var(--fire)',padding:'18px 20px',marginBottom:'1.5rem'}}>
+            <p className="bc" style={{fontSize:11,fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--dim)',marginBottom:10}}>{t.orderInfo}</p>
+            {order.productName && (
+              <div style={{display:'flex',justifyContent:'space-between',gap:12,padding:'6px 0',borderBottom:'1px solid var(--line)'}}>
+                <span className="bc" style={{color:'var(--mid)',fontSize:13,flexShrink:0}}>{t.productLabel}</span>
+                <span style={{color:'var(--white)',fontWeight:700,fontSize:13,textAlign:isRTL?'left':'right'}}>{order.productName}</span>
+              </div>
+            )}
+            {order.total != null && (
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',padding:'10px 0 0'}}>
+                <span className="bc" style={{color:'var(--mid)',fontSize:13}}>{t.total}</span>
+                <span className="bb" style={{color:'var(--fire)',fontSize:'1.4rem'}}>{Number(order.total).toLocaleString()} {currency}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{background:'var(--panel)',border:'1px solid var(--line)',marginBottom:'2rem'}}>
+          {t.successSteps.map((step: any, i: number) => {
+            const Icon = stepIcons[i] || CheckCircle2;
+            const done = i === 0;
+            return (
+              <div key={i} style={{display:'flex',alignItems:'center',gap:14,padding:'14px 16px',borderBottom:i<t.successSteps.length-1?'1px solid var(--line)':'none',background:done?'rgba(255,69,0,0.06)':'transparent'}}>
+                <div style={{width:36,height:36,flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',background:done?'var(--fire)':'var(--panel-2)',color:done?'#fff':'var(--dim)'}}>
+                  <Icon style={{width:17,height:17}}/>
+                </div>
+                <div style={{flex:1,minWidth:0}}>
+                  <p className="bc" style={{fontSize:14,fontWeight:700,color:done?'var(--white)':'var(--dim)',textTransform:'uppercase',letterSpacing:'0.03em'}}>{step.title}</p>
+                  <p style={{fontSize:12,color:'var(--mid)',marginTop:2}}>{step.desc}</p>
+                </div>
+                {done && <span className="bc" style={{fontSize:10,fontWeight:800,color:'var(--green)',whiteSpace:'nowrap'}}>{t.successDoneBadge}</span>}
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{display:'flex',flexDirection:'column',gap:10}}>
+          <Link href="/" className="btn-fire" style={{display:'inline-flex',alignItems:'center',justifyContent:'center',gap:10,clipPath:'none',padding:'15px'}}>
+            <ShoppingCart style={{width:17,height:17}}/> {t.shopNow}
+          </Link>
+          <Link href="/" style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,padding:'13px',color:'var(--mid)',fontSize:13,fontWeight:700,border:'1px solid var(--line)'}}>
+            {t.backToShop}
+          </Link>
         </div>
       </div>
     </div>

@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Phone, Mail,
-  CheckCircle2, Truck, ArrowLeft,
+  CheckCircle2, Truck, ArrowLeft, Package,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, ShieldCheck,
   Send
@@ -1009,6 +1009,71 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
           </div>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1rem' }}>* تكاليف التوصيل سيتم احتسابها لاحقاً.</p>
           <button className="btn-primary" style={{ width: '100%' }}>إتمام الطلب</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function Success({ store, order }: { store: any; domain: string; order: any }) {
+  const currency = store?.currency || 'DZD';
+  const steps = [
+    { icon: CheckCircle2, title: 'تم استلام طلبك', desc: 'تم تسجيل طلبك بنجاح في نظامنا' },
+    { icon: Phone, title: 'تأكيد الطلب', desc: 'سنتصل بك خلال 24 ساعة' },
+    { icon: Package, title: 'التجهيز والتغليف', desc: 'يتم تجهيز طلبك بعناية' },
+    { icon: Truck, title: 'الشحن والتوصيل', desc: '2-5 أيام عمل' },
+  ];
+
+  return (
+    <div dir="rtl" style={{ minHeight: '100vh', background: 'var(--bg-alt)', padding: '3rem 1.25rem' }}>
+      <div style={{ maxWidth: 480, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', background: 'var(--bg-main)', padding: '3rem 2rem', borderRadius: 8, border: '1px solid var(--border-color)', marginBottom: '1.5rem' }}>
+          <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'var(--bg-alt)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem' }}>
+            <CheckCircle2 size={30} style={{ color: 'var(--primary)' }} />
+          </div>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.5rem' }}>تم تأكيد طلبك!</h2>
+          <p style={{ color: 'var(--text-muted)', lineHeight: 1.7 }}>شكراً لثقتك بنا، سنتواصل معك قريباً لتأكيد التفاصيل.</p>
+        </div>
+
+        {order && (order.productName || order.total != null) && (
+          <div style={{ background: 'var(--bg-main)', borderRadius: 8, border: '1px solid var(--border-color)', padding: '1.25rem 1.5rem', marginBottom: '1.5rem' }}>
+            <p style={{ fontWeight: 700, fontSize: '0.75rem', marginBottom: '0.75rem', color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>معلومات الطلب</p>
+            {order.productName && (
+              <div style={{ paddingBottom: 10, marginBottom: 10, borderBottom: '1px solid var(--border-color)', fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>{order.productName}</div>
+            )}
+            {order.total != null && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>الإجمالي</span>
+                <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)' }}>{Number(order.total).toLocaleString()} {currency}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{ background: 'var(--bg-main)', borderRadius: 8, border: '1px solid var(--border-color)', overflow: 'hidden', marginBottom: '1.5rem' }}>
+          {steps.map((step, i) => {
+            const Icon = step.icon; const done = i === 0;
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '1rem 1.25rem', borderBottom: i < steps.length - 1 ? '1px solid var(--border-color)' : 'none', background: done ? 'var(--bg-alt)' : 'transparent' }}>
+                <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? 'var(--primary)' : 'var(--bg-alt)', color: done ? '#fff' : 'var(--text-muted)' }}>
+                  <Icon size={16} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '0.85rem', fontWeight: 700, color: done ? 'var(--text-main)' : 'var(--text-muted)', marginBottom: 2 }}>{step.title}</p>
+                  <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>{step.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+          <Link href="/" className="btn-primary" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, textDecoration: 'none', padding: '0.875rem' }}>
+            <ShoppingBag size={17} /> تسوق الآن
+          </Link>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.8rem', borderRadius: 8, border: '1px solid var(--border-color)', color: 'var(--text-muted)', fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none' }}>
+            العودة للمتجر
+          </Link>
         </div>
       </div>
     </div>

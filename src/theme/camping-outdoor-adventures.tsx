@@ -1281,6 +1281,73 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   );
 }
 
+export function Success({ store, order }: { store: any; domain: string; order: any }) {
+  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const currency = store?.currency || 'DZD';
+  const steps = [
+    { icon: CheckCircle2, title: isRTL ? 'تم استلام طلبك' : lang === 'fr' ? 'Commande reçue' : 'Order received', desc: isRTL ? 'تم تسجيل طلبك بنجاح في نظامنا' : lang === 'fr' ? 'Votre commande a été enregistrée avec succès' : 'Your order has been registered successfully' },
+    { icon: Phone, title: isRTL ? 'تأكيد الطلب' : lang === 'fr' ? 'Confirmation' : 'Confirmation', desc: isRTL ? 'سنتصل بك خلال 24 ساعة' : lang === 'fr' ? 'Nous vous appellerons sous 24h' : "We'll call you within 24 hours" },
+    { icon: Package, title: isRTL ? 'التجهيز والتغليف' : lang === 'fr' ? 'Préparation' : 'Packaging', desc: isRTL ? 'يتم تجهيز طلبك بعناية' : lang === 'fr' ? 'Votre commande est préparée avec soin' : 'Your order is being prepared with care' },
+    { icon: Truck, title: isRTL ? 'الشحن والتوصيل' : lang === 'fr' ? 'Livraison' : 'Shipping', desc: isRTL ? '2-5 أيام عمل' : lang === 'fr' ? '2-5 jours ouvrables' : '2-5 business days' },
+  ];
+
+  return (
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ minHeight: '100vh', background: BG, padding: '3rem 1.5rem' }}>
+      <div style={{ maxWidth: 480, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', background: CARD, padding: '3rem 2rem', borderRadius: 12, border: `1px solid ${BD}`, marginBottom: '1.5rem' }}>
+          <CheckCircle2 size={48} style={{ color: OR, display: 'block', margin: '0 auto 1.25rem' }} />
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: INK, marginBottom: '0.5rem' }}>{t.successTitle}</h2>
+          <p style={{ color: SUB, lineHeight: 1.75, fontSize: '0.9rem' }}>{t.successDesc}</p>
+        </div>
+
+        {order && (order.productName || order.total != null) && (
+          <div style={{ background: CARD, borderRadius: 12, border: `1px solid ${BD}`, padding: '1.25rem 1.5rem', marginBottom: '1.5rem' }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 700, color: SUB, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>{t.orderInfo}</p>
+            {order.productName && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, paddingBottom: 8, marginBottom: 8, borderBottom: `1px solid ${BD}`, fontSize: '0.88rem' }}>
+                <span style={{ fontWeight: 600, color: INK }}>{order.productName}</span>
+              </div>
+            )}
+            {order.total != null && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+                <span style={{ color: SUB, fontSize: '0.88rem' }}>{t.total}</span>
+                <span style={{ color: OR, fontSize: '1.1rem' }}>{Number(order.total).toLocaleString()} {currency}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{ background: CARD, borderRadius: 12, border: `1px solid ${BD}`, overflow: 'hidden', marginBottom: '1.5rem' }}>
+          {steps.map((step, i) => {
+            const Icon = step.icon;
+            const done = i === 0;
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '1rem 1.25rem', borderBottom: i < steps.length - 1 ? `1px solid ${BD}` : 'none', background: done ? '#FBF3EC' : CARD }}>
+                <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? OR : '#F1EEE7', color: done ? '#fff' : SUB }}>
+                  <Icon size={16} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '0.85rem', fontWeight: 700, color: done ? INK : SUB, marginBottom: 2 }}>{step.title}</p>
+                  <p style={{ fontSize: '0.76rem', color: SUB }}>{step.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+          <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: OR, color: '#fff', padding: '0.875rem 1.5rem', fontWeight: 700, fontSize: '0.9rem', borderRadius: 8, textDecoration: 'none' }}>
+            <ShoppingBag size={17} /> {t.shopNow}
+          </Link>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.8rem', borderRadius: 8, border: `1px solid ${BD}`, color: SUB, fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none' }}>
+            {t.backToShop}
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const Shell = ({ children, title, dir }: { children: React.ReactNode; title: string; dir?: string }) => (
   <div dir={dir || 'rtl'} style={{ minHeight: '100vh', background: BG }}>
     <div style={{ background: DARK, borderBottom: `3px solid ${OR}`, paddingTop: 72, paddingBottom: 40, paddingLeft: 24, paddingRight: 24 }}>

@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
   AlertCircle, X, Phone,
-  CheckCircle2, ArrowLeft, Ruler,
+  CheckCircle2, ArrowLeft, Ruler, Package,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Shield, Truck, Settings, HardHat,
   Mail,
@@ -1203,6 +1203,69 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               {submitting ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />جاري المعالجة...</> : 'تأكيد الطلب'}
             </button>
           </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function Success({ store, order }: { store: any; domain: string; order: any }) {
+  const currency = store?.currency || 'DZD';
+  const steps = [
+    { icon: CheckCircle2, title: 'تم استلام طلبك', desc: 'تم تسجيل طلبك بنجاح في نظامنا' },
+    { icon: Phone, title: 'تأكيد الطلب', desc: 'سنتصل بك خلال 24 ساعة' },
+    { icon: Package, title: 'التجهيز والتغليف', desc: 'يتم تجهيز طلبك بعناية' },
+    { icon: Truck, title: 'الشحن والتوصيل', desc: '2-5 أيام عمل' },
+  ];
+
+  return (
+    <div dir="rtl" style={{ minHeight: '100vh', background: BG, padding: '3rem 1.25rem' }}>
+      <div style={{ maxWidth: 480, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', background: CARD, padding: '3rem 2rem', borderRadius: 12, border: `1px solid ${BD}`, borderTop: `3px solid ${A}`, marginBottom: '1.5rem' }}>
+          <CheckCircle2 size={40} style={{ color: A, display: 'block', margin: '0 auto 1.25rem' }} />
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: SL, marginBottom: '0.625rem' }}>تم تأكيد طلبك!</h2>
+          <p style={{ color: '#64748B', lineHeight: 1.7 }}>شكراً لثقتك بنا، سنتواصل معك قريباً لتأكيد التفاصيل.</p>
+        </div>
+
+        {order && (order.productName || order.total != null) && (
+          <div style={{ background: CARD, borderRadius: 12, border: `1px solid ${BD}`, padding: '1.25rem 1.5rem', marginBottom: '1.5rem' }}>
+            <p style={{ fontWeight: 700, fontSize: '0.75rem', marginBottom: '0.75rem', color: SL, textTransform: 'uppercase', letterSpacing: '0.06em' }}>معلومات الطلب</p>
+            {order.productName && (
+              <div style={{ paddingBottom: 10, marginBottom: 10, borderBottom: `1px solid ${BD}`, fontSize: 14, fontWeight: 700, color: SL }}>{order.productName}</div>
+            )}
+            {order.total != null && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 13, color: '#64748B' }}>الإجمالي</span>
+                <span style={{ fontSize: '1.2rem', fontWeight: 800, color: AD }}>{Number(order.total).toLocaleString()} {currency}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{ background: CARD, borderRadius: 12, border: `1px solid ${BD}`, overflow: 'hidden', marginBottom: '1.5rem' }}>
+          {steps.map((step, i) => {
+            const Icon = step.icon; const done = i === 0;
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '1rem 1.25rem', borderBottom: i < steps.length - 1 ? `1px solid ${BD}` : 'none', background: done ? AL : 'transparent' }}>
+                <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? A : BG, color: done ? SL : '#94A3B8' }}>
+                  <Icon size={16} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '0.85rem', fontWeight: 700, color: done ? SL : '#94A3B8', marginBottom: 2 }}>{step.title}</p>
+                  <p style={{ fontSize: '0.76rem', color: '#64748B' }}>{step.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: A, color: SL, padding: '0.875rem 2rem', borderRadius: 8, fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none' }}>
+            <ShoppingBag size={17} /> تسوق الآن
+          </Link>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.8rem', borderRadius: 8, border: `1px solid ${BD}`, color: '#64748B', fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none' }}>
+            العودة للمتجر
+          </Link>
         </div>
       </div>
     </div>

@@ -50,7 +50,7 @@ const FB = "'Inter','Cairo',system-ui,-apple-system,sans-serif";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
 /* ============================ TYPES ============================ */
-interface Offer { id: string; name: string; quantity: number; price: number; }
+interface Offer { id: string; name: string; quantity: number; price: number; subTitle?: string; shippingFree?: boolean; }
 interface Variant { id: string; name: string; value: string; }
 interface Attribute { id: string; type: string; name: string; displayMode?: 'color' | 'image' | 'text' | null; variants: Variant[]; }
 interface ProductImage { id: string; imageUrl: string; }
@@ -62,8 +62,8 @@ interface Commune { id: string; name: string; ar_name: string; wilayaId: string;
 interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
-  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; slug?: string;
-  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; };
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; slug?: string; shippingFree?: boolean;
+  store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 
 /* ============================ I18N ============================ */
@@ -112,6 +112,13 @@ const T = {
     confirmOrder: 'تأكيد الطلب', sending: 'جاري الإرسال...', cancel: 'إلغاء',
     successTitle: 'تم إرسال طلبك بنجاح!', successDesc: 'سنتواصل معك قريباً لتأكيد التفاصيل.',
     backToShop: 'العودة للتسوق',
+    orderInfo: 'معلومات الطلب',
+    successSteps: [
+      { title: 'تم استلام طلبك', desc: 'تم تسجيل طلبك بنجاح في نظامنا' },
+      { title: 'تأكيد الطلب', desc: 'سنتصل بك خلال 24 ساعة' },
+      { title: 'التجهيز والتغليف', desc: 'يتم تجهيز طلبك بعناية' },
+      { title: 'الشحن والتوصيل', desc: '2-5 أيام عمل' },
+    ],
     cartEmpty: 'السلة فارغة', cartEmptyDesc: 'لم تتم إضافة أي منتجات بعد.',
     myCart: 'سلتي', subtotal: 'المجموع الفرعي', items: 'عنصر', remove: 'حذف',
     errSubmit: 'حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مجدداً.',
@@ -121,6 +128,10 @@ const T = {
     privacyTitle: 'سياسة الخصوصية', termsTitle: 'الشروط والأحكام',
     cookiesTitle: 'سياسة الكوكيز', contactTitle: 'تواصل معنا',
     offersTitle: 'العروض المتاحة', descTitle: 'الوصف', optionsTitle: 'الخيارات',
+    freeShippingBadge: 'توصيل مجاني',
+    freeShippingThreshold: 'توصيل مجاني عند الشراء بأكثر من {{amount}}',
+    freeShippingRemaining: 'أضف {{amount}} لتحصل على توصيل مجاني',
+    freeShippingReached: 'مبروك! لديك توصيل مجاني 🎉',
     shippingTab: 'التوصيل والإرجاع',
     shippingBody: 'نوصل لكل ولايات الوطن خلال 2 إلى 5 أيام عمل. الدفع عند الاستلام متاح، ويمكن استبدال المقاس بعد الاستلام مباشرة إن لم يكن مناسباً.',
     searchResultsFor: 'نتائج البحث عن:',
@@ -182,6 +193,13 @@ const T = {
     confirmOrder: 'Confirmer la commande', sending: 'Envoi en cours...', cancel: 'Annuler',
     successTitle: 'Commande confirmée !', successDesc: 'Notre équipe vous contactera bientôt.',
     backToShop: 'Retour à la boutique',
+    orderInfo: 'Informations de commande',
+    successSteps: [
+      { title: 'Commande reçue', desc: 'Votre commande a été enregistrée avec succès' },
+      { title: 'Confirmation', desc: 'Nous vous appellerons sous 24h' },
+      { title: 'Préparation', desc: 'Votre commande est préparée avec soin' },
+      { title: 'Livraison', desc: '2-5 jours ouvrables' },
+    ],
     cartEmpty: 'Votre panier est vide', cartEmptyDesc: 'Découvrez notre sélection.',
     myCart: 'Mon Panier', subtotal: 'Sous-total', items: 'article(s)', remove: 'Retirer',
     errSubmit: 'Une erreur est survenue. Veuillez réessayer.',
@@ -191,6 +209,10 @@ const T = {
     privacyTitle: 'Politique de confidentialité', termsTitle: 'Conditions générales',
     cookiesTitle: 'Politique des cookies', contactTitle: 'Nous contacter',
     offersTitle: 'Offres groupées', descTitle: 'Description', optionsTitle: 'Options',
+    freeShippingBadge: 'Livraison gratuite',
+    freeShippingThreshold: 'Livraison gratuite dès {{amount}} d\'achat',
+    freeShippingRemaining: 'Ajoutez {{amount}} pour profiter de la livraison gratuite',
+    freeShippingReached: 'Bravo ! Vous avez la livraison gratuite 🎉',
     shippingTab: 'Livraison & retour',
     shippingBody: 'Nous livrons dans toutes les wilayas sous 2 à 5 jours ouvrables. Paiement à la livraison disponible, et échange de pointure possible dès réception.',
     searchResultsFor: 'Résultats pour :',
@@ -252,6 +274,13 @@ const T = {
     confirmOrder: 'Confirm Order', sending: 'Sending...', cancel: 'Cancel',
     successTitle: 'Order placed successfully!', successDesc: 'We will contact you shortly to confirm the details.',
     backToShop: 'Back to Shop',
+    orderInfo: 'Order Info',
+    successSteps: [
+      { title: 'Order received', desc: 'Your order has been registered successfully' },
+      { title: 'Confirmation', desc: "We'll call you within 24 hours" },
+      { title: 'Packaging', desc: 'Your order is being prepared with care' },
+      { title: 'Shipping', desc: '2-5 business days' },
+    ],
     cartEmpty: 'Your cart is empty', cartEmptyDesc: 'Start shopping now.',
     myCart: 'My Cart', subtotal: 'Subtotal', items: 'item(s)', remove: 'Remove',
     errSubmit: 'An error occurred. Please try again.',
@@ -261,6 +290,10 @@ const T = {
     privacyTitle: 'Privacy Policy', termsTitle: 'Terms & Conditions',
     cookiesTitle: 'Cookie Policy', contactTitle: 'Contact Us',
     offersTitle: 'Available Offers', descTitle: 'Description', optionsTitle: 'Options',
+    freeShippingBadge: 'Free Delivery',
+    freeShippingThreshold: 'Free delivery on orders over {{amount}}',
+    freeShippingRemaining: 'Add {{amount}} more to get free delivery',
+    freeShippingReached: 'You unlocked free delivery! 🎉',
     shippingTab: 'Shipping & returns',
     shippingBody: 'We deliver to every wilaya within 2 to 5 business days. Cash on delivery is available, and size exchange is possible right after delivery.',
     searchResultsFor: 'Results for:',
@@ -465,6 +498,7 @@ const THEME_CSS = `
 .vx-ctag { position:absolute; top:12px; inset-inline-start:12px; background:${A2}; color:#fff; font-size:.7rem; font-weight:800; padding: 6px 11px; border-radius:8px; transform: rotate(-4deg); z-index:2; }
 .vx-cadd { position:absolute; top:12px; inset-inline-end:12px; width:38px; height:38px; border-radius:999px; background:${A}; color:#0B0D10; display:grid; place-items:center; z-index:2; opacity:0; transform: scale(.7); transition: opacity .25s, transform .25s cubic-bezier(.22,.68,0,1.4); }
 .vx-card:hover .vx-cadd { opacity:1; transform: scale(1); }
+.vx-cfree { position:absolute; top:58px; inset-inline-end:12px; background:${A}; color:#0B0D10; font-size:.7rem; font-weight:800; padding: 6px 9px; border-radius:8px; z-index:2; display:grid; place-items:center; }
 
 /* ---- pagination ---- */
 .vx-pg { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top: 40px; }
@@ -939,6 +973,7 @@ export function Card({ product, displayImage, discount, store, viewDetails, inde
     >
       {discount > 0 && <span className="vx-ctag">−{discount}%</span>}
       <span className="vx-cadd" aria-hidden="true"><Plus size={19} strokeWidth={2.6} /></span>
+      {product?.shippingFree && <span className="vx-cfree">🚚</span>}
 
       {img && !imgErr ? (
         <img src={img} alt={product?.name || ''} loading="lazy" className="vx-cimg" onError={() => setImgErr(true)} />
@@ -1241,6 +1276,13 @@ export function Details({
             )}
           </div>
 
+          {(product?.shippingFree || (store?.supportFreeShipping && store?.freeShippingMinAmount != null)) && (
+            <div style={{ marginBottom: 20, padding: '10px 14px', border: `1px solid ${A}`, background: AL, borderRadius: 14, fontSize: '.82rem', fontWeight: 700, color: A, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Truck size={15} strokeWidth={2} />
+              {product.shippingFree ? t.freeShippingBadge : t.freeShippingThreshold.replace('{{amount}}', `${fmt(Number(store.freeShippingMinAmount))} ${cur(store)}`)}
+            </div>
+          )}
+
           {offers.length > 0 && (
             <div style={{ marginBottom: 22 }}>
               <p style={{ ...eyebrow, marginBottom: 10 }}>{t.offersTitle}</p>
@@ -1254,7 +1296,12 @@ export function Details({
                     </span>
                     <span style={{ flex: 1, minWidth: 0 }}>
                       <span dir="auto" style={{ display: 'block', fontSize: '.88rem', fontWeight: 600, color: INK }}>{o.name}</span>
-                      <span style={{ display: 'block', fontSize: '.73rem', color: SUB, marginTop: 2 }}>× {o.quantity}</span>
+                      <span style={{ display: 'block', fontSize: '.73rem', color: SUB, marginTop: 2 }}>× {o.quantity}{o.subTitle ? ` · ${o.subTitle}` : ''}</span>
+                      {o.shippingFree && (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '.7rem', color: A, fontWeight: 700, marginTop: 3 }}>
+                          <Truck size={11} strokeWidth={2} /> {t.freeShippingBadge}
+                        </span>
+                      )}
                     </span>
                     <span className="vx-disp" style={{ fontSize: '1.15rem', color: active ? A : INK, whiteSpace: 'nowrap' }}>
                       {fmt(Number(o.price))} {cur(store)}
@@ -1376,18 +1423,25 @@ export function ProductForm({
     return Number(product?.price) || 0;
   };
 
-  const getLiv = useCallback((): number => {
-    if (!selW) return 0;
-    return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
-  }, [selW, fd.typeLivraison]);
-
   const getVarId = (): any => {
     const vd = product?.variantDetails?.find((d: VariantDetail) => variantMatches(d, selectedVariants || {}));
     return vd ? vd.id : null;
   };
 
   const fp = getFP();
-  const total = () => fp * fd.quantity + getLiv();
+  const supportQty = (store?.supportQty ?? product?.store?.supportQty) !== false;
+  const qty = supportQty ? fd.quantity : 1;
+  const selOfferObj = product?.offers?.find((o: Offer) => String(o.id) === String(selectedOffer));
+  const orderFreeShipping = !!(product?.shippingFree || selOfferObj?.shippingFree ||
+    (store?.supportFreeShipping && store?.freeShippingMinAmount != null && (fp * qty) >= Number(store.freeShippingMinAmount)));
+
+  const getLiv = useCallback((): number => {
+    if (orderFreeShipping) return 0;
+    if (!selW) return 0;
+    return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
+  }, [selW, fd.typeLivraison, orderFreeShipping]);
+
+  const total = () => fp * qty + getLiv();
 
   const validate = (): boolean => {
     const e: Record<string, string> = {};
@@ -1401,6 +1455,7 @@ export function ProductForm({
 
   const payload = () => ({
     ...fd,
+    quantity: qty,
     product,
     productId: product?.id,
     storeId: product?.store?.id || store?.id,
@@ -1451,20 +1506,22 @@ export function ProductForm({
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16 }}>
-        <span style={{ fontSize: '.82rem', fontWeight: 700 }}>{t.qty}</span>
-        <span style={{ display: 'inline-flex', alignItems: 'center', border: `1px solid ${BD}`, borderRadius: 999, background: BG }}>
-          <button type="button" onClick={() => set('quantity', Math.max(1, fd.quantity - 1))} aria-label="-"
-            style={{ width: 42, height: 42, borderRadius: 999, display: 'grid', placeItems: 'center', background: 'transparent', border: 'none', cursor: 'pointer', color: INK }}>
-            <Minus size={15} />
-          </button>
-          <span className="vx-disp" style={{ minWidth: 40, textAlign: 'center', fontSize: '1.15rem' }}>{fd.quantity}</span>
-          <button type="button" onClick={() => set('quantity', fd.quantity + 1)} aria-label="+"
-            style={{ width: 42, height: 42, borderRadius: 999, display: 'grid', placeItems: 'center', background: 'transparent', border: 'none', cursor: 'pointer', color: INK }}>
-            <Plus size={15} />
-          </button>
-        </span>
-      </div>
+      {supportQty && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16 }}>
+          <span style={{ fontSize: '.82rem', fontWeight: 700 }}>{t.qty}</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', border: `1px solid ${BD}`, borderRadius: 999, background: BG }}>
+            <button type="button" onClick={() => set('quantity', Math.max(1, fd.quantity - 1))} aria-label="-"
+              style={{ width: 42, height: 42, borderRadius: 999, display: 'grid', placeItems: 'center', background: 'transparent', border: 'none', cursor: 'pointer', color: INK }}>
+              <Minus size={15} />
+            </button>
+            <span className="vx-disp" style={{ minWidth: 40, textAlign: 'center', fontSize: '1.15rem' }}>{fd.quantity}</span>
+            <button type="button" onClick={() => set('quantity', fd.quantity + 1)} aria-label="+"
+              style={{ width: 42, height: 42, borderRadius: 999, display: 'grid', placeItems: 'center', background: 'transparent', border: 'none', cursor: 'pointer', color: INK }}>
+              <Plus size={15} />
+            </button>
+          </span>
+        </div>
+      )}
 
       {!isOrderNow && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -1556,8 +1613,8 @@ export function ProductForm({
 
           <div style={{ marginBottom: 16, padding: '4px 14px 12px', background: BG, border: `1px solid ${BD}`, borderRadius: 16 }}>
             <Row l={t.price} v={`${fmt(fp)} ${cur(store)}`} />
-            <Row l={t.qty} v={`× ${fd.quantity}`} />
-            <Row l={t.delivery} v={selW ? `${fmt(getLiv())} ${cur(store)}` : '—'} />
+            <Row l={t.qty} v={`× ${qty}`} />
+            <Row l={t.delivery} v={!selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${fmt(getLiv())} ${cur(store)}`} />
             <Row l={t.total} v={`${fmt(total())} ${cur(store)}`} strong />
           </div>
 
@@ -1618,12 +1675,20 @@ export function Cart({ domain, store }: any) {
   }, [fd.customerWelaya]);
 
   const selW = wilayas.find((w) => String(w.id) === String(fd.customerWelaya));
-  const getLiv = useCallback((): number => {
-    if (!selW) return 0;
-    return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
-  }, [selW, fd.typeLivraison]);
 
   const cartTotal = items.reduce((s, it) => s + (Number(it.finalPrice) || 0) * (Number(it.quantity) || 1), 0);
+
+  const hasFreeShippingItem = items.some((it) => it.product?.shippingFree || it.product?.offers?.find((o: Offer) => o.id === it.selectedOffer)?.shippingFree);
+  const freeShippingMin = store?.supportFreeShipping ? store?.freeShippingMinAmount : null;
+  const freeShippingReached = hasFreeShippingItem || (freeShippingMin != null && cartTotal >= Number(freeShippingMin));
+  const freeShippingRemainingAmt = freeShippingMin != null ? Number(freeShippingMin) - cartTotal : 0;
+
+  const getLiv = useCallback((): number => {
+    if (freeShippingReached) return 0;
+    if (!selW) return 0;
+    return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
+  }, [selW, fd.typeLivraison, freeShippingReached]);
+
   const finalTotal = cartTotal + getLiv();
 
   const removeItem = (i: number) => {
@@ -1711,6 +1776,17 @@ export function Cart({ domain, store }: any) {
     <div className="vx-wrap" style={{ paddingTop: '30px', paddingBottom: '80px' }}>
       <span style={eyebrow}>{items.length} {t.items}</span>
       <h1 className="vx-disp" style={{ fontSize: 'clamp(1.9rem,6vw,3rem)', textTransform: 'uppercase', margin: '.25rem 0 26px' }}>{t.myCart}</h1>
+
+      {freeShippingMin != null && (
+        <div style={{
+          border: `1px solid ${freeShippingReached ? A : BD}`, background: freeShippingReached ? AL : CARD,
+          borderRadius: 16, padding: '12px 16px', marginBottom: 22, color: freeShippingReached ? A : SUB, fontSize: '.85rem', fontWeight: 700,
+          display: 'flex', alignItems: 'center', gap: 9,
+        }}>
+          <Truck size={16} strokeWidth={2} />
+          {freeShippingReached ? t.freeShippingReached : t.freeShippingRemaining.replace('{{amount}}', `${fmt(Number(freeShippingRemainingAmt))} ${cur(store)}`)}
+        </div>
+      )}
 
       <div className="vx-cartlay">
         <div>
@@ -1824,7 +1900,7 @@ export function Cart({ domain, store }: any) {
 
             <div style={{ marginBottom: 16, padding: '4px 14px 12px', background: BG, border: `1px solid ${BD}`, borderRadius: 16 }}>
               <Row l={t.subtotal} v={`${fmt(cartTotal)} ${cur(store)}`} />
-              <Row l={t.delivery} v={selW ? `${fmt(getLiv())} ${cur(store)}` : '—'} />
+              <Row l={t.delivery} v={!selW ? '—' : freeShippingReached ? t.freeShippingBadge : `${fmt(getLiv())} ${cur(store)}`} />
               <Row l={t.total} v={`${fmt(finalTotal)} ${cur(store)}`} strong />
             </div>
 
@@ -1838,6 +1914,67 @@ export function Cart({ domain, store }: any) {
               {submitting ? t.sending : t.confirmOrder}
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================ SUCCESS ============================ */
+export function Success({ store, order }: { store: any; domain: string; order: any }) {
+  const t = T[getLang(store)];
+  const currency = store?.currency || 'DZD';
+  const stepIcons = [Check, Phone, PackageCheck, Truck];
+
+  return (
+    <div dir={t.dir} style={{ minHeight: '100vh', background: BG, padding: '3rem 1.25rem' }}>
+      <div style={{ maxWidth: 480, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', background: CARD, padding: '3rem 2rem', borderRadius: 4, border: `1px solid ${BD}`, marginBottom: '1.5rem' }}>
+          <div style={{ width: 60, height: 60, borderRadius: '50%', background: AL, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem' }}>
+            <Check size={28} style={{ color: A }} />
+          </div>
+          <h1 className="vx-disp" style={{ fontSize: 'clamp(1.7rem,5.4vw,2.6rem)', textTransform: 'uppercase', color: INK, margin: '0 0 12px' }}>{t.successTitle}</h1>
+          <p style={{ color: SUB, fontSize: '.92rem' }}>{t.successDesc}</p>
+        </div>
+
+        {order && (order.productName || order.total != null) && (
+          <div style={{ background: CARD, borderRadius: 4, border: `1px solid ${BD}`, padding: '1.25rem 1.5rem', marginBottom: '1.5rem' }}>
+            <p style={{ fontWeight: 700, fontSize: '0.75rem', color: INK, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>{t.orderInfo}</p>
+            {order.productName && (
+              <div style={{ paddingBottom: 10, marginBottom: 10, borderBottom: `1px solid ${BD}`, fontSize: 14, fontWeight: 700, color: INK }}>{order.productName}</div>
+            )}
+            {order.total != null && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 13, color: SUB }}>{t.total}</span>
+                <span className="vx-disp" style={{ fontSize: '1.2rem', color: A }}>{Number(order.total).toLocaleString()} {currency}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{ background: CARD, borderRadius: 4, border: `1px solid ${BD}`, overflow: 'hidden', marginBottom: '1.5rem' }}>
+          {t.successSteps.map((step, i) => {
+            const Icon = stepIcons[i] ?? Check;
+            const done = i === 0;
+            return (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '1rem 1.25rem', borderBottom: i < t.successSteps.length - 1 ? `1px solid ${BD}` : 'none', background: done ? AL : 'transparent' }}>
+                <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? A : BG, color: done ? BG : SUB }}>
+                  <Icon size={16} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '0.85rem', fontWeight: 700, color: done ? INK : SUB, marginBottom: 2 }}>{step.title}</p>
+                  <p style={{ fontSize: '0.76rem', color: SUB }}>{step.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+          <Link href="/" className="vx-btnp" style={{ ...btnPrimary, width: '100%', justifyContent: 'center' }}>{t.shopNow}</Link>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.8rem', borderRadius: 4, border: `1px solid ${BD}`, color: SUB, fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none' }}>
+            {t.backToShop}
+          </Link>
         </div>
       </div>
     </div>
