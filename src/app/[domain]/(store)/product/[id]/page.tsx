@@ -2,8 +2,42 @@ import { notFound } from 'next/navigation'
 import { cache } from 'react'
 import { getStoreByDomain, getProduct } from '@/lib/api'
 import ProductClient from './ProductClient'
+import type { Metadata } from 'next'
 
 const getStoreCached = cache(async (domain: string) => getStoreByDomain(domain))
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ domain: string; id: string }>
+}): Promise<Metadata> {
+  const { domain, id } = await params
+  const [product, store] = await Promise.all([
+    getProduct(domain, id),
+    getStoreCached(domain),
+  ])
+
+  if (!product || !store) return {}
+
+  const image = product.productImage || product.imagesProduct?.[0]?.imageUrl || store.design?.logoUrl || ''
+  const description = (product.desc || '').replace(/<[^>]+>/g, '').trim().slice(0, 160) || store.name
+
+  return {
+    title: product.name,
+    description,
+    openGraph: {
+      title: product.name,
+      description,
+      images: image ? [{ url: image }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: product.name,
+      description,
+      images: image ? [image] : undefined,
+    },
+  }
+}
 
 function StoreNotFound({ domain }: { domain: string }) {
   return (

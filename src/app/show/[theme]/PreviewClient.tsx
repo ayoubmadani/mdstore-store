@@ -20,7 +20,7 @@ const LANGS: { code: PreviewLang; label: string }[] = [
 
 type ViewMode = 'desktop' | 'mobile'
 const MOBILE_WIDTH = 380
-const MOBILE_HEIGHT = 640
+const MOBILE_HEIGHT = 700
 
 // iframe بعرض ثابت حقيقي — الحل الوحيد لتفعيل media queries الفعلية للثيم بدل عرض
 // المتصفح الكامل الذي يبقى واسعاً حتى لو صندوق العرض ضيّق بصرياً.

@@ -1,6 +1,6 @@
 ---
 name: theme-dev-v2
-description: "v2 — دليل تطوير ثيمات MdStore: بنية الملفات، أنماط i18n (ar/fr/en)، أخطاء BiDi/RTL، CSS في flex containers، variant filtering، image attr display، bundle command، قواعد ثابتة للـ Navbar/Footer/Hero، حقول Free Shipping / Qty Support على store وproduct وoffer، وصفحات static إضافية (additionalPages) خارج الأربع الأساسية."
+description: "v2 — دليل تطوير ثيمات MdStore: بنية الملفات، أنماط i18n (ar/fr/en)، أخطاء BiDi/RTL، CSS في flex containers، variant filtering، image attr display، bundle command، قواعد ثابتة للـ Navbar/Footer/Hero، حقول Free Shipping / Qty Support على store وproduct وoffer، صفحات static إضافية (additionalPages) خارج الأربع الأساسية، وexport `Success` الإلزامي لصفحة نجاح الطلب."
 ---
 
 # Theme Dev v2 — دليل تطوير ثيمات MdStore
@@ -29,8 +29,10 @@ description: "v2 — دليل تطوير ثيمات MdStore: بنية الملف
 ```ts
 export default Main         // الـ layout الرئيسي
 export { Navbar, Footer, Card, Home, Details, ProductForm, Cart,
-         Privacy, Terms, Cookies, Contact, StaticPage }
+         Privacy, Terms, Cookies, Contact, StaticPage, Success }
 ```
+
+> **`Success` إلزامي** — صفحة `/success` تعرض الثيم عبر `ThemeRunner` بـ `exportName="Success"`. ثيم بدون هذا الـ export تنكسر صفحة نجاح الطلب لديه. انظر §22 للتفاصيل الكاملة.
 
 ### نمط اللغة (getLang + T lookup)
 
@@ -403,6 +405,45 @@ style={{ borderBottom: isActive ? `2px solid ${ACCENT}` : '2px solid transparent
 export function Privacy({ store }: { store: any }) { ... }
 ```
 
+### روابط سريعة / قانوني — عمودان منفصلان، لا عمود واحد
+
+**المشكلة:** بعض الثيمات تجمع كل الروابط (الرئيسية، السلة، اتصل بنا، الخصوصية، الشروط، الكوكيز) تحت عمود واحد اسمه "روابط سريعة" — يصبح طويلاً وغير منظّم بصرياً، ولا يتماشى مع بقية الثيمات في المشروع.
+
+```tsx
+// ✗ خطأ — كل الروابط الستة في مصفوفة وعمود واحد
+const links = [
+  { h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact },
+  { h: '/privacy', l: t.privacy }, { h: '/terms', l: t.terms }, { h: '/cookies', l: t.cookies },
+];
+// عمود واحد بعنوان t.quickLinks يعرض كل الستة
+
+// ✓ صحيح — قسّمها لمصفوفتين وعمودين منفصلين
+const links = [
+  { h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact },
+].filter((lnk) => lnk.h !== '/cart' || store?.cart !== false);
+
+const legalLinks = [
+  { h: '/privacy', l: t.privacy }, { h: '/terms', l: t.terms }, { h: '/cookies', l: t.cookies },
+];
+```
+
+```tsx
+// ✓ عمودان منفصلان في الـ JSX — كل عمود بعنوانه الخاص
+<div>
+  <p className="foot-heading">{t.quickLinks}</p>
+  {links.map((l) => <Link key={l.h} href={l.h}>{l.l}</Link>)}
+</div>
+
+<div>
+  <p className="foot-heading">{t.legalNav}</p>
+  {legalLinks.map((l) => <Link key={l.h} href={l.h}>{l.l}</Link>)}
+</div>
+```
+
+**مفتاح ترجمة مطلوب:** أضف `legalNav` لكل من ar/fr/en إن لم يكن موجوداً (`'قانوني'` / `'Légal'` / `'Legal'`) — بجانب `quickLinks` الموجود مسبقاً.
+
+**شبكة الفوتر:** إن كان الفوتر يستخدم CSS grid بعدد أعمدة ثابت (مثل `grid-template-columns: 1.4fr 1fr 1fr`)، حدّثه ليستوعب عموداً إضافياً (مثال: `1.3fr 1fr 1fr 1fr`)، وأضف breakpoint متوسط (`~640px`) بعمودين قبل الانتقال للعرض الكامل على `768px` — حتى لا يضيق العمود الرابع فجأة.
+
 ---
 
 ## 12. Trust Items — نمطان مقبولان
@@ -483,6 +524,8 @@ node scripts/bundle-themes.mjs
 - [ ] `getLiv()` في كل من ProductForm وCart تُرجع `0` فعلياً عند تحقق الشحن المجاني — ليس فقط شارة نصية (انظر §19 ⚠️)
 - [ ] كل مكان يعرض `selW.livraisonHome`/`livraisonOfice` مباشرة (أزرار home/office) يعرض `t.freeShippingBadge` بدل السعر الخام عند تحقق الشحن المجاني
 - [ ] `offer.subTitle` يُعرض تحت اسم العرض إذا موجود (انظر §19)
+- [ ] `export function Success({ store, order }: ...)` موجود في الملف — تحقق بـ `grep -L "export function Success" src/theme/*.tsx` (انظر §22)
+- [ ] الفوتر: "روابط سريعة" و"قانوني" عمودان منفصلان (لا مصفوفة واحدة تجمع الستة روابط) — تحقق من وجود `t.legalNav` (انظر §11)
 - [ ] تم تشغيل `node scripts/bundle-themes.mjs --slug=<name>`
 
 ---
@@ -887,5 +930,139 @@ pages: {
 - [ ] إذا استُخدم `t.pages.*`، أُضيف مفتاح الصفحة الجديدة لكل من ar/fr/en
 - [ ] `additionalPages` يحتوي `name_ar` + `name_fr` + `name_en` + `link` لكل عنصر (وليس `name` مفرد)
 - [ ] تم تشغيل `node scripts/bundle-themes.mjs --slug=<name>` بعد الإضافة
+
+---
+
+## 22. `Success` — صفحة نجاح الطلب (export إلزامي)
+
+### السياق
+
+بعد إرسال الطلب، الزبون يصل لصفحة `/success` (الوصول الفعلي عبر `/successfully` الذي يعيد التوجيه إليها — انظر §17). هذه الصفحة (`src/app/[domain]/(store)/success/page.tsx`) لا ترسم أي HTML خاص بها — تفوّض كل العرض للثيم عبر `ThemeRunner`:
+
+```tsx
+// src/app/[domain]/(store)/success/page.tsx
+<ThemeRunner
+  bundleUrl={`/api/themes/${slug}`}
+  exportName="Success"
+  themeProps={{ store, domain, order }}
+/>
+```
+
+`order` يُقرأ من `localStorage.getItem('last_order')` (JSON اختياري بحقول مثل `productName`, `total`, `id`) — قد يكون `null` إذا لم يوجد طلب مخزَّن. **أي ثيم لا يُصدِّر `Success` تنكسر صفحة نجاح الطلب لديه بالكامل** (خطأ من `ThemeRunner`: الـ export غير موجود في الحزمة).
+
+### التوقيع المطلوب
+
+```tsx
+export function Success({ store, order }: { store: any; domain?: string; order?: any }) {
+  const t = T[getLang(store)];
+  const currency = store?.currency || 'DZD';
+  // ...
+}
+```
+
+### البنية القياسية (4 أجزاء)
+
+```tsx
+export function Success({ store, order }: { store: any; domain?: string; order?: any }) {
+  const t = T[getLang(store)];
+  const currency = store?.currency || 'DZD';
+  const stepIcons = [CheckIcon, Phone, Package, Truck]; // استخدم الأيقونات المستوردة أصلاً في الملف
+
+  return (
+    <div dir={t.dir}>
+      {/* 1) بطاقة تأكيد مركزية */}
+      <div>
+        <CheckIcon /* أو ما يعادلها في الملف */ />
+        <h1>{t.successTitle}</h1>
+        <p>{t.successDesc}</p>
+      </div>
+
+      {/* 2) معلومات الطلب — اختياري، فقط إذا order موجود وله بيانات */}
+      {order && (order.productName || order.total != null) && (
+        <div>
+          <p>{t.orderInfo}</p>
+          {order.productName && <div>{order.productName}</div>}
+          {order.total != null && (
+            <div><span>{t.total}</span><span>{fmt(order.total, currency)}</span></div>
+          )}
+        </div>
+      )}
+
+      {/* 3) خطوات ما بعد الطلب — 4 عناصر، الأولى "مكتملة" بصرياً */}
+      <div>
+        {t.successSteps.map((step, i) => {
+          const done = i === 0;
+          const Icon = stepIcons[i] ?? stepIcons[0];
+          return (
+            <div key={i} style={{ /* خلفية/لون مميز إذا done */ }}>
+              <Icon />
+              <p>{step.title}</p>
+              <p>{step.desc}</p>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 4) أزرار — بدون domain في المسار (نفس §17) */}
+      <Link href="/">{t.shopNow}</Link>
+      <Link href="/">{t.backToShop}</Link>
+    </div>
+  );
+}
+```
+
+### مفاتيح i18n المطلوبة (أضِفها لكل من ar/fr/en)
+
+`successTitle`, `successDesc`, `backToShop`, `shopNow` غالباً موجودة مسبقاً (تُستخدم أيضاً في `Cart`/`ProductForm`). الجديد المطلوب فقط لهذه الصفحة:
+
+```ts
+orderInfo: 'معلومات الطلب',
+successSteps: [
+  { title: 'تم استلام طلبك', desc: 'تم تسجيل طلبك بنجاح في نظامنا' },
+  { title: 'تأكيد الطلب', desc: 'سنتصل بك خلال 24 ساعة' },
+  { title: 'التجهيز والتغليف', desc: 'يتم تجهيز طلبك بعناية' },
+  { title: 'الشحن والتوصيل', desc: '2-5 أيام عمل' },
+],
+```
+
+```ts
+// fr
+orderInfo: 'Informations de commande',
+successSteps: [
+  { title: 'Commande reçue', desc: 'Votre commande a été enregistrée avec succès' },
+  { title: 'Confirmation', desc: 'Nous vous appellerons sous 24h' },
+  { title: 'Préparation', desc: 'Votre commande est préparée avec soin' },
+  { title: 'Livraison', desc: '2-5 jours ouvrables' },
+],
+
+// en
+orderInfo: 'Order Info',
+successSteps: [
+  { title: 'Order received', desc: 'Your order has been registered successfully' },
+  { title: 'Confirmation', desc: "We'll call you within 24 hours" },
+  { title: 'Packaging', desc: 'Your order is being prepared with care' },
+  { title: 'Shipping', desc: '2-5 business days' },
+],
+```
+
+### كيف تكتشف ثيماً ناقصاً
+
+```bash
+grep -L "export function Success" src/theme/*.tsx
+```
+
+كل ملف يظهر في النتيجة يفتقد هذا الـ export ويجب إكماله بنفس البنية أعلاه، مع تكييف الألوان/الأيقونات على تصميم الثيم الخاص به (استخدم `Styles`/CSS classes الموجودة في الملف بدل ابتكار نمط جديد).
+
+### مثال حي مطبَّق
+
+`auto-everyday-auto-essentials-theme.tsx` — كان الثيم الوحيد من بين كل الثيمات يفتقد `Success` (اكتُشف بأمر الـ grep أعلاه وأُصلح في 2026-08-26). للنمط المرجعي الكامل انظر `Success` في `sport-urban-fitness-running-theme.tsx` أو في نفس الملف بعد إصلاحه.
+
+### قائمة تحقق إضافية
+
+- [ ] `export function Success({ store, order }: ...)` موجود في الملف
+- [ ] `t.orderInfo` و `t.successSteps` (4 عناصر `{title, desc}`) مضافة لـ ar/fr/en
+- [ ] لا استيراد أيقونات جديدة إذا كانت موجودة أصلاً في الملف — أعد استخدام ما هو مستورد (Check/CheckCircle2, Phone, Package, Truck أو ما يعادلها)
+- [ ] الزرّان (`shopNow`/`backToShop`) يوجّهان لـ `/` بدون domain (نفس قاعدة §17)
+- [ ] تم تشغيل `node scripts/bundle-themes.mjs --slug=<name>` والتحقق من محتوى S3 المرفوع فعلياً
 
 ---
