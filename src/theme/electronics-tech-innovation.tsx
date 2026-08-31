@@ -969,8 +969,8 @@ export function Home({ store, page }: any) {
         )}
         <div className="ti-grid-overlay" />
 
-        <div className="ti-container" style={{ position: 'relative', zIndex: 2, padding: '5rem 1.5rem' }}>
-          <div style={{ maxWidth: 720, marginInlineEnd: 'auto' }}>
+        <div className="ti-container" style={{ position: 'relative', zIndex: 2, padding: '5rem 1.5rem', width: '100%' }}>
+          <div style={{ maxWidth: 720, marginInlineEnd: 'auto', textAlign: t.dir === 'rtl' ? 'right' : 'left' }}>
             <span className="ti-hero-badge ti-mono" style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               border: `1px solid ${A}`, color: A, background: AL,
@@ -980,14 +980,14 @@ export function Home({ store, page }: any) {
               <Cpu size={13} aria-hidden="true" /> {t.heroBadge}
             </span>
 
-            <h1 className="ti-hero-title" style={{
+            <h1 className="ti-hero-title" dir={t.dir} style={{
               fontSize: 'clamp(1.75rem, 5vw, 3.5rem)', fontWeight: 900, lineHeight: 1.2,
-              margin: '0 0 1rem', color: TXT,
+              margin: '0 0 1rem', color: TXT, textAlign: t.dir === 'rtl' ? 'right' : 'left',
             }}
               dangerouslySetInnerHTML={{ __html: heroTitle }} />
 
             {store?.hero?.subtitle && (
-              <p className="ti-hero-sub" style={{ color: SUB, fontSize: 'clamp(0.95rem, 2vw, 1.15rem)', lineHeight: 1.8, margin: '0 0 2rem', maxWidth: 560 }}>
+              <p className="ti-hero-sub" style={{ color: SUB, fontSize: 'clamp(0.95rem, 2vw, 1.15rem)', lineHeight: 1.8, margin: '0 0 2rem', maxWidth: 560, textAlign: t.dir === 'rtl' ? 'right' : 'left' }}>
                 {store.hero.subtitle}
               </p>
             )}
@@ -1007,7 +1007,7 @@ export function Home({ store, page }: any) {
 
         {/* floating deco chip */}
         <div className="ti-hero-chip ti-mono" aria-hidden="true" style={{
-          position: 'absolute', bottom: 36, insetInlineEnd: 40, zIndex: 2,
+          position: 'absolute', bottom: 36, left: '25%', zIndex: 2,
           border: `1px solid ${BD}`, background: 'rgba(14,22,38,0.8)', backdropFilter: 'blur(8px)',
           borderRadius: 4, padding: '10px 16px', fontSize: '0.7rem', color: SUB, letterSpacing: '0.1em',
           display: 'flex', alignItems: 'center', gap: 8,
