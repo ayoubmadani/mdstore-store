@@ -232,7 +232,11 @@ export default function ProductClient({
     }
   }
 
-  const allImages  = [product.productImage, ...(product.imagesProduct?.map((i: any) => i.imageUrl) || [])].filter(Boolean) as string[]
+  // imagesProduct[0] هي الصورة الرئيسية دائماً (نفس القاعدة المعتمدة في الداشبورد)،
+  // و productImage مجرد حقل احتياطي قديم — لا نجمعه مع imagesProduct لتفادي تكرار نفس الصورة
+  const allImages  = product.imagesProduct?.length
+    ? product.imagesProduct.map((i: any) => i.imageUrl)
+    : [product.productImage].filter(Boolean) as string[]
   const discount   = (() => {
     if (!product.priceOriginal) return 0
     const o = parseFloat(product.priceOriginal.toString())
