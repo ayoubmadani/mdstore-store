@@ -42,6 +42,8 @@ export interface ProductFormStrings {
   currency: string;
   loading: string;
   pieces: string;
+  orderSuccessTitle: string;
+  orderSuccessSubtitle: string;
 }
 
 const TRANSLATIONS: Record<ProductFormLanguage, ProductFormStrings> = {
@@ -82,6 +84,8 @@ const TRANSLATIONS: Record<ProductFormLanguage, ProductFormStrings> = {
     currency: 'د.ج',
     loading: 'جارٍ التحميل...',
     pieces: 'قطع',
+    orderSuccessTitle: 'تم تأكيد طلبك بنجاح!',
+    orderSuccessSubtitle: 'سنتواصل معك خلال 24 ساعة لتأكيد التسليم',
   },
   fr: {
     formTitle: 'Entrez vos informations de livraison',
@@ -120,6 +124,8 @@ const TRANSLATIONS: Record<ProductFormLanguage, ProductFormStrings> = {
     currency: 'DA',
     loading: 'Chargement...',
     pieces: 'pièces',
+    orderSuccessTitle: 'Commande confirmée avec succès !',
+    orderSuccessSubtitle: 'Nous vous contacterons sous 24h pour confirmer la livraison',
   },
   en: {
     formTitle: 'Enter your delivery information',
@@ -158,6 +164,8 @@ const TRANSLATIONS: Record<ProductFormLanguage, ProductFormStrings> = {
     currency: 'DZD',
     loading: 'Loading...',
     pieces: 'pieces',
+    orderSuccessTitle: 'Your order was placed successfully!',
+    orderSuccessSubtitle: "We'll contact you within 24 hours to confirm delivery",
   },
 };
 

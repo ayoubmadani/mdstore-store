@@ -6,16 +6,31 @@ import type { Pixel } from '@/types/store';
 
 interface CustomerTrackerProps {
   pixels: Pixel[];
+  // 'store' (الافتراضي) لصفحات المتجر العادية، 'landing_page' لصفحات الهبوط
+  // (مع تمرير landingPageId الخاص بالصفحة الحالية لمطابقتها)
+  pageType?: 'store' | 'landing_page';
+  landingPageId?: string;
 }
 
 const SAFE_PIXEL_ID = /^[\w-]{1,64}$/;
 
-const CustomerTracker = ({ pixels }: CustomerTrackerProps) => {
+const CustomerTracker = ({ pixels, pageType = 'store', landingPageId }: CustomerTrackerProps) => {
   if (!pixels || pixels.length === 0) return null;
+
+  const scopedPixels = pixels.filter((pixel) => {
+    const scope = pixel.scope ?? 'store';
+    if (pageType === 'store') return scope === 'store';
+    // landing_page-scoped pixels carry exactly one of these two FKs,
+    // depending on whether they were created via the old LandingPage module
+    // or the page-builder editor (builderPageId) — either can match here.
+    return scope === 'landing_page' && (pixel.builderPageId ?? pixel.landingPageId) === landingPageId;
+  });
+
+  if (scopedPixels.length === 0) return null;
 
   return (
     <>
-      {pixels.map((pixel) => {
+      {scopedPixels.map((pixel) => {
         if (!pixel.isActive) return null;
         if (!SAFE_PIXEL_ID.test(pixel.pixelId)) return null;
 

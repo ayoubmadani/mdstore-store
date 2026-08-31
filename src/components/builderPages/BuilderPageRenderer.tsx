@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import { Phone, MessageCircle, Mail, MapPin, ShoppingCart, ArrowUp, ArrowDown, Facebook, Instagram } from 'lucide-react';
 import ProductFormBlockRenderer from './ProductFormBlockRenderer';
 import AddShow from '@/components/addShow';
+import CustomerTracker from '@/components/CustomerTracker';
 import WhatsAppIcon from './WhatsAppIcon';
+import type { Pixel } from '@/types/store';
 
 // Matches dashboard/src/pages/editor/blocks/floatingButtonIcons.jsx's own
 // name→icon map exactly — the stored value is just this portable string,
@@ -168,6 +170,7 @@ interface BuilderPageData {
   productId?: string;
   settings?: { backgroundColor?: string; maxWidth?: number; padding?: number; language?: 'ar' | 'fr' | 'en' };
   tree: BuilderBlock[];
+  pixels?: Pixel[];
 }
 
 // View-only counterpart to dashboard/src/pages/editor/blocks/ElementsOverlay.jsx
@@ -361,7 +364,7 @@ function SpacerBlockRenderer({ props, elements, maxWidth }: { props: Record<stri
 // of the storefront's theme system (no ThemeRunner, no eval): the published
 // artifact is plain JSON, and every block type here has a fixed, built-in
 // renderer, the same way componentsMap.js drives the editor.
-export default function BuilderPageRenderer({ page, lpDomain }: { page: BuilderPageData; lpDomain: string }) {
+export default function BuilderPageRenderer({ page, lpDomain, dedicated }: { page: BuilderPageData; lpDomain: string; dedicated?: boolean }) {
   const settings = page.settings || {};
   const pagePadding = settings.padding || 0;
   const pageMaxWidth = settings.maxWidth || 720;
@@ -394,6 +397,7 @@ export default function BuilderPageRenderer({ page, lpDomain }: { page: BuilderP
       }}
     >
       <AddShow storeId={page.storeId} productId={page.productId} builderPageId={page.id} />
+      <CustomerTracker pixels={page.pixels ?? []} pageType="landing_page" landingPageId={page.id} />
       {page.tree.map((block, index) => {
         const isPinnedSpacer = block.type === 'spacer' && (block.props?.position === 'top' || block.props?.position === 'bottom');
         if (block.type === 'floatingButton') return <FloatingActionButton key={block.id ?? index} props={block.props} referenceWidth={pageMaxWidth} />;
@@ -408,6 +412,8 @@ export default function BuilderPageRenderer({ page, lpDomain }: { page: BuilderP
                 lpDomain={lpDomain}
                 builderPageId={page.id}
                 language={settings.language}
+                dedicated={dedicated}
+                pixels={page.pixels}
               />
             )}
             {!isPinnedSpacer && <FloatingElements elements={block.props?.elements} referenceWidth={pageMaxWidth} />}

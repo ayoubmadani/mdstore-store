@@ -119,3 +119,16 @@ export async function getStoreByDomain(
     return null;
   }
 }
+
+// Fetches a published builder-page by its own id — used when a domain is
+// dedicated to it (Store.domains[].scope === 'landing_page'), since that
+// Domain row only carries the page's id, not its own `domain` column.
+export async function getBuilderPageById(id: string) {
+  if (!API_URL || !id) return null;
+  try {
+    const { data } = await axios.get(`${API_URL}/builder-pages/public/${id}`, { timeout: 10000 });
+    return data || null;
+  } catch {
+    return null;
+  }
+}

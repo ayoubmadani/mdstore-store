@@ -39,13 +39,38 @@ export default function SuccessPage({
   const [pixels, setPixels] = useState<Pixel[]>([]);
   const hasTracked = useRef(false);
 
-  // fetch LP pixels
+  // fetch LP pixels — نفس منطق النطاق (scope) الذي يستخدمه CustomerTracker
+  // على صفحة الهبوط نفسها، حتى لا يُطلق حدث الشراء لبكسل خاص بالمتجر فقط
+  // لم يُحمَّل أصلاً على هذه الصفحة. يجرّب builder-pages أولاً (الأداة
+  // الفعلية المستخدمة اليوم) ثم يتراجع لـ landing-page القديمة، بنفس
+  // منطق صفحة الهبوط نفسها في page.tsx.
   useEffect(() => {
     const fullPath = cleanFullPath(window.location.href)
       .replace(/\/successfully\/?$/, '');
-    axios.get(`${API_URL}/landing-page/find?domain=${fullPath}`)
-      .then(res => setPixels(res.data?.product?.store?.pixels ?? []))
-      .catch(() => {});
+
+    const load = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/builder-pages/find`, { params: { domain: fullPath } });
+        if (res.data) {
+          const pageId = res.data?.id;
+          const allPixels: Pixel[] = res.data?.pixels ?? [];
+          setPixels(allPixels.filter(px =>
+            (px.scope ?? 'store') === 'landing_page' && (px.builderPageId ?? px.landingPageId) === pageId
+          ));
+          return;
+        }
+      } catch { /* not a builder-page domain — fall back below */ }
+
+      try {
+        const res = await axios.get(`${API_URL}/landing-page/find`, { params: { domain: fullPath } });
+        const lpId = res.data?.id;
+        const allPixels: Pixel[] = res.data?.product?.store?.pixels ?? [];
+        setPixels(allPixels.filter(px =>
+          (px.scope ?? 'store') === 'landing_page' && px.landingPageId === lpId
+        ));
+      } catch { /* neither system has this domain */ }
+    };
+    load();
   }, []);
 
   // fire purchase event once pixels scripts are ready

@@ -69,6 +69,11 @@ export interface ProductFormProps {
   inputTextColor?:       string;
   borderRadius?:         number;  // builder-pages productForm block only — 0 by default (square corners)
   language?:             string;  // builder-pages productForm block only — page.settings.language, defaults to 'ar'
+  // When set, a successful order calls this instead of navigating to
+  // `${pathname}/successfully` — used for a domain dedicated entirely to
+  // one builder-page (see BuilderPageRenderer's `dedicated` prop), where
+  // that route doesn't exist and the confirmation renders inline instead.
+  onOrderSuccess?:       (order: { id: string; total: number }) => void;
 }
 
 /* ─── Helpers ────────────────────────────────────────── */
@@ -121,7 +126,7 @@ export default function ProductForm({
   platform, priceLoss = 0, lpId, builderPageId, title, buttonText, renderBefore,
   backgroundColor, textColor, buttonBackgroundColor, buttonTextColor,
   buttonBorderColor, inputBackgroundColor, inputBorderColor, inputTextColor,
-  borderRadius, language,
+  borderRadius, language, onOrderSuccess,
 }: ProductFormProps) {
   const router = useRouter();
   const t = getProductFormStrings(language);
@@ -277,7 +282,11 @@ export default function ProductForm({
           });
         }
         if (res.data?.customerId) localStorage.setItem('customerId', res.data.customerId);
-        router.push(`${window.location.pathname}/successfully?productId=${product.id}`);
+        if (onOrderSuccess) {
+          onOrderSuccess({ id: res.data?.id, total: getTotalPrice() });
+        } else {
+          router.push(`${window.location.pathname}/successfully?productId=${product.id}`);
+        }
       }
     } catch {
       alert(t.connectionError);

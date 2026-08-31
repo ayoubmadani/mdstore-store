@@ -247,7 +247,7 @@ export default function LandingPageView({
   return (
     <div style={{
       }}>         <AddShow lpId={lp.id} />
-      <CustomerTracker pixels={product.store.pixels ?? []} />
+      <CustomerTracker pixels={product.store.pixels ?? []} pageType="landing_page" landingPageId={lp.id} />
 
       <div className="min-h-screen bg-gray-50" dir="rtl">
 

@@ -8,6 +8,7 @@ export interface Store {
   cart: boolean;
   theme?: { slug: string };
   pixels?: Pixel[];
+  domains?: { id: string; domain: string; scope?: 'store' | 'landing_page'; builderPageId?: string }[];
   design: {
     primaryColor: string;
     secondaryColor: string;
@@ -36,10 +37,14 @@ export interface Store {
 
 export interface Pixel {
   id: string;
+  name?: string;
   type: 'facebook' | 'tiktok' | 'google' | 'snapchat';
   pixelId: string;
   isActive: boolean;
   events?: string[];
+  scope?: 'store' | 'landing_page';
+  landingPageId?: string;
+  builderPageId?: string;
 }
 
 export interface Product {

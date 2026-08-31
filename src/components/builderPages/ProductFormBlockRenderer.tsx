@@ -1,11 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { CheckCircle } from 'lucide-react';
 import axios from 'axios';
 import ProductForm from '@/components/productForm/productForm';
 import { getProductFormStrings } from '@/components/productForm/translations';
+import type { Pixel } from '@/types/store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
+const SAFE_PIXEL_ID = /^[\w-]{1,64}$/;
 
 // Structurally matches productForm.tsx's own (unexported) Attribute/
 // VariantDetail/VariantAttributeEntry shapes exactly — TS treats two
@@ -61,18 +64,50 @@ export default function ProductFormBlockRenderer({
   lpDomain,
   builderPageId,
   language,
+  dedicated,
+  pixels,
 }: {
   productId?: string;
   props: Record<string, unknown>;
   lpDomain: string;
   builderPageId: string;
   language?: string;
+  // Rendered via a domain dedicated entirely to this page (see
+  // BuilderPageRenderer) — there's no "/successfully" route to redirect to
+  // there, so a successful order shows an inline confirmation instead, and
+  // fires the Purchase pixel event directly here rather than on that
+  // separate page's own load effect.
+  dedicated?: boolean;
+  pixels?: Pixel[];
 }) {
   const t = getProductFormStrings(language);
   const formatPrice = (n: number) => `${Number(n || 0).toLocaleString('en-US')} ${t.currency}`;
   const [product, setProduct] = useState<ProductInfo | null>(null);
   const [selectedOffer, setSelectedOffer] = useState<string | null>(null);
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
+  const [orderResult, setOrderResult] = useState<{ id: string; total: number } | null>(null);
+  const hasTrackedRef = useRef(false);
+
+  useEffect(() => {
+    if (!orderResult || hasTrackedRef.current || !pixels?.length) return;
+    const fire = () => {
+      pixels.forEach((px) => {
+        if (!px.isActive || !SAFE_PIXEL_ID.test(px.pixelId)) return;
+        if (px.type === 'facebook' && (window as any).fbq) {
+          (window as any).fbq('track', 'Purchase', { value: orderResult.total, currency: 'DZD', order_id: orderResult.id });
+        }
+        if (px.type === 'tiktok' && (window as any).ttq) {
+          (window as any).ttq.track('CompletePayment', { value: orderResult.total, currency: 'DZD', order_id: orderResult.id });
+        }
+        if (px.type === 'google' && (window as any).gtag) {
+          (window as any).gtag('event', 'purchase', { transaction_id: orderResult.id, value: orderResult.total, currency: 'DZD' });
+        }
+      });
+      hasTrackedRef.current = true;
+    };
+    const timer = setTimeout(fire, 1500);
+    return () => clearTimeout(timer);
+  }, [orderResult, pixels]);
 
   useEffect(() => {
     if (!productId) return;
@@ -254,7 +289,22 @@ export default function ProductFormBlockRenderer({
         backgroundColor: containerBackgroundColor || 'transparent',
       }}
     >
-      {!product ? (
+      {dedicated && orderResult ? (
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '40px 20px',
+            backgroundColor: backgroundColor || '#ffffff',
+            color: textColor || '#111827',
+            borderRadius: borderRadius ?? 0,
+            border: `1px solid ${inputBorderColor || '#e4e4e7'}`,
+          }}
+        >
+          <CheckCircle size={48} style={{ color: '#10b981', marginInline: 'auto', marginBottom: 16 }} />
+          <p style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>{t.orderSuccessTitle}</p>
+          <p style={{ fontSize: 13, opacity: 0.7 }}>{t.orderSuccessSubtitle}</p>
+        </div>
+      ) : !product ? (
         <p style={{ textAlign: 'center', fontSize: 14, opacity: 0.6 }}>{t.loading}</p>
       ) : (
         <ProductForm
@@ -288,6 +338,7 @@ export default function ProductFormBlockRenderer({
           inputTextColor={inputTextColor}
           borderRadius={borderRadius}
           language={language}
+          onOrderSuccess={dedicated ? setOrderResult : undefined}
         />
       )}
     </div>

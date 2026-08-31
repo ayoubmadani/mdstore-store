@@ -1,10 +1,11 @@
 import { cache } from 'react'
 import { notFound } from 'next/navigation'
-import { getStoreByDomain } from '@/lib/api'
+import { getStoreByDomain, getBuilderPageById } from '@/lib/api'
 import { StoreProvider } from '@/Hook/store-provider'
 import CustomerTracker from '@/components/CustomerTracker'
 import AddShow from '@/components/addShow'
 import ThemeRunner from '@/components/ThemeRunner'
+import BuilderPageRenderer from '@/components/builderPages/BuilderPageRenderer'
 import type { Metadata } from 'next'
 
 const getStoreCached = cache(async (domain: string) => getStoreByDomain(domain))
@@ -39,6 +40,21 @@ export default async function DomainLayout({ children, params }: LayoutProps) {
   const { domain } = await params
   const store = await getStoreCached(domain)
   if (!store) notFound()
+
+  // دومين مخصص بالكامل لصفحة هبوط واحدة (أُنشئ من داخل المحرر) — يعرض تلك
+  // الصفحة حصرياً عند الجذر (وأي مسار آخر تحته)، بدل واجهة المتجر العادية،
+  // بلا أي chrome (نفس شكل /lp/[lpdomain] تماماً).
+  const dedicatedDomain = store.domains?.find((d) => d.domain === domain && d.scope === 'landing_page')
+  if (dedicatedDomain?.builderPageId) {
+    const page = await getBuilderPageById(dedicatedDomain.builderPageId)
+    if (!page) notFound()
+    return (
+      <div dir={(page.settings?.language || 'ar') === 'ar' ? 'rtl' : 'ltr'}>
+        <CustomerTracker pixels={page.pixels ?? []} pageType="landing_page" landingPageId={page.id} />
+        <BuilderPageRenderer page={page} lpDomain={domain} dedicated />
+      </div>
+    )
+  }
 
   const slug     = store.theme?.slug || 'default'
   const language = store.language    || 'ar'
