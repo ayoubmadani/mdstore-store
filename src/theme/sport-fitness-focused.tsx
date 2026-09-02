@@ -12,7 +12,7 @@ import {
   ArrowLeft, CheckCircle2, Lock,
   Menu, Zap, Flame, Dumbbell, Trophy, Shield, Truck,
   Package, Target, TrendingUp, Search,
-  ShoppingCart, Trash2, Loader2, Minus, Plus, MapPin,
+  ShoppingCart, Trash2, Loader2, Minus, Plus, MapPin, Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
@@ -212,6 +212,7 @@ export interface Product {
   id: string; name: string; price: string|number; priceOriginal?: string|number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
   variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+  isDigital?: boolean;
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 export interface ProductFormProps {
@@ -270,6 +271,15 @@ const jsonAr = {
   phonePh: '05xxxxxxxx',
   errPhone: 'رقم الهاتف مطلوب',
   errPhoneInvalid: 'رقم هاتف غير صالح',
+  orderEmail: 'البريد الإلكتروني',
+  emailPh: 'example@email.com',
+  errEmail: 'يرجى إدخال بريد إلكتروني صحيح',
+  whatsapp: 'رقم واتساب',
+  whatsappPh: '0550123456',
+  errWhatsapp: 'رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)',
+  contactQuestion: 'هل تملك بريداً إلكترونياً أم واتساب؟',
+  contactViaEmail: 'البريد الإلكتروني',
+  contactViaWhatsapp: 'واتساب',
   wilaya: 'الولاية',
   errWilaya: 'الولاية مطلوبة',
   wilayaPh: 'اختر الولاية',
@@ -429,6 +439,15 @@ const jsonFr = {
   phonePh: '0555 12 34 56',
   errPhone: 'Le numéro de téléphone est requis',
   errPhoneInvalid: 'Numéro de téléphone invalide',
+  orderEmail: 'E-mail',
+  emailPh: 'exemple@email.com',
+  errEmail: 'Veuillez saisir une adresse e-mail valide',
+  whatsapp: 'Numéro WhatsApp',
+  whatsappPh: '0550123456',
+  errWhatsapp: 'Numéro WhatsApp algérien valide requis (ex: 0550123456)',
+  contactQuestion: 'Avez-vous un e-mail ou un numéro WhatsApp ?',
+  contactViaEmail: 'E-mail',
+  contactViaWhatsapp: 'WhatsApp',
   wilaya: 'Wilaya',
   errWilaya: 'Sélectionnez une wilaya',
   wilayaPh: 'Choisir la wilaya',
@@ -572,6 +591,9 @@ const jsonEn = {
   all: 'All', noProducts: 'No products available at the moment.', shopNow: 'Shop Now', searchResultsFor: 'Results for:',
   fullName: 'Full name', fullNamePh: 'Your name', errName: 'Name is required',
   phone: 'Phone', phonePh: '0555 12 34 56', errPhone: 'Phone number is required', errPhoneInvalid: 'Invalid phone number',
+  orderEmail: 'Email', emailPh: 'example@email.com', errEmail: 'Please enter a valid email address',
+  whatsapp: 'WhatsApp number', whatsappPh: '0550123456', errWhatsapp: 'A valid Algerian WhatsApp number is required (e.g. 0550123456)',
+  contactQuestion: 'Do you have an email or a WhatsApp number?', contactViaEmail: 'Email', contactViaWhatsapp: 'WhatsApp',
   wilaya: 'Wilaya', errWilaya: 'Select a wilaya', wilayaPh: 'Choose wilaya', wilayaNA: 'Delivery unavailable',
   commune: 'Commune', errCommune: 'Select a commune', communePh: 'Choose commune', communeLoading: 'Loading...',
   deliveryType: 'Delivery type', deliveryHome: 'Home delivery', deliveryOffice: 'Office pickup',
@@ -1043,7 +1065,9 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
               <Dumbbell style={{width:'40px',height:'40px',color:'var(--dim)'}}/>
             </div>}
         {discount > 0 && <span className="bc" style={{position:'absolute',top:10,right:10,backgroundColor:'var(--fire)',color:'white',fontSize:'10px',fontWeight:900,padding:'3px 10px',letterSpacing:'0.06em',clipPath:'polygon(0 0,100% 0,94% 100%,0 100%)'}}>-{discount}%</span>}
-        {product?.shippingFree && <span className="bc" style={{position:'absolute',top:10,left:10,backgroundColor:'var(--gold)',color:'var(--black)',fontSize:'10px',fontWeight:900,padding:'3px 9px'}}>🚚</span>}
+        {product?.isDigital ? (
+          <span className="bc" style={{position:'absolute',top:10,left:10,backgroundColor:'var(--gold)',color:'var(--black)',fontSize:'10px',fontWeight:900,padding:'3px 9px',display:'flex',alignItems:'center'}}><Download size={12}/></span>
+        ) : product?.shippingFree && <span className="bc" style={{position:'absolute',top:10,left:10,backgroundColor:'var(--gold)',color:'var(--black)',fontSize:'10px',fontWeight:900,padding:'3px 9px'}}>🚚</span>}
         <div style={{position:'absolute',top:0,left:0,right:0,height:'2px',background:'linear-gradient(90deg,var(--fire),var(--gold))'}}/>
       </div>
       <div style={{padding:'14px',flex:1,display:'flex',flexDirection:'column',gap:'8px'}}>
@@ -1443,7 +1467,8 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   const [wilayas, setWilayas]   = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLC]       = useState(false);
-  const [fd, setFd] = useState({customerId:'',customerName:'',customerPhone:'',customerWelaya:'',customerCommune:'',quantity:1,priceLoss:0,typeLivraison:'home' as 'home'|'office'});
+  const [fd, setFd] = useState({customerId:'',customerName:'',customerPhone:'',customerWelaya:'',customerCommune:'',customerEmail:'',customerWhatsapp:'',quantity:1,priceLoss:0,typeLivraison:'home' as 'home'|'office'});
+  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [errors, setErrors]   = useState<Record<string,string>>({});
   const [sub, setSub]         = useState(false);
   const [isOrderNow, setIsOrderNow] = useState(false);
@@ -1471,14 +1496,22 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   const selOfferObj = product.offers?.find((o:any)=>o.id===selectedOffer);
   const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
     (storeprop?.supportFreeShipping && storeprop?.freeShippingMinAmount != null && (fp*qty) >= Number(storeprop.freeShippingMinAmount)));
-  const getLiv = useCallback(():number=>{ if(orderFreeShipping) return 0; if(!selW) return 0; return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice; },[selW,fd.typeLivraison,orderFreeShipping]);
+  const getLiv = useCallback(():number=>{ if(product.isDigital) return 0; if(orderFreeShipping) return 0; if(!selW) return 0; return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice; },[selW,fd.typeLivraison,orderFreeShipping,product.isDigital]);
   const total = ()=> fp*qty + +getLiv();
   const validate = ()=>{
     const e:Record<string,string>={};
     if(!fd.customerName.trim())  e.customerName=t.errName;
     if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
-    if(!fd.customerWelaya)       e.customerWelaya=t.errWilaya;
-    if(!fd.customerCommune)      e.customerCommune=t.errCommune;
+    if (product.isDigital) {
+      if (contactMethod === 'email') {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
+      } else {
+        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
+      }
+    } else {
+      if(!fd.customerWelaya)       e.customerWelaya=t.errWilaya;
+      if(!fd.customerCommune)      e.customerCommune=t.errCommune;
+    }
     return e;
   };
   const getVarId = useCallback(()=>{
@@ -1500,7 +1533,11 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     const er=validate(); if(Object.keys(er).length){setErrors(er);return;}
     setErrors({}); setSub(true);
     try{
-      await axios.post(`${API_URL}/orders/create`,{...fd,quantity:qty,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});
+      const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
+      const payload = product.isDigital
+        ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+        : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
+      await axios.post(`${API_URL}/orders/create`,{...payload,quantity:qty,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});
       if(fd.customerId) localStorage.setItem('customerId',fd.customerId);
       router.push(`/successfully?productId=${product?.id}`);
     }catch{}finally{setSub(false);}
@@ -1509,7 +1546,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} style={{marginTop:'22px',paddingTop:'20px',borderTop:'1px solid var(--line)'}}>
       {/* Cart + Order buttons */}
-        {product.store?.cart && (
+        {product.store?.cart && !product.isDigital && (
         <div style={{display:'flex',gap:'8px',marginBottom:'16px'}}>
           <button onClick={addToCart} disabled={isAdded} className="bc" style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:7,padding:'12px',cursor:isAdded?'default':'pointer',fontFamily:'inherit',fontWeight:800,fontSize:'13px',letterSpacing:'0.08em',textTransform:'uppercase',border:`1.5px solid ${isAdded?'var(--green)':'var(--dim)'}`,background:isAdded?'rgba(57,255,20,0.1)':'transparent',color:isAdded?'var(--green)':'var(--mid)',transition:'all 0.25s'}}>
             {isAdded?<><CheckCircle2 size={14} className="anim-check"/>{t.addedToCart}</>:<><ShoppingCart size={14}/>{t.addToCart}</>}
@@ -1520,9 +1557,9 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
         </div>
       )}
 
-      {(isOrderNow || !product.store?.cart) && (
+      {(isOrderNow || !product.store?.cart || product.isDigital) && (
         <div>
-          {product.store?.cart && (
+          {product.store?.cart && !product.isDigital && (
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'14px'}}>
               <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--fire)',margin:0}}>{t.delivDataTitle}</p>
               <button onClick={()=>setIsOrderNow(false)} className="bc" style={{display:'flex',alignItems:'center',gap:4,padding:'4px 10px',border:'1px solid var(--dim)',background:'transparent',color:'var(--mid)',fontSize:'11px',fontWeight:700,cursor:'pointer',fontFamily:'inherit',letterSpacing:'0.1em',textTransform:'uppercase'}}>
@@ -1543,42 +1580,72 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
                   onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerPhone?'#ef4444':'var(--dim)';}}/>
               </FR>
             </div>
-            <div className="form-2c">
-              <FR error={errors.customerWelaya} label={t.wilaya}>
-                <div style={{position:'relative'}}>
-                  <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
-                  <select value={fd.customerWelaya} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})}
-                    className={`inp${errors.customerWelaya?' inp-err':''}`} style={isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}}
-                    onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerWelaya?'#ef4444':'var(--dim)';}}>
-                    <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {isRTL?w.ar_name:w.name}</option>)}
-                  </select>
+            {product.isDigital ? (
+              <FR label={t.contactQuestion}>
+                <div>
+                  <div style={{display:'flex',border:'1.5px solid var(--dim)',overflow:'hidden',marginBottom:'10px'}}>
+                    <button type="button" onClick={()=>{setContactMethod('email');setFd(p=>({...p,customerWhatsapp:''}));}} style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:6,padding:'10px 0',border:'none',cursor:'pointer',fontFamily:'inherit',fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',backgroundColor:contactMethod==='email'?'var(--fire)':'transparent',color:contactMethod==='email'?'#fff':'var(--mid)'}}>
+                      <Mail style={{width:'13px',height:'13px'}}/>{t.contactViaEmail}
+                    </button>
+                    <button type="button" onClick={()=>{setContactMethod('whatsapp');setFd(p=>({...p,customerEmail:''}));}} style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:6,padding:'10px 0',border:'none',cursor:'pointer',fontFamily:'inherit',fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',backgroundColor:contactMethod==='whatsapp'?'var(--fire)':'transparent',color:contactMethod==='whatsapp'?'#fff':'var(--mid)'}}>
+                      <MessageCircle style={{width:'13px',height:'13px'}}/>{t.contactViaWhatsapp}
+                    </button>
+                  </div>
+                  {contactMethod==='email' ? (
+                    <FR error={errors.customerEmail} label={t.orderEmail}>
+                      <input type="email" dir="ltr" value={fd.customerEmail} onChange={e=>setFd({...fd,customerEmail:e.target.value})} placeholder={t.emailPh}
+                        style={INP_S(!!errors.customerEmail)} className={`inp${errors.customerEmail?' inp-err':''}`}
+                        onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerEmail?'#ef4444':'var(--dim)';}}/>
+                    </FR>
+                  ) : (
+                    <FR error={errors.customerWhatsapp} label={t.whatsapp}>
+                      <input type="tel" dir="ltr" value={fd.customerWhatsapp} onChange={e=>setFd({...fd,customerWhatsapp:e.target.value})} placeholder={t.whatsappPh}
+                        style={INP_S(!!errors.customerWhatsapp)} className={`inp${errors.customerWhatsapp?' inp-err':''}`}
+                        onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerWhatsapp?'#ef4444':'var(--dim)';}}/>
+                    </FR>
+                  )}
                 </div>
               </FR>
-              <FR error={errors.customerCommune} label={t.commune}>
-                <div style={{position:'relative'}}>
-                  <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
-                  <select value={fd.customerCommune} disabled={!fd.customerWelaya||loadingC} onChange={e=>setFd({...fd,customerCommune:e.target.value})}
-                    className={`inp${errors.customerCommune?' inp-err':''}`} style={{...(isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}),opacity:!fd.customerWelaya?0.4:1}}
-                    onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerCommune?'#ef4444':'var(--dim)';}}>
-                    <option value="">{loadingC?t.communeLoading:t.communePh}</option>{communes.map(c=><option key={c.id} value={c.id}>{isRTL?c.ar_name:c.name}</option>)}
-                  </select>
+            ) : (
+              <>
+                <div className="form-2c">
+                  <FR error={errors.customerWelaya} label={t.wilaya}>
+                    <div style={{position:'relative'}}>
+                      <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
+                      <select value={fd.customerWelaya} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})}
+                        className={`inp${errors.customerWelaya?' inp-err':''}`} style={isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}}
+                        onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerWelaya?'#ef4444':'var(--dim)';}}>
+                        <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {isRTL?w.ar_name:w.name}</option>)}
+                      </select>
+                    </div>
+                  </FR>
+                  <FR error={errors.customerCommune} label={t.commune}>
+                    <div style={{position:'relative'}}>
+                      <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
+                      <select value={fd.customerCommune} disabled={!fd.customerWelaya||loadingC} onChange={e=>setFd({...fd,customerCommune:e.target.value})}
+                        className={`inp${errors.customerCommune?' inp-err':''}`} style={{...(isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}),opacity:!fd.customerWelaya?0.4:1}}
+                        onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerCommune?'#ef4444':'var(--dim)';}}>
+                        <option value="">{loadingC?t.communeLoading:t.communePh}</option>{communes.map(c=><option key={c.id} value={c.id}>{isRTL?c.ar_name:c.name}</option>)}
+                      </select>
+                    </div>
+                  </FR>
                 </div>
-              </FR>
-            </div>
 
-            <FR label={t.deliveryType}>
-              <div className="dlv-2c">
-                {(['home','office'] as const).map(dtype=>(
-                  <button key={dtype} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:dtype}))}
-                    style={{padding:'12px 10px',border:`1.5px solid ${fd.typeLivraison===dtype?'var(--fire)':'var(--dim)'}`,backgroundColor:fd.typeLivraison===dtype?'rgba(255,69,0,0.1)':'transparent',cursor:'pointer',textAlign:'start',transition:'all 0.2s',fontFamily:'inherit'}}>
-                    <p className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:fd.typeLivraison===dtype?'var(--fire)':'var(--mid)',margin:'0 0 4px'}}>{dtype==='home'?t.homeDelivLabel:t.officeDelivLabel}</p>
-                    {selW && (orderFreeShipping ? <p className="bb" style={{fontSize:'0.85rem',color:fd.typeLivraison===dtype?'var(--fire)':'var(--dim)',margin:0}}>{t.freeShippingBadge}</p> : <p className="bb" style={{fontSize:'1rem',color:fd.typeLivraison===dtype?'var(--fire)':'var(--dim)',margin:0}}>{(dtype==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'11px',color:'var(--dim)'}}>{storeprop?.currency || 'DZD'}</span></p>)}
-                  </button>
-                ))}
-              </div>
-            </FR>
+                <FR label={t.deliveryType}>
+                  <div className="dlv-2c">
+                    {(['home','office'] as const).map(dtype=>(
+                      <button key={dtype} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:dtype}))}
+                        style={{padding:'12px 10px',border:`1.5px solid ${fd.typeLivraison===dtype?'var(--fire)':'var(--dim)'}`,backgroundColor:fd.typeLivraison===dtype?'rgba(255,69,0,0.1)':'transparent',cursor:'pointer',textAlign:'start',transition:'all 0.2s',fontFamily:'inherit'}}>
+                        <p className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:fd.typeLivraison===dtype?'var(--fire)':'var(--mid)',margin:'0 0 4px'}}>{dtype==='home'?t.homeDelivLabel:t.officeDelivLabel}</p>
+                        {selW && (orderFreeShipping ? <p className="bb" style={{fontSize:'0.85rem',color:fd.typeLivraison===dtype?'var(--fire)':'var(--dim)',margin:0}}>{t.freeShippingBadge}</p> : <p className="bb" style={{fontSize:'1rem',color:fd.typeLivraison===dtype?'var(--fire)':'var(--dim)',margin:0}}>{(dtype==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'11px',color:'var(--dim)'}}>{storeprop?.currency || 'DZD'}</span></p>)}
+                      </button>
+                    ))}
+                  </div>
+                </FR>
+              </>
+            )}
 
-            {supportQty && (
+            {supportQty && !product.isDigital && (
               <FR label={t.qty}>
                 <div style={{display:'inline-flex',alignItems:'center',border:'1.5px solid var(--dim)',overflow:'hidden',backgroundColor:'var(--panel)'}}>
                   <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderRight:'1px solid var(--dim)',background:'transparent',cursor:'pointer',color:'var(--fire)',fontSize:'18px',fontWeight:700}}>-</button>
@@ -1594,7 +1661,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
                 <Package style={{width:'13px',height:'13px',color:'var(--fire)'}}/>
                 <span className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)'}}>{t.summaryTitle}</span>
               </div>
-              {[{l:t.productLabel,v:product.name.slice(0,22)+(product.name.length>22?'...':'')},{l:t.price,v:`${fp.toLocaleString()} ${storeprop?.currency||'DZD'}`},{l:t.qty,v:`× ${qty}`},{l:t.delivery,v:!selW?'—':orderFreeShipping?t.freeShippingBadge:`${getLiv().toLocaleString()} ${storeprop?.currency||'DZD'}`}].map(row=>(
+              {[{l:t.productLabel,v:product.name.slice(0,22)+(product.name.length>22?'...':'')},{l:t.price,v:`${fp.toLocaleString()} ${storeprop?.currency||'DZD'}`},{l:t.qty,v:`× ${qty}`},...(product.isDigital?[]:[{l:t.delivery,v:!selW?'—':orderFreeShipping?t.freeShippingBadge:`${getLiv().toLocaleString()} ${storeprop?.currency||'DZD'}`}])].map(row=>(
                 <div key={row.l} style={{display:'flex',justifyContent:'space-between',padding:'7px 14px',borderBottom:'1px solid var(--line)'}}>
                   <span className="bc" style={{fontSize:'12px',color:'var(--dim)',letterSpacing:'0.06em',textTransform:'uppercase'}}>{row.l}</span>
                   <span style={{fontSize:'13px',fontWeight:600,color:'var(--mid)'}}>{row.v}</span>

@@ -20,7 +20,7 @@ import { useCartStore } from '@/store/useCartStore';
 import {
   ShoppingCart, Search, X, Menu, Phone, Mail, MapPin, ChevronDown,
   ChevronLeft, ChevronRight, Trash2, Cpu, Truck, ShieldCheck, Lock,
-  Headphones, AlertCircle, CheckCircle2, Minus, Plus, Zap, Star, Send, Package,
+  Headphones, AlertCircle, CheckCircle2, Minus, Plus, Zap, Star, Send, Package, MessageCircle, Download,
 } from 'lucide-react';
 
 /* ========================= Types ========================= */
@@ -38,6 +38,7 @@ interface Product {
   id: string; name: string; slug?: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
   variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+  isDigital?: boolean;
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 
@@ -111,6 +112,9 @@ const T = {
     errName: 'الاسم الكامل مطلوب (3 أحرف على الأقل)',
     errPhone: 'رقم هاتف جزائري صحيح مطلوب (مثال: 0550123456)',
     errWilaya: 'اختر الولاية', errCommune: 'اختر البلدية',
+    orderEmail: 'البريد الإلكتروني', emailPh: 'example@email.com', errEmail: 'يرجى إدخال بريد إلكتروني صحيح',
+    whatsapp: 'رقم واتساب', whatsappPh: '0550123456', errWhatsapp: 'رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)',
+    contactQuestion: 'هل تملك بريداً إلكترونياً أم واتساب؟', contactViaEmail: 'البريد الإلكتروني', contactViaWhatsapp: 'واتساب',
     privacyTitle: 'سياسة الخصوصية', termsTitle: 'الشروط والأحكام',
     cookiesTitle: 'سياسة الكوكيز', contactTitle: 'تواصل معنا',
     offersTitle: 'العروض المتاحة', descTitle: 'الوصف',
@@ -177,6 +181,9 @@ const T = {
     errName: 'Nom complet requis (3 caractères minimum)',
     errPhone: 'Numéro de téléphone algérien valide requis (ex: 0550123456)',
     errWilaya: 'Veuillez choisir une wilaya', errCommune: 'Veuillez choisir une commune',
+    orderEmail: 'E-mail', emailPh: 'exemple@email.com', errEmail: 'Veuillez saisir une adresse e-mail valide',
+    whatsapp: 'Numéro WhatsApp', whatsappPh: '0550123456', errWhatsapp: 'Numéro WhatsApp algérien valide requis (ex: 0550123456)',
+    contactQuestion: 'Avez-vous un e-mail ou un numéro WhatsApp ?', contactViaEmail: 'E-mail', contactViaWhatsapp: 'WhatsApp',
     privacyTitle: 'Politique de confidentialité', termsTitle: 'Conditions générales',
     cookiesTitle: 'Politique des cookies', contactTitle: 'Nous contacter',
     offersTitle: 'Offres groupées', descTitle: 'Description',
@@ -243,6 +250,9 @@ const T = {
     errName: 'Full name is required (at least 3 characters)',
     errPhone: 'Valid Algerian phone number required (e.g. 0550123456)',
     errWilaya: 'Please select a wilaya', errCommune: 'Please select a commune',
+    orderEmail: 'Email', emailPh: 'example@email.com', errEmail: 'Please enter a valid email address',
+    whatsapp: 'WhatsApp number', whatsappPh: '0550123456', errWhatsapp: 'A valid Algerian WhatsApp number is required (e.g. 0550123456)',
+    contactQuestion: 'Do you have an email or a WhatsApp number?', contactViaEmail: 'Email', contactViaWhatsapp: 'WhatsApp',
     privacyTitle: 'Privacy Policy', termsTitle: 'Terms & Conditions',
     cookiesTitle: 'Cookie Policy', contactTitle: 'Contact Us',
     offersTitle: 'Available Offers', descTitle: 'Description',
@@ -898,7 +908,15 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
             -{discount}%
           </span>
         )}
-        {product.shippingFree && (
+        {product.isDigital ? (
+          <span className="ti-mono" style={{
+            position: 'absolute', top: 10, insetInlineEnd: 10, zIndex: 2,
+            background: A, color: BG, fontSize: '0.62rem', fontWeight: 700,
+            padding: '3px 8px', borderRadius: 3, display: 'flex', alignItems: 'center',
+          }}>
+            <Download size={12} />
+          </span>
+        ) : product.shippingFree && (
           <span className="ti-mono" style={{
             position: 'absolute', top: 10, insetInlineEnd: 10, zIndex: 2,
             background: TXT, color: BG, fontSize: '0.62rem', fontWeight: 700,
@@ -1306,10 +1324,12 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
 
   const [fd, setFd] = useState({
     customerId: '', customerName: '', customerPhone: '',
+    customerEmail: '', customerWhatsapp: '',
     customerWelaya: '', customerCommune: '',
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',
   });
+  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
@@ -1355,38 +1375,54 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     (store?.supportFreeShipping && store?.freeShippingMinAmount != null && (fp * qty) >= Number(store.freeShippingMinAmount)));
   // §10 — Number() coercion, per-wilaya per-type
   const getLiv = useCallback((): number => {
+    if (product?.isDigital) return 0;
     if (orderFreeShipping) return 0;
     if (!selW) return 0;
     return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
-  }, [selW, fd.typeLivraison, orderFreeShipping]);
+  }, [selW, fd.typeLivraison, orderFreeShipping, product?.isDigital]);
   const total = () => fp * qty + getLiv();
 
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName || fd.customerName.trim().length < 3) e.customerName = t.errName;
     if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhone;
-    if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
-    if (!fd.customerCommune) e.customerCommune = t.errCommune;
+    if (product?.isDigital) {
+      if (contactMethod === 'email') {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
+      } else {
+        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
+      }
+    } else {
+      if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
+      if (!fd.customerCommune) e.customerCommune = t.errCommune;
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const buildPayload = () => ({
-    ...fd,
-    quantity: qty,
-    product,
-    productId: product?.id,
-    storeId: product?.store?.id || store?.id,
-    userId,
-    selectedOffer,
-    selectedVariants,
-    platform,
-    variantDetailId: getVarId(),
-    finalPrice: fp,
-    totalPrice: total(),
-    priceLivraison: getLiv(), // §10.5 — always its own field
-    addedAt: Date.now(),
-  });
+  const buildPayload = () => {
+    const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
+    const shipping = product?.isDigital
+      ? { ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+      : { customerWelaya, customerCommune, typeLivraison, priceLoss };
+    return {
+      ...rest,
+      ...shipping,
+      quantity: qty,
+      product,
+      productId: product?.id,
+      storeId: product?.store?.id || store?.id,
+      userId,
+      selectedOffer,
+      selectedVariants,
+      platform,
+      variantDetailId: getVarId(),
+      finalPrice: fp,
+      totalPrice: total(),
+      priceLivraison: getLiv(), // §10.5 — always its own field
+      addedAt: Date.now(),
+    };
+  };
 
   // §10 / §15.14 — addToCart never validates
   const addToCart = () => {
@@ -1431,7 +1467,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   return (
     <div style={{ border: `1px solid ${BD}`, borderRadius: 6, background: CARD, padding: '1.25rem', marginTop: '0.5rem' }}>
       {/* Quantity */}
-      {supportQty && (
+      {supportQty && !product?.isDigital && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: '1rem' }}>
           <span className="ti-label" style={{ marginBottom: 0 }}>{t.qty}</span>
           <div style={{ display: 'inline-flex', alignItems: 'center', border: `1px solid ${BD}`, borderRadius: 4, overflow: 'hidden' }}>
@@ -1458,7 +1494,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
           <button className="ti-btn ti-btn-pulse" onClick={() => setIsOrderNow(true)}>
             <Zap size={16} aria-hidden="true" /> {t.orderNow}
           </button>
-          {store?.cart !== false && ( // §15.27 — never === true
+          {store?.cart !== false && !product?.isDigital && ( // §15.27 — never === true
             <button className="ti-btn ti-btn-outline" onClick={addToCart}>
               <ShoppingCart size={16} aria-hidden="true" /> {added ? t.addedToCart : t.addToCart}
             </button>
@@ -1485,65 +1521,108 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
             <FieldErr k="customerPhone" />
           </div>
 
-          <div className="ti-form-row-2">
-            <div>
-              <label className="ti-label" htmlFor="ti-wilaya">{t.wilaya}</label>
-              <div style={{ position: 'relative' }}>
-                <ChevronDown size={13} aria-hidden="true" style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
-                <select id="ti-wilaya" className={`ti-input ${errors.customerWelaya ? 'err' : ''}`}
-                  disabled={wilayas.length === 0}
-                  value={fd.customerWelaya}
-                  onChange={(e) => setFd((f) => ({ ...f, customerWelaya: e.target.value, customerCommune: '' }))}
-                  style={{ paddingInlineEnd: 36 }}>
-                  <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
-                  {wilayas.map((w) => (
-                    <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>
-                  ))}
-                </select>
-              </div>
-              <FieldErr k="customerWelaya" />
-            </div>
-            <div>
-              <label className="ti-label" htmlFor="ti-commune">{t.commune}</label>
-              <div style={{ position: 'relative' }}>
-                <ChevronDown size={13} aria-hidden="true" style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
-                <select id="ti-commune" className={`ti-input ${errors.customerCommune ? 'err' : ''}`}
-                  disabled={!fd.customerWelaya || loadingC}
-                  value={fd.customerCommune}
-                  onChange={(e) => set('customerCommune', e.target.value)}
-                  style={{ paddingInlineEnd: 36 }}>
-                  <option value="">{loadingC ? t.communeLoading : t.communePlaceholder}</option>
-                  {communes.map((c) => (
-                    <option key={c.id} value={c.id}>{t.dir === 'rtl' ? c.ar_name : c.name}</option>
-                  ))}
-                </select>
-              </div>
-              <FieldErr k="customerCommune" />
-            </div>
-          </div>
-
-          {/* Delivery type toggle */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: '1rem' }}>
-            {(['home', 'office'] as const).map((type) => {
-              const active = fd.typeLivraison === type;
-              return (
-                <button key={type} onClick={() => set('typeLivraison', type)} style={{
-                  padding: '0.7rem', minHeight: 44, cursor: 'pointer', fontFamily: 'inherit',
-                  border: active ? `2px solid ${A}` : `1px solid ${BD}`, borderRadius: 4,
-                  background: active ? AL : 'transparent', color: active ? A : SUB, fontWeight: 700, fontSize: '0.85rem',
-                  transition: 'border-color 0.2s, color 0.2s, background 0.2s',
+          {product?.isDigital ? (
+            <div style={{ marginBottom: '1rem' }}>
+              <span className="ti-label" style={{ display: 'block', marginBottom: '0.5rem' }}>{t.contactQuestion}</span>
+              <div style={{ display: 'flex', border: `1px solid ${BD}`, borderRadius: 4, overflow: 'hidden', marginBottom: '0.75rem' }}>
+                <button type="button" onClick={() => { setContactMethod('email'); set('customerWhatsapp', ''); }} style={{
+                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.65rem 0',
+                  border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.85rem', fontWeight: 700,
+                  background: contactMethod === 'email' ? A : 'transparent', color: contactMethod === 'email' ? CARD : SUB,
                 }}>
-                  {type === 'home' ? t.deliveryHome : t.deliveryOffice}
+                  <Mail size={14} aria-hidden="true" />{t.contactViaEmail}
                 </button>
-              );
-            })}
-          </div>
+                <button type="button" onClick={() => { setContactMethod('whatsapp'); set('customerEmail', ''); }} style={{
+                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.65rem 0',
+                  border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.85rem', fontWeight: 700,
+                  background: contactMethod === 'whatsapp' ? A : 'transparent', color: contactMethod === 'whatsapp' ? CARD : SUB,
+                }}>
+                  <MessageCircle size={14} aria-hidden="true" />{t.contactViaWhatsapp}
+                </button>
+              </div>
+              {contactMethod === 'email' ? (
+                <div>
+                  <label className="ti-label" htmlFor="ti-email">{t.orderEmail}</label>
+                  <input id="ti-email" className={`ti-input ${errors.customerEmail ? 'err' : ''}`} dir="ltr"
+                    type="email" value={fd.customerEmail} onChange={(e) => set('customerEmail', e.target.value)}
+                    placeholder={t.emailPh} />
+                  <FieldErr k="customerEmail" />
+                </div>
+              ) : (
+                <div>
+                  <label className="ti-label" htmlFor="ti-whatsapp">{t.whatsapp}</label>
+                  <input id="ti-whatsapp" className={`ti-input ti-mono ${errors.customerWhatsapp ? 'err' : ''}`} dir="ltr"
+                    type="tel" inputMode="tel" value={fd.customerWhatsapp} onChange={(e) => set('customerWhatsapp', e.target.value)}
+                    placeholder={t.whatsappPh} />
+                  <FieldErr k="customerWhatsapp" />
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <div className="ti-form-row-2">
+                <div>
+                  <label className="ti-label" htmlFor="ti-wilaya">{t.wilaya}</label>
+                  <div style={{ position: 'relative' }}>
+                    <ChevronDown size={13} aria-hidden="true" style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
+                    <select id="ti-wilaya" className={`ti-input ${errors.customerWelaya ? 'err' : ''}`}
+                      disabled={wilayas.length === 0}
+                      value={fd.customerWelaya}
+                      onChange={(e) => setFd((f) => ({ ...f, customerWelaya: e.target.value, customerCommune: '' }))}
+                      style={{ paddingInlineEnd: 36 }}>
+                      <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
+                      {wilayas.map((w) => (
+                        <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <FieldErr k="customerWelaya" />
+                </div>
+                <div>
+                  <label className="ti-label" htmlFor="ti-commune">{t.commune}</label>
+                  <div style={{ position: 'relative' }}>
+                    <ChevronDown size={13} aria-hidden="true" style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
+                    <select id="ti-commune" className={`ti-input ${errors.customerCommune ? 'err' : ''}`}
+                      disabled={!fd.customerWelaya || loadingC}
+                      value={fd.customerCommune}
+                      onChange={(e) => set('customerCommune', e.target.value)}
+                      style={{ paddingInlineEnd: 36 }}>
+                      <option value="">{loadingC ? t.communeLoading : t.communePlaceholder}</option>
+                      {communes.map((c) => (
+                        <option key={c.id} value={c.id}>{t.dir === 'rtl' ? c.ar_name : c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <FieldErr k="customerCommune" />
+                </div>
+              </div>
+
+              {/* Delivery type toggle */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: '1rem' }}>
+                {(['home', 'office'] as const).map((type) => {
+                  const active = fd.typeLivraison === type;
+                  return (
+                    <button key={type} onClick={() => set('typeLivraison', type)} style={{
+                      padding: '0.7rem', minHeight: 44, cursor: 'pointer', fontFamily: 'inherit',
+                      border: active ? `2px solid ${A}` : `1px solid ${BD}`, borderRadius: 4,
+                      background: active ? AL : 'transparent', color: active ? A : SUB, fontWeight: 700, fontSize: '0.85rem',
+                      transition: 'border-color 0.2s, color 0.2s, background 0.2s',
+                    }}>
+                      {type === 'home' ? t.deliveryHome : t.deliveryOffice}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
 
           {/* Order summary — delivery is its own labeled line (§10.4) */}
           <div style={{ border: `1px solid ${BD}`, borderRadius: 4, background: SRF, padding: '0.75rem 1rem', marginBottom: '1rem' }}>
             <SummaryRow l={t.price} v={`${fmt(fp)} ${cur(store)}`} />
             <SummaryRow l={t.qty} v={`× ${qty}`} />
-            <SummaryRow l={t.delivery} v={!selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${fmt(getLiv())} ${cur(store)}`} />
+            {!product?.isDigital && (
+              <SummaryRow l={t.delivery} v={!selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${fmt(getLiv())} ${cur(store)}`} />
+            )}
             <div style={{ height: 1, background: BD, margin: '0.25rem 0' }} />
             <SummaryRow l={t.total} v={`${fmt(total())} ${cur(store)}`} big />
           </div>

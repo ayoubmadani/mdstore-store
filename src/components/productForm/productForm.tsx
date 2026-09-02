@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   ShoppingCart, MapPin, Phone, User, Home,
   ChevronDown, Truck, Shield, Package,
-  Building2, AlertCircle, Tag,
+  Building2, AlertCircle, Tag, Mail, MessageCircle,
 } from 'lucide-react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -26,6 +26,7 @@ export interface Product {
   productImage?: string; imagesProduct?: ProductImage[];
   offers?: Offer[]; attributes?: Attribute[];
   variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
+  isDigital?: boolean;
   store: { id: string; name: string; subdomain: string; userId: string; };
 }
 
@@ -157,15 +158,19 @@ export default function ProductForm({
 
   /* ── Form state ── */
   const [formData, setFormData] = useState({
-    customerId:      '',
-    customerName:    '',
-    customerPhone:   '',
-    customerWelaya:  '',
-    customerCommune: '',
-    quantity:        1,
+    customerId:       '',
+    customerName:     '',
+    customerPhone:    '',
+    customerEmail:    '',
+    customerWhatsapp: '',
+    customerWelaya:   '',
+    customerCommune:  '',
+    quantity:         1,
     priceLoss:0,
-    typeLivraison:   'home' as 'home' | 'office',
+    typeLivraison:    'home' as 'home' | 'office',
   });
+  // منتج رقمي فقط — أي طريقة يستخدمها الزائر للتواصل بدل الشحن
+  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -206,11 +211,12 @@ export default function ProductForm({
   }, [product, selectedOffer, selectedVariants]);
 
   const getPriceLivraison = useCallback((): number => {
+    if (product.isDigital) return 0;
     if (!selectedWilayaData) return 0;
         return formData.typeLivraison === 'home'
       ? selectedWilayaData.livraisonHome
       : selectedWilayaData.livraisonOfice;
-  }, [selectedWilayaData, formData.typeLivraison]);
+  }, [selectedWilayaData, formData.typeLivraison, product.isDigital]);
 
   useEffect(()=>{
     if (selectedWilayaData) {
@@ -237,12 +243,22 @@ export default function ProductForm({
       e.customerName  = t.errorName;
     if (!/^(0|\+213)[5-7][0-9]{8}$/.test(formData.customerPhone.replace(/\s/g, '')))
       e.customerPhone = t.errorPhone;
-    if (!formData.customerWelaya)  e.customerWelaya  = t.errorWilaya;
-    if (!formData.customerCommune) e.customerCommune = t.errorCommune;
+    if (product.isDigital) {
+      if (contactMethod === 'email') {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.customerEmail.trim()))
+          e.customerEmail = t.errorEmail;
+      } else {
+        if (!/^(0|\+213)[5-7][0-9]{8}$/.test(formData.customerWhatsapp.replace(/\s/g, '')))
+          e.customerWhatsapp = t.errorWhatsapp;
+      }
+    } else {
+      if (!formData.customerWelaya)  e.customerWelaya  = t.errorWilaya;
+      if (!formData.customerCommune) e.customerCommune = t.errorCommune;
+    }
     if (formData.quantity < 1)     e.quantity        = t.errorQuantity;
     setFormErrors(e);
     return Object.keys(e).length === 0;
-  }, [formData, t]);
+  }, [formData, t, product.isDigital, contactMethod]);
 
   /* ── Submit ── */
   const handleSubmit = async (e: React.FormEvent) => {
@@ -257,14 +273,20 @@ export default function ProductForm({
         platform,
         quantity:          formData.quantity,
         totalPrice:        getTotalPrice(),
-        typeShip:          formData.typeLivraison,
-        priceShip:         getPriceLivraison(),
-        priceLoss:         formData.priceLoss,
         customerId:        formData.customerId,
         customerName:      formData.customerName,
         customerPhone:     formData.customerPhone,
-        customerWilayaId:  formData.customerWelaya,
-        customerCommuneId: formData.customerCommune,
+        ...(product.isDigital
+          ? (contactMethod === 'email'
+              ? { customerEmail: formData.customerEmail }
+              : { customerWhatsapp: formData.customerWhatsapp })
+          : {
+              typeShip:          formData.typeLivraison,
+              priceShip:         getPriceLivraison(),
+              priceLoss:         formData.priceLoss,
+              customerWilayaId:  formData.customerWelaya,
+              customerCommuneId: formData.customerCommune,
+            }),
         lpId,
         builderPageId,
       }
@@ -336,91 +358,143 @@ export default function ProductForm({
           </FieldWrapper>
         </div>
 
-        {/* Wilaya + Commune */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FieldWrapper error={formErrors.customerWelaya} label={t.wilaya} labelColor={cardText}>
-            <div className="relative">
-              <MapPin className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
-              <select value={formData.customerWelaya}
-                onChange={e => setFormData({ ...formData, customerWelaya: e.target.value, customerCommune: '' })}
-                className={`${inputCls(!!formErrors.customerWelaya)} pr-10 appearance-none cursor-pointer`}
-                style={fieldStyle(!!formErrors.customerWelaya)}>
-                <option value="">{t.selectWilaya}</option>
-                {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
-              </select>
-              <ChevronDown className="absolute left-3 top-3.5 w-4 h-4 pointer-events-none" style={{ opacity: 0.4 }} />
+        {product.isDigital ? (
+          /* Email or WhatsApp — digital products need no shipping info */
+          <div className="space-y-3">
+            <p className="text-xs font-bold uppercase tracking-wider" style={{ color: cardText, opacity: 0.6 }}>{t.contactQuestion}</p>
+            <div className="flex rounded-lg overflow-hidden border" style={{ borderColor: fieldBorder }}>
+              <button type="button" onClick={() => setContactMethod('email')}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium transition-colors"
+                style={contactMethod === 'email'
+                  ? { backgroundColor: accent, color: btnText }
+                  : { backgroundColor: 'transparent', color: cardText, opacity: 0.6 }}>
+                <Mail className="w-4 h-4" />
+                {t.contactViaEmail}
+              </button>
+              <button type="button" onClick={() => setContactMethod('whatsapp')}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium transition-colors"
+                style={contactMethod === 'whatsapp'
+                  ? { backgroundColor: accent, color: btnText }
+                  : { backgroundColor: 'transparent', color: cardText, opacity: 0.6 }}>
+                <MessageCircle className="w-4 h-4" />
+                {t.contactViaWhatsapp}
+              </button>
+            </div>
+
+            {contactMethod === 'email' ? (
+              <FieldWrapper error={formErrors.customerEmail} label={t.email} labelColor={cardText}>
+                <div className="relative">
+                  <Mail className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
+                  <input type="email" dir="ltr" value={formData.customerEmail} placeholder={t.emailPlaceholder}
+                    onChange={e => setFormData({ ...formData, customerEmail: e.target.value })}
+                    className={`${inputCls(!!formErrors.customerEmail)} pr-10`}
+                    style={fieldStyle(!!formErrors.customerEmail)} />
+                </div>
+              </FieldWrapper>
+            ) : (
+              <FieldWrapper error={formErrors.customerWhatsapp} label={t.whatsapp} labelColor={cardText}>
+                <div className="relative">
+                  <MessageCircle className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
+                  <input type="tel" dir="ltr" value={formData.customerWhatsapp} placeholder={t.whatsappPlaceholder}
+                    onChange={e => setFormData({ ...formData, customerWhatsapp: e.target.value })}
+                    className={`${inputCls(!!formErrors.customerWhatsapp)} pr-10`}
+                    style={fieldStyle(!!formErrors.customerWhatsapp)} />
+                </div>
+              </FieldWrapper>
+            )}
+          </div>
+        ) : (
+          <>
+            {/* Wilaya + Commune */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FieldWrapper error={formErrors.customerWelaya} label={t.wilaya} labelColor={cardText}>
+                <div className="relative">
+                  <MapPin className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
+                  <select value={formData.customerWelaya}
+                    onChange={e => setFormData({ ...formData, customerWelaya: e.target.value, customerCommune: '' })}
+                    className={`${inputCls(!!formErrors.customerWelaya)} pr-10 appearance-none cursor-pointer`}
+                    style={fieldStyle(!!formErrors.customerWelaya)}>
+                    <option value="">{t.selectWilaya}</option>
+                    {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                  </select>
+                  <ChevronDown className="absolute left-3 top-3.5 w-4 h-4 pointer-events-none" style={{ opacity: 0.4 }} />
+                </div>
+              </FieldWrapper>
+
+              <FieldWrapper error={formErrors.customerCommune} label={t.commune} labelColor={cardText}>
+                <div className="relative">
+                  <MapPin className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
+                  <select value={formData.customerCommune}
+                    disabled={!formData.customerWelaya || loadingCommunes}
+                    onChange={e => setFormData({ ...formData, customerCommune: e.target.value })}
+                    className={`${inputCls(!!formErrors.customerCommune)} pr-10 appearance-none cursor-pointer disabled:opacity-50`}
+                    style={fieldStyle(!!formErrors.customerCommune)}>
+                    <option value="">
+                      {loadingCommunes ? t.loadingCommunes
+                        : formData.customerWelaya ? t.selectCommune
+                        : t.selectWilayaFirst}
+                    </option>
+                    {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                  </select>
+                  <ChevronDown className="absolute left-3 top-3.5 w-4 h-4 pointer-events-none" style={{ opacity: 0.4 }} />
+                </div>
+              </FieldWrapper>
+            </div>
+
+            {/* Delivery type */}
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: cardText, opacity: 0.6 }}>{t.deliveryType}</p>
+              <div className="grid grid-cols-2 gap-3">
+                {(['home', 'office'] as const).map(type => {
+                  const isSelected = formData.typeLivraison === type;
+                  return (
+                    <button key={type} type="button"
+                      onClick={() => setFormData(p => ({ ...p, typeLivraison: type }))}
+                      className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-200"
+                      style={{
+                        borderColor: isSelected ? accent : fieldBorder,
+                        backgroundColor: isSelected ? accent : cardBg,
+                        color: isSelected ? btnText : cardText,
+                        boxShadow: isSelected ? '0 10px 15px -3px rgba(0,0,0,0.1)' : undefined,
+                      }}>
+                      {type === 'home'
+                        ? <Home      className="w-6 h-6" style={{ opacity: isSelected ? 1 : 0.4 }} />
+                        : <Building2 className="w-6 h-6" style={{ opacity: isSelected ? 1 : 0.4 }} />}
+                      <div className="text-center">
+                        <p className="text-sm font-bold">{type === 'home' ? t.home : t.office}</p>
+                        {selectedWilayaData && (
+                          <p className="text-xs mt-0.5" style={{ opacity: isSelected ? 0.75 : 0.5 }}>
+                            {(type === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice).toLocaleString('ar-DZ')} {t.currency}
+                          </p>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              {!selectedWilayaData && (
+                <p className="text-xs mt-2 text-center" style={{ color: cardText, opacity: 0.4 }}>{t.selectWilayaForPrice}</p>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Quantity — a digital product is a single license/copy, not a
+            stockable count, so there's nothing to increment */}
+        {!product.isDigital && (
+          <FieldWrapper error={formErrors.quantity} label={t.quantity} labelColor={cardText}>
+            <div className="flex items-center gap-4">
+              <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
+                className="w-12 h-12 rounded-xl border-2 flex items-center justify-center transition-all font-bold text-xl active:scale-95"
+                style={{ borderColor: fieldBorder, color: cardText }}>−</button>
+              <span className="w-16 text-center text-2xl font-black" style={{ color: cardText }}>{formData.quantity}</span>
+              <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: p.quantity + 1 }))}
+                className="w-12 h-12 rounded-xl border-2 flex items-center justify-center transition-all font-bold text-xl active:scale-95"
+                style={{ borderColor: fieldBorder, color: cardText }}>+</button>
+              <span className="text-sm font-medium" style={{ color: cardText, opacity: 0.45 }}>{t.piece}</span>
             </div>
           </FieldWrapper>
-
-          <FieldWrapper error={formErrors.customerCommune} label={t.commune} labelColor={cardText}>
-            <div className="relative">
-              <MapPin className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
-              <select value={formData.customerCommune}
-                disabled={!formData.customerWelaya || loadingCommunes}
-                onChange={e => setFormData({ ...formData, customerCommune: e.target.value })}
-                className={`${inputCls(!!formErrors.customerCommune)} pr-10 appearance-none cursor-pointer disabled:opacity-50`}
-                style={fieldStyle(!!formErrors.customerCommune)}>
-                <option value="">
-                  {loadingCommunes ? t.loadingCommunes
-                    : formData.customerWelaya ? t.selectCommune
-                    : t.selectWilayaFirst}
-                </option>
-                {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
-              </select>
-              <ChevronDown className="absolute left-3 top-3.5 w-4 h-4 pointer-events-none" style={{ opacity: 0.4 }} />
-            </div>
-          </FieldWrapper>
-        </div>
-
-        {/* Delivery type */}
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: cardText, opacity: 0.6 }}>{t.deliveryType}</p>
-          <div className="grid grid-cols-2 gap-3">
-            {(['home', 'office'] as const).map(type => {
-              const isSelected = formData.typeLivraison === type;
-              return (
-                <button key={type} type="button"
-                  onClick={() => setFormData(p => ({ ...p, typeLivraison: type }))}
-                  className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-200"
-                  style={{
-                    borderColor: isSelected ? accent : fieldBorder,
-                    backgroundColor: isSelected ? accent : cardBg,
-                    color: isSelected ? btnText : cardText,
-                    boxShadow: isSelected ? '0 10px 15px -3px rgba(0,0,0,0.1)' : undefined,
-                  }}>
-                  {type === 'home'
-                    ? <Home      className="w-6 h-6" style={{ opacity: isSelected ? 1 : 0.4 }} />
-                    : <Building2 className="w-6 h-6" style={{ opacity: isSelected ? 1 : 0.4 }} />}
-                  <div className="text-center">
-                    <p className="text-sm font-bold">{type === 'home' ? t.home : t.office}</p>
-                    {selectedWilayaData && (
-                      <p className="text-xs mt-0.5" style={{ opacity: isSelected ? 0.75 : 0.5 }}>
-                        {(type === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice).toLocaleString('ar-DZ')} {t.currency}
-                      </p>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-          {!selectedWilayaData && (
-            <p className="text-xs mt-2 text-center" style={{ color: cardText, opacity: 0.4 }}>{t.selectWilayaForPrice}</p>
-          )}
-        </div>
-
-        {/* Quantity */}
-        <FieldWrapper error={formErrors.quantity} label={t.quantity} labelColor={cardText}>
-          <div className="flex items-center gap-4">
-            <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
-              className="w-12 h-12 rounded-xl border-2 flex items-center justify-center transition-all font-bold text-xl active:scale-95"
-              style={{ borderColor: fieldBorder, color: cardText }}>−</button>
-            <span className="w-16 text-center text-2xl font-black" style={{ color: cardText }}>{formData.quantity}</span>
-            <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: p.quantity + 1 }))}
-              className="w-12 h-12 rounded-xl border-2 flex items-center justify-center transition-all font-bold text-xl active:scale-95"
-              style={{ borderColor: fieldBorder, color: cardText }}>+</button>
-            <span className="text-sm font-medium" style={{ color: cardText, opacity: 0.45 }}>{t.piece}</span>
-          </div>
-        </FieldWrapper>
+        )}
 
         {/* Order summary */}
         <div className="rounded-2xl p-5 space-y-3 text-sm border" style={{ backgroundColor: fieldBg, borderColor: fieldBorder, color: cardText }}>
@@ -456,22 +530,26 @@ export default function ProductForm({
             );
           })}
 
-          <div className="flex justify-between" style={{ opacity: 0.75 }}>
-            <span className="flex items-center gap-1"><Truck className="w-4 h-4" /> {t.delivery}</span>
-            <span className="font-medium" style={{ opacity: 1 }}>
-              {formData.typeLivraison === 'home' ? t.homeShort : t.officeShort}
-              {selectedWilayaData && <span className="mr-1" style={{ opacity: 0.7 }}>({getPriceLivraison().toLocaleString('ar-DZ')} {t.currency})</span>}
-            </span>
-          </div>
+          {!product.isDigital && (
+            <div className="flex justify-between" style={{ opacity: 0.75 }}>
+              <span className="flex items-center gap-1"><Truck className="w-4 h-4" /> {t.delivery}</span>
+              <span className="font-medium" style={{ opacity: 1 }}>
+                {formData.typeLivraison === 'home' ? t.homeShort : t.officeShort}
+                {selectedWilayaData && <span className="mr-1" style={{ opacity: 0.7 }}>({getPriceLivraison().toLocaleString('ar-DZ')} {t.currency})</span>}
+              </span>
+            </div>
+          )}
 
           <div className="flex justify-between" style={{ opacity: 0.75 }}>
             <span>{t.unitPrice}</span>
             <span className="font-bold" style={{ opacity: 1 }}>{finalPrice.toLocaleString('ar-DZ')} {t.currency}</span>
           </div>
-          <div className="flex justify-between" style={{ opacity: 0.75 }}>
-            <span>{t.quantity}</span>
-            <span className="font-bold" style={{ opacity: 1 }}>× {formData.quantity}</span>
-          </div>
+          {!product.isDigital && (
+            <div className="flex justify-between" style={{ opacity: 0.75 }}>
+              <span>{t.quantity}</span>
+              <span className="font-bold" style={{ opacity: 1 }}>× {formData.quantity}</span>
+            </div>
+          )}
 
           <div className="flex justify-between items-center pt-3 border-t-2 border-dashed" style={{ borderColor: fieldBorder }}>
             <span className="font-bold text-base">{t.total}</span>

@@ -10,7 +10,7 @@ import {
   ShoppingCart, MapPin, Phone, Mail, User,
   ChevronDown, Truck, Package, AlertCircle,
   Check, ChevronLeft, Home as HomeIcon, Building2,
-  Shield, X, Menu, Minus, Plus, Trash2, Loader2,
+  Shield, X, Menu, Minus, Plus, Trash2, Loader2, MessageCircle, Download,
 } from 'lucide-react';
 import { Store } from '@/types/store';
 import { useCartStore } from '@/store/useCartStore';
@@ -34,6 +34,7 @@ export interface Product {
   productImage?: string; imagesProduct?: ProductImage[];
   offers?: Offer[]; attributes?: Attribute[];
   variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+  isDigital?: boolean;
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 
@@ -415,7 +416,11 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
             -{discount}%
           </span>
         )}
-        {product.shippingFree && (
+        {product.isDigital ? (
+          <span style={{ position: 'absolute', top: 8, left: 8, background: '#111', color: '#fff', fontSize: 10, padding: '2px 6px', borderRadius: 2, fontWeight: 700, display: 'flex', alignItems: 'center' }}>
+            <Download size={12} />
+          </span>
+        ) : product.shippingFree && (
           <span style={{ position: 'absolute', top: 8, left: 8, background: '#111', color: '#fff', fontSize: 10, padding: '2px 6px', borderRadius: 2, fontWeight: 700 }}>
             🚚
           </span>
@@ -649,7 +654,8 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [wilayas,         setWilayas]         = useState<Wilaya[]>([]);
   const [communes,        setCommunes]        = useState<Commune[]>([]);
   const [loadingCommunes, setLoadingCommunes] = useState(false);
-  const [fd, setFd] = useState({ customerId: '', customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '', quantity: 1, priceLoss: 0, typeLivraison: 'home' as 'home' | 'office' });
+  const [fd, setFd] = useState({ customerId: '', customerName: '', customerPhone: '', customerEmail: '', customerWhatsapp: '', customerWelaya: '', customerCommune: '', quantity: 1, priceLoss: 0, typeLivraison: 'home' as 'home' | 'office' });
+  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [errors,  setErrors]  = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
@@ -683,10 +689,11 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
     (storeInfo?.supportFreeShipping && storeInfo?.freeShippingMinAmount != null && (getFP() * qty) >= Number(storeInfo.freeShippingMinAmount)));
   const getLiv = useCallback((): number => {
+    if (product.isDigital) return 0;
     if (orderFreeShipping) return 0;
     if (!selW) return 0;
     return Number(fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice);
-  }, [selW, fd.typeLivraison, orderFreeShipping]);
+  }, [selW, fd.typeLivraison, orderFreeShipping, product.isDigital]);
   const getTotal = useCallback(() => getFP() * qty + getLiv(), [getFP, qty, getLiv]);
 
   const getVariantId = useCallback(() => {
@@ -698,8 +705,16 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const e: Record<string, string> = {};
     if (!fd.customerName.trim() || fd.customerName.length < 3) e.customerName = 'الاسم مطلوب (3 أحرف على الأقل)';
     if (!/^(0|\+213)[5-7][0-9]{8}$/.test(fd.customerPhone.replace(/\s/g, ''))) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
-    if (!fd.customerWelaya)  e.customerWelaya  = 'اختر الولاية';
-    if (!fd.customerCommune) e.customerCommune = 'اختر البلدية';
+    if (product.isDigital) {
+      if (contactMethod === 'email') {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = 'يرجى إدخال بريد إلكتروني صحيح';
+      } else {
+        if (!/^(0|\+213)[5-7][0-9]{8}$/.test(fd.customerWhatsapp.replace(/\s/g, ''))) e.customerWhatsapp = 'رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)';
+      }
+    } else {
+      if (!fd.customerWelaya)  e.customerWelaya  = 'اختر الولاية';
+      if (!fd.customerCommune) e.customerCommune = 'اختر البلدية';
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -718,14 +733,16 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if (!validate()) return;
     setSubmitting(true);
     try {
-      const res = await axios.post(`${API_URL}/orders`, {
+      const payload = {
         productId: product.id, variantDetailId: getVariantId(), domain,
         storeId: product.store.id, offerId: selectedOffer ?? undefined, platform,
-        quantity: qty, totalPrice: getTotal(), typeShip: fd.typeLivraison,
-        priceShip: getLiv(), priceLoss: fd.priceLoss, customerId: fd.customerId,
+        quantity: qty, totalPrice: getTotal(), priceLoss: fd.priceLoss, customerId: fd.customerId,
         customerName: fd.customerName, customerPhone: fd.customerPhone,
-        customerWilayaId: fd.customerWelaya, customerCommuneId: fd.customerCommune,
-      });
+        ...(product.isDigital
+          ? (contactMethod === 'email' ? { customerEmail: fd.customerEmail } : { customerWhatsapp: fd.customerWhatsapp })
+          : { typeShip: fd.typeLivraison, priceShip: getLiv(), customerWilayaId: fd.customerWelaya, customerCommuneId: fd.customerCommune }),
+      };
+      const res = await axios.post(`${API_URL}/orders`, payload);
       if (res.status === 200 || res.status === 201) {
         if (typeof window !== 'undefined' && res.data?.customerId) localStorage.setItem('customerId', res.data.customerId);
         router.push(`/successfully?productId=${product?.id}`);
@@ -760,35 +777,66 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </FR>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: 0 }}>
-          <FR label="الولاية" error={errors.customerWelaya}>
-            <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...S.inputBase, appearance: 'none' as any }}>
-              <option value="">اختر الولاية</option>
-              {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
-            </select>
-          </FR>
-          <FR label="البلدية" error={errors.customerCommune}>
-            <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingCommunes} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...S.inputBase, appearance: 'none' as any, opacity: (!fd.customerWelaya || loadingCommunes) ? 0.5 : 1 }}>
-              <option value="">{loadingCommunes ? 'جاري...' : 'اختر البلدية'}</option>
-              {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
-            </select>
-          </FR>
-        </div>
-
-        <FR label="طريقة التوصيل">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-            {(['home', 'office'] as const).map(t => (
-              <button key={t} type="button" onClick={() => setFd({ ...fd, typeLivraison: t })}
-                style={{ ...S.btnOutline, justifyContent: 'center', flexDirection: 'column', gap: 2, padding: '0.6rem', borderColor: fd.typeLivraison === t ? '#111' : '#ddd', background: fd.typeLivraison === t ? '#111' : '#fff', color: fd.typeLivraison === t ? '#fff' : '#333' }}>
-                {t === 'home' ? <HomeIcon size={14} /> : <Building2 size={14} />}
-                <span style={{ fontSize: '0.75rem' }}>{t === 'home' ? 'المنزل' : 'المكتب'}</span>
-                {selW && <span style={{ fontSize: '0.72rem', opacity: 0.7 }}>{orderFreeShipping ? '🚚 توصيل مجاني' : `${(t === 'home' ? selW.livraisonHome : selW.livraisonOfice)} دج`}</span>}
+        {product.isDigital ? (
+          <div style={{ marginBottom: '0.85rem' }}>
+            <label style={S.label}>هل تملك بريداً إلكترونياً أم واتساب؟</label>
+            <div style={{ display: 'flex', borderRadius: 4, overflow: 'hidden', border: '1px solid #ddd', marginBottom: '0.5rem' }}>
+              <button type="button" onClick={() => { setContactMethod('email'); setFd(p => ({ ...p, customerWhatsapp: '' })); }}
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.6rem 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.8rem', fontWeight: 700, background: contactMethod === 'email' ? '#111' : 'transparent', color: contactMethod === 'email' ? '#fff' : '#333' }}>
+                <Mail size={14} />البريد الإلكتروني
               </button>
-            ))}
+              <button type="button" onClick={() => { setContactMethod('whatsapp'); setFd(p => ({ ...p, customerEmail: '' })); }}
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.6rem 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.8rem', fontWeight: 700, background: contactMethod === 'whatsapp' ? '#111' : 'transparent', color: contactMethod === 'whatsapp' ? '#fff' : '#333' }}>
+                <MessageCircle size={14} />واتساب
+              </button>
+            </div>
+            {contactMethod === 'email' ? (
+              <FR label="البريد الإلكتروني" error={errors.customerEmail}>
+                <input type="email" dir="ltr" value={fd.customerEmail} placeholder="example@email.com"
+                  onChange={e => setFd({ ...fd, customerEmail: e.target.value })}
+                  style={S.inputBase} />
+              </FR>
+            ) : (
+              <FR label="رقم واتساب" error={errors.customerWhatsapp}>
+                <input type="tel" dir="ltr" value={fd.customerWhatsapp} placeholder="0550123456"
+                  onChange={e => setFd({ ...fd, customerWhatsapp: e.target.value })}
+                  style={S.inputBase} />
+              </FR>
+            )}
           </div>
-        </FR>
+        ) : (
+          <>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: 0 }}>
+              <FR label="الولاية" error={errors.customerWelaya}>
+                <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...S.inputBase, appearance: 'none' as any }}>
+                  <option value="">اختر الولاية</option>
+                  {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                </select>
+              </FR>
+              <FR label="البلدية" error={errors.customerCommune}>
+                <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingCommunes} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...S.inputBase, appearance: 'none' as any, opacity: (!fd.customerWelaya || loadingCommunes) ? 0.5 : 1 }}>
+                  <option value="">{loadingCommunes ? 'جاري...' : 'اختر البلدية'}</option>
+                  {communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                </select>
+              </FR>
+            </div>
 
-        {supportQty && (
+            <FR label="طريقة التوصيل">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                {(['home', 'office'] as const).map(t => (
+                  <button key={t} type="button" onClick={() => setFd({ ...fd, typeLivraison: t })}
+                    style={{ ...S.btnOutline, justifyContent: 'center', flexDirection: 'column', gap: 2, padding: '0.6rem', borderColor: fd.typeLivraison === t ? '#111' : '#ddd', background: fd.typeLivraison === t ? '#111' : '#fff', color: fd.typeLivraison === t ? '#fff' : '#333' }}>
+                    {t === 'home' ? <HomeIcon size={14} /> : <Building2 size={14} />}
+                    <span style={{ fontSize: '0.75rem' }}>{t === 'home' ? 'المنزل' : 'المكتب'}</span>
+                    {selW && <span style={{ fontSize: '0.72rem', opacity: 0.7 }}>{orderFreeShipping ? '🚚 توصيل مجاني' : `${(t === 'home' ? selW.livraisonHome : selW.livraisonOfice)} دج`}</span>}
+                  </button>
+                ))}
+              </div>
+            </FR>
+          </>
+        )}
+
+        {supportQty && !product.isDigital && (
           <FR label="الكمية">
             <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: 4, width: 'fit-content', background: '#fff', overflow: 'hidden' }}>
               <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={14} /></button>
@@ -820,7 +868,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           <button type="submit" disabled={submitting} style={{ ...S.btnBlack, flex: 1, justifyContent: 'center', opacity: submitting ? 0.7 : 1 }}>
             {submitting ? <><Loader2 size={14} /> جاري الإرسال...</> : <><ShoppingCart size={14} /> تأكيد الطلب</>}
           </button>
-        {product.store.cart && (
+        {product.store.cart && !product.isDigital && (
             <button type="button" onClick={addToCart} disabled={isAdded} style={{ ...S.btnOutline, padding: '0.65rem 0.9rem' }}>
               {isAdded ? <Check size={16} color="green" /> : <ShoppingCart size={16} />}
             </button>

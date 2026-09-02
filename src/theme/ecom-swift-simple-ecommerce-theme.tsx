@@ -12,7 +12,7 @@ import {
   CheckCircle2, Truck, ArrowLeft, Package,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, ShieldCheck,
-  Send
+  Send, MessageCircle, Download
 } from 'lucide-react';
 import { Store } from '@/types/store';
 import { useCartStore } from '@/store/useCartStore';
@@ -111,6 +111,7 @@ export interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
   variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+  isDigital?: boolean;
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 export interface ProductFormProps {
@@ -526,7 +527,9 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div style={{ aspectRatio: '1/1', background: 'var(--bg-alt)', position: 'relative', flexShrink: 0, overflow: 'hidden' }}>
           {displayImage ? <img src={displayImage} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ShoppingBag color="var(--border-color)" /></div>}
           {discount > 0 && <span style={{ position: 'absolute', top: 10, right: 10, background: 'var(--primary)', color: '#fff', fontSize: '10px', padding: '4px 8px', borderRadius: '4px' }}>-{discount}%</span>}
-          {product.shippingFree && <span style={{ position: 'absolute', top: 10, left: 10, background: 'var(--primary)', color: '#fff', fontSize: '10px', padding: '4px 8px', borderRadius: '4px' }}>🚚</span>}
+          {product.isDigital ? (
+            <span style={{ position: 'absolute', top: 10, left: 10, background: 'var(--primary)', color: '#fff', fontSize: '10px', padding: '4px 8px', borderRadius: '4px', display: 'flex', alignItems: 'center' }}><Download size={12} /></span>
+          ) : product.shippingFree && <span style={{ position: 'absolute', top: 10, left: 10, background: 'var(--primary)', color: '#fff', fontSize: '10px', padding: '4px 8px', borderRadius: '4px' }}>🚚</span>}
         </div>
         <div style={{ padding: '1rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
           <h3 style={{ fontSize: '0.95rem', fontWeight: 500, marginBottom: '0.5rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{product.name}</h3>
@@ -828,7 +831,8 @@ export function ProductForm({ product, userId, domain, selectedOffer, selectedVa
   const router = useRouter();
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
-  const [fd, setFd] = useState({ customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '', quantity: 1, typeLivraison: 'home' as 'home' | 'office' });
+  const [fd, setFd] = useState({ customerName: '', customerPhone: '', customerEmail: '', customerWhatsapp: '', customerWelaya: '', customerCommune: '', quantity: 1, typeLivraison: 'home' as 'home' | 'office' });
+  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sub, setSub] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
@@ -856,15 +860,23 @@ export function ProductForm({ product, userId, domain, selectedOffer, selectedVa
   const storeInfo = store || product.store;
   const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
     (storeInfo?.supportFreeShipping && storeInfo?.freeShippingMinAmount != null && (fp * qty) >= Number(storeInfo.freeShippingMinAmount)));
-  const getLiv = () => { if (orderFreeShipping) return 0; return selW ? (fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice)) : 0; };
+  const getLiv = () => { if (product.isDigital) return 0; if (orderFreeShipping) return 0; return selW ? (fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice)) : 0; };
   const total = () => (fp * qty) + getLiv();
 
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'مطلوب';
     if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
-    if (!fd.customerWelaya) e.customerWelaya = 'مطلوب';
-    if (!fd.customerCommune) e.customerCommune = 'مطلوب';
+    if (product.isDigital) {
+      if (contactMethod === 'email') {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = 'يرجى إدخال بريد إلكتروني صحيح';
+      } else {
+        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = 'رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)';
+      }
+    } else {
+      if (!fd.customerWelaya) e.customerWelaya = 'مطلوب';
+      if (!fd.customerCommune) e.customerCommune = 'مطلوب';
+    }
     return e;
   };
 
@@ -883,7 +895,11 @@ export function ProductForm({ product, userId, domain, selectedOffer, selectedVa
     if (Object.keys(er).length) { setErrors(er); return; }
     setSub(true);
     try {
-      await axios.post(`${API_URL}/orders/create`, { ...fd, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+      const { customerWelaya, customerCommune, typeLivraison, customerEmail, customerWhatsapp, ...rest } = fd;
+      const payload = product.isDigital
+        ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+        : { ...rest, customerWelaya, customerCommune, typeLivraison };
+      await axios.post(`${API_URL}/orders/create`, { ...payload, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       router.push(`/successfully?productId=${product?.id}`);
     } catch { } finally { setSub(false); }
   };
@@ -897,30 +913,56 @@ export function ProductForm({ product, userId, domain, selectedOffer, selectedVa
             <FR error={errors.customerName} label="الاسم"><input className="input-base" type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} /></FR>
             <FR error={errors.customerPhone} label="الهاتف"><input className="input-base" type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} /></FR>
           </div>
-          <div className="grid-2">
-            <FR error={errors.customerWelaya} label="الولاية">
-              <select className="input-base" value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}>
-                <option value="">اختر</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.ar_name}</option>)}
-              </select>
-            </FR>
-            <FR error={errors.customerCommune} label="البلدية">
-              <select className="input-base" value={fd.customerCommune} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} disabled={!fd.customerWelaya}>
-                <option value="">اختر</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
-              </select>
-            </FR>
-          </div>
+          {product.isDigital ? (
+            <>
+              <FR label="هل تملك بريداً إلكترونياً أم واتساب؟">
+                <div style={{ display: 'flex', border: '1px solid var(--border-color)', borderRadius: '6px', overflow: 'hidden' }}>
+                  <button type="button" onClick={() => { setContactMethod('email'); setFd(p => ({ ...p, customerWhatsapp: '' })); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600, background: contactMethod === 'email' ? 'var(--primary)' : 'transparent', color: contactMethod === 'email' ? '#fff' : 'inherit' }}>
+                    <Mail size={14} />البريد الإلكتروني
+                  </button>
+                  <button type="button" onClick={() => { setContactMethod('whatsapp'); setFd(p => ({ ...p, customerEmail: '' })); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600, background: contactMethod === 'whatsapp' ? 'var(--primary)' : 'transparent', color: contactMethod === 'whatsapp' ? '#fff' : 'inherit' }}>
+                    <MessageCircle size={14} />واتساب
+                  </button>
+                </div>
+              </FR>
+              {contactMethod === 'email' ? (
+                <FR error={errors.customerEmail} label="البريد الإلكتروني">
+                  <input className="input-base" type="email" dir="ltr" value={fd.customerEmail} onChange={e => setFd({ ...fd, customerEmail: e.target.value })} placeholder="example@email.com" />
+                </FR>
+              ) : (
+                <FR error={errors.customerWhatsapp} label="رقم واتساب">
+                  <input className="input-base" type="tel" dir="ltr" value={fd.customerWhatsapp} onChange={e => setFd({ ...fd, customerWhatsapp: e.target.value })} placeholder="0550123456" />
+                </FR>
+              )}
+            </>
+          ) : (
+            <>
+              <div className="grid-2">
+                <FR error={errors.customerWelaya} label="الولاية">
+                  <select className="input-base" value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}>
+                    <option value="">اختر</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.ar_name}</option>)}
+                  </select>
+                </FR>
+                <FR error={errors.customerCommune} label="البلدية">
+                  <select className="input-base" value={fd.customerCommune} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} disabled={!fd.customerWelaya}>
+                    <option value="">اختر</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
+                  </select>
+                </FR>
+              </div>
 
-          <FR label="طريقة التوصيل">
-            <div className="grid-2">
-              {(['home', 'office'] as const).map(t => (
-                <button key={t} type="button" onClick={() => setFd({ ...fd, typeLivraison: t })} className="btn-outline" style={{ borderColor: fd.typeLivraison === t ? 'var(--primary)' : 'var(--border-color)', background: fd.typeLivraison === t ? 'var(--bg-main)' : 'transparent' }}>
-                  {t === 'home' ? 'المنزل' : 'المكتب'} {selW && `- ${orderFreeShipping ? '🚚 توصيل مجاني' : `${(t === 'home' ? selW.livraisonHome : selW.livraisonOfice)} دج`}`}
-                </button>
-              ))}
-            </div>
-          </FR>
+              <FR label="طريقة التوصيل">
+                <div className="grid-2">
+                  {(['home', 'office'] as const).map(t => (
+                    <button key={t} type="button" onClick={() => setFd({ ...fd, typeLivraison: t })} className="btn-outline" style={{ borderColor: fd.typeLivraison === t ? 'var(--primary)' : 'var(--border-color)', background: fd.typeLivraison === t ? 'var(--bg-main)' : 'transparent' }}>
+                      {t === 'home' ? 'المنزل' : 'المكتب'} {selW && `- ${orderFreeShipping ? '🚚 توصيل مجاني' : `${(t === 'home' ? selW.livraisonHome : selW.livraisonOfice)} دج`}`}
+                    </button>
+                  ))}
+                </div>
+              </FR>
+            </>
+          )}
 
-          {supportQty && (
+          {supportQty && !product.isDigital && (
             <FR label="الكمية">
               <div style={{ display: 'flex', alignItems: 'center', border: '1px solid var(--border-color)', borderRadius: '6px', width: 'fit-content', background: 'var(--bg-main)' }}>
                 <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 40, height: 40, background: 'none', border: 'none', cursor: 'pointer' }}><Minus size={14} /></button>
@@ -938,7 +980,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, selectedVa
 
         <div className="grid-2" style={{ gap: '1rem' }}>
           <button type="submit" className="btn-primary" disabled={sub}>{sub ? <Loader2 className="anim-pulse" size={18} /> : 'تأكيد الطلب'}</button>
-        {product.store.cart && (
+        {product.store.cart && !product.isDigital && (
             <button type="button" className="btn-outline" onClick={addToCart} disabled={isAdded}>
               {isAdded ? <CheckCircle2 size={18} color="green" /> : <ShoppingCart size={18} />}
               {isAdded ? 'تمت الإضافة' : 'أضف للسلة'}

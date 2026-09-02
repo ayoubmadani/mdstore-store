@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
-import { ShoppingBag, Search, Menu, X, ChevronLeft, ChevronRight, Trash2, Plus, Minus, Check, MapPin, Phone, Mail, Package, Truck } from 'lucide-react';
+import { ShoppingBag, Search, Menu, X, ChevronLeft, ChevronRight, Trash2, Plus, Minus, Check, MapPin, Phone, Mail, Package, Truck, MessageCircle, Download } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
 /* ============================================================
@@ -31,7 +31,7 @@ interface Commune { id: string; name: string; ar_name: string; wilayaId: string;
 interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
-  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean; isDigital?: boolean;
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
   slug?: string;
 }
@@ -196,6 +196,15 @@ const jsonAr = {
   phonePh: '05xxxxxxxx',
   errPhone: 'رقم الهاتف مطلوب',
   errPhoneInvalid: 'رقم هاتف غير صالح',
+  orderEmail: 'البريد الإلكتروني',
+  orderEmailPh: 'example@email.com',
+  errEmail: 'يرجى إدخال بريد إلكتروني صحيح',
+  whatsapp: 'رقم واتساب',
+  whatsappPh: '0550123456',
+  errWhatsapp: 'رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)',
+  contactQuestion: 'هل تملك بريداً إلكترونياً أم واتساب؟',
+  contactViaEmail: 'البريد الإلكتروني',
+  contactViaWhatsapp: 'واتساب',
   wilaya: 'الولاية',
   errWilaya: 'الولاية مطلوبة',
   wilayaPh: 'اختر الولاية',
@@ -328,6 +337,15 @@ const jsonFr = {
   phonePh: '0555 12 34 56',
   errPhone: 'Le numéro de téléphone est requis',
   errPhoneInvalid: 'Numéro de téléphone invalide',
+  orderEmail: 'E-mail',
+  orderEmailPh: 'exemple@email.com',
+  errEmail: 'Veuillez saisir une adresse e-mail valide',
+  whatsapp: 'Numéro WhatsApp',
+  whatsappPh: '0550123456',
+  errWhatsapp: 'Numéro WhatsApp algérien valide requis (ex: 0550123456)',
+  contactQuestion: 'Avez-vous un e-mail ou un numéro WhatsApp ?',
+  contactViaEmail: 'E-mail',
+  contactViaWhatsapp: 'WhatsApp',
   wilaya: 'Wilaya',
   errWilaya: 'Sélectionnez une wilaya',
   wilayaPh: 'Choisir la wilaya',
@@ -717,7 +735,11 @@ export function Card({ product, displayImage, discount, store }: any) {
               -{discount}%
             </span>
           )}
-          {product.shippingFree && (
+          {product.isDigital ? (
+            <span style={{ position: 'absolute', top: 10, insetInlineEnd: 10, background: 'var(--thread-red)', color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 8px', borderRadius: 2, display: 'flex', alignItems: 'center' }}>
+              <Download size={12} />
+            </span>
+          ) : product.shippingFree && (
             <span style={{ position: 'absolute', top: 10, insetInlineEnd: 10, background: 'var(--thread-ink)', color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 8px', borderRadius: 2 }}>
               🚚
             </span>
@@ -983,10 +1005,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   const [fd, setFd] = useState({
     customerId: '', customerName: '', customerPhone: '',
+    customerEmail: '', customerWhatsapp: '',
     customerWelaya: '', customerCommune: '',
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',
   });
+  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
 
   useEffect(() => {
     if (userId) fetchWilayas(userId).then(setWilayas);
@@ -1022,6 +1046,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     (storeInfo?.supportFreeShipping && storeInfo?.freeShippingMinAmount != null && (fp * qty) >= Number(storeInfo.freeShippingMinAmount)));
 
   const getLiv = (): number => {
+    if (product.isDigital) return 0;
     if (orderFreeShipping) return 0;
     const w = wilayas.find((x) => String(x.id) === String(fd.customerWelaya));
     if (!w) return 0;
@@ -1034,8 +1059,16 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = t.errName;
     if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone)) e.customerPhone = t.errPhoneInvalid;
-    if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
-    if (!fd.customerCommune) e.customerCommune = t.errCommune;
+    if (product.isDigital) {
+      if (contactMethod === 'email') {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
+      } else {
+        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
+      }
+    } else {
+      if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
+      if (!fd.customerCommune) e.customerCommune = t.errCommune;
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -1071,8 +1104,13 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if (!validate()) return;
     setSubmitting(true);
     try {
+      const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
+      const shipping = product.isDigital
+        ? { ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+        : { customerWelaya, customerCommune, typeLivraison, priceLoss };
       const payload = {
-        ...fd,
+        ...rest,
+        ...shipping,
         quantity: qty,
         product,
         variantDetailId: getVarId(),
@@ -1102,7 +1140,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   return (
     <div style={{ marginTop: 24 }}>
-      {!isOrderNow ? (
+      {!isOrderNow && !product.isDigital ? (
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           {product.store?.cart !== false && (
             <button className="pc-btn pc-btn-outline" onClick={addToCart} style={{ flex: 1, minWidth: 160 }}>{t.addToCartBtn}</button>
@@ -1113,7 +1151,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         <div className="pc-stitch-border" style={{ padding: 20, borderRadius: 3, background: '#fff' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <p style={{ fontWeight: 700, fontSize: 14.5 }}>{t.orderFormTitle}</p>
-            <button className="pc-btn" onClick={() => setIsOrderNow(false)} style={{ background: 'none' }}><X size={18} /></button>
+            {!product.isDigital && (
+              <button className="pc-btn" onClick={() => setIsOrderNow(false)} style={{ background: 'none' }}><X size={18} /></button>
+            )}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -1127,6 +1167,33 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }} />
               {errors.customerPhone && <p style={{ color: 'var(--thread-red)', fontSize: 12, marginTop: 4 }}>{errors.customerPhone}</p>}
             </div>
+            {product.isDigital ? (
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>{t.contactQuestion}</p>
+                <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
+                  <button type="button" className="pc-btn" onClick={() => { setContactMethod('email'); setFd(p => ({ ...p, customerWhatsapp: '' })); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px', border: contactMethod === 'email' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: contactMethod === 'email' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>
+                    <Mail size={14} />{t.contactViaEmail}
+                  </button>
+                  <button type="button" className="pc-btn" onClick={() => { setContactMethod('whatsapp'); setFd(p => ({ ...p, customerEmail: '' })); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px', border: contactMethod === 'whatsapp' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: contactMethod === 'whatsapp' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>
+                    <MessageCircle size={14} />{t.contactViaWhatsapp}
+                  </button>
+                </div>
+                {contactMethod === 'email' ? (
+                  <div>
+                    <input type="email" dir="ltr" placeholder={t.orderEmailPh} value={fd.customerEmail} onChange={(e) => setFd({ ...fd, customerEmail: e.target.value })}
+                      style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }} />
+                    {errors.customerEmail && <p style={{ color: 'var(--thread-red)', fontSize: 12, marginTop: 4 }}>{errors.customerEmail}</p>}
+                  </div>
+                ) : (
+                  <div>
+                    <input type="tel" dir="ltr" placeholder={t.whatsappPh} value={fd.customerWhatsapp} onChange={(e) => setFd({ ...fd, customerWhatsapp: e.target.value })}
+                      style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }} />
+                    {errors.customerWhatsapp && <p style={{ color: 'var(--thread-red)', fontSize: 12, marginTop: 4 }}>{errors.customerWhatsapp}</p>}
+                  </div>
+                )}
+              </div>
+            ) : (
+            <>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <div>
                 <select value={fd.customerWelaya} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}
@@ -1150,8 +1217,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <button className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'home' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'home' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'home' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forHome}</button>
               <button className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'office' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'office' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'office' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forOffice}</button>
             </div>
+            </>
+            )}
 
-            {supportQty && (
+            {supportQty && !product.isDigital && (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: 13 }}>{t.qtyLabel}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -1164,7 +1233,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
             <div style={{ borderTop: '2px dashed var(--cotton-300)', paddingTop: 12, fontSize: 13.5, display: 'flex', flexDirection: 'column', gap: 6 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>{product.name}</span><span>{fp} {cur} × {qty}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>{t.delivery}</span><span>{!wilayas.find((x) => String(x.id) === String(fd.customerWelaya)) ? '—' : orderFreeShipping ? t.freeShippingBadge : `${getLiv()} ${cur}`}</span></div>
+              {!product.isDigital && (
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>{t.delivery}</span><span>{!wilayas.find((x) => String(x.id) === String(fd.customerWelaya)) ? '—' : orderFreeShipping ? t.freeShippingBadge : `${getLiv()} ${cur}`}</span></div>
+              )}
               <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: 15.5 }}><span>{t.totalLabel}</span><span>{total()} {cur}</span></div>
             </div>
 

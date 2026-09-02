@@ -21,7 +21,7 @@ import {
   Search, X, Menu, ShoppingCart, Trash2, Plus, Minus, Phone, Mail, MapPin,
   Truck, ShieldCheck, CreditCard, Headphones, ChevronLeft, ChevronRight,
   ChevronDown, AlertCircle, CheckCircle2, Package, Star, ArrowLeft, ArrowRight,
-  Send, Home as HomeIcon, Wrench,
+  Send, Home as HomeIcon, Wrench, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
@@ -106,6 +106,9 @@ const tAr = {
   errSubmit: 'حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مجدداً.',
   errName: 'الاسم الكامل مطلوب (3 أحرف على الأقل)',
   errPhone: 'رقم هاتف جزائري صحيح مطلوب (مثال: 0550123456)',
+  orderEmail: 'البريد الإلكتروني', orderEmailPh: 'example@email.com', errEmail: 'يرجى إدخال بريد إلكتروني صحيح',
+  whatsapp: 'رقم واتساب', whatsappPh: '0550123456', errWhatsapp: 'رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)',
+  contactQuestion: 'هل تملك بريداً إلكترونياً أم واتساب؟', contactViaEmail: 'البريد الإلكتروني', contactViaWhatsapp: 'واتساب',
   errWilaya: 'اختر الولاية', errCommune: 'اختر البلدية',
   offersTitle: 'العروض المتاحة', descTitle: 'وصف المنتج',
   freeShippingBadge: 'توصيل مجاني',
@@ -192,6 +195,9 @@ const tFr: typeof tAr = {
   errSubmit: 'Une erreur est survenue. Veuillez réessayer.',
   errName: 'Nom complet requis (3 caractères minimum)',
   errPhone: 'Numéro de téléphone algérien valide requis (ex : 0550123456)',
+  orderEmail: 'E-mail', orderEmailPh: 'exemple@email.com', errEmail: 'Veuillez saisir une adresse e-mail valide',
+  whatsapp: 'Numéro WhatsApp', whatsappPh: '0550123456', errWhatsapp: 'Numéro WhatsApp algérien valide requis (ex: 0550123456)',
+  contactQuestion: 'Avez-vous un e-mail ou un numéro WhatsApp ?', contactViaEmail: 'E-mail', contactViaWhatsapp: 'WhatsApp',
   errWilaya: 'Veuillez choisir une wilaya', errCommune: 'Veuillez choisir une commune',
   offersTitle: 'Offres groupées', descTitle: 'Description du produit',
   freeShippingBadge: 'Livraison gratuite',
@@ -278,6 +284,9 @@ const tEn: typeof tAr = {
   errSubmit: 'An error occurred. Please try again.',
   errName: 'Full name is required (at least 3 characters)',
   errPhone: 'Valid Algerian phone number required (e.g. 0550123456)',
+  orderEmail: 'Email', orderEmailPh: 'example@email.com', errEmail: 'Please enter a valid email address',
+  whatsapp: 'WhatsApp number', whatsappPh: '0550123456', errWhatsapp: 'A valid Algerian WhatsApp number is required (e.g. 0550123456)',
+  contactQuestion: 'Do you have an email or a WhatsApp number?', contactViaEmail: 'Email', contactViaWhatsapp: 'WhatsApp',
   errWilaya: 'Please select a wilaya', errCommune: 'Please select a commune',
   offersTitle: 'Available offers', descTitle: 'Product description',
   freeShippingBadge: 'Free Delivery',
@@ -1006,7 +1015,9 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {product?.category?.name || store?.name || t.viewDetails}
         </span>
-        {product?.shippingFree ? <span style={{ color: AD }}>{t.freeShippingBadge}</span> : null}
+        {product?.isDigital ? (
+          <span style={{ color: AD, display: 'inline-flex', alignItems: 'center' }}><Download size={12} /></span>
+        ) : product?.shippingFree ? <span style={{ color: AD }}>{t.freeShippingBadge}</span> : null}
       </div>
 
       <div className="ae-card-imgwrap">
@@ -1472,10 +1483,12 @@ export function ProductForm({
 
   const [fd, setFd] = useState({
     customerId: '', customerName: '', customerPhone: '',
+    customerEmail: '', customerWhatsapp: '',
     customerWelaya: '', customerCommune: '',
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',
   });
+  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
@@ -1516,10 +1529,11 @@ export function ProductForm({
   const orderFreeShipping = isFreeShipping({ store, product, offer: selOffer, amount: fp * qty });
 
   const getLiv = useCallback((): number => {
+    if (product?.isDigital) return 0;
     if (orderFreeShipping) return 0;
     if (!selW) return 0;
     return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
-  }, [selW, fd.typeLivraison, orderFreeShipping]);
+  }, [selW, fd.typeLivraison, orderFreeShipping, product?.isDigital]);
 
   const total = () => Number(fp) * Number(qty) + Number(getLiv());
 
@@ -1532,28 +1546,43 @@ export function ProductForm({
     const e: Record<string, string> = {};
     if (!fd.customerName || fd.customerName.trim().length < 3) e.customerName = t.errName;
     if (!/^(0|\+213)[5-7]\d{8}$/.test((fd.customerPhone || '').replace(/\s/g, ''))) e.customerPhone = t.errPhone;
-    if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
-    if (!fd.customerCommune) e.customerCommune = t.errCommune;
+    if (product?.isDigital) {
+      if (contactMethod === 'email') {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((fd.customerEmail || '').trim())) e.customerEmail = t.errEmail;
+      } else {
+        if (!/^(0|\+213)[5-7]\d{8}$/.test((fd.customerWhatsapp || '').replace(/\s/g, ''))) e.customerWhatsapp = t.errWhatsapp;
+      }
+    } else {
+      if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
+      if (!fd.customerCommune) e.customerCommune = t.errCommune;
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const buildPayload = () => ({
-    ...fd,
-    quantity: qty,
-    product,
-    productId: product?.id,
-    storeId: store?.id || product?.store?.id,
-    userId: uid,
-    selectedOffer: selectedOffer || null,
-    selectedVariants: selectedVariants || {},
-    variantDetailId: getVarId(),
-    platform: platform || 'web',
-    finalPrice: fp,
-    totalPrice: total(),
-    priceLivraison: getLiv(),
-    addedAt: new Date().toISOString(),
-  });
+  const buildPayload = () => {
+    const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
+    const shipping = product?.isDigital
+      ? { ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+      : { customerWelaya, customerCommune, typeLivraison, priceLoss };
+    return {
+      ...rest,
+      ...shipping,
+      quantity: qty,
+      product,
+      productId: product?.id,
+      storeId: store?.id || product?.store?.id,
+      userId: uid,
+      selectedOffer: selectedOffer || null,
+      selectedVariants: selectedVariants || {},
+      variantDetailId: getVarId(),
+      platform: platform || 'web',
+      finalPrice: fp,
+      totalPrice: total(),
+      priceLivraison: getLiv(),
+      addedAt: new Date().toISOString(),
+    };
+  };
 
   const addToCart = () => {
     if (!domain) return;
@@ -1597,7 +1626,7 @@ export function ProductForm({
     <div style={{ border: `1px solid ${BD}`, borderTop: `3px solid ${INK}`, padding: '1.25rem', background: '#fff' }}>
       <Styles />
 
-      {supportQty ? (
+      {supportQty && !product?.isDigital ? (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: '1.1rem', flexWrap: 'wrap' }}>
           <span style={{ fontSize: '0.82rem', fontWeight: 700 }}>{t.qty}</span>
           <div className="ae-qty">
@@ -1622,12 +1651,12 @@ export function ProductForm({
         </p>
       ) : null}
 
-      {!isOrderNow ? (
+      {!isOrderNow && !product?.isDigital ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <button type="button" className="ae-btn ae-btn-accent" style={{ width: '100%' }} onClick={() => setIsOrderNow(true)}>
             {t.orderNow}
           </button>
-          {store?.cart !== false ? (
+          {store?.cart !== false && !product?.isDigital ? (
             <button type="button" className="ae-btn ae-btn-ghost" style={{ width: '100%' }} onClick={addToCart}>
               <ShoppingCart size={16} /> {t.addToCart}
             </button>
@@ -1656,6 +1685,39 @@ export function ProductForm({
             </div>
           </div>
 
+          {product?.isDigital ? (
+            <div style={{ marginBottom: '0.85rem' }}>
+              {label(t.contactQuestion)}
+              <div style={{ display: 'flex', borderRadius: 2, overflow: 'hidden', border: `2px solid ${BD}`, marginBottom: 10 }}>
+                <button type="button" onClick={() => { setContactMethod('email'); setFd(p => ({ ...p, customerWhatsapp: '' })); }}
+                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.65rem 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.82rem', fontWeight: 700, background: contactMethod === 'email' ? A : 'transparent', color: contactMethod === 'email' ? '#fff' : SUB }}>
+                  <Mail size={14} />{t.contactViaEmail}
+                </button>
+                <button type="button" onClick={() => { setContactMethod('whatsapp'); setFd(p => ({ ...p, customerEmail: '' })); }}
+                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.65rem 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.82rem', fontWeight: 700, background: contactMethod === 'whatsapp' ? A : 'transparent', color: contactMethod === 'whatsapp' ? '#fff' : SUB }}>
+                  <MessageCircle size={14} />{t.contactViaWhatsapp}
+                </button>
+              </div>
+              {contactMethod === 'email' ? (
+                <div>
+                  {label(t.orderEmail)}
+                  <input className={`ae-input${errors.customerEmail ? ' ae-err' : ''}`} type="email" value={fd.customerEmail}
+                    onChange={(e) => set('customerEmail', e.target.value)} placeholder={t.orderEmailPh}
+                    autoComplete="email" dir="ltr" />
+                  {errLine(errors.customerEmail)}
+                </div>
+              ) : (
+                <div>
+                  {label(t.whatsapp)}
+                  <input className={`ae-input ae-num${errors.customerWhatsapp ? ' ae-err' : ''}`} value={fd.customerWhatsapp}
+                    onChange={(e) => set('customerWhatsapp', e.target.value)} placeholder={t.whatsappPh}
+                    type="tel" inputMode="tel" autoComplete="tel" dir="ltr" />
+                  {errLine(errors.customerWhatsapp)}
+                </div>
+              )}
+            </div>
+          ) : (
+          <>
           <div className="ae-form-2" style={{ marginBottom: '0.85rem' }}>
             <div>
               {label(t.wilaya)}
@@ -1721,6 +1783,8 @@ export function ProductForm({
               })}
             </div>
           </div>
+          </>
+          )}
 
           <div style={{ background: SURF, border: `1px solid ${BD}`, padding: '0.9rem 1rem', marginBottom: '1rem' }}>
             <p style={{ margin: '0 0 4px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: SUB }}>
@@ -1730,14 +1794,16 @@ export function ProductForm({
               <span>{t.price}</span>
               <span className="ae-num">{fmt(fp, currency)}</span>
             </div>
-            <div className="ae-summary-row">
+            <div className="ae-summary-row" style={product?.isDigital ? { borderBottom: `1px solid ${BD}` } : undefined}>
               <span>{t.qty}</span>
               <span className="ae-num">× {qty}</span>
             </div>
-            <div className="ae-summary-row" style={{ borderBottom: `1px solid ${BD}` }}>
-              <span>{t.delivery}</span>
-              <span className="ae-num">{livLabel}</span>
-            </div>
+            {!product?.isDigital && (
+              <div className="ae-summary-row" style={{ borderBottom: `1px solid ${BD}` }}>
+                <span>{t.delivery}</span>
+                <span className="ae-num">{livLabel}</span>
+              </div>
+            )}
             <div className="ae-summary-row" style={{ paddingTop: 12 }}>
               <span style={{ color: TXT, fontWeight: 800, fontSize: '0.95rem' }}>{t.total}</span>
               <span className="ae-num" style={{ fontWeight: 800, fontSize: '1.1rem', color: INK }}>{fmt(total(), currency)}</span>
@@ -1755,10 +1821,12 @@ export function ProductForm({
               onClick={submitOrder} disabled={submitting}>
               {submitting ? t.sending : t.confirmOrder}
             </button>
-            <button type="button" className="ae-btn ae-btn-ghost" style={{ minWidth: 110 }}
-              onClick={() => setIsOrderNow(false)} disabled={submitting}>
-              {t.cancel}
-            </button>
+            {!product?.isDigital && (
+              <button type="button" className="ae-btn ae-btn-ghost" style={{ minWidth: 110 }}
+                onClick={() => setIsOrderNow(false)} disabled={submitting}>
+                {t.cancel}
+              </button>
+            )}
           </div>
         </div>
       )}

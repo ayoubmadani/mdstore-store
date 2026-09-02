@@ -12,7 +12,7 @@ import {
   Search, ShoppingCart, Menu, X, Phone, Mail, MapPin, ChevronDown,
   Star, Trash2, AlertCircle, Minus, Plus, Check, ArrowRight,
   Sparkles, Shield, Truck, Headphones, Instagram, Facebook, Send,
-  Package, Clock, Heart
+  Package, Clock, Heart, MessageCircle, Download
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
@@ -31,6 +31,7 @@ interface Product {
   id: string; slug?: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
   variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+  isDigital?: boolean;
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 interface ProductFormProps {
@@ -99,6 +100,15 @@ const T = {
     errName: 'الاسم الكامل مطلوب (3 أحرف على الأقل)',
     errPhone: 'رقم هاتف جزائري صحيح مطلوب (مثال: 0550123456)',
     errWilaya: 'اختر الولاية', errCommune: 'اختر البلدية',
+    orderEmail: 'البريد الإلكتروني',
+    emailPh: 'example@email.com',
+    errEmail: 'يرجى إدخال بريد إلكتروني صحيح',
+    whatsapp: 'رقم واتساب',
+    whatsappPh: '0550123456',
+    errWhatsapp: 'رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)',
+    contactQuestion: 'هل تملك بريداً إلكترونياً أم واتساب؟',
+    contactViaEmail: 'البريد الإلكتروني',
+    contactViaWhatsapp: 'واتساب',
     privacyTitle: 'سياسة الخصوصية', termsTitle: 'الشروط والأحكام',
     cookiesTitle: 'سياسة الكوكيز', contactTitle: 'تواصل معنا',
     offersTitle: 'العروض المتاحة', descTitle: 'الوصف',
@@ -161,6 +171,15 @@ const T = {
     errName: 'Nom complet requis (3 caractères minimum)',
     errPhone: 'Numéro de téléphone algérien valide requis (ex: 0550123456)',
     errWilaya: 'Veuillez choisir une wilaya', errCommune: 'Veuillez choisir une commune',
+    orderEmail: 'E-mail',
+    emailPh: 'exemple@email.com',
+    errEmail: 'Veuillez saisir une adresse e-mail valide',
+    whatsapp: 'Numéro WhatsApp',
+    whatsappPh: '0550123456',
+    errWhatsapp: 'Numéro WhatsApp algérien valide requis (ex: 0550123456)',
+    contactQuestion: 'Avez-vous un e-mail ou un numéro WhatsApp ?',
+    contactViaEmail: 'E-mail',
+    contactViaWhatsapp: 'WhatsApp',
     privacyTitle: 'Politique de confidentialité', termsTitle: 'Conditions générales',
     cookiesTitle: 'Politique des cookies', contactTitle: 'Nous contacter',
     offersTitle: 'Offres groupées', descTitle: 'Description',
@@ -222,6 +241,15 @@ const T = {
     errSubmit: 'An error occurred. Please try again.',
     errName: 'Full name is required (at least 3 characters)',
     errPhone: 'Valid Algerian phone number required (e.g. 0550123456)',
+    orderEmail: 'Email',
+    emailPh: 'example@email.com',
+    errEmail: 'Please enter a valid email address',
+    whatsapp: 'WhatsApp number',
+    whatsappPh: '0550123456',
+    errWhatsapp: 'A valid Algerian WhatsApp number is required (e.g. 0550123456)',
+    contactQuestion: 'Do you have an email or a WhatsApp number?',
+    contactViaEmail: 'Email',
+    contactViaWhatsapp: 'WhatsApp',
     errWilaya: 'Please select a wilaya', errCommune: 'Please select a commune',
     privacyTitle: 'Privacy Policy', termsTitle: 'Terms & Conditions',
     cookiesTitle: 'Cookie Policy', contactTitle: 'Contact Us',
@@ -855,7 +883,11 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
           <Sparkles size={40} color={BD} />
         </div>
       )}
-      {product.shippingFree && (
+      {product.isDigital ? (
+        <span style={{ position: 'absolute', top: 10, left: 10, background: A, color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 9px', borderRadius: 999, zIndex: 2, display: 'inline-flex', alignItems: 'center' }}>
+          <Download size={12} />
+        </span>
+      ) : product.shippingFree && (
         <span style={{ position: 'absolute', top: 10, left: 10, background: TXT, color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 9px', borderRadius: 999, zIndex: 2 }}>🚚</span>
       )}
       <div className="luxe-card-body">
@@ -1120,7 +1152,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [fd, setFd] = useState({
     customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '',
     quantity: 1, typeLivraison: 'home' as 'home' | 'office', priceLoss: 0,
+    customerEmail: '', customerWhatsapp: '',
   });
+  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
 
   useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
   useEffect(() => {
@@ -1149,10 +1183,11 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
     (store?.supportFreeShipping && store?.freeShippingMinAmount != null && (getFP() * qty) >= Number(store.freeShippingMinAmount)));
   const getLiv = useCallback((): number => {
+    if (product.isDigital) return 0;
     if (orderFreeShipping) return 0;
     if (!selW) return 0;
     return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
-  }, [selW, fd.typeLivraison, orderFreeShipping]);
+  }, [selW, fd.typeLivraison, orderFreeShipping, product.isDigital]);
 
   const total = useCallback(() => getFP() * qty + getLiv(), [getFP, qty, getLiv]);
 
@@ -1166,11 +1201,19 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const e: Record<string, string> = {};
     if (!fd.customerName || fd.customerName.length < 3) e.name = t.errName;
     if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone)) e.phone = t.errPhone;
-    if (!fd.customerWelaya) e.wilaya = t.errWilaya;
-    if (!fd.customerCommune) e.commune = t.errCommune;
+    if (product.isDigital) {
+      if (contactMethod === 'email') {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.email = t.errEmail;
+      } else {
+        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.whatsapp = t.errWhatsapp;
+      }
+    } else {
+      if (!fd.customerWelaya) e.wilaya = t.errWilaya;
+      if (!fd.customerCommune) e.commune = t.errCommune;
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
-  }, [fd, t]);
+  }, [fd, t, product.isDigital, contactMethod]);
 
   const addToCart = useCallback(() => {
     const payload = {
@@ -1190,10 +1233,14 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if (!validate()) return;
     setSubmitting(true);
     try {
+      const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
+      const payload = product.isDigital
+        ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+        : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
       const r = await fetch(`${API_URL}/orders/create`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...fd, quantity: qty, product, productId: product.id, storeId: product.store?.id, userId,
+          ...payload, quantity: qty, product, productId: product.id, storeId: product.store?.id, userId,
           variantDetailId: getVarId(), selectedOffer, selectedVariants,
           finalPrice: getFP(), totalPrice: total(), priceLivraison: getLiv(),
         }),
@@ -1205,7 +1252,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       } else { setErrors({ submit: t.errSubmit }); }
     } catch { setErrors({ submit: t.errSubmit }); }
     setSubmitting(false);
-  }, [fd, qty, product, userId, getVarId, selectedOffer, selectedVariants, getFP, total, getLiv, validate, t]);
+  }, [fd, qty, product, userId, getVarId, selectedOffer, selectedVariants, getFP, total, getLiv, validate, t, contactMethod]);
 
   if (success) {
     return (
@@ -1220,7 +1267,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   return (
     <div className="luxe-form">
-      {!isOrderNow ? (
+      {!isOrderNow && !product.isDigital ? (
         <div className="luxe-btn-grid">
           <button className="luxe-btn-primary" onClick={() => setIsOrderNow(true)}>
             {t.orderNow}
@@ -1247,41 +1294,70 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             {errors.phone && <p style={{ color: ERR, fontSize: '0.75rem', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}><AlertCircle size={11} /> {errors.phone}</p>}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
+          {product.isDigital ? (
             <div className="luxe-input-wrap">
-              <label>{t.wilaya}</label>
-              <div className="luxe-select-wrap">
-                <select className={`luxe-select ${errors.wilaya ? 'err' : ''}`} value={fd.customerWelaya} onChange={e => setFd(p => ({...p, customerWelaya: e.target.value, customerCommune: ''}))} disabled={wilayas.length === 0}>
-                  <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
-                  {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>)}
-                </select>
-                <ChevronDown size={14} className="chevron" />
+              <label>{t.contactQuestion}</label>
+              <div className="luxe-delivery-toggle">
+                <button type="button" className={`luxe-delivery-btn ${contactMethod === 'email' ? 'active' : ''}`} onClick={() => { setContactMethod('email'); setFd(p => ({ ...p, customerWhatsapp: '' })); }}>
+                  <Mail size={16} /> {t.contactViaEmail}
+                </button>
+                <button type="button" className={`luxe-delivery-btn ${contactMethod === 'whatsapp' ? 'active' : ''}`} onClick={() => { setContactMethod('whatsapp'); setFd(p => ({ ...p, customerEmail: '' })); }}>
+                  <MessageCircle size={16} /> {t.contactViaWhatsapp}
+                </button>
               </div>
-              {errors.wilaya && <p style={{ color: ERR, fontSize: '0.75rem', marginTop: 4 }}><AlertCircle size={11} /> {errors.wilaya}</p>}
+              {contactMethod === 'email' ? (
+                <div className="luxe-input-wrap" style={{ marginTop: '0.75rem' }}>
+                  <label>{t.orderEmail}</label>
+                  <input className={`luxe-input ${errors.email ? 'err' : ''}`} type="email" dir="ltr" placeholder={t.emailPh} value={fd.customerEmail} onChange={e => setFd(p => ({...p, customerEmail: e.target.value}))} />
+                  {errors.email && <p style={{ color: ERR, fontSize: '0.75rem', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}><AlertCircle size={11} /> {errors.email}</p>}
+                </div>
+              ) : (
+                <div className="luxe-input-wrap" style={{ marginTop: '0.75rem' }}>
+                  <label>{t.whatsapp}</label>
+                  <input className={`luxe-input ${errors.whatsapp ? 'err' : ''}`} type="tel" dir="ltr" placeholder={t.whatsappPh} value={fd.customerWhatsapp} onChange={e => setFd(p => ({...p, customerWhatsapp: e.target.value}))} />
+                  {errors.whatsapp && <p style={{ color: ERR, fontSize: '0.75rem', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}><AlertCircle size={11} /> {errors.whatsapp}</p>}
+                </div>
+              )}
             </div>
-            <div className="luxe-input-wrap">
-              <label>{t.commune}</label>
-              <div className="luxe-select-wrap">
-                <select className={`luxe-select ${errors.commune ? 'err' : ''}`} value={fd.customerCommune} onChange={e => setFd(p => ({...p, customerCommune: e.target.value}))} disabled={!fd.customerWelaya || loadingC}>
-                  <option value="">{loadingC ? t.communeLoading : t.communePlaceholder}</option>
-                  {communes.map(c => <option key={c.id} value={c.id}>{t.dir === 'rtl' ? c.ar_name : c.name}</option>)}
-                </select>
-                <ChevronDown size={14} className="chevron" />
+          ) : (
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
+                <div className="luxe-input-wrap">
+                  <label>{t.wilaya}</label>
+                  <div className="luxe-select-wrap">
+                    <select className={`luxe-select ${errors.wilaya ? 'err' : ''}`} value={fd.customerWelaya} onChange={e => setFd(p => ({...p, customerWelaya: e.target.value, customerCommune: ''}))} disabled={wilayas.length === 0}>
+                      <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
+                      {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>)}
+                    </select>
+                    <ChevronDown size={14} className="chevron" />
+                  </div>
+                  {errors.wilaya && <p style={{ color: ERR, fontSize: '0.75rem', marginTop: 4 }}><AlertCircle size={11} /> {errors.wilaya}</p>}
+                </div>
+                <div className="luxe-input-wrap">
+                  <label>{t.commune}</label>
+                  <div className="luxe-select-wrap">
+                    <select className={`luxe-select ${errors.commune ? 'err' : ''}`} value={fd.customerCommune} onChange={e => setFd(p => ({...p, customerCommune: e.target.value}))} disabled={!fd.customerWelaya || loadingC}>
+                      <option value="">{loadingC ? t.communeLoading : t.communePlaceholder}</option>
+                      {communes.map(c => <option key={c.id} value={c.id}>{t.dir === 'rtl' ? c.ar_name : c.name}</option>)}
+                    </select>
+                    <ChevronDown size={14} className="chevron" />
+                  </div>
+                  {errors.commune && <p style={{ color: ERR, fontSize: '0.75rem', marginTop: 4 }}><AlertCircle size={11} /> {errors.commune}</p>}
+                </div>
               </div>
-              {errors.commune && <p style={{ color: ERR, fontSize: '0.75rem', marginTop: 4 }}><AlertCircle size={11} /> {errors.commune}</p>}
-            </div>
-          </div>
 
-          <div className="luxe-delivery-toggle">
-            <button className={`luxe-delivery-btn ${fd.typeLivraison === 'home' ? 'active' : ''}`} onClick={() => setFd(p => ({...p, typeLivraison: 'home'}))}>
-              <Truck size={16} /> {t.deliveryHome}
-            </button>
-            <button className={`luxe-delivery-btn ${fd.typeLivraison === 'office' ? 'active' : ''}`} onClick={() => setFd(p => ({...p, typeLivraison: 'office'}))}>
-              <Package size={16} /> {t.deliveryOffice}
-            </button>
-          </div>
+              <div className="luxe-delivery-toggle">
+                <button className={`luxe-delivery-btn ${fd.typeLivraison === 'home' ? 'active' : ''}`} onClick={() => setFd(p => ({...p, typeLivraison: 'home'}))}>
+                  <Truck size={16} /> {t.deliveryHome}
+                </button>
+                <button className={`luxe-delivery-btn ${fd.typeLivraison === 'office' ? 'active' : ''}`} onClick={() => setFd(p => ({...p, typeLivraison: 'office'}))}>
+                  <Package size={16} /> {t.deliveryOffice}
+                </button>
+              </div>
+            </>
+          )}
 
-          {supportQty && (
+          {supportQty && !product.isDigital && (
             <div className="luxe-qty-row">
               <button className="luxe-qty-btn" onClick={() => setFd(p => ({...p, quantity: Math.max(1, p.quantity - 1)}))}><Minus size={16} /></button>
               <span className="luxe-qty-val">{fd.quantity}</span>
@@ -1293,7 +1369,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           <div className="luxe-summary">
             <div className="luxe-summary-row"><span className="luxe-summary-label">{t.price}</span><span className="luxe-summary-val">{getFP().toLocaleString()} {"DZD"}</span></div>
             <div className="luxe-summary-row"><span className="luxe-summary-label">{t.qty}</span><span className="luxe-summary-val">× {qty}</span></div>
-            <div className="luxe-summary-row"><span className="luxe-summary-label">{t.delivery}</span><span className="luxe-summary-val">{!selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${getLiv().toLocaleString()} DZD`}</span></div>
+            {!product.isDigital && (
+              <div className="luxe-summary-row"><span className="luxe-summary-label">{t.delivery}</span><span className="luxe-summary-val">{!selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${getLiv().toLocaleString()} DZD`}</span></div>
+            )}
             <div className="luxe-summary-row"><span className="luxe-summary-label">{t.total}</span><span className="luxe-summary-val">{total().toLocaleString()} {"DZD"}</span></div>
           </div>
 

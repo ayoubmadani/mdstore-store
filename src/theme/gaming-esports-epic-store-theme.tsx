@@ -10,7 +10,7 @@ import {
   ShoppingCart, Search, Menu, X, ChevronDown, ChevronLeft, ChevronRight,
   Star, Trash2, Phone, Mail, MapPin, Send, AlertCircle, Minus, Plus,
   Gamepad2, Shield, Truck, Headphones, Zap, Trophy, Monitor, Cpu,
-  Crosshair, Sword, Crown, Flame, CheckCircle, Package,
+  Crosshair, Sword, Crown, Flame, CheckCircle, Package, MessageCircle, Download,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────
@@ -25,7 +25,7 @@ interface Commune { id: string; name: string; ar_name: string; wilayaId: string;
 interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
-  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; slug?: string; shippingFree?: boolean;
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; slug?: string; shippingFree?: boolean; isDigital?: boolean;
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 interface ProductFormProps {
@@ -104,6 +104,9 @@ const jsonAr = {
   orderInfo: "معلومات الطلب", addToCart: "أضف إلى السلة", orderNow: "اطلب الآن",
   confirmOrder: "تأكيد الطلب", sending: "جاري الإرسال...", back: "رجوع",
   addedMsg: "تمت الإضافة إلى السلة!", errSubmit: "حدث خطأ أثناء إرسال الطلب",
+  orderEmail: "البريد الإلكتروني", orderEmailPh: "example@email.com", errEmail: "يرجى إدخال بريد إلكتروني صحيح",
+  whatsapp: "رقم واتساب", whatsappPh: "0550123456", errWhatsapp: "رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)",
+  contactQuestion: "هل تملك بريداً إلكترونياً أم واتساب؟", contactViaEmail: "البريد الإلكتروني", contactViaWhatsapp: "واتساب",
   myCart: "السلة", cartEmpty: "السلة فارغة", cartEmptyDesc: "لم تضف أي منتجات بعد",
   successTitle: "تم إرسال طلبك!", successDesc: "سنتواصل معك قريباً لتأكيد التفاصيل",
   backToShop: "العودة للتسوق", checkoutTitle: "إتمام الطلب",
@@ -164,6 +167,9 @@ const jsonFr = {
   orderInfo: "Informations commande", addToCart: "Ajouter au panier", orderNow: "Commander",
   confirmOrder: "Confirmer la commande", sending: "Envoi...", back: "Annuler",
   addedMsg: "Ajouté au panier ✓", errSubmit: "Une erreur est survenue",
+  orderEmail: "E-mail", orderEmailPh: "exemple@email.com", errEmail: "Veuillez saisir une adresse e-mail valide",
+  whatsapp: "Numéro WhatsApp", whatsappPh: "0550123456", errWhatsapp: "Numéro WhatsApp algérien valide requis (ex: 0550123456)",
+  contactQuestion: "Avez-vous un e-mail ou un numéro WhatsApp ?", contactViaEmail: "E-mail", contactViaWhatsapp: "WhatsApp",
   myCart: "Mon Panier", cartEmpty: "Votre panier est vide", cartEmptyDesc: "Découvrez notre sélection.",
   successTitle: "Commande confirmée !", successDesc: "Notre équipe vous contactera bientôt.",
   backToShop: "Retour à la boutique", checkoutTitle: "Finaliser la commande",
@@ -224,6 +230,9 @@ const jsonEn = {
   orderInfo: "Order information", addToCart: "Add to cart", orderNow: "Order now",
   confirmOrder: "Confirm order", sending: "Processing...", back: "Cancel",
   addedMsg: "Added to cart!", errSubmit: "An error occurred",
+  orderEmail: "Email", orderEmailPh: "example@email.com", errEmail: "Please enter a valid email address",
+  whatsapp: "WhatsApp number", whatsappPh: "0550123456", errWhatsapp: "A valid Algerian WhatsApp number is required (e.g. 0550123456)",
+  contactQuestion: "Do you have an email or a WhatsApp number?", contactViaEmail: "Email", contactViaWhatsapp: "WhatsApp",
   myCart: "Cart", cartEmpty: "Your cart is empty", cartEmptyDesc: "You haven't added any products yet.",
   successTitle: "Order placed!", successDesc: "We'll contact you shortly to confirm details.",
   backToShop: "Back to shopping", checkoutTitle: "Complete order",
@@ -646,7 +655,11 @@ export function Card({ product, displayImage, discount, store, viewDetails }: { 
           -{discount}%
         </div>
       )}
-      {product.shippingFree && (
+      {product.isDigital ? (
+        <div style={{ position: "absolute", top: 10, insetInlineEnd: 10, background: A, color: "#fff", fontSize: "0.7rem", fontWeight: 800, padding: "3px 8px", borderRadius: 4, zIndex: 2, display: "flex", alignItems: "center" }}>
+          <Download size={12} />
+        </div>
+      ) : product.shippingFree && (
         <div style={{ position: "absolute", top: 10, insetInlineEnd: 10, background: SUCCESS, color: C0, fontSize: "0.7rem", fontWeight: 800, padding: "3px 8px", borderRadius: 4, zIndex: 2 }}>
           🚚
         </div>
@@ -946,7 +959,8 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const t = T[getLang(store)];
   const isRTL = t.dir === "rtl";
   const currency = store?.currency || "DZD";
-  const [fd, setFd] = useState({ customerId: "", customerName: "", customerPhone: "", customerWelaya: "", customerCommune: "", quantity: 1, priceLoss: propPriceLoss || 0, typeLivraison: "home" as "home" | "office" });
+  const [fd, setFd] = useState({ customerId: "", customerName: "", customerPhone: "", customerWelaya: "", customerCommune: "", quantity: 1, priceLoss: propPriceLoss || 0, typeLivraison: "home" as "home" | "office", customerEmail: "", customerWhatsapp: "" });
+  const [contactMethod, setContactMethod] = useState<"email" | "whatsapp">("email");
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
@@ -982,10 +996,11 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
     (store?.supportFreeShipping && store?.freeShippingMinAmount != null && (fp * qty) >= Number(store.freeShippingMinAmount)));
   const getLiv = useCallback(() => {
+    if (product.isDigital) return 0;
     if (orderFreeShipping) return 0;
     if (!selW) return 0;
     return Number(fd.typeLivraison === "home" ? selW.livraisonHome : selW.livraisonOfice);
-  }, [selW, fd.typeLivraison, orderFreeShipping]);
+  }, [selW, fd.typeLivraison, orderFreeShipping, product.isDigital]);
 
   const total = () => fp * qty + getLiv();
 
@@ -994,8 +1009,16 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if (!fd.customerName.trim()) errs.customerName = t.errName;
     if (!fd.customerPhone.trim()) errs.customerPhone = t.errPhone;
     else if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone)) errs.customerPhone = t.errPhoneInvalid;
-    if (!fd.customerWelaya) errs.customerWelaya = t.errWilaya;
-    if (!fd.customerCommune) errs.customerCommune = t.errCommune;
+    if (product.isDigital) {
+      if (contactMethod === "email") {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) errs.customerEmail = t.errEmail;
+      } else {
+        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) errs.customerWhatsapp = t.errWhatsapp;
+      }
+    } else {
+      if (!fd.customerWelaya) errs.customerWelaya = t.errWilaya;
+      if (!fd.customerCommune) errs.customerCommune = t.errCommune;
+    }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -1020,7 +1043,11 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if (!validate()) return;
     setSubmitting(true);
     try {
-      await axios.post(`${API_URL}/orders/create`, { ...fd, quantity: qty, product, variantDetailId: getVId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform, finalPrice: getFP(), totalPrice: total(), priceLivraison: getLiv() });
+      const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
+      const payload = product.isDigital
+        ? { ...rest, ...(contactMethod === "email" ? { customerEmail } : { customerWhatsapp }) }
+        : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
+      await axios.post(`${API_URL}/orders/create`, { ...payload, quantity: qty, product, variantDetailId: getVId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform, finalPrice: getFP(), totalPrice: total(), priceLivraison: getLiv() });
       router.push(`/successfully?productId=${product.id}`);
     } catch (err: any) {
       setErrors({ submit: err?.response?.data?.message || t.errSubmit });
@@ -1043,7 +1070,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         </div>
       )}
 
-      {!isOrderNow ? (
+      {(!isOrderNow && !product.isDigital) ? (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {/* Qty */}
           {supportQty && (
@@ -1071,7 +1098,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {product.store?.cart === true && (
+            {product.store?.cart === true && !product.isDigital && (
               <button onClick={addToCart} style={{ ...btnPrimary, background: C3, color: TXT, border: `1px solid ${BD}` }}>
                 <ShoppingCart size={16} />{t.addToCart}
               </button>
@@ -1096,42 +1123,67 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </FormField>
           </div>
 
-          <div className="form2">
-            <FormField label={t.wilaya} error={errors.customerWelaya}>
-              <div style={{ position: "relative" }}>
-                <ChevronDown size={12} style={{ position: "absolute", insetInlineStart: 10, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: SUB }} />
-                <select value={fd.customerWelaya} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: "" })} disabled={wilayas.length === 0} style={{ ...inputBase, paddingInlineStart: 30, direction: isRTL ? "rtl" : "ltr", borderColor: errors.customerWelaya ? "#EF4444" : BD }}>
-                  <option value="">{wilayas.length === 0 ? t.wilayaNA : t.wilayaPh}</option>
-                  {wilayas.map((w) => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
-                </select>
-              </div>
-            </FormField>
-            <FormField label={t.commune} error={errors.customerCommune}>
-              <div style={{ position: "relative" }}>
-                <ChevronDown size={12} style={{ position: "absolute", insetInlineStart: 10, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: SUB }} />
-                <select value={fd.customerCommune} onChange={(e) => setFd({ ...fd, customerCommune: e.target.value })} disabled={!fd.customerWelaya || loadingC} style={{ ...inputBase, paddingInlineStart: 30, direction: isRTL ? "rtl" : "ltr", borderColor: errors.customerCommune ? "#EF4444" : BD }}>
-                  <option value="">{loadingC ? t.communeLoading : t.communePh}</option>
-                  {communes.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-              </div>
-            </FormField>
-          </div>
-
-          {/* Delivery type */}
-          <div>
-            <label style={{ fontSize: "0.78rem", color: SUB, marginBottom: 6, display: "block", fontWeight: 600 }}>{t.deliveryType}</label>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-              {(["home", "office"] as const).map((type) => (
-                <button key={type} type="button" onClick={() => setFd({ ...fd, typeLivraison: type })} style={{ padding: "9px 8px", borderRadius: 6, border: `1px solid ${fd.typeLivraison === type ? A : BD}`, background: fd.typeLivraison === type ? AL : "transparent", color: fd.typeLivraison === type ? A : SUB, fontWeight: 700, fontSize: "0.82rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                  {type === "home" ? <Truck size={14} /> : <MapPin size={14} />}
-                  {type === "home" ? t.deliveryHome : t.deliveryOffice}
+          {product.isDigital ? (
+            <div>
+              <label style={{ fontSize: "0.78rem", color: SUB, marginBottom: 6, display: "block", fontWeight: 600 }}>{t.contactQuestion}</label>
+              <div style={{ display: "flex", borderRadius: 6, overflow: "hidden", border: `1px solid ${BD}`, marginBottom: 10 }}>
+                <button type="button" onClick={() => { setContactMethod("email"); setFd((p) => ({ ...p, customerWhatsapp: "" })); }} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px 0", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: "0.82rem", fontWeight: 700, background: contactMethod === "email" ? A : "transparent", color: contactMethod === "email" ? "#fff" : SUB }}>
+                  <Mail size={14} />{t.contactViaEmail}
                 </button>
-              ))}
+                <button type="button" onClick={() => { setContactMethod("whatsapp"); setFd((p) => ({ ...p, customerEmail: "" })); }} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px 0", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: "0.82rem", fontWeight: 700, background: contactMethod === "whatsapp" ? A : "transparent", color: contactMethod === "whatsapp" ? "#fff" : SUB }}>
+                  <MessageCircle size={14} />{t.contactViaWhatsapp}
+                </button>
+              </div>
+              {contactMethod === "email" ? (
+                <FormField label={t.orderEmail} error={errors.customerEmail}>
+                  <input type="email" dir="ltr" value={fd.customerEmail} onChange={(e) => setFd({ ...fd, customerEmail: e.target.value })} placeholder={t.orderEmailPh} style={{ ...inputBase, direction: "ltr", borderColor: errors.customerEmail ? "#EF4444" : BD }} />
+                </FormField>
+              ) : (
+                <FormField label={t.whatsapp} error={errors.customerWhatsapp}>
+                  <input type="tel" dir="ltr" value={fd.customerWhatsapp} onChange={(e) => setFd({ ...fd, customerWhatsapp: e.target.value })} placeholder={t.whatsappPh} style={{ ...inputBase, direction: "ltr", borderColor: errors.customerWhatsapp ? "#EF4444" : BD }} />
+                </FormField>
+              )}
             </div>
-          </div>
+          ) : (
+            <>
+              <div className="form2">
+                <FormField label={t.wilaya} error={errors.customerWelaya}>
+                  <div style={{ position: "relative" }}>
+                    <ChevronDown size={12} style={{ position: "absolute", insetInlineStart: 10, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: SUB }} />
+                    <select value={fd.customerWelaya} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: "" })} disabled={wilayas.length === 0} style={{ ...inputBase, paddingInlineStart: 30, direction: isRTL ? "rtl" : "ltr", borderColor: errors.customerWelaya ? "#EF4444" : BD }}>
+                      <option value="">{wilayas.length === 0 ? t.wilayaNA : t.wilayaPh}</option>
+                      {wilayas.map((w) => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                    </select>
+                  </div>
+                </FormField>
+                <FormField label={t.commune} error={errors.customerCommune}>
+                  <div style={{ position: "relative" }}>
+                    <ChevronDown size={12} style={{ position: "absolute", insetInlineStart: 10, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: SUB }} />
+                    <select value={fd.customerCommune} onChange={(e) => setFd({ ...fd, customerCommune: e.target.value })} disabled={!fd.customerWelaya || loadingC} style={{ ...inputBase, paddingInlineStart: 30, direction: isRTL ? "rtl" : "ltr", borderColor: errors.customerCommune ? "#EF4444" : BD }}>
+                      <option value="">{loadingC ? t.communeLoading : t.communePh}</option>
+                      {communes.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </select>
+                  </div>
+                </FormField>
+              </div>
+
+              {/* Delivery type */}
+              <div>
+                <label style={{ fontSize: "0.78rem", color: SUB, marginBottom: 6, display: "block", fontWeight: 600 }}>{t.deliveryType}</label>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  {(["home", "office"] as const).map((type) => (
+                    <button key={type} type="button" onClick={() => setFd({ ...fd, typeLivraison: type })} style={{ padding: "9px 8px", borderRadius: 6, border: `1px solid ${fd.typeLivraison === type ? A : BD}`, background: fd.typeLivraison === type ? AL : "transparent", color: fd.typeLivraison === type ? A : SUB, fontWeight: 700, fontSize: "0.82rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                      {type === "home" ? <Truck size={14} /> : <MapPin size={14} />}
+                      {type === "home" ? t.deliveryHome : t.deliveryOffice}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Qty in order mode */}
-          {supportQty && (
+          {supportQty && !product.isDigital && (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: C2, borderRadius: 8, padding: "9px 12px", border: `1px solid ${BD}` }}>
               <span style={{ color: SUB, fontSize: "0.82rem" }}>{t.qty}</span>
               <div style={{ display: "flex", alignItems: "center", border: `1px solid ${BD}`, borderRadius: 6, overflow: "hidden" }}>
@@ -1144,7 +1196,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
           {/* Summary */}
           <div style={{ background: C2, borderRadius: 8, padding: "12px", border: `1px solid ${BD}` }}>
-            {[{ l: t.price, v: `${fp.toLocaleString()} ${currency}` }, { l: t.qty, v: `× ${qty}` }, { l: t.delivery, v: !selW ? "—" : orderFreeShipping ? t.freeShippingBadge : `${getLiv().toLocaleString()} ${currency}` }].map((r) => (
+            {[{ l: t.price, v: `${fp.toLocaleString()} ${currency}` }, { l: t.qty, v: `× ${qty}` }, ...(product.isDigital ? [] : [{ l: t.delivery, v: !selW ? "—" : orderFreeShipping ? t.freeShippingBadge : `${getLiv().toLocaleString()} ${currency}` }])].map((r) => (
               <div key={r.l} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: `1px solid ${BD}`, fontSize: "0.82rem" }}>
                 <span style={{ color: SUB }}>{r.l}</span><span style={{ color: TXT, fontWeight: 700 }}>{r.v}</span>
               </div>
@@ -1162,7 +1214,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           )}
 
           <div style={{ display: "flex", gap: 8 }}>
-            <button type="button" onClick={() => setIsOrderNow(false)} style={{ ...btnSecondary, flex: 1 }}>{t.back}</button>
+            {!product.isDigital && (
+              <button type="button" onClick={() => setIsOrderNow(false)} style={{ ...btnSecondary, flex: 1 }}>{t.back}</button>
+            )}
             <button type="submit" disabled={submitting} style={{ ...btnPrimary, flex: 2, opacity: submitting ? 0.65 : 1 }}>
               {submitting ? t.sending : <><Send size={15} />{t.confirmOrder}</>}
             </button>

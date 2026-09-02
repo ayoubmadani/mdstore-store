@@ -30,8 +30,8 @@ import DOMPurify from 'dompurify';
 import { useCartStore } from '@/store/useCartStore';
 import {
   Search, ShoppingBag, Menu, X, ChevronLeft, ChevronRight, ChevronDown, LayoutGrid,
-  Phone, Mail, MapPin, Star, Trash2, Minus, Plus, Check, AlertCircle, Home as HomeIcon,
-  Truck, ShieldCheck, Headphones, Send, Smartphone, ArrowRight, BadgeCheck, CreditCard, Cable, Package,
+  Phone, Mail, MessageCircle, MapPin, Star, Trash2, Minus, Plus, Check, AlertCircle, Home as HomeIcon,
+  Truck, ShieldCheck, Headphones, Send, Smartphone, ArrowRight, BadgeCheck, CreditCard, Cable, Package, Download,
 } from 'lucide-react';
 
 /* ============================ TOKENS ============================ */
@@ -64,7 +64,7 @@ interface Commune { id: string; name: string; ar_name: string; wilayaId: string;
 interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
-  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; slug?: string; shippingFree?: boolean;
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; slug?: string; shippingFree?: boolean; isDigital?: boolean;
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 
@@ -128,6 +128,9 @@ const T = {
     errName: 'الاسم الكامل مطلوب (3 أحرف على الأقل)',
     errPhone: 'رقم هاتف جزائري صحيح مطلوب (مثال: 0550123456)',
     errWilaya: 'اختر الولاية', errCommune: 'اختر البلدية',
+    orderEmail: 'البريد الإلكتروني', emailPh: 'example@email.com', errEmail: 'يرجى إدخال بريد إلكتروني صحيح',
+    whatsapp: 'رقم واتساب', whatsappPh: '0550123456', errWhatsapp: 'رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)',
+    contactQuestion: 'هل تملك بريداً إلكترونياً أم واتساب؟', contactViaEmail: 'البريد الإلكتروني', contactViaWhatsapp: 'واتساب',
     privacyTitle: 'سياسة الخصوصية', termsTitle: 'الشروط والأحكام',
     cookiesTitle: 'سياسة الكوكيز', contactTitle: 'تواصل معنا',
     offersTitle: 'العروض المتاحة', descTitle: 'الوصف', optionsTitle: 'الخيارات',
@@ -215,6 +218,9 @@ const T = {
     errName: 'Nom complet requis (3 caractères minimum)',
     errPhone: 'Numéro de téléphone algérien valide requis (ex: 0550123456)',
     errWilaya: 'Veuillez choisir une wilaya', errCommune: 'Veuillez choisir une commune',
+    orderEmail: 'E-mail', emailPh: 'exemple@email.com', errEmail: 'Veuillez saisir une adresse e-mail valide',
+    whatsapp: 'Numéro WhatsApp', whatsappPh: '0550123456', errWhatsapp: 'Numéro WhatsApp algérien valide requis (ex: 0550123456)',
+    contactQuestion: 'Avez-vous un e-mail ou un numéro WhatsApp ?', contactViaEmail: 'E-mail', contactViaWhatsapp: 'WhatsApp',
     privacyTitle: 'Politique de confidentialité', termsTitle: 'Conditions générales',
     cookiesTitle: 'Politique des cookies', contactTitle: 'Nous contacter',
     offersTitle: 'Offres groupées', descTitle: 'Description', optionsTitle: 'Options',
@@ -302,6 +308,9 @@ const T = {
     errName: 'Full name is required (at least 3 characters)',
     errPhone: 'Valid Algerian phone number required (e.g. 0550123456)',
     errWilaya: 'Please select a wilaya', errCommune: 'Please select a commune',
+    orderEmail: 'Email', emailPh: 'example@email.com', errEmail: 'Please enter a valid email address',
+    whatsapp: 'WhatsApp number', whatsappPh: '0550123456', errWhatsapp: 'A valid Algerian WhatsApp number is required (e.g. 0550123456)',
+    contactQuestion: 'Do you have an email or a WhatsApp number?', contactViaEmail: 'Email', contactViaWhatsapp: 'WhatsApp',
     privacyTitle: 'Privacy Policy', termsTitle: 'Terms & Conditions',
     cookiesTitle: 'Cookie Policy', contactTitle: 'Contact Us',
     offersTitle: 'Available Offers', descTitle: 'Description', optionsTitle: 'Options',
@@ -966,7 +975,9 @@ export function Card({ product, displayImage, discount, store, viewDetails, inde
     >
       <span className="tk-matte">
         {discount > 0 && <span className="tk-savetab">−{discount}%</span>}
-        {product?.shippingFree && <span className="tk-freetab">🚚</span>}
+        {product?.isDigital ? (
+          <span className="tk-freetab" style={{ display: 'flex', alignItems: 'center' }}><Download size={12} /></span>
+        ) : product?.shippingFree && <span className="tk-freetab">🚚</span>}
         {img && !imgErr ? (
           <img src={img} alt={product?.name || ''} loading="lazy" className="tk-cimg" onError={() => setImgErr(true)} />
         ) : (
@@ -1369,9 +1380,11 @@ export function ProductForm({
   const [fd, setFd] = useState({
     customerId: '', customerName: '', customerPhone: '',
     customerWelaya: '', customerCommune: '',
+    customerEmail: '', customerWhatsapp: '',
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',
   });
+  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
 
   useEffect(() => { if (uid) fetchWilayas(uid).then(setWilayas); }, [uid]);
 
@@ -1404,10 +1417,11 @@ export function ProductForm({
     (store?.supportFreeShipping && store?.freeShippingMinAmount != null && (fp * qty) >= Number(store.freeShippingMinAmount)));
 
   const getLiv = useCallback((): number => {
+    if (product?.isDigital) return 0;
     if (orderFreeShipping) return 0;
     if (!selW) return 0;
     return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
-  }, [selW, fd.typeLivraison, orderFreeShipping]);
+  }, [selW, fd.typeLivraison, orderFreeShipping, product?.isDigital]);
 
   const total = () => fp * qty + getLiv();
 
@@ -1415,27 +1429,42 @@ export function ProductForm({
     const e: Record<string, string> = {};
     if (!fd.customerName || fd.customerName.trim().length < 3) e.customerName = t.errName;
     if (!/^(0|\+213)[5-7]\d{8}$/.test((fd.customerPhone || '').replace(/\s/g, ''))) e.customerPhone = t.errPhone;
-    if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
-    if (!fd.customerCommune) e.customerCommune = t.errCommune;
+    if (product?.isDigital) {
+      if (contactMethod === 'email') {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
+      } else {
+        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
+      }
+    } else {
+      if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
+      if (!fd.customerCommune) e.customerCommune = t.errCommune;
+    }
     setErrs(e);
     return Object.keys(e).length === 0;
   };
 
-  const payload = () => ({
-    ...fd,
-    quantity: qty,
-    product,
-    productId: product?.id,
-    storeId: product?.store?.id || store?.id,
-    userId: uid,
-    variantDetailId: getVarId(),
-    selectedOffer: selectedOffer || null,
-    selectedVariants: selectedVariants || {},
-    platform: platform || 'web',
-    finalPrice: fp,
-    totalPrice: total(),
-    priceLivraison: getLiv(),
-  });
+  const payload = () => {
+    const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
+    const shippingOrContact = product?.isDigital
+      ? (contactMethod === 'email' ? { customerEmail } : { customerWhatsapp })
+      : { customerWelaya, customerCommune, typeLivraison, priceLoss };
+    return {
+      ...rest,
+      ...shippingOrContact,
+      quantity: qty,
+      product,
+      productId: product?.id,
+      storeId: product?.store?.id || store?.id,
+      userId: uid,
+      variantDetailId: getVarId(),
+      selectedOffer: selectedOffer || null,
+      selectedVariants: selectedVariants || {},
+      platform: platform || 'web',
+      finalPrice: fp,
+      totalPrice: total(),
+      priceLivraison: getLiv(),
+    };
+  };
 
   const addToCart = () => {
     try {
@@ -1474,7 +1503,7 @@ export function ProductForm({
 
   return (
     <div>
-      {supportQty && (
+      {supportQty && !product?.isDigital && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16 }}>
           <span style={{ fontSize: '.84rem', fontWeight: 600 }}>{t.qty}</span>
           <span style={{ display: 'inline-flex', alignItems: 'center', border: `1px solid ${BD}`, borderRadius: 10, background: BG }}>
@@ -1491,7 +1520,7 @@ export function ProductForm({
         </div>
       )}
 
-      {!isOrderNow && (
+      {!isOrderNow && !product?.isDigital && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <button type="button" className="tk-btnp" style={btnPrimary} onClick={() => setIsOrderNow(true)}>
             {t.orderNow}
@@ -1504,7 +1533,7 @@ export function ProductForm({
         </div>
       )}
 
-      {isOrderNow && (
+      {(isOrderNow || product?.isDigital) && (
         <div className="tk-fade">
           <div style={{ marginBottom: 13 }}>
             <label style={label} htmlFor="tk-name">{t.fullName}</label>
@@ -1523,66 +1552,117 @@ export function ProductForm({
             <ErrLine msg={errs.customerPhone} />
           </div>
 
-          <div className="tk-form-2" style={{ marginBottom: 13 }}>
-            <div>
-              <label style={label} htmlFor="tk-wil">{t.wilaya}</label>
-              <div style={{ position: 'relative' }}>
-                <ChevronDown size={14} color={SUB} style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
-                <select id="tk-wil" disabled={wilayas.length === 0}
-                  style={{ ...inputBase, paddingInlineEnd: 36, ...(errs.customerWelaya ? { borderColor: ERR } : {}) }}
-                  value={fd.customerWelaya}
-                  onChange={(e) => setFd((s) => ({ ...s, customerWelaya: e.target.value, customerCommune: '' }))}>
-                  <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
-                  {wilayas.map((w) => (
-                    <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>
-                  ))}
-                </select>
+          {product?.isDigital ? (
+            <div style={{ marginBottom: 16 }}>
+              <span style={label}>{t.contactQuestion}</span>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 13 }}>
+                <button type="button" onClick={() => { setContactMethod('email'); set('customerWhatsapp', ''); }}
+                  style={{
+                    minHeight: 46, padding: '0 10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                    cursor: 'pointer', fontFamily: 'inherit', fontSize: '.8rem',
+                    borderRadius: 10, background: contactMethod === 'email' ? AL : CARD,
+                    border: `1px solid ${contactMethod === 'email' ? A : BD}`, color: contactMethod === 'email' ? A : SUB,
+                    fontWeight: contactMethod === 'email' ? 600 : 400, transition: 'all .2s',
+                  }}>
+                  <Mail size={14} />{t.contactViaEmail}
+                </button>
+                <button type="button" onClick={() => { setContactMethod('whatsapp'); set('customerEmail', ''); }}
+                  style={{
+                    minHeight: 46, padding: '0 10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                    cursor: 'pointer', fontFamily: 'inherit', fontSize: '.8rem',
+                    borderRadius: 10, background: contactMethod === 'whatsapp' ? AL : CARD,
+                    border: `1px solid ${contactMethod === 'whatsapp' ? A : BD}`, color: contactMethod === 'whatsapp' ? A : SUB,
+                    fontWeight: contactMethod === 'whatsapp' ? 600 : 400, transition: 'all .2s',
+                  }}>
+                  <MessageCircle size={14} />{t.contactViaWhatsapp}
+                </button>
               </div>
-              <ErrLine msg={errs.customerWelaya} />
+              {contactMethod === 'email' ? (
+                <div>
+                  <label style={label} htmlFor="tk-email">{t.orderEmail}</label>
+                  <input id="tk-email" type="email" dir="ltr" inputMode="email"
+                    style={{ ...inputBase, ...(errs.customerEmail ? { borderColor: ERR } : {}) }}
+                    value={fd.customerEmail} placeholder={t.emailPh}
+                    onChange={(e) => set('customerEmail', e.target.value)} />
+                  <ErrLine msg={errs.customerEmail} />
+                </div>
+              ) : (
+                <div>
+                  <label style={label} htmlFor="tk-whatsapp">{t.whatsapp}</label>
+                  <input id="tk-whatsapp" type="tel" dir="ltr" inputMode="tel"
+                    style={{ ...inputBase, ...(errs.customerWhatsapp ? { borderColor: ERR } : {}) }}
+                    value={fd.customerWhatsapp} placeholder={t.whatsappPh}
+                    onChange={(e) => set('customerWhatsapp', e.target.value)} />
+                  <ErrLine msg={errs.customerWhatsapp} />
+                </div>
+              )}
             </div>
+          ) : (
+            <>
+              <div className="tk-form-2" style={{ marginBottom: 13 }}>
+                <div>
+                  <label style={label} htmlFor="tk-wil">{t.wilaya}</label>
+                  <div style={{ position: 'relative' }}>
+                    <ChevronDown size={14} color={SUB} style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                    <select id="tk-wil" disabled={wilayas.length === 0}
+                      style={{ ...inputBase, paddingInlineEnd: 36, ...(errs.customerWelaya ? { borderColor: ERR } : {}) }}
+                      value={fd.customerWelaya}
+                      onChange={(e) => setFd((s) => ({ ...s, customerWelaya: e.target.value, customerCommune: '' }))}>
+                      <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
+                      {wilayas.map((w) => (
+                        <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <ErrLine msg={errs.customerWelaya} />
+                </div>
 
-            <div>
-              <label style={label} htmlFor="tk-com">{t.commune}</label>
-              <div style={{ position: 'relative' }}>
-                <ChevronDown size={14} color={SUB} style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
-                <select id="tk-com" disabled={!fd.customerWelaya || loadingC}
-                  style={{ ...inputBase, paddingInlineEnd: 36, ...(errs.customerCommune ? { borderColor: ERR } : {}) }}
-                  value={fd.customerCommune}
-                  onChange={(e) => set('customerCommune', e.target.value)}>
-                  <option value="">{loadingC ? t.communeLoading : t.communePlaceholder}</option>
-                  {communes.map((c) => (
-                    <option key={c.id} value={c.id}>{t.dir === 'rtl' ? c.ar_name : c.name}</option>
-                  ))}
-                </select>
+                <div>
+                  <label style={label} htmlFor="tk-com">{t.commune}</label>
+                  <div style={{ position: 'relative' }}>
+                    <ChevronDown size={14} color={SUB} style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                    <select id="tk-com" disabled={!fd.customerWelaya || loadingC}
+                      style={{ ...inputBase, paddingInlineEnd: 36, ...(errs.customerCommune ? { borderColor: ERR } : {}) }}
+                      value={fd.customerCommune}
+                      onChange={(e) => set('customerCommune', e.target.value)}>
+                      <option value="">{loadingC ? t.communeLoading : t.communePlaceholder}</option>
+                      {communes.map((c) => (
+                        <option key={c.id} value={c.id}>{t.dir === 'rtl' ? c.ar_name : c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <ErrLine msg={errs.customerCommune} />
+                </div>
               </div>
-              <ErrLine msg={errs.customerCommune} />
-            </div>
-          </div>
 
-          <div style={{ marginBottom: 16 }}>
-            <span style={label}>{t.delivery}</span>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              {([['home', t.deliveryHome], ['office', t.deliveryOffice]] as const).map(([k, l]) => {
-                const active = fd.typeLivraison === k;
-                return (
-                  <button key={k} type="button" onClick={() => set('typeLivraison', k)}
-                    style={{
-                      minHeight: 46, padding: '0 10px', cursor: 'pointer', fontFamily: 'inherit', fontSize: '.8rem',
-                      borderRadius: 10, background: active ? AL : CARD,
-                      border: `1px solid ${active ? A : BD}`, color: active ? A : SUB,
-                      fontWeight: active ? 600 : 400, transition: 'all .2s',
-                    }}>
-                    {l}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+              <div style={{ marginBottom: 16 }}>
+                <span style={label}>{t.delivery}</span>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  {([['home', t.deliveryHome], ['office', t.deliveryOffice]] as const).map(([k, l]) => {
+                    const active = fd.typeLivraison === k;
+                    return (
+                      <button key={k} type="button" onClick={() => set('typeLivraison', k)}
+                        style={{
+                          minHeight: 46, padding: '0 10px', cursor: 'pointer', fontFamily: 'inherit', fontSize: '.8rem',
+                          borderRadius: 10, background: active ? AL : CARD,
+                          border: `1px solid ${active ? A : BD}`, color: active ? A : SUB,
+                          fontWeight: active ? 600 : 400, transition: 'all .2s',
+                        }}>
+                        {l}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
 
           <div style={{ marginBottom: 16, padding: '4px 14px 12px', background: BG, border: `1px solid ${BD}`, borderRadius: 14 }}>
             <Row l={t.price} v={`${fmt(fp)} ${cur(store)}`} />
             <Row l={t.qty} v={`× ${qty}`} />
-            <Row l={t.delivery} v={!selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${fmt(getLiv())} ${cur(store)}`} />
+            {!product?.isDigital && (
+              <Row l={t.delivery} v={!selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${fmt(getLiv())} ${cur(store)}`} />
+            )}
             <Row l={t.total} v={`${fmt(total())} ${cur(store)}`} strong />
           </div>
 
@@ -1596,10 +1676,12 @@ export function ProductForm({
             <button type="button" className="tk-btnp" style={btnPrimary} onClick={submitOrder} disabled={submitting}>
               {submitting ? t.sending : t.confirmOrder}
             </button>
-            <button type="button" className="tk-btng" style={{ ...btnGhost, color: SUB }}
-              onClick={() => setIsOrderNow(false)} disabled={submitting}>
-              {t.cancel}
-            </button>
+            {!product?.isDigital && (
+              <button type="button" className="tk-btng" style={{ ...btnGhost, color: SUB }}
+                onClick={() => setIsOrderNow(false)} disabled={submitting}>
+                {t.cancel}
+              </button>
+            )}
           </div>
         </div>
       )}

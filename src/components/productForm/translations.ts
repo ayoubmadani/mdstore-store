@@ -11,6 +11,13 @@ export interface ProductFormStrings {
   fullName: string;
   fullNamePlaceholder: string;
   phone: string;
+  email: string;
+  emailPlaceholder: string;
+  whatsapp: string;
+  whatsappPlaceholder: string;
+  contactQuestion: string;
+  contactViaEmail: string;
+  contactViaWhatsapp: string;
   wilaya: string;
   selectWilaya: string;
   commune: string;
@@ -35,6 +42,8 @@ export interface ProductFormStrings {
   secure: string;
   errorName: string;
   errorPhone: string;
+  errorEmail: string;
+  errorWhatsapp: string;
   errorWilaya: string;
   errorCommune: string;
   errorQuantity: string;
@@ -53,6 +62,13 @@ const TRANSLATIONS: Record<ProductFormLanguage, ProductFormStrings> = {
     fullName: 'الاسم الكامل',
     fullNamePlaceholder: 'محمد أحمد',
     phone: 'رقم الهاتف',
+    email: 'البريد الإلكتروني',
+    emailPlaceholder: 'example@email.com',
+    whatsapp: 'رقم واتساب',
+    whatsappPlaceholder: '0550123456',
+    contactQuestion: 'هل تملك بريداً إلكترونياً أم واتساب؟',
+    contactViaEmail: 'البريد الإلكتروني',
+    contactViaWhatsapp: 'واتساب',
     wilaya: 'الولاية',
     selectWilaya: 'اختر الولاية',
     commune: 'البلدية',
@@ -77,6 +93,8 @@ const TRANSLATIONS: Record<ProductFormLanguage, ProductFormStrings> = {
     secure: 'بياناتك آمنة ومشفرة 100%',
     errorName: 'الاسم الكامل مطلوب (3 أحرف على الأقل)',
     errorPhone: 'رقم هاتف جزائري صحيح مطلوب (مثال: 0550123456)',
+    errorEmail: 'يرجى إدخال بريد إلكتروني صحيح',
+    errorWhatsapp: 'رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)',
     errorWilaya: 'اختر الولاية',
     errorCommune: 'اختر البلدية',
     errorQuantity: 'الكمية يجب أن تكون 1 على الأقل',
@@ -93,6 +111,13 @@ const TRANSLATIONS: Record<ProductFormLanguage, ProductFormStrings> = {
     fullName: 'Nom complet',
     fullNamePlaceholder: 'Mohamed Ahmed',
     phone: 'Numéro de téléphone',
+    email: 'E-mail',
+    emailPlaceholder: 'exemple@email.com',
+    whatsapp: 'Numéro WhatsApp',
+    whatsappPlaceholder: '0550123456',
+    contactQuestion: 'Avez-vous un e-mail ou un numéro WhatsApp ?',
+    contactViaEmail: 'E-mail',
+    contactViaWhatsapp: 'WhatsApp',
     wilaya: 'Wilaya',
     selectWilaya: 'Choisir la wilaya',
     commune: 'Commune',
@@ -117,6 +142,8 @@ const TRANSLATIONS: Record<ProductFormLanguage, ProductFormStrings> = {
     secure: 'Vos données sont sécurisées et cryptées à 100%',
     errorName: 'Le nom complet est requis (3 caractères minimum)',
     errorPhone: 'Numéro de téléphone algérien valide requis (ex: 0550123456)',
+    errorEmail: 'Veuillez saisir une adresse e-mail valide',
+    errorWhatsapp: 'Numéro WhatsApp algérien valide requis (ex: 0550123456)',
     errorWilaya: 'Choisissez la wilaya',
     errorCommune: 'Choisissez la commune',
     errorQuantity: 'La quantité doit être au moins 1',
@@ -133,6 +160,13 @@ const TRANSLATIONS: Record<ProductFormLanguage, ProductFormStrings> = {
     fullName: 'Full name',
     fullNamePlaceholder: 'John Doe',
     phone: 'Phone number',
+    email: 'Email',
+    emailPlaceholder: 'example@email.com',
+    whatsapp: 'WhatsApp number',
+    whatsappPlaceholder: '0550123456',
+    contactQuestion: 'Do you have an email or a WhatsApp number?',
+    contactViaEmail: 'Email',
+    contactViaWhatsapp: 'WhatsApp',
     wilaya: 'Province',
     selectWilaya: 'Select province',
     commune: 'District',
@@ -157,6 +191,8 @@ const TRANSLATIONS: Record<ProductFormLanguage, ProductFormStrings> = {
     secure: 'Your data is 100% secure and encrypted',
     errorName: 'Full name is required (at least 3 characters)',
     errorPhone: 'A valid Algerian phone number is required (e.g. 0550123456)',
+    errorEmail: 'Please enter a valid email address',
+    errorWhatsapp: 'A valid Algerian WhatsApp number is required (e.g. 0550123456)',
     errorWilaya: 'Select the province',
     errorCommune: 'Select the district',
     errorQuantity: 'Quantity must be at least 1',

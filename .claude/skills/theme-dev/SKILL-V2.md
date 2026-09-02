@@ -1,6 +1,6 @@
 ---
 name: theme-dev-v2
-description: "v2 — دليل تطوير ثيمات MdStore: بنية الملفات، أنماط i18n (ar/fr/en)، أخطاء BiDi/RTL، CSS في flex containers، variant filtering، image attr display، bundle command، قواعد ثابتة للـ Navbar/Footer/Hero، حقول Free Shipping / Qty Support على store وproduct وoffer، صفحات static إضافية (additionalPages) خارج الأربع الأساسية، وexport `Success` الإلزامي لصفحة نجاح الطلب."
+description: "v2 — دليل تطوير ثيمات MdStore: بنية الملفات، أنماط i18n (ar/fr/en)، أخطاء BiDi/RTL، CSS في flex containers، variant filtering، image attr display، bundle command، قواعد ثابتة للـ Navbar/Footer/Hero، حقول Free Shipping / Qty Support على store وproduct وoffer، صفحات static إضافية (additionalPages) خارج الأربع الأساسية، export `Success` الإلزامي لصفحة نجاح الطلب، ومنتج رقمي (product.isDigital) — لا شحن، الزائر يختار بريد إلكتروني أو واتساب عبر زرّي تبديل بدل عنوان، لا يدخل السلة."
 ---
 
 # Theme Dev v2 — دليل تطوير ثيمات MdStore
@@ -19,6 +19,7 @@ description: "v2 — دليل تطوير ثيمات MdStore: بنية الملف
 - تصحيح أخطاء بصرية في الثيم (محاذاة، overflow، ألوان)
 - إضافة فلترة المتغيرات (variant filtering)
 - تصحيح عرض الـ attributes (صور/ألوان/نص)
+- إضافة دعم "منتج رقمي" (`product.isDigital`) — لا شحن، الزائر يختار بريد إلكتروني أو واتساب بدل عنوان (انظر §23)
 
 ---
 
@@ -526,6 +527,8 @@ node scripts/bundle-themes.mjs
 - [ ] `offer.subTitle` يُعرض تحت اسم العرض إذا موجود (انظر §19)
 - [ ] `export function Success({ store, order }: ...)` موجود في الملف — تحقق بـ `grep -L "export function Success" src/theme/*.tsx` (انظر §22)
 - [ ] الفوتر: "روابط سريعة" و"قانوني" عمودان منفصلان (لا مصفوفة واحدة تجمع الستة روابط) — تحقق من وجود `t.legalNav` (انظر §11)
+- [ ] منتج رقمي (`product.isDigital`): لا شحن، لا كمية، لا زر سلة، زرّا تبديل بريد/واتساب (مفتاح البريد `orderEmail` وليس `email`) (انظر §23)
+- [ ] سطر "السعر" في ملخص الطلب يعرض السعر الفعلي (`fp`)، ليس اسم المنتج — خطأ نسخ-ولصق شائع في هذه العائلة من الثيمات (انظر §23)
 - [ ] تم تشغيل `node scripts/bundle-themes.mjs --slug=<name>`
 
 ---
@@ -1064,5 +1067,187 @@ grep -L "export function Success" src/theme/*.tsx
 - [ ] لا استيراد أيقونات جديدة إذا كانت موجودة أصلاً في الملف — أعد استخدام ما هو مستورد (Check/CheckCircle2, Phone, Package, Truck أو ما يعادلها)
 - [ ] الزرّان (`shopNow`/`backToShop`) يوجّهان لـ `/` بدون domain (نفس قاعدة §17)
 - [ ] تم تشغيل `node scripts/bundle-themes.mjs --slug=<name>` والتحقق من محتوى S3 المرفوع فعلياً
+
+---
+
+## 23. منتج رقمي (`product.isDigital`) — لا شحن، الزائر يختار بريد إلكتروني أو واتساب بدل عنوان
+
+أُضيف هذا الحقل من الـ API (2026-09-01). اختياري عند القراءة، `false` افتراضياً — إذا كان الثيم لا يتعامل معه، يبقى يعمل بسلوكه القديم (كل منتج يُعامَل كمنتج عادي).
+
+**تحديث 2026-09-01:** التصميم الأولي كان بريد إلكتروني فقط. تم تغييره لاحقاً بطلب من المستخدم — الزائر يختار بين البريد أو رقم واتساب عبر **زرّي تبديل بسيطين** (بريد / واتساب)، وليس بريداً إلزامياً. السبب: بعض الزوار يفضّلون واتساب على البريد للتواصل السريع. الأمثلة أدناه تعكس هذا التصميم النهائي.
+
+### الفكرة
+
+`product.isDigital === true` يعني: لا يوجد شحن فعلي لهذا المنتج (رخصة/ملف/اشتراك، وليس سلعة تُشحَن). هذا يُغيّر `ProductForm` وحده — **`Cart` لا يحتاج أي تعديل إطلاقاً**، لأن منتجاً رقمياً لا يدخل السلة أصلاً (انظر التبرير أدناه):
+
+| العنصر | سلوك عادي | سلوك `isDigital: true` |
+|--------|-----------|------------------------|
+| حقول الشحن (ولاية/بلدية/نوع التوصيل) | تُعرض وتُطلَب | **تُستبدَل بالكامل** بزرّي تبديل (بريد/واتساب) + حقل واحد حسب الاختيار |
+| تكلفة التوصيل | تُحسب من `getLiv()` | `0` دائماً — `getLiv()` تُرجع `0` كأول سطر |
+| الكمية | stepper حسب `supportQty` | **مخفية بالكامل** (ليس فقط مقفلة على 1 كما في §19 — منتج رقمي = نسخة واحدة، لا "كمية") |
+| زر "أضف للسلة" | يظهر إذا `store.cart` | **مخفي بالكامل** — لا يدخل السلة إطلاقاً |
+| `Cart` | يعرض كل عناصر السلة | **بلا أي تعديل** — بما أن الزر أعلاه مخفي، منتج رقمي لا يصل إليه أبداً |
+
+**لماذا لا يدخل السلة؟** الطلب الواحد (Order) له عميل/شحن واحد فقط في الـ backend. لا يمكن الجمع بين منتج رقمي (يحتاج بريداً إلكترونياً) ومنتج عادي (يحتاج عنواناً) في نفس الطلب — لذا منتج رقمي هو "اطلب الآن" مباشرة فقط، أبسط من محاولة دعمه داخل منطق السلة متعدد العناصر.
+
+### التعديلات المطلوبة — كلها داخل `ProductForm` فقط
+
+```tsx
+// 1. الحقل في الـ interface
+export interface Product {
+  ...
+  isDigital?: boolean;
+}
+
+// 2. حالة النموذج — أضف الحقلين + حالة اختيار طريقة التواصل، لا تحذف حقول الشحن (تبقى تُستخدَم للمنتج العادي)
+const [fd, setFd] = useState({ ..., customerEmail: '', customerWhatsapp: '', ... });
+const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
+
+// 3. getLiv — أول سطر في الدالة، قبل أي فحص آخر (بما فيها الشحن المجاني §19)
+const getLiv = useCallback((): number => {
+  if (product.isDigital) return 0;
+  if (orderFreeShipping) return 0;
+  ...
+}, [..., product.isDigital]);
+
+// 4. validate — استبدال الفرع، وليس إضافة شرط فوق الموجود. تحقق حسب contactMethod المختار
+const validate = () => {
+  const e: Record<string, string> = {};
+  if (!fd.customerName.trim()) e.customerName = t.errName;
+  if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
+  if (product.isDigital) {
+    if (contactMethod === 'email') {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
+    } else {
+      if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
+    }
+  } else {
+    if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
+    if (!fd.customerCommune) e.customerCommune = t.errCommune;
+  }
+  return e;
+};
+
+// 5. handleSubmit — لا تُرسِل حقول الشحن لمنتج رقمي، ولا تُرسِل كلا حقلي التواصل معاً
+//    (destructure الكل ثم spread شرطي حسب contactMethod — لا ترسل قيماً فارغة أو حقلاً غير مستخدَم)
+const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
+const payload = product.isDigital
+  ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+  : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
+await axios.post(`${API_URL}/orders/create`, { ...payload, quantity: qty, productId: product.id, ... });
+
+// 6. زر "أضف للسلة" / "اطلب الآن" — أخفِ كتلة السلة بالكامل لمنتج رقمي،
+//    واجعل النموذج يظهر مباشرة بدل انتظار ضغطة "اطلب الآن" (لأن زر تفعيلها غير موجود أصلاً)
+{product.store.cart && !product.isDigital && (
+  <div className="cart-add-btns">{/* addToCart + setIsOrderNow(true) */}</div>
+)}
+{(isOrderNow || !product.store.cart || product.isDigital) && (
+  <div className="anim-slide-fade">
+    {product.store.cart && !product.isDigital && (
+      <div>{/* عنوان "نوع التوصيل" + زر رجوع setIsOrderNow(false) */}</div>
+    )}
+    <form onSubmit={handleSubmit}>...</form>
+  </div>
+)}
+
+// 7. JSX — استبدال كامل لكتلة الشحن بزرّي تبديل + حقل واحد شرطي، وليس بريداً وحيداً بلا اختيار
+// `accentColor` هنا رمزي — كل ثيم له لونه الخاص (hex ثابت غالباً، مثل '#1D4ED8' في blue
+// أو '#E63946' في red)؛ استخدم نفس اللون المستخدَم أصلاً في أزرار delivery-grid لهذا الثيم
+// بالتحديد، لا تخترع لوناً جديداً.
+{product.isDigital ? (
+  <div>
+    {/* سؤال صريح فوق الزرّين مباشرة — لا تفترض أن الأيقونتين وحدهما كافيتان لتوضيح الاختيار */}
+    <p style={{ fontSize: '0.775rem', fontWeight: 700, color: '#555', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.contactQuestion}</p>
+    <div style={{ display: 'flex', borderRadius: 10, overflow: 'hidden', border: '1.5px solid #E8E8E8', marginBottom: '0.75rem' }}>
+      <button type="button" onClick={() => setContactMethod('email')}
+        style={{ flex: 1, /* ... */ background: contactMethod === 'email' ? accentColor : 'transparent', color: contactMethod === 'email' ? '#fff' : '#555' }}>
+        <Mail size={14} />{t.contactViaEmail}
+      </button>
+      <button type="button" onClick={() => setContactMethod('whatsapp')}
+        style={{ flex: 1, /* ... */ background: contactMethod === 'whatsapp' ? accentColor : 'transparent', color: contactMethod === 'whatsapp' ? '#fff' : '#555' }}>
+        <MessageCircle size={14} />{t.contactViaWhatsapp}
+      </button>
+    </div>
+    {contactMethod === 'email' ? (
+      <FR error={errors.customerEmail} label={t.orderEmail}>
+        <input type="email" dir="ltr" value={fd.customerEmail}
+          onChange={e => setFd({ ...fd, customerEmail: e.target.value })}
+          placeholder={t.emailPh} style={inp(!!errors.customerEmail)} />
+      </FR>
+    ) : (
+      <FR error={errors.customerWhatsapp} label={t.whatsapp}>
+        <input type="tel" dir="ltr" value={fd.customerWhatsapp}
+          onChange={e => setFd({ ...fd, customerWhatsapp: e.target.value })}
+          placeholder={t.whatsappPh} style={inp(!!errors.customerWhatsapp)} />
+      </FR>
+    )}
+  </div>
+) : (
+  <>{/* form-row-2 (wilaya + commune) ثم delivery-grid — دون أي تغيير */}</>
+)}
+
+// 8. الكمية — إخفاء كامل، وليس فقط قفل على 1
+{supportQty && !product.isDigital && (
+  <div>{/* qty stepper */}</div>
+)}
+
+// 9. سطر "التوصيل" في ملخص الطلب — يُحذف بالكامل، وليس معروضاً بـ "0 DZD"
+{[
+  { l: t.product, v: product.name.slice(0, 26) + '...' },
+  { l: t.price, v: `${fp.toLocaleString()} ${currency}` },
+  ...(product.isDigital ? [] : [{ l: t.delivery, v: ... }]),
+].map(r => (...))}
+```
+
+### ⚠️ خطأ حقيقي اكتُشف أثناء التطبيق الفعلي (2026-09-01): تعارض اسم مفتاح `email`
+
+كل ثيمات هذه العائلة (`color-*-rush-*`، وعلى الأرجح غيرها أيضاً — تحقق دائماً) تحتوي مسبقاً على مفتاح ترجمة `email` خاص بصفحة "اتصل بنا" (`Contact`). إضافة مفتاح جديد باسم `email` لحقل البريد في نموذج الطلب **يُنتج خاصية مكرَّرة في نفس object literal** — `jsonAr`/`jsonFr`/`jsonEn` كائنات مسطّحة واحدة لكل الثيم بأكمله، غير مقسّمة حسب المكوّن. النتيجة: فشل `tsc` بـ `TS1117: An object literal cannot have multiple properties with the same name`، والقيمة الفعلية وقت التشغيل هي آخر تعريف فقط (يُلغي الأول بصمت).
+
+**الحل: استخدم `orderEmail` (وليس `email`) لحقل البريد الخاص بالطلب** — في الترجمات الثلاث والـ JSX معاً. لا تلمس مفتاح `email` الأصلي لصفحة الاتصال إطلاقاً.
+
+```tsx
+// ✗ خطأ — يتعارض مع email الموجود مسبقاً لصفحة Contact في نفس الملف
+email: 'البريد الإلكتروني',
+
+// ✓ صحيح
+orderEmail: 'البريد الإلكتروني',
+```
+
+**كيف تكتشفه:** شغّل `npx tsc --noEmit -p tsconfig.json | grep <اسم الملف>` بعد كل إضافة مفتاح جديد — أي `TS1117` على السطر الذي أضفته للتو يعني تعارض اسم. أو، قبل الإضافة أصلاً: `grep -n "^\s*email: " src/theme/<file>.tsx` — إن ظهر أكثر من نتيجة فالاسم محجوز.
+
+نفس الفحص ينطبق على المفاتيح الجديدة لواتساب (`whatsapp`, `whatsappPh`, `errWhatsapp`, `contactViaEmail`, `contactViaWhatsapp`) — لم تظهر أي تعارضات معها في `color-electric-blue-rush-theme.tsx` أو `color-bold-red-rush-ecommerce-theme.tsx`، لكن تحقق دائماً بنفس طريقة `grep` قبل الإضافة في كل ثيم جديد، فبعض الثيمات قد تملك مفتاح `whatsapp` مسبقاً (مثلاً كأيقونة تواصل في الـ Footer).
+
+### ⚠️ خلل موجود مسبقاً في نفس الثيمات، اكتُشف أثناء نفس العمل (غير ناتج عن منتج رقمي، لكن يظهر بوضوح بعد حذف سطر التوصيل)
+
+في ملخص الطلب (Summary)، بعض الثيمات (مؤكَّد في `color-electric-blue-rush-theme.tsx` و`color-bold-red-rush-ecommerce-theme.tsx`، افحص البقية بنفس الطريقة) فيها سطر بعنوان `t.price` ("السعر") لكن قيمته الفعلية **اسم المنتج** (`product.name.slice(...)`) — خطأ نسخ-ولصق أصلي، لا يوجد مفتاح `t.product` في الملف أصلاً، ولا سطر سعر حقيقي منفصل.
+
+```tsx
+// ✗ الخطأ الأصلي — التسمية "السعر" لكن القيمة اسم المنتج
+{ l: t.price, v: product.name.slice(0, 26) + (product.name.length > 26 ? '...' : '') },
+
+// ✓ الإصلاح — سطر منتج بتسمية صحيحة + سطر سعر حقيقي منفصل
+{ l: t.product, v: product.name.slice(0, 26) + (product.name.length > 26 ? '...' : '') },
+{ l: t.price, v: `${fp.toLocaleString()} ${currency}` },
+```
+
+أضف `product: 'المنتج'` / `'Produit'` / `'Product'` لملفات الترجمة الثلاث عند إصلاح هذا. أصلحه كلما مررت على ثيم لإضافة منتج رقمي — نفس منطق §20 (ليس سببه هذا التعديل، لكن سهل الاكتشاف والإصلاح أثناء المرور، ولا تتركه فقط لأنه غير مرتبط).
+
+### قائمة تحقق إضافية (أضِفها لقائمة §15)
+
+- [ ] `Product` interface يحتوي `isDigital?: boolean`
+- [ ] `fd`/`formData` يحتوي `customerEmail: ''` و`customerWhatsapp: ''`، بالإضافة إلى حالة `contactMethod` (`'email' | 'whatsapp'`, افتراضي `'email'`)
+- [ ] سؤال نصي (`t.contactQuestion`، مثال: "هل تملك بريداً إلكترونياً أم واتساب؟") يظهر فوق زرّي التبديل مباشرة — وليس زرّين بلا أي شرح للاختيار
+- [ ] مفتاح الترجمة الجديد اسمه `orderEmail` وليس `email` — تحقق أولاً أن `email` غير مستخدَم مسبقاً في نفس الملف (`grep -n "^\s*email: "`)؛ نفس الفحص لمفاتيح `whatsapp`/`whatsappPh`/`errWhatsapp`/`contactViaEmail`/`contactViaWhatsapp` قبل إضافتها
+- [ ] زرّا التبديل (بريد/واتساب) يستخدمان لون الثيم الفعلي (نفس المستخدَم في `delivery-grid`)، وليس لوناً عاماً مخترعاً
+- [ ] `getLiv()` تُرجع `0` فوراً إذا `product.isDigital` (أول سطر في الدالة، قبل فحص الشحن المجاني)
+- [ ] `validate()`: فرع `if (product.isDigital)` يتفرّع بدوره حسب `contactMethod` — بريد أو واتساب، وليس كلاهما معاً؛ وإلا الولاية/البلدية كالمعتاد للمنتج العادي
+- [ ] `handleSubmit`: حقول الشحن لا تُرسَل إطلاقاً لمنتج رقمي، وحقل التواصل غير المختار (`customerEmail` أو `customerWhatsapp`) لا يُرسَل أيضاً — فقط الحقل المطابق لـ `contactMethod`
+- [ ] زر "أضف للسلة" مخفي بالكامل لمنتج رقمي، والنموذج يظهر مباشرة بدلاً منه
+- [ ] حقل الكمية مخفي بالكامل لمنتج رقمي (وليس مقفلاً على 1 فقط كما في §19)
+- [ ] سطر "التوصيل" في ملخص الطلب محذوف بالكامل لمنتج رقمي (وليس معروضاً بقيمة 0)
+- [ ] `Cart` **بلا أي تعديل** — منتج رقمي لا يدخله إطلاقاً بما أن زر الإضافة مخفي
+- [ ] سطر "السعر" في ملخص الطلب يعرض السعر الفعلي (`fp`)، وليس اسم المنتج — أصلحه إن وُجد بغض النظر عن ارتباطه بمنتج رقمي (انظر التحذير أعلاه)
+- [ ] `npx tsc --noEmit` و`npx eslint <file>` قبل التعديل (`git stash`) وبعده — قارن العدد، الهدف عدم زيادة الأخطاء لا حذف كل القديم منها
+- [ ] تم تشغيل `node scripts/bundle-themes.mjs --slug=<name>`
 
 ---

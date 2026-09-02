@@ -39,6 +39,7 @@ interface Product {
   productImage?: string; imagesProduct?: ProductImage[];
   offers?: Offer[]; attributes?: Attribute[];
   variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
+  isDigital?: boolean;
   store: { id: string; name: string; subdomain: string; userId: string; pixels?: Pixel[]; };
 }
 interface LandingPage {

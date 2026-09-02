@@ -5,7 +5,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
-import { Star, ChevronDown, AlertCircle, X, CheckCircle2, Shield, ArrowLeft, Plus, Minus, Search, ShoppingCart, Trash2, Loader2, ChevronLeft, ChevronRight, Phone, Package, Truck } from 'lucide-react';
+import { Star, ChevronDown, AlertCircle, X, CheckCircle2, Shield, ArrowLeft, Plus, Minus, Search, ShoppingCart, Trash2, Loader2, ChevronLeft, ChevronRight, Phone, Package, Truck, Mail, MessageCircle, Download } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
@@ -89,7 +89,7 @@ interface VariantAttributeEntry{attrId:string;attrName:string;displayMode:'color
 interface VariantDetail{id:string|number;name:VariantAttributeEntry[];price:number;stock:number;autoGenerate:boolean}
 interface Wilaya{id:string;name:string;ar_name:string;livraisonHome:number;livraisonOfice:number;livraisonReturn:number}
 interface Commune{id:string;name:string;ar_name:string;wilayaId:string}
-export interface Product{id:string;name:string;price:string|number;priceOriginal?:string|number;desc?:string;productImage?:string;imagesProduct?:ProductImage[];offers?:Offer[];attributes?:Attribute[];variantDetails?:VariantDetail[];stock?:number;isActive?:boolean;shippingFree?:boolean;store:{id:string;name:string;subdomain:string;userId:string;cart?:boolean;supportQty?:boolean;supportFreeShipping?:boolean;freeShippingMinAmount?:number|null}}
+export interface Product{id:string;name:string;price:string|number;priceOriginal?:string|number;desc?:string;productImage?:string;imagesProduct?:ProductImage[];offers?:Offer[];attributes?:Attribute[];variantDetails?:VariantDetail[];stock?:number;isActive?:boolean;shippingFree?:boolean;isDigital?:boolean;store:{id:string;name:string;subdomain:string;userId:string;cart?:boolean;supportQty?:boolean;supportFreeShipping?:boolean;freeShippingMinAmount?:number|null}}
 export interface ProductFormProps{product:Product;userId:string;domain:string;selectedOffer:string|null;setSelectedOffer:(id:string|null)=>void;selectedVariants:Record<string,string>;platform?:string;priceLoss?:number;store?:any}
 
 const vm=(d:VariantDetail,s:Record<string,string>)=>Object.entries(s).every(([n,v])=>d.name.some(e=>e.attrName===n&&e.value===v));
@@ -134,6 +134,15 @@ const jsonAr = {
   phonePh: '05xxxxxxxx',
   errPhone: 'رقم الهاتف مطلوب',
   errPhoneInvalid: 'رقم هاتف غير صالح',
+  orderEmail: 'البريد الإلكتروني',
+  emailPh: 'example@email.com',
+  errEmail: 'يرجى إدخال بريد إلكتروني صحيح',
+  whatsapp: 'رقم واتساب',
+  whatsappPh: '0550123456',
+  errWhatsapp: 'رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)',
+  contactQuestion: 'هل تملك بريداً إلكترونياً أم واتساب؟',
+  contactViaEmail: 'البريد الإلكتروني',
+  contactViaWhatsapp: 'واتساب',
   wilaya: 'الولاية',
   errWilaya: 'الولاية مطلوبة',
   wilayaPh: 'اختر الولاية',
@@ -255,6 +264,15 @@ const jsonFr = {
   phonePh: '0555 12 34 56',
   errPhone: 'Le numéro de téléphone est requis',
   errPhoneInvalid: 'Numéro de téléphone invalide',
+  orderEmail: 'E-mail',
+  emailPh: 'exemple@email.com',
+  errEmail: 'Veuillez saisir une adresse e-mail valide',
+  whatsapp: 'Numéro WhatsApp',
+  whatsappPh: '0550123456',
+  errWhatsapp: 'Numéro WhatsApp algérien valide requis (ex: 0550123456)',
+  contactQuestion: 'Avez-vous un e-mail ou un numéro WhatsApp ?',
+  contactViaEmail: 'E-mail',
+  contactViaWhatsapp: 'WhatsApp',
   wilaya: 'Wilaya',
   errWilaya: 'Sélectionnez une wilaya',
   wilayaPh: 'Choisir la wilaya',
@@ -561,7 +579,7 @@ export function Card({product,displayImage,discount,store}:any){
           {displayImage?<img src={displayImage} alt={product.name}/>
             :<div style={{width:'100%',aspectRatio:'3/4',background:'var(--s2)',display:'flex',alignItems:'center',justifyContent:'center'}}><span style={{fontSize:'2rem',color:'var(--br2)'}}>?</span></div>}
           {discount>0&&<span style={{position:'absolute',top:10,right:10,background:'var(--cp)',color:'var(--bg)',fontSize:'9px',fontWeight:800,padding:'3px 8px',letterSpacing:'0.1em',fontFamily:"'Raleway',sans-serif"}}>-{discount}%</span>}
-          {product.shippingFree&&<span style={{position:'absolute',top:10,left:10,background:'var(--tx)',color:'var(--bg)',fontSize:'9px',fontWeight:800,padding:'3px 8px'}}>🚚</span>}
+          {product.isDigital?<span style={{position:'absolute',top:10,left:10,background:'var(--cp)',color:'var(--bg)',fontSize:'9px',fontWeight:800,padding:'3px 8px',display:'flex',alignItems:'center'}}><Download style={{width:12,height:12}}/></span>:product.shippingFree&&<span style={{position:'absolute',top:10,left:10,background:'var(--tx)',color:'var(--bg)',fontSize:'9px',fontWeight:800,padding:'3px 8px'}}>🚚</span>}
         </div>
         <div style={{padding:'12px 2px 0'}}>
           <p style={{fontSize:'13px',fontWeight:500,color:'var(--tx)',lineHeight:1.35,marginBottom:6,display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical',overflow:'hidden'}}>{product.name}</p>
@@ -767,7 +785,8 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
   const [wilayas,setW]=useState<Wilaya[]>([]);
   const [communes,setC]=useState<Commune[]>([]);
   const [lcC,setLC]=useState(false);
-  const [fd,setFd]=useState({customerId:'',customerName:'',customerPhone:'',customerWelaya:'',customerCommune:'',quantity:1,priceLoss:0,typeLivraison:'home' as 'home'|'office'});
+  const [fd,setFd]=useState({customerId:'',customerName:'',customerPhone:'',customerEmail:'',customerWhatsapp:'',customerWelaya:'',customerCommune:'',quantity:1,priceLoss:0,typeLivraison:'home' as 'home'|'office'});
+  const [contactMethod,setContactMethod]=useState<'email'|'whatsapp'>('email');
   const [errors,setE]=useState<Record<string,string>>({});
   const [sub,setSub]=useState(false);
   const [orderNow,setON]=useState(false);
@@ -791,10 +810,10 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
   const selOfferObj=product.offers?.find((o:any)=>o.id===selectedOffer);
   const storeInfo=store||product.store;
   const orderFreeShipping=!!(product.shippingFree||selOfferObj?.shippingFree||(storeInfo?.supportFreeShipping&&storeInfo?.freeShippingMinAmount!=null&&(fp*qty)>=Number(storeInfo.freeShippingMinAmount)));
-  const getLiv=useCallback(():any=>{if(orderFreeShipping)return 0;if(!selW)return 0;return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice},[selW,fd.typeLivraison,orderFreeShipping]);
+  const getLiv=useCallback(():any=>{if(product.isDigital)return 0;if(orderFreeShipping)return 0;if(!selW)return 0;return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice},[selW,fd.typeLivraison,orderFreeShipping,product.isDigital]);
   const total = () => Number(fp) * Number(qty) + Number(getLiv());
   const getVarId=useCallback(()=>{if(!product.variantDetails?.length||!Object.keys(selectedVariants).length)return undefined;return product.variantDetails.find((v:any)=>vm(v,selectedVariants))?.id},[product.variantDetails,selectedVariants]);
-  const validate=()=>{const e:Record<string,string>={};if(!fd.customerName.trim())e.name=t.errName;if(!fd.customerPhone.trim()||!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim()))e.phone=t.errPhoneInvalid;if(!fd.customerWelaya)e.w=t.errWilaya;if(!fd.customerCommune)e.c=t.errCommune;return e};
+  const validate=()=>{const e:Record<string,string>={};if(!fd.customerName.trim())e.name=t.errName;if(!fd.customerPhone.trim()||!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim()))e.phone=t.errPhoneInvalid;if(product.isDigital){if(contactMethod==='email'){if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim()))e.email=t.errEmail}else{if(!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim()))e.whatsapp=t.errWhatsapp}}else{if(!fd.customerWelaya)e.w=t.errWilaya;if(!fd.customerCommune)e.c=t.errCommune}return e};
 
   const addCart=()=>{
     setAdded(true);
@@ -806,13 +825,13 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
   const submit=async(e:React.FormEvent)=>{
     e.preventDefault();const er=validate();if(Object.keys(er).length){setE(er);return}
     setE({});setSub(true);
-    try{await axios.post(`${API}/orders/create`,{...fd,quantity:qty,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});if(fd.customerId)localStorage.setItem('customerId',fd.customerId);router.push(`/successfully?productId=${product?.id}`)}
+    try{const {customerWelaya,customerCommune,typeLivraison,priceLoss,customerEmail,customerWhatsapp,...rest}=fd;const payload=product.isDigital?{...rest,...(contactMethod==='email'?{customerEmail}:{customerWhatsapp})}:{...rest,customerWelaya,customerCommune,typeLivraison,priceLoss};await axios.post(`${API}/orders/create`,{...payload,quantity:qty,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});if(fd.customerId)localStorage.setItem('customerId',fd.customerId);router.push(`/successfully?productId=${product?.id}`)}
     catch{}finally{setSub(false)}
   };
 
   return(
     <div dir={t.dir} style={{marginTop:20}}>
-      {product.store?.cart!==false&&(
+      {product.store?.cart!==false&&!product.isDigital&&(
         <div style={{display:'flex',gap:8,marginBottom:14}}>
           <button onClick={addCart} disabled={added} className="btn-ghost" style={{flex:1,padding:'12px',opacity:added?1:undefined,borderColor:added?'#22c55e':undefined,color:added?'#22c55e':undefined}}>
             {added?<><CheckCircle2 size={13}/>{t.addedToCart}</>:<><ShoppingCart size={13}/>{t.addToCart}</>}
@@ -820,9 +839,9 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
           <button onClick={()=>setON(true)} className="btn-dark" style={{flex:1,padding:'12px'}}>{t.orderNow}</button>
         </div>
       )}
-      {(orderNow||product.store?.cart===false)&&(
+      {(orderNow||product.store?.cart===false||product.isDigital)&&(
         <div style={{borderTop:'1px solid var(--br)',paddingTop:20,marginTop:8}}>
-          {product.store?.cart!==false&&(
+          {product.store?.cart!==false&&!product.isDigital&&(
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
               <span className="lbl" style={{margin:0}}>{t.orderFormLabel}</span>
               <button onClick={()=>setON(false)} style={{background:'none',border:'none',cursor:'pointer',color:'var(--mu)',display:'flex',alignItems:'center',gap:4,fontSize:'10px',fontFamily:"'Raleway',sans-serif",letterSpacing:'0.14em'}}><X style={{width:10,height:10}}/>{t.cancelBtn}</button>
@@ -833,6 +852,28 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
               <FR label={t.fullName} error={errors.name}><input type="text" value={fd.customerName} onChange={e=>setFd({...fd,customerName:e.target.value})} placeholder={t.fullNamePh} style={IS(!!errors.name)} onFocus={onF} onBlur={e=>onBl(e,!!errors.name)}/></FR>
               <FR label={t.phone} error={errors.phone}><input type="tel" value={fd.customerPhone} onChange={e=>setFd({...fd,customerPhone:e.target.value})} placeholder={t.phonePh} style={IS(!!errors.phone)} onFocus={onF} onBlur={e=>onBl(e,!!errors.phone)}/></FR>
             </div>
+            {product.isDigital?(
+              <FR label={t.contactQuestion}>
+                <div style={{display:'flex',border:'1px solid var(--br2)',marginBottom:10}}>
+                  <button type="button" onClick={()=>{setContactMethod('email');setFd(p=>({...p,customerWhatsapp:''}))}} style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:6,padding:'11px 0',border:'none',cursor:'pointer',fontFamily:"'Raleway',sans-serif",fontSize:'11px',fontWeight:700,letterSpacing:'0.08em',background:contactMethod==='email'?'var(--cp)':'transparent',color:contactMethod==='email'?'#fff':'var(--mu)'}}>
+                    <Mail style={{width:13,height:13}}/>{t.contactViaEmail}
+                  </button>
+                  <button type="button" onClick={()=>{setContactMethod('whatsapp');setFd(p=>({...p,customerEmail:''}))}} style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:6,padding:'11px 0',border:'none',cursor:'pointer',fontFamily:"'Raleway',sans-serif",fontSize:'11px',fontWeight:700,letterSpacing:'0.08em',background:contactMethod==='whatsapp'?'var(--cp)':'transparent',color:contactMethod==='whatsapp'?'#fff':'var(--mu)'}}>
+                    <MessageCircle style={{width:13,height:13}}/>{t.contactViaWhatsapp}
+                  </button>
+                </div>
+                {contactMethod==='email'?(
+                  <FR label={t.orderEmail} error={errors.email}>
+                    <input type="email" dir="ltr" value={fd.customerEmail} onChange={e=>setFd({...fd,customerEmail:e.target.value})} placeholder={t.emailPh} style={IS(!!errors.email)} onFocus={onF} onBlur={e=>onBl(e,!!errors.email)}/>
+                  </FR>
+                ):(
+                  <FR label={t.whatsapp} error={errors.whatsapp}>
+                    <input type="tel" dir="ltr" value={fd.customerWhatsapp} onChange={e=>setFd({...fd,customerWhatsapp:e.target.value})} placeholder={t.whatsappPh} style={IS(!!errors.whatsapp)} onFocus={onF} onBlur={e=>onBl(e,!!errors.whatsapp)}/>
+                  </FR>
+                )}
+              </FR>
+            ):(
+            <>
             <div className="f2">
               <FR label={t.wilaya} error={errors.w}>
                 <div style={{position:'relative'}}>
@@ -862,7 +903,9 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
                 ))}
               </div>
             </FR>
-            {supportQty&&(
+            </>
+            )}
+            {supportQty&&!product.isDigital&&(
             <FR label={t.qty}>
               <div style={{display:'inline-flex',alignItems:'center',border:'1px solid var(--br2)'}}>
                 <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} style={{width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',background:'transparent',border:'none',borderLeft:'1px solid var(--br2)',cursor:'pointer',color:'var(--mu)',transition:'color .15s'}}
@@ -881,7 +924,7 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
             )}
 
             <div style={{background:'var(--s1)',padding:'14px',marginBottom:14}}>
-              {[{l:t.price,v:`${fp.toLocaleString()} ${cur}`},{l:t.qty,v:`× ${qty}`},{l:t.delivery,v:!selW?'—':orderFreeShipping?t.freeShippingBadge:`${getLiv().toLocaleString()} ${cur}`}].map(r=>(
+              {[{l:t.price,v:`${fp.toLocaleString()} ${cur}`},{l:t.qty,v:`× ${qty}`},...(product.isDigital?[]:[{l:t.delivery,v:!selW?'—':orderFreeShipping?t.freeShippingBadge:`${getLiv().toLocaleString()} ${cur}`}])].map(r=>(
                 <div key={r.l} style={{display:'flex',justifyContent:'space-between',padding:'5px 0',borderBottom:'1px solid var(--br)'}}>
                   <span style={{fontSize:'11px',color:'var(--mu)',letterSpacing:'0.08em'}}>{r.l}</span>
                   <span style={{fontSize:'12px',fontWeight:600,color:'var(--tx)',fontFamily:"'Raleway',sans-serif"}}>{r.v}</span>

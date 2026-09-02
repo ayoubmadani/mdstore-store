@@ -23,6 +23,7 @@ interface ProductInfo {
   id: string; name: string; price: number; productImage?: string;
   storeId: string; userId: string; domain: string;
   attributes?: Attribute[]; variantDetails?: VariantDetail[]; offers?: Offer[];
+  isDigital?: boolean;
 }
 
 function variantMatches(detail: VariantDetail, sel: Record<string, string>): boolean {
@@ -316,6 +317,7 @@ export default function ProductFormBlockRenderer({
             offers: product.offers,
             attributes: product.attributes,
             variantDetails: product.variantDetails,
+            isDigital: product.isDigital,
             store: { id: product.storeId, name: '', subdomain: product.domain, userId: product.userId },
           }}
           userId={product.userId}

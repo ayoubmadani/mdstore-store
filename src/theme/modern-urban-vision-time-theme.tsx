@@ -19,10 +19,10 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import { useCartStore } from '@/store/useCartStore';
 import {
-  Search, X, Menu, ShoppingBag, Phone, Mail, MapPin, ChevronDown,
+  Search, X, Menu, ShoppingBag, Phone, Mail, MessageCircle, MapPin, ChevronDown,
   ChevronLeft, ChevronRight, Trash2, AlertCircle, CheckCircle2,
   Glasses, Watch, Truck, ShieldCheck, CreditCard, Headphones,
-  Star, Plus, Minus, ArrowRight, Send,
+  Star, Plus, Minus, ArrowRight, Send, Download,
 } from 'lucide-react';
 
 /* ---------------------------------------------------------------- tokens */
@@ -54,7 +54,7 @@ interface Commune { id: string; name: string; ar_name: string; wilayaId: string;
 interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
   productImage?: string; imagesProduct?: ProductImage[]; offers?: Offer[]; attributes?: Attribute[];
-  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean;
+  variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean; shippingFree?: boolean; isDigital?: boolean;
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 
@@ -112,6 +112,9 @@ const T = {
     errName: 'الاسم الكامل مطلوب (3 أحرف على الأقل)',
     errPhone: 'رقم هاتف جزائري صحيح مطلوب (مثال: 0550123456)',
     errWilaya: 'اختر الولاية', errCommune: 'اختر البلدية',
+    orderEmail: 'البريد الإلكتروني', emailPh: 'example@email.com', errEmail: 'يرجى إدخال بريد إلكتروني صحيح',
+    whatsapp: 'رقم واتساب', whatsappPh: '0550123456', errWhatsapp: 'رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)',
+    contactQuestion: 'هل تملك بريداً إلكترونياً أم واتساب؟', contactViaEmail: 'البريد الإلكتروني', contactViaWhatsapp: 'واتساب',
     privacyTitle: 'سياسة الخصوصية', termsTitle: 'الشروط والأحكام',
     cookiesTitle: 'سياسة الكوكيز', contactTitle: 'تواصل معنا',
     offersTitle: 'العروض المتاحة', descTitle: 'الوصف',
@@ -186,6 +189,9 @@ const T = {
     errName: 'Nom complet requis (3 caractères minimum)',
     errPhone: 'Numéro de téléphone algérien valide requis (ex: 0550123456)',
     errWilaya: 'Veuillez choisir une wilaya', errCommune: 'Veuillez choisir une commune',
+    orderEmail: 'E-mail', emailPh: 'exemple@email.com', errEmail: 'Veuillez saisir une adresse e-mail valide',
+    whatsapp: 'Numéro WhatsApp', whatsappPh: '0550123456', errWhatsapp: 'Numéro WhatsApp algérien valide requis (ex: 0550123456)',
+    contactQuestion: 'Avez-vous un e-mail ou un numéro WhatsApp ?', contactViaEmail: 'E-mail', contactViaWhatsapp: 'WhatsApp',
     privacyTitle: 'Politique de confidentialité', termsTitle: 'Conditions générales',
     cookiesTitle: 'Politique des cookies', contactTitle: 'Nous contacter',
     offersTitle: 'Offres groupées', descTitle: 'Description',
@@ -260,6 +266,9 @@ const T = {
     errName: 'Full name is required (at least 3 characters)',
     errPhone: 'Valid Algerian phone number required (e.g. 0550123456)',
     errWilaya: 'Please select a wilaya', errCommune: 'Please select a commune',
+    orderEmail: 'Email', emailPh: 'example@email.com', errEmail: 'Please enter a valid email address',
+    whatsapp: 'WhatsApp number', whatsappPh: '0550123456', errWhatsapp: 'A valid Algerian WhatsApp number is required (e.g. 0550123456)',
+    contactQuestion: 'Do you have an email or a WhatsApp number?', contactViaEmail: 'Email', contactViaWhatsapp: 'WhatsApp',
     privacyTitle: 'Privacy Policy', termsTitle: 'Terms & Conditions',
     cookiesTitle: 'Cookie Policy', contactTitle: 'Contact Us',
     offersTitle: 'Available Offers', descTitle: 'Description',
@@ -1249,7 +1258,9 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
       <div className="uvt-card-eyebrow">
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{eyebrow}</span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-          {product?.shippingFree && <span className="uvt-off">🚚</span>}
+          {product?.isDigital ? (
+            <span className="uvt-off" style={{ display: 'inline-flex', alignItems: 'center' }}><Download size={11} /></span>
+          ) : product?.shippingFree && <span className="uvt-off">🚚</span>}
           {discount > 0 && <span className="uvt-off">&minus;{discount}%</span>}
         </span>
       </div>
@@ -1483,9 +1494,11 @@ export function ProductForm({
   const [fd, setFd] = useState({
     customerId: '', customerName: '', customerPhone: '',
     customerWelaya: '', customerCommune: '',
+    customerEmail: '', customerWhatsapp: '',
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',
   });
+  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
 
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -1537,10 +1550,11 @@ export function ProductForm({
     (store?.supportFreeShipping && store?.freeShippingMinAmount != null && (fp * qty) >= Number(store.freeShippingMinAmount)));
 
   const getLiv = useCallback((): number => {
+    if (product?.isDigital) return 0;
     if (orderFreeShipping) return 0;
     if (!selW) return 0;
     return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
-  }, [selW, fd.typeLivraison, orderFreeShipping]);
+  }, [selW, fd.typeLivraison, orderFreeShipping, product?.isDigital]);
 
   const total = (): number => fp * qty + getLiv();
 
@@ -1553,27 +1567,42 @@ export function ProductForm({
     const e: Record<string, string> = {};
     if (!fd.customerName || fd.customerName.trim().length < 3) e.customerName = t.errName;
     if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.replace(/\s/g, ''))) e.customerPhone = t.errPhone;
-    if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
-    if (!fd.customerCommune) e.customerCommune = t.errCommune;
+    if (product?.isDigital) {
+      if (contactMethod === 'email') {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
+      } else {
+        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
+      }
+    } else {
+      if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
+      if (!fd.customerCommune) e.customerCommune = t.errCommune;
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const basePayload = () => ({
-    ...fd,
-    quantity: qty,
-    product,
-    productId: product?.id,
-    storeId: store?.id || product?.store?.id,
-    userId: uid,
-    variantDetailId: getVarId(),
-    selectedOffer: selectedOffer || null,
-    selectedVariants: selectedVariants || {},
-    platform: platform || 'web',
-    finalPrice: fp,
-    totalPrice: total(),
-    priceLivraison: getLiv(),
-  });
+  const basePayload = () => {
+    const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
+    const shippingOrContact = product?.isDigital
+      ? (contactMethod === 'email' ? { customerEmail } : { customerWhatsapp })
+      : { customerWelaya, customerCommune, typeLivraison, priceLoss };
+    return {
+      ...rest,
+      ...shippingOrContact,
+      quantity: qty,
+      product,
+      productId: product?.id,
+      storeId: store?.id || product?.store?.id,
+      userId: uid,
+      variantDetailId: getVarId(),
+      selectedOffer: selectedOffer || null,
+      selectedVariants: selectedVariants || {},
+      platform: platform || 'web',
+      finalPrice: fp,
+      totalPrice: total(),
+      priceLivraison: getLiv(),
+    };
+  };
 
   /* ---- add to cart — NEVER validates (§15.14) ---- */
   const addToCart = () => {
@@ -1615,7 +1644,7 @@ export function ProductForm({
     <div className="uvt-formcard">
       {/* quantity + unit price — always visible */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-        {supportQty && (
+        {supportQty && !product?.isDigital && (
           <div>
             <span className="uvt-label" style={{ marginBottom: 6 }}>{t.qty}</span>
             <QtyCounter
@@ -1635,7 +1664,7 @@ export function ProductForm({
 
       <div style={{ margin: '1.1rem 0' }}><TickRail count={22} /></div>
 
-      {isOrderNow && (
+      {(isOrderNow || product?.isDigital) && (
         <div style={{ animation: 'fadeUp .35s ease both' }}>
           <Field label={t.fullName} error={errors.customerName}>
             <input
@@ -1658,65 +1687,116 @@ export function ProductForm({
             />
           </Field>
 
-          <div className="uvt-row2">
-            <Field label={t.wilaya} error={errors.customerWelaya}>
-              <SelectWrap>
-                <select
-                  disabled={wilayas.length === 0}
-                  style={{ ...inputBase, paddingInlineEnd: 36, ...(errors.customerWelaya ? { borderColor: ERR } : {}) }}
-                  value={fd.customerWelaya}
-                  onChange={(e) => { set('customerWelaya', e.target.value); set('customerCommune', ''); }}
+          {product?.isDigital ? (
+            <div style={{ marginBottom: '0.9rem' }}>
+              <span className="uvt-label" style={{ marginBottom: 6, display: 'block' }}>{t.contactQuestion}</span>
+              <div className="uvt-toggle" style={{ marginBottom: 10 }}>
+                <button
+                  type="button"
+                  className={contactMethod === 'email' ? 'is-active' : ''}
+                  onClick={() => { setContactMethod('email'); setFd(p => ({ ...p, customerWhatsapp: '' })); }}
                 >
-                  <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
-                  {wilayas.map((w) => (
-                    <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>
-                  ))}
-                </select>
-              </SelectWrap>
-            </Field>
-
-            <Field label={t.commune} error={errors.customerCommune}>
-              <SelectWrap>
-                <select
-                  disabled={!fd.customerWelaya || loadingC}
-                  style={{ ...inputBase, paddingInlineEnd: 36, ...(errors.customerCommune ? { borderColor: ERR } : {}) }}
-                  value={fd.customerCommune}
-                  onChange={(e) => set('customerCommune', e.target.value)}
+                  <Mail size={15} /> {t.contactViaEmail}
+                </button>
+                <button
+                  type="button"
+                  className={contactMethod === 'whatsapp' ? 'is-active' : ''}
+                  onClick={() => { setContactMethod('whatsapp'); setFd(p => ({ ...p, customerEmail: '' })); }}
                 >
-                  <option value="">{loadingC ? t.communeLoading : t.communePlaceholder}</option>
-                  {communes.map((c) => (
-                    <option key={c.id} value={c.id}>{t.dir === 'rtl' ? c.ar_name : c.name}</option>
-                  ))}
-                </select>
-              </SelectWrap>
-            </Field>
-          </div>
-
-          <Field label={t.deliveryType}>
-            <div className="uvt-toggle">
-              <button
-                type="button"
-                className={fd.typeLivraison === 'home' ? 'is-active' : ''}
-                onClick={() => set('typeLivraison', 'home')}
-              >
-                <Truck size={15} /> {t.deliveryHome}
-              </button>
-              <button
-                type="button"
-                className={fd.typeLivraison === 'office' ? 'is-active' : ''}
-                onClick={() => set('typeLivraison', 'office')}
-              >
-                <MapPin size={15} /> {t.deliveryOffice}
-              </button>
+                  <MessageCircle size={15} /> {t.contactViaWhatsapp}
+                </button>
+              </div>
+              {contactMethod === 'email' ? (
+                <Field label={t.orderEmail} error={errors.customerEmail}>
+                  <input
+                    type="email"
+                    dir="ltr"
+                    className="uvt-num"
+                    style={{ ...inputBase, ...(errors.customerEmail ? { borderColor: ERR } : {}) }}
+                    value={fd.customerEmail}
+                    onChange={(e) => set('customerEmail', e.target.value)}
+                    placeholder={t.emailPh}
+                  />
+                </Field>
+              ) : (
+                <Field label={t.whatsapp} error={errors.customerWhatsapp}>
+                  <input
+                    type="tel"
+                    dir="ltr"
+                    className="uvt-num"
+                    style={{ ...inputBase, ...(errors.customerWhatsapp ? { borderColor: ERR } : {}) }}
+                    value={fd.customerWhatsapp}
+                    onChange={(e) => set('customerWhatsapp', e.target.value)}
+                    placeholder={t.whatsappPh}
+                  />
+                </Field>
+              )}
             </div>
-          </Field>
+          ) : (
+            <>
+              <div className="uvt-row2">
+                <Field label={t.wilaya} error={errors.customerWelaya}>
+                  <SelectWrap>
+                    <select
+                      disabled={wilayas.length === 0}
+                      style={{ ...inputBase, paddingInlineEnd: 36, ...(errors.customerWelaya ? { borderColor: ERR } : {}) }}
+                      value={fd.customerWelaya}
+                      onChange={(e) => { set('customerWelaya', e.target.value); set('customerCommune', ''); }}
+                    >
+                      <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
+                      {wilayas.map((w) => (
+                        <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>
+                      ))}
+                    </select>
+                  </SelectWrap>
+                </Field>
+
+                <Field label={t.commune} error={errors.customerCommune}>
+                  <SelectWrap>
+                    <select
+                      disabled={!fd.customerWelaya || loadingC}
+                      style={{ ...inputBase, paddingInlineEnd: 36, ...(errors.customerCommune ? { borderColor: ERR } : {}) }}
+                      value={fd.customerCommune}
+                      onChange={(e) => set('customerCommune', e.target.value)}
+                    >
+                      <option value="">{loadingC ? t.communeLoading : t.communePlaceholder}</option>
+                      {communes.map((c) => (
+                        <option key={c.id} value={c.id}>{t.dir === 'rtl' ? c.ar_name : c.name}</option>
+                      ))}
+                    </select>
+                  </SelectWrap>
+                </Field>
+              </div>
+
+              <Field label={t.deliveryType}>
+                <div className="uvt-toggle">
+                  <button
+                    type="button"
+                    className={fd.typeLivraison === 'home' ? 'is-active' : ''}
+                    onClick={() => set('typeLivraison', 'home')}
+                  >
+                    <Truck size={15} /> {t.deliveryHome}
+                  </button>
+                  <button
+                    type="button"
+                    className={fd.typeLivraison === 'office' ? 'is-active' : ''}
+                    onClick={() => set('typeLivraison', 'office')}
+                  >
+                    <MapPin size={15} /> {t.deliveryOffice}
+                  </button>
+                </div>
+              </Field>
+            </>
+          )}
 
           {/* summary AFTER fields, BEFORE buttons (§15.24) */}
           <div className="uvt-summary">
             <p className="uvt-label" style={{ margin: 0 }}>{t.orderSummary}</p>
             <SummaryRow l={t.price} v={`${fmt(fp)} ${currency}`} />
             <SummaryRow l={t.qty} v={`× ${qty}`} />
-            <SummaryRow l={t.delivery} v={!selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${fmt(getLiv())} ${currency}`} />
+            {!product?.isDigital && (
+              <SummaryRow l={t.delivery} v={!selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${fmt(getLiv())} ${currency}`} />
+            )}
             <div className="uvt-sumtotal">
               <SummaryRow l={t.total} v={`${fmt(total())} ${currency}`} strong />
             </div>
@@ -1732,14 +1812,16 @@ export function ProductForm({
             <button type="button" style={btnAmber} onClick={submitOrder} disabled={submitting}>
               {submitting ? t.sending : t.confirmOrder}
             </button>
-            <button type="button" style={btnGhost} onClick={() => setIsOrderNow(false)} disabled={submitting}>
-              {t.cancel}
-            </button>
+            {!product?.isDigital && (
+              <button type="button" style={btnGhost} onClick={() => setIsOrderNow(false)} disabled={submitting}>
+                {t.cancel}
+              </button>
+            )}
           </div>
         </div>
       )}
 
-      {!isOrderNow && (
+      {!isOrderNow && !product?.isDigital && (
         <div className="uvt-btnrow">
           <button type="button" style={btnPrimary} onClick={() => setIsOrderNow(true)}>
             {t.orderNow}
