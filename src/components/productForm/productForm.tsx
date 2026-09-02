@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   ShoppingCart, MapPin, Phone, User, Home,
   ChevronDown, Truck, Shield, Package,
-  Building2, AlertCircle, Tag, Mail, MessageCircle,
+  Building2, AlertCircle, Mail, MessageCircle,
 } from 'lucide-react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -535,33 +535,6 @@ export default function ProductForm({
             <span className="flex items-center gap-1"><Package className="w-4 h-4" /> {t.product}</span>
             <span className="font-bold truncate max-w-[50%]" style={{ opacity: 1 }}>{product.name}</span>
           </div>
-
-          {selectedOffer && (() => {
-            const offer = product.offers?.find(o => o.id === selectedOffer);
-            if (!offer) return null;
-            return (
-              <div className="flex justify-between items-center" style={{ opacity: 0.75 }}>
-                <span className="flex items-center gap-1"><Tag className="w-3.5 h-3.5 text-amber-500" /> {t.offer}</span>
-                <span className="text-amber-600 font-bold bg-amber-50 px-2.5 py-1 rounded-lg text-xs border border-amber-100">{offer.name}</span>
-              </div>
-            );
-          })()}
-
-          {Object.entries(selectedVariants).map(([attrName, val]) => {
-            const attr    = product.attributes?.find(a => a.name === attrName);
-            const variant = attr?.variants?.find(v => v.value === val);
-            if (!variant) return null;
-            return (
-              <div key={attrName} className="flex justify-between items-center" style={{ opacity: 0.75 }}>
-                <span>{attrName}</span>
-                <span className="font-medium flex items-center gap-2" style={{ opacity: 1 }}>
-                  {attr?.displayMode === 'color' && <span className="w-4 h-4 rounded-full border border-gray-300 shrink-0" style={{ backgroundColor: val }} />}
-                  {attr?.displayMode === 'image' && <span className="w-10 h-10 rounded-md border border-gray-300 shrink-0 bg-cover bg-center" style={{ backgroundImage: `url(${val})` }} />}
-                  {!attr?.displayMode && <span className="truncate max-w-[120px] border px-1 rounded-md">{variant.name || val}</span>}
-                </span>
-              </div>
-            );
-          })}
 
           {!product.isDigital && (
             <div className="flex justify-between" style={{ opacity: 0.75 }}>

@@ -207,12 +207,25 @@ function FloatingElements({ elements, referenceWidth }: { elements: unknown; ref
           top: `${el.y ?? 50}%`,
           transform: 'translate(-50%, -50%)',
           width: width ? `${width}%` : undefined,
-          height: boxHeight ? `${boxHeight}px` : undefined,
+          // Same fixed-px-vs-shrinking-container issue as fontSize below —
+          // width already scales with the container (%), so a raw px height
+          // stops matching it at any width other than referenceWidth,
+          // stretching the element tall and thin on narrower screens. cqw is
+          // a container-width-relative unit, so using it here (not just for
+          // fontSize) keeps height shrinking in lockstep with width.
+          height: boxHeight ? `clamp(20px, ${(boxHeight / referenceWidth) * 100}cqw, ${boxHeight}px)` : undefined,
           pointerEvents: 'auto' as const,
         };
 
         if (el.type === 'button') {
           const isFormLink = el.linkType === 'form';
+          // Same reasoning as the text element's fontSize clamp below — a
+          // fixed px padding/font stays the same size while the block itself
+          // (and everything positioned on it by %) shrinks around it at
+          // narrower widths, so the button ends up crowding or overlapping
+          // its neighbors instead of shrinking along with them. Padding in
+          // `em` scales automatically once fontSize itself is responsive.
+          const basePx = el.fontSize || 16;
           return (
             <a
               key={el.id}
@@ -227,11 +240,12 @@ function FloatingElements({ elements, referenceWidth }: { elements: unknown; ref
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: width ? 0 : '10px 24px',
+                padding: width ? 0 : '0.7em 1.6em',
                 borderRadius: 8,
                 backgroundColor: el.backgroundColor || '#10b981',
                 color: el.textColor || '#ffffff',
                 fontWeight: 600,
+                fontSize: `clamp(10px, ${(basePx / referenceWidth) * 100}cqw, ${basePx}px)`,
                 textDecoration: 'none',
                 whiteSpace: width ? 'normal' : 'nowrap',
               }}
