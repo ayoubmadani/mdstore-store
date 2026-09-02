@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Check } from 'lucide-react';
 import axios from 'axios';
 import ProductForm from '@/components/productForm/productForm';
 import { getProductFormStrings } from '@/components/productForm/translations';
@@ -24,12 +24,27 @@ interface ProductInfo {
   storeId: string; userId: string; domain: string;
   attributes?: Attribute[]; variantDetails?: VariantDetail[]; offers?: Offer[];
   isDigital?: boolean;
+  supportQty?: boolean;
 }
 
 function variantMatches(detail: VariantDetail, sel: Record<string, string>): boolean {
   return Object.entries(sel).every(([attrName, value]) =>
     detail.name?.some((entry) => entry.attrName === attrName && entry.value === value)
   );
+}
+
+// Picks black or white for a checkmark drawn on top of an arbitrary color
+// swatch, so it stays visible on both light (e.g. white, yellow) and dark
+// (e.g. black, navy) attribute colors instead of assuming one fixed color.
+function contrastText(hex: string): string {
+  if (!hex || !/^#([0-9a-f]{6}|[0-9a-f]{3})$/i.test(hex)) return '#ffffff';
+  const full = hex.length === 4
+    ? `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`
+    : hex;
+  const num = parseInt(full.slice(1), 16);
+  const r = (num >> 16) & 0xff, g = (num >> 8) & 0xff, b = num & 0xff;
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.6 ? '#000000' : '#ffffff';
 }
 
 // Mirrors dashboard/src/pages/editor/blocks/ProductFormBlock.jsx's own
@@ -44,7 +59,6 @@ function variantMatches(detail: VariantDetail, sel: Record<string, string>): boo
 interface ProductFormBlockProps {
   showProductName?: boolean;
   productName?: string;
-  title?: string;
   buttonText?: string;
   containerBackgroundColor?: string;
   backgroundColor?: string;
@@ -52,11 +66,16 @@ interface ProductFormBlockProps {
   buttonBackgroundColor?: string;
   buttonTextColor?: string;
   buttonBorderColor?: string;
+  buttonBackgroundColorDisabled?: string;
+  buttonTextColorDisabled?: string;
+  buttonBorderColorDisabled?: string;
   inputBackgroundColor?: string;
   inputBorderColor?: string;
   inputTextColor?: string;
   paddingX?: number;
+  paddingY?: number;
   borderRadius?: number;
+  sectionGap?: number;
 }
 
 export default function ProductFormBlockRenderer({
@@ -133,7 +152,6 @@ export default function ProductFormBlockRenderer({
   const {
     showProductName = true,
     productName: productNameOverride,
-    title,
     buttonText,
     containerBackgroundColor,
     backgroundColor,
@@ -141,11 +159,16 @@ export default function ProductFormBlockRenderer({
     buttonBackgroundColor,
     buttonTextColor,
     buttonBorderColor,
+    buttonBackgroundColorDisabled,
+    buttonTextColorDisabled,
+    buttonBorderColorDisabled,
     inputBackgroundColor,
     inputBorderColor,
     inputTextColor,
     paddingX,
+    paddingY,
     borderRadius,
+    sectionGap,
   } = (props || {}) as ProductFormBlockProps;
 
   // Matches ProductForm.tsx's own default fallback exactly (both are only
@@ -153,6 +176,19 @@ export default function ProductFormBlockRenderer({
   // '#10b981' as this block's defaultProp) — keeps the offers/attributes
   // picker and the actual submit button in visual agreement.
   const accentColor = buttonBackgroundColor || '#111827';
+  // "Couleurs du bouton actif/désactivé" apply to every selectable-choice
+  // button here (offers, attribute/variant options) — active = the
+  // currently-picked choice, désactivé = every other choice in that group.
+  const activeBtnText = buttonTextColor || '#ffffff';
+  const activeBtnBorder = buttonBorderColor || accentColor;
+  const inactiveBtnBg = buttonBackgroundColorDisabled || '#f9fafb';
+  const inactiveBtnText = buttonTextColorDisabled || '#18181b';
+  const inactiveBtnBorder = buttonBorderColorDisabled || '#e4e4e7';
+  // Same merchant-configurable radius as the outer <ProductForm> card,
+  // applied to every inner section box too (product info, offers, options)
+  // so "Rayon des angles" controls all of them uniformly.
+  const sectionRadius = borderRadius ?? 10;
+  const gapPx = sectionGap ?? 14;
 
   const matchedVariantDetail =
     product?.variantDetails?.length && Object.keys(selectedVariants).length
@@ -162,23 +198,24 @@ export default function ProductFormBlockRenderer({
   if (!productId) return null;
 
   const productSummary = product && (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        {product.productImage && (
-          <img src={product.productImage} alt="" style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover' }} />
-        )}
-        <div>
-          {showProductName !== false && (
-            <p style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>{productNameOverride || product.name}</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: gapPx }}>
+      {showProductName !== false && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 12, borderRadius: sectionRadius, backgroundColor: backgroundColor || '#ffffff', border: '1px solid #e4e4e7' }}>
+          {product.productImage && (
+            <img src={product.productImage} alt="" style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover' }} />
           )}
-          <p style={{ margin: 0, fontSize: 13, opacity: 0.7 }}>
-            {formatPrice(matchedVariantDetail && matchedVariantDetail.price !== -1 ? matchedVariantDetail.price : product.price)}
-          </p>
+          <div>
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>{productNameOverride || product.name}</p>
+            <p style={{ margin: 0, fontSize: 13, opacity: 0.7 }}>
+              {formatPrice(matchedVariantDetail && matchedVariantDetail.price !== -1 ? matchedVariantDetail.price : product.price)}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {product.offers && product.offers.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 12, borderRadius: sectionRadius, backgroundColor: backgroundColor || '#ffffff', border: '1px solid #e4e4e7' }}>
+          <p style={{ margin: 0, fontSize: 20, fontWeight: 700, opacity: 0.6, textTransform: 'uppercase', letterSpacing: 0.4 }}>{t.offersTitle}</p>
           {product.offers.map((offer) => (
             <label
               key={offer.id}
@@ -187,11 +224,12 @@ export default function ProductFormBlockRenderer({
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: 8,
-                padding: '8px 10px',
+                padding: '14px 10px',
                 borderRadius: 8,
-                border: `1px solid ${selectedOffer === offer.id ? accentColor : '#e4e4e7'}`,
+                border: `1px solid ${selectedOffer === offer.id ? activeBtnBorder : inactiveBtnBorder}`,
                 cursor: 'pointer',
-                fontSize: 13,
+                fontSize: 20,
+                fontWeight: 700,
               }}
             >
               <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -202,7 +240,10 @@ export default function ProductFormBlockRenderer({
                   onChange={() => setSelectedOffer(selectedOffer === offer.id ? null : offer.id)}
                   style={{ accentColor }}
                 />
-                {offer.name} <span style={{ opacity: 0.6 }}>({offer.quantity} {t.pieces})</span>
+                <span style={{ display: 'flex', flexDirection: 'column' }}>
+                  {offer.name}
+                  <span style={{ fontSize: 16, fontWeight: 400, opacity: 0.6 }}>({offer.quantity} {t.pieces})</span>
+                </span>
               </span>
               <span style={{ fontWeight: 700 }}>{formatPrice(offer.price)}</span>
             </label>
@@ -210,13 +251,20 @@ export default function ProductFormBlockRenderer({
         </div>
       )}
 
-      {product.attributes?.map((attr) => (
+      {product.attributes && product.attributes.length > 0 && (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: 12, borderRadius: sectionRadius, backgroundColor: backgroundColor || '#ffffff', border: '1px solid #e4e4e7' }}>
+        <p style={{ margin: 0, fontSize: 20, fontWeight: 700, opacity: 0.6, textTransform: 'uppercase', letterSpacing: 0.4 }}>{t.optionsTitle}</p>
+      {product.attributes.map((attr) => (
         <div key={attr.id}>
-          <p style={{ fontSize: 12, fontWeight: 600, margin: '0 0 4px' }}>{attr.name}</p>
+          <p style={{ fontSize: 14, fontWeight: 600, margin: '0 0 4px' }}>{attr.name}</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {attr.variants?.map((v) => {
               const isSelected = selectedVariants[attr.name] === v.value;
               if (attr.displayMode === 'color') {
+                // A colored ring around a colored swatch can blend into the
+                // swatch's own fill and become invisible — a white gap
+                // between them plus a checkmark makes the selected one
+                // unmistakable no matter what color it is.
                 return (
                   <button
                     key={v.id}
@@ -224,17 +272,29 @@ export default function ProductFormBlockRenderer({
                     onClick={() => handleVariantSelect(attr.name, v.value)}
                     title={v.name}
                     style={{
-                      width: 26,
-                      height: 26,
+                      position: 'relative',
+                      width: 38,
+                      height: 38,
                       borderRadius: '50%',
                       background: v.value,
-                      border: `2px solid ${isSelected ? accentColor : '#e4e4e7'}`,
+                      border: '2px solid #ffffff',
+                      boxShadow: isSelected
+                        ? `0 0 0 2.5px ${activeBtnBorder}`
+                        : `0 0 0 1px ${inactiveBtnBorder}`,
                       cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
-                  />
+                  >
+                    {isSelected && <Check size={16} color={contrastText(v.value)} />}
+                  </button>
                 );
               }
               if (attr.displayMode === 'image') {
+                // Same reasoning as the color swatch — the image's own
+                // colors could match the ring, so a corner checkmark badge
+                // stays visible regardless of what's in the picture.
                 return (
                   <button
                     key={v.id}
@@ -242,17 +302,33 @@ export default function ProductFormBlockRenderer({
                     onClick={() => handleVariantSelect(attr.name, v.value)}
                     title={v.name}
                     style={{
-                      width: 34,
-                      height: 34,
+                      position: 'relative',
+                      width: 100,
+                      height: 100,
                       borderRadius: 8,
                       padding: 0,
                       backgroundImage: `url(${v.value})`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
-                      border: `2px solid ${isSelected ? accentColor : '#e4e4e7'}`,
+                      border: '2px solid #ffffff',
+                      boxShadow: isSelected
+                        ? `0 0 0 2.5px ${activeBtnBorder}`
+                        : `0 0 0 1px ${inactiveBtnBorder}`,
                       cursor: 'pointer',
                     }}
-                  />
+                  >
+                    {isSelected && (
+                      <span style={{
+                        position: 'absolute', top: -8, right: -8,
+                        width: 22, height: 22, borderRadius: '50%',
+                        backgroundColor: activeBtnBorder,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        border: '2px solid #ffffff',
+                      }}>
+                        <Check size={13} color={contrastText(activeBtnBorder)} />
+                      </span>
+                    )}
+                  </button>
                 );
               }
               return (
@@ -261,12 +337,12 @@ export default function ProductFormBlockRenderer({
                   type="button"
                   onClick={() => handleVariantSelect(attr.name, v.value)}
                   style={{
-                    padding: '5px 12px',
+                    padding: '10px 18px',
                     borderRadius: 6,
-                    fontSize: 12,
-                    backgroundColor: isSelected ? accentColor : '#f9fafb',
-                    color: isSelected ? '#ffffff' : '#18181b',
-                    border: `1px solid ${isSelected ? accentColor : '#e4e4e7'}`,
+                    fontSize: 16,
+                    backgroundColor: isSelected ? accentColor : inactiveBtnBg,
+                    color: isSelected ? activeBtnText : inactiveBtnText,
+                    border: `1px solid ${isSelected ? activeBtnBorder : inactiveBtnBorder}`,
                     cursor: 'pointer',
                   }}
                 >
@@ -277,13 +353,15 @@ export default function ProductFormBlockRenderer({
           </div>
         </div>
       ))}
+      </div>
+      )}
     </div>
   );
 
   return (
     <div
       style={{
-        paddingBlock: 20,
+        paddingBlock: paddingY ?? 0,
         paddingInline: `${paddingX ?? 3}%`,
         width: '100%',
         boxSizing: 'border-box',
@@ -318,7 +396,7 @@ export default function ProductFormBlockRenderer({
             attributes: product.attributes,
             variantDetails: product.variantDetails,
             isDigital: product.isDigital,
-            store: { id: product.storeId, name: '', subdomain: product.domain, userId: product.userId },
+            store: { id: product.storeId, name: '', subdomain: product.domain, userId: product.userId, supportQty: product.supportQty },
           }}
           userId={product.userId}
           domain={product.domain}
@@ -327,7 +405,6 @@ export default function ProductFormBlockRenderer({
           setSelectedOffer={setSelectedOffer}
           selectedVariants={selectedVariants}
           renderBefore={productSummary}
-          title={title}
           buttonText={buttonText}
           builderPageId={builderPageId}
           backgroundColor={backgroundColor}
@@ -335,10 +412,14 @@ export default function ProductFormBlockRenderer({
           buttonBackgroundColor={buttonBackgroundColor}
           buttonTextColor={buttonTextColor}
           buttonBorderColor={buttonBorderColor}
+          buttonBackgroundColorDisabled={buttonBackgroundColorDisabled}
+          buttonTextColorDisabled={buttonTextColorDisabled}
+          buttonBorderColorDisabled={buttonBorderColorDisabled}
           inputBackgroundColor={inputBackgroundColor}
           inputBorderColor={inputBorderColor}
           inputTextColor={inputTextColor}
           borderRadius={borderRadius}
+          sectionGap={sectionGap}
           language={language}
           onOrderSuccess={dedicated ? setOrderResult : undefined}
         />

@@ -27,7 +27,7 @@ export interface Product {
   offers?: Offer[]; attributes?: Attribute[];
   variantDetails?: VariantDetail[]; stock?: number; isActive?: boolean;
   isDigital?: boolean;
-  store: { id: string; name: string; subdomain: string; userId: string; };
+  store: { id: string; name: string; subdomain: string; userId: string; supportQty?: boolean; };
 }
 
 interface Wilaya  { id: string; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn:number;}
@@ -45,7 +45,6 @@ export interface ProductFormProps {
   priceLoss?:       number;       // LP only
   lpId?:string
   builderPageId?:   string;       // builder-pages productForm block only — same role as lpId
-  title?:           string;       // builder-pages productForm block only — overrides the header text
   buttonText?:      string;       // builder-pages productForm block only — overrides the submit button text
   // builder-pages productForm block only — its own product image/name/price
   // + offers/attributes picker (ProductFormBlockRenderer.tsx), rendered
@@ -65,10 +64,14 @@ export interface ProductFormProps {
   buttonBackgroundColor?: string;
   buttonTextColor?:      string;
   buttonBorderColor?:    string;
+  buttonBackgroundColorDisabled?: string;
+  buttonTextColorDisabled?:      string;
+  buttonBorderColorDisabled?:    string;
   inputBackgroundColor?: string;
   inputBorderColor?:     string;
   inputTextColor?:       string;
   borderRadius?:         number;  // builder-pages productForm block only — 0 by default (square corners)
+  sectionGap?:           number;  // builder-pages productForm block only — gap between section boxes, 14 by default
   language?:             string;  // builder-pages productForm block only — page.settings.language, defaults to 'ar'
   // When set, a successful order calls this instead of navigating to
   // `${pathname}/successfully` — used for a domain dedicated entirely to
@@ -101,7 +104,7 @@ const FieldWrapper = ({ error, children, label, labelColor }: {
 }) => (
   <div className="space-y-1.5">
     {label && (
-      <label className="text-xs font-semibold uppercase tracking-wider" style={{ color: labelColor, opacity: 0.65 }}>
+      <label className="text-lg font-semibold uppercase tracking-wider" style={{ color: labelColor }}>
         {label}
       </label>
     )}
@@ -115,7 +118,7 @@ const FieldWrapper = ({ error, children, label, labelColor }: {
 );
 
 const inputCls = (err?: boolean) =>
-  `w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all placeholder-gray-400
+  `w-full px-4 py-3 rounded-xl border text-base outline-none transition-all placeholder-gray-400
    ${err ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100' : 'focus:ring-2 focus:ring-gray-100'}`;
 
 /* ══════════════════════════════════════════════════════
@@ -124,10 +127,11 @@ const inputCls = (err?: boolean) =>
 export default function ProductForm({
   product, userId, domain,
   selectedOffer, setSelectedOffer, selectedVariants,
-  platform, priceLoss = 0, lpId, builderPageId, title, buttonText, renderBefore,
+  platform, priceLoss = 0, lpId, builderPageId, buttonText, renderBefore,
   backgroundColor, textColor, buttonBackgroundColor, buttonTextColor,
   buttonBorderColor, inputBackgroundColor, inputBorderColor, inputTextColor,
-  borderRadius, language, onOrderSuccess,
+  buttonBackgroundColorDisabled, buttonTextColorDisabled, buttonBorderColorDisabled,
+  borderRadius, sectionGap, language, onOrderSuccess,
 }: ProductFormProps) {
   const router = useRouter();
   const t = getProductFormStrings(language);
@@ -142,7 +146,25 @@ export default function ProductForm({
   const btnText    = buttonTextColor      || '#ffffff';
   const fieldBg    = inputBackgroundColor || '#f9fafb';
   const fieldBorder = inputBorderColor    || '#e5e7eb';
+  // "Couleurs du bouton actif/désactivé" apply to every selectable-choice
+  // button in the form (delivery type, digital contact-method toggle) —
+  // active = the currently-picked choice, désactivé = the other choice(s).
+  const activeBtnBorder = buttonBorderColor || accent;
+  const inactiveBtnBg = buttonBackgroundColorDisabled || 'transparent';
+  const inactiveBtnText = buttonTextColorDisabled || cardText;
+  const inactiveBtnBorder = buttonBorderColorDisabled || fieldBorder;
   const fieldText  = inputTextColor       || '#111827';
+  // Same merchant-configurable radius as the outer card, applied to every
+  // inner section box too (header, offers/options via renderBefore, fields,
+  // summary) so "Rayon des angles" controls all of them uniformly.
+  const sectionRadius = borderRadius ?? 16;
+  // Merchant-configurable gap between top-level section boxes (header,
+  // offers/options via renderBefore, order-form fields, summary).
+  const gapPx = sectionGap ?? 16;
+  // Store-level "Qty Support" toggle — hide the quantity picker entirely
+  // (not just lock it to 1) when the merchant's store doesn't offer it,
+  // same as the theme files' own ProductForm already does.
+  const supportQty = product.store?.supportQty !== false;
   // Error state keeps its own red border (set via className) — the inline
   // style only supplies borderColor when there's no error to override.
   const fieldStyle = (hasError?: boolean): React.CSSProperties => ({
@@ -292,8 +314,12 @@ export default function ProductForm({
       }
       
       setSubmitting(true);
+    // Minimum visible duration for the "submitting" (disabled-button-colors)
+    // state — the API call can resolve in well under 100ms, too fast to
+    // actually see the button's disabled styling, so this floors it at 500ms.
+    const minDelay = new Promise(resolve => setTimeout(resolve, 500));
     try {
-      const res = await axios.post(`${API_URL}/orders`, payload);
+      const [res] = await Promise.all([axios.post(`${API_URL}/orders`, payload), minDelay]);
 
       if (res.status === 200 || res.status === 201) {
         if (typeof window !== 'undefined' && (window as any).gtag) {
@@ -321,20 +347,25 @@ export default function ProductForm({
 
   /* ── Render ── */
   return (
-    <div className="overflow-hidden shadow-xl shadow-gray-900/5 border" style={{ backgroundColor: cardBg, borderColor: fieldBorder, color: cardText, borderRadius: borderRadius ?? 0 }}>
+    // builder-pages usage: "Couleurs du formulaire" now drives each inner
+    // section box (see cardBg usages below) — the card itself should show
+    // whatever "Couleur de fond du conteneur" the outer ProductFormBlockRenderer
+    // wrapper is already painted with, not a second/competing color, so it's
+    // transparent here and lets that wrapper's background show through. The
+    // plain /lp/[lpdomain] route has no such outer wrapper, so it keeps cardBg.
+    <div className="overflow-hidden" style={{ backgroundColor: builderPageId ? 'transparent' : cardBg, color: cardText, borderRadius: borderRadius ?? 0 }}>
 
-      {/* Header */}
-      <div className="px-6 py-5 border-b" style={{ borderColor: fieldBorder }}>
-        <div className="flex items-center gap-2">
-          <ShoppingCart className="w-5 h-5" style={{ opacity: 0.75 }} />
-          <p className="font-bold">{title || t.formTitle}</p>
-        </div>
-        <p className="text-xs mt-1" style={{ opacity: 0.55 }}>{t.formSubtitle}</p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="p-6 space-y-4">
+      {/* builder-pages usage already gets its own outer padding (paddingX/
+          paddingY on ProductFormBlockRenderer's wrapper) — adding this
+          card's own p-6 on top of that double-pads it, showing the card's
+          own background color as a band around every section box. The
+          plain /lp/[lpdomain] route has no such outer wrapper, so it still
+          needs this padding for breathing room. */}
+      <form onSubmit={handleSubmit} className={`flex flex-col ${builderPageId ? '' : 'p-6'}`} style={{ gap: gapPx, paddingTop: builderPageId ? gapPx : undefined }}>
         {renderBefore}
 
+        {/* Order form fields */}
+        <div className="p-5 space-y-4 border" style={{ backgroundColor: cardBg, borderColor: fieldBorder, borderRadius: sectionRadius }}>
         {/* Name + Phone */}
         <div className="grid grid-cols-1 gap-4">
           <FieldWrapper error={formErrors.customerName} label={t.fullName} labelColor={cardText}>
@@ -367,7 +398,7 @@ export default function ProductForm({
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium transition-colors"
                 style={contactMethod === 'email'
                   ? { backgroundColor: accent, color: btnText }
-                  : { backgroundColor: 'transparent', color: cardText, opacity: 0.6 }}>
+                  : { backgroundColor: inactiveBtnBg, color: inactiveBtnText, opacity: 0.6 }}>
                 <Mail className="w-4 h-4" />
                 {t.contactViaEmail}
               </button>
@@ -375,7 +406,7 @@ export default function ProductForm({
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium transition-colors"
                 style={contactMethod === 'whatsapp'
                   ? { backgroundColor: accent, color: btnText }
-                  : { backgroundColor: 'transparent', color: cardText, opacity: 0.6 }}>
+                  : { backgroundColor: inactiveBtnBg, color: inactiveBtnText, opacity: 0.6 }}>
                 <MessageCircle className="w-4 h-4" />
                 {t.contactViaWhatsapp}
               </button>
@@ -443,7 +474,7 @@ export default function ProductForm({
 
             {/* Delivery type */}
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: cardText, opacity: 0.6 }}>{t.deliveryType}</p>
+              <p className="text-lg font-bold uppercase tracking-wider mb-3" style={{ color: cardText }}>{t.deliveryType}</p>
               <div className="grid grid-cols-2 gap-3">
                 {(['home', 'office'] as const).map(type => {
                   const isSelected = formData.typeLivraison === type;
@@ -452,16 +483,16 @@ export default function ProductForm({
                       onClick={() => setFormData(p => ({ ...p, typeLivraison: type }))}
                       className="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-200"
                       style={{
-                        borderColor: isSelected ? accent : fieldBorder,
-                        backgroundColor: isSelected ? accent : cardBg,
-                        color: isSelected ? btnText : cardText,
+                        borderColor: isSelected ? activeBtnBorder : inactiveBtnBorder,
+                        backgroundColor: isSelected ? accent : inactiveBtnBg,
+                        color: isSelected ? btnText : inactiveBtnText,
                         boxShadow: isSelected ? '0 10px 15px -3px rgba(0,0,0,0.1)' : undefined,
                       }}>
                       {type === 'home'
                         ? <Home      className="w-6 h-6" style={{ opacity: isSelected ? 1 : 0.4 }} />
                         : <Building2 className="w-6 h-6" style={{ opacity: isSelected ? 1 : 0.4 }} />}
                       <div className="text-center">
-                        <p className="text-sm font-bold">{type === 'home' ? t.home : t.office}</p>
+                        <p className="text-base font-bold">{type === 'home' ? t.home : t.office}</p>
                         {selectedWilayaData && (
                           <p className="text-xs mt-0.5" style={{ opacity: isSelected ? 0.75 : 0.5 }}>
                             {(type === 'home' ? selectedWilayaData.livraisonHome : selectedWilayaData.livraisonOfice).toLocaleString('ar-DZ')} {t.currency}
@@ -480,8 +511,9 @@ export default function ProductForm({
         )}
 
         {/* Quantity — a digital product is a single license/copy, not a
-            stockable count, so there's nothing to increment */}
-        {!product.isDigital && (
+            stockable count, so there's nothing to increment; supportQty
+            being off means the store doesn't offer quantity selection at all */}
+        {supportQty && !product.isDigital && (
           <FieldWrapper error={formErrors.quantity} label={t.quantity} labelColor={cardText}>
             <div className="flex items-center gap-4">
               <button type="button" onClick={() => setFormData(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
@@ -495,9 +527,10 @@ export default function ProductForm({
             </div>
           </FieldWrapper>
         )}
+        </div>
 
         {/* Order summary */}
-        <div className="rounded-2xl p-5 space-y-3 text-sm border" style={{ backgroundColor: fieldBg, borderColor: fieldBorder, color: cardText }}>
+        <div className="p-5 space-y-3 text-sm border" style={{ backgroundColor: cardBg, borderColor: fieldBorder, color: cardText, borderRadius: sectionRadius }}>
           <div className="flex justify-between" style={{ opacity: 0.75 }}>
             <span className="flex items-center gap-1"><Package className="w-4 h-4" /> {t.product}</span>
             <span className="font-bold truncate max-w-[50%]" style={{ opacity: 1 }}>{product.name}</span>
@@ -544,7 +577,7 @@ export default function ProductForm({
             <span>{t.unitPrice}</span>
             <span className="font-bold" style={{ opacity: 1 }}>{finalPrice.toLocaleString('ar-DZ')} {t.currency}</span>
           </div>
-          {!product.isDigital && (
+          {supportQty && !product.isDigital && (
             <div className="flex justify-between" style={{ opacity: 0.75 }}>
               <span>{t.quantity}</span>
               <span className="font-bold" style={{ opacity: 1 }}>× {formData.quantity}</span>
@@ -558,24 +591,26 @@ export default function ProductForm({
               <span className="text-sm font-bold mr-1" style={{ opacity: 0.6 }}>{t.currency}</span>
             </span>
           </div>
-        </div>
 
-        {/* Submit */}
-        <button type="submit" disabled={submitting}
-          className="w-full py-4 rounded-2xl font-bold text-base transition-all flex items-center justify-center gap-2 shadow-lg"
-          style={{
-            backgroundColor: accent,
-            color: btnText,
-            border: buttonBorderColor ? `2px solid ${buttonBorderColor}` : undefined,
-            opacity: submitting ? 0.9 : 1,
-            cursor: submitting ? 'not-allowed' : 'pointer',
-          }}>
-          {submitting ? (
-            <><div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${btnText}55`, borderTopColor: 'transparent' }} />{t.submitting}</>
-          ) : (
-            <><ShoppingCart className="w-5 h-5" />{buttonText || t.submit}</>
-          )}
-        </button>
+          {/* Submit — only a merchant-set disabled color skips the opacity
+              dim, so pages saved before this field existed look the same */}
+          <button type="submit" disabled={submitting}
+            className="w-full py-4 rounded-2xl font-bold text-base transition-all flex items-center justify-center gap-2 shadow-lg"
+            style={{
+              backgroundColor: submitting ? (buttonBackgroundColorDisabled || accent) : accent,
+              color: submitting ? (buttonTextColorDisabled || btnText) : btnText,
+              border: (submitting ? (buttonBorderColorDisabled || buttonBorderColor) : buttonBorderColor)
+                ? `2px solid ${submitting ? (buttonBorderColorDisabled || buttonBorderColor) : buttonBorderColor}` : undefined,
+              opacity: submitting && !buttonBackgroundColorDisabled ? 0.9 : 1,
+              cursor: submitting ? 'not-allowed' : 'pointer',
+            }}>
+            {submitting ? (
+              <><div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${buttonTextColorDisabled || btnText}55`, borderTopColor: 'transparent' }} />{t.submitting}</>
+            ) : (
+              <><ShoppingCart className="w-5 h-5" />{buttonText || t.submit}</>
+            )}
+          </button>
+        </div>
 
         <p className="text-xs text-center flex items-center justify-center gap-1" style={{ color: cardText, opacity: 0.4 }}>
           <Shield className="w-3 h-3" />{t.secure}

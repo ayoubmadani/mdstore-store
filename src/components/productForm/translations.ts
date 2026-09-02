@@ -6,8 +6,6 @@
 export type ProductFormLanguage = 'ar' | 'fr' | 'en';
 
 export interface ProductFormStrings {
-  formTitle: string;
-  formSubtitle: string;
   fullName: string;
   fullNamePlaceholder: string;
   phone: string;
@@ -32,6 +30,8 @@ export interface ProductFormStrings {
   piece: string;
   product: string;
   offer: string;
+  offersTitle: string;
+  optionsTitle: string;
   delivery: string;
   homeShort: string;
   officeShort: string;
@@ -57,8 +57,6 @@ export interface ProductFormStrings {
 
 const TRANSLATIONS: Record<ProductFormLanguage, ProductFormStrings> = {
   ar: {
-    formTitle: 'أدخل بيانات التسليم',
-    formSubtitle: 'سنتواصل معك خلال 24 ساعة لتأكيد طلبك',
     fullName: 'الاسم الكامل',
     fullNamePlaceholder: 'محمد أحمد',
     phone: 'رقم الهاتف',
@@ -83,6 +81,8 @@ const TRANSLATIONS: Record<ProductFormLanguage, ProductFormStrings> = {
     piece: 'قطعة',
     product: 'المنتج',
     offer: 'العرض',
+    offersTitle: 'العروض',
+    optionsTitle: 'الخيارات',
     delivery: 'التوصيل',
     homeShort: 'المنزل',
     officeShort: 'المكتب',
@@ -106,8 +106,6 @@ const TRANSLATIONS: Record<ProductFormLanguage, ProductFormStrings> = {
     orderSuccessSubtitle: 'سنتواصل معك خلال 24 ساعة لتأكيد التسليم',
   },
   fr: {
-    formTitle: 'Entrez vos informations de livraison',
-    formSubtitle: 'Nous vous contacterons sous 24h pour confirmer votre commande',
     fullName: 'Nom complet',
     fullNamePlaceholder: 'Mohamed Ahmed',
     phone: 'Numéro de téléphone',
@@ -132,6 +130,8 @@ const TRANSLATIONS: Record<ProductFormLanguage, ProductFormStrings> = {
     piece: 'pièce',
     product: 'Produit',
     offer: 'Offre',
+    offersTitle: 'Offres',
+    optionsTitle: 'Options',
     delivery: 'Livraison',
     homeShort: 'Domicile',
     officeShort: 'Bureau',
@@ -155,8 +155,6 @@ const TRANSLATIONS: Record<ProductFormLanguage, ProductFormStrings> = {
     orderSuccessSubtitle: 'Nous vous contacterons sous 24h pour confirmer la livraison',
   },
   en: {
-    formTitle: 'Enter your delivery information',
-    formSubtitle: "We'll contact you within 24 hours to confirm your order",
     fullName: 'Full name',
     fullNamePlaceholder: 'John Doe',
     phone: 'Phone number',
@@ -181,6 +179,8 @@ const TRANSLATIONS: Record<ProductFormLanguage, ProductFormStrings> = {
     piece: 'piece',
     product: 'Product',
     offer: 'Offer',
+    offersTitle: 'Offers',
+    optionsTitle: 'Options',
     delivery: 'Delivery',
     homeShort: 'Home',
     officeShort: 'Office',
