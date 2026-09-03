@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Phone, MessageCircle, Mail, MapPin, ShoppingCart, ArrowUp, ArrowDown, Facebook, Instagram } from 'lucide-react';
+import { Phone, MessageCircle, Mail, MapPin, ShoppingCart, ArrowUp, ArrowDown, Facebook, Instagram, ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductFormBlockRenderer from './ProductFormBlockRenderer';
 import AddShow from '@/components/addShow';
 import CustomerTracker from '@/components/CustomerTracker';
@@ -289,6 +289,126 @@ function FloatingElements({ elements, referenceWidth }: { elements: unknown; ref
   );
 }
 
+const arrowBtnStyle = (side: 'left' | 'right'): React.CSSProperties => ({
+  position: 'absolute',
+  top: '50%',
+  [side]: 10,
+  transform: 'translateY(-50%)',
+  width: 32,
+  height: 32,
+  borderRadius: '50%',
+  border: 'none',
+  backgroundColor: 'rgba(255,255,255,0.85)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+  color: '#18181b',
+});
+
+// Mirrors dashboard/src/pages/editor/blocks/ProductImagesBlock.jsx's display
+// logic exactly (same slider/vertical markup) — but unlike the editor, this
+// side is read-only: `images` is whatever the merchant's editing session
+// already baked into the published tree (seeded from the product once, then
+// independently managed there), never fetched or re-synced here.
+function ProductImagesBlockRenderer({ props }: { props: Record<string, unknown> }) {
+  const { layout, images, borderRadius, showDots, showArrows, showThumbnails, backgroundColor, padding, borderColor, borderWidth, imageGap } = props as {
+    layout?: string; images?: string[];
+    borderRadius?: number; showDots?: boolean; showArrows?: boolean; showThumbnails?: boolean;
+    backgroundColor?: string; padding?: number; borderColor?: string; borderWidth?: number; imageGap?: number;
+  };
+  const [index, setIndex] = useState(0);
+
+  const list = Array.isArray(images) ? images : [];
+  const radius = borderRadius ?? 12;
+
+  if (list.length === 0) return null;
+
+  const mainBorder = borderWidth ? `${borderWidth}px solid ${borderColor || '#000000'}` : undefined;
+
+  if (layout === 'vertical') {
+    return (
+      <div style={{ backgroundColor: backgroundColor || undefined, padding: padding || undefined, display: 'flex', flexDirection: 'column', gap: imageGap ?? 12 }}>
+        {list.map((src, pos) => (
+          <div key={pos} style={{ position: 'relative', width: '100%', aspectRatio: '1 / 1', minWidth: 0, minHeight: 0, borderRadius: radius, overflow: 'hidden', border: mainBorder, boxSizing: 'border-box' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- dynamic per-product src, not a static build-time asset */}
+            <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  const activeIndex = index < list.length ? index : 0;
+  const goTo = (i: number) => setIndex(((i % list.length) + list.length) % list.length);
+
+  return (
+    <div style={{ backgroundColor: backgroundColor || undefined, padding: padding || undefined }}>
+      <div style={{ position: 'relative', width: '100%', aspectRatio: '1 / 1', minWidth: 0, minHeight: 0, borderRadius: radius, overflow: 'hidden', border: mainBorder, boxSizing: 'border-box' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- dynamic per-product src, not a static build-time asset */}
+        <img src={list[activeIndex]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        {showArrows !== false && list.length > 1 && (
+          <>
+            <button type="button" onClick={() => goTo(activeIndex - 1)} style={arrowBtnStyle('left')}>
+              <ChevronLeft size={18} />
+            </button>
+            <button type="button" onClick={() => goTo(activeIndex + 1)} style={arrowBtnStyle('right')}>
+              <ChevronRight size={18} />
+            </button>
+          </>
+        )}
+        {showDots !== false && list.length > 1 && (
+          <div style={{ position: 'absolute', bottom: 10, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 6 }}>
+            {list.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setIndex(i)}
+                style={{
+                  width: i === activeIndex ? 18 : 6,
+                  height: 6,
+                  borderRadius: 3,
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  backgroundColor: i === activeIndex ? '#ffffff' : 'rgba(255,255,255,0.5)',
+                  transition: 'width 0.2s',
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+      {showThumbnails !== false && list.length > 1 && (
+        <div style={{ display: 'flex', gap: 8, marginTop: 8, overflowX: 'auto' }}>
+          {list.map((src, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setIndex(i)}
+              style={{
+                flexShrink: 0,
+                width: 100,
+                height: 100,
+                padding: 0,
+                borderRadius: 6,
+                overflow: 'hidden',
+                cursor: 'pointer',
+                border: i === activeIndex ? `2px solid ${borderColor || '#10b981'}` : '2px solid transparent',
+                opacity: i === activeIndex ? 1 : 0.7,
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element -- dynamic per-product src, not a static build-time asset */}
+              <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Mirrors dashboard/src/pages/editor/blocks/ImageBlock.jsx.
 function ImageBlockRenderer({ props, referenceWidth }: { props: Record<string, unknown>; referenceWidth: number }) {
   const { src, alt, caption, width, align, height } = props as ImageBlockProps;
@@ -418,6 +538,7 @@ export default function BuilderPageRenderer({ page, lpDomain, dedicated }: { pag
         return (
           <div key={block.id ?? index} style={{ position: 'relative', containerType: 'inline-size' }} id={block.type === 'productForm' ? 'md-product-form' : undefined}>
             {block.type === 'image' && <ImageBlockRenderer props={block.props} referenceWidth={pageMaxWidth} />}
+            {block.type === 'productImages' && <ProductImagesBlockRenderer props={block.props} />}
             {block.type === 'spacer' && <SpacerBlockRenderer props={block.props} elements={isPinnedSpacer ? block.props?.elements : undefined} maxWidth={pageMaxWidth} />}
             {block.type === 'productForm' && (
               <ProductFormBlockRenderer
