@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { Phone, MessageCircle, Mail, MapPin, ShoppingCart, ArrowUp, ArrowDown, Facebook, Instagram, ChevronLeft, ChevronRight } from 'lucide-react';
-import ProductFormBlockRenderer from './ProductFormBlockRenderer';
+// نفس نموذج المحرر (نسخة منه) — حتى يطابق الموقع المعاينة تماماً
+import EditorProductFormBlockJs from './EditorProductFormBlock';
+// ملف JS: كل خصائص البلوك اختيارية (كما يمررها المحرر)
+const EditorProductFormBlock = EditorProductFormBlockJs as unknown as React.ComponentType<Record<string, unknown>>;
 import AddShow from '@/components/addShow';
 import CustomerTracker from '@/components/CustomerTracker';
 import WhatsAppIcon from './WhatsAppIcon';
@@ -536,15 +539,14 @@ export default function BuilderPageRenderer({ page, lpDomain, dedicated }: { pag
         const isPinnedSpacer = block.type === 'spacer' && (block.props?.position === 'top' || block.props?.position === 'bottom');
         if (block.type === 'floatingButton') return <FloatingActionButton key={block.id ?? index} props={block.props} referenceWidth={pageMaxWidth} />;
         return (
-          <div key={block.id ?? index} style={{ position: 'relative', containerType: 'inline-size' }} id={block.type === 'productForm' ? 'md-product-form' : undefined}>
+          <div key={block.id ?? index} style={{ position: 'relative', containerType: 'inline-size' }}>
             {block.type === 'image' && <ImageBlockRenderer props={block.props} referenceWidth={pageMaxWidth} />}
             {block.type === 'productImages' && <ProductImagesBlockRenderer props={block.props} />}
             {block.type === 'spacer' && <SpacerBlockRenderer props={block.props} elements={isPinnedSpacer ? block.props?.elements : undefined} maxWidth={pageMaxWidth} />}
             {block.type === 'productForm' && (
-              <ProductFormBlockRenderer
+              <EditorProductFormBlock
+                {...(block.props as Record<string, unknown>)}
                 productId={page.productId || (block.props?.productId as string | undefined)}
-                props={block.props}
-                lpDomain={lpDomain}
                 builderPageId={page.id}
                 language={settings.language}
                 dedicated={dedicated}

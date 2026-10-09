@@ -1,0 +1,950 @@
+'use client';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// نسخة من dashboard-order/src/pages/editor/blocks/ProductFormBlock.jsx — نفس
+// الكود حرفياً حتى يطابق نموذج الطلب في الموقع معاينة المحرر تماماً.
+// الفروق الوحيدة (موسومة بـ «الموقع»): جلب المنتج بدون توكن، ربط الطلب
+// بالصفحة (builderPageId)، حدث الشراء، والانتقال لصفحة "شكراً".
+// عند تعديل نموذج المحرر: انسخ التعديل هنا أيضاً.
+// ═══════════════════════════════════════════════════════════════════════════
+
+import { useEffect, useState } from 'react';
+import {
+  Minus, Plus, ShoppingCart, MapPin, Phone, User, Home,
+  ChevronDown, Truck, Shield, Package, Building2, AlertCircle, Mail, MessageCircle,
+  Check as CheckIcon,
+} from 'lucide-react';
+import axios from 'axios';
+import { getProductFormStrings } from './editorProductFormTranslations';
+
+// «الموقع»
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
+
+// «الموقع» صفحة "شكراً": داخل /lp/<slug> نكمل المسار كما كان؛ على دومين مخصص
+// للصفحة (الجذر) نستعمل /lp/page/successfully — ومحلياً يبقى الدومين في أول المسار
+// «الموقع» نفس منطق ProductFormBlockRenderer (main): Purchase لفيسبوك، CompletePayment
+// لتيك توك، purchase لجوجل — بعد 1.5 ثانية حتى تكون سكربتات البيكسل قد حُمّلت
+const SAFE_PIXEL_ID = /^[\w-]{1,64}$/;
+function firePurchasePixels(pixels, order) {
+  if (!pixels?.length || typeof window === 'undefined') return;
+  setTimeout(() => {
+    pixels.forEach((px) => {
+      if (!px.isActive || !SAFE_PIXEL_ID.test(px.pixelId)) return;
+      if (px.type === 'facebook' && window.fbq) {
+        window.fbq('track', 'Purchase', { value: order.total, currency: 'DZD', order_id: order.id });
+      }
+      if (px.type === 'tiktok' && window.ttq) {
+        window.ttq.track('CompletePayment', { value: order.total, currency: 'DZD', order_id: order.id });
+      }
+      if (px.type === 'google' && window.gtag) {
+        window.gtag('event', 'purchase', { transaction_id: order.id, value: order.total, currency: 'DZD' });
+      }
+    });
+  }, 1500);
+}
+
+function successPath(productId) {
+  const path = window.location.pathname.replace(/\/$/, '');
+  const base = path.includes('/lp/') ? path : `${path}/lp/page`;
+  return `${base}/successfully?productId=${productId}`;
+}
+
+// Mirrors store/src/components/productForm/productForm.tsx (+ ProductClient.tsx's
+// variant/offer picker) field names, layout, and POST /orders payload exactly —
+// that's the real, already-working storefront order flow, so this block both
+// looks like and submits real orders the same way instead of inventing a
+// parallel shape. Wilaya/commune/order endpoints are public (no auth) to match
+// how a real customer on a published page would call them; only the initial
+// product-info lookup needs the dashboard's own token, since it currently only
+// runs inside the editor.
+
+// A VariantDetail's `name` is a denormalized JSON array of {attrName, value}
+// entries (not a relation) — matching is done client-side, same as the real form.
+function variantMatches(detail, selected) {
+  return Object.entries(selected).every(([attrName, value]) =>
+    detail.name?.some((entry) => entry.attrName === attrName && entry.value === value)
+  );
+}
+
+// Picks black or white for a checkmark drawn on top of an arbitrary color
+// swatch, so it stays visible on both light (e.g. white, yellow) and dark
+// (e.g. black, navy) attribute colors instead of assuming one fixed color.
+function contrastText(hex) {
+  if (!hex || !/^#([0-9a-f]{6}|[0-9a-f]{3})$/i.test(hex)) return '#ffffff';
+  const full = hex.length === 4
+    ? `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`
+    : hex;
+  const num = parseInt(full.slice(1), 16);
+  const r = (num >> 16) & 0xff, g = (num >> 8) & 0xff, b = num & 0xff;
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.6 ? '#000000' : '#ffffff';
+}
+
+function FieldWrapper({ label, labelColor, error, children }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      {label && (
+        <label style={{ fontSize: 12, fontWeight: 700, color: labelColor, textTransform: 'uppercase', letterSpacing: 0.4 }}>
+          {label}
+        </label>
+      )}
+      {children}
+      {error && (
+        <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: '#ef4444', display: 'flex', alignItems: 'center', gap: 4 }}>
+          <AlertCircle size={12} />
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+export default function ProductFormBlock({
+  productId,
+  showProductName,
+  productName,
+  buttonText,
+  containerBackgroundColor,
+  backgroundColor,
+  textColor,
+  buttonBackgroundColor,
+  buttonTextColor,
+  buttonBorderColor,
+  buttonBackgroundColorDisabled,
+  buttonTextColorDisabled,
+  buttonBorderColorDisabled,
+  inputBackgroundColor,
+  inputBorderColor,
+  inputTextColor,
+  paddingX,
+  paddingY,
+  borderRadius,
+  sectionGap,
+  language,
+  builderPageId, // «الموقع»
+  dedicated,     // «الموقع» دومين مخصص للصفحة: لا صفحة "شكراً" — تأكيد داخل النموذج
+  pixels,        // «الموقع» بيكسلات الصفحة (لحدث الشراء في الحالة dedicated)
+}) {
+  const t = getProductFormStrings(language);
+  const formatPrice = (n) => `${Number(n || 0).toLocaleString('ar-DZ')} ${t.currency}`;
+  const [product, setProduct] = useState(null);
+  const [wilayas, setWilayas] = useState([]);
+  const [communes, setCommunes] = useState([]);
+  const [selectedVariants, setSelectedVariants] = useState({});
+  const [selectedOffer, setSelectedOffer] = useState(null);
+  const [form, setForm] = useState({
+    customerName: '',
+    customerPhone: '',
+    customerEmail: '',
+    customerWhatsapp: '',
+    wilayaId: '',
+    communeId: '',
+    typeShip: 'home',
+    quantity: 1,
+  });
+  // منتج رقمي فقط — أي طريقة يستخدمها الزائر للتواصل بدل الشحن
+  const [contactMethod, setContactMethod] = useState('email');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(null);
+  const [focusedField, setFocusedField] = useState(null);
+
+  // Focus/selected accent reuses the button's own color instead of a
+  // separate picker — one accent color to set, consistently applied.
+  // accentColor can be a raw CSS var() expression (the default), which can't
+  // have an alpha suffix appended, so the box-shadow needs its own fallback.
+  const accentColor = buttonBackgroundColor || 'var(--md-primary, #10b981)';
+  const accentShadow = buttonBackgroundColor ? `${buttonBackgroundColor}26` : 'rgba(16, 185, 129, 0.15)';
+  const muted = textColor || '#27272a';
+  const baseInputStyle = {
+    ...inputStyle,
+    backgroundColor: inputBackgroundColor || inputStyle.backgroundColor,
+    borderColor: inputBorderColor || inputStyle.borderColor,
+    color: inputTextColor || inputStyle.color,
+  };
+  // "Couleurs du bouton actif/désactivé" apply to every selectable-choice
+  // button in the form (delivery type, offers, attribute/variant options,
+  // digital contact-method toggle) — active = the currently-picked choice,
+  // désactivé = every other choice in that same group, not the submit button.
+  const activeBtnText = buttonTextColor || '#ffffff';
+  const activeBtnBorder = buttonBorderColor || accentColor;
+  const inactiveBtnBg = buttonBackgroundColorDisabled || 'transparent';
+  const inactiveBtnText = buttonTextColorDisabled || muted;
+  const inactiveBtnBorder = buttonBorderColorDisabled || baseInputStyle.borderColor;
+  const fieldStyle = (name, extra) => ({
+    ...baseInputStyle,
+    ...extra,
+    ...(focusedField === name
+      ? { borderColor: accentColor, backgroundColor: '#ffffff', boxShadow: `0 0 0 3px ${accentShadow}` }
+      : {}),
+  });
+  // Same merchant-configurable radius as the outer card, applied to every
+  // inner section box too (header, product info, offers, options, fields,
+  // summary) so "Rayon des angles" controls all of them uniformly.
+  const sectionRadius = borderRadius ?? 10;
+  // Merchant-configurable gap between top-level section boxes (header,
+  // product info / offers / options, order-form fields, summary).
+  const gapPx = sectionGap ?? 14;
+  const fieldHandlers = (name) => ({
+    onFocus: () => setFocusedField(name),
+    onBlur: () => setFocusedField((f) => (f === name ? null : f)),
+  });
+
+  useEffect(() => {
+    if (!productId) return;
+    axios
+      .get(`${baseURL}/builder-pages/product-info/${productId}`) // «الموقع» مسار عام
+      .then((res) => setProduct(res.data))
+      .catch(() => setProduct(null));
+  }, [productId]);
+
+  useEffect(() => {
+    if (!product?.userId) return;
+    axios
+      .get(`${baseURL}/shipping/public/get-shipping/${product.userId}`)
+      .then((res) => setWilayas(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setWilayas([]));
+  }, [product?.userId]);
+
+  useEffect(() => {
+    if (!form.wilayaId) {
+      setCommunes([]);
+      return;
+    }
+    axios
+      .get(`${baseURL}/shipping/get-communes/${form.wilayaId}`)
+      .then((res) => setCommunes(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setCommunes([]));
+  }, [form.wilayaId]);
+
+  const toggleVariant = (attrName, value) => {
+    setSelectedVariants((prev) => {
+      const next = { ...prev };
+      if (next[attrName] === value) delete next[attrName];
+      else next[attrName] = value;
+      return next;
+    });
+  };
+
+  const matchedVariantDetail =
+    product?.variantDetails?.length && Object.keys(selectedVariants).length
+      ? product.variantDetails.find((v) => variantMatches(v, selectedVariants))
+      : null;
+
+  // Precedence matches the real storefront exactly: offer price overrides
+  // everything, then a matched variant's price override, then the base price.
+  const getUnitPrice = () => {
+    const offer = product?.offers?.find((o) => o.id === selectedOffer);
+    if (offer) return offer.price;
+    if (matchedVariantDetail && matchedVariantDetail.price !== -1) return matchedVariantDetail.price;
+    return product?.price || 0;
+  };
+
+  const selectedWilaya = wilayas.find((w) => String(w.id) === String(form.wilayaId));
+  // أسعار التوصيل تصل من الـ API كنصوص (decimal) — Number() وإلا صار "8900" + "0" = "89000"
+  const priceShip = product?.isDigital
+    ? 0
+    : selectedWilaya
+      ? Number(form.typeShip === 'office'
+        ? selectedWilaya.livraisonOfice
+        : selectedWilaya.livraisonHome) || 0
+      : 0;
+  const priceLoss = product?.isDigital ? 0 : (Number(selectedWilaya?.livraisonReturn) || 0);
+  // Store-level "Qty Support" toggle — hide the quantity picker entirely
+  // (not just lock it to 1) when the merchant's store doesn't offer it,
+  // same as the theme files' own ProductForm already does.
+  const supportQty = product?.supportQty !== false;
+  const totalPrice = Number(getUnitPrice()) * form.quantity + priceShip;
+
+  const outOfStock =
+    matchedVariantDetail && !matchedVariantDetail.autoGenerate && matchedVariantDetail.stock <= 0;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!product) return;
+
+    const normalizedPhone = form.customerPhone.trim().replace(/^\+213/, '0');
+    if (!/^(05|06|07)\d{8}$/.test(normalizedPhone)) {
+      setError(t.errorPhone);
+      return;
+    }
+    if (product.isDigital) {
+      if (contactMethod === 'email') {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.customerEmail.trim())) {
+          setError(t.errorEmail);
+          return;
+        }
+      } else if (!/^(0|\+213)[5-7][0-9]{8}$/.test(form.customerWhatsapp.trim().replace(/\s/g, ''))) {
+        setError(t.errorWhatsapp);
+        return;
+      }
+    }
+
+    setSubmitting(true);
+    setError(null);
+    // Minimum visible duration for the "submitting" (disabled-button-colors)
+    // state — a local API call can resolve in well under 100ms, too fast to
+    // actually see the button's disabled styling, so this floors it at 500ms.
+    const minDelay = new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      const customerId = localStorage.getItem('customerId') || undefined;
+      const [res] = await Promise.all([
+        axios.post(`${baseURL}/orders`, {
+          productId: product.id,
+          variantDetailId: matchedVariantDetail?.id,
+          offerId: selectedOffer || undefined,
+          domain: product.domain,
+          platform: 'mdstore',
+          builderPageId, // «الموقع» إحصائيات الصفحة
+          quantity: form.quantity,
+          totalPrice,
+          customerId,
+          customerName: form.customerName,
+          customerPhone: normalizedPhone,
+          ...(product.isDigital
+            ? (contactMethod === 'email'
+                ? { customerEmail: form.customerEmail.trim() }
+                : { customerWhatsapp: form.customerWhatsapp.trim() })
+            : {
+                typeShip: form.typeShip,
+                priceShip,
+                priceLoss,
+                customerWilayaId: form.wilayaId ? Number(form.wilayaId) : undefined,
+                customerCommuneId: form.communeId ? Number(form.communeId) : undefined,
+              }),
+        }),
+        minDelay,
+      ]);
+      if (res.data?.customerId) localStorage.setItem('customerId', res.data.customerId);
+      if (dedicated) {
+        // «الموقع» دومين مخصص: لا مسار /successfully — رسالة تأكيد هنا + حدث الشراء للبيكسلات
+        firePurchasePixels(pixels, { id: res.data?.id ?? product.id, total: totalPrice });
+        setSubmitted(true);
+      } else {
+        // «الموقع» حدث الشراء ثم صفحة "شكراً" (بيكسلات فيسبوك/تيك توك تُطلق هناك)
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('event', 'purchase', {
+            transaction_id: product.id, value: totalPrice, currency: 'DZD',
+            items: [{ item_name: product.name, item_id: product.id, price: getUnitPrice(), quantity: form.quantity }],
+          });
+        }
+        window.location.assign(successPath(product.id));
+        setSubmitted(true);
+      }
+    } catch {
+      await minDelay;
+      setError(t.submitError);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+
+  return (
+    // Stable id a "jump to order form" button (see ElementsOverlay.jsx)
+    // scrolls to — works from anywhere on the page without needing to know
+    // this block's own generated id.
+    <div
+      id="md-product-form"
+      style={{
+        paddingBlock: paddingY ?? 0,
+        paddingInline: `${paddingX ?? 0}%`,
+        width: '100%',
+        height: '100%',
+        boxSizing: 'border-box',
+        backgroundColor: containerBackgroundColor || 'transparent',
+      }}
+    >
+      <div style={{ backgroundColor: containerBackgroundColor || '#ffffff', color: muted, overflow: 'hidden', borderRadius: borderRadius ?? 0 }}>
+        <div style={{ paddingTop: gapPx }}>
+          {!productId ? (
+            <p style={{ textAlign: 'center', fontSize: 14, opacity: 0.6 }}>{t.noProductSelected}</p>
+          ) : submitted ? (
+            <p style={{ textAlign: 'center', fontSize: 15, fontWeight: 600, color: accentColor }}>
+              {t.submitSuccess}
+            </p>
+          ) : (
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: gapPx }}>
+              {product && showProductName !== false && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 12, borderRadius: sectionRadius, backgroundColor: backgroundColor || '#ffffff', border: `1px solid ${baseInputStyle.borderColor}` }}>
+                  {product.productImage && (
+                    <img src={product.productImage} alt="" style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover' }} />
+                  )}
+                  <div>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>{productName || product.name}</p>
+                    <p style={{ margin: 0, fontSize: 13, opacity: 0.7 }}>{formatPrice(getUnitPrice())}</p>
+                  </div>
+                </div>
+              )}
+
+              {(product?.offers?.length > 0 || product?.attributes?.length > 0) && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: gapPx }}>
+                  {product?.offers?.length > 0 && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 12, borderRadius: sectionRadius, backgroundColor: backgroundColor || '#ffffff', border: `1px solid ${baseInputStyle.borderColor}` }}>
+                      <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: muted, opacity: 0.6, textTransform: 'uppercase', letterSpacing: 0.4 }}>{t.offersTitle}</p>
+                      {product.offers.map((offer) => {
+                        const isSel = selectedOffer === offer.id;
+                        return (
+                          <label
+                            key={offer.id}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: 10,
+                              padding: '12px 14px',
+                              borderRadius: 10,
+                              // المختار: خلفية بلون الزر (شفافة) + إطار 2px — أوضح من الإطار وحده
+                              border: `2px solid ${isSel ? accentColor : inactiveBtnBorder}`,
+                              backgroundColor: isSel ? `color-mix(in srgb, ${accentColor} 14%, transparent)` : 'transparent',
+                              cursor: 'pointer',
+                              transition: 'background-color .15s, border-color .15s',
+                            }}
+                          >
+                            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                              {/* زر الاختيار الأصلي مخفي بصرياً فقط (لوحة المفاتيح وقارئ الشاشة) */}
+                              <input
+                                type="radio"
+                                name="offer"
+                                checked={isSel}
+                                onChange={() => setSelectedOffer(isSel ? null : offer.id)}
+                                style={{ position: 'absolute', opacity: 0, width: 1, height: 1, pointerEvents: 'none' }}
+                              />
+                              <span style={{
+                                width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
+                                border: `2px solid ${isSel ? accentColor : 'currentColor'}`, opacity: isSel ? 1 : 0.45,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              }}>
+                                {isSel && <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: accentColor }} />}
+                              </span>
+                              <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                <span style={{ fontSize: 14, fontWeight: 700 }}>{offer.name}</span>
+                                {offer.quantity > 1 && (
+                                  <span style={{ fontSize: 11, fontWeight: 500, opacity: 0.6 }}>{offer.quantity} {t.pieces}</span>
+                                )}
+                              </span>
+                            </span>
+                            <span style={{ fontSize: 15, fontWeight: 800, whiteSpace: 'nowrap' }}>{formatPrice(offer.price)}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {product?.attributes?.length > 0 && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: 12, borderRadius: sectionRadius, backgroundColor: backgroundColor || '#ffffff', border: `1px solid ${baseInputStyle.borderColor}` }}>
+                      <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: muted, opacity: 0.6, textTransform: 'uppercase', letterSpacing: 0.4 }}>{t.optionsTitle}</p>
+                      {product.attributes.map((attr) => (
+                        <div key={attr.id}>
+                          <p style={{ fontSize: 12, fontWeight: 600, margin: '0 0 4px' }}>{attr.name}</p>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                            {attr.variants?.map((v) => {
+                              const isSelected = selectedVariants[attr.name] === v.value;
+
+                              if (attr.displayMode === 'color') {
+                                // A colored ring around a colored swatch can
+                                // blend into the swatch's own fill and become
+                                // invisible — a white gap between them plus a
+                                // checkmark makes the selected one unmistakable
+                                // no matter what color it is.
+                                return (
+                                  <button
+                                    key={v.id}
+                                    type="button"
+                                    onClick={() => toggleVariant(attr.name, v.value)}
+                                    title={v.name}
+                                    style={{
+                                      position: 'relative',
+                                      width: 38,
+                                      height: 38,
+                                      borderRadius: '50%',
+                                      background: v.value,
+                                      border: '2px solid #ffffff',
+                                      boxShadow: isSelected
+                                        ? `0 0 0 2.5px ${activeBtnBorder}`
+                                        : `0 0 0 1px ${inactiveBtnBorder}`,
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                    }}
+                                  >
+                                    {isSelected && (
+                                      <CheckIcon size={16} color={contrastText(v.value)} />
+                                    )}
+                                  </button>
+                                );
+                              }
+
+                              if (attr.displayMode === 'image') {
+                                // Same reasoning as the color swatch — the
+                                // image's own colors could match the ring, so
+                                // a corner checkmark badge stays visible
+                                // regardless of what's in the picture.
+                                return (
+                                  <button
+                                    key={v.id}
+                                    type="button"
+                                    onClick={() => toggleVariant(attr.name, v.value)}
+                                    title={v.name}
+                                    style={{
+                                      position: 'relative',
+                                      width: 100,
+                                      height: 100,
+                                      borderRadius: 8,
+                                      padding: 0,
+                                      backgroundImage: `url(${v.value})`,
+                                      backgroundSize: 'cover',
+                                      backgroundPosition: 'center',
+                                      border: '2px solid #ffffff',
+                                      boxShadow: isSelected
+                                        ? `0 0 0 2.5px ${activeBtnBorder}`
+                                        : `0 0 0 1px ${inactiveBtnBorder}`,
+                                      cursor: 'pointer',
+                                    }}
+                                  >
+                                    {isSelected && (
+                                      <span style={{
+                                        position: 'absolute', top: -8, right: -8,
+                                        width: 22, height: 22, borderRadius: '50%',
+                                        backgroundColor: activeBtnBorder,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        border: '2px solid #ffffff',
+                                      }}>
+                                        <CheckIcon size={13} color={contrastText(activeBtnBorder)} />
+                                      </span>
+                                    )}
+                                  </button>
+                                );
+                              }
+
+                              return (
+                                <button
+                                  key={v.id}
+                                  type="button"
+                                  onClick={() => toggleVariant(attr.name, v.value)}
+                                  style={{
+                                    padding: '8px 14px',
+                                    borderRadius: 6,
+                                    fontSize: 12,
+                                    backgroundColor: isSelected ? accentColor : inactiveBtnBg,
+                                    color: isSelected ? activeBtnText : inactiveBtnText,
+                                    border: `1px solid ${isSelected ? activeBtnBorder : inactiveBtnBorder}`,
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  {v.name}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Order form fields */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: 12, borderRadius: sectionRadius, backgroundColor: backgroundColor || '#ffffff', border: `1px solid ${baseInputStyle.borderColor}` }}>
+              {/* Name + Phone — بدون أسماء حقول: الـ placeholder يحمل اسم الحقل (نفس المتجر: hideLabels) */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 10 }}>
+                <FieldWrapper>
+                  <div style={{ position: 'relative' }}>
+                    <User size={15} style={iconInFieldStyle} />
+                    <input
+                      type="text"
+                      placeholder={t.fullName}
+                      aria-label={t.fullName}
+                      value={form.customerName}
+                      onChange={(e) => setForm((f) => ({ ...f, customerName: e.target.value }))}
+                      required
+                      style={fieldStyle('customerName', { paddingInlineStart: 34 })}
+                      {...fieldHandlers('customerName')}
+                    />
+                  </div>
+                </FieldWrapper>
+                <FieldWrapper>
+                  <div style={{ position: 'relative' }}>
+                    <Phone size={15} style={iconInFieldStyle} />
+                    <input
+                      type="tel"
+                      // الأرقام من اليسار لليمين فقط حين يكتب الزبون — الـ placeholder (اسم الحقل) يتبع اتجاه الصفحة وخطها
+                      dir={form.customerPhone ? 'ltr' : undefined}
+                      placeholder={t.phone}
+                      aria-label={t.phone}
+                      value={form.customerPhone}
+                      onChange={(e) => setForm((f) => ({ ...f, customerPhone: e.target.value }))}
+                      required
+                      style={fieldStyle('customerPhone', { paddingInlineStart: 34, ...emptyLtrFieldStyle(form.customerPhone) })}
+                      {...fieldHandlers('customerPhone')}
+                    />
+                  </div>
+                </FieldWrapper>
+              </div>
+
+              {product?.isDigital ? (
+                /* Email or WhatsApp — digital products need no shipping info */
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: muted, opacity: 0.6, textTransform: 'uppercase', letterSpacing: 0.4 }}>{t.contactQuestion}</p>
+                  <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', border: `1px solid ${inputBorderColor || inputStyle.borderColor}` }}>
+                    <button
+                      type="button"
+                      onClick={() => setContactMethod('email')}
+                      style={{
+                        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                        padding: '10px 0', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer',
+                        backgroundColor: contactMethod === 'email' ? accentColor : inactiveBtnBg,
+                        color: contactMethod === 'email' ? activeBtnText : inactiveBtnText,
+                        opacity: contactMethod === 'email' ? 1 : 0.6,
+                      }}
+                    >
+                      <Mail size={14} />
+                      {t.contactViaEmail}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setContactMethod('whatsapp')}
+                      style={{
+                        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                        padding: '10px 0', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer',
+                        backgroundColor: contactMethod === 'whatsapp' ? accentColor : inactiveBtnBg,
+                        color: contactMethod === 'whatsapp' ? activeBtnText : inactiveBtnText,
+                        opacity: contactMethod === 'whatsapp' ? 1 : 0.6,
+                      }}
+                    >
+                      <MessageCircle size={14} />
+                      {t.contactViaWhatsapp}
+                    </button>
+                  </div>
+
+                  {contactMethod === 'email' ? (
+                    <FieldWrapper>
+                      <div style={{ position: 'relative' }}>
+                        <Mail size={15} style={iconInFieldStyle} />
+                        <input
+                          type="email"
+                          dir={form.customerEmail ? 'ltr' : undefined}
+                          placeholder={t.email}
+                          aria-label={t.email}
+                          value={form.customerEmail}
+                          onChange={(e) => setForm((f) => ({ ...f, customerEmail: e.target.value }))}
+                          required
+                          style={fieldStyle('customerEmail', { paddingInlineStart: 34, ...emptyLtrFieldStyle(form.customerEmail, false) })}
+                          {...fieldHandlers('customerEmail')}
+                        />
+                      </div>
+                    </FieldWrapper>
+                  ) : (
+                    <FieldWrapper>
+                      <div style={{ position: 'relative' }}>
+                        <MessageCircle size={15} style={iconInFieldStyle} />
+                        <input
+                          type="tel"
+                          dir={form.customerWhatsapp ? 'ltr' : undefined}
+                          placeholder={t.whatsapp}
+                          aria-label={t.whatsapp}
+                          value={form.customerWhatsapp}
+                          onChange={(e) => setForm((f) => ({ ...f, customerWhatsapp: e.target.value }))}
+                          required
+                          style={fieldStyle('customerWhatsapp', { paddingInlineStart: 34, ...emptyLtrFieldStyle(form.customerWhatsapp) })}
+                          {...fieldHandlers('customerWhatsapp')}
+                        />
+                      </div>
+                    </FieldWrapper>
+                  )}
+                </div>
+              ) : (
+                <>
+                  {/* Wilaya + Commune */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                    <FieldWrapper>
+                      <div style={{ position: 'relative' }}>
+                        <MapPin size={15} style={iconInFieldStyle} />
+                        <select
+                          value={form.wilayaId}
+                          aria-label={t.wilaya}
+                          onChange={(e) => setForm((f) => ({ ...f, wilayaId: e.target.value, communeId: '' }))}
+                          required
+                          style={fieldStyle('wilayaId', { paddingInlineStart: 34, paddingInlineEnd: 28, appearance: 'none', cursor: 'pointer' })}
+                          {...fieldHandlers('wilayaId')}
+                        >
+                          <option value="">{t.selectWilaya}</option>
+                          {wilayas.map((w) => (
+                            <option key={w.id} value={w.id}>{w.ar_name || w.name}</option>
+                          ))}
+                        </select>
+                        <ChevronDown size={14} style={chevronInFieldStyle} />
+                      </div>
+                    </FieldWrapper>
+                    <FieldWrapper>
+                      <div style={{ position: 'relative' }}>
+                        <MapPin size={15} style={iconInFieldStyle} />
+                        <select
+                          value={form.communeId}
+                          aria-label={t.commune}
+                          onChange={(e) => setForm((f) => ({ ...f, communeId: e.target.value }))}
+                          disabled={!form.wilayaId}
+                          style={fieldStyle('communeId', { paddingInlineStart: 34, paddingInlineEnd: 28, appearance: 'none', cursor: 'pointer', opacity: form.wilayaId ? 1 : 0.6 })}
+                          {...fieldHandlers('communeId')}
+                        >
+                          <option value="">{t.selectCommune}</option>
+                          {communes.map((c) => (
+                            <option key={c.id} value={c.id}>{c.ar_name || c.name}</option>
+                          ))}
+                        </select>
+                        <ChevronDown size={14} style={chevronInFieldStyle} />
+                      </div>
+                    </FieldWrapper>
+                  </div>
+
+                  {/* Delivery type */}
+                  <div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                      {[
+                        { type: 'home', Icon: Home, label: t.home },
+                        { type: 'office', Icon: Building2, label: t.office },
+                      ].map((opt) => {
+                        const isSelected = form.typeShip === opt.type;
+                        return (
+                          <button
+                            key={opt.type}
+                            type="button"
+                            onClick={() => setForm((f) => ({ ...f, typeShip: opt.type }))}
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              gap: 6,
+                              padding: '12px 8px',
+                              borderRadius: 14,
+                              border: `2px solid ${isSelected ? activeBtnBorder : inactiveBtnBorder}`,
+                              backgroundColor: isSelected ? accentColor : inactiveBtnBg,
+                              color: isSelected ? activeBtnText : inactiveBtnText,
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <opt.Icon size={20} style={{ opacity: isSelected ? 1 : 0.5 }} />
+                            <span style={{ textAlign: 'center' }}>
+                              <span style={{ display: 'block', fontSize: 13, fontWeight: 700 }}>{opt.label}</span>
+                              {selectedWilaya && (
+                                <span style={{ display: 'block', fontSize: 10.5, marginTop: 2, opacity: isSelected ? 0.85 : 0.55 }}>
+                                  {formatPrice(opt.type === 'home' ? selectedWilaya.livraisonHome : selectedWilaya.livraisonOfice)}
+                                </span>
+                              )}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {!selectedWilaya && (
+                      <p style={{ fontSize: 11, opacity: 0.5, marginTop: 6, textAlign: 'center' }}>{t.selectWilayaForPrice}</p>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Quantity — a digital product is a single license/copy, not a
+                  stockable count, so there's nothing to increment; supportQty
+                  being off means the store doesn't offer quantity selection at all */}
+              {supportQty && !product?.isDigital && (
+                <FieldWrapper label={t.quantity} labelColor={muted}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <button
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, quantity: Math.max(1, f.quantity - 1) }))}
+                      disabled={form.quantity <= 1}
+                      style={quantityButtonStyle(accentColor, form.quantity <= 1)}
+                    >
+                      <Minus size={14} strokeWidth={2.5} />
+                    </button>
+                    <span style={{ minWidth: 24, textAlign: 'center', fontSize: 15, fontWeight: 800 }}>
+                      {form.quantity}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, quantity: f.quantity + 1 }))}
+                      style={quantityButtonStyle(accentColor, false)}
+                    >
+                      <Plus size={14} strokeWidth={2.5} />
+                    </button>
+                    <span style={{ fontSize: 12, opacity: 0.5, fontWeight: 500 }}>{t.piece}</span>
+                  </div>
+                </FieldWrapper>
+              )}
+              </div>
+
+              {/* Order summary */}
+              {product && (
+                <div style={{ borderRadius: sectionRadius, backgroundColor: backgroundColor || '#ffffff', border: `1px solid ${baseInputStyle.borderColor}`, padding: 16, display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', opacity: 0.75 }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Package size={14} /> {t.product}</span>
+                    <span style={{ fontWeight: 700, opacity: 1, maxWidth: '55%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</span>
+                  </div>
+
+                  {/* العرض والخيارات لا تُكرَّر في الملخص — اختارها الزبون في الأعلى */}
+
+                  {!product.isDigital && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', opacity: 0.75 }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}><Truck size={14} /> {t.delivery}</span>
+                      <span style={{ fontWeight: 600, opacity: 1 }}>
+                        {form.typeShip === 'home' ? t.homeShort : t.officeShort}
+                        {form.wilayaId && <span style={{ opacity: 0.6 }}> ({formatPrice(priceShip)})</span>}
+                      </span>
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', opacity: 0.75 }}>
+                    <span>{t.unitPrice}</span>
+                    <span style={{ fontWeight: 700, opacity: 1 }}>{formatPrice(getUnitPrice())}</span>
+                  </div>
+                  {supportQty && !product.isDigital && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', opacity: 0.75 }}>
+                      <span>{t.quantity}</span>
+                      <span style={{ fontWeight: 700, opacity: 1 }}>× {form.quantity}</span>
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, borderTop: `1.5px dashed ${baseInputStyle.borderColor}` }}>
+                    <span style={{ fontWeight: 700, fontSize: 14 }}>{t.total}</span>
+                    <span style={{ fontSize: 19, fontWeight: 800 }}>
+                      {formatPrice(totalPrice)}
+                    </span>
+                  </div>
+
+                  {outOfStock && (
+                    <p style={{ color: '#dc2626', fontSize: 12, textAlign: 'center', margin: 0 }}>{t.outOfStock}</p>
+                  )}
+                  {error && <p style={{ color: '#dc2626', fontSize: 12, textAlign: 'center', margin: 0 }}>{error}</p>}
+
+                  {(() => {
+                    const isBtnDisabled = submitting || outOfStock;
+                    // Only a merchant-set disabled color skips the opacity dim —
+                    // otherwise fall back to the old behavior (active color + 0.6
+                    // opacity) so pages saved before this field existed look the same.
+                    const btnBg = isBtnDisabled ? (buttonBackgroundColorDisabled || buttonBackgroundColor || 'var(--md-primary, #10b981)') : (buttonBackgroundColor || 'var(--md-primary, #10b981)');
+                    const btnText = isBtnDisabled ? (buttonTextColorDisabled || buttonTextColor || '#ffffff') : (buttonTextColor || '#ffffff');
+                    const btnBorder = isBtnDisabled ? (buttonBorderColorDisabled || buttonBorderColor) : buttonBorderColor;
+                    return (
+                  <button
+                    type="submit"
+                    disabled={isBtnDisabled}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      padding: '13px 24px',
+                      borderRadius: 14,
+                      border: btnBorder ? `2px solid ${btnBorder}` : 'none',
+                      backgroundColor: btnBg,
+                      color: btnText,
+                      fontWeight: 700,
+                      fontSize: 15,
+                      cursor: isBtnDisabled ? 'default' : 'pointer',
+                      opacity: isBtnDisabled && !buttonBackgroundColorDisabled ? 0.6 : 1,
+                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                    }}
+                  >
+                    {submitting ? (
+                      <>
+                        <span style={spinnerStyle(btnText)} />
+                        {t.submitting}
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart size={17} />
+                        {buttonText || t.submit}
+                      </>
+                    )}
+                  </button>
+                    );
+                  })()}
+                </div>
+              )}
+
+              <p style={{ margin: 0, fontSize: 11, textAlign: 'center', opacity: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+                <Shield size={12} />
+                {t.secure}
+              </p>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// borderColor/backgroundColor/color are kept as their own properties (not
+// folded into a `border` shorthand) so ProductFormBlock can override just
+// one of them per the block's inputBackgroundColor/inputBorderColor/
+// inputTextColor props without needing to reconstruct the whole shorthand.
+const inputStyle = {
+  padding: '11px 14px',
+  borderRadius: 10,
+  borderWidth: 1.5,
+  borderStyle: 'solid',
+  borderColor: '#e4e4e7',
+  fontSize: 16,
+  width: '100%',
+  boxSizing: 'border-box',
+  backgroundColor: '#f9fafb',
+  color: '#18181b',
+  outline: 'none',
+  transition: 'border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease',
+};
+
+// خانات الهاتف/واتساب/البريد: فارغة → اتجاه الصفحة وخطها (الـ placeholder هو اسم الحقل)،
+// فيها قيمة → من اليسار لليمين (+ خط الأرقام للهاتف). المتصفح يفرض ltr على
+// input[type=tel|email] افتراضياً، فلا يكفي حذف dir — يجب direction: inherit صراحةً.
+function emptyLtrFieldStyle(value, mono = true) {
+  return value
+    ? { direction: 'ltr', textAlign: 'left', fontFamily: mono ? 'monospace' : undefined }
+    : { direction: 'inherit', textAlign: 'start' };
+}
+
+const iconInFieldStyle = {
+  position: 'absolute',
+  insetInlineStart: 12,
+  top: '50%',
+  transform: 'translateY(-50%)',
+  opacity: 0.4,
+  pointerEvents: 'none',
+};
+
+const chevronInFieldStyle = {
+  position: 'absolute',
+  insetInlineEnd: 10,
+  top: '50%',
+  transform: 'translateY(-50%)',
+  opacity: 0.4,
+  pointerEvents: 'none',
+};
+
+const quantityButtonStyle = (accentColor, disabled) => ({
+  width: 32,
+  height: 32,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: 10,
+  border: `1.5px solid ${disabled ? '#e4e4e7' : accentColor}`,
+  backgroundColor: 'transparent',
+  color: disabled ? '#a1a1aa' : accentColor,
+  cursor: disabled ? 'default' : 'pointer',
+  opacity: disabled ? 0.6 : 1,
+  padding: 0,
+});
+
+// Tailwind's own `spin` keyframe is already generated globally elsewhere in
+// this app (via the many `animate-spin` classNames on Loader2 icons), so
+// this can reference it directly by name instead of declaring a new one.
+const spinnerStyle = (color) => ({
+  width: 15,
+  height: 15,
+  borderRadius: '50%',
+  border: `2px solid ${color}55`,
+  borderTopColor: color,
+  animation: 'spin 0.7s linear infinite',
+  display: 'inline-block',
+});
+
