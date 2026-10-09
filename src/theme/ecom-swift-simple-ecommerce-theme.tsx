@@ -502,13 +502,16 @@ export function Footer({ store }: any) {
         <div>
           <h4 style={{ fontWeight: 700, marginBottom: '1rem' }}>تواصل</h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-            {store?.contact?.phone && <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Phone size={14} /> {store.contact.phone}</span>}
-            {store?.contact?.whatsapp && whatsappHref(store.contact.whatsapp) !== '#' && (
+            {/* جهة تواصل غير مضافة بعد: تظهر بعبارة «سيتوفر لاحقاً» */}
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Phone size={14} /> {store?.contact?.phone ? <span dir="ltr">{store.contact.phone}</span> : <span style={{ opacity: 0.7 }}>سيتوفر لاحقاً</span>}</span>
+            {store?.contact?.whatsapp && whatsappHref(store.contact.whatsapp) !== '#' ? (
               <a href={whatsappHref(store.contact.whatsapp)} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'inherit', textDecoration: 'none' }}>
                 <MessageCircle size={14} /> <span dir="ltr">{store.contact.whatsapp}</span>
               </a>
+            ) : (
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><MessageCircle size={14} /> <span style={{ opacity: 0.7 }}>سيتوفر لاحقاً</span></span>
             )}
-            {store?.contact?.email && <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Mail size={14} /> {store.contact.email}</span>}
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Mail size={14} /> {store?.contact?.email ? store.contact.email : <span style={{ opacity: 0.7 }}>سيتوفر لاحقاً</span>}</span>
             {[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') && <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><MapPin size={14} /> {[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')}</span>}
           </div>
         </div>
