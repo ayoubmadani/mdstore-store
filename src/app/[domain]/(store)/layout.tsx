@@ -6,6 +6,7 @@ import CustomerTracker from '@/components/CustomerTracker'
 import AddShow from '@/components/addShow'
 import ThemeRunner from '@/components/ThemeRunner'
 import BuilderPageRenderer from '@/components/builderPages/BuilderPageRenderer'
+import DedicatedPageSwitch from '@/components/builderPages/DedicatedPageSwitch'
 import type { Metadata } from 'next'
 
 const getStoreCached = cache(async (domain: string) => getStoreByDomain(domain))
@@ -48,11 +49,17 @@ export default async function DomainLayout({ children, params }: LayoutProps) {
   if (dedicatedDomain?.builderPageId) {
     const page = await getBuilderPageById(dedicatedDomain.builderPageId)
     if (!page) notFound()
+    // /success يعرض صفحة "شكراً" الخاصة بالمتجر بعد الطلب
     return (
-      <div dir={(page.settings?.language || 'ar') === 'ar' ? 'rtl' : 'ltr'}>
-        <CustomerTracker pixels={page.pixels ?? []} pageType="landing_page" landingPageId={page.id} />
-        <BuilderPageRenderer page={page} lpDomain={domain} dedicated />
-      </div>
+      <StoreProvider store={store} theme={store.theme?.slug || 'default'}>
+        <div dir={(page.settings?.language || 'ar') === 'ar' ? 'rtl' : 'ltr'}>
+          <CustomerTracker pixels={page.pixels ?? []} pageType="landing_page" landingPageId={page.id} />
+          <DedicatedPageSwitch
+            page={<BuilderPageRenderer page={page} lpDomain={domain} dedicated />}
+            success={children}
+          />
+        </div>
+      </StoreProvider>
     )
   }
 

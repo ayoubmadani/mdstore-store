@@ -5,11 +5,13 @@ import { useParams } from 'next/navigation'
 import { usePixel } from '@/Hook/pixel-provider'
 import { useStore } from '@/Hook/store-provider'
 import ThemeRunner from '@/components/ThemeRunner'
+import LandingSuccess, { type LandingOrderInfo } from '@/components/builderPages/LandingSuccess'
 
 interface OrderInfo {
   id?: string
   total?: number
   productName?: string
+  landing?: LandingOrderInfo['landing']
 }
 
 function StoreNotFound({ domain }: { domain: string }) {
@@ -43,6 +45,7 @@ export default function SuccessPage() {
   const { trackPurchase } = usePixel()
   const hasTracked = useRef(false)
   const [order, setOrder] = useState<OrderInfo | null>(null)
+  const [ready, setReady] = useState(false) // لا نعرض شيئاً قبل قراءة last_order (تجنب وميض صفحة القالب)
 
   useEffect(() => {
     if (!domain || hasTracked.current) return
@@ -51,11 +54,17 @@ export default function SuccessPage() {
       try {
         const parsed = JSON.parse(saved)
         setOrder(parsed)
-        trackPurchase(parsed.total, 'DZD', parsed.id)
+        // طلب من صفحة هبوط: LandingSuccess يطلق حدث الشراء ببيكسلات الصفحة نفسها
+        if (!parsed.landing) trackPurchase(parsed.total, 'DZD', parsed.id)
         hasTracked.current = true
       } catch {}
     }
+    setReady(true)
   }, [domain, trackPurchase])
+
+  // صفحة "شكراً" موحدة لصفحات الهبوط بألوان نموذج الطلب
+  if (!ready) return null
+  if (order?.landing) return <LandingSuccess order={order as LandingOrderInfo} />
 
   if (!store) return <StoreNotFound domain={domain} />
   if (!store.isActive) return <StoreInactive store={store} />

@@ -20,33 +20,11 @@ import { getProductFormStrings } from './editorProductFormTranslations';
 // «الموقع»
 const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
-// «الموقع» صفحة "شكراً": داخل /lp/<slug> نكمل المسار كما كان؛ على دومين مخصص
-// للصفحة (الجذر) نستعمل /lp/page/successfully — ومحلياً يبقى الدومين في أول المسار
-// «الموقع» نفس منطق ProductFormBlockRenderer (main): Purchase لفيسبوك، CompletePayment
-// لتيك توك، purchase لجوجل — بعد 1.5 ثانية حتى تكون سكربتات البيكسل قد حُمّلت
-const SAFE_PIXEL_ID = /^[\w-]{1,64}$/;
-function firePurchasePixels(pixels, order) {
-  if (!pixels?.length || typeof window === 'undefined') return;
-  setTimeout(() => {
-    pixels.forEach((px) => {
-      if (!px.isActive || !SAFE_PIXEL_ID.test(px.pixelId)) return;
-      if (px.type === 'facebook' && window.fbq) {
-        window.fbq('track', 'Purchase', { value: order.total, currency: 'DZD', order_id: order.id });
-      }
-      if (px.type === 'tiktok' && window.ttq) {
-        window.ttq.track('CompletePayment', { value: order.total, currency: 'DZD', order_id: order.id });
-      }
-      if (px.type === 'google' && window.gtag) {
-        window.gtag('event', 'purchase', { transaction_id: order.id, value: order.total, currency: 'DZD' });
-      }
-    });
-  }, 1500);
-}
-
+// «الموقع» بعد الطلب: <الدومين>/success?product=<id> (محلياً يبقى الدومين في أول المسار)
 function successPath(productId) {
   const path = window.location.pathname.replace(/\/$/, '');
-  const base = path.includes('/lp/') ? path : `${path}/lp/page`;
-  return `${base}/successfully?productId=${productId}`;
+  const base = path.includes('/lp/') ? path.slice(0, path.indexOf('/lp/')) : path;
+  return `${base}/success?product=${productId}`;
 }
 
 // Mirrors store/src/components/productForm/productForm.tsx (+ ProductClient.tsx's
@@ -121,9 +99,8 @@ export default function ProductFormBlock({
   borderRadius,
   sectionGap,
   language,
+  pixels,        // «الموقع» بيكسلات الصفحة — حدث الشراء في صفحة "شكراً" الموحدة
   builderPageId, // «الموقع»
-  dedicated,     // «الموقع» دومين مخصص للصفحة: لا صفحة "شكراً" — تأكيد داخل النموذج
-  pixels,        // «الموقع» بيكسلات الصفحة (لحدث الشراء في الحالة dedicated)
 }) {
   const t = getProductFormStrings(language);
   const formatPrice = (n) => `${Number(n || 0).toLocaleString('ar-DZ')} ${t.currency}`;
@@ -316,21 +293,40 @@ export default function ProductFormBlock({
         minDelay,
       ]);
       if (res.data?.customerId) localStorage.setItem('customerId', res.data.customerId);
-      if (dedicated) {
-        // «الموقع» دومين مخصص: لا مسار /successfully — رسالة تأكيد هنا + حدث الشراء للبيكسلات
-        firePurchasePixels(pixels, { id: res.data?.id ?? product.id, total: totalPrice });
-        setSubmitted(true);
-      } else {
-        // «الموقع» حدث الشراء ثم صفحة "شكراً" (بيكسلات فيسبوك/تيك توك تُطلق هناك)
-        if (typeof window !== 'undefined' && window.gtag) {
-          window.gtag('event', 'purchase', {
-            transaction_id: product.id, value: totalPrice, currency: 'DZD',
-            items: [{ item_name: product.name, item_id: product.id, price: getUnitPrice(), quantity: form.quantity }],
-          });
-        }
-        window.location.assign(successPath(product.id));
-        setSubmitted(true);
+      // «الموقع» صفحة /success تقرأ last_order وتطلق حدث الشراء للبيكسلات
+      localStorage.setItem('last_order', JSON.stringify({
+        id: res.data?.order?.id ?? res.data?.id ?? 'NEW_ORDER',
+        total: totalPrice,
+        productName: product.name,
+        // «الموقع» صفحة "شكراً" الموحدة لصفحات الهبوط (LandingSuccess) بألوان هذا النموذج
+        landing: {
+          builderPageId,
+          backUrl: window.location.pathname + window.location.search,
+          language,
+          productImage: product.productImage,
+          quantity: form.quantity,
+          customerName: form.customerName,
+          customerPhone: form.customerPhone,
+          pixels,
+          colors: {
+            accent: buttonBackgroundColor,
+            accentText: buttonTextColor,
+            container: containerBackgroundColor,
+            section: backgroundColor,
+            text: textColor,
+            border: inputBorderColor,
+            radius: borderRadius,
+          },
+        },
+      }));
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'purchase', {
+          transaction_id: product.id, value: totalPrice, currency: 'DZD',
+          items: [{ item_name: product.name, item_id: product.id, price: getUnitPrice(), quantity: form.quantity }],
+        });
       }
+      window.location.assign(successPath(product.id));
+      setSubmitted(true);
     } catch {
       await minDelay;
       setError(t.submitError);

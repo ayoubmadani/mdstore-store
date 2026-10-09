@@ -9,6 +9,8 @@ const EditorProductFormBlock = EditorProductFormBlockJs as unknown as React.Comp
 import AddShow from '@/components/addShow';
 import CustomerTracker from '@/components/CustomerTracker';
 import WhatsAppIcon from './WhatsAppIcon';
+import { BUTTON_ANIMATION_CSS, buttonAnimationClass } from './buttonAnimations';
+import { buttonHref, type ButtonLinkType } from './buttonLinks';
 import type { Pixel } from '@/types/store';
 
 // Matches dashboard/src/pages/editor/blocks/floatingButtonIcons.jsx's own
@@ -38,7 +40,8 @@ const FLOATING_BUTTON_POSITION_STYLE: Record<string, React.CSSProperties> = {
 // SpacerBlockRenderer's pinned bar already does, keeps it anchored to a
 // corner of the actual visible page at any viewport size.
 function FloatingActionButton({ props, referenceWidth }: { props: Record<string, unknown>; referenceWidth: number }) {
-  const { link, linkType, position, contentType, text, icon, width: w, height: h, backgroundColor, textColor, fontSize } = props as FloatingButtonProps;
+  const { link, linkType, position, contentType, text, icon, width: w, height: h, backgroundColor, textColor, fontSize, animation, whatsappNumber, whatsappMessage } = props as FloatingButtonProps;
+  const animClass = buttonAnimationClass(animation);
   const isFormLink = linkType === 'form';
   // Once a "jump to order form" button's own target has scrolled into view,
   // its job is done — leaving it on screen just sits a floating button on
@@ -76,8 +79,10 @@ function FloatingActionButton({ props, referenceWidth }: { props: Record<string,
         zIndex: 40,
       }}
     >
+      {animClass && <style>{BUTTON_ANIMATION_CSS}</style>}
       <a
-        href={isFormLink ? '#md-product-form' : link || '#'}
+        className={animClass}
+        href={buttonHref({ linkType, link, whatsappNumber, whatsappMessage })}
         target={isFormLink ? undefined : '_blank'}
         rel={isFormLink ? undefined : 'noreferrer'}
         onClick={(e) => {
@@ -103,7 +108,9 @@ function FloatingActionButton({ props, referenceWidth }: { props: Record<string,
           fontSize: fontSize || 14, // حجم خط النص من المحرر (الافتراضي 14)
           textDecoration: 'none',
           pointerEvents: 'auto',
-        }}
+          '--md-btn-color': backgroundColor || '#10b981', // لون توهج حركة «glow»
+          '--md-btn-base': FLOATING_BUTTON_POSITION_STYLE[position || 'bottom-right']?.transform || 'translate(0, 0)',
+        } as React.CSSProperties}
       >
         {isText ? text : <Icon size={Math.round(Math.min(width, height) * 0.45)} />}
       </a>
@@ -126,9 +133,12 @@ interface FloatingElement {
   color?: string;
   text?: string;
   link?: string;
-  linkType?: 'external' | 'form';
+  linkType?: ButtonLinkType;
+  whatsappNumber?: string;
+  whatsappMessage?: string;
   backgroundColor?: string;
   textColor?: string;
+  animation?: string;
   src?: string;
   alt?: string;
 }
@@ -155,7 +165,9 @@ interface BuilderBlock {
 }
 interface FloatingButtonProps {
   link?: string;
-  linkType?: 'external' | 'form';
+  linkType?: ButtonLinkType;
+  whatsappNumber?: string;
+  whatsappMessage?: string;
   position?: 'top-right' | 'top-left' | 'top-center' | 'bottom-right' | 'bottom-left' | 'bottom-center';
   contentType?: 'text' | 'icon';
   text?: string;
@@ -165,6 +177,7 @@ interface FloatingButtonProps {
   height?: number;
   backgroundColor?: string;
   textColor?: string;
+  animation?: string;
 }
 
 interface BuilderPageData {
@@ -231,10 +244,14 @@ function FloatingElements({ elements, referenceWidth }: { elements: unknown; ref
           // its neighbors instead of shrinking along with them. Padding in
           // `em` scales automatically once fontSize itself is responsive.
           const basePx = el.fontSize || 16;
+          const animClass = buttonAnimationClass(el.animation);
           return (
             <a
               key={el.id}
-              href={isFormLink ? '#md-product-form' : el.link || '#'}
+              className={animClass}
+              href={buttonHref(el)}
+              target={el.linkType === 'whatsapp' ? '_blank' : undefined}
+              rel={el.linkType === 'whatsapp' ? 'noreferrer' : undefined}
               onClick={(e) => {
                 if (!isFormLink) return;
                 e.preventDefault();
@@ -253,8 +270,11 @@ function FloatingElements({ elements, referenceWidth }: { elements: unknown; ref
                 fontSize: `clamp(${Math.min(14, basePx)}px, ${(basePx / referenceWidth) * 100}cqw, ${basePx}px)`, // زر: 14px على الأقل ليبقى مقروءاً
                 textDecoration: 'none',
                 whiteSpace: width ? 'normal' : 'nowrap',
-              }}
+                '--md-btn-color': el.backgroundColor || '#10b981', // لون توهج حركة «glow»
+                '--md-btn-base': commonStyle.transform, // الحركة تُبنى فوق تموضع الزر
+              } as React.CSSProperties}
             >
+              {animClass && <style>{BUTTON_ANIMATION_CSS}</style>}
               {el.text}
             </a>
           );

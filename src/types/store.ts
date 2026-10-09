@@ -23,6 +23,7 @@ export interface Store {
   contact: {
     email?: string | null;
     phone?: string | null;
+    whatsapp?: string | null;
     wilaya?: string | null;
     address?: string | null;
   };
@@ -49,6 +50,8 @@ export interface Pixel {
 
 export interface Product {
   id: string;
+  whatsappEnabled?: boolean;
+  whatsappNumber?: string | null;
   name: string;
   price: number;
   priceOriginal?: number;
