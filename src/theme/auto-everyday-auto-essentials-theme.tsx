@@ -24,6 +24,7 @@ import {
   Send, Home as HomeIcon, Wrench, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 /* ------------------------------------------------------------------ config */
 
@@ -967,16 +968,15 @@ export function Footer({ store }: any) {
               {t.contactUs}
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: '0.86rem', color: 'rgba(255,255,255,0.72)' }}>
-              {store?.contact?.phone ? (
-                <a href={`tel:${store.contact.phone}`} className="ae-num" style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                  <Phone size={15} color={A} /> {store.contact.phone}
-                </a>
-              ) : null}
-              {store?.contact?.email ? (
-                <a href={`mailto:${store.contact.email}`} style={{ display: 'flex', alignItems: 'center', gap: 9, wordBreak: 'break-all' }}>
-                  <Mail size={15} color={A} /> {store.contact.email}
-                </a>
-              ) : null}
+              <a href={store?.contact?.phone ? `tel:${store?.contact?.phone}` : undefined} className="ae-num" style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+                <Phone size={15} color={A} /> {store?.contact?.phone || comingSoon(store)}
+              </a>
+              <a href={storeWhatsappHref(store)} target="_blank" rel="noreferrer" className="ae-num" style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+                <WhatsAppGlyph size={15} color={A} /> {store?.contact?.whatsapp || comingSoon(store)}
+              </a>
+              <a href={store?.contact?.email ? `mailto:${store?.contact?.email}` : undefined} style={{ display: 'flex', alignItems: 'center', gap: 9, wordBreak: 'break-all' }}>
+                <Mail size={15} color={A} /> {store?.contact?.email || comingSoon(store)}
+              </a>
               {(store?.contact?.wilaya || store?.contact?.address) ? (
                 <p style={{ display: 'flex', alignItems: 'flex-start', gap: 9, margin: 0, lineHeight: 1.6 }}>
                   <MapPin size={15} color={A} style={{ flexShrink: 0, marginTop: 2 }} />
@@ -1493,7 +1493,9 @@ export function ProductForm({
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState('');
 
@@ -1821,7 +1823,7 @@ export function ProductForm({
               onClick={submitOrder} disabled={submitting}>
               {submitting ? t.sending : t.confirmOrder}
             </button>
-            {!product?.isDigital && (
+            {orderNowState && (
               <button type="button" className="ae-btn ae-btn-ghost" style={{ minWidth: 110 }}
                 onClick={() => setIsOrderNow(false)} disabled={submitting}>
                 {t.cancel}
@@ -1841,6 +1843,7 @@ export function ProductForm({
           <CheckCircle2 size={16} color={A} /> {toast}
         </div>
       ) : null}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

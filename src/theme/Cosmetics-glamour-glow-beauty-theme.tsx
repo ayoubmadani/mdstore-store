@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { showError } from '@/lib/showError';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -660,16 +661,15 @@ export function Footer({ store }: { store: any }) {
         {/* Contact */}
         <div>
           <p className="gg-footer-title">{t.contactSect}</p>
-          {store?.contact?.phone && (
-            <a href={`tel:${store.contact.phone}`} className="gg-footer-link" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Phone size={13} style={{ color: 'var(--gold)', flexShrink: 0 }} />{store.contact.phone}
-            </a>
-          )}
-          {store?.contact?.email && (
-            <a href={`mailto:${store.contact.email}`} className="gg-footer-link" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Mail size={13} style={{ color: 'var(--gold)', flexShrink: 0 }} />{store.contact.email}
-            </a>
-          )}
+          <a href={store?.contact?.phone ? `tel:${store?.contact?.phone}` : undefined} className="gg-footer-link" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Phone size={13} style={{ color: 'var(--gold)', flexShrink: 0 }} />{store?.contact?.phone || comingSoon(store)}
+          </a>
+          <a href={storeWhatsappHref(store)} target="_blank" rel="noreferrer" className="gg-footer-link" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <WhatsAppGlyph size={13} style={{ color: 'var(--gold)', flexShrink: 0 }} />{store?.contact?.whatsapp || comingSoon(store)}
+          </a>
+          <a href={store?.contact?.email ? `mailto:${store?.contact?.email}` : undefined} className="gg-footer-link" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Mail size={13} style={{ color: 'var(--gold)', flexShrink: 0 }} />{store?.contact?.email || comingSoon(store)}
+          </a>
           {store?.contact?.address && (
             <span className="gg-footer-link" style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'default' }}>
               <MapPin size={13} style={{ color: 'var(--gold)', flexShrink: 0 }} />{store.contact.address}
@@ -1034,7 +1034,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sub, setSub] = useState(false);
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [isAdded, setIsAdded] = useState(false);
   const initCount = useCartStore(s => s.initCount);
 
@@ -1140,9 +1142,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           {product.store?.cart && !product.isDigital && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 12, fontWeight: 700, color: 'var(--mid)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.deliveryInfoTitle}</p>
-              <button onClick={() => setIsOrderNow(false)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', border: '1px solid var(--line-dk)', background: 'transparent', color: 'var(--dim)', fontFamily: 'inherit', fontSize: 12, cursor: 'pointer', borderRadius: 6 }}>
+              {orderNowState && (<button onClick={() => setIsOrderNow(false)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', border: '1px solid var(--line-dk)', background: 'transparent', color: 'var(--dim)', fontFamily: 'inherit', fontSize: 12, cursor: 'pointer', borderRadius: 6 }}>
                 <X size={11} /> {t.cancel}
-              </button>
+              </button>)}
             </div>
           )}
           <form onSubmit={handleSubmit}>
@@ -1251,6 +1253,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </form>
         </div>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

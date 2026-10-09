@@ -101,7 +101,8 @@ export async function getStoreByDomain(
         // تأكد من أن الـ Default values لا تظهر إلا إذا كانت القيمة الأصلية null أو undefined
         ...store.design,
         logoUrl: store.design?.logoUrl || '/default-logo.png',
-        faviconUrl: store.design?.faviconUrl || '/default-favicon.png',
+        // أيقونة المتجر: favicon المتجر ثم شعاره — لا أيقونة MD أبداً في المتاجر
+        faviconUrl: store.design?.faviconUrl || store.design?.logoUrl || '/default-favicon.png',
       }
     };
 

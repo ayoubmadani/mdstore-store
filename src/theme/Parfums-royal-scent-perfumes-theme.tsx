@@ -11,12 +11,13 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import DOMPurify from 'dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 import {
   Search, X, ShoppingBag, Menu, Phone, Mail, MessageCircle, MapPin, Star,
   ChevronLeft, ChevronRight, Trash2, Check, Minus, Plus, Package, Truck, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 /* ============================== TYPES ============================== */
 
@@ -696,16 +697,15 @@ export function Footer({ store }: any) {
               {t.contactUs}
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {store?.contact?.phone && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: MUTED, fontSize: '0.85rem' }}>
-                  <Phone size={14} /> {store.contact.phone}
-                </span>
-              )}
-              {store?.contact?.email && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: MUTED, fontSize: '0.85rem' }}>
-                  <Mail size={14} /> {store.contact.email}
-                </span>
-              )}
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: MUTED, fontSize: '0.85rem' }}>
+                <Phone size={14} /> {store?.contact?.phone || comingSoon(store)}
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: MUTED, fontSize: '0.85rem' }}>
+                <WhatsAppGlyph size={14} /> {store?.contact?.whatsapp || comingSoon(store)}
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: MUTED, fontSize: '0.85rem' }}>
+                <Mail size={14} /> {store?.contact?.email || comingSoon(store)}
+              </span>
               {store?.contact?.address && (
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: MUTED, fontSize: '0.85rem' }}>
                   <MapPin size={14} /> {store.contact.wilaya ? `${store.contact.wilaya}, ` : ''}{store.contact.address}
@@ -1024,7 +1024,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -1265,7 +1267,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <button className="rsp-btn-primary" onClick={submitOrder} disabled={submitting} style={{ flex: 1 }}>
               {submitting ? t.sending : t.confirmOrder}
             </button>
-            {!product?.isDigital && (
+            {orderNowState && (
               <button className="rsp-btn-outline" onClick={() => setIsOrderNow(false)} disabled={submitting} style={{ flex: 1 }}>
                 {t.cancel}
               </button>
@@ -1273,6 +1275,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </div>
         </div>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

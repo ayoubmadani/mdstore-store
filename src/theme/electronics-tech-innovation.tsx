@@ -15,13 +15,14 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import DOMPurify from 'dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 import { useCartStore } from '@/store/useCartStore';
 import {
   ShoppingCart, Search, X, Menu, Phone, Mail, MapPin, ChevronDown,
   ChevronLeft, ChevronRight, Trash2, Cpu, Truck, ShieldCheck, Lock,
   Headphones, AlertCircle, CheckCircle2, Minus, Plus, Zap, Star, Send, Package, MessageCircle, Download,
 } from 'lucide-react';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 /* ========================= Types ========================= */
 
@@ -847,18 +848,18 @@ export function Footer({ store }: any) {
 <div>
             <h4 className="ti-mono" style={{ color: TXT, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem' }}>{t.contactUs}</h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {store?.contact?.phone && (
-                <li style={{ display: 'flex', alignItems: 'center', gap: 10, color: SUB, fontSize: '0.88rem' }}>
-                  <Phone size={15} color={A} aria-hidden="true" />
-                  <a href={`tel:${store.contact.phone}`} className="ti-mono" dir="ltr">{store.contact.phone}</a>
-                </li>
-              )}
-              {store?.contact?.email && (
-                <li style={{ display: 'flex', alignItems: 'center', gap: 10, color: SUB, fontSize: '0.88rem' }}>
-                  <Mail size={15} color={A} aria-hidden="true" />
-                  <a href={`mailto:${store.contact.email}`}>{store.contact.email}</a>
-                </li>
-              )}
+              <li style={{ display: 'flex', alignItems: 'center', gap: 10, color: SUB, fontSize: '0.88rem' }}>
+                <Phone size={15} color={A} aria-hidden="true" />
+                <a href={store?.contact?.phone ? `tel:${store?.contact?.phone}` : undefined} className="ti-mono" dir="ltr">{store?.contact?.phone || comingSoon(store)}</a>
+              </li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: 10, color: SUB, fontSize: '0.88rem' }}>
+                <WhatsAppGlyph size={15} color={A} aria-hidden="true" />
+                <a href={storeWhatsappHref(store)} target="_blank" rel="noreferrer" className="ti-mono" dir="ltr">{store?.contact?.whatsapp || comingSoon(store)}</a>
+              </li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: 10, color: SUB, fontSize: '0.88rem' }}>
+                <Mail size={15} color={A} aria-hidden="true" />
+                <a href={store?.contact?.email ? `mailto:${store?.contact?.email}` : undefined}>{store?.contact?.email || comingSoon(store)}</a>
+              </li>
               {(store?.contact?.wilaya || store?.contact?.address) && (
                 <li style={{ display: 'flex', alignItems: 'center', gap: 10, color: SUB, fontSize: '0.88rem' }}>
                   <MapPin size={15} color={A} aria-hidden="true" />
@@ -1334,7 +1335,9 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [submitting, setSubmitting] = useState(false);
   const [added, setAdded] = useState(false);
 
@@ -1638,12 +1641,13 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
               {submitting ? t.sending : t.confirmOrder}
             </button>
             {/* §15.15 — Cancel button, disabled while submitting */}
-            <button className="ti-btn ti-btn-ghost" onClick={() => setIsOrderNow(false)} disabled={submitting}>
+            {orderNowState && (<button className="ti-btn ti-btn-ghost" onClick={() => setIsOrderNow(false)} disabled={submitting}>
               {t.cancel}
-            </button>
+            </button>)}
           </div>
         </div>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

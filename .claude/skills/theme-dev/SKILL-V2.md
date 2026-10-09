@@ -1,6 +1,6 @@
 ---
 name: theme-dev-v2
-description: "v2 — دليل تطوير ثيمات MdStore: بنية الملفات، أنماط i18n (ar/fr/en)، أخطاء BiDi/RTL، CSS في flex containers، variant filtering، image attr display، bundle command، قواعد ثابتة للـ Navbar/Footer/Hero، حقول Free Shipping / Qty Support على store وproduct وoffer، صفحات static إضافية (additionalPages) خارج الأربع الأساسية، export `Success` الإلزامي لصفحة نجاح الطلب، ومنتج رقمي (product.isDigital) — لا شحن، الزائر يختار بريد إلكتروني أو واتساب عبر زرّي تبديل بدل عنوان، لا يدخل السلة."
+description: "v2 — دليل تطوير ثيمات MdStore: بنية الملفات، أنماط i18n (ar/fr/en)، أخطاء BiDi/RTL، CSS في flex containers، variant filtering، image attr display، bundle command، قواعد ثابتة للـ Navbar/Footer/Hero، حقول Free Shipping / Qty Support على store وproduct وoffer، صفحات static إضافية (additionalPages) خارج الأربع الأساسية، export `Success` الإلزامي لصفحة نجاح الطلب، ومنتج رقمي (product.isDigital) — لا شحن، الزائر يختار بريد إلكتروني أو واتساب عبر زرّي تبديل بدل عنوان، لا يدخل السلة، وزر واتساب المنتج (product.whatsappEnabled) + Footer التواصل مع «سيتوفر لاحقاً»."
 ---
 
 # Theme Dev v2 — دليل تطوير ثيمات MdStore
@@ -1251,3 +1251,95 @@ orderEmail: 'البريد الإلكتروني',
 - [ ] تم تشغيل `node scripts/bundle-themes.mjs --slug=<name>`
 
 ---
+
+---
+
+## واتساب — زر المنتج + Footer التواصل (إلزامي في كل ثيم)
+
+المرجع المطبَّق: `src/theme/ecom-swift-simple-ecommerce-theme.tsx`.
+
+> **الطريقة المعتمدة الآن:** استعمل المكوّنات المشتركة من `@/components/theme/storeContact` بدل نسخ الكود:
+> ```tsx
+> import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+> // زر المنتج (داخل ProductForm تحت أزرار الطلب) — يترجم نفسه حسب store.language:
+> <WhatsAppOrderButton product={product} store={store} />
+> // Footer: { icon: <WhatsAppGlyph size={14} />, val: store?.contact?.whatsapp || comingSoon(store) }
+> // رابط: href={storeWhatsappHref(store)}  (undefined إذا لا يوجد رقم)
+> ```
+> مطبَّق في كل الثيمات. الكود المفصّل أدناه للمرجع فقط.
+> لا تستورد `dompurify` — استعمل `isomorphic-dompurify` (هو الـ external في bundle-themes).
+
+### الحقول المتوفرة
+
+| المصدر | الحقل | المعنى |
+|--------|-------|--------|
+| `store.contact.whatsapp` | `string \| null` | رقم واتساب المتجر (من «متجري» في لوحة التحكم) |
+| `product.whatsappEnabled` | `boolean` | التاجر فعّل زر «استفسر عبر واتساب» لهذا المنتج |
+| `product.whatsappNumber` | `string \| null` | رقم خاص بالمنتج (يُملأ افتراضياً من رقم المتجر) |
+
+أضف للـ `interface Product` في الثيم: `whatsappEnabled?: boolean; whatsappNumber?: string | null;`
+
+### الرابط — استعمل الـ helper المشترك دائماً
+
+```tsx
+import { whatsappHref } from '@/components/builderPages/buttonLinks';
+// whatsappHref(number, message?) → 'https://wa.me/213…?text=…' أو '#' إذا الرقم غير صالح
+// يحوّل 0XXXXXXXXX → 213XXXXXXXXX تلقائياً — لا تكتب منطق wa.me يدوياً
+```
+
+### 1) زر المنتج — داخل `ProductForm` تحت أزرار «تأكيد الطلب / أضف للسلة»
+
+```tsx
+{product.whatsappEnabled && whatsappHref(product.whatsappNumber || store?.contact?.whatsapp) !== '#' && (
+  <a
+    href={whatsappHref(
+      product.whatsappNumber || store?.contact?.whatsapp,
+      `${t.waOrderMsg} ${product.name}${typeof window !== 'undefined' ? `\n${window.location.href}` : ''}`,
+    )}
+    target="_blank"
+    rel="noreferrer"
+    style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+             width: '100%', padding: '0.85rem 1rem', borderRadius: 8,
+             backgroundColor: '#25D366', color: '#ffffff', fontWeight: 700, textDecoration: 'none' }}
+  >
+    <WhatsAppSvg /> {t.orderViaWhatsapp}
+  </a>
+)}
+```
+
+- يظهر **فقط** إذا `whatsappEnabled` + رقم صالح (رقم المنتج أولاً ثم رقم المتجر).
+- اللون `#25D366` ثابت (هوية واتساب) مهما كان لون الثيم.
+- `ProductForm` يجب أن يستقبل `store` (موجود في `ProductFormProps`).
+- الأيقونة: SVG واتساب inline (lucide لا يحتوي شعار واتساب) — انسخها من الثيم المرجعي.
+
+### 2) Footer — قسم «تواصل»
+
+لا يوجد زر واتساب عائم في المتجر (أُزيل) — الرقم يظهر في Footer فقط.
+الهاتف + واتساب + البريد **تظهر دائماً**؛ الناقص منها يُكتب «سيتوفر لاحقاً». العنوان/الولاية يظهران فقط إن وُجدا.
+
+```tsx
+<span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+  <Phone size={14} /> {store?.contact?.phone ? <span dir="ltr">{store.contact.phone}</span> : <span style={{ opacity: 0.7 }}>{t.comingSoon}</span>}
+</span>
+{store?.contact?.whatsapp && whatsappHref(store.contact.whatsapp) !== '#' ? (
+  <a href={whatsappHref(store.contact.whatsapp)} target="_blank" rel="noreferrer"
+     style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'inherit', textDecoration: 'none' }}>
+    <MessageCircle size={14} /> <span dir="ltr">{store.contact.whatsapp}</span>
+  </a>
+) : (
+  <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><MessageCircle size={14} /> <span style={{ opacity: 0.7 }}>{t.comingSoon}</span></span>
+)}
+<span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+  <Mail size={14} /> {store?.contact?.email ? store.contact.email : <span style={{ opacity: 0.7 }}>{t.comingSoon}</span>}
+</span>
+```
+
+- الأرقام داخل `<span dir="ltr">` حتى لا تنقلب في RTL.
+
+### مفاتيح الترجمة المطلوبة
+
+| المفتاح | ar | fr | en |
+|---------|----|----|----|
+| `orderViaWhatsapp` | استفسر عبر واتساب | Une question ? WhatsApp | Ask on WhatsApp |
+| `waOrderMsg` | مرحباً، لدي استفسار حول: | Bonjour, j'ai une question sur : | Hello, I have a question about: |
+| `comingSoon` | سيتوفر لاحقاً | Bientôt disponible | Coming soon |

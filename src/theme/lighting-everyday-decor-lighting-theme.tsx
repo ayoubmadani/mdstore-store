@@ -24,12 +24,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useCartStore } from '@/store/useCartStore';
-import DOMPurify from 'dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 import {
   Search, X, ShoppingBag, Menu, Phone, Mail, MapPin, Send, MessageCircle,
   ChevronLeft, ChevronRight, ChevronDown, Trash2, Plus, Minus,
   Lightbulb, Star, Check, AlertCircle, Truck, ShieldCheck, CreditCard, Headphones, Package, Download,
 } from 'lucide-react';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 /* ============================================================================
    TYPES (preserved as-is)
@@ -755,16 +756,15 @@ export function Footer({ store }: any) {
 <div>
             <h4 className="lm-display" style={{ fontSize: '1.05rem', margin: '0 0 14px', color: '#FFF7EA' }}>{t.contactUs}</h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {contact.phone && (
-                <li style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '.9rem', color: '#C6B49C' }}>
-                  <Phone size={16} color={A} /> <span dir="ltr">{contact.phone}</span>
-                </li>
-              )}
-              {contact.email && (
-                <li style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '.9rem', color: '#C6B49C' }}>
-                  <Mail size={16} color={A} /> {contact.email}
-                </li>
-              )}
+              <li style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '.9rem', color: '#C6B49C' }}>
+                <Phone size={16} color={A} /> <span dir="ltr">{contact.phone || comingSoon(store)}</span>
+              </li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '.9rem', color: '#C6B49C' }}>
+                <WhatsAppGlyph size={16} color={A} /> <span dir="ltr">{store?.contact?.whatsapp || comingSoon(store)}</span>
+              </li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '.9rem', color: '#C6B49C' }}>
+                <Mail size={16} color={A} /> {contact.email || comingSoon(store)}
+              </li>
               {(contact.wilaya || contact.address) && (
                 <li style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '.9rem', color: '#C6B49C' }}>
                   <MapPin size={16} color={A} /> {[contact.wilaya, contact.address].filter(Boolean).join(' — ')}
@@ -1028,7 +1028,9 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -1296,7 +1298,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
             <button onClick={submitOrder} disabled={submitting} className="lm-btn" style={btnPrimary}>
               {submitting ? t.sending : t.confirmOrder}
             </button>
-            {!product.isDigital && (
+            {orderNowState && (
               <button onClick={() => setIsOrderNow(false)} disabled={submitting} className="lm-btn"
                 style={{ ...btnGhost, borderColor: BD, color: SUB }}>
                 {t.cancel}
@@ -1305,6 +1307,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
           </>
         )}
       </div>
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

@@ -15,6 +15,7 @@ import {
   Package, Clock, Heart, MessageCircle, Download
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -857,8 +858,9 @@ export function Footer({ store }: any) {
           </div>
 <div>
           <p className="luxe-footer-links-title">{t.contactUs}</p>
-          {store?.contact?.phone && <div className="luxe-footer-contact"><Phone size={16} color={A} /> {store.contact.phone}</div>}
-          {store?.contact?.email && <div className="luxe-footer-contact"><Mail size={16} color={A} /> {store.contact.email}</div>}
+          <div className="luxe-footer-contact"><Phone size={16} color={A} /> {store?.contact?.phone || comingSoon(store)}</div>
+          <div className="luxe-footer-contact"><WhatsAppGlyph size={16} color={A} /> {store?.contact?.whatsapp || comingSoon(store)}</div>
+          <div className="luxe-footer-contact"><Mail size={16} color={A} /> {store?.contact?.email || comingSoon(store)}</div>
           {store?.contact?.wilaya && <div className="luxe-footer-contact"><MapPin size={16} color={A} /> {store.contact.wilaya}{store?.contact?.address ? `, ${store.contact.address}` : ''}</div>}
         </div>
       </div>
@@ -1141,7 +1143,9 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, store: storeprop }: ProductFormProps & { store?: any }) {
   const store = storeprop || product?.store;
   const t = T[getLang(store)];
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -1380,11 +1384,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           <button className="luxe-btn-primary" onClick={submitOrder} disabled={submitting}>
             {submitting ? <><Clock size={18} /> {t.sending}</> : <><Check size={18} /> {t.confirmOrder}</>}
           </button>
-          <button className="luxe-btn-secondary" onClick={() => setIsOrderNow(false)} disabled={submitting}>
+          {orderNowState && (<button className="luxe-btn-secondary" onClick={() => setIsOrderNow(false)} disabled={submitting}>
             {t.cancel}
-          </button>
+          </button>)}
         </>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

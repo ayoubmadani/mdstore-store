@@ -19,13 +19,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import DOMPurify from 'dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 import { useCartStore } from '@/store/useCartStore';
 import {
   Search, X, ShoppingCart, Menu, Phone, Mail, MapPin, ChevronDown,
   ChevronLeft, ChevronRight, Star, Truck, ShieldCheck, Lock, Headphones,
   Trash2, Plus, Minus, CheckCircle, AlertCircle, Package, ArrowLeft, ArrowRight, MessageCircle, Download,
 } from 'lucide-react';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 /* ============================================================
  * 0. Design tokens
@@ -730,8 +731,9 @@ export function Footer({ store }: any) {
 <div>
             <h4 className="hn-display" style={{ fontSize: '1rem', fontWeight: 800, margin: '0 0 1rem' }}>{t.contactUs}</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: '0.9rem', color: 'rgba(255,255,255,0.72)' }}>
-              {store?.contact?.phone && <a href={`tel:${store.contact.phone}`} style={{ color: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}><Phone size={16} color="#7FE3C0" /> {store.contact.phone}</a>}
-              {store?.contact?.email && <a href={`mailto:${store.contact.email}`} style={{ color: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}><Mail size={16} color="#7FE3C0" /> {store.contact.email}</a>}
+              <a href={store?.contact?.phone ? `tel:${store?.contact?.phone}` : undefined} style={{ color: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}><Phone size={16} color="#7FE3C0" /> {store?.contact?.phone || comingSoon(store)}</a>
+              <a href={storeWhatsappHref(store)} target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}><WhatsAppGlyph size={16} color="#7FE3C0" /> {store?.contact?.whatsapp || comingSoon(store)}</a>
+              <a href={store?.contact?.email ? `mailto:${store?.contact?.email}` : undefined} style={{ color: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}><Mail size={16} color="#7FE3C0" /> {store?.contact?.email || comingSoon(store)}</a>
               {(store?.contact?.wilaya || store?.contact?.address) && <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}><MapPin size={16} color="#7FE3C0" /> {[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' — ')}</span>}
             </div>
           </div>
@@ -1472,6 +1474,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
           <ShoppingCart size={18} /> {t.addToCart}
         </button>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

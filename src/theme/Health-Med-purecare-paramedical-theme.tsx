@@ -15,6 +15,7 @@ import {
   Trash2, Loader2, Phone, MapPin, Mail, Activity, Zap, User, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -884,8 +885,9 @@ export function Footer({ store }: any) {
           <div>
             <p style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>{t.contactSect}</p>
             {[
-              { icon: <Phone style={{ width: '13px', height: '13px' }} />, val: store?.contact?.phone },
-              { icon: <Mail style={{ width: '13px', height: '13px' }} />, val: store?.contact?.email },
+              { icon: <Phone style={{ width: '13px', height: '13px' }} />, val: store?.contact?.phone || comingSoon(store) },
+              { icon: <WhatsAppGlyph style={{ width: '13px', height: '13px' }} />, val: store?.contact?.whatsapp || comingSoon(store) },
+              { icon: <Mail style={{ width: '13px', height: '13px' }} />, val: store?.contact?.email || comingSoon(store) },
               { icon: <MapPin style={{ width: '13px', height: '13px' }} />, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
             ].filter(r => r.val).map((item, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: 'rgba(255,255,255,0.45)' }}>
@@ -1331,7 +1333,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sub, setSub] = useState(false);
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [isAdded, setIsAdded] = useState(false);
   const initCount = useCartStore(s => s.initCount);
 
@@ -1430,9 +1434,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           {product.store?.cart && !product.isDigital && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
               <p style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--blue)', margin: 0 }}>{t.deliveryInfo}</p>
-              <button onClick={() => setIsOrderNow(false)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', border: '1px solid var(--line-dk)', background: 'transparent', color: 'var(--dim)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', borderRadius: 5 }}>
+              {orderNowState && (<button onClick={() => setIsOrderNow(false)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', border: '1px solid var(--line-dk)', background: 'transparent', color: 'var(--dim)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', borderRadius: 5 }}>
                 <X style={{ width: '10px', height: '10px' }} /> {t.cancel}
-              </button>
+              </button>)}
             </div>
           )}
           <form onSubmit={handleSubmit}>
@@ -1561,6 +1565,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </form>
         </div>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

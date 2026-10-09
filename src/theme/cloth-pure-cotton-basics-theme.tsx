@@ -6,6 +6,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import { ShoppingBag, Search, Menu, X, ChevronLeft, ChevronRight, Trash2, Plus, Minus, Check, MapPin, Phone, Mail, Package, Truck, MessageCircle, Download } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 /* ============================================================
    PURE COTTON BASICS — Structural + Visual Theme
@@ -703,8 +704,9 @@ export function Footer({ store }: any) {
         <div>
           <h4 style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, letterSpacing: .4 }}>{t.contactSect}</h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13.5, color: 'var(--thread-soft)' }}>
-            {store?.contact?.phone && <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Phone size={14} /> {store.contact.phone}</span>}
-            {store?.contact?.email && <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Mail size={14} /> {store.contact.email}</span>}
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Phone size={14} /> {store?.contact?.phone || comingSoon(store)}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><WhatsAppGlyph size={14} /> {store?.contact?.whatsapp || comingSoon(store)}</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Mail size={14} /> {store?.contact?.email || comingSoon(store)}</span>
             {(store?.contact?.wilaya || store?.contact?.address) && (
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><MapPin size={14} /> {store?.contact?.wilaya} {store?.contact?.address}</span>
             )}
@@ -997,7 +999,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const router = useRouter();
   const initCount = useCartStore((s: any) => s.initCount);
 
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -1151,7 +1155,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         <div className="pc-stitch-border" style={{ padding: 20, borderRadius: 3, background: '#fff' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <p style={{ fontWeight: 700, fontSize: 14.5 }}>{t.orderFormTitle}</p>
-            {!product.isDigital && (
+            {orderNowState && (
               <button className="pc-btn" onClick={() => setIsOrderNow(false)} style={{ background: 'none' }}><X size={18} /></button>
             )}
           </div>
@@ -1245,6 +1249,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </div>
         </div>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

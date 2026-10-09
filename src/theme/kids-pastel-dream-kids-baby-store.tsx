@@ -13,6 +13,7 @@ import {
     Shield, Truck, Sparkles, Lock, Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -860,9 +861,10 @@ export function Footer({ store }: any) {
 <div>
                         <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--peach)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>{t.contactSect}</h4>
                         {[
-                            { e: '📞', v: store?.contact?.phone },
+                            { e: '📞', v: store?.contact?.phone || comingSoon(store) },
+                            { e: '💬', v: store?.contact?.whatsapp || comingSoon(store) },
                             { e: '📍', v: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
-                            { e: '📧', v: store?.contact?.email },
+                            { e: '📧', v: store?.contact?.email || comingSoon(store) },
                         ].filter(r => r.v).map((r, i) => (
                             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', fontSize: '0.9rem', fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: '0.625rem' }}>
                                 <span>{r.e}</span>{r.v}
@@ -1315,7 +1317,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [sub, setSub] = useState(false);
-    const [isOrderNow, setIsOrderNow] = useState(false);
+    const [orderNowState, setIsOrderNow] = useState(false);
+    // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+    const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
     const [isAdded, setIsAdded] = useState(false);
     const initCount = useCartStore(s => s.initCount);
 
@@ -1413,9 +1417,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                     {product.store?.cart && !product.isDigital && (
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                             <p style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{t.orderInfo}</p>
-                            <button onClick={() => setIsOrderNow(false)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0.375rem 0.75rem', borderRadius: 50, border: '1.5px solid var(--border)', background: '#fff', color: 'var(--text-soft)', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                            {orderNowState && (<button onClick={() => setIsOrderNow(false)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0.375rem 0.75rem', borderRadius: 50, border: '1.5px solid var(--border)', background: '#fff', color: 'var(--text-soft)', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
                                 <X size={11} /> {t.back}
-                            </button>
+                            </button>)}
                         </div>
                     )}
                     <form onSubmit={handleSubmit}>
@@ -1524,6 +1528,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                     </form>
                 </div>
             )}
+          <WhatsAppOrderButton product={product} store={store} />
         </div>
     );
 }

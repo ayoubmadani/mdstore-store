@@ -8,8 +8,9 @@ import {
   Trash2, Star, Phone, Mail, MapPin, AlertCircle, Check, Zap, Timer,
   Minus, Plus, ArrowRight, ArrowLeft, Activity, Package, Truck, MessageCircle, Download,
 } from 'lucide-react';
-import DOMPurify from 'dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 import { useCartStore } from '@/store/useCartStore';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 /* ============================================================
    NAVBAR ARCHETYPE : E — Icon-heavy Minimal
@@ -670,16 +671,15 @@ export function Footer({ store }: any) {
         <div>
           <p style={{ fontWeight: 700, marginBottom: 14, color: A, fontSize: '0.8rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{t.contactUs}</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {store?.contact?.phone && (
-              <a href={`tel:${store.contact.phone}`} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#c9c9c9', fontSize: '0.85rem' }}>
-                <Phone size={14} /> {store.contact.phone}
-              </a>
-            )}
-            {store?.contact?.email && (
-              <a href={`mailto:${store.contact.email}`} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#c9c9c9', fontSize: '0.85rem' }}>
-                <Mail size={14} /> {store.contact.email}
-              </a>
-            )}
+            <a href={store?.contact?.phone ? `tel:${store?.contact?.phone}` : undefined} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#c9c9c9', fontSize: '0.85rem' }}>
+              <Phone size={14} /> {store?.contact?.phone || comingSoon(store)}
+            </a>
+            <a href={storeWhatsappHref(store)} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#c9c9c9', fontSize: '0.85rem' }}>
+              <WhatsAppGlyph size={14} /> {store?.contact?.whatsapp || comingSoon(store)}
+            </a>
+            <a href={store?.contact?.email ? `mailto:${store?.contact?.email}` : undefined} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#c9c9c9', fontSize: '0.85rem' }}>
+              <Mail size={14} /> {store?.contact?.email || comingSoon(store)}
+            </a>
             {(store?.contact?.wilaya || store?.contact?.address) && (
               <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#c9c9c9', fontSize: '0.85rem' }}>
                 <MapPin size={14} /> {[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(', ')}
@@ -1013,7 +1013,9 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -1218,9 +1220,9 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
             <button onClick={submitOrder} disabled={submitting} className="btn-primary" style={btnPrimary}>
               {submitting ? t.sending : t.confirmOrder}
             </button>
-            <button onClick={() => setIsOrderNow(false)} disabled={submitting} style={btnOutline}>
+            {orderNowState && (<button onClick={() => setIsOrderNow(false)} disabled={submitting} style={btnOutline}>
               {t.cancel}
-            </button>
+            </button>)}
           </div>
         </div>
       )}
@@ -1237,6 +1239,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
           </button>
         </div>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

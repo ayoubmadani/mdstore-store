@@ -24,6 +24,7 @@ import {
   Glasses, Watch, Truck, ShieldCheck, CreditCard, Headphones,
   Star, Plus, Minus, ArrowRight, Send, Download,
 } from 'lucide-react';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 /* ---------------------------------------------------------------- tokens */
 
@@ -1204,18 +1205,18 @@ export function Footer({ store }: any) {
           </div>
 <div>
             <p className="uvt-fhead">{t.contactUs}</p>
-            {store?.contact?.phone && (
-              <a href={`tel:${store.contact.phone}`} className="uvt-fcontact">
-                <Phone size={15} color={A} style={{ flexShrink: 0, marginTop: 2 }} />
-                <span className="uvt-num">{store.contact.phone}</span>
-              </a>
-            )}
-            {store?.contact?.email && (
-              <a href={`mailto:${store.contact.email}`} className="uvt-fcontact">
-                <Mail size={15} color={A} style={{ flexShrink: 0, marginTop: 2 }} />
-                <span style={{ wordBreak: 'break-all' }}>{store.contact.email}</span>
-              </a>
-            )}
+            <a href={store?.contact?.phone ? `tel:${store?.contact?.phone}` : undefined} className="uvt-fcontact">
+              <Phone size={15} color={A} style={{ flexShrink: 0, marginTop: 2 }} />
+              <span className="uvt-num">{store?.contact?.phone || comingSoon(store)}</span>
+            </a>
+            <a href={storeWhatsappHref(store)} target="_blank" rel="noreferrer" className="uvt-fcontact">
+              <WhatsAppGlyph size={15} color={A} style={{ flexShrink: 0, marginTop: 2 }} />
+              <span className="uvt-num">{store?.contact?.whatsapp || comingSoon(store)}</span>
+            </a>
+            <a href={store?.contact?.email ? `mailto:${store?.contact?.email}` : undefined} className="uvt-fcontact">
+              <Mail size={15} color={A} style={{ flexShrink: 0, marginTop: 2 }} />
+              <span style={{ wordBreak: 'break-all' }}>{store?.contact?.email || comingSoon(store)}</span>
+            </a>
             {(store?.contact?.wilaya || store?.contact?.address) && (
               <p className="uvt-fcontact">
                 <MapPin size={15} color={A} style={{ flexShrink: 0, marginTop: 2 }} />
@@ -1504,7 +1505,9 @@ export function ProductForm({
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [submitting, setSubmitting] = useState(false);
   const [apiErr, setApiErr] = useState('');
   const [added, setAdded] = useState(false);
@@ -1812,7 +1815,7 @@ export function ProductForm({
             <button type="button" style={btnAmber} onClick={submitOrder} disabled={submitting}>
               {submitting ? t.sending : t.confirmOrder}
             </button>
-            {!product?.isDigital && (
+            {orderNowState && (
               <button type="button" style={btnGhost} onClick={() => setIsOrderNow(false)} disabled={submitting}>
                 {t.cancel}
               </button>
@@ -1835,6 +1838,7 @@ export function ProductForm({
           )}
         </div>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

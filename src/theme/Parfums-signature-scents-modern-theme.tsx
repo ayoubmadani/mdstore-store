@@ -10,6 +10,7 @@ import {
   Gift, Truck, ShieldCheck, Headphones, Check, Package, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 /* ============================================================
    Signature Scents — Modern Perfume Theme (AR / RTL)
@@ -754,12 +755,9 @@ export function Footer({ store }: any) {
           <div>
             <h4 style={{ fontFamily: FONT_HEAD, fontSize: 16, marginBottom: 16, color: GOLD }}>{t.contactSect}</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {store?.contact?.phone && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#C9B8C4', fontSize: 14 }}><Phone size={15} /> {store.contact.phone}</span>
-              )}
-              {store?.contact?.email && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#C9B8C4', fontSize: 14 }}><Mail size={15} /> {store.contact.email}</span>
-              )}
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#C9B8C4', fontSize: 14 }}><Phone size={15} /> {store?.contact?.phone || comingSoon(store)}</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#C9B8C4', fontSize: 14 }}><WhatsAppGlyph size={15} /> {store?.contact?.whatsapp || comingSoon(store)}</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#C9B8C4', fontSize: 14 }}><Mail size={15} /> {store?.contact?.email || comingSoon(store)}</span>
               {(store?.contact?.wilaya || store?.contact?.address) && (
                 <span style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#C9B8C4', fontSize: 14 }}>
                   <MapPin size={15} /> {[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(', ')}
@@ -1089,7 +1087,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [added, setAdded] = useState(false);
@@ -1314,7 +1314,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <button onClick={submitOrder} disabled={submitting} className="btn-primary" style={{ ...btnPrimary, flex: 1, opacity: submitting ? 0.65 : 1, cursor: submitting ? 'default' : 'pointer' }}>
               {submitting ? t.sending : t.confirmOrder}
             </button>
-            {!product.isDigital && (
+            {orderNowState && (
               <button onClick={() => setIsOrderNow(false)} disabled={submitting} style={{ padding: '0.9rem 1.5rem', minHeight: 44, background: 'transparent', color: TXT, border: `1.5px solid ${BD}`, borderRadius: 14, fontWeight: 700, cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.65 : 1, fontFamily: 'inherit' }}>
                 {t.cancelBtn}
               </button>
@@ -1322,6 +1322,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </div>
         </div>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

@@ -26,13 +26,14 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import DOMPurify from 'dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 import { useCartStore } from '@/store/useCartStore';
 import {
   Search, ShoppingBag, Menu, X, ChevronLeft, ChevronRight, ChevronDown, LayoutGrid,
   Phone, Mail, MessageCircle, MapPin, Star, Trash2, Minus, Plus, Check, AlertCircle, Home as HomeIcon,
   Truck, ShieldCheck, Headphones, Send, Smartphone, ArrowRight, BadgeCheck, CreditCard, Cable, Package, Download,
 } from 'lucide-react';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 /* ============================ TOKENS ============================ */
 const A = '#5B4BE0';
@@ -931,16 +932,15 @@ export function Footer({ store }: any) {
 
           <div>
             <p style={{ ...eyebrow, marginBottom: 10 }}>{t.contactUs}</p>
-            {c.phone && (
-              <a href={`tel:${c.phone}`} className="tk-footlink" style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                <Phone size={14} strokeWidth={1.8} /> <span dir="ltr">{c.phone}</span>
-              </a>
-            )}
-            {c.email && (
-              <a href={`mailto:${c.email}`} className="tk-footlink" style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                <Mail size={14} strokeWidth={1.8} /> {c.email}
-              </a>
-            )}
+            <a href={c.phone ? `tel:${c.phone}` : undefined} className="tk-footlink" style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+              <Phone size={14} strokeWidth={1.8} /> <span dir="ltr">{c.phone || comingSoon(store)}</span>
+            </a>
+            <a href={storeWhatsappHref(store)} target="_blank" rel="noreferrer" className="tk-footlink" style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+              <WhatsAppGlyph size={14} strokeWidth={1.8} /> <span dir="ltr">{store?.contact?.whatsapp || comingSoon(store)}</span>
+            </a>
+            <a href={c.email ? `mailto:${c.email}` : undefined} className="tk-footlink" style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+              <Mail size={14} strokeWidth={1.8} /> {c.email || comingSoon(store)}
+            </a>
             {(c.wilaya || c.address) && (
               <span className="tk-footlink" style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
                 <MapPin size={14} strokeWidth={1.8} style={{ marginTop: 3, flexShrink: 0 }} />
@@ -1371,7 +1371,9 @@ export function ProductForm({
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [submitting, setSubmitting] = useState(false);
   const [added, setAdded] = useState(false);
   const [errs, setErrs] = useState<Record<string, string>>({});
@@ -1676,7 +1678,7 @@ export function ProductForm({
             <button type="button" className="tk-btnp" style={btnPrimary} onClick={submitOrder} disabled={submitting}>
               {submitting ? t.sending : t.confirmOrder}
             </button>
-            {!product?.isDigital && (
+            {orderNowState && (
               <button type="button" className="tk-btng" style={{ ...btnGhost, color: SUB }}
                 onClick={() => setIsOrderNow(false)} disabled={submitting}>
                 {t.cancel}
@@ -1685,6 +1687,7 @@ export function ProductForm({
           </div>
         </div>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

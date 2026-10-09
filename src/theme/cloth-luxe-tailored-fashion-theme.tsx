@@ -7,6 +7,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import { Star, ChevronDown, AlertCircle, X, CheckCircle2, Shield, ArrowLeft, Plus, Minus, Search, ShoppingCart, Trash2, Loader2, ChevronLeft, ChevronRight, Phone, Package, Truck, Mail, MessageCircle, Download } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -556,7 +557,7 @@ export function Footer({store}:any){
         </div>
         <div>
           <p className="lbl" style={{marginBottom:14,color:'var(--cp)'}}>{t.contactSect}</p>
-          {[store?.contact?.phone&&`📞 ${store.contact.phone}`,[store?.contact?.wilaya,store?.contact?.address].filter(Boolean).join(' / ')&&`📍 ${[store.contact?.wilaya,store.contact?.address].filter(Boolean).join(' / ')}`,store?.contact?.email&&`✉️ ${store.contact.email}`].filter(Boolean).map((v,i)=>(
+          {[`📞 ${store?.contact?.phone||comingSoon(store)}`,`💬 ${store?.contact?.whatsapp||comingSoon(store)}`,[store?.contact?.wilaya,store?.contact?.address].filter(Boolean).join(' / ')&&`📍 ${[store.contact?.wilaya,store.contact?.address].filter(Boolean).join(' / ')}`,`✉️ ${store?.contact?.email||comingSoon(store)}`].filter(Boolean).map((v,i)=>(
             <p key={i} style={{fontSize:'12px',color:'var(--mu)',marginBottom:9,letterSpacing:'0.04em'}}>{v as string}</p>
           ))}
         </div>
@@ -945,6 +946,7 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
           </form>
         </div>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

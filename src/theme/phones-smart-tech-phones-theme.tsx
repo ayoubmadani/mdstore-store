@@ -19,6 +19,7 @@ import {
   ChevronLeft, ChevronRight, Star, Trash2, Plus, Minus, Check, AlertCircle,
   Truck, ShieldCheck, CreditCard, Headphones, Smartphone, Send, Cpu, Package, Download,
 } from 'lucide-react';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 /* ------------------------------ Tokens ------------------------------ */
 const A   = '#2F5BFF'; // electric cobalt accent
@@ -782,16 +783,15 @@ export function Footer({ store }: any) {
 <div>
             <h4 style={{ color: '#fff', fontSize: '0.95rem', fontWeight: 800, marginBottom: 14 }}>{t.contactUs}</h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {c.phone && (
-                <li style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.9rem' }}>
-                  <Phone size={16} color={A} /> <span className="pt-mono">{c.phone}</span>
-                </li>
-              )}
-              {c.email && (
-                <li style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.9rem' }}>
-                  <Mail size={16} color={A} /> {c.email}
-                </li>
-              )}
+              <li style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.9rem' }}>
+                <Phone size={16} color={A} /> <span className="pt-mono">{c.phone || comingSoon(store)}</span>
+              </li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.9rem' }}>
+                <WhatsAppGlyph size={16} color={A} /> <span className="pt-mono">{store?.contact?.whatsapp || comingSoon(store)}</span>
+              </li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.9rem' }}>
+                <Mail size={16} color={A} /> {c.email || comingSoon(store)}
+              </li>
               {(c.wilaya || c.address) && (
                 <li style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: '0.9rem' }}>
                   <MapPin size={16} color={A} style={{ flexShrink: 0, marginTop: 2 }} />
@@ -1163,7 +1163,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -1432,7 +1434,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <button className="pt-btn" onClick={submitOrder} disabled={submitting}>
               {submitting ? t.sending : t.confirmOrder}
             </button>
-            {!product?.isDigital && (
+            {orderNowState && (
               <button className="pt-btn pt-btn-ghost" style={{ width: 'auto', padding: '0.9rem 1.4rem' }}
                 onClick={() => setIsOrderNow(false)} disabled={submitting}>
                 {t.cancel}
@@ -1441,6 +1443,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </div>
         </div>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

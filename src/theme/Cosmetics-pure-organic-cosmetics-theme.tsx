@@ -12,6 +12,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -899,8 +900,9 @@ export function Footer({ store }: any) {
           <div>
             <h4 style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.16em', marginBottom:'1.5rem' }}>{t.contactSect}</h4>
             {[
-              { icon:<Phone size={12}/>, val: store?.contact?.phone },
-              { icon:<Mail size={12}/>, val: store?.contact?.email },
+              { icon: <Phone size={12}/>, val: store?.contact?.phone || comingSoon(store) },
+              { icon: <WhatsAppGlyph size={12}/>, val: store?.contact?.whatsapp || comingSoon(store) },
+              { icon:<Mail size={12}/>, val: store?.contact?.email || comingSoon(store) },
               { icon:<MapPin size={12}/>, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
             ].filter(r => r.val).map((r,i) => (
               <div key={i} style={{ display:'flex', alignItems:'center', gap:'0.625rem', marginBottom:'0.875rem' }}>
@@ -1497,6 +1499,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </form>
         </div>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

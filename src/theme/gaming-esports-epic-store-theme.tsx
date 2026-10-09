@@ -3,9 +3,10 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import DOMPurify from "dompurify";
+import DOMPurify from 'isomorphic-dompurify';
 import axios from "axios";
 import { useCartStore } from "@/store/useCartStore";
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 import {
   ShoppingCart, Search, Menu, X, ChevronDown, ChevronLeft, ChevronRight,
   Star, Trash2, Phone, Mail, MapPin, Send, AlertCircle, Minus, Plus,
@@ -610,16 +611,15 @@ export function Footer({ store }: { store: any }) {
           <div>
             <h4 style={{ color: TXT, fontWeight: 700, marginBottom: 14, fontSize: "0.9rem" }}>{t.contactSect}</h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {store?.contact?.phone && (
-                <a href={`tel:${store.contact.phone}`} style={{ color: SUB, textDecoration: "none", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: 8 }}>
-                  <Phone size={13} color={A} />{store.contact.phone}
-                </a>
-              )}
-              {store?.contact?.email && (
-                <a href={`mailto:${store.contact.email}`} style={{ color: SUB, textDecoration: "none", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: 8 }}>
-                  <Mail size={13} color={A} />{store.contact.email}
-                </a>
-              )}
+              <a href={store?.contact?.phone ? `tel:${store?.contact?.phone}` : undefined} style={{ color: SUB, textDecoration: "none", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: 8 }}>
+                <Phone size={13} color={A} />{store?.contact?.phone || comingSoon(store)}
+              </a>
+              <a href={storeWhatsappHref(store)} target="_blank" rel="noreferrer" style={{ color: SUB, textDecoration: "none", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: 8 }}>
+                <WhatsAppGlyph size={13} color={A} />{store?.contact?.whatsapp || comingSoon(store)}
+              </a>
+              <a href={store?.contact?.email ? `mailto:${store?.contact?.email}` : undefined} style={{ color: SUB, textDecoration: "none", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: 8 }}>
+                <Mail size={13} color={A} />{store?.contact?.email || comingSoon(store)}
+              </a>
               {store?.contact?.wilaya && (
                 <span style={{ color: SUB, fontSize: "0.85rem", display: "flex", alignItems: "center", gap: 8 }}>
                   <MapPin size={13} color={A} />{store.contact.wilaya}{store.contact.address ? ` — ${store.contact.address}` : ""}
@@ -965,7 +965,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [submitting, setSubmitting] = useState(false);
   const [added, setAdded] = useState(false);
   const router = useRouter();
@@ -1214,7 +1216,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           )}
 
           <div style={{ display: "flex", gap: 8 }}>
-            {!product.isDigital && (
+            {orderNowState && (
               <button type="button" onClick={() => setIsOrderNow(false)} style={{ ...btnSecondary, flex: 1 }}>{t.back}</button>
             )}
             <button type="submit" disabled={submitting} style={{ ...btnPrimary, flex: 2, opacity: submitting ? 0.65 : 1 }}>
@@ -1223,6 +1225,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </div>
         </form>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

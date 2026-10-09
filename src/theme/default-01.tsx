@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Store } from '@/types/store';
 import { useCartStore } from '@/store/useCartStore';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 // ─────────────────────────────────────────────────────────────
 // TYPES
@@ -364,20 +365,19 @@ export function Footer({ store }: any) {
             ))}
           </div>
         </div>
-        {(store?.contact?.phone || store?.contact?.email || store?.contact?.wilaya || store?.contact?.address) && (
+        {true && (
           <div>
             <p style={{ fontWeight: 700, marginBottom: '0.75rem', fontSize: '0.85rem', color: '#444' }}>{isRTL ? 'تواصل معنا' : 'Contact'}</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              {store?.contact?.phone && (
-                <a href={`tel:${store.contact.phone}`} style={{ fontSize: '0.82rem', color: '#555', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <Phone size={12} />{store.contact.phone}
-                </a>
-              )}
-              {store?.contact?.email && (
-                <a href={`mailto:${store.contact.email}`} style={{ fontSize: '0.82rem', color: '#555', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <Mail size={12} />{store.contact.email}
-                </a>
-              )}
+              <a href={store?.contact?.phone ? `tel:${store?.contact?.phone}` : undefined} style={{ fontSize: '0.82rem', color: '#555', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Phone size={12} />{store?.contact?.phone || comingSoon(store)}
+              </a>
+              <a href={storeWhatsappHref(store)} target="_blank" rel="noreferrer" style={{ fontSize: '0.82rem', color: '#555', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <WhatsAppGlyph size={12} />{store?.contact?.whatsapp || comingSoon(store)}
+              </a>
+              <a href={store?.contact?.email ? `mailto:${store?.contact?.email}` : undefined} style={{ fontSize: '0.82rem', color: '#555', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Mail size={12} />{store?.contact?.email || comingSoon(store)}
+              </a>
               {(store?.contact?.wilaya || store?.contact?.address) && (
                 <span style={{ fontSize: '0.82rem', color: '#555', display: 'flex', alignItems: 'center', gap: 6 }}>
                   <MapPin size={12} />{[store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')}
@@ -879,6 +879,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           <Shield size={11} /> بياناتك آمنة ومشفرة
         </p>
       </form>
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

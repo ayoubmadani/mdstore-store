@@ -22,13 +22,14 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import DOMPurify from 'dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 import { useCartStore } from '@/store/useCartStore';
 import {
   Search, ShoppingBag, Menu, X, ChevronLeft, ChevronRight, ChevronDown,
   Phone, Mail, MapPin, Star, Trash2, Minus, Plus, Check, AlertCircle,
   Truck, ShieldCheck, Award, Headphones, Send, Footprints, ArrowRight, Package, MessageCircle, Download,
 } from 'lucide-react';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 /* ============================ TOKENS ============================ */
 const A = '#7C441C';
@@ -888,16 +889,15 @@ export function Footer({ store }: any) {
           </div>
 <div>
             <p style={{ ...eyebrow, color: '#8C8073', marginBottom: 14 }}>{t.contactUs}</p>
-            {c.phone && (
-              <a href={`tel:${c.phone}`} className="lx-footlink" style={{ display: 'flex', alignItems: 'center', gap: 9 }} dir="ltr">
-                <Phone size={14} strokeWidth={1.6} /> {c.phone}
-              </a>
-            )}
-            {c.email && (
-              <a href={`mailto:${c.email}`} className="lx-footlink" style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                <Mail size={14} strokeWidth={1.6} /> {c.email}
-              </a>
-            )}
+            <a href={c.phone ? `tel:${c.phone}` : undefined} className="lx-footlink" style={{ display: 'flex', alignItems: 'center', gap: 9 }} dir="ltr">
+              <Phone size={14} strokeWidth={1.6} /> {c.phone || comingSoon(store)}
+            </a>
+            <a href={storeWhatsappHref(store)} target="_blank" rel="noreferrer" className="lx-footlink" style={{ display: 'flex', alignItems: 'center', gap: 9 }} dir="ltr">
+              <WhatsAppGlyph size={14} strokeWidth={1.6} /> {store?.contact?.whatsapp || comingSoon(store)}
+            </a>
+            <a href={c.email ? `mailto:${c.email}` : undefined} className="lx-footlink" style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+              <Mail size={14} strokeWidth={1.6} /> {c.email || comingSoon(store)}
+            </a>
             {(c.wilaya || c.address) && (
               <span className="lx-footlink" style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
                 <MapPin size={14} strokeWidth={1.6} style={{ marginTop: 3, flexShrink: 0 }} />
@@ -1323,7 +1323,9 @@ export function ProductForm({
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [submitting, setSubmitting] = useState(false);
   const [added, setAdded] = useState(false);
   const [errs, setErrs] = useState<Record<string, string>>({});
@@ -1632,13 +1634,14 @@ export function ProductForm({
             <button type="button" className="lx-btnp" style={btnPrimary} onClick={submitOrder} disabled={submitting}>
               {submitting ? t.sending : t.confirmOrder}
             </button>
-            <button type="button" className="lx-btng" style={{ ...btnGhost, color: SUB, borderColor: BD }}
+            {orderNowState && (<button type="button" className="lx-btng" style={{ ...btnGhost, color: SUB, borderColor: BD }}
               onClick={() => setIsOrderNow(false)} disabled={submitting}>
               {t.cancel}
-            </button>
+            </button>)}
           </div>
         </div>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

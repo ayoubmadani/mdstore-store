@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Store } from '@/types/store';
 import { useCartStore } from '@/store/useCartStore';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -1015,7 +1016,7 @@ export function Footer({ store }: any) {
           {[
             { title: t.quickLinks, links: [['/', t.footerHomeLink], ['/cart', t.cart], ['/contact', t.footerSupportLink]] },
             { title: t.legalNav, links: [['/Privacy', t.privacy], ['/Terms', t.terms], ['/cookies', t.cookies]] },
-            { title: t.contactSect, links: [[`tel:${store.contact.phone}`, store.contact.phone], ['#', [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')], [`mailto:${store.contact.email}`, store.contact.email]] },
+            { title: t.contactSect, links: [[store?.contact?.phone ? `tel:${store.contact.phone}` : '#', store?.contact?.phone || comingSoon(store)], [storeWhatsappHref(store) || '#', store?.contact?.whatsapp || comingSoon(store)], ['#', [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ')], [store?.contact?.email ? `mailto:${store.contact.email}` : '#', store?.contact?.email || comingSoon(store)]] },
           ].map(col => (
             <div key={col.title}>
               <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '11px', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase', color: cyan, marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1023,8 +1024,8 @@ export function Footer({ store }: any) {
                 {col.title}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {col.links.map(([href, label]) => (
-                  <a key={label} href={href} style={{ fontSize: '14px', color: 'var(--mid)', textDecoration: 'none', transition: 'all 0.3s', display: 'inline-block' }}
+                {col.links.map(([href, label], li) => (
+                  <a key={li} href={href} style={{ fontSize: '14px', color: 'var(--mid)', textDecoration: 'none', transition: 'all 0.3s', display: 'inline-block' }}
                     onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'white'; el.style.paddingInlineStart = '5px'; }}
                     onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--mid)'; el.style.paddingInlineStart = '0'; }}>
                     {label}
@@ -1531,7 +1532,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sub, setSub] = useState(false);
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [isAdded, setIsAdded] = useState(false);
 
   const initCount = useCartStore((state) => state.initCount);
@@ -1674,9 +1677,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           {product.store.cart && !product.isDigital && (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', margin: 0 }}>{t.deliveryInfoTitle}</p>
-              <button onClick={() => setIsOrderNow(false)} style={{ background: 'none', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--mid)', cursor: 'pointer', padding: '4px 10px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {orderNowState && (<button onClick={() => setIsOrderNow(false)} style={{ background: 'none', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--mid)', cursor: 'pointer', padding: '4px 10px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <X size={12} /> {t.cancel}
-              </button>
+              </button>)}
             </div>
           )}
           <form onSubmit={handleSubmit}>
@@ -1828,6 +1831,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </form>
         </div>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

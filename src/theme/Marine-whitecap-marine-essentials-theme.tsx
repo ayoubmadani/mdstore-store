@@ -5,8 +5,9 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import DOMPurify from 'dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 import { useCartStore } from '@/store/useCartStore';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 // =============================================================================
 // Whitecap Marine Essentials Theme
@@ -593,16 +594,15 @@ export function Footer({ store }: any) {
 <div>
             <h4 style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 700, margin: '0 0 14px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.contactUs}</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {store?.contact?.phone && (
-                <a href={`tel:${store.contact.phone}`} style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <IconPhone size={14} color="#94a3b8" /> {store.contact.phone}
-                </a>
-              )}
-              {store?.contact?.email && (
-                <a href={`mailto:${store.contact.email}`} style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <IconMail size={14} color="#94a3b8" /> {store.contact.email}
-                </a>
-              )}
+              <a href={store?.contact?.phone ? `tel:${store?.contact?.phone}` : undefined} style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <IconPhone size={14} color="#94a3b8" /> {store?.contact?.phone || comingSoon(store)}
+              </a>
+              <a href={storeWhatsappHref(store)} target="_blank" rel="noreferrer" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <WhatsAppGlyph size={14} color="#94a3b8" /> {store?.contact?.whatsapp || comingSoon(store)}
+              </a>
+              <a href={store?.contact?.email ? `mailto:${store?.contact?.email}` : undefined} style={{ color: '#94a3b8', textDecoration: 'none', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <IconMail size={14} color="#94a3b8" /> {store?.contact?.email || comingSoon(store)}
+              </a>
               {(store?.contact?.wilaya || store?.contact?.address) && (
                 <span style={{ color: '#94a3b8', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 8 }}>
                   <IconMapPin size={14} color="#94a3b8" /> {store.contact.wilaya} {store.contact.address}
@@ -997,7 +997,9 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -1302,7 +1304,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
             <button onClick={submitOrder} disabled={submitting} style={{ flex: 1, minHeight: 44, background: A, color: '#fff', border: 'none', borderRadius: 6, fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', opacity: submitting ? 0.65 : 1, transition: 'all 0.2s' }}>
               {submitting ? t.sending : t.confirmOrder}
             </button>
-            {!product?.isDigital && (
+            {orderNowState && (
               <button onClick={() => setIsOrderNow(false)} disabled={submitting} style={{ flex: 1, minHeight: 44, background: '#fff', color: SUB, border: `1px solid ${BD}`, borderRadius: 6, fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', opacity: submitting ? 0.65 : 1, transition: 'all 0.2s' }}>
                 {t.cancel}
               </button>
@@ -1310,6 +1312,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
           </div>
         </div>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }

@@ -15,6 +15,7 @@ import {
   Headphones, Volume2, Mail, Sparkles, ShieldCheck, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -742,8 +743,9 @@ export function Footer({ store }: any) {
           <div>
             <h4 className="eyebrow" style={{ fontSize: '0.68rem', fontWeight: 700, color: A, textTransform: 'uppercase' as const, marginBottom: '1.25rem' }}>{t.contactSect}</h4>
             {[
-              { icon: <Phone size={14} />, val: store?.contact?.phone },
-              { icon: <Mail size={14} />, val: store?.contact?.email },
+              { icon: <Phone size={14} />, val: store?.contact?.phone || comingSoon(store) },
+              { icon: <WhatsAppGlyph size={14} />, val: store?.contact?.whatsapp || comingSoon(store) },
+              { icon: <Mail size={14} />, val: store?.contact?.email || comingSoon(store) },
               { icon: <MapPin size={14} />, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
             ].filter(r => r.val).map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem', fontSize: '0.875rem' }}>
@@ -1074,7 +1076,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sub, setSub] = useState(false);
-  const [isOrderNow, setIsOrderNow] = useState(false);
+  const [orderNowState, setIsOrderNow] = useState(false);
+  // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
+  const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [isAdded, setIsAdded] = useState(false);
   const initCount = useCartStore((s) => s.initCount);
 
@@ -1176,7 +1180,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           {product.store.cart && !product.isDigital && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <p className="eyebrow" style={{ fontWeight: 600, fontSize: '0.72rem', color: SUB, textTransform: 'uppercase' as const }}>{t.deliveryType}</p>
-              <button onClick={() => setIsOrderNow(false)} style={{ fontSize: '0.8rem', color: SUB, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>{t.back}</button>
+              {orderNowState && (<button onClick={() => setIsOrderNow(false)} style={{ fontSize: '0.8rem', color: SUB, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>{t.back}</button>)}
             </div>
           )}
           <form onSubmit={handleSubmit}>
@@ -1271,6 +1275,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </form>
         </div>
       )}
+      <WhatsAppOrderButton product={product} store={store} />
     </div>
   );
 }
