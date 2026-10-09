@@ -38,7 +38,7 @@ const FLOATING_BUTTON_POSITION_STYLE: Record<string, React.CSSProperties> = {
 // SpacerBlockRenderer's pinned bar already does, keeps it anchored to a
 // corner of the actual visible page at any viewport size.
 function FloatingActionButton({ props, referenceWidth }: { props: Record<string, unknown>; referenceWidth: number }) {
-  const { link, linkType, position, contentType, text, icon, width: w, height: h, backgroundColor, textColor } = props as FloatingButtonProps;
+  const { link, linkType, position, contentType, text, icon, width: w, height: h, backgroundColor, textColor, fontSize } = props as FloatingButtonProps;
   const isFormLink = linkType === 'form';
   // Once a "jump to order form" button's own target has scrolled into view,
   // its job is done — leaving it on screen just sits a floating button on
@@ -100,7 +100,7 @@ function FloatingActionButton({ props, referenceWidth }: { props: Record<string,
           color: textColor || '#ffffff',
           boxShadow: '0 10px 25px -5px rgba(0,0,0,0.25)',
           fontWeight: 700,
-          fontSize: 14,
+          fontSize: fontSize || 14, // حجم خط النص من المحرر (الافتراضي 14)
           textDecoration: 'none',
           pointerEvents: 'auto',
         }}
@@ -160,6 +160,7 @@ interface FloatingButtonProps {
   contentType?: 'text' | 'icon';
   text?: string;
   icon?: string;
+  fontSize?: number;
   width?: number;
   height?: number;
   backgroundColor?: string;
@@ -216,7 +217,8 @@ function FloatingElements({ elements, referenceWidth }: { elements: unknown; ref
           // stretching the element tall and thin on narrower screens. cqw is
           // a container-width-relative unit, so using it here (not just for
           // fontSize) keeps height shrinking in lockstep with width.
-          height: boxHeight ? `clamp(20px, ${(boxHeight / referenceWidth) * 100}cqw, ${boxHeight}px)` : undefined,
+          // زر: لا يصغر عن 44px (أصغر مساحة ضغط مريحة على الهاتف)؛ باقي العناصر: 20px كما كانت
+          height: boxHeight ? `clamp(${el.type === 'button' ? Math.min(44, boxHeight) : 20}px, ${(boxHeight / referenceWidth) * 100}cqw, ${boxHeight}px)` : undefined,
           pointerEvents: 'auto' as const,
         };
 
@@ -248,7 +250,7 @@ function FloatingElements({ elements, referenceWidth }: { elements: unknown; ref
                 backgroundColor: el.backgroundColor || '#10b981',
                 color: el.textColor || '#ffffff',
                 fontWeight: 600,
-                fontSize: `clamp(10px, ${(basePx / referenceWidth) * 100}cqw, ${basePx}px)`,
+                fontSize: `clamp(${Math.min(14, basePx)}px, ${(basePx / referenceWidth) * 100}cqw, ${basePx}px)`, // زر: 14px على الأقل ليبقى مقروءاً
                 textDecoration: 'none',
                 whiteSpace: width ? 'normal' : 'nowrap',
               }}
@@ -472,10 +474,14 @@ function ImageBlockRenderer({ props, referenceWidth }: { props: Record<string, u
 function SpacerBlockRenderer({ props, elements, maxWidth }: { props: Record<string, unknown>; elements: unknown; maxWidth: number }) {
   const { height, backgroundColor, position } = props as SpacerBlockProps;
   const isPinned = position === 'top' || position === 'bottom';
+  const h = height || 60;
   return (
     <div
       style={{
-        height: height || 60,
+        // غير المثبّت يصغر مع عرض الصفحة بنفس نسبة الصور والأزرار التي فوقه (cqw)،
+        // وإلا بقي شريطاً بارتفاع ثابت فارغاً حول زر صغُر. أدنى 44px ليتسع الزر.
+        // المثبّت أعلى/أسفل الشاشة شريط ثابت يبقى بارتفاعه (وتُحسب منه مسافة الصفحة).
+        height: isPinned ? h : `clamp(${Math.min(44, h)}px, ${(h / maxWidth) * 100}cqw, ${h}px)`,
         backgroundColor: backgroundColor || '#ffffff',
         ...(isPinned
           ? {
