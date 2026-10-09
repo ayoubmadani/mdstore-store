@@ -119,3 +119,27 @@ export async function getStoreByDomain(
     return null;
   }
 }
+/**
+ * هل الدومين للمتجر كله أم لصفحة محرر واحدة (domains.scope = 'landing_page')؟
+ * أي فشل → نتعامل معه كدومين متجر عادي.
+ */
+export async function resolveDomain(domain: string): Promise<{ scope: 'store' | 'landing_page'; builderPageId: string | null }> {
+  try {
+    const { data } = await axios.get(`${API_URL}/domain/resolve/${encodeURIComponent(domain)}`, { timeout: 8000 });
+    return data?.scope === 'landing_page' && data.builderPageId
+      ? { scope: 'landing_page', builderPageId: data.builderPageId }
+      : { scope: 'store', builderPageId: null };
+  } catch {
+    return { scope: 'store', builderPageId: null };
+  }
+}
+
+/** صفحة محرر منشورة بمعرّفها (مع بيكسلاتها) — null إن لم تُنشر */
+export async function getBuilderPageById(id: string) {
+  try {
+    const { data } = await axios.get(`${API_URL}/builder-pages/public/${id}`, { timeout: 10000 });
+    return data ?? null;
+  } catch {
+    return null;
+  }
+}

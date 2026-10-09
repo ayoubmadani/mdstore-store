@@ -127,50 +127,68 @@ export default function ProductFormBlockRenderer({
 
   const productSummary = product && (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        {product.productImage && (
-          <img src={product.productImage} alt="" style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover' }} />
-        )}
-        <div>
-          {showProductName !== false && (
-            <p style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>{productNameOverride || product.name}</p>
+      {/* مثل المحرر: إخفاء "اسم المنتج" يخفي سطر المنتج كله (الصورة والاسم والسعر) */}
+      {showProductName !== false && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {product.productImage && (
+            <img src={product.productImage} alt="" style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover' }} />
           )}
-          <p style={{ margin: 0, fontSize: 13, opacity: 0.7 }}>
-            {formatPrice(matchedVariantDetail && matchedVariantDetail.price !== -1 ? matchedVariantDetail.price : product.price)}
-          </p>
+          <div>
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>{productNameOverride || product.name}</p>
+            <p style={{ margin: 0, fontSize: 13, opacity: 0.7 }}>
+              {formatPrice(matchedVariantDetail && matchedVariantDetail.price !== -1 ? matchedVariantDetail.price : product.price)}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {product.offers && product.offers.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {product.offers.map((offer) => (
-            <label
-              key={offer.id}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 8,
-                padding: '8px 10px',
-                borderRadius: 8,
-                border: `1px solid ${selectedOffer === offer.id ? accentColor : '#e4e4e7'}`,
-                cursor: 'pointer',
-                fontSize: 13,
-              }}
-            >
-              <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <input
-                  type="radio"
-                  name="offer"
-                  checked={selectedOffer === offer.id}
-                  onChange={() => setSelectedOffer(selectedOffer === offer.id ? null : offer.id)}
-                  style={{ accentColor }}
-                />
-                {offer.name} <span style={{ opacity: 0.6 }}>({offer.quantity} {t.pieces})</span>
-              </span>
-              <span style={{ fontWeight: 700 }}>{formatPrice(offer.price)}</span>
-            </label>
-          ))}
+          {product.offers.map((offer) => {
+            const isSel = selectedOffer === offer.id;
+            return (
+              <label
+                key={offer.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 10,
+                  padding: '12px 14px',
+                  borderRadius: 10,
+                  // المختار: خلفية بلون الزر (شفافة) + إطار 2px — مطابق لمعاينة المحرر
+                  border: `2px solid ${isSel ? accentColor : '#e4e4e7'}`,
+                  backgroundColor: isSel ? `color-mix(in srgb, ${accentColor} 14%, transparent)` : 'transparent',
+                  cursor: 'pointer',
+                  transition: 'background-color .15s, border-color .15s',
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <input
+                    type="radio"
+                    name="offer"
+                    checked={isSel}
+                    onChange={() => setSelectedOffer(isSel ? null : offer.id)}
+                    style={{ position: 'absolute', opacity: 0, width: 1, height: 1, pointerEvents: 'none' }}
+                  />
+                  <span style={{
+                    width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
+                    border: `2px solid ${isSel ? accentColor : 'currentColor'}`, opacity: isSel ? 1 : 0.45,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    {isSel && <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: accentColor }} />}
+                  </span>
+                  <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700 }}>{offer.name}</span>
+                    {offer.quantity > 1 && (
+                      <span style={{ fontSize: 11, fontWeight: 500, opacity: 0.6 }}>{offer.quantity} {t.pieces}</span>
+                    )}
+                  </span>
+                </span>
+                <span style={{ fontSize: 15, fontWeight: 800, whiteSpace: 'nowrap' }}>{formatPrice(offer.price)}</span>
+              </label>
+            );
+          })}
         </div>
       )}
 
@@ -258,6 +276,8 @@ export default function ProductFormBlockRenderer({
         <p style={{ textAlign: 'center', fontSize: 14, opacity: 0.6 }}>{t.loading}</p>
       ) : (
         <ProductForm
+          hideLabels
+          hideHeader
           product={{
             id: product.id,
             name: product.name,

@@ -1,6 +1,7 @@
 import { cache } from 'react'
 import { notFound } from 'next/navigation'
-import { getStoreByDomain } from '@/lib/api'
+import { getBuilderPageById, getStoreByDomain, resolveDomain } from '@/lib/api'
+import BuilderPageRenderer from '@/components/builderPages/BuilderPageRenderer'
 import { StoreProvider } from '@/Hook/store-provider'
 import CustomerTracker from '@/components/CustomerTracker'
 import AddShow from '@/components/addShow'
@@ -9,6 +10,14 @@ import type { Metadata } from 'next'
 
 const getStoreCached = cache(async (domain: string) => getStoreByDomain(domain))
 
+// دومين مخصص لصفحة محرر واحدة (domains.scope = 'landing_page'): الصفحة نفسها تُعرض
+// على الدومين بدل واجهة المتجر — null إن كان دومين متجر أو الصفحة غير منشورة
+const getDomainPageCached = cache(async (domain: string) => {
+  const { scope, builderPageId } = await resolveDomain(domain)
+  if (scope !== 'landing_page' || !builderPageId) return null
+  return getBuilderPageById(builderPageId)
+})
+
 interface LayoutProps {
   children: React.ReactNode
   params: Promise<{ domain: string }>
@@ -16,6 +25,9 @@ interface LayoutProps {
 
 export async function generateMetadata({ params }: LayoutProps): Promise<Metadata> {
   const { domain } = await params
+  const domainPage = await getDomainPageCached(domain)
+  if (domainPage) return { title: domainPage.name || domain }
+
   const store = await getStoreCached(domain)
   if (!store) return { title: 'Store Not Found' }
 
@@ -37,6 +49,19 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
 
 export default async function DomainLayout({ children, params }: LayoutProps) {
   const { domain } = await params
+
+  // الدومين كله لصفحة واحدة: تُعرض مباشرة بدون ثيم المتجر. بعد الطلب يذهب الزبون إلى
+  // /lp/page/successfully (مسار lp خارج هذا الـ layout، فلا يُعاد عرض الصفحة)
+  const domainPage = await getDomainPageCached(domain)
+  if (domainPage) {
+    return (
+      <>
+        <CustomerTracker pixels={domainPage.pixels ?? []} />
+        <BuilderPageRenderer page={domainPage} lpDomain="page" />
+      </>
+    )
+  }
+
   const store = await getStoreCached(domain)
   if (!store) notFound()
 

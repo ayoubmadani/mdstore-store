@@ -12,9 +12,43 @@ function negotiateLocale(acceptLanguage: string | null): string {
   return preferred.find((l) => SUPPORTED_LOCALES.includes(l)) ?? DEFAULT_LOCALE;
 }
 
+// ── تطوير محلي فقط (localhost) ──────────────────────────────────────────────
+// محلياً يكون الدومين في المسار (localhost:3000/a.mdstore.top)، بينما روابط الثيم
+// مثل /product/... تفترض أن الدومين هو الـ host (كما في الإنتاج) فيضيع الدومين.
+// نحفظ آخر دومين فُتح في كوكي، ونوجّه المسارات بدون دومين إليه داخلياً.
+const DEV_DOMAIN_COOKIE = 'dev_store_domain';
+const STATIC_EXT = /\.(ico|png|jpe?g|gif|svg|webp|avif|js|mjs|css|map|json|txt|xml|woff2?|ttf|otf|mp4|webm)$/i;
+
+function isLocalHost(hostname: string) {
+  return hostname.startsWith('localhost') || hostname.startsWith('127.0.0.1');
+}
+
+/** أول جزء من المسار إن كان يشبه دوميناً (a.mdstore.top) لا ملفاً ثابتاً */
+function domainSegment(path: string): string | null {
+  const first = path.split('/')[1] ?? '';
+  return /^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(first) && !STATIC_EXT.test(first) ? first.toLowerCase() : null;
+}
+
 export function middleware(req: NextRequest) {
   const url = req.nextUrl; // لا حاجة لـ clone() هنا في البداية
   const path = url.pathname;
+  const host = req.headers.get('host')?.toLowerCase() || '';
+
+  // محلياً: مسار يبدأ بدومين → نتذكّره للروابط التالية
+  if (isLocalHost(host) && !path.startsWith('/_next') && !path.startsWith('/api')) {
+    const devDomain = domainSegment(path);
+    if (devDomain) {
+      const res = NextResponse.next();
+      res.cookies.set(DEV_DOMAIN_COOKIE, devDomain, { path: '/', sameSite: 'lax' });
+      return res;
+    }
+    // مسار بدون دومين (/product/..., /cart) بعد فتح متجر → نفس المتجر
+    const remembered = req.cookies.get(DEV_DOMAIN_COOKIE)?.value;
+    if (remembered && path !== '/' && !path.includes('.')) {
+      url.pathname = `/${remembered}${path}`;
+      return NextResponse.rewrite(url);
+    }
+  }
 
   // 1. استثناء الملفات التقنية والملفات الثابتة
   if (path.startsWith('/_next') || path.includes('.')) {

@@ -53,6 +53,13 @@ export interface ProductFormProps {
   // that double-nesting was exactly the "shape doesn't match the editor"
   // mismatch, since the dashboard's own block preview is a single card.
   renderBefore?:    React.ReactNode;
+  // صفحات المحرر فقط: بدون أسماء الحقول — الـ placeholder يحمل اسم الحقل.
+  // باقي النماذج (صفحة المنتج، صفحات الهبوط القديمة) تبقى كما هي.
+  hideLabels?:      boolean;
+  // صفحات المحرر فقط: بدون عنوان "أدخل بيانات التسليم" — معاينة المحرر لا تعرضه
+  hideHeader?:      boolean;
+  // صفحات المحرر فقط: ملخص الطلب بدون سطري العرض والخيارات (مكررة — اختارها الزبون في الأعلى)
+  hideSummaryChoices?: boolean;
   // builder-pages productForm block only — mirrors dashboard/src/pages/editor/
   // blocks/ProductFormBlock.jsx's own color props exactly, so a merchant's
   // customization actually survives publishing instead of being silently
@@ -118,7 +125,7 @@ const inputCls = (err?: boolean) =>
 export default function ProductForm({
   product, userId, domain,
   selectedOffer, setSelectedOffer, selectedVariants,
-  platform, priceLoss = 0, lpId, builderPageId, title, buttonText, renderBefore,
+  platform, priceLoss = 0, lpId, builderPageId, title, buttonText, renderBefore, hideLabels = false, hideHeader = false, hideSummaryChoices = false,
   backgroundColor, textColor, buttonBackgroundColor, buttonTextColor,
   buttonBorderColor, inputBackgroundColor, inputBorderColor, inputTextColor,
   borderRadius, language,
@@ -293,46 +300,50 @@ export default function ProductForm({
     <div className="overflow-hidden shadow-xl shadow-gray-900/5 border" style={{ backgroundColor: cardBg, borderColor: fieldBorder, color: cardText, borderRadius: borderRadius ?? 0 }}>
 
       {/* Header */}
-      <div className="px-6 py-5 border-b" style={{ borderColor: fieldBorder }}>
-        <div className="flex items-center gap-2">
-          <ShoppingCart className="w-5 h-5" style={{ opacity: 0.75 }} />
-          <p className="font-bold">{title || t.formTitle}</p>
+      {!hideHeader && (
+        <div className="px-6 py-5 border-b" style={{ borderColor: fieldBorder }}>
+          <div className="flex items-center gap-2">
+            <ShoppingCart className="w-5 h-5" style={{ opacity: 0.75 }} />
+            <p className="font-bold">{title || t.formTitle}</p>
+          </div>
+          <p className="text-xs mt-1" style={{ opacity: 0.55 }}>{t.formSubtitle}</p>
         </div>
-        <p className="text-xs mt-1" style={{ opacity: 0.55 }}>{t.formSubtitle}</p>
-      </div>
+      )}
 
       <form onSubmit={handleSubmit} className="p-6 space-y-4">
         {renderBefore}
 
         {/* Name + Phone */}
         <div className="grid grid-cols-1 gap-4">
-          <FieldWrapper error={formErrors.customerName} label={t.fullName} labelColor={cardText}>
+          <FieldWrapper error={formErrors.customerName} label={hideLabels ? undefined : t.fullName} labelColor={cardText}>
             <div className="relative">
               <User className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
-              <input type="text" value={formData.customerName} placeholder={t.fullNamePlaceholder}
+              <input type="text" value={formData.customerName} placeholder={hideLabels ? t.fullName : t.fullNamePlaceholder} aria-label={t.fullName}
                 onChange={e => setFormData({ ...formData, customerName: e.target.value })}
                 className={`${inputCls(!!formErrors.customerName)} pr-10`}
                 style={fieldStyle(!!formErrors.customerName)} />
             </div>
           </FieldWrapper>
 
-          <FieldWrapper error={formErrors.customerPhone} label={t.phone} labelColor={cardText}>
+          <FieldWrapper error={formErrors.customerPhone} label={hideLabels ? undefined : t.phone} labelColor={cardText}>
             <div className="relative">
               <Phone className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
-              <input type="tel" dir="ltr" value={formData.customerPhone} placeholder="0550 123 456"
+              {/* hideLabels: الـ placeholder هو اسم الحقل، فيتبع اتجاه الصفحة حتى يبدأ الزبون بالكتابة */}
+              <input type="tel" dir={hideLabels && !formData.customerPhone ? undefined : 'ltr'} value={formData.customerPhone} placeholder={hideLabels ? t.phone : '0550 123 456'} aria-label={t.phone}
                 onChange={e => setFormData({ ...formData, customerPhone: e.target.value })}
-                className={`${inputCls(!!formErrors.customerPhone)} pr-10 font-mono`}
-                style={fieldStyle(!!formErrors.customerPhone)} />
+                className={`${inputCls(!!formErrors.customerPhone)} pr-10 ${hideLabels && !formData.customerPhone ? '' : 'font-mono'}`}
+                // المتصفح يفرض ltr على input[type=tel] — direction: inherit يعيد الـ placeholder لاتجاه الصفحة
+                style={{ ...fieldStyle(!!formErrors.customerPhone), ...(hideLabels && !formData.customerPhone ? { direction: 'inherit', textAlign: 'start' } : {}) }} />
             </div>
           </FieldWrapper>
         </div>
 
         {/* Wilaya + Commune */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FieldWrapper error={formErrors.customerWelaya} label={t.wilaya} labelColor={cardText}>
+          <FieldWrapper error={formErrors.customerWelaya} label={hideLabels ? undefined : t.wilaya} labelColor={cardText}>
             <div className="relative">
               <MapPin className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
-              <select value={formData.customerWelaya}
+              <select value={formData.customerWelaya} aria-label={t.wilaya}
                 onChange={e => setFormData({ ...formData, customerWelaya: e.target.value, customerCommune: '' })}
                 className={`${inputCls(!!formErrors.customerWelaya)} pr-10 appearance-none cursor-pointer`}
                 style={fieldStyle(!!formErrors.customerWelaya)}>
@@ -343,10 +354,10 @@ export default function ProductForm({
             </div>
           </FieldWrapper>
 
-          <FieldWrapper error={formErrors.customerCommune} label={t.commune} labelColor={cardText}>
+          <FieldWrapper error={formErrors.customerCommune} label={hideLabels ? undefined : t.commune} labelColor={cardText}>
             <div className="relative">
               <MapPin className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
-              <select value={formData.customerCommune}
+              <select value={formData.customerCommune} aria-label={t.commune}
                 disabled={!formData.customerWelaya || loadingCommunes}
                 onChange={e => setFormData({ ...formData, customerCommune: e.target.value })}
                 className={`${inputCls(!!formErrors.customerCommune)} pr-10 appearance-none cursor-pointer disabled:opacity-50`}
@@ -365,7 +376,9 @@ export default function ProductForm({
 
         {/* Delivery type */}
         <div>
-          <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: cardText, opacity: 0.6 }}>{t.deliveryType}</p>
+          {!hideLabels && (
+            <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: cardText, opacity: 0.6 }}>{t.deliveryType}</p>
+          )}
           <div className="grid grid-cols-2 gap-3">
             {(['home', 'office'] as const).map(type => {
               const isSelected = formData.typeLivraison === type;
@@ -414,13 +427,15 @@ export default function ProductForm({
         </FieldWrapper>
 
         {/* Order summary */}
-        <div className="rounded-2xl p-5 space-y-3 text-sm border" style={{ backgroundColor: fieldBg, borderColor: fieldBorder, color: cardText }}>
+        {/* خلفية الملخص = خلفية النموذج (مثل معاينة المحرر) — خلفية الحقول مع لون نص النموذج
+            كانت تعطي نصاً أبيض على أبيض حين يكون النموذج داكناً */}
+        <div className="rounded-2xl p-5 space-y-3 text-sm border" style={{ backgroundColor: cardBg, borderColor: fieldBorder, color: cardText }}>
           <div className="flex justify-between" style={{ opacity: 0.75 }}>
             <span className="flex items-center gap-1"><Package className="w-4 h-4" /> {t.product}</span>
             <span className="font-bold truncate max-w-[50%]" style={{ opacity: 1 }}>{product.name}</span>
           </div>
 
-          {selectedOffer && (() => {
+          {!hideSummaryChoices && selectedOffer && (() => {
             const offer = product.offers?.find(o => o.id === selectedOffer);
             if (!offer) return null;
             return (
@@ -431,7 +446,7 @@ export default function ProductForm({
             );
           })()}
 
-          {Object.entries(selectedVariants).map(([attrName, val]) => {
+          {!hideSummaryChoices && Object.entries(selectedVariants).map(([attrName, val]) => {
             const attr    = product.attributes?.find(a => a.name === attrName);
             const variant = attr?.variants?.find(v => v.value === val);
             if (!variant) return null;
