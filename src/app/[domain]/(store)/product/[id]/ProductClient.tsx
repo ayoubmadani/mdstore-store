@@ -23,6 +23,17 @@ interface Wilaya {
 }
 interface Commune { id: string; name: string; ar_name: string; wilayaId: string }
 
+// الاختيار الافتراضي: أول تركيبة متاحة (variantDetails المفعّلة)، وإلا أول قيمة لكل خاصية
+function firstSelection(product: any): Record<string, string> {
+  const attrs: any[] = product?.attributes || []
+  const vd = (product?.variantDetails || []).find((d: any) => Array.isArray(d?.name) && d.name.length)
+  if (vd) {
+    const names = new Set(attrs.map((a) => a.name))
+    return Object.fromEntries(vd.name.filter((e: any) => !names.size || names.has(e.attrName)).map((e: any) => [e.attrName, e.value]))
+  }
+  return Object.fromEntries(attrs.filter((a) => a.variants?.length).map((a) => [a.name, a.variants[0].value]))
+}
+
 function variantMatches(detail: VariantDetail, selected: Record<string, string>) {
   return Object.entries(selected).every(([attrName, val]) =>
     detail.name.some(e => e.attrName === attrName && e.value === val),
@@ -58,7 +69,8 @@ export default function ProductClient({
 
   const [selectedImage, setSelectedImage]   = useState(0)
   const [selectedOffer, setSelectedOffer]   = useState<string | null>(product.offers?.[0]?.id ?? null)
-  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({})
+  // قيمة أولى افتراضية: أول تركيبة متاحة (العرض الأول مختار أصلاً أعلاه)
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>(() => firstSelection(product))
   const [isWishlisted, setIsWishlisted]     = useState(false)
   const [wilayas, setWilayas]               = useState<Wilaya[]>([])
   const [communes, setCommunes]             = useState<Commune[]>([])
