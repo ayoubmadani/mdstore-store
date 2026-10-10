@@ -428,7 +428,7 @@ html, body { margin: 0; padding: 0; background: ${BG}; color: ${TXT}; font-famil
 .luxe-hero-cta:active { transform: translateY(0) scale(0.97); }
 
 /* Trust bar */
-.luxe-trust { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; padding: 2.5rem 0; border-bottom: 1px solid ${BD}; }
+.luxe-trust { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; padding: 2.5rem 0; border-bottom: 1px solid ${BD}; }
 .luxe-trust-item { display: flex; align-items: center; gap: 14px; padding: 1rem; background: ${SURFACE}; border-radius: 10px; border: 1px solid ${BD}; }
 .luxe-trust-icon { width: 44px; height: 44px; border-radius: 10px; background: ${AL}; display: flex; align-items: center; justify-content: center; color: ${A}; flex-shrink: 0; }
 
@@ -442,7 +442,7 @@ html, body { margin: 0; padding: 0; background: ${BG}; color: ${TXT}; font-famil
 .luxe-cat.active { background: ${A}; color: ${BG}; border-color: ${A}; font-weight: 700; }
 
 /* Products grid */
-.luxe-products-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem 0 3rem; }
+.luxe-products-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; padding: 1rem 0 3rem; }
 
 /* Card Archetype 2 — Overlay Reveal */
 .luxe-card { position: relative; overflow: hidden; border-radius: 14px; aspect-ratio: 3/4; background: ${SURFACE}; cursor: pointer; text-decoration: none; color: inherit; display: block; animation: fadeUp 0.5s ease both; }
@@ -471,7 +471,7 @@ html, body { margin: 0; padding: 0; background: ${BG}; color: ${TXT}; font-famil
 .luxe-pag-btn.active { background: ${A}; color: ${BG}; border-color: ${A}; }
 
 /* Details */
-.luxe-details { display: grid; grid-template-columns: 1fr; gap: 2rem; padding: 2rem 0; }
+.luxe-details { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; padding: 2rem 0; }
 .luxe-gallery-main { position: relative; aspect-ratio: 1/1; border-radius: 16px; overflow: hidden; background: ${SURFACE}; border: 1px solid ${BD}; }
 .luxe-gallery-main img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .luxe-gallery-nav {
@@ -501,8 +501,8 @@ html, body { margin: 0; padding: 0; background: ${BG}; color: ${TXT}; font-famil
 .luxe-attr-chip.active { background: ${AL}; border-color: ${A}; color: ${A}; font-weight: 700; }
 .luxe-attr-color { width: 32px; height: 32px; border-radius: 50%; border: 2px solid ${BD}; cursor: pointer; padding: 0; }
 .luxe-attr-color.active { border-color: ${A}; box-shadow: 0 0 0 3px ${AL}; }
-.luxe-attr-img { width: 44px; height: 44px; border-radius: 8px; border: 2px solid ${BD}; cursor: pointer; overflow: hidden; padding: 0; background: none; }
-.luxe-attr-img.active { border-color: ${A}; }
+.luxe-attr-img { width: 64px; height: 64px; border-radius: 8px; border: 2px solid ${BD}; cursor: pointer; overflow: hidden; padding: 0; background: none; }
+.luxe-attr-img.active { border: 3px solid ${A}; box-shadow: 0 0 0 2px #fff, 0 0 0 4px ${A}; }
 .luxe-attr-img img { width: 100%; height: 100%; object-fit: cover; }
 
 /* ProductForm / Cart form */
@@ -520,9 +520,9 @@ html, body { margin: 0; padding: 0; background: ${BG}; color: ${TXT}; font-famil
 .luxe-select-wrap .chevron { position: absolute; top: 50%; transform: translateY(-50%); right: 14px; color: ${SUB}; pointer-events: none; }
 .luxe-select { width: 100%; padding: 0.75rem 2.5rem 0.75rem 1rem; font-size: 0.9rem; border: 1px solid ${BD}; border-radius: 10px; background: ${CARD}; color: ${TXT}; outline: none; font-family: inherit; appearance: none; cursor: pointer; }
 .luxe-select:focus { border-color: ${A}; box-shadow: 0 0 0 3px ${AL}; }
-.luxe-delivery-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
-.luxe-btn-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
-@media (min-width: 640px) { .luxe-btn-grid { grid-template-columns: 1fr 1fr; } }
+.luxe-delivery-toggle { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; margin-bottom: 1rem; }
+.luxe-btn-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+@media (min-width: 640px) { .luxe-btn-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 .luxe-delivery-btn {
   padding: 0.75rem; border-radius: 10px; border: 1px solid ${BD}; background: ${CARD}; color: ${SUB};
   cursor: pointer; font-family: inherit; font-size: 0.85rem; font-weight: 600; transition: all 0.15s;
@@ -559,7 +559,7 @@ html, body { margin: 0; padding: 0; background: ${BG}; color: ${TXT}; font-famil
 .luxe-success-icon { width: 64px; height: 64px; border-radius: 50%; background: ${AL}; color: ${A}; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; }
 
 /* Cart */
-.luxe-cart-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; padding: 2rem 0; }
+.luxe-cart-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; padding: 2rem 0; }
 .luxe-cart-item { display: flex; gap: 14px; padding: 1rem; background: ${SURFACE}; border: 1px solid ${BD}; border-radius: 14px; margin-bottom: 1rem; }
 .luxe-cart-item-img { width: 80px; height: 80px; border-radius: 10px; object-fit: cover; flex-shrink: 0; background: ${CARD}; }
 .luxe-cart-item-info { flex: 1; }
@@ -572,7 +572,7 @@ html, body { margin: 0; padding: 0; background: ${BG}; color: ${TXT}; font-famil
 
 /* Footer */
 .luxe-footer { border-top: 1px solid ${BD}; padding: 3rem 0 2rem; margin-top: 3rem; }
-.luxe-footer-grid { display: grid; grid-template-columns: 1fr; gap: 2.5rem; }
+.luxe-footer-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
 .luxe-footer-brand { font-family: 'El Messiri', serif; font-size: 1.4rem; font-weight: 700; color: ${A}; margin: 0 0 0.5rem; }
 .luxe-footer-desc { color: ${SUB}; font-size: 0.9rem; line-height: 1.6; margin: 0 0 1rem; }
 .luxe-footer-links-title { font-size: 0.85rem; font-weight: 700; color: ${TXT}; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 1rem; }
@@ -587,7 +587,7 @@ html, body { margin: 0; padding: 0; background: ${BG}; color: ${TXT}; font-famil
 .luxe-static-body { max-width: 800px; margin: 0 auto; padding: 0 1.5rem 3rem; line-height: 1.8; color: ${SUB}; }
 .luxe-static-body h3 { color: ${TXT}; font-family: 'El Messiri', serif; margin-top: 2rem; }
 .luxe-static-body p { margin: 0.75rem 0; }
-.luxe-contact-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; padding: 2rem 0; }
+.luxe-contact-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; padding: 2rem 0; }
 .luxe-contact-info { background: ${SURFACE}; border: 1px solid ${BD}; border-radius: 16px; padding: 1.5rem; }
 .luxe-contact-info h3 { font-family: 'El Messiri', serif; margin: 0 0 1rem; color: ${A}; }
 .luxe-contact-row { display: flex; align-items: center; gap: 12px; color: ${SUB}; margin-bottom: 12px; font-size: 0.9rem; }
@@ -602,21 +602,21 @@ html, body { margin: 0; padding: 0; background: ${BG}; color: ${TXT}; font-famil
 
 /* Responsive */
 @media (min-width: 640px) {
-  .luxe-products-grid { grid-template-columns: repeat(2, 1fr); }
-  .luxe-trust { grid-template-columns: repeat(4, 1fr); }
+  .luxe-products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .luxe-trust { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 @media (min-width: 768px) {
-  .luxe-details { grid-template-columns: 1fr 1fr; }
-  .luxe-footer-grid { grid-template-columns: 2fr 1fr 1fr 1.5fr; }
-  .luxe-contact-grid { grid-template-columns: 1fr 1fr; }
-  .luxe-cart-grid { grid-template-columns: 1.2fr 1fr; }
+  .luxe-details { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .luxe-footer-grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.5fr); }
+  .luxe-contact-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .luxe-cart-grid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
 }
 @media (min-width: 1024px) {
-  .luxe-products-grid { grid-template-columns: repeat(3, 1fr); }
+  .luxe-products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .luxe-nav-links { display: flex; }
 }
 @media (min-width: 1280px) {
-  .luxe-products-grid { grid-template-columns: repeat(4, 1fr); }
+  .luxe-products-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 @media (max-width: 1023px) {
   .luxe-nav-links { display: none; }
@@ -1325,7 +1325,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
           ) : (
             <>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '0.875rem' }}>
                 <div className="luxe-input-wrap">
                   <label>{t.wilaya}</label>
                   <div className="luxe-select-wrap">
@@ -1560,7 +1560,7 @@ export function Cart({ domain, store }: any) {
             {errors.phone && <p style={{ color: ERR, fontSize: '0.75rem', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}><AlertCircle size={11} /> {errors.phone}</p>}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '0.875rem' }}>
             <div className="luxe-input-wrap">
               <label>{t.wilaya}</label>
               <div className="luxe-select-wrap">

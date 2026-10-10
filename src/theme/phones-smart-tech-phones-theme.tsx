@@ -394,7 +394,7 @@ const THEME_CSS = `
 .pt-cat.active { border-color:${A}; color:${A}; background:${AL}; }
 
 /* ---- Product grid ---- */
-.pt-grid { display:grid; grid-template-columns:1fr; gap:1rem; }
+.pt-grid { display:grid; grid-template-columns:minmax(0, 1fr); gap:1rem; }
 @media (min-width:640px){ .pt-grid { grid-template-columns:repeat(2,1fr); } }
 @media (min-width:1024px){ .pt-grid { grid-template-columns:repeat(3,1fr); } }
 @media (min-width:1280px){ .pt-grid { grid-template-columns:repeat(4,1fr); } }
@@ -460,14 +460,14 @@ const THEME_CSS = `
 .pt-input::placeholder { color:${MUT}; }
 
 /* ---- Layouts ---- */
-.pt-details { display:grid; grid-template-columns:1fr; gap:2rem; }
-@media (min-width:768px){ .pt-details { grid-template-columns:1fr 1fr; gap:2.5rem; } }
-.pt-cart-grid { display:grid; grid-template-columns:1fr; gap:1.5rem; }
-@media (min-width:1024px){ .pt-cart-grid { grid-template-columns:1.3fr 1fr; } }
-.pt-footer-grid { display:grid; grid-template-columns:1fr; gap:2rem; }
-@media (min-width:768px){ .pt-footer-grid { grid-template-columns:2fr 1fr 1fr 1.2fr; } }
-.pt-form-row2 { display:grid; grid-template-columns:1fr; gap:0.85rem; }
-@media (min-width:520px){ .pt-form-row2 { grid-template-columns:1fr 1fr; } }
+.pt-details { display:grid; grid-template-columns:minmax(0, 1fr); gap:2rem; }
+@media (min-width:768px){ .pt-details { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:2.5rem; } }
+.pt-cart-grid { display:grid; grid-template-columns:minmax(0, 1fr); gap:1.5rem; }
+@media (min-width:1024px){ .pt-cart-grid { grid-template-columns:minmax(0, 1.3fr) minmax(0, 1fr); } }
+.pt-footer-grid { display:grid; grid-template-columns:minmax(0, 1fr); gap:2rem; }
+@media (min-width:768px){ .pt-footer-grid { grid-template-columns:minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr); } }
+.pt-form-row2 { display:grid; grid-template-columns:minmax(0, 1fr); gap:0.85rem; }
+@media (min-width:520px){ .pt-form-row2 { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); } }
 
 /* ---- Skeleton ---- */
 .pt-skel { background: linear-gradient(90deg,#e8eaef 25%,#f2f3f6 50%,#e8eaef 75%);
@@ -1028,7 +1028,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             )}
           </div>
           {images.length > 1 && (
-            <div style={{ display: 'flex', gap: 10, marginTop: 12, overflowX: 'auto', paddingBottom: 4 }}>
+            <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap', paddingBottom: 4 }}>
               {images.map((im, i) => (
                 <button key={i} onClick={() => setSel(i)}
                   style={{ width: 72, height: 72, borderRadius: 12, overflow: 'hidden', flexShrink: 0, padding: 0, cursor: 'pointer', border: `2px solid ${i === sel ? A : BD}`, background: BG }}>
@@ -1337,7 +1337,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           {product?.isDigital ? (
             <div>
               <label style={label}>{t.contactQuestion}</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10, marginBottom: 14 }}>
                 <button type="button" onClick={() => { setContactMethod('email'); set('customerWhatsapp', ''); }}
                   style={{ padding: '0.75rem', borderRadius: 12, cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem', minHeight: 46, border: `1.5px solid ${contactMethod === 'email' ? A : BD}`, background: contactMethod === 'email' ? AL : CARD, color: contactMethod === 'email' ? A : SUB, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                   <Mail size={16} /> {t.contactViaEmail}
@@ -1402,7 +1402,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               </div>
 
               {/* Delivery toggle */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
                 {(['home', 'office'] as const).map((typ) => {
                   const on = fd.typeLivraison === typ;
                   return (
@@ -1649,7 +1649,7 @@ export function Cart({ domain, store }: any) {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
             {(['home', 'office'] as const).map((typ) => {
               const on = fd.typeLivraison === typ;
               return (
@@ -1813,8 +1813,8 @@ export function Contact({ store }: any) {
   return (
     <Shell title={t.contactTitle}>
       <p style={{ color: SUB, marginTop: '-1rem', marginBottom: 28 }}>{t.contactSubtitle}</p>
-      <div className="pt-details" style={{ gridTemplateColumns: '1fr' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
+      <div className="pt-details" style={{ gridTemplateColumns: 'minmax(0, 1fr)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '2rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <h3 style={{ fontSize: '1.05rem', fontWeight: 800, margin: 0 }}>{t.getInTouch}</h3>
             {c.phone && (

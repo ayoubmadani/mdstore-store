@@ -73,53 +73,53 @@ const THEME_CSS = `
 
   .trust-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0;
   }
   @media (min-width: 1024px) {
-    .trust-grid { grid-template-columns: repeat(4, 1fr); }
+    .trust-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   }
 
   .cats-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.625rem;
   }
   @media (min-width: 640px) {
-    .cats-grid { grid-template-columns: repeat(3, 1fr); }
+    .cats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
   @media (min-width: 1024px) {
-    .cats-grid { grid-template-columns: repeat(6, 1fr); }
+    .cats-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
   }
 
   .products-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
   }
   @media (min-width: 1024px) {
-    .products-grid { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    .products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
   }
   @media (min-width: 1280px) {
-    .products-grid { grid-template-columns: repeat(4, 1fr); }
+    .products-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   }
 
   .hero-inner {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2rem;
     align-items: center;
     min-height: 88vh;
     padding: 7rem 1.5rem 4rem;
   }
   @media (min-width: 1024px) {
-    .hero-inner { grid-template-columns: 1fr 1fr; min-height: 100vh; padding: 0 4rem; }
+    .hero-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 100vh; padding: 0 4rem; }
   }
 
   /* ── Details Section ── */
   .details-inner {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
     padding: 0.5rem; /* تقليل البادينج الجانبي جداً للجوال */
   }
@@ -141,7 +141,7 @@ const THEME_CSS = `
 
   @media (min-width: 768px) {
     .details-inner { 
-      grid-template-columns: 1fr 1fr; 
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); 
       gap: 3rem; 
       padding: 2rem; 
     }
@@ -159,42 +159,42 @@ const THEME_CSS = `
 
   .form-row-2 {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.875rem;
     margin-bottom: 0.875rem;
   }
   @media (min-width: 500px) {
-    .form-row-2 { grid-template-columns: 1fr 1fr; }
+    .form-row-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   }
 
   .cart-inner {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2rem;
   }
   @media (min-width: 1024px) {
-    .cart-inner { grid-template-columns: 1.2fr 1fr; gap: 3rem; }
+    .cart-inner { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 3rem; }
   }
 
   .contact-inner {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2rem;
   }
   @media (min-width: 1024px) {
-    .contact-inner { grid-template-columns: 1fr 2fr; }
+    .contact-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
   }
 
   .footer-inner {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 3rem;
     padding-bottom: 3rem;
     margin-bottom: 2rem;
     border-bottom: 1px solid rgba(255,255,255,0.06);
   }
   @media (min-width: 768px) {
-    .footer-inner { grid-template-columns: 2fr 1fr 1fr 1fr; }
+    .footer-inner { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); }
   }
 
   .hero-actions { display: flex; flex-direction: column; gap: 0.75rem; }
@@ -203,9 +203,9 @@ const THEME_CSS = `
   .cart-add-btns { display: flex; flex-direction: column; gap: 0.75rem; }
   @media (min-width: 500px) { .cart-add-btns { flex-direction: row; } }
 
-  .delivery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .delivery-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.75rem; }
 
-  .thumb-row { display: flex; gap: 0.625rem; margin-top: 0.875rem; overflow-x: auto; padding-bottom: 4px; }
+  .thumb-row { display: flex; gap: 0.625rem; margin-top: 0.875rem; flex-wrap: wrap; padding-bottom: 4px; }
 
   .pagination { display: flex; justify-content: center; gap: 0.375rem; flex-wrap: wrap; margin-top: 3rem; }
 
@@ -1355,8 +1355,8 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                             width: 32, height: 32, borderRadius: '50%', background: isImgUrl ? `url(${v.value}) center/cover` : v.value, border: '1px solid #eee', cursor: available ? 'pointer' : 'not-allowed', overflow: 'hidden', opacity: available ? 1 : 0.35,
                             outline: `2.5px solid ${isSelected ? '#16A34A' : 'transparent'}`, outlineOffset: 3
                           } : attr.displayMode === 'image' ? {
-                            width: 44, height: 44, borderRadius: 10, backgroundImage: `url(${v.value})`, backgroundSize: 'cover',
-                            backgroundPosition: 'center', opacity: available ? 1 : 0.35, border: `2px solid ${isSelected ? '#16A34A' : '#E8E8E8'}`,
+                            width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${v.value})`, backgroundSize: 'cover',
+                            backgroundPosition: 'center', opacity: available ? 1 : 0.35, border: `3px solid ${isSelected ? '#16A34A' : '#E8E8E8'}`, boxShadow: isSelected ? `0 0 0 2px #fff, 0 0 0 4px ${'#16A34A'}` : 'none',
                             cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.18s'
                           } : {
                             padding: '0.45rem 1.1rem', border: `1.5px solid ${isSelected ? '#16A34A' : '#E8E8E8'}`, borderRadius: 8,

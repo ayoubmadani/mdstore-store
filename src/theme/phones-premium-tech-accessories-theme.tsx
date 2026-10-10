@@ -480,8 +480,8 @@ const THEME_CSS = `
 /* ---- hero bento ---- */
 .tk-hero { position:relative; overflow:hidden; }
 .tk-hero-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; z-index:0; }
-.tk-bento { position:relative; z-index:2; display:grid; grid-template-columns:1fr; gap:12px; padding: 30px 0 42px; }
-@media (min-width: 860px) { .tk-bento { grid-template-columns: 1.75fr 1fr; grid-template-rows: auto auto; gap:14px; padding: 46px 0 60px; } }
+.tk-bento { position:relative; z-index:2; display:grid; grid-template-columns:minmax(0, 1fr); gap:12px; padding: 30px 0 42px; }
+@media (min-width: 860px) { .tk-bento { grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); grid-template-rows: auto auto; gap:14px; padding: 46px 0 60px; } }
 .tk-tile { background: rgba(255,255,255,.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border:1px solid ${BD}; border-radius:22px; padding: 26px 22px; animation: tkUp .6s ease both; }
 @media (min-width: 860px) {
   .tk-tile-main { grid-row: 1 / span 2; display:flex; flex-direction:column; justify-content:center; padding: 44px 40px; }
@@ -505,7 +505,7 @@ const THEME_CSS = `
 .tk-segb.is-active { background:${CARD}; color:${INK}; box-shadow: 0 1px 3px rgba(15,17,21,.12); }
 
 /* ---- grid + card ---- */
-.tk-grid { display:grid; grid-template-columns: 1fr; gap: 14px; }
+.tk-grid { display:grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
 @media (min-width: 640px)  { .tk-grid { grid-template-columns: repeat(2,1fr); } }
 @media (min-width: 1024px) { .tk-grid { grid-template-columns: repeat(3,1fr); } }
 @media (min-width: 1280px) { .tk-grid { grid-template-columns: repeat(4,1fr); } }
@@ -530,8 +530,8 @@ const THEME_CSS = `
 .tk-pgb.is-off { opacity:.4; pointer-events:none; }
 
 /* ---- product page ---- */
-.tk-pd { display:grid; grid-template-columns:1fr; gap: 26px; }
-@media (min-width: 1024px) { .tk-pd { grid-template-columns: 1.05fr .95fr; gap: 42px; align-items:start; } }
+.tk-pd { display:grid; grid-template-columns:minmax(0, 1fr); gap: 26px; }
+@media (min-width: 1024px) { .tk-pd { grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 42px; align-items:start; } }
 .tk-stack { display:flex; gap:14px; overflow-x:auto; scroll-snap-type: x mandatory; scrollbar-width:none; }
 .tk-stack::-webkit-scrollbar { display:none; }
 @media (min-width: 1024px) { .tk-stack { flex-direction:column; overflow:visible; }
@@ -565,18 +565,18 @@ const THEME_CSS = `
 
 /* ---- footer ---- */
 .tk-foot { background:${CARD}; border-top:1px solid ${BD}; margin-top: 70px; }
-.tk-footgrid { display:grid; grid-template-columns:1fr; gap: 28px; padding: 44px 0 30px; }
-@media (min-width: 768px) { .tk-footgrid { grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; } }
+.tk-footgrid { display:grid; grid-template-columns:minmax(0, 1fr); gap: 28px; padding: 44px 0 30px; }
+@media (min-width: 768px) { .tk-footgrid { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 40px; } }
 .tk-footlink { display:block; color:${SUB}; text-decoration:none; font-size:.85rem; padding: 6px 0; transition: color .2s, padding-inline-start .2s; }
 .tk-footlink:hover { color:${A}; padding-inline-start: 5px; }
 
 /* ---- misc ---- */
 .tk-skel { background: linear-gradient(90deg, ${MATTE} 25%, #F6F7FA 50%, ${MATTE} 75%); background-size: 420px 100%; animation: tkShim 1.4s infinite linear; border-radius:12px; }
 .tk-badge { animation: tkBadge .42s ease; }
-.tk-form-2 { display:grid; grid-template-columns:1fr; gap: .85rem; }
-@media (min-width: 520px) { .tk-form-2 { grid-template-columns: 1fr 1fr; } }
-.tk-ct2 { display:grid; grid-template-columns:1fr; gap: 26px; }
-@media (min-width: 860px) { .tk-ct2 { grid-template-columns: .8fr 1.2fr; gap: 36px; align-items:start; } }
+.tk-form-2 { display:grid; grid-template-columns:minmax(0, 1fr); gap: .85rem; }
+@media (min-width: 520px) { .tk-form-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.tk-ct2 { display:grid; grid-template-columns:minmax(0, 1fr); gap: 26px; }
+@media (min-width: 860px) { .tk-ct2 { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 36px; align-items:start; } }
 .tk-btnp:hover { background:${AD} !important; border-color:${AD} !important; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(91,75,224,.26); }
 .tk-btnp:active { transform: translateY(0) scale(.99); }
 .tk-btnp:disabled { opacity:.55; cursor:default; transform:none; box-shadow:none; }
@@ -1045,7 +1045,7 @@ export function Home({ store, page }: any) {
             </div>
 
             <div className="tk-tile tk-tile-stats" style={{ animationDelay: '.1s' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 16 }}>
                 {t.stats.map((s: any, i: number) => (
                   <div key={i}>
                     <p className="tk-disp" style={{ fontSize: 'clamp(1.6rem,5vw,2.2rem)', color: A, margin: 0, lineHeight: 1, fontWeight: 700 }}>{s.n}</p>
@@ -1557,7 +1557,7 @@ export function ProductForm({
           {product?.isDigital ? (
             <div style={{ marginBottom: 16 }}>
               <span style={label}>{t.contactQuestion}</span>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 13 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8, marginBottom: 13 }}>
                 <button type="button" onClick={() => { setContactMethod('email'); set('customerWhatsapp', ''); }}
                   style={{
                     minHeight: 46, padding: '0 10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
@@ -1639,7 +1639,7 @@ export function ProductForm({
 
               <div style={{ marginBottom: 16 }}>
                 <span style={label}>{t.delivery}</span>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8 }}>
                   {([['home', t.deliveryHome], ['office', t.deliveryOffice]] as const).map(([k, l]) => {
                     const active = fd.typeLivraison === k;
                     return (
@@ -1931,7 +1931,7 @@ export function Cart({ domain, store }: any) {
 
             <div style={{ marginBottom: 16 }}>
               <span style={label}>{t.delivery}</span>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8 }}>
                 {([['home', t.deliveryHome], ['office', t.deliveryOffice]] as const).map(([k, l]) => {
                   const active = fd.typeLivraison === k;
                   return (

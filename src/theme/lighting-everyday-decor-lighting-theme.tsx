@@ -366,7 +366,7 @@ const THEME_CSS = `
 .lm-glow-orb { animation: lmFloat 6s ease-in-out infinite; will-change: transform; }
 
 /* ---- Responsive grids ---- */
-.lm-products { display:grid; grid-template-columns:1fr; gap:1.1rem; }
+.lm-products { display:grid; grid-template-columns:minmax(0, 1fr); gap:1.1rem; }
 @media (min-width:640px)  { .lm-products { grid-template-columns:repeat(2,1fr); } }
 @media (min-width:1024px) { .lm-products { grid-template-columns:repeat(3,1fr); } }
 @media (min-width:1280px) { .lm-products { grid-template-columns:repeat(4,1fr); } }
@@ -374,8 +374,8 @@ const THEME_CSS = `
 .lm-trust { display:grid; grid-template-columns:repeat(2,1fr); gap:.9rem; }
 @media (min-width:768px)  { .lm-trust { grid-template-columns:repeat(4,1fr); } }
 
-.lm-details { display:grid; grid-template-columns:1fr; gap:2rem; }
-@media (min-width:960px)  { .lm-details { grid-template-columns:1.1fr .95fr; align-items:start; } }
+.lm-details { display:grid; grid-template-columns:minmax(0, 1fr); gap:2rem; }
+@media (min-width:960px)  { .lm-details { grid-template-columns:minmax(0, 1.1fr) minmax(0, .95fr); align-items:start; } }
 
 .lm-cart { display:flex; flex-direction:column; gap:1.6rem; }
 @media (min-width:1024px) {
@@ -384,17 +384,17 @@ const THEME_CSS = `
   .lm-cart > *:last-child  { flex:1; min-width:320px; position:sticky; top:90px; }
 }
 
-.lm-foot { display:grid; grid-template-columns:1fr; gap:2rem; }
-@media (min-width:768px)  { .lm-foot { grid-template-columns:1.4fr 1fr 1fr 1fr; } }
+.lm-foot { display:grid; grid-template-columns:minmax(0, 1fr); gap:2rem; }
+@media (min-width:768px)  { .lm-foot { grid-template-columns:minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); } }
 
-.lm-row2 { display:grid; grid-template-columns:1fr; gap:.85rem; }
-@media (min-width:520px)  { .lm-row2 { grid-template-columns:1fr 1fr; } }
+.lm-row2 { display:grid; grid-template-columns:minmax(0, 1fr); gap:.85rem; }
+@media (min-width:520px)  { .lm-row2 { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); } }
 
-.lm-contact { display:grid; grid-template-columns:1fr; gap:2rem; }
-@media (min-width:820px)  { .lm-contact { grid-template-columns:1fr 1.2fr; } }
+.lm-contact { display:grid; grid-template-columns:minmax(0, 1fr); gap:2rem; }
+@media (min-width:820px)  { .lm-contact { grid-template-columns:minmax(0, 1fr) minmax(0, 1.2fr); } }
 
-.lm-hero-grid { display:grid; grid-template-columns:1fr; gap:1.5rem; align-items:center; }
-@media (min-width:900px)  { .lm-hero-grid { grid-template-columns:1.15fr .85fr; } }
+.lm-hero-grid { display:grid; grid-template-columns:minmax(0, 1fr); gap:1.5rem; align-items:center; }
+@media (min-width:900px)  { .lm-hero-grid { grid-template-columns:minmax(0, 1.15fr) minmax(0, .85fr); } }
 
 /* ---- Desktop / mobile nav visibility ---- */
 .lm-nav-desktop { display:none; }
@@ -1239,7 +1239,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
               </div>
 
               {/* Delivery type toggle */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
                 {(['home', 'office'] as const).map((tp) => {
                   const on = fd.typeLivraison === tp;
                   return (
@@ -1699,7 +1699,7 @@ export function Cart({ domain, store }: any) {
                 </div>
               </Field>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
               {(['home', 'office'] as const).map((tp) => {
                 const on = fd.typeLivraison === tp;
                 return (

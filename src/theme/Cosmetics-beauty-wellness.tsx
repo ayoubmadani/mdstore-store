@@ -138,31 +138,31 @@ const CSS = `
 
   .prod-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
   .trust-bar { display:grid; grid-template-columns:repeat(4,1fr); }
-  .footer-g  { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; }
-  .details-g { display:grid; grid-template-columns:1fr 1fr; gap:32px; }
-  .contact-g { display:grid; grid-template-columns:1fr 1fr; gap:56px; }
-  .form-2c   { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .dlv-2c    { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-  .cart-g    { display:grid; grid-template-columns:1.2fr 1fr; gap:40px; align-items:start; }
+  .footer-g  { display:grid; grid-template-columns:minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap:48px; }
+  .details-g { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:32px; }
+  .contact-g { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:56px; }
+  .form-2c   { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:10px; }
+  .dlv-2c    { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:8px; }
+  .cart-g    { display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(0, 1fr); gap:40px; align-items:start; }
 
   @media (max-width:1100px) {
     .prod-grid { grid-template-columns:repeat(3,1fr); }
-    .footer-g  { grid-template-columns:1fr 1fr; gap:32px; }
+    .footer-g  { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:32px; }
   }
   @media (max-width:768px) {
     .nav-links { display:none; }
     .nav-mob   { display:flex; }
-    .prod-grid { grid-template-columns:1fr; gap:12px; }
+    .prod-grid { grid-template-columns:minmax(0, 1fr); gap:12px; }
     .trust-bar { grid-template-columns:repeat(2,1fr); }
-    .footer-g  { grid-template-columns:1fr; gap:28px; }
-    .details-g { grid-template-columns:1fr; }
-    .contact-g { grid-template-columns:1fr; gap:28px; }
-    .cart-g    { grid-template-columns:1fr; }
+    .footer-g  { grid-template-columns:minmax(0, 1fr); gap:28px; }
+    .details-g { grid-template-columns:minmax(0, 1fr); }
+    .contact-g { grid-template-columns:minmax(0, 1fr); gap:28px; }
+    .cart-g    { grid-template-columns:minmax(0, 1fr); }
   }
   @media (max-width:480px) {
-    .prod-grid { grid-template-columns:1fr; gap:8px; }
-    .form-2c   { grid-template-columns:1fr; }
-    .dlv-2c    { grid-template-columns:1fr; }
+    .prod-grid { grid-template-columns:minmax(0, 1fr); gap:8px; }
+    .form-2c   { grid-template-columns:minmax(0, 1fr); }
+    .dlv-2c    { grid-template-columns:minmax(0, 1fr); }
   }
 `;
 
@@ -1389,7 +1389,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                     {attr.variants.map((v: any) => {
                       const s = selectedVariants[attr.name] === v.value;
                       const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)));
-                      return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: '48px', height: '48px', overflow: 'hidden', border: `2px solid ${s ? 'var(--plum)' : 'var(--line-dk)'}`, cursor: available ? 'pointer' : 'not-allowed', padding: 0, borderRadius: '4px', opacity: available ? 1 : 0.35 }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>;
+                      return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: '48px', height: '48px', overflow: 'hidden', border: `3px solid ${s ? 'var(--plum)' : 'var(--line-dk)'}`, boxShadow: s ? `0 0 0 2px #fff, 0 0 0 4px ${'var(--plum)'}` : 'none', cursor: available ? 'pointer' : 'not-allowed', padding: 0, borderRadius: '4px', opacity: available ? 1 : 0.35 }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>;
                     })}
                   </div>
                 ) : (
@@ -1827,7 +1827,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 
             <div style={{ margin: '20px 0' }}>
               <p style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--plum)', marginBottom: '12px' }}>{t.deliveryType}</p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '10px' }}>
                 {(['home', 'office'] as const).map(dtype => (
                   <button
                     key={dtype}

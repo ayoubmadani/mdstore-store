@@ -115,37 +115,37 @@ const CSS = `
   /* Grids */
   .prod-grid  { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
   .trust-bar  { display:grid; grid-template-columns:repeat(4,1fr); }
-  .footer-g   { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; }
-  .details-g  { display:grid; grid-template-columns:1fr 1fr; }
+  .footer-g   { display:grid; grid-template-columns:minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap:48px; }
+  .details-g  { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); }
   .details-L  { position:sticky; top:64px; height:calc(100vh - 64px); overflow:hidden; }
   .details-R  { padding:40px 36px 80px; }
-  .form-2c    { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .dlv-2c     { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-  .cart-layout{ display:grid; grid-template-columns:1.2fr 1fr; gap:40px; align-items:start; }
-  .contact-g  { display:grid; grid-template-columns:1fr 1fr; gap:56px; }
+  .form-2c    { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:10px; }
+  .dlv-2c     { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:8px; }
+  .cart-layout{ display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(0, 1fr); gap:40px; align-items:start; }
+  .contact-g  { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:56px; }
   .cats-grid  { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; }
   .pagination { display:flex; justify-content:center; gap:6px; margin-top:48px; flex-wrap:wrap; }
   .cart-add-btns { display:flex; gap:8px; }
 
   @media (max-width:1100px) {
     .prod-grid { grid-template-columns:repeat(3,1fr); }
-    .footer-g  { grid-template-columns:1fr 1fr; gap:32px; }
+    .footer-g  { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:32px; }
   }
   @media (max-width:768px) {
-    .prod-grid  { grid-template-columns:1fr; }
+    .prod-grid  { grid-template-columns:minmax(0, 1fr); }
     .trust-bar  { grid-template-columns:repeat(2,1fr); }
-    .footer-g   { grid-template-columns:1fr 1fr; gap:24px; }
-    .details-g  { grid-template-columns:1fr; }
+    .footer-g   { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:24px; }
+    .details-g  { grid-template-columns:minmax(0, 1fr); }
     .details-L  { position:static; height:auto; aspect-ratio:1; }
     .details-R  { padding:24px 16px 48px; }
-    .contact-g  { grid-template-columns:1fr; gap:28px; }
-    .cart-layout{ grid-template-columns:1fr; }
+    .contact-g  { grid-template-columns:minmax(0, 1fr); gap:28px; }
+    .cart-layout{ grid-template-columns:minmax(0, 1fr); }
   }
   @media (max-width:480px) {
-    .prod-grid { grid-template-columns:1fr; }
-    .footer-g  { grid-template-columns:1fr; }
-    .form-2c   { grid-template-columns:1fr; }
-    .dlv-2c    { grid-template-columns:1fr; }
+    .prod-grid { grid-template-columns:minmax(0, 1fr); }
+    .footer-g  { grid-template-columns:minmax(0, 1fr); }
+    .form-2c   { grid-template-columns:minmax(0, 1fr); }
+    .dlv-2c    { grid-template-columns:minmax(0, 1fr); }
     .cart-add-btns { flex-direction:column; }
   }
 `;
@@ -1333,7 +1333,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
                 </div>
               ) : attr.displayMode==='image' ? (
                 <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>
-                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; const available=!product.variantDetails?.length||product.variantDetails.some((vd:any)=>Object.entries({...selectedVariants,[attr.name]:v.value}).every(([n,val])=>vd.name.some((e:any)=>e.attrName===n&&e.value===val))); return <button key={v.id} onClick={()=>available&&handleVariantSelection(attr.name,v.value)} style={{width:'52px',height:'52px',overflow:'hidden',border:`2px solid ${s?'var(--blue)':'var(--line)'}`,cursor:available?'pointer':'not-allowed',padding:0,opacity:available?1:0.35}}><img src={v.value} alt={v.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/></button>;})}
+                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; const available=!product.variantDetails?.length||product.variantDetails.some((vd:any)=>Object.entries({...selectedVariants,[attr.name]:v.value}).every(([n,val])=>vd.name.some((e:any)=>e.attrName===n&&e.value===val))); return <button key={v.id} onClick={()=>available&&handleVariantSelection(attr.name,v.value)} style={{width:'52px',height:'52px',overflow:'hidden',border: `3px solid ${s ? 'var(--blue)' : 'var(--line)'}`, boxShadow: s ? `0 0 0 2px #fff, 0 0 0 4px ${'var(--blue)'}` : 'none',cursor:available?'pointer':'not-allowed',padding:0,opacity:available?1:0.35}}><img src={v.value} alt={v.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/></button>;})}
                 </div>
               ) : (
                 <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>

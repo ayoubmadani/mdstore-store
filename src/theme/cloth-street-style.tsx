@@ -65,12 +65,12 @@ const CSS = `
   /* Products grid */
   .products-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1px;
     background: var(--ink);
   }
-  @media (min-width: 768px)  { .products-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 1280px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 768px)  { .products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (min-width: 1280px) { .products-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
   .zc { position:relative; overflow:hidden; background: var(--paper); }
 
@@ -133,39 +133,39 @@ const CSS = `
   /* Layout grids */
   .nav-ticker      { flex:1; margin:0 32px; overflow:hidden; border-left:1px solid var(--ink); border-right:1px solid var(--ink); padding:0 16px; height:100%; display:flex; align-items:center; }
   .stats-grid      { display:grid; grid-template-columns:repeat(4,1fr); }
-  .details-split   { display:grid; grid-template-columns:1fr 1fr; }
+  .details-split   { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); }
   .details-img     { border-right:1px solid var(--ink); position:sticky; top:52px; height:calc(100vh - 52px); overflow:hidden; }
   .details-info    { padding:28px 26px; }
-  .form-2c         { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-  .dlv-2c          { display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--ink); }
-  .cart-layout     { display:grid; grid-template-columns:1.2fr 1fr; gap:40px; align-items:start; }
-  .contact-grid    { display:grid; grid-template-columns:1fr 1fr; gap:36px; }
+  .form-2c         { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:8px; }
+  .dlv-2c          { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); border:1px solid var(--ink); }
+  .cart-layout     { display:grid; grid-template-columns:minmax(0, 1.2fr) minmax(0, 1fr); gap:40px; align-items:start; }
+  .contact-grid    { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:36px; }
   .cart-add-btns   { display:flex; gap:8px; }
   .pagination      { display:flex; justify-content:center; gap:6px; margin-top:40px; flex-wrap:wrap; }
 
-  @media (max-width:1024px) { .cart-layout { grid-template-columns:1fr; } }
+  @media (max-width:1024px) { .cart-layout { grid-template-columns:minmax(0, 1fr); } }
   @media (max-width:900px) {
-    .details-split { grid-template-columns:1fr; }
+    .details-split { grid-template-columns:minmax(0, 1fr); }
     .details-img   { position:static; aspect-ratio:3/4; height:auto; width:100%; border-right:none; border-bottom:1px solid var(--ink); }
     .details-info  { padding:20px 16px; }
-    .contact-grid  { grid-template-columns:1fr; gap:24px; }
+    .contact-grid  { grid-template-columns:minmax(0, 1fr); gap:24px; }
   }
   @media (max-width:768px) {
-    .zs-third { grid-template-columns:1fr 1fr; }
-    .zs-main, .zs-flip { grid-template-columns:1fr 1fr; }
+    .zs-third { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); }
+    .zs-main, .zs-flip { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); }
     .stats-grid { grid-template-columns:repeat(2,1fr); }
     .nav-ticker { display:none; }
   }
   @media (max-width:480px) {
-    .zs-half, .zs-third, .zs-main, .zs-flip { grid-template-columns:1fr; }
-    .form-2c  { grid-template-columns:1fr; }
-    .dlv-2c   { grid-template-columns:1fr; }
+    .zs-half, .zs-third, .zs-main, .zs-flip { grid-template-columns:minmax(0, 1fr); }
+    .form-2c  { grid-template-columns:minmax(0, 1fr); }
+    .dlv-2c   { grid-template-columns:minmax(0, 1fr); }
     .cart-add-btns { flex-direction:column; }
     .zc { min-height:240px; }
   }
 
-  .footer-cols { display:grid; grid-template-columns:1fr; gap:2rem; }
-  @media(min-width:768px){.footer-cols{grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;}}
+  .footer-cols { display:grid; grid-template-columns:minmax(0, 1fr); gap:2rem; }
+  @media(min-width:768px){.footer-cols{grid-template-columns:minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);gap:40px;}}
 `;
 
 /* ─── TYPES ─── */
@@ -1213,7 +1213,7 @@ export function Details({ product, store, toggleWishlist, isWishlisted, discount
                 </div>
               ) : attr.displayMode === 'image' ? (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                  {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val))); return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: '48px', height: '48px', overflow: 'hidden', border: `2px solid ${s ? 'var(--punch)' : 'var(--paper-dk)'}`, cursor: available ? 'pointer' : 'not-allowed', padding: 0, opacity: available ? 1 : 0.35 }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>; })}
+                  {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val))); return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: '48px', height: '48px', overflow: 'hidden', border: `3px solid ${s ? 'var(--punch)' : 'var(--paper-dk)'}`, boxShadow: s ? `0 0 0 2px #fff, 0 0 0 4px ${'var(--punch)'}` : 'none', cursor: available ? 'pointer' : 'not-allowed', padding: 0, opacity: available ? 1 : 0.35 }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>; })}
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>

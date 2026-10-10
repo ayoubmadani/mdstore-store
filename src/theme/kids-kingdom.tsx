@@ -360,27 +360,27 @@ const THEME_CSS = `
   /* ── Responsive: Products grid ── */
   .products-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
   }
-  @media (min-width: 768px)  { .products-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(4, 1fr); gap: 1.25rem; } }
+  @media (min-width: 768px)  { .products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.25rem; } }
 
   /* ── Responsive: Features ── */
   .features-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.875rem;
   }
-  @media (min-width: 1024px) { .features-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 1024px) { .features-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
   /* ── Responsive: Details layout ── */
   .details-layout {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
   }
-  @media (min-width: 768px) { .details-layout { grid-template-columns: 45fr 55fr; gap: 2.5rem; } }
+  @media (min-width: 768px) { .details-layout { grid-template-columns: minmax(0, 45fr) minmax(0, 55fr); gap: 2.5rem; } }
 
   /* ── Details gallery sticky (desktop only) ── */
   .details-gallery { position: static; }
@@ -389,28 +389,28 @@ const THEME_CSS = `
   /* ── Responsive: Form rows ── */
   .form-row-2 {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.875rem;
   }
-  @media (min-width: 540px) { .form-row-2 { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 540px) { .form-row-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 
   /* ── Responsive: Cart layout ── */
   .cart-layout {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2rem;
   }
-  @media (min-width: 1024px) { .cart-layout { grid-template-columns: 1fr 1fr; gap: 3rem; } }
+  @media (min-width: 1024px) { .cart-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; } }
 
   /* ── Responsive: Footer ── */
   .footer-cols {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2.5rem;
     padding-bottom: 2.5rem;
     border-bottom: 1px solid rgba(255,255,255,0.1);
   }
-  @media (min-width: 768px) { .footer-cols { grid-template-columns: 1.6fr 1fr 1fr 1fr; } }
+  @media (min-width: 768px) { .footer-cols { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); } }
 
   /* ── Responsive: Hero actions ── */
   .hero-actions { display: flex; flex-direction: column; gap: 0.875rem; align-items: flex-start; }
@@ -421,17 +421,17 @@ const THEME_CSS = `
   @media (min-width: 540px) { .cart-add-btns { flex-direction: row; } }
 
   /* ── Delivery grid ── */
-  .delivery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .delivery-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.75rem; }
 
   /* ── Thumb row ── */
-  .thumb-row { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 4px; margin-top: 0.75rem; }
+  .thumb-row { display: flex; gap: 0.5rem; flex-wrap: wrap; padding-bottom: 4px; margin-top: 0.75rem; }
 
   /* ── Pagination ── */
   .pagination { display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 3rem; }
 
   /* ── Contact layout ── */
-  .contact-layout { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-  @media (min-width: 1024px) { .contact-layout { grid-template-columns: 1fr 1.5fr; } }
+  .contact-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  @media (min-width: 1024px) { .contact-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); } }
 
   /* ── Cart badge ── */
   .cart-badge {
@@ -1135,7 +1135,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
         )}
       </div>
       {allImages.length > 1 && (
-        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, marginTop: 10 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', paddingBottom: 4, marginTop: 10 }}>
           {allImages.map((img: string, idx: number) => (
             <button key={idx} onClick={() => setSel(idx)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 12, overflow: 'hidden', border: `3px solid ${sel === idx ? accent : 'var(--border)'}`, opacity: sel === idx ? 1 : 0.5, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.2s' }}>
               <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
@@ -1230,7 +1230,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                     const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) =>
                       Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val))
                     );
-                    return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: 52, height: 52, borderRadius: 12, overflow: 'hidden', border: `3px solid ${active ? accent : 'var(--border)'}`, cursor: available ? 'pointer' : 'not-allowed', padding: 0, background: 'none', transition: 'all 0.2s', opacity: available ? 1 : 0.35 }}>
+                    return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: 64, height: 64, borderRadius: 12, overflow: 'hidden', border: `3px solid ${active ? accent : 'var(--border)'}`, boxShadow: active ? `0 0 0 2px #fff, 0 0 0 4px ${accent}` : 'none', cursor: available ? 'pointer' : 'not-allowed', padding: 0, background: 'none', transition: 'all 0.2s', opacity: available ? 1 : 0.35 }}>
                       <img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                     </button>;
                   })}

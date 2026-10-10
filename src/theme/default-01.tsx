@@ -548,7 +548,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
               )}
             </div>
             {allImages.length > 1 && (
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', overflowX: 'auto' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
                 {allImages.map((img: string, i: number) => (
                   <button key={i} onClick={() => setSelImg(i)} style={{ width: 56, height: 56, flexShrink: 0, border: `2px solid ${selImg === i ? '#111' : '#e5e5e5'}`, borderRadius: 3, padding: 0, cursor: 'pointer', overflow: 'hidden', background: 'none' }}>
                     <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
@@ -613,10 +613,10 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                     );
                     return attr.displayMode === 'color' ? (
                       <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.name}
-                        style={{ width: 28, height: 28, borderRadius: '50%', background: v.value, border: sel ? '2px solid #111' : '2px solid #ddd', cursor: available ? 'pointer' : 'not-allowed', outline: sel ? '2px solid #111' : 'none', outlineOffset: 2, opacity: available ? 1 : 0.35 }} />
+                        style={{ width: 64, height: 64, borderRadius: '50%', background: v.value, border: sel ? '2px solid #111' : '2px solid #ddd', cursor: available ? 'pointer' : 'not-allowed', outline: sel ? '2px solid #111' : 'none', outlineOffset: 2, opacity: available ? 1 : 0.35 }} />
                     ) : isImg ? (
                       <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, imgSrc!)} title={v.name}
-                        style={{ width: 52, height: 52, padding: 0, overflow: 'hidden', border: `2px solid ${sel ? '#111' : '#ddd'}`, borderRadius: 4, cursor: available ? 'pointer' : 'not-allowed', flexShrink: 0, opacity: available ? 1 : 0.35 }}>
+                        style={{ width: 64, height: 64, padding: 0, overflow: 'hidden', border: `3px solid ${sel ? '#111' : '#ddd'}`, boxShadow: sel ? `0 0 0 2px #fff, 0 0 0 4px ${'#111'}` : 'none', borderRadius: 4, cursor: available ? 'pointer' : 'not-allowed', flexShrink: 0, opacity: available ? 1 : 0.35 }}>
                         <img src={imgSrc!} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                       </button>
                     ) : (
@@ -758,7 +758,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         <p style={{ fontSize: '0.85rem', fontWeight: 700 }}>تأكيد الطلب</p>
       </div>
       <form onSubmit={handleSubmit} style={{ padding: '1rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: 0 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '0.75rem', marginBottom: 0 }}>
           <FR label="الاسم الكامل" error={errors.customerName}>
             <div style={{ position: 'relative' }}>
               <User size={14} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} />
@@ -806,7 +806,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </div>
         ) : (
           <>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: 0 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '0.75rem', marginBottom: 0 }}>
               <FR label="الولاية" error={errors.customerWelaya}>
                 <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...S.inputBase, appearance: 'none' as any }}>
                   <option value="">اختر الولاية</option>
@@ -822,7 +822,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
 
             <FR label="طريقة التوصيل">
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '0.5rem' }}>
                 {(['home', 'office'] as const).map(t => (
                   <button key={t} type="button" onClick={() => setFd({ ...fd, typeLivraison: t })}
                     style={{ ...S.btnOutline, justifyContent: 'center', flexDirection: 'column', gap: 2, padding: '0.6rem', borderColor: fd.typeLivraison === t ? '#111' : '#ddd', background: fd.typeLivraison === t ? '#111' : '#fff', color: fd.typeLivraison === t ? '#fff' : '#333' }}>

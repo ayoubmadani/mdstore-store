@@ -192,53 +192,53 @@ const CSS = `
   /* ── Grids ── */
   .products-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 16px;
   }
-  @media (min-width: 640px)  { .products-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(4, 1fr); gap: 24px; } }
+  @media (min-width: 640px)  { .products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; } }
 
   .cats-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
   }
-  @media (min-width: 640px)  { .cats-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 1024px) { .cats-grid { grid-template-columns: repeat(6, 1fr); } }
+  @media (min-width: 640px)  { .cats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .cats-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
 
   .trust-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  @media (min-width: 1024px) { .trust-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 1024px) { .trust-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
   .details-layout {
-    display: grid; grid-template-columns: 1fr; gap: 2rem;
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem;
   }
-  @media (min-width: 768px) { .details-layout { grid-template-columns: 1fr 1fr; gap: 3rem; } }
+  @media (min-width: 768px) { .details-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; } }
 
   .form-row-2 {
-    display: grid; grid-template-columns: 1fr; gap: 0.875rem;
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.875rem;
   }
-  @media (min-width: 540px) { .form-row-2 { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 540px) { .form-row-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 
   .cart-layout {
-    display: grid; grid-template-columns: 1fr; gap: 2rem;
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem;
   }
-  @media (min-width: 1024px) { .cart-layout { grid-template-columns: 1.2fr 1fr; gap: 3rem; } }
+  @media (min-width: 1024px) { .cart-layout { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 3rem; } }
 
   .footer-cols {
-    display: grid; grid-template-columns: 1fr; gap: 2.5rem;
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.5rem;
     padding-bottom: 2.5rem; border-bottom: 1px solid rgba(255,255,255,0.06);
   }
-  @media (min-width: 768px) { .footer-cols { grid-template-columns: 1.8fr 1fr 1fr 1fr; } }
+  @media (min-width: 768px) { .footer-cols { grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); } }
 
   .hero-layout {
-    display: grid; grid-template-columns: 1fr; gap: 2rem;
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem;
     align-items: center; padding: 7rem 1.5rem 4rem; min-height: 90vh;
   }
   @media (min-width: 1024px) {
-    .hero-layout { grid-template-columns: 1fr 1fr; padding: 0 3rem; min-height: 100vh; }
+    .hero-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 0 3rem; min-height: 100vh; }
   }
 
   .hero-actions { display: flex; flex-direction: column; gap: 0.875rem; }
@@ -246,18 +246,18 @@ const CSS = `
 
   .banner-inner {
     background: var(--primary); border-radius: var(--radius); overflow: hidden;
-    display: grid; grid-template-columns: 1fr; min-height: 360px;
+    display: grid; grid-template-columns: minmax(0, 1fr); min-height: 360px;
   }
-  @media (min-width: 768px) { .banner-inner { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 768px) { .banner-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 
   .cart-add-btns { display: flex; flex-direction: column; gap: 0.75rem; }
   @media (min-width: 540px) { .cart-add-btns { flex-direction: row; } }
 
-  .delivery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-  .thumb-row { display: flex; gap: 0.625rem; overflow-x: auto; padding-bottom: 4px; margin-top: 0.875rem; }
+  .delivery-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.75rem; }
+  .thumb-row { display: flex; gap: 0.625rem; flex-wrap: wrap; padding-bottom: 4px; margin-top: 0.875rem; }
   .pagination { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-top: 3rem; }
-  .contact-layout { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-  @media (min-width: 1024px) { .contact-layout { grid-template-columns: 1fr 1.5fr; } }
+  .contact-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  @media (min-width: 1024px) { .contact-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); } }
 
   /* ── Hero badges ── */
   .hero-badge {
@@ -1605,7 +1605,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                           key={v.id}
                           onClick={() => available && handleVariantSelection(attr.name, v.value)}
                           style={{
-                            width: 40, height: 40, borderRadius: 'var(--radius-s)',
+                            width: 64, height: 64, borderRadius: 'var(--radius-s)',
                             backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center',
                             border: 'none', cursor: available ? 'pointer' : 'not-allowed',
                             outline: `3px solid ${isSelected ? 'var(--accent)' : 'transparent'}`, outlineOffset: 2, transition: 'all 0.2s', opacity: available ? 1 : 0.35

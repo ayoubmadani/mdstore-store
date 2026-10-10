@@ -74,37 +74,37 @@ const THEME_CSS = `
   .lux-card-cta { transform: translateY(8px); opacity: 0; transition: all 0.4s ease 0.05s; }
   .lux-card:hover .lux-card-cta { transform: translateY(0); opacity: 1; }
 
-  .trust-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: ${BD}; }
-  @media (min-width: 1024px) { .trust-grid { grid-template-columns: repeat(4, 1fr); } }
+  .trust-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: ${BD}; }
+  @media (min-width: 1024px) { .trust-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
   .cats-grid { display: flex; gap: 1.5rem; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
   .cats-grid::-webkit-scrollbar { height: 0; }
 
-  .products-grid { display: grid; grid-template-columns: 1fr; gap: 1.125rem; }
-  @media (min-width: 500px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; } }
-  @media (min-width: 1280px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
+  .products-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.125rem; }
+  @media (min-width: 500px) { .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; } }
+  @media (min-width: 1280px) { .products-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
-  .details-inner { display: grid; grid-template-columns: 1fr; gap: 1rem; padding: 0.5rem; }
+  .details-inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; padding: 0.5rem; }
   .gallery-container { position: relative; top: 0; width: 100%; }
   .info-container { background: ${CARD}; border-radius: 0; padding: 1.25rem; border: 1px solid ${BD}; }
   @media (min-width: 768px) {
-    .details-inner { grid-template-columns: 1fr 1fr; gap: 3rem; padding: 2rem; }
+    .details-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; padding: 2rem; }
     .gallery-container { position: sticky; top: 100px; z-index: 10; }
     .info-container { padding: 1.75rem; }
   }
 
-  .form-row-2 { display: grid; grid-template-columns: 1fr; gap: 0.875rem; margin-bottom: 0.875rem; }
-  @media (min-width: 500px) { .form-row-2 { grid-template-columns: 1fr 1fr; } }
+  .form-row-2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.875rem; margin-bottom: 0.875rem; }
+  @media (min-width: 500px) { .form-row-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 
-  .cart-inner { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-  @media (min-width: 1024px) { .cart-inner { grid-template-columns: 1.2fr 1fr; gap: 3rem; } }
+  .cart-inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  @media (min-width: 1024px) { .cart-inner { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 3rem; } }
 
-  .contact-inner { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-  @media (min-width: 1024px) { .contact-inner { grid-template-columns: 1fr 2fr; } }
+  .contact-inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  @media (min-width: 1024px) { .contact-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); } }
 
-  .footer-inner { display: grid; grid-template-columns: 1fr; gap: 3rem; padding-bottom: 3rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.07); }
-  @media (min-width: 768px) { .footer-inner { grid-template-columns: 2fr 1fr 1fr 1fr; } }
+  .footer-inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 3rem; padding-bottom: 3rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  @media (min-width: 768px) { .footer-inner { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); } }
 
   .hero-actions { display: flex; flex-direction: column; gap: 0.75rem; }
   @media (min-width: 500px) { .hero-actions { flex-direction: row; align-items: center; justify-content: center; } }
@@ -112,8 +112,8 @@ const THEME_CSS = `
   .cart-add-btns { display: flex; flex-direction: column; gap: 0.75rem; }
   @media (min-width: 500px) { .cart-add-btns { flex-direction: row; } }
 
-  .delivery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-  .thumb-row { display: flex; gap: 0.5rem; margin-top: 0.75rem; overflow-x: auto; padding-bottom: 4px; }
+  .delivery-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.75rem; }
+  .thumb-row { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; padding-bottom: 4px; }
   .pagination { display: flex; justify-content: center; gap: 0.375rem; flex-wrap: wrap; margin-top: 3rem; }
 
   a { text-decoration: none; color: inherit; }
@@ -1032,7 +1032,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                     return (
                       <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={
                         attr.displayMode === 'color' ? { width: 28, height: 28, borderRadius: '50%', background: v.value, border: `1px solid ${BD}`, cursor: available ? 'pointer' : 'not-allowed', outline: `2.5px solid ${isSelected ? A : 'transparent'}`, outlineOffset: 3, opacity: available ? 1 : 0.35 }
-                        : attr.displayMode === 'image' ? { width: 42, height: 42, backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center', border: `2px solid ${isSelected ? A : BD}`, cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.3s', opacity: available ? 1 : 0.35 }
+                        : attr.displayMode === 'image' ? { width: 64, height: 64, backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center', border: `3px solid ${isSelected ? A : BD}`, boxShadow: isSelected ? `0 0 0 2px #fff, 0 0 0 4px ${A}` : 'none', cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.3s', opacity: available ? 1 : 0.35 }
                         : { padding: '0.375rem 0.875rem', border: `1px solid ${isSelected ? A : BD}`, borderRadius: 0, fontSize: '0.8rem', fontWeight: 600, background: isSelected ? AL : 'transparent', color: isSelected ? A : (available ? SUB : '#bbb'), cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.3s', textDecoration: available ? 'none' : 'line-through' }
                       }>
                         {attr.displayMode !== 'color' && attr.displayMode !== 'image' && v.name}

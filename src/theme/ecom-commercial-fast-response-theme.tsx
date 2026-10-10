@@ -293,22 +293,30 @@ const THEME_CSS = `
 /* Layout */
 .hn-container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
 
-.hn-products-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-@media (min-width: 640px)  { .hn-products-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1024px) { .hn-products-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 1280px) { .hn-products-grid { grid-template-columns: repeat(4, 1fr); gap: 1.25rem; } }
+.hn-products-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+@media (min-width: 640px)  { .hn-products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .hn-products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1280px) { .hn-products-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.25rem; } }
 
-.hn-trust-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-@media (min-width: 768px) { .hn-trust-grid { grid-template-columns: repeat(4, 1fr); gap: 1rem; } }
+.hn-trust-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+@media (min-width: 768px) { .hn-trust-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; } }
 
-.hn-details-grid { display: grid; grid-template-columns: 1fr; gap: 1.75rem; }
-@media (min-width: 1024px) { .hn-details-grid { grid-template-columns: 1.5fr 1fr; gap: 2.5rem; align-items: start; } }
+.hn-details-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.75rem; }
+.hn-details-grid > * { min-width: 0; }
+@media (max-width: 640px) {
+  .hn-details-wrap { padding: 1rem 0.75rem 2rem !important; }
+  .hn-details-card { padding: 1rem 0.875rem !important; }
+  .hn-order-box { padding: 12px 10px 4px !important; }
+}
+@media (min-width: 1024px) { .hn-details-grid { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 2.5rem; align-items: start; } }
+.hn-thumbs { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
 
-.hn-cart-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-@media (min-width: 1024px) { .hn-cart-grid { grid-template-columns: 1.3fr 1fr; gap: 2rem; align-items: start; } }
+.hn-cart-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+.hn-cart-grid > * { min-width: 0; }
+@media (min-width: 1024px) { .hn-cart-grid { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 2rem; align-items: start; } }
 
-.hn-footer-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-@media (min-width: 768px) { .hn-footer-grid { grid-template-columns: 1.4fr 1fr 1fr 1fr; } }
+.hn-footer-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+@media (min-width: 768px) { .hn-footer-grid { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); } }
 
 .hn-buybox-sticky { }
 @media (min-width: 1024px) { .hn-buybox-sticky { position: sticky; top: 92px; } }
@@ -986,7 +994,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
   const mainImg = uniqueImages[sel];
 
   return (
-    <div className="hn-container" style={{ padding: '2rem 1.5rem 3rem' }}>
+    <div className="hn-container hn-details-wrap" style={{ padding: '2rem 1.5rem 3rem' }}>
       {/* breadcrumb */}
       <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: SUB, textDecoration: 'none', fontSize: '0.85rem', marginBottom: 20, fontWeight: 700 }}>
         {t.dir === 'rtl' ? <ArrowRight size={16} /> : <ArrowLeft size={16} />} {t.backToShop}
@@ -1019,7 +1027,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
 
           {/* thumbnails */}
           {uniqueImages.length > 1 && (
-            <div style={{ display: 'flex', gap: 10, marginTop: 12, overflowX: 'auto', paddingBottom: 4 }}>
+            <div className="hn-thumbs">
               {uniqueImages.map((im, i) => (
                 <button key={i} onClick={() => { setSel(i); setMainErr(false); }}
                   style={{ width: 72, height: 72, borderRadius: 10, overflow: 'hidden', flexShrink: 0, cursor: 'pointer', padding: 0, background: BG, border: `2px solid ${i === sel ? A : BD}` }}>
@@ -1031,7 +1039,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
 
           {/* description (desktop only) */}
           {product?.desc && (
-            <div className="hn-desc-desktop" style={{ marginTop: 28, background: '#fff', border: `1.5px solid ${BD}`, borderRadius: 16, padding: '1.5rem' }}>
+            <div className="hn-desc-desktop hn-details-card" style={{ marginTop: 28, background: '#fff', border: `1.5px solid ${BD}`, borderRadius: 16, padding: '1.5rem' }}>
               <h3 className="hn-display" style={{ fontSize: '1.15rem', fontWeight: 800, margin: '0 0 1rem', paddingBottom: 10, borderBottom: `2px solid ${AL}` }}>{t.descTitle}</h3>
               <div style={{ color: '#3a463f', lineHeight: 1.85, fontSize: '0.95rem' }}
                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc) }} />
@@ -1041,7 +1049,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
 
         {/* ===== RIGHT: buy box ===== */}
         <div className="hn-buybox-sticky">
-          <div style={{ background: '#fff', border: `1.5px solid ${BD}`, borderRadius: 16, padding: '1.5rem', boxShadow: '0 10px 30px rgba(15,26,21,0.06)' }}>
+          <div className="hn-details-card" style={{ background: '#fff', border: `1.5px solid ${BD}`, borderRadius: 16, padding: '1.5rem', boxShadow: '0 10px 30px rgba(15,26,21,0.06)' }}>
             <h1 className="hn-display" style={{ fontSize: '1.5rem', fontWeight: 900, margin: 0, lineHeight: 1.3 }}>{product?.name}</h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
               <Stars n={5} size={15} />
@@ -1114,7 +1122,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
                         if (attr.displayMode === 'image') {
                           return (
                             <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.name}
-                              style={{ width: 48, height: 48, borderRadius: 8, overflow: 'hidden', cursor: available ? 'pointer' : 'not-allowed', padding: 0, background: BG, border: `2px solid ${on ? A : BD}`, opacity: available ? 1 : 0.35 }}>
+                              style={{ width: 64, height: 64, borderRadius: 8, overflow: 'hidden', cursor: available ? 'pointer' : 'not-allowed', padding: 0, background: BG, border: `3px solid ${on ? A : BD}`, boxShadow: on ? `0 0 0 2px #fff, 0 0 0 4px ${A}` : 'none', opacity: available ? 1 : 0.35 }}>
                               <img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             </button>
                           );
@@ -1135,7 +1143,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
             )}
 
             {/* ===== ORDER FORM (always visible — Hanouti signature) ===== */}
-            <div style={{ background: AL, borderRadius: 12, padding: '14px 14px 4px', marginTop: 4 }}>
+            <div className="hn-order-box" style={{ background: AL, borderRadius: 12, padding: '14px 14px 4px', marginTop: 4 }}>
               <p className="hn-display" style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 900, fontSize: '1rem', margin: '0 0 12px', color: AD }}>
                 <Truck size={18} /> {t.orderHere}
               </p>
@@ -1154,7 +1162,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
 
           {/* description (mobile only — below form) */}
           {product?.desc && (
-            <div className="hn-desc-mobile" style={{ marginTop: 20, background: '#fff', border: `1.5px solid ${BD}`, borderRadius: 16, padding: '1.5rem' }}>
+            <div className="hn-desc-mobile hn-details-card" style={{ marginTop: 20, background: '#fff', border: `1.5px solid ${BD}`, borderRadius: 16, padding: '1.5rem' }}>
               <h3 className="hn-display" style={{ fontSize: '1.15rem', fontWeight: 800, margin: '0 0 1rem', paddingBottom: 10, borderBottom: `2px solid ${AL}` }}>{t.descTitle}</h3>
               <div style={{ color: '#3a463f', lineHeight: 1.85, fontSize: '0.95rem' }}
                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.desc) }} />
@@ -1423,7 +1431,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
 
           {/* delivery type */}
           <label style={fieldLabel}>{t.delivery}</label>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8, marginBottom: 14 }}>
             {(['home', 'office'] as const).map((typ) => {
               const on = fd.typeLivraison === typ;
               return (
@@ -1695,7 +1703,7 @@ export function Cart({ domain, store }: any) {
           <FieldErr msg={errors.customerCommune} />
 
           <label style={fieldLabel}>{t.delivery}</label>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8, marginBottom: 16 }}>
             {(['home', 'office'] as const).map((typ) => {
               const on = fd.typeLivraison === typ;
               return (
@@ -1914,7 +1922,7 @@ export function Contact({ store }: any) {
           <button className="hn-btn" onClick={() => { setSent(false); setForm({ name: '', email: '', phone: '', message: '' }); }} style={{ ...btnOutline, width: 'auto', display: 'inline-flex' }}>{t.anotherMsg}</button>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 24 }}>
           {/* contact info */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {store?.contact?.phone && <div style={contactRow}><span style={contactIco}><Phone size={18} /></span><div><p style={{ margin: 0, fontSize: '0.78rem', color: SUB }}>{t.phone}</p><a href={`tel:${store.contact.phone}`} style={{ color: TXT, textDecoration: 'none', fontWeight: 700 }}>{store.contact.phone}</a></div></div>}

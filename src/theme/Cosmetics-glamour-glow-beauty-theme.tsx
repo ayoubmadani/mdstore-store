@@ -179,10 +179,10 @@ const GLOBAL_CSS = `
   .gg-trust-icon { width: 44px; height: 44px; border-radius: 50%; background: var(--blush); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
 
   /* Details */
-  .gg-det-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; max-width: 1200px; margin: 0 auto; padding: 48px 24px 80px; }
+  .gg-det-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; max-width: 1200px; margin: 0 auto; padding: 48px 24px 80px; }
   .gg-gallery-main { aspect-ratio: 3/4; border-radius: 12px; overflow: hidden; background: var(--blush); border: 1px solid var(--line); position: relative; }
   .gg-gallery-main img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .gg-gallery-thumbs { display: flex; gap: 10px; margin-top: 12px; overflow-x: auto; scrollbar-width: none; }
+  .gg-gallery-thumbs { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; scrollbar-width: none; }
   .gg-gallery-thumbs::-webkit-scrollbar { display: none; }
   .gg-gallery-thumb { width: 72px; height: 90px; flex-shrink: 0; border-radius: 8px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; background: var(--blush); }
   .gg-gallery-thumb.active { border-color: var(--pink); }
@@ -201,10 +201,10 @@ const GLOBAL_CSS = `
   .gg-offer.active .gg-offer-radio::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
 
   /* Cart grid */
-  .gg-cart-grid { display: grid; grid-template-columns: 1fr 380px; gap: 32px; align-items: start; }
+  .gg-cart-grid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 32px; align-items: start; }
 
   /* Contact grid */
-  .gg-contact-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 28px; }
+  .gg-contact-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: 28px; }
 
   /* Section heading */
   .gg-sec-hd { text-align: center; margin-bottom: 32px; }
@@ -213,7 +213,7 @@ const GLOBAL_CSS = `
 
   /* Footer */
   .gg-footer { background: var(--ink); color: var(--blush); }
-  .gg-footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; max-width: 1360px; margin: 0 auto; padding: 60px 24px 40px; }
+  .gg-footer-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 32px; max-width: 1360px; margin: 0 auto; padding: 60px 24px 40px; }
   .gg-footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 600; font-style: italic; color: var(--pink); margin-bottom: 12px; }
   .gg-footer-desc { font-family: 'Nunito Sans', sans-serif; font-size: 13px; color: #a07080; line-height: 1.8; margin-bottom: 20px; }
   .gg-footer-title { font-family: 'Nunito Sans', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
@@ -224,26 +224,26 @@ const GLOBAL_CSS = `
 
   @media (max-width: 1024px) {
     .gg-trust { grid-template-columns: repeat(2,1fr); }
-    .gg-footer-grid { grid-template-columns: 1fr 1fr; }
-    .gg-cart-grid { grid-template-columns: 1fr; }
-    .gg-contact-grid { grid-template-columns: 1fr; }
+    .gg-footer-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .gg-cart-grid { grid-template-columns: minmax(0, 1fr); }
+    .gg-contact-grid { grid-template-columns: minmax(0, 1fr); }
   }
   @media (max-width: 768px) {
     .gg-nav-links { display: none; }
     .gg-hero-img { display: none; }
     .gg-hero-content { padding: 48px 20px; }
-    .gg-det-grid { grid-template-columns: 1fr; gap: 28px; }
+    .gg-det-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
     .gg-cards-grid { grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 14px; }
-    .gg-footer-grid { grid-template-columns: 1fr; gap: 28px; padding: 40px 20px 28px; }
+    .gg-footer-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 40px 20px 28px; }
     .gg-footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
   }
   @media (max-width: 480px) {
-    .gg-trust { grid-template-columns: 1fr 1fr; }
-    .gg-cards-grid { grid-template-columns: 1fr; }
+    .gg-trust { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .gg-cards-grid { grid-template-columns: minmax(0, 1fr); }
   }
 
-  .gg-form-2c{display:grid;grid-template-columns:1fr;gap:10px;}
-  @media(min-width:540px){.gg-form-2c{grid-template-columns:1fr 1fr;}}
+  .gg-form-2c{display:grid;grid-template-columns:minmax(0, 1fr);gap:10px;}
+  @media(min-width:540px){.gg-form-2c{grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);}}
 `;
 
 /* ══════════════════════════════════════════════════════════════
@@ -955,7 +955,7 @@ export function Details({ product, discount, allImages, domain, allAttrs, finalP
                     const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val)));
                     return (
                       <button key={v.id} onClick={() => available && handleVariantSelection?.(attr.name, v.value)}
-                        style={{ width: 52, height: 52, overflow: 'hidden', border: `2px solid ${selectedVariants?.[attr.name] === v.value ? 'var(--pink)' : 'var(--line-dk)'}`, cursor: available ? 'pointer' : 'not-allowed', padding: 0, borderRadius: 8, opacity: available ? 1 : 0.35 }}>
+                        style={{ width: 64, height: 64, overflow: 'hidden', border: `3px solid ${selectedVariants?.[attr.name] === v.value ? 'var(--pink)' : 'var(--line-dk)'}`, boxShadow: selectedVariants?.[attr.name] === v.value ? '0 0 0 2px #fff, 0 0 0 4px var(--pink)' : 'none', cursor: available ? 'pointer' : 'not-allowed', padding: 0, borderRadius: 8, opacity: available ? 1 : 0.35 }}>
                         <img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                       </button>
                     );
@@ -1157,7 +1157,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 </div>
               </FR>
             )}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
               <FR label={t.fullName} error={errors.customerName}>
                 <input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} placeholder={t.fullNamePh} style={INP(!!errors.customerName)} />
               </FR>
@@ -1187,7 +1187,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               </FR>
             ) : (
               <>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
                   <FR label={t.wilaya} error={errors.customerWelaya}>
                     <div style={{ position: 'relative' }}>
                       <ChevronDown size={13} style={{ position: 'absolute', ...(isRTL ? { right: 11 } : { left: 11 }), top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
@@ -1208,7 +1208,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                   </FR>
                 </div>
                 <FR label={t.deliveryType}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
                     {(['home', 'office'] as const).map(dtype => (
                       <button key={dtype} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: dtype }))}
                         style={{ padding: '12px 10px', border: `1.5px solid ${fd.typeLivraison === dtype ? 'var(--pink)' : 'var(--line-dk)'}`, background: fd.typeLivraison === dtype ? 'var(--blush)' : 'transparent', cursor: 'pointer', textAlign: 'center', borderRadius: 8, transition: 'all 0.2s', fontFamily: 'inherit' }}>
@@ -1388,11 +1388,11 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         <div style={{ background: 'var(--white)', border: '1px solid var(--line)', borderRadius: 12, padding: 28, alignSelf: 'start' }}>
           <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--pink)', marginBottom: 20 }}>{t.checkoutInfoTitle}</p>
           <form onSubmit={handleSubmit}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10, marginBottom: 10 }}>
               <FR label={t.fullName} error={errors.name}><input type="text" value={fd.customerName} onChange={e => setFd({ ...fd, customerName: e.target.value })} style={INP(!!errors.name)} /></FR>
               <FR label={t.phone} error={errors.phone}><input type="tel" value={fd.customerPhone} onChange={e => setFd({ ...fd, customerPhone: e.target.value })} style={INP(!!errors.phone)} /></FR>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10, marginBottom: 16 }}>
               <FR label={t.wilaya} error={errors.w}>
                 <div style={{ position: 'relative' }}>
                   <ChevronDown size={13} style={{ position: 'absolute', ...(isRTL ? { right: 11 } : { left: 11 }), top: '50%', transform: 'translateY(-50%)', color: 'var(--dim)', pointerEvents: 'none' }} />
@@ -1413,7 +1413,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 
             <div style={{ margin: '20px 0' }}>
               <p style={{ fontFamily: "'Nunito Sans',sans-serif", fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pink)', marginBottom: 12 }}>{t.deliveryType}</p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
                 {(['home', 'office'] as const).map(dtype => (
                   <button key={dtype} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: dtype }))}
                     style={{ padding: '13px 8px', border: `1.5px solid ${fd.typeLivraison === dtype ? 'var(--pink)' : 'var(--line-dk)'}`, borderRadius: 8, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === dtype ? 'rgba(255,31,142,0.06)' : 'var(--white)', fontFamily: 'inherit', transition: 'all 0.2s' }}>

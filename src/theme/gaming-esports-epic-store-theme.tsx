@@ -294,12 +294,12 @@ export default function Main({ store, children, domain }: { store: any; children
         .pgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
         @media(min-width:768px){.pgrid{grid-template-columns:repeat(3,1fr)}}
         @media(min-width:1200px){.pgrid{grid-template-columns:repeat(4,1fr)}}
-        .form2{display:grid;grid-template-columns:1fr 1fr;gap:.875rem}
-        @media(max-width:500px){.form2{grid-template-columns:1fr}}
-        .cart-layout{display:grid;grid-template-columns:1fr;gap:2rem}
-        @media(min-width:900px){.cart-layout{grid-template-columns:1.3fr 1fr}}
-        .det-layout{display:grid;grid-template-columns:1fr;gap:2rem}
-        @media(min-width:768px){.det-layout{grid-template-columns:1fr 1fr}}
+        .form2{display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);gap:.875rem}
+        @media(max-width:500px){.form2{grid-template-columns:minmax(0, 1fr)}}
+        .cart-layout{display:grid;grid-template-columns:minmax(0, 1fr);gap:2rem}
+        @media(min-width:900px){.cart-layout{grid-template-columns:minmax(0, 1.3fr) minmax(0, 1fr)}}
+        .det-layout{display:grid;grid-template-columns:minmax(0, 1fr);gap:2rem}
+        @media(min-width:768px){.det-layout{grid-template-columns:minmax(0, 1fr) minmax(0, 1fr)}}
         .nav-desktop{display:flex;align-items:center;gap:24px}
         .nav-mobile-btn{display:none}
         @media(max-width:720px){.nav-desktop{display:none}.nav-mobile-btn{display:flex}}
@@ -565,7 +565,7 @@ export function Footer({ store }: { store: any }) {
 
   return (
     <footer dir={t.dir} style={{ background: C1, borderTop: `1px solid ${BD}`, padding: "2.5rem 0 1rem" }}>
-      <div style={{ ...container, display: "grid", gridTemplateColumns: "1fr", gap: "2rem" }}>
+      <div style={{ ...container, display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: "2rem" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: "2rem" }}>
           {/* Brand */}
           <div>
@@ -856,7 +856,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               )}
             </div>
             {imgs.length > 1 && (
-              <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 4 }}>
+              <div style={{ display: "flex", gap: 6, flexWrap: 'wrap', paddingBottom: 4 }}>
                 {imgs.map((url: string, i: number) => (
                   <button key={i} onClick={() => { setSel(i); setImgErr(false); }} style={{ width: 64, height: 64, borderRadius: 6, overflow: "hidden", border: `2px solid ${sel === i ? A : BD}`, padding: 0, cursor: "pointer", flexShrink: 0, background: C2 }}>
                     <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
@@ -921,7 +921,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                           <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.value} style={{ width: 30, height: 30, borderRadius: "50%", background: v.value, border: `2px solid ${isSel ? A : "transparent"}`, outline: isSel ? `2px solid ${A}` : "none", outlineOffset: 2, cursor: available ? "pointer" : "not-allowed", padding: 0, opacity: available ? 1 : 0.35 }} />
                         );
                         if (attr.displayMode === "image") return (
-                          <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: 42, height: 42, borderRadius: 6, overflow: "hidden", border: `2px solid ${isSel ? A : BD}`, padding: 0, cursor: available ? "pointer" : "not-allowed", opacity: available ? 1 : 0.35 }}>
+                          <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: 64, height: 64, borderRadius: 6, overflow: "hidden", border: `3px solid ${isSel ? A : BD}`, boxShadow: isSel ? `0 0 0 2px #fff, 0 0 0 4px ${A}` : 'none', padding: 0, cursor: available ? "pointer" : "not-allowed", opacity: available ? 1 : 0.35 }}>
                             <img src={v.value} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                           </button>
                         );
@@ -1172,7 +1172,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               {/* Delivery type */}
               <div>
                 <label style={{ fontSize: "0.78rem", color: SUB, marginBottom: 6, display: "block", fontWeight: 600 }}>{t.deliveryType}</label>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 8 }}>
                   {(["home", "office"] as const).map((type) => (
                     <button key={type} type="button" onClick={() => setFd({ ...fd, typeLivraison: type })} style={{ padding: "9px 8px", borderRadius: 6, border: `1px solid ${fd.typeLivraison === type ? A : BD}`, background: fd.typeLivraison === type ? AL : "transparent", color: fd.typeLivraison === type ? A : SUB, fontWeight: 700, fontSize: "0.82rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
                       {type === "home" ? <Truck size={14} /> : <MapPin size={14} />}
@@ -1401,7 +1401,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 
               <div>
                 <label style={{ fontSize: "0.78rem", color: SUB, marginBottom: 6, display: "block", fontWeight: 600 }}>{t.deliveryType}</label>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 8 }}>
                   {(["home", "office"] as const).map((type) => (
                     <button key={type} type="button" onClick={() => setFd({ ...fd, typeLivraison: type })} style={{ padding: "9px 6px", borderRadius: 6, border: `1px solid ${fd.typeLivraison === type ? A : BD}`, background: fd.typeLivraison === type ? AL : "transparent", color: fd.typeLivraison === type ? A : SUB, fontWeight: 700, fontSize: "0.78rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
                       {type === "home" ? <Truck size={13} /> : <MapPin size={13} />}
@@ -1577,7 +1577,7 @@ export function Contact({ store }: { store: any }) {
         <h1 style={{ fontSize: "1.4rem", fontWeight: 800, color: TXT, marginBottom: 22, display: "flex", alignItems: "center", gap: 10 }}>
           <Headphones size={22} color={A} />{t.contactTitle}
         </h1>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1.5rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: "1.5rem" }}>
           {/* Contact info */}
           {(store?.contact?.phone || store?.contact?.email || store?.contact?.wilaya) && (
             <div style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 10, padding: "1.25rem" }}>

@@ -4,6 +4,7 @@ import { useEffect, useMemo, type SyntheticEvent } from 'react'
 import ThemeRunner from '@/components/ThemeRunner'
 import { buildPreviewStore, PREVIEW_DOMAIN, PREVIEW_WILAYAS, PREVIEW_COMMUNES, type PreviewLang } from '@/lib/mock-preview-store'
 import { installPreviewMockApi, setPreviewSearchLang } from '@/lib/preview-mock-api'
+import MobilePaddingClamp from '@/components/theme/MobilePaddingClamp'
 import type { Store } from '@/types/store'
 
 // 'home'|'product'|'cart'|'success' مسارات معروفة لها exports مخصصة في الثيم. أي قيمة
@@ -138,7 +139,9 @@ export default function PreviewContent({ theme, lang, page }: { theme: string; l
         )}
 
         {page === 'product' && (
-          <PreviewProductDetails product={store.products![0]} store={store} domain={PREVIEW_DOMAIN} bundleUrl={bundleUrl} />
+          <MobilePaddingClamp>
+            <PreviewProductDetails product={store.products![0]} store={store} domain={PREVIEW_DOMAIN} bundleUrl={bundleUrl} />
+          </MobilePaddingClamp>
         )}
 
         {page === 'cart' && (

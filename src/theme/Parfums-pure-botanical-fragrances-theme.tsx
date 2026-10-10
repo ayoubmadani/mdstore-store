@@ -290,7 +290,7 @@ const THEME_CSS = `
 .pbf-card-badge { background:${SAGE}; color:#fff; font-size:0.65rem; padding:2px 7px; border-radius:2px; font-weight:700; }
 .pbf-card-stars { display:flex; gap:2px; margin-bottom:6px; }
 
-.pbf-products-grid { display:grid; grid-template-columns:1fr; gap:1.1rem; }
+.pbf-products-grid { display:grid; grid-template-columns:minmax(0, 1fr); gap:1.1rem; }
 @media (min-width:640px) { .pbf-products-grid { grid-template-columns:repeat(2,1fr); } }
 @media (min-width:1024px) { .pbf-products-grid { grid-template-columns:repeat(3,1fr); } }
 @media (min-width:1280px) { .pbf-products-grid { grid-template-columns:repeat(4,1fr); } }
@@ -316,7 +316,7 @@ const THEME_CSS = `
 .pbf-btn-outline { background:transparent; color:${INK}; border:1px solid ${BORDER}; padding:14px 32px; font-weight:500; letter-spacing:0.02em; border-radius:2px; cursor:pointer; transition:all 0.2s ease; min-height:48px; }
 .pbf-btn-outline:hover { border-color:${SAGE_DARK}; color:${SAGE_DARK}; }
 
-.pbf-trust-bar { display:grid; grid-template-columns:1fr; gap:1.5rem; padding:2.5rem 0; border-top:1px solid ${BORDER}; border-bottom:1px solid ${BORDER}; }
+.pbf-trust-bar { display:grid; grid-template-columns:minmax(0, 1fr); gap:1.5rem; padding:2.5rem 0; border-top:1px solid ${BORDER}; border-bottom:1px solid ${BORDER}; }
 @media (min-width:768px) { .pbf-trust-bar { grid-template-columns:repeat(4,1fr); } }
 .pbf-trust-item { text-align:center; }
 .pbf-trust-item strong { display:block; color:${SAGE_DARK}; font-size:0.95rem; margin-bottom:4px; }
@@ -612,8 +612,8 @@ export function Footer({ store }: any) {
           © {year} {store?.name || 'Pure Botanical'} — {t.rightsReserved}
         </p>
       </div>
-      <style dangerouslySetInnerHTML={{ __html: `.pbf-footer-grid{ display:grid; grid-template-columns:1fr; }
-@media (min-width:768px){ .pbf-footer-grid{ grid-template-columns: 1.4fr 1fr 1fr 1fr; } }` }} />
+      <style dangerouslySetInnerHTML={{ __html: `.pbf-footer-grid{ display:grid; grid-template-columns:minmax(0, 1fr); }
+@media (min-width:768px){ .pbf-footer-grid{ grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); } }` }} />
     </footer>
   );
 }
@@ -799,7 +799,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             )}
           </div>
           {images?.length > 1 && (
-            <div style={{ display: 'flex', gap: 10, marginTop: 12, overflowX: 'auto' }}>
+            <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
               {images.map((img: string, i: number) => (
                 <button key={i} onClick={() => setSel(i)}
                   style={{ width: 64, height: 64, flexShrink: 0, borderRadius: 4, overflow: 'hidden', border: sel === i ? `2px solid ${SAGE_DARK}` : `1px solid ${BORDER}`, padding: 0, cursor: 'pointer', background: 'none' }}>
@@ -868,7 +868,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                   if (attr.displayMode === 'image') {
                     return (
                       <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
-                        style={{ width: 48, height: 48, borderRadius: 4, overflow: 'hidden', border: isSel ? `2px solid ${SAGE_DARK}` : `1px solid ${BORDER}`, padding: 0, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}>
+                        style={{ width: 64, height: 64, borderRadius: 4, overflow: 'hidden', border: isSel ? `3px solid ${SAGE_DARK}` : `1px solid ${BORDER}`, boxShadow: isSel ? `0 0 0 2px #fff, 0 0 0 4px ${SAGE_DARK}` : 'none', padding: 0, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}>
                         <img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </button>
                     );
@@ -903,7 +903,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           )}
         </div>
       </div>
-      <style dangerouslySetInnerHTML={{ __html: `@media (min-width:768px){ .pbf-details-inner{ grid-template-columns: 1fr 1fr; } }` }} />
+      <style dangerouslySetInnerHTML={{ __html: `@media (min-width:768px){ .pbf-details-inner{ grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }` }} />
     </div>
   );
 }
@@ -1111,7 +1111,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
           ) : (
             <>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
                 <div>
                   <label className="pbf-label">{t.wilaya}</label>
                   <select className="pbf-input-field" disabled={wilayas.length === 0} value={fd.customerWelaya}
@@ -1306,7 +1306,7 @@ export function Cart({ domain, store }: any) {
           {freeShippingReached ? t.freeShippingReached : t.freeShippingRemaining.replace('{{amount}}', `${Number(freeShippingRemainingAmt).toLocaleString()} ${store?.currency}`)}
         </div>
       )}
-      <div className="pbf-cart-inner" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
+      <div className="pbf-cart-inner" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '2rem' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {items.map((it, idx) => (
             <div key={idx} style={{ display: 'flex', gap: 14, border: `1px solid ${BORDER}`, borderRadius: 6, padding: 14, alignItems: 'center', background: '#fff' }}>
@@ -1393,7 +1393,7 @@ export function Cart({ domain, store }: any) {
           </div>
         </div>
       </div>
-      <style dangerouslySetInnerHTML={{ __html: `@media (min-width:1024px){ .pbf-cart-inner{ grid-template-columns: 1.2fr 1fr; } }` }} />
+      <style dangerouslySetInnerHTML={{ __html: `@media (min-width:1024px){ .pbf-cart-inner{ grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } }` }} />
     </div>
   );
 }

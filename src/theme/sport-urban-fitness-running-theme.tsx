@@ -276,22 +276,22 @@ input, select, textarea { font-family: inherit; }
 
 .container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
 
-.products-grid { display:grid; grid-template-columns: 1fr; gap: 1rem; }
+.products-grid { display:grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
 @media (min-width: 640px)  { .products-grid { grid-template-columns: repeat(2,1fr); } }
 @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(3,1fr); } }
 @media (min-width: 1280px) { .products-grid { grid-template-columns: repeat(4,1fr); } }
 
-.form-row-2 { display:grid; grid-template-columns: 1fr; gap: .875rem; margin-bottom:.875rem; }
-@media (min-width:500px) { .form-row-2 { grid-template-columns: 1fr 1fr; } }
+.form-row-2 { display:grid; grid-template-columns: minmax(0, 1fr); gap: .875rem; margin-bottom:.875rem; }
+@media (min-width:500px) { .form-row-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 
-.details-inner { display:grid; grid-template-columns: 1fr; gap: 2rem; }
-@media (min-width:768px) { .details-inner { grid-template-columns: 1fr 1fr; } }
+.details-inner { display:grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+@media (min-width:768px) { .details-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 
-.cart-inner { display:grid; grid-template-columns: 1fr; gap: 2rem; }
-@media (min-width:1024px) { .cart-inner { grid-template-columns: 1.2fr 1fr; } }
+.cart-inner { display:grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+@media (min-width:1024px) { .cart-inner { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } }
 
-.footer-grid { display:grid; grid-template-columns: 1fr; gap: 2rem; }
-@media (min-width:768px) { .footer-grid { grid-template-columns: 1.5fr 1fr 1fr 1fr; } }
+.footer-grid { display:grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+@media (min-width:768px) { .footer-grid { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); } }
 
 .card { animation: fadeUp .5s ease both; transition: transform .28s cubic-bezier(.22,.68,0,1.2), box-shadow .28s ease; }
 .card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,.14); }
@@ -758,7 +758,7 @@ export function Home({ store, page }: any) {
     <div>
       {/* HERO — asymmetric: oversized headline overlapping a smaller image tile */}
       <section style={{ background: DARK, position: 'relative', overflow: 'hidden', minHeight: 'clamp(480px, 68vh, 760px)', display: 'flex', alignItems: 'center' }}>
-        <div className="container" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem', width: '100%', position: 'relative', zIndex: 2, padding: '4rem 1.5rem' }}>
+        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '1rem', width: '100%', position: 'relative', zIndex: 2, padding: '4rem 1.5rem' }}>
           <span className="hero-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: AL, color: A, fontSize: '0.75rem', fontWeight: 800, padding: '6px 14px', borderRadius: 999, width: 'fit-content', letterSpacing: '0.05em' }}>
             <Zap size={13} /> {t.heroTag}
           </span>
@@ -896,7 +896,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
             )}
           </div>
           {images.length > 1 && (
-            <div style={{ display: 'flex', gap: 8, marginTop: 10, overflowX: 'auto' }}>
+            <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
               {images.map((img, i) => (
                 <button key={i} onClick={() => setSel(i)} style={{ width: 60, height: 60, flexShrink: 0, borderRadius: 4, overflow: 'hidden', border: `2px solid ${i === sel ? A : BD}`, padding: 0, background: 'none' }}>
                   <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -958,7 +958,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
                     return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: 32, height: 32, borderRadius: '50%', background: v.value, border: active ? `3px solid ${A}` : `1px solid ${BD}`, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }} title={v.name} />;
                   }
                   if (attr.displayMode === 'image') {
-                    return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: 48, height: 48, borderRadius: 4, overflow: 'hidden', border: active ? `2px solid ${A}` : `1px solid ${BD}`, padding: 0, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}><img src={v.value} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>;
+                    return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: 64, height: 64, borderRadius: 4, overflow: 'hidden', border: active ? `3px solid ${A}` : `1px solid ${BD}`, boxShadow: active ? `0 0 0 2px #fff, 0 0 0 4px ${A}` : 'none', padding: 0, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}><img src={v.value} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>;
                   }
                   return (
                     <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ padding: '8px 16px', borderRadius: 4, border: active ? `2px solid ${A}` : `1px solid ${BD}`, background: active ? AL : '#fff', fontWeight: 600, fontSize: '0.8rem', cursor: available ? 'pointer' : 'not-allowed', color: available ? 'inherit' : '#bbb', textDecoration: available ? 'none' : 'line-through' }}>
@@ -1173,7 +1173,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10, marginBottom: 14 }}>
                 {(['home', 'office'] as const).map((type) => (
                   <button key={type} onClick={() => setFd({ ...fd, typeLivraison: type })}
                     style={{
@@ -1416,7 +1416,7 @@ export function Cart({ domain, store }: any) {
               {errors.customerCommune && <ErrorMsg text={errors.customerCommune} />}
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10, marginBottom: 14 }}>
             {(['home', 'office'] as const).map((type) => (
               <button key={type} onClick={() => setFd({ ...fd, typeLivraison: type })}
                 style={{ padding: '10px', borderRadius: 4, fontWeight: 700, fontSize: '0.8rem', background: fd.typeLivraison === type ? AL : 'transparent', border: `1px solid ${fd.typeLivraison === type ? A : BD}`, color: fd.typeLivraison === type ? DARK : SUB }}>
@@ -1603,7 +1603,7 @@ export function Contact({ store }: any) {
 
   return (
     <Shell title={t.contactTitle}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }} className="details-inner">
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '2rem' }} className="details-inner">
         <div>
           {store?.contact?.phone && (
             <p style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, fontSize: '0.9rem' }}><Phone size={16} color={AD} /> {store.contact.phone}</p>

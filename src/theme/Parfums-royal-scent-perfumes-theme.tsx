@@ -390,7 +390,7 @@ const THEME_CSS = `
 .rsp-btn-outline { background:transparent; color:${CREAM}; border:1px solid ${BORDER}; padding:14px 32px; font-weight:600; letter-spacing:0.05em; border-radius:2px; cursor:pointer; transition:all 0.2s ease; min-height:48px; }
 .rsp-btn-outline:hover { border-color:${GOLD}; color:${GOLD_LIGHT}; }
 
-.rsp-trust-bar { display:grid; grid-template-columns:1fr; gap:1.5rem; padding:2.5rem 0; border-top:1px solid ${BORDER}; border-bottom:1px solid ${BORDER}; }
+.rsp-trust-bar { display:grid; grid-template-columns:minmax(0, 1fr); gap:1.5rem; padding:2.5rem 0; border-top:1px solid ${BORDER}; border-bottom:1px solid ${BORDER}; }
 @media (min-width:480px) { .rsp-trust-bar { grid-template-columns:repeat(2,1fr); } }
 @media (min-width:768px) { .rsp-trust-bar { grid-template-columns:repeat(4,1fr); } }
 .rsp-trust-item { text-align:center; }
@@ -411,21 +411,21 @@ const THEME_CSS = `
 
 .rsp-fade-page { transition:opacity 0.3s ease; }
 
-.rsp-addr-grid { display:grid; grid-template-columns:1fr; gap:12px; }
-@media (min-width:480px) { .rsp-addr-grid { grid-template-columns:1fr 1fr; } }
+.rsp-addr-grid { display:grid; grid-template-columns:minmax(0, 1fr); gap:12px; }
+@media (min-width:480px) { .rsp-addr-grid { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); } }
 
 .rsp-gallery-main { position:relative; aspect-ratio:1/1; border-radius:6px; overflow:hidden; }
 @media (min-width:640px) { .rsp-gallery-main { aspect-ratio:4/5; } }
 
 .rsp-details-pad { padding:1rem 1rem; }
 @media (min-width:640px) { .rsp-details-pad { padding:2.5rem 1.5rem; } }
-.rsp-details-inner { display:grid; grid-template-columns:1fr; gap:1.25rem; }
-@media (min-width:768px) { .rsp-details-inner { grid-template-columns:1fr 1fr; gap:2.5rem; } }
+.rsp-details-inner { display:grid; grid-template-columns:minmax(0, 1fr); gap:1.25rem; }
+@media (min-width:768px) { .rsp-details-inner { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:2.5rem; } }
 
 .rsp-footer-deco { height:1px; background:linear-gradient(to right, transparent, ${GOLD}, transparent); }
-.rsp-footer-grid { display:grid; grid-template-columns:1fr; gap:2rem; padding:3rem 0 2rem; }
-@media (min-width:560px) { .rsp-footer-grid { grid-template-columns:1fr 1fr; } .rsp-footer-brand { grid-column:1/-1; } }
-@media (min-width:768px) { .rsp-footer-grid { grid-template-columns:1.5fr 1fr 1fr 1fr; } .rsp-footer-brand { grid-column:auto; } }
+.rsp-footer-grid { display:grid; grid-template-columns:minmax(0, 1fr); gap:2rem; padding:3rem 0 2rem; }
+@media (min-width:560px) { .rsp-footer-grid { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); } .rsp-footer-brand { grid-column:1/-1; } }
+@media (min-width:768px) { .rsp-footer-grid { grid-template-columns:minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); } .rsp-footer-brand { grid-column:auto; } }
 .rsp-footer-link { color:${MUTED}; font-size:0.85rem; text-decoration:none; display:block; padding:4px 0; transition:color 0.2s; }
 .rsp-footer-link:hover { color:${GOLD_LIGHT}; }
 .rsp-footer-bottom { text-align:center; color:${MUTED}; font-size:0.75rem; border-top:1px solid ${BORDER}; padding-top:20px; padding-bottom:0.5rem; }
@@ -898,7 +898,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             )}
           </div>
           {images?.length > 1 && (
-            <div style={{ display: 'flex', gap: 10, marginTop: 12, overflowX: 'auto' }}>
+            <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
               {images.map((img: string, i: number) => (
                 <button key={i} onClick={() => setSel(i)}
                   style={{ width: 64, height: 64, flexShrink: 0, borderRadius: 4, overflow: 'hidden', border: sel === i ? `2px solid ${GOLD}` : `1px solid ${BORDER}`, padding: 0, cursor: 'pointer', background: 'none' }}>
@@ -967,7 +967,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                   if (attr.displayMode === 'image') {
                     return (
                       <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
-                        style={{ width: 48, height: 48, borderRadius: 4, overflow: 'hidden', border: isSel ? `2px solid ${GOLD}` : `1px solid ${BORDER}`, padding: 0, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}>
+                        style={{ width: 64, height: 64, borderRadius: 4, overflow: 'hidden', border: isSel ? `3px solid ${GOLD}` : `1px solid ${BORDER}`, boxShadow: isSel ? `0 0 0 2px #fff, 0 0 0 4px ${GOLD}` : 'none', padding: 0, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}>
                         <img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </button>
                     );
@@ -1405,7 +1405,7 @@ export function Cart({ domain, store }: any) {
           {freeShippingReached ? t.freeShippingReached : t.freeShippingRemaining.replace('{{amount}}', `${Number(freeShippingRemainingAmt).toLocaleString()} ${store?.currency}`)}
         </div>
       )}
-      <div className="rsp-cart-inner" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
+      <div className="rsp-cart-inner" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '2rem' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {items.map((it, idx) => (
             <div key={idx} style={{ display: 'flex', gap: 14, border: `1px solid ${BORDER}`, borderRadius: 6, padding: 14, alignItems: 'center' }}>
@@ -1492,7 +1492,7 @@ export function Cart({ domain, store }: any) {
           </div>
         </div>
       </div>
-      <style dangerouslySetInnerHTML={{ __html: `@media (min-width:1024px){ .rsp-cart-inner{ grid-template-columns: 1.2fr 1fr; } }` }} />
+      <style dangerouslySetInnerHTML={{ __html: `@media (min-width:1024px){ .rsp-cart-inner{ grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } }` }} />
     </div>
   );
 }
@@ -1691,7 +1691,7 @@ export function Contact({ store }: any) {
                 <input type="text" required placeholder={t.namePh} value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })} style={inputStyle} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
                 <div>
                   <label style={labelStyle}>{t.emailLbl}</label>
                   <input type="email" required placeholder={t.emailPh} value={form.email}

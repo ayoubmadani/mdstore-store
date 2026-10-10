@@ -416,7 +416,7 @@ const THEME_CSS = `
 /* ---- masthead ---- */
 .lx-head { position: sticky; top: 0; z-index: 200; background: ${BG}; border-bottom: 1px solid ${BD}; transition: box-shadow .3s; }
 .lx-head.is-scrolled { box-shadow: 0 1px 0 ${BD}, 0 10px 30px rgba(28,25,23,.06); }
-.lx-mast { display:grid; grid-template-columns: 1fr auto 1fr; align-items:center; gap:14px; padding: 20px 0 16px; transition: padding .3s; }
+.lx-mast { display:grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items:center; gap:14px; padding: 20px 0 16px; transition: padding .3s; }
 .lx-head.is-scrolled .lx-mast { padding: 10px 0 8px; }
 .lx-word { font-family: ${FD}; font-size: clamp(1.35rem, 4.4vw, 2.1rem); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: ${INK}; text-decoration:none; text-align:center; line-height:1.1; white-space:nowrap; transition: font-size .3s; }
 .lx-head.is-scrolled .lx-word { font-size: clamp(1.05rem, 3.4vw, 1.35rem); }
@@ -460,7 +460,7 @@ const THEME_CSS = `
 .lx-hero-title { font-family:${FD}; font-weight:500; font-size: clamp(2.4rem, 7.4vw, 5.2rem); line-height:1.03; letter-spacing:-0.01em; margin:.5rem 0 1rem; max-width: 760px; margin-inline-end:auto; word-break: break-word; animation: lxUp .8s ease .08s both; }
 .lx-hero-sub { font-size: clamp(.95rem,2.2vw,1.08rem); line-height:1.75; max-width: 520px; margin-inline-end:auto; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; animation: lxUp .8s ease .2s both; }
 .lx-hero-cta { display:flex; flex-wrap:wrap; gap:12px; margin-top: 2rem; animation: lxUp .8s ease .32s both; }
-.lx-marks { display:grid; grid-template-columns:1fr; margin-top: clamp(38px, 6vw, 64px); border-top:1px solid ${BD}; animation: lxUp .8s ease .44s both; }
+.lx-marks { display:grid; grid-template-columns:minmax(0, 1fr); margin-top: clamp(38px, 6vw, 64px); border-top:1px solid ${BD}; animation: lxUp .8s ease .44s both; }
 .lx-mark { padding: 16px 0; border-bottom:1px solid ${BD}; display:flex; align-items:baseline; gap:14px; }
 @media (min-width: 768px) {
   .lx-marks { grid-template-columns: repeat(3,1fr); border-bottom:1px solid ${BD}; }
@@ -488,7 +488,7 @@ const THEME_CSS = `
 .lx-cat.is-active::after { content:''; position:absolute; bottom:0; inset-inline-start:0; width:100%; height:2px; background:${A}; animation: lxRule .32s ease both; }
 
 /* ---- grid + card ---- */
-.lx-grid { display:grid; grid-template-columns: 1fr; gap: 1px; background: ${BD}; border: 1px solid ${BD}; }
+.lx-grid { display:grid; grid-template-columns: minmax(0, 1fr); gap: 1px; background: ${BD}; border: 1px solid ${BD}; }
 @media (min-width: 640px)  { .lx-grid { grid-template-columns: repeat(2,1fr); } }
 @media (min-width: 1024px) { .lx-grid { grid-template-columns: repeat(3,1fr); } }
 @media (min-width: 1280px) { .lx-grid { grid-template-columns: repeat(4,1fr); } }
@@ -520,8 +520,8 @@ const THEME_CSS = `
 .lx-film::-webkit-scrollbar { display:none; }
 .lx-thumb { width:78px; height:78px; flex:0 0 auto; border:1px solid ${BD}; background:${AL}; padding:0; cursor:pointer; overflow:hidden; transition: border-color .2s, opacity .2s; opacity:.62; }
 .lx-thumb.is-active { border-color:${A}; opacity:1; }
-.lx-pd-body { display:grid; grid-template-columns:1fr; gap: 40px; margin-top: 42px; }
-@media (min-width: 1024px) { .lx-pd-body { grid-template-columns: 1.1fr .9fr; gap: 56px; align-items:start; } }
+.lx-pd-body { display:grid; grid-template-columns:minmax(0, 1fr); gap: 40px; margin-top: 42px; }
+@media (min-width: 1024px) { .lx-pd-body { grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 56px; align-items:start; } }
 @media (min-width: 1024px) { .lx-buy { position: sticky; top: 130px; } }
 .lx-desc-d { display:none; }
 .lx-desc-m { display:block; }
@@ -543,18 +543,18 @@ const THEME_CSS = `
 
 /* ---- footer ---- */
 .lx-foot { background:${DARK}; color:#CFC5B8; margin-top: 80px; }
-.lx-footgrid { display:grid; grid-template-columns:1fr; gap: 34px; padding: 56px 0 40px; }
-@media (min-width: 768px) { .lx-footgrid { grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 48px; } }
+.lx-footgrid { display:grid; grid-template-columns:minmax(0, 1fr); gap: 34px; padding: 56px 0 40px; }
+@media (min-width: 768px) { .lx-footgrid { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 48px; } }
 .lx-footlink { display:block; color:#CFC5B8; text-decoration:none; font-size:.82rem; padding: 7px 0; transition: color .2s, padding-inline-start .2s; }
 .lx-footlink:hover { color:#FFF8F1; padding-inline-start: 6px; }
 
 /* ---- misc ---- */
 .lx-skel { background: linear-gradient(90deg, ${AL} 25%, #F7F1E9 50%, ${AL} 75%); background-size: 420px 100%; animation: lxShim 1.4s infinite linear; }
 .lx-badge { animation: lxBadge .42s ease; }
-.lx-ct2 { display:grid; grid-template-columns:1fr; gap: 40px; }
-@media (min-width: 860px) { .lx-ct2 { grid-template-columns: .85fr 1.15fr; gap: 46px; align-items:start; } }
-.lx-form-2 { display:grid; grid-template-columns:1fr; gap: .9rem; }
-@media (min-width: 520px) { .lx-form-2 { grid-template-columns: 1fr 1fr; } }
+.lx-ct2 { display:grid; grid-template-columns:minmax(0, 1fr); gap: 40px; }
+@media (min-width: 860px) { .lx-ct2 { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 46px; align-items:start; } }
+.lx-form-2 { display:grid; grid-template-columns:minmax(0, 1fr); gap: .9rem; }
+@media (min-width: 520px) { .lx-form-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 .lx-btnp:hover { background:${AD} !important; border-color:${AD} !important; }
 .lx-btnp:active { transform: translateY(1px); }
 .lx-btnp:disabled { opacity:.6; cursor: default; transform:none; }
@@ -1596,7 +1596,7 @@ export function ProductForm({
 
               <div style={{ marginBottom: 18 }}>
                 <span style={label}>{t.delivery}</span>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8 }}>
                   {([['home', t.deliveryHome], ['office', t.deliveryOffice]] as const).map(([k, l]) => {
                     const active = fd.typeLivraison === k;
                     return (
@@ -1887,7 +1887,7 @@ export function Cart({ domain, store }: any) {
 
             <div style={{ marginBottom: 18 }}>
               <span style={label}>{t.delivery}</span>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8 }}>
                 {([['home', t.deliveryHome], ['office', t.deliveryOffice]] as const).map(([k, l]) => {
                   const active = fd.typeLivraison === k;
                   return (

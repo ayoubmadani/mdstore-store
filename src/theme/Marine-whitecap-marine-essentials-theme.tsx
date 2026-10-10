@@ -737,7 +737,7 @@ export function Home({ store, page }: any) {
       {/* Trust bar */}
       <section style={{ background: '#fff', borderBottom: `1px solid ${BD}` }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '1.5rem' }}>
-          <div className="wc-trust-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
+          <div className="wc-trust-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '1.5rem' }}>
             {t.trust.map((item, i) => (
               <div key={i} style={{ textAlign: 'center', padding: '1rem' }}>
                 <p style={{ fontWeight: 700, fontSize: '0.9rem', color: TXT, margin: '0 0 4px' }}>{item.t}</p>
@@ -788,7 +788,7 @@ export function Home({ store, page }: any) {
             </div>
           ) : (
             <>
-              <div className="wc-products-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
+              <div className="wc-products-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '1rem' }}>
                 {products.map((p: any, i: number) => {
                   const price = Number(p.price);
                   const priceOriginal = p.priceOriginal ? Number(p.priceOriginal) : 0;
@@ -838,7 +838,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
   return (
     <div style={{ background: BG, padding: '2rem 0' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
-        <div className="wc-details-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2.5rem' }}>
+        <div className="wc-details-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '2.5rem' }}>
           {/* Gallery */}
           <div>
             <div style={{ position: 'relative', borderRadius: 10, overflow: 'hidden', border: `1px solid ${BD}`, background: '#fff', aspectRatio: '1/1' }}>
@@ -941,7 +941,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                         if (attr.displayMode === 'image') {
                           return (
                             <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
-                              style={{ width: 44, height: 44, borderRadius: 6, overflow: 'hidden', border: `2px solid ${isSelected ? A : BD}`, padding: 0, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}>
+                              style={{ width: 64, height: 64, borderRadius: 6, overflow: 'hidden', border: `3px solid ${isSelected ? A : BD}`, boxShadow: isSelected ? `0 0 0 2px #fff, 0 0 0 4px ${A}` : 'none', padding: 0, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}>
                               <img src={v.value} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             </button>
                           );
@@ -1187,7 +1187,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
       ) : (
         <div style={{ animation: 'fadeUp 0.4s ease' }}>
           {/* Name + Phone */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.875rem', marginBottom: '0.875rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '0.875rem', marginBottom: '0.875rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: 6, color: TXT }}>{t.fullName}</label>
               <input value={fd.customerName} onChange={e => setFd(p => ({ ...p, customerName: e.target.value }))} placeholder={t.fullNamePlaceholder}
@@ -1234,7 +1234,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
           ) : (
             <>
               {/* Wilaya + Commune */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.875rem', marginBottom: '0.875rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '0.875rem', marginBottom: '0.875rem' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: 6, color: TXT }}>{t.wilaya}</label>
                   <div style={{ position: 'relative' }}>
@@ -1266,7 +1266,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
               {/* Delivery type */}
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: 8, color: TXT }}>{t.delivery}</label>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8 }}>
                   <button onClick={() => setFd(p => ({ ...p, typeLivraison: 'home' }))}
                     style={{ padding: '10px', borderRadius: 6, border: `1px solid ${fd.typeLivraison === 'home' ? A : BD}`, background: fd.typeLivraison === 'home' ? AL : '#fff', color: fd.typeLivraison === 'home' ? A : TXT, fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}>
                     {t.deliveryHome}
@@ -1464,7 +1464,7 @@ export function Cart({ domain, store }: any) {
             {freeShippingReached ? t.freeShippingReached : t.freeShippingRemaining.replace('{{amount}}', `${Number(freeShippingRemainingAmt).toLocaleString()} ${store?.currency}`)}
           </div>
         )}
-        <div className="wc-cart-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
+        <div className="wc-cart-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '2rem' }}>
           {/* Items */}
           <div style={{ minWidth: 0 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -1498,7 +1498,7 @@ export function Cart({ domain, store }: any) {
             <div style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 10, padding: '1.25rem' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: 800, color: TXT, margin: '0 0 1rem' }}>{t.confirmOrder}</h3>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.875rem', marginBottom: '0.875rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '0.875rem', marginBottom: '0.875rem' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: 6, color: TXT }}>{t.fullName}</label>
                   <input value={fd.customerName} onChange={e => setFd(p => ({ ...p, customerName: e.target.value }))} placeholder={t.fullNamePlaceholder}
@@ -1513,7 +1513,7 @@ export function Cart({ domain, store }: any) {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.875rem', marginBottom: '0.875rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '0.875rem', marginBottom: '0.875rem' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: 6, color: TXT }}>{t.wilaya}</label>
                   <div style={{ position: 'relative' }}>
@@ -1542,7 +1542,7 @@ export function Cart({ domain, store }: any) {
 
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: 8, color: TXT }}>{t.delivery}</label>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8 }}>
                   <button onClick={() => setFd(p => ({ ...p, typeLivraison: 'home' }))}
                     style={{ padding: '10px', borderRadius: 6, border: `1px solid ${fd.typeLivraison === 'home' ? A : BD}`, background: fd.typeLivraison === 'home' ? AL : '#fff', color: fd.typeLivraison === 'home' ? A : TXT, fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer' }}>
                     {t.deliveryHome}
@@ -1747,7 +1747,7 @@ export function Contact({ store }: any) {
   return (
     <div style={{ background: BG, minHeight: '60vh', padding: '3rem 0' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
-        <div className="wc-contact-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2.5rem' }}>
+        <div className="wc-contact-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '2.5rem' }}>
           {/* Info */}
           <div>
             <h1 style={{ fontSize: 'clamp(1.25rem, 3vw, 1.75rem)', fontWeight: 800, color: TXT, margin: '0 0 1rem' }}>{t.contactTitle}</h1>
@@ -1791,7 +1791,7 @@ export function Contact({ store }: any) {
 
           {/* Form */}
           <form onSubmit={submit} style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 10, padding: '1.5rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.875rem', marginBottom: '0.875rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '0.875rem', marginBottom: '0.875rem' }}>
               <input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder={t.fullName} required style={inputBase} />
               <input value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} placeholder="Email" type="email" required style={inputBase} />
             </div>
@@ -1880,42 +1880,42 @@ function ThemeCSS() {
 
       /* ─── Responsive: Footer ─── */
       @media (min-width: 768px) {
-        .wc-footer-grid { display:grid; grid-template-columns: 1fr; }
-        @media (min-width:768px) { .wc-footer-grid { grid-template-columns: 1.2fr 1fr 1fr 1fr; } }
+        .wc-footer-grid { display:grid; grid-template-columns: minmax(0, 1fr); }
+        @media (min-width:768px) { .wc-footer-grid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); } }
       }
 
       /* ─── Responsive: Products ─── */
       @media (min-width: 640px) {
-        .wc-products-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        .wc-products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
       }
       @media (min-width: 1024px) {
-        .wc-products-grid { grid-template-columns: repeat(3, 1fr) !important; }
+        .wc-products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
       }
       @media (min-width: 1280px) {
-        .wc-products-grid { grid-template-columns: repeat(4, 1fr) !important; }
+        .wc-products-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
       }
 
       /* ─── Responsive: Trust ─── */
       @media (min-width: 640px) {
-        .wc-trust-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        .wc-trust-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
       }
       @media (min-width: 1024px) {
-        .wc-trust-grid { grid-template-columns: repeat(4, 1fr) !important; }
+        .wc-trust-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
       }
 
       /* ─── Responsive: Details ─── */
       @media (min-width: 768px) {
-        .wc-details-grid { grid-template-columns: 1fr 1fr !important; }
+        .wc-details-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; }
       }
 
       /* ─── Responsive: Cart ─── */
       @media (min-width: 1024px) {
-        .wc-cart-grid { grid-template-columns: 1.2fr 1fr !important; }
+        .wc-cart-grid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) !important; }
       }
 
       /* ─── Responsive: Contact ─── */
       @media (min-width: 768px) {
-        .wc-contact-grid { grid-template-columns: 1fr 1fr !important; }
+        .wc-contact-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; }
       }
 
       /* ─── Nav link underline ─── */

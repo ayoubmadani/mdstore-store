@@ -121,48 +121,48 @@ const THEME_CSS = `
   /* ── Grids ── */
   .products-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
   }
-  @media (min-width: 640px)  { .products-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(4, 1fr); gap: 1.5rem; } }
+  @media (min-width: 640px)  { .products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; } }
 
   .trust-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
   }
-  @media (min-width: 1024px) { .trust-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 1024px) { .trust-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
   .details-layout {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2rem;
   }
-  @media (min-width: 768px) { .details-layout { grid-template-columns: 1fr 1fr; gap: 3rem; } }
+  @media (min-width: 768px) { .details-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; } }
 
   .form-row-2 {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.875rem;
   }
-  @media (min-width: 540px) { .form-row-2 { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 540px) { .form-row-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 
   .cart-layout {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2rem;
   }
-  @media (min-width: 1024px) { .cart-layout { grid-template-columns: 1.1fr 1fr; gap: 3rem; } }
+  @media (min-width: 1024px) { .cart-layout { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 3rem; } }
 
   .footer-cols {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2.5rem;
     padding-bottom: 2.5rem;
     border-bottom: 1px solid rgba(255,255,255,0.15);
   }
-  @media (min-width: 768px) { .footer-cols { grid-template-columns: 1.8fr 1fr 1fr 1fr; } }
+  @media (min-width: 768px) { .footer-cols { grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); } }
 
   .hero-actions { display: flex; flex-direction: column; gap: 0.875rem; }
   @media (min-width: 540px) { .hero-actions { flex-direction: row; align-items: center; } }
@@ -170,11 +170,11 @@ const THEME_CSS = `
   .cart-add-btns { display: flex; flex-direction: column; gap: 0.75rem; }
   @media (min-width: 540px) { .cart-add-btns { flex-direction: row; } }
 
-  .delivery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-  .thumb-row { display: flex; gap: 0.625rem; overflow-x: auto; padding-bottom: 4px; margin-top: 0.75rem; }
+  .delivery-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.75rem; }
+  .thumb-row { display: flex; gap: 0.625rem; flex-wrap: wrap; padding-bottom: 4px; margin-top: 0.75rem; }
   .pagination { display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 3rem; }
-  .contact-layout { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-  @media (min-width: 1024px) { .contact-layout { grid-template-columns: 1fr 1.5fr; } }
+  .contact-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  @media (min-width: 1024px) { .contact-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); } }
 
   .cart-badge {
     position: absolute; top: -4px; right: -4px;
@@ -1116,7 +1116,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
                                             if (attr.displayMode === 'image') {
                                                 return (
                                                     <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)}
-                                                        style={{ width: 40, height: 40, borderRadius: 10, backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center', border: isSelected ? '2px solid var(--amber-dk)' : '2px solid var(--border)', cursor: available ? 'pointer' : 'not-allowed', transition: '0.2s all', opacity: available ? 1 : 0.35 }} />
+                                                        style={{ width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center', border: isSelected ? `3px solid var(--amber-dk)` : '2px solid var(--border)', boxShadow: isSelected ? `0 0 0 2px #fff, 0 0 0 4px var(--amber-dk)` : 'none', cursor: available ? 'pointer' : 'not-allowed', transition: '0.2s all', opacity: available ? 1 : 0.35 }} />
                                                 );
                                             }
                                             return (

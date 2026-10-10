@@ -56,16 +56,16 @@ const THEME_CSS = `
   /* ── Common Layouts ── */
   .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
   
-  .grid-2 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-  @media (min-width: 640px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+  .grid-2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  @media (min-width: 640px) { .grid-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 
-  .grid-3 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-  @media (min-width: 640px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
-  @media (min-width: 1024px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } }
+  .grid-3 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  @media (min-width: 640px) { .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
-  .grid-4 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-  @media (min-width: 640px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
-  @media (min-width: 1024px) { .grid-4 { grid-template-columns: repeat(4, 1fr); } }
+  .grid-4 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  @media (min-width: 640px) { .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
   /* ── Buttons & Inputs ── */
   .btn-primary {
@@ -93,8 +93,8 @@ const THEME_CSS = `
   a { text-decoration: none; color: inherit; transition: color 0.2s; }
   a:hover { color: var(--text-muted); }
 
-  .form-row-2{display:grid;grid-template-columns:1fr;gap:0.8rem;}
-  @media(min-width:540px){.form-row-2{grid-template-columns:1fr 1fr;}}
+  .form-row-2{display:grid;grid-template-columns:minmax(0, 1fr);gap:0.8rem;}
+  @media(min-width:540px){.form-row-2{grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);}}
 `;
 
 const SimpleDivider = () => <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '2rem 0' }} />;
@@ -708,7 +708,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             {discount > 0 && <span style={{ position: 'absolute', top: 12, right: 12, background: 'var(--primary)', color: '#fff', fontSize: '12px', padding: '4px 10px', borderRadius: '4px' }}>خصم {discount}%</span>}
           </div>
           {allImages.length > 1 && (
-            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', overflowX: 'auto' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
               {allImages.map((img: string, idx: number) => (
                 <button key={idx} onClick={() => setSel(idx)} style={{ width: 60, height: 60, flexShrink: 0, border: `1px solid ${sel === idx ? 'var(--primary)' : 'var(--border-color)'}`, borderRadius: '4px', padding: 0, cursor: 'pointer', overflow: 'hidden' }}>
                   <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: sel === idx ? 1 : 0.6 }} alt="" />
@@ -778,7 +778,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                     );
                     return (
                       <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, imgSrc)} title={v.name}
-                        style={{ width: 48, height: 48, padding: 0, overflow: 'hidden', border: `2px solid ${sel ? 'var(--primary)' : 'var(--border-color)'}`, borderRadius: 6, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}>
+                        style={{ width: 64, height: 64, padding: 0, overflow: 'hidden', border: `3px solid ${sel ? 'var(--primary)' : 'var(--border-color)'}`, boxShadow: sel ? `0 0 0 2px #fff, 0 0 0 4px ${'var(--primary)'}` : 'none', borderRadius: 6, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}>
                         <img src={imgSrc} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                       </button>
                     );

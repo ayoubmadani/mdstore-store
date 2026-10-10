@@ -422,8 +422,8 @@ const THEME_CSS = `
 .ti-input:disabled { opacity: 0.55; }
 .ti-input option { background: ${SRF}; color: ${TXT}; }
 .ti-label { display: block; font-size: 0.78rem; font-weight: 700; color: ${SUB}; margin-bottom: 0.35rem; font-family: ${FONT_MONO}; text-transform: uppercase; letter-spacing: 0.06em; }
-.ti-form-row-2 { display: grid; grid-template-columns: 1fr; gap: 0.875rem; margin-bottom: 0.875rem; }
-@media (min-width: 500px) { .ti-form-row-2 { grid-template-columns: 1fr 1fr; } }
+.ti-form-row-2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.875rem; margin-bottom: 0.875rem; }
+@media (min-width: 500px) { .ti-form-row-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 
 /* ---------- Category chips (§16-E option 3: bordered chip) ---------- */
 .ti-cat {
@@ -436,10 +436,10 @@ const THEME_CSS = `
 .ti-cat.active { border: 2px solid ${A}; color: ${A}; background: ${AL}; }
 
 /* ---------- Products grid (§18) ---------- */
-.ti-products-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-@media (min-width: 640px) { .ti-products-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1024px) { .ti-products-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 1280px) { .ti-products-grid { grid-template-columns: repeat(4, 1fr); } }
+.ti-products-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+@media (min-width: 640px) { .ti-products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .ti-products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1280px) { .ti-products-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
 /* ---------- Hero ---------- */
 .ti-hero-title { animation: fadeUp 0.7s ease 0.1s both; }
@@ -456,16 +456,16 @@ const THEME_CSS = `
 }
 
 /* ---------- Layouts ---------- */
-.ti-trust-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: ${BD}; border: 1px solid ${BD}; border-radius: 6px; overflow: hidden; }
-@media (min-width: 768px) { .ti-trust-grid { grid-template-columns: repeat(4, 1fr); } }
-.ti-details-inner { display: grid; grid-template-columns: 1fr; gap: 2.5rem; }
-@media (min-width: 768px) { .ti-details-inner { grid-template-columns: 1fr 1fr; } }
-.ti-cart-inner { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-@media (min-width: 1024px) { .ti-cart-inner { grid-template-columns: 1.2fr 1fr; } }
-.ti-footer-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-@media (min-width: 768px) { .ti-footer-grid { grid-template-columns: 1.4fr 1fr 1fr 1fr; } }
-.ti-contact-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-@media (min-width: 900px) { .ti-contact-grid { grid-template-columns: 1fr 1.4fr; } }
+.ti-trust-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: ${BD}; border: 1px solid ${BD}; border-radius: 6px; overflow: hidden; }
+@media (min-width: 768px) { .ti-trust-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.ti-details-inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
+@media (min-width: 768px) { .ti-details-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.ti-cart-inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+@media (min-width: 1024px) { .ti-cart-inner { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } }
+.ti-footer-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+@media (min-width: 768px) { .ti-footer-grid { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); } }
+.ti-contact-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+@media (min-width: 900px) { .ti-contact-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); } }
 
 /* ---------- Search dropdown (desktop) — RTL-safe (§15.28) ---------- */
 .ti-search-drop {
@@ -1168,7 +1168,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
             )}
           </div>
           {images.length > 1 && (
-            <div style={{ display: 'flex', gap: 8, marginTop: 10, overflowX: 'auto', paddingBottom: 4 }}>
+            <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap', paddingBottom: 4 }}>
               {images.map((img, i) => (
                 <button key={i} onClick={() => setSel(i)} aria-label={`image ${i + 1}`} style={{
                   width: 68, height: 68, flexShrink: 0, borderRadius: 4, overflow: 'hidden', cursor: 'pointer',
@@ -1266,8 +1266,8 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
                   if (attr.displayMode === 'image') {
                     return (
                       <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} aria-label={v.value} style={{
-                        width: 56, height: 56, borderRadius: 4, overflow: 'hidden', cursor: available ? 'pointer' : 'not-allowed', padding: 0,
-                        border: active ? `2px solid ${A}` : `1px solid ${BD}`, background: CARD, opacity: available ? 1 : 0.35,
+                        width: 64, height: 64, borderRadius: 4, overflow: 'hidden', cursor: available ? 'pointer' : 'not-allowed', padding: 0,
+                        border: active ? `3px solid ${A}` : `1px solid ${BD}`, boxShadow: active ? `0 0 0 2px #fff, 0 0 0 4px ${A}` : 'none', background: CARD, opacity: available ? 1 : 0.35,
                       }}>
                         <img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                       </button>
@@ -1601,7 +1601,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
               </div>
 
               {/* Delivery type toggle */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10, marginBottom: '1rem' }}>
                 {(['home', 'office'] as const).map((type) => {
                   const active = fd.typeLivraison === type;
                   return (
@@ -1900,7 +1900,7 @@ export function Cart({ domain, store }: any) {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10, marginBottom: '1rem' }}>
             {(['home', 'office'] as const).map((type) => {
               const active = fd.typeLivraison === type;
               return (

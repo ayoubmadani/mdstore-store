@@ -45,14 +45,14 @@ a{text-decoration:none;color:inherit}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
 
 /* details */
-.det-grid{display:grid;grid-template-columns:1fr 1fr}
+.det-grid{display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1fr)}
 .det-sticky{position:sticky;top:60px;height:calc(100vh - 60px);overflow:hidden}
 
 /* cart */
-.cart-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+.cart-grid{display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);gap:40px;align-items:start}
 
 /* form */
-.f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f2{display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);gap:12px}
 
 /* input */
 .inp{width:100%;padding:12px 14px;background:var(--s2);border:1px solid var(--br2);color:var(--tx);font-family:'Raleway',sans-serif;font-size:13px;outline:none;transition:border-color .2s;appearance:none}
@@ -70,15 +70,15 @@ a{text-decoration:none;color:inherit}
 .lbl{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--mu);display:block;margin-bottom:7px;font-family:'Raleway',sans-serif}
 .pag{display:flex;justify-content:center;align-items:center;gap:3px;padding:48px 0}
 
-@media(max-width:900px){.det-grid{grid-template-columns:1fr}.det-sticky{position:static;height:70vw;min-height:300px}.cart-grid{grid-template-columns:1fr}.g3,.g4{grid-template-columns:1fr}}
-@media(max-width:600px){.g3,.g4{grid-template-columns:1fr}.f2{grid-template-columns:1fr}}
+@media(max-width:900px){.det-grid{grid-template-columns:minmax(0, 1fr)}.det-sticky{position:static;height:70vw;min-height:300px}.cart-grid{grid-template-columns:minmax(0, 1fr)}.g3,.g4{grid-template-columns:minmax(0, 1fr)}}
+@media(max-width:600px){.g3,.g4{grid-template-columns:minmax(0, 1fr)}.f2{grid-template-columns:minmax(0, 1fr)}}
 @media(max-width:480px){.srch-drop{position:fixed!important;top:60px!important;left:12px!important;right:12px!important;width:auto!important}}
 
-  .footer-grid { display:grid; grid-template-columns:1fr; gap:2rem; }
-  @media(min-width:768px){.footer-grid{grid-template-columns:1.5fr 1fr 1fr 1fr;gap:40px;}}
+  .footer-grid { display:grid; grid-template-columns:minmax(0, 1fr); gap:2rem; }
+  @media(min-width:768px){.footer-grid{grid-template-columns:minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);gap:40px;}}
 
-  .contact-layout{display:grid;grid-template-columns:1fr;gap:32px;}
-  @media(min-width:768px){.contact-layout{grid-template-columns:1fr 1.5fr;gap:48px;}}
+  .contact-layout{display:grid;grid-template-columns:minmax(0, 1fr);gap:32px;}
+  @media(min-width:768px){.contact-layout{grid-template-columns:minmax(0, 1fr) minmax(0, 1.5fr);gap:48px;}}
 `;
 
 /* types */
@@ -753,7 +753,7 @@ export function Details({product,discount,allImages,allAttrs,finalPrice,inStock,
                   {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value;const available=!product.variantDetails?.length||product.variantDetails.some((vd:any)=>Object.entries({...selectedVariants,[attr.name]:v.value}).every(([n,val])=>vd.name.some((e:any)=>e.attrName===n&&e.value===val)));return<button key={v.id} onClick={()=>available&&handleVariantSelection(attr.name,v.value)} title={v.name} style={{width:26,height:26,backgroundColor:v.value,border:`2px solid ${s?'var(--cp)':'transparent'}`,cursor:available?'pointer':'not-allowed',outline:s?'2px solid var(--cp)':'none',outlineOffset:2,borderRadius:'50%',transition:'outline .15s',opacity:available?1:0.35}}/>;})}</div>
               ):attr.displayMode==='image'?(
                 <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
-                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value;const available=!product.variantDetails?.length||product.variantDetails.some((vd:any)=>Object.entries({...selectedVariants,[attr.name]:v.value}).every(([n,val])=>vd.name.some((e:any)=>e.attrName===n&&e.value===val)));return<button key={v.id} onClick={()=>available&&handleVariantSelection(attr.name,v.value)} style={{width:46,height:60,overflow:'hidden',border:`2px solid ${s?'var(--cp)':'var(--br2)'}`,cursor:available?'pointer':'not-allowed',padding:0,transition:'border-color .18s',opacity:available?1:0.35}}><img src={v.value} alt={v.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/></button>;})}
+                  {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value;const available=!product.variantDetails?.length||product.variantDetails.some((vd:any)=>Object.entries({...selectedVariants,[attr.name]:v.value}).every(([n,val])=>vd.name.some((e:any)=>e.attrName===n&&e.value===val)));return<button key={v.id} onClick={()=>available&&handleVariantSelection(attr.name,v.value)} style={{width:64,height:64,overflow:'hidden',border: `3px solid ${s ? 'var(--cp)' : 'var(--br2)'}`, boxShadow: s ? `0 0 0 2px #fff, 0 0 0 4px ${'var(--cp)'}` : 'none',cursor:available?'pointer':'not-allowed',padding:0,transition:'border-color .18s',opacity:available?1:0.35}}><img src={v.value} alt={v.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/></button>;})}
                 </div>
               ):(
                 <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
@@ -894,7 +894,7 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
               </FR>
             </div>
             <FR label={t.deliveryType}>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+              <div style={{display:'grid',gridTemplateColumns:'minmax(0, 1fr) minmax(0, 1fr)',gap:8}}>
                 {(['home','office'] as const).map(type=>(
                   <button key={type} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:type}))}
                     style={{padding:'11px',border:`1px solid ${fd.typeLivraison===type?'var(--cp)':'var(--br2)'}`,background:fd.typeLivraison===type?'var(--cl)':'transparent',cursor:'pointer',textAlign:'center',transition:'all .18s',fontFamily:"'Raleway',sans-serif"}}>

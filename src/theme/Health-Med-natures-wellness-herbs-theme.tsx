@@ -53,18 +53,18 @@ const THEME_CSS = `
   .nav-mobile  { display: flex; gap: 0.5rem; }
   @media (min-width: 1024px) { .nav-desktop { display: flex; } .nav-mobile { display: none; } }
 
-  .hero-inner { display: grid; grid-template-columns: 1fr; align-items: center; gap: 2rem; }
-  @media (min-width: 900px) { .hero-inner { grid-template-columns: 1fr 1fr; gap: 4rem; } }
+  .hero-inner { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 2rem; }
+  @media (min-width: 900px) { .hero-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4rem; } }
 
-  .cats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-  @media (min-width: 500px) { .cats-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 768px) { .cats-grid { grid-template-columns: repeat(4, 1fr); } }
-  @media (min-width: 1024px) { .cats-grid { grid-template-columns: repeat(6, 1fr); } }
+  .cats-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+  @media (min-width: 500px) { .cats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (min-width: 768px) { .cats-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .cats-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
 
-  .products-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-  @media (min-width: 500px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (min-width: 1280px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
+  .products-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  @media (min-width: 500px) { .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (min-width: 1280px) { .products-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
   .nat-card { background: ${CARD}; border-radius: 16px; overflow: hidden; border: 1px solid ${BD}; transition: all 0.25s; display: flex; flex-direction: column; }
   .nat-card:hover { transform: translateY(-5px); box-shadow: 0 12px 40px rgba(45,106,79,0.13); border-color: ${GA}; }
@@ -73,26 +73,26 @@ const THEME_CSS = `
   .trust-row { display: flex; overflow-x: auto; gap: 1px; background: ${BD}; border-radius: 12px; overflow: hidden; -webkit-overflow-scrolling: touch; }
   .trust-row::-webkit-scrollbar { height: 0; }
 
-  .details-inner { display: grid; grid-template-columns: 1fr; gap: 1.5rem; padding: 1rem; }
+  .details-inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; padding: 1rem; }
   .gallery-container { position: relative; top: 0; width: 100%; }
   .info-container { background: ${CARD}; border-radius: 16px; border: 1px solid ${BD}; padding: 1.5rem; }
   @media (min-width: 768px) {
-    .details-inner { grid-template-columns: 1fr 1fr; gap: 3.5rem; padding: 2.5rem; }
+    .details-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3.5rem; padding: 2.5rem; }
     .gallery-container { position: sticky; top: 100px; z-index: 10; }
     .info-container { padding: 2rem; }
   }
 
-  .form-row-2 { display: grid; grid-template-columns: 1fr; gap: 0.875rem; margin-bottom: 0.875rem; }
-  @media (min-width: 500px) { .form-row-2 { grid-template-columns: 1fr 1fr; } }
+  .form-row-2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.875rem; margin-bottom: 0.875rem; }
+  @media (min-width: 500px) { .form-row-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 
-  .cart-inner { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-  @media (min-width: 1024px) { .cart-inner { grid-template-columns: 1.2fr 1fr; gap: 3rem; } }
+  .cart-inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  @media (min-width: 1024px) { .cart-inner { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 3rem; } }
 
-  .contact-inner { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-  @media (min-width: 1024px) { .contact-inner { grid-template-columns: 1fr 2fr; } }
+  .contact-inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  @media (min-width: 1024px) { .contact-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); } }
 
-  .footer-inner { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding-bottom: 2.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(178,210,195,0.2); }
-  @media (min-width: 768px) { .footer-inner { grid-template-columns: 2fr 1fr 1fr 1fr; } }
+  .footer-inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.5rem; padding-bottom: 2.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(178,210,195,0.2); }
+  @media (min-width: 768px) { .footer-inner { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); } }
 
   .hero-actions { display: flex; flex-direction: column; gap: 0.75rem; }
   @media (min-width: 500px) { .hero-actions { flex-direction: row; align-items: center; } }
@@ -100,8 +100,8 @@ const THEME_CSS = `
   .cart-add-btns { display: flex; flex-direction: column; gap: 0.75rem; }
   @media (min-width: 500px) { .cart-add-btns { flex-direction: row; } }
 
-  .delivery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-  .thumb-row { display: flex; gap: 0.5rem; margin-top: 0.75rem; overflow-x: auto; padding-bottom: 4px; }
+  .delivery-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.75rem; }
+  .thumb-row { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; padding-bottom: 4px; }
   .pagination { display: flex; justify-content: center; gap: 0.375rem; flex-wrap: wrap; margin-top: 3rem; }
 
   a { text-decoration: none; color: inherit; }
@@ -1147,7 +1147,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                     return (
                       <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={
                         attr.displayMode === 'color' ? { width: 28, height: 28, borderRadius: '50%', background: v.value, border: `2px solid ${BD}`, cursor: available ? 'pointer' : 'not-allowed', outline: `2.5px solid ${isSel ? G : 'transparent'}`, outlineOffset: 2, opacity: available ? 1 : 0.35 }
-                        : attr.displayMode === 'image' ? { width: 44, height: 44, backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 8, border: `2px solid ${isSel ? G : BD}`, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }
+                        : attr.displayMode === 'image' ? { width: 64, height: 64, backgroundImage: `url(${v.value})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: 8, border: `3px solid ${isSel ? G : BD}`, boxShadow: isSel ? `0 0 0 2px #fff, 0 0 0 4px ${G}` : 'none', cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }
                         : { padding: '0.4rem 0.875rem', border: `1.5px solid ${isSel ? G : BD}`, borderRadius: 20, fontSize: '0.8rem', fontWeight: 600, background: isSel ? GL : CARD, color: isSel ? G : (available ? SUB : '#bbb'), cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.15s', fontFamily: 'inherit', textDecoration: available ? 'none' : 'line-through' }
                       }>{attr.displayMode !== 'color' && attr.displayMode !== 'image' && v.name}</button>
                     );

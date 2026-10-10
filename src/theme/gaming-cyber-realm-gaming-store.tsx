@@ -207,18 +207,18 @@ const CSS = `
   .prod-grid  { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
   .cat-grid   { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
   .trust-bar  { display:grid; grid-template-columns:repeat(4,1fr); }
-  .footer-g   { display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:48px; }
-  .details-g  { display:grid; grid-template-columns:1fr 1fr; }
+  .footer-g   { display:grid; grid-template-columns:minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap:48px; }
+  .details-g  { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); }
   .details-L  { padding:20px 0; position:sticky; top:70px; height:calc(100vh - 70px); overflow:hidden; }
   .details-R  { padding:20px 32px; overflow-y:auto; }
-  .contact-g  { display:grid; grid-template-columns:1fr 1fr; gap:48px; }
-  .form-2c    { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .dlv-2c     { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-  .cart-g     { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  .contact-g  { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:48px; }
+  .form-2c    { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:10px; }
+  .dlv-2c     { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:8px; }
+  .cart-g     { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:24px; }
 
   @media (max-width:1100px) {
     .prod-grid { grid-template-columns:repeat(3,1fr); }
-    .footer-g  { grid-template-columns:1fr 1fr; gap:32px; }
+    .footer-g  { grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:32px; }
   }
   @media (max-width:768px) {
     .nav-links  { display:none; }
@@ -226,19 +226,19 @@ const CSS = `
     .prod-grid  { grid-template-columns:repeat(1,1fr); gap:10px; }
     .cat-grid   { grid-template-columns:repeat(2,1fr); }
     .trust-bar  { grid-template-columns:repeat(2,1fr); }
-    .footer-g   { grid-template-columns:1fr; gap:24px; }
+    .footer-g   { grid-template-columns:minmax(0, 1fr); gap:24px; }
     .footer-g > div:first-child { grid-column: 1 !important; }
-    .details-g  { grid-template-columns:1fr; }
+    .details-g  { grid-template-columns:minmax(0, 1fr); }
     .details-L  { padding:0; position:static; width:100%; height:auto; aspect-ratio:1; margin-bottom:20px; display:flex; flex-direction:column; gap:20px; }
     .details-R  { padding:20px 0; }
-    .contact-g  { grid-template-columns:1fr; gap:28px; }
-    .cart-g     { grid-template-columns:1fr; }
+    .contact-g  { grid-template-columns:minmax(0, 1fr); gap:28px; }
+    .cart-g     { grid-template-columns:minmax(0, 1fr); }
   }
   @media (max-width:480px) {
-    .prod-grid  { grid-template-columns:1fr; gap:8px; }
-    .footer-g   { grid-template-columns:1fr; }
-    .form-2c    { grid-template-columns:1fr; }
-    .dlv-2c     { grid-template-columns:1fr; }
+    .prod-grid  { grid-template-columns:minmax(0, 1fr); gap:8px; }
+    .footer-g   { grid-template-columns:minmax(0, 1fr); }
+    .form-2c    { grid-template-columns:minmax(0, 1fr); }
+    .dlv-2c     { grid-template-columns:minmax(0, 1fr); }
   }
 `;
 
@@ -1483,7 +1483,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                   </div>
                 ) : attr.displayMode === 'image' ? (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                    {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val))); return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: '52px', height: '52px', overflow: 'hidden', border: `2px solid ${s ? 'var(--cyan)' : 'var(--line)'}`, cursor: available ? 'pointer' : 'not-allowed', padding: 0, borderRadius: '4px', boxShadow: s ? 'var(--glow-c)' : 'none', opacity: available ? 1 : 0.35 }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>; })}
+                    {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val))); return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: '64px', height: '64px', overflow: 'hidden', border: `3px solid ${s ? 'var(--cyan)' : 'var(--line)'}`, boxShadow: s ? '0 0 0 2px #fff, 0 0 0 4px var(--cyan), var(--glow-c)' : 'none', cursor: available ? 'pointer' : 'not-allowed', padding: 0, borderRadius: '4px', opacity: available ? 1 : 0.35 }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>; })}
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
@@ -2066,7 +2066,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 </div>
 
                 {/* الولاية + البلدية */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '10px' }}>
                   <div>
                     <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '6px' }}>{t.wilaya} *</p>
                     <div style={{ position: 'relative' }}>
@@ -2098,7 +2098,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 {/* نوع التوصيل */}
                 <div>
                   <p style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', color: 'var(--cyan)', letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '8px' }}>{t.deliveryType}</p>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '8px' }}>
                     {(['home', 'office'] as const).map(dtype => (
                       <button key={dtype} type="button" onClick={() => setFd({ ...fd, typeLivraison: dtype })}
                         style={{ padding: '13px', borderRadius: '4px', border: `1px solid ${fd.typeLivraison === dtype ? 'var(--cyan)' : 'var(--line)'}`, background: fd.typeLivraison === dtype ? 'rgba(0,212,255,0.07)' : 'transparent', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s', boxShadow: fd.typeLivraison === dtype ? 'var(--glow-c)' : 'none' }}>

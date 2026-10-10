@@ -141,29 +141,29 @@ function ThemeStyle() {
 
       .pc-det-grid {
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         gap: 28px;
       }
       @media (min-width: 768px) {
-        .pc-det-grid { grid-template-columns: 1.1fr 1fr; gap: 44px; }
+        .pc-det-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 44px; }
       }
 
       .pc-cart-grid {
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         gap: 24px;
       }
       @media (min-width: 800px) {
-        .pc-cart-grid { grid-template-columns: 1.3fr 1fr; gap: 36px; }
+        .pc-cart-grid { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 36px; }
       }
 
       .pc-contact-grid {
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         gap: 28px;
       }
       @media (min-width: 768px) {
-        .pc-contact-grid { grid-template-columns: 1fr 1.2fr; gap: 40px; }
+        .pc-contact-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 40px; }
       }
     `}</style>
   );
@@ -958,7 +958,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                   return <button key={v.id} className="pc-btn" onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: 32, height: 32, borderRadius: '50%', background: v.value, border: active ? '2.5px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }} />;
                 }
                 if (attr.displayMode === 'image') {
-                  return <button key={v.id} className="pc-btn" onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: 50, height: 50, padding: 0, border: active ? '2.5px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', overflow: 'hidden', cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>;
+                  return <button key={v.id} className="pc-btn" onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: 64, height: 64, padding: 0, border: active ? `3px solid var(--thread-red)` : '1.5px solid var(--cotton-300)', boxShadow: active ? `0 0 0 2px #fff, 0 0 0 4px var(--thread-red)` : 'none', overflow: 'hidden', cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>;
                 }
                 return (
                   <button key={v.id} className="pc-btn" onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ padding: '8px 16px', fontSize: 13, border: active ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: active ? 'var(--cotton-100)' : 'transparent', cursor: available ? 'pointer' : 'not-allowed', color: available ? 'inherit' : '#bbb', textDecoration: available ? 'none' : 'line-through' }}>
@@ -1198,7 +1198,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               </div>
             ) : (
             <>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
               <div>
                 <select value={fd.customerWelaya} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}
                   style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }}>
@@ -1403,7 +1403,7 @@ export function Cart({ domain, store }: any) {
               style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }} />
             {errors.customerPhone && <p style={{ color: 'var(--thread-red)', fontSize: 12, marginTop: 4 }}>{errors.customerPhone}</p>}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
             <select value={fd.customerWelaya} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}
               style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }}>
               <option value="">{t.wilayaPh}</option>

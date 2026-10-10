@@ -135,24 +135,24 @@ body { font-family: ${FONT_BODY}; background: ${BG}; color: ${TXT}; margin: 0; }
 .nav-burger { display: none; }
 @media (max-width: 860px) { .nav-links { display: none; } .nav-burger { display: flex; } }
 
-.products-grid { display: grid; grid-template-columns: 1fr; gap: 1.1rem; }
-@media (min-width: 640px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 1280px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
+.products-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.1rem; }
+@media (min-width: 640px) { .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1280px) { .products-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
-.form-row-2 { display: grid; grid-template-columns: 1fr; gap: 0.875rem; margin-bottom: 0.875rem; }
-@media (min-width: 500px) { .form-row-2 { grid-template-columns: 1fr 1fr; } }
+.form-row-2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.875rem; margin-bottom: 0.875rem; }
+@media (min-width: 500px) { .form-row-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 
-.cart-inner { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-@media (min-width: 1024px) { .cart-inner { grid-template-columns: 1.2fr 1fr; } }
-.details-inner { display: grid; grid-template-columns: 1fr; gap: 2.5rem; }
-@media (min-width: 768px) { .details-inner { grid-template-columns: 1fr 1fr; } }
+.cart-inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+@media (min-width: 1024px) { .cart-inner { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } }
+.details-inner { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
+@media (min-width: 768px) { .details-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 
-.hero-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; align-items: center; }
-@media (min-width: 900px) { .hero-grid { grid-template-columns: 1.2fr 0.8fr; } }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; align-items: center; }
+@media (min-width: 900px) { .hero-grid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); } }
 
-.footer-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-@media (min-width: 768px) { .footer-grid { grid-template-columns: 1.5fr 1fr 1fr 1fr; } }
+.footer-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+@media (min-width: 768px) { .footer-grid { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); } }
 
 .search-dropdown { position: absolute; top: calc(100% + 10px); left: 0; width: 340px; }
 @media (max-width: 480px) { .search-dropdown { position: fixed; left: 12px; right: 12px; width: auto; top: 70px; } }
@@ -990,7 +990,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             )}
           </div>
           {images.length > 1 && (
-            <div style={{ display: 'flex', gap: 10, overflowX: 'auto' }}>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               {images.map((im, i) => (
                 <button key={i} onClick={() => setSel(i)} style={{ width: 66, height: 66, borderRadius: 12, overflow: 'hidden', border: `2px solid ${sel === i ? A : BD}`, padding: 0, cursor: 'pointer', flexShrink: 0 }}>
                   <img src={im} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -1046,7 +1046,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                     return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: 34, height: 34, borderRadius: '50%', background: v.value, border: `2px solid ${active ? A : BD}`, cursor: available ? 'pointer' : 'not-allowed', boxShadow: active ? `0 0 0 3px ${AL}` : 'none', opacity: available ? 1 : 0.35 }} />;
                   }
                   if (attr.displayMode === 'image') {
-                    return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: 54, height: 54, borderRadius: 10, overflow: 'hidden', border: `2px solid ${active ? A : BD}`, padding: 0, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>;
+                    return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: 64, height: 64, borderRadius: 10, overflow: 'hidden', border: `3px solid ${active ? A : BD}`, boxShadow: active ? `0 0 0 2px #fff, 0 0 0 4px ${A}` : 'none', padding: 0, cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35 }}><img src={v.value} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></button>;
                   }
                   return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ padding: '9px 18px', borderRadius: 999, border: `1.5px solid ${active ? A : BD}`, background: active ? AL : CARD, color: active ? A : (available ? TXT : '#bbb'), fontWeight: 700, fontSize: 13, cursor: available ? 'pointer' : 'not-allowed', textDecoration: available ? 'none' : 'line-through' }}>{v.name}</button>;
                 })}
@@ -1283,7 +1283,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10, marginBottom: 18 }}>
                 {(['home', 'office'] as const).map((typ) => (
                   <button key={typ} onClick={() => setFd((s) => ({ ...s, typeLivraison: typ }))} style={{
                     padding: '12px', borderRadius: 12, fontWeight: 700, fontSize: 13.5, cursor: 'pointer', minHeight: 44,
@@ -1490,7 +1490,7 @@ export function Cart({ domain, store }: any) {
                 {communes.map((c) => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
               </select>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 18 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10, marginBottom: 18 }}>
               {(['home', 'office'] as const).map((typ) => (
                 <button key={typ} onClick={() => setFd((s) => ({ ...s, typeLivraison: typ }))} style={{ padding: '12px', borderRadius: 12, fontWeight: 700, fontSize: 13.5, cursor: 'pointer', minHeight: 44, background: fd.typeLivraison === typ ? AL : 'transparent', border: `1.5px solid ${fd.typeLivraison === typ ? A : BD}`, color: fd.typeLivraison === typ ? A : TXT }}>
                   {typ === 'home' ? t.deliveryHome : t.deliveryOffice}

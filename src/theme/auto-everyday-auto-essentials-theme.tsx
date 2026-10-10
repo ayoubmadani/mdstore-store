@@ -472,7 +472,7 @@ const THEME_CSS = `
 
 /* ---------- trust ---------- */
 .ae-trust-grid {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 0;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0;
   border: 1px solid ${BD}; background: #fff;
 }
 .ae-trust-cell {
@@ -482,7 +482,7 @@ const THEME_CSS = `
 .ae-trust-cell:nth-child(2n) { border-inline-end: none; }
 .ae-trust-cell:nth-child(n+3) { border-bottom: none; }
 @media (min-width: 900px) {
-  .ae-trust-grid { grid-template-columns: repeat(4, 1fr); }
+  .ae-trust-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .ae-trust-cell { border-bottom: none; }
   .ae-trust-cell:nth-child(2n) { border-inline-end: 1px solid ${BD}; }
   .ae-trust-cell:last-child { border-inline-end: none; }
@@ -501,10 +501,10 @@ const THEME_CSS = `
 }
 
 /* ---------- product grid + card (archetype 5) ---------- */
-.ae-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-@media (min-width: 640px)  { .ae-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1024px) { .ae-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 1280px) { .ae-grid { grid-template-columns: repeat(4, 1fr); } }
+.ae-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+@media (min-width: 640px)  { .ae-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .ae-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1280px) { .ae-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
 .ae-card {
   display: flex; flex-direction: column; background: #fff; border: 1px solid ${BD};
@@ -535,15 +535,15 @@ const THEME_CSS = `
 }
 
 /* ---------- layouts ---------- */
-.ae-det-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-@media (min-width: 900px) { .ae-det-grid { grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start; } }
-.ae-cart-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-@media (min-width: 1024px) { .ae-cart-grid { grid-template-columns: 1.25fr 1fr; align-items: start; } }
-.ae-form-2 { display: grid; grid-template-columns: 1fr; gap: 0.85rem; }
-@media (min-width: 520px) { .ae-form-2 { grid-template-columns: 1fr 1fr; } }
-.ae-foot-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-@media (min-width: 640px) { .ae-foot-grid { grid-template-columns: 1fr 1fr; } }
-@media (min-width: 768px) { .ae-foot-grid { grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 2.5rem; } }
+.ae-det-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+@media (min-width: 900px) { .ae-det-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2.5rem; align-items: start; } }
+.ae-cart-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+@media (min-width: 1024px) { .ae-cart-grid { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: start; } }
+.ae-form-2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.85rem; }
+@media (min-width: 520px) { .ae-form-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.ae-foot-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+@media (min-width: 640px) { .ae-foot-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+@media (min-width: 768px) { .ae-foot-grid { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 2.5rem; } }
 
 /* ---------- controls ---------- */
 .ae-input, .ae-select, .ae-textarea {
@@ -1286,7 +1286,7 @@ export function Details({
           </div>
 
           {gallery.length > 1 ? (
-            <div style={{ display: 'flex', gap: 8, marginTop: 10, overflowX: 'auto', paddingBottom: 4 }}>
+            <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap', paddingBottom: 4 }}>
               {gallery.map((g, i) => (
                 <button key={i} onClick={() => { setSel(i); setImgErr(false); }} aria-label={`${t.prevImg} ${i + 1}`}
                   style={{
@@ -1393,7 +1393,7 @@ export function Details({
                             onClick={() => available && handleVariantSelection(attr.name, v.value)}
                             aria-label={v.name}
                             style={{
-                              width: 46, height: 46, padding: 3, overflow: 'hidden', flexShrink: 0,
+                              width: 64, height: 64, padding: 3, overflow: 'hidden', flexShrink: 0,
                               border: `2px solid ${isSelected ? INK : BD}`, borderRadius: 2, background: '#fff',
                               cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35,
                               transition: 'all 0.18s ease',
@@ -1412,8 +1412,8 @@ export function Details({
                           <button key={v.id} title={v.name}
                             onClick={() => available && handleVariantSelection(attr.name, imgSrc)}
                             style={{
-                              width: 54, height: 54, padding: 0, overflow: 'hidden', flexShrink: 0,
-                              border: `2px solid ${isSelected ? INK : BD}`, borderRadius: 2, background: SURF,
+                              width: 64, height: 64, padding: 0, overflow: 'hidden', flexShrink: 0,
+                              border: `3px solid ${isSelected ? INK : BD}`, boxShadow: isSelected ? `0 0 0 2px #fff, 0 0 0 4px ${INK}` : 'none', borderRadius: 2, background: SURF,
                               cursor: available ? 'pointer' : 'not-allowed', opacity: available ? 1 : 0.35,
                             }}>
                             <img src={imgSrc} alt={v.name || ''} style={imgStyle} />
@@ -1759,7 +1759,7 @@ export function ProductForm({
 
           <div style={{ marginBottom: '1rem' }}>
             {label(t.deliveryType)}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8 }}>
               {([
                 { k: 'home', l: t.deliveryHome, p: selW?.livraisonHome },
                 { k: 'office', l: t.deliveryOffice, p: selW?.livraisonOfice },
@@ -2096,7 +2096,7 @@ export function Cart({ domain, store }: any) {
 
           <div style={{ marginBottom: '1rem' }}>
             {label(t.deliveryType)}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8 }}>
               {([
                 { k: 'home', l: t.deliveryHome, p: selW?.livraisonHome },
                 { k: 'office', l: t.deliveryOffice, p: selW?.livraisonOfice },

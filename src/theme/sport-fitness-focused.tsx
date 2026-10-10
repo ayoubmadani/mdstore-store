@@ -151,12 +151,12 @@ const CSS = `
   .prod-grid  { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
   .cat-row    { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
   .trust-row  { display: grid; grid-template-columns: repeat(4,1fr); }
-  .footer-g   { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; }
-  .details-g  { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
-  .contact-g  { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
-  .form-2c    { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .dlv-2c     { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .cart-layout{ display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: start; }
+  .footer-g   { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 48px; }
+  .details-g  { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; }
+  .contact-g  { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; }
+  .form-2c    { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+  .dlv-2c     { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+  .cart-layout{ display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 40px; align-items: start; }
   .thumb-row  { display: flex; gap: 8px; flex-wrap: wrap; }
   .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 40px; flex-wrap: wrap; }
 
@@ -165,20 +165,20 @@ const CSS = `
 
   @media (max-width: 1024px) {
     .prod-grid  { grid-template-columns: repeat(3,1fr); }
-    .footer-g   { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .footer-g   { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; }
   }
   @media (max-width: 768px) {
-    .prod-grid  { grid-template-columns: 1fr; gap: 10px; }
+    .prod-grid  { grid-template-columns: minmax(0, 1fr); gap: 10px; }
     .cat-row    { grid-template-columns: repeat(2,1fr); }
     .trust-row  { grid-template-columns: repeat(2,1fr); }
-    .footer-g   { grid-template-columns: 1fr; gap: 28px; }
-    .details-g  { grid-template-columns: 1fr; }
-    .contact-g  { grid-template-columns: 1fr; gap: 24px; }
-    .cart-layout{ grid-template-columns: 1fr; }
+    .footer-g   { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+    .details-g  { grid-template-columns: minmax(0, 1fr); }
+    .contact-g  { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+    .cart-layout{ grid-template-columns: minmax(0, 1fr); }
   }
   @media (max-width: 480px) {
-    .form-2c    { grid-template-columns: 1fr; }
-    .dlv-2c     { grid-template-columns: 1fr; }
+    .form-2c    { grid-template-columns: minmax(0, 1fr); }
+    .dlv-2c     { grid-template-columns: minmax(0, 1fr); }
   }
 `;
 
@@ -1424,7 +1424,7 @@ export function Details({ product, store: storeprop, toggleWishlist, isWishliste
                 ) : attr.displayMode==='image' ? (
                   <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>
                     {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value;const available=!product.variantDetails?.length||product.variantDetails.some((vd:any)=>Object.entries({...selectedVariants,[attr.name]:v.value}).every(([n,val])=>vd.name.some((e:any)=>e.attrName===n&&e.value===val)));return(
-                      <button key={v.id} onClick={()=>available&&handleVariantSelection(attr.name,v.value)} style={{width:'52px',height:'52px',overflow:'hidden',border:`2px solid ${s?'var(--fire)':'var(--line)'}`,cursor:available?'pointer':'not-allowed',padding:0,opacity:available?1:0.35}}>
+                      <button key={v.id} onClick={()=>available&&handleVariantSelection(attr.name,v.value)} style={{width:'64px',height:'64px',overflow:'hidden',border: `3px solid ${s ? 'var(--fire)' : 'var(--line)'}`, boxShadow: s ? `0 0 0 2px #fff, 0 0 0 4px ${'var(--fire)'}` : 'none',cursor:available?'pointer':'not-allowed',padding:0,opacity:available?1:0.35}}>
                         <img src={v.value} alt={v.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
                       </button>
                     );})}
