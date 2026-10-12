@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { ProductAddons, addonsTotal } from '@/components/theme/ProductAddons';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -284,9 +285,9 @@ type TKeys = typeof T['ar'];
 function variantMatches(d: VariantDetail, sel: Record<string, string>) {
   return Object.entries(sel).every(([n, v]) => d.name.some(e => e.attrName === n && e.value === v));
 }
-const fetchWilayas = async (uid: string): Promise<Wilaya[]> => {
+const fetchWilayas = async (uid: string, sid?: string): Promise<Wilaya[]> => {
   try {
-    const r = await fetch(`${API_URL}/shipping/public/get-shipping/${uid}`);
+    const r = await fetch(`${API_URL}/shipping/public/get-shipping/${uid}${sid ? `?storeId=${sid}` : ''}`);
     if (!r.ok) return [];
     return await r.json();
   } catch { return []; }
@@ -1141,6 +1142,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 
 /* ─────────── ProductForm ─────────── */
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, store: storeprop }: ProductFormProps & { store?: any }) {
+  const [addonIds, setAddonIds] = useState<string[]>([]);
   const store = storeprop || product?.store;
   const t = T[getLang(store)];
   const [orderNowState, setIsOrderNow] = useState(false);
@@ -1160,7 +1162,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   });
   const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
 
-  useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
+  useEffect(() => { if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); }, [userId]);
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
     setLoadingC(true);
@@ -1180,12 +1182,14 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     }
     return Number(product.price);
   }, [selectedOffer, selectedVariants, product]);
+  // سعر الوحدة مع الإضافات المختارة
+  const unitFP = useCallback(() => getFP() + addonsTotal(product, addonIds), [getFP, product, addonIds]);
 
   const supportQty = (store?.supportQty ?? product.store?.supportQty) !== false;
   const qty = supportQty ? fd.quantity : 1;
   const selOfferObj = product.offers?.find((o: any) => o.id === selectedOffer);
   const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
-    (store?.supportFreeShipping && store?.freeShippingMinAmount != null && (getFP() * qty) >= Number(store.freeShippingMinAmount)));
+    (store?.supportFreeShipping && store?.freeShippingMinAmount != null && (unitFP() * qty) >= Number(store.freeShippingMinAmount)));
   const getLiv = useCallback((): number => {
     if (product.isDigital) return 0;
     if (orderFreeShipping) return 0;
@@ -1193,7 +1197,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
   }, [selW, fd.typeLivraison, orderFreeShipping, product.isDigital]);
 
-  const total = useCallback(() => getFP() * qty + getLiv(), [getFP, qty, getLiv]);
+  const total = useCallback(() => unitFP() * qty + getLiv(), [unitFP, qty, getLiv]);
 
   const getVarId = useCallback(() => {
     if (!Object.keys(selectedVariants).length || !product.variantDetails) return null;
@@ -1223,7 +1227,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const payload = {
       ...fd, quantity: qty, product, productId: product.id, storeId: product.store?.id, userId,
       variantDetailId: getVarId(), selectedOffer, selectedVariants,
-      finalPrice: getFP(), totalPrice: total(), priceLivraison: getLiv(),
+      addonIds, finalPrice: unitFP(), totalPrice: total(), priceLivraison: getLiv(),
       addedAt: new Date().toISOString(),
     };
     const arr = JSON.parse(localStorage.getItem(domain) || '[]');
@@ -1231,7 +1235,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     localStorage.setItem(domain, JSON.stringify(arr));
     const cs = useCartStore.getState();
     cs.initCount(arr.length);
-  }, [fd, qty, product, userId, domain, getVarId, selectedOffer, selectedVariants, getFP, total, getLiv]);
+  }, [fd, qty, product, userId, domain, getVarId, selectedOffer, selectedVariants, unitFP, total, getLiv]);
 
   const submitOrder = useCallback(async () => {
     if (!validate()) return;
@@ -1246,7 +1250,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         body: JSON.stringify({
           ...payload, quantity: qty, product, productId: product.id, storeId: product.store?.id, userId,
           variantDetailId: getVarId(), selectedOffer, selectedVariants,
-          finalPrice: getFP(), totalPrice: total(), priceLivraison: getLiv(),
+          addonIds, finalPrice: unitFP(), totalPrice: total(), priceLivraison: getLiv(),
         }),
       });
       if (r.ok) {
@@ -1256,7 +1260,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       } else { setErrors({ submit: t.errSubmit }); }
     } catch { setErrors({ submit: t.errSubmit }); }
     setSubmitting(false);
-  }, [fd, qty, product, userId, getVarId, selectedOffer, selectedVariants, getFP, total, getLiv, validate, t, contactMethod]);
+  }, [fd, qty, product, userId, getVarId, selectedOffer, selectedVariants, unitFP, total, getLiv, validate, t, contactMethod]);
 
   if (success) {
     return (
@@ -1271,6 +1275,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   return (
     <div className="luxe-form">
+      <ProductAddons product={product} store={storeprop || product.store} selected={addonIds} onChange={setAddonIds} accent={A} />
       {!isOrderNow && !product.isDigital ? (
         <div className="luxe-btn-grid">
           <button className="luxe-btn-primary" onClick={() => setIsOrderNow(true)}>
@@ -1371,7 +1376,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
           {/* Summary */}
           <div className="luxe-summary">
-            <div className="luxe-summary-row"><span className="luxe-summary-label">{t.price}</span><span className="luxe-summary-val">{getFP().toLocaleString()} {"DZD"}</span></div>
+            <div className="luxe-summary-row"><span className="luxe-summary-label">{t.price}</span><span className="luxe-summary-val">{unitFP().toLocaleString()} {"DZD"}</span></div>
             <div className="luxe-summary-row"><span className="luxe-summary-label">{t.qty}</span><span className="luxe-summary-val">× {qty}</span></div>
             {!product.isDigital && (
               <div className="luxe-summary-row"><span className="luxe-summary-label">{t.delivery}</span><span className="luxe-summary-val">{!selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${getLiv().toLocaleString()} DZD`}</span></div>
@@ -1417,7 +1422,7 @@ export function Cart({ domain, store }: any) {
     setLoaded(true);
   }, [domain]);
 
-  useEffect(() => { if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas); }, [store]);
+  useEffect(() => { if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas); }, [store]);
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
     setLoadingC(true);
@@ -1462,7 +1467,7 @@ export function Cart({ domain, store }: any) {
         fetch(`${API_URL}/orders/create`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            ...fd, product: it.product, productId: it.productId, storeId: it.storeId, userId: it.userId,
+            ...fd, product: it.product, productId: it.productId, addonIds: it.addonIds, storeId: it.storeId, userId: it.userId,
             variantDetailId: it.variantDetailId, selectedOffer: it.selectedOffer, selectedVariants: it.selectedVariants,
             finalPrice: it.finalPrice, totalPrice: (Number(it.finalPrice) * (it.quantity || 1)) + getLiv(),
             priceLivraison: getLiv(), quantity: it.quantity || 1,

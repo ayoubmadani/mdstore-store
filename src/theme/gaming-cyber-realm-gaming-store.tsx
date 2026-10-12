@@ -4,6 +4,7 @@ import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
+import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
@@ -266,7 +267,7 @@ export interface ProductFormProps {
 function variantMatches(d: VariantDetail, sel: Record<string, string>): boolean {
   return Object.entries(sel).every(([n, v]) => d.name.some(e => e.attrName === n && e.value === v));
 }
-const fetchWilayas = async (uid: string): Promise<Wilaya[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}`); return data || []; } catch { return []; } };
+const fetchWilayas = async (uid: string, sid?: string): Promise<Wilaya[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}${sid ? `?storeId=${sid}` : ''}`); return data || []; } catch { return []; } };
 const fetchCommunes = async (wid: string): Promise<Commune[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/get-communes/${wid}`); return data || []; } catch { return []; } };
 
 /* ── DECORATIVE ─────────────────────────────────────────────── */
@@ -1521,6 +1522,7 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
 );
 
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0, store }: ProductFormProps) {
+  const [addonIds, setAddonIds] = useState<string[]>([]);
   const router = useRouter();
   const t = T[getLang(store)];
   const isRTL = t.dir === 'rtl';
@@ -1539,7 +1541,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   const initCount = useCartStore((state) => state.initCount);
 
-  useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
+  useEffect(() => { if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); }, [userId]);
   useEffect(() => { if (typeof window !== 'undefined') { const id = localStorage.getItem('customerId'); if (id) setFd(p => ({ ...p, customerId: id })); } }, []);
   useEffect(() => { if (!fd.customerWelaya) { setCommunes([]); return; } setLC(true); fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLC(false); }); }, [fd.customerWelaya]);
 
@@ -1555,7 +1557,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   }, [product, selectedOffer, selectedVariants]);
   useEffect(() => { if (selW) setFd(f => ({ ...f, priceLoss: selW.livraisonReturn })); }, [selW]);
 
-  const fp = getFP();
+  const fp = getFP() + addonsTotal(product, addonIds);
   const supportQty = (store?.supportQty ?? product?.store?.supportQty) !== false;
   const qty = supportQty ? fd.quantity : 1;
   const selOfferObj = product.offers?.find((o: any) => o.id === selectedOffer);
@@ -1594,7 +1596,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     setIsAdded(true);
     const existing = localStorage.getItem(domain);
     const cart = existing ? JSON.parse(existing) : [];
-    cart.push({
+    cart.push({ addonIds,
       ...fd, quantity: qty, product, variantDetailId: getVariantDetailId(),
       productId: product.id, storeId: product.store.id, userId,
       selectedOffer, selectedVariants,
@@ -1614,7 +1616,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       const payload = product.isDigital
         ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
         : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
-      await axios.post(`${API_URL}/orders/create`, { ...payload, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVariantDetailId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+      await axios.post(`${API_URL}/orders/create`, { addonIds, ...payload, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVariantDetailId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (typeof window !== 'undefined' && fd.customerId) localStorage.setItem('customerId', fd.customerId);
       router.push(`/successfully?productId=${product?.id}`);
     } catch (err) { console.error(err); } finally { setSub(false); }
@@ -1622,6 +1624,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   return (
     <div style={{ direction: isRTL ? 'rtl' : 'ltr', marginTop: '20px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
+  <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#0099CC" />
 
       {/* ── أزرار السلة / الطلب المباشر ── */}
         {product.store.cart && !product.isDigital && (
@@ -1854,7 +1857,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   useEffect(() => {
     const saved = localStorage.getItem(domain);
     if (saved) setCartItems(JSON.parse(saved));
-    if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas);
+    if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas);
   }, [domain, store]);
 
   useEffect(() => {
@@ -1898,7 +1901,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         customerWelaya: fd.customerWelaya, customerCommune: fd.customerCommune,
         typeLivraison: fd.typeLivraison, quantity: item.quantity,
         priceLoss: selW?.livraisonReturn ?? 0, customerId: item.customerId || '',
-        variantDetailId: item.variantDetailId, productId: item.productId,
+        variantDetailId: item.variantDetailId, addonIds: item.addonIds, productId: item.productId,
         storeId: item.storeId, userId: item.userId,
         selectedOffer: item.selectedOffer, selectedVariants: item.selectedVariants,
         platform: item.platform || 'store', finalPrice: item.finalPrice,

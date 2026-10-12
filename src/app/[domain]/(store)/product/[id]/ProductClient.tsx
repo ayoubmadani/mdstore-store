@@ -40,9 +40,9 @@ function variantMatches(detail: VariantDetail, selected: Record<string, string>)
   )
 }
 
-const getWilayas = async (userId: string): Promise<Wilaya[]> => {
+const getWilayas = async (userId: string, sid?: string): Promise<Wilaya[]> => {
   try {
-    const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${userId}`)
+    const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${userId}${sid ? `?storeId=${sid}` : ''}`)
     return data || []
   } catch { return [] }
 }
@@ -95,7 +95,7 @@ export default function ProductClient({
   }, [product.id])
 
   useEffect(() => {
-    if (product?.store?.userId) getWilayas(product.store.userId).then(setWilayas)
+    if (product?.store?.userId) getWilayas(product.store.userId, product.store.id).then(setWilayas)
   }, [product?.store?.userId])
 
   useEffect(() => {

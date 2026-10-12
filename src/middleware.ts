@@ -60,11 +60,12 @@ export function middleware(req: NextRequest) {
       res.cookies.set(DEV_DOMAIN_COOKIE, devDomain, { path: '/', sameSite: 'lax' });
       return res;
     }
-    // مسار بدون دومين (/product/..., /cart) بعد فتح متجر → نفس المتجر
+    // مسار بدون دومين (/product/..., /cart) بعد فتح متجر → نفس المتجر، مع إظهار
+    // الدومين في شريط العنوان (localhost:3000/a.mdstore.top/product/...)
     const remembered = req.cookies.get(DEV_DOMAIN_COOKIE)?.value;
     if (remembered && path !== '/' && !path.includes('.')) {
       url.pathname = `/${remembered}${path}`;
-      return NextResponse.rewrite(url);
+      return NextResponse.redirect(url);
     }
   }
 

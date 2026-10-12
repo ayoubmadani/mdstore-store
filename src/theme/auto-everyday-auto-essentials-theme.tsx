@@ -16,6 +16,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import axios from 'axios';
+import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Search, X, Menu, ShoppingCart, Trash2, Plus, Minus, Phone, Mail, MapPin,
@@ -341,9 +342,9 @@ function variantMatches(d: VariantDetail, sel: Record<string, string>) {
     d.name?.some((e) => e.attrName === n && e.value === v));
 }
 
-const fetchWilayas = async (uid: string): Promise<Wilaya[]> => {
+const fetchWilayas = async (uid: string, sid?: string): Promise<Wilaya[]> => {
   try {
-    const r = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}`);
+    const r = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}${sid ? `?storeId=${sid}` : ''}`);
     return Array.isArray(r.data) ? r.data : (r.data?.data || []);
   } catch { return []; }
 };
@@ -1473,6 +1474,7 @@ export function Details({
 export function ProductForm({
   product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform,
 }: any) {
+  const [addonIds, setAddonIds] = useState<string[]>([]);
   const store = storeprop || product?.store;
   const t = T[getLang(store)];
   const currency = store?.currency || 'DZD';
@@ -1499,7 +1501,7 @@ export function ProductForm({
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState('');
 
-  useEffect(() => { if (uid) fetchWilayas(uid).then(setWilayas); }, [uid]);
+  useEffect(() => { if (uid) fetchWilayas(uid, store?.id).then(setWilayas); }, [uid]);
 
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1524,7 +1526,7 @@ export function ProductForm({
     if (d && Number(d.price) !== -1) return Number(d.price);
     return Number(product?.price || 0);
   };
-  const fp = getFP();
+  const fp = getFP() + addonsTotal(product, addonIds);
 
   const selW = wilayas.find((w) => String(w.id) === String(fd.customerWelaya));
 
@@ -1567,7 +1569,7 @@ export function ProductForm({
     const shipping = product?.isDigital
       ? { ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
       : { customerWelaya, customerCommune, typeLivraison, priceLoss };
-    return {
+    return { addonIds,
       ...rest,
       ...shipping,
       quantity: qty,
@@ -1626,6 +1628,7 @@ export function ProductForm({
 
   return (
     <div style={{ border: `1px solid ${BD}`, borderTop: `3px solid ${INK}`, padding: '1.25rem', background: '#fff' }}>
+  <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#FF7A00" />
       <Styles />
 
       {supportQty && !product?.isDigital ? (
@@ -1877,7 +1880,7 @@ export function Cart({ domain, store }: any) {
   }, [domain]);
 
   useEffect(() => {
-    if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas);
+    if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas);
   }, [store]);
 
   useEffect(() => {

@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
+import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
@@ -168,7 +169,7 @@ export interface ProductFormProps {
 function variantMatches(d: VariantDetail, sel: Record<string,string>) {
   return Object.entries(sel).every(([n,v]) => d.name.some(e => e.attrName === n && e.value === v));
 }
-const fetchWilayas  = async (uid: string): Promise<Wilaya[]>  => { try { const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}`); return data||[]; } catch { return []; } };
+const fetchWilayas  = async (uid: string, sid?: string): Promise<Wilaya[]>  => { try { const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}${sid ? `?storeId=${sid}` : ''}`); return data||[]; } catch { return []; } };
 const fetchCommunes = async (wid: string): Promise<Commune[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/get-communes/${wid}`); return data||[]; } catch { return []; } };
 
 /* ─── Shared styles ─── */
@@ -1291,6 +1292,7 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
 );
 
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: ProductFormProps) {
+  const [addonIds, setAddonIds] = useState<string[]>([]);
   const t = T[getLang(store || product?.store)];
   const isRTL = t.dir === 'rtl';
   const currency = store?.currency || product?.store?.currency || 'DZD';
@@ -1306,7 +1308,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [isAdded, setAdded]   = useState(false);
   const initCount = useCartStore((s: any) => s.initCount);
 
-  useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
+  useEffect(() => { if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); }, [userId]);
   useEffect(() => { if (typeof window !== 'undefined') { const id = localStorage.getItem('customerId'); if (id) setFd(p => ({ ...p, customerId: id })); } }, []);
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1325,7 +1327,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     return base;
   }, [product, selectedOffer, selectedVariants]);
   const supportQty = (store?.supportQty ?? product.store?.supportQty) !== false;
-  const fp    = getFP();
+  const fp    = getFP() + addonsTotal(product, addonIds);
   const qty   = supportQty ? fd.quantity : 1;
   const selOfferObj = product.offers?.find((o: any) => o.id === selectedOffer);
   const storeInfo = store || product.store;
@@ -1362,7 +1364,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const addToCart = () => {
     setAdded(true);
     const cart = JSON.parse(localStorage.getItem(domain)||'[]');
-    cart.push({ ...fd, quantity: qty, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform||'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
+    cart.push({ addonIds, ...fd, quantity: qty, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform||'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
     localStorage.setItem(domain, JSON.stringify(cart));
     initCount(cart.length);
     setTimeout(() => setAdded(false), 2200);
@@ -1377,7 +1379,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       const payload = product.isDigital
         ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
         : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
-      await axios.post(`${API_URL}/orders/create`, { ...payload, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform||'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+      await axios.post(`${API_URL}/orders/create`, { addonIds, ...payload, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform||'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
       router.push(`${window.location.origin}/successfully?productId=${product.id}`);
     } catch {} finally { setSub(false); }
@@ -1387,6 +1389,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   return (
     <div style={{ marginTop:'1.25rem', paddingTop:'1rem', borderTop:`1px solid ${BD}` }}>
+  <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#DC2626" />
         {product.store.cart && !product.isDigital && (
         <div className="cart-add-btns" style={{ marginBottom:'1.25rem' }}>
           <button onClick={addToCart} disabled={isAdded} style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:6, padding:'0.85rem 1rem', border:`1.5px solid ${isAdded ? '#22C55E' : BD}`, borderRadius:12, fontSize:'0.875rem', fontWeight:500, cursor:'pointer', background: isAdded ? 'rgba(34,197,94,0.06)' : CARD, color: isAdded ? '#22C55E' : SUB, transition:'all 0.2s', fontFamily:'inherit' }}>
@@ -1521,7 +1524,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const [errors, setErrors] = useState<Record<string,string>>({});
   const initCount = useCartStore((s: any) => s.initCount);
 
-  useEffect(() => { setItems(JSON.parse(localStorage.getItem(domain)||'[]')); if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas); }, [domain, store]);
+  useEffect(() => { setItems(JSON.parse(localStorage.getItem(domain)||'[]')); if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas); }, [domain, store]);
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
     setLC(true); fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLC(false); });
@@ -1551,7 +1554,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     if (Object.keys(er).length) { setErrors(er); return; }
     setErrors({}); setSubmitting(true);
     try {
-      await axios.post(`${API_URL}/orders/create`, items.map(i => ({ ...fd, productId: i.productId, storeId: i.storeId, userId: i.userId, selectedOffer: i.selectedOffer, variantDetailId: i.variantDetailId, selectedVariants: i.selectedVariants, platform: i.platform||'store', finalPrice: i.finalPrice, totalPrice: finalTotal, priceLivraison: +getLiv(), quantity: i.quantity, customerId: i.customerId||'', priceLoss: selW?.livraisonReturn??0 })));
+      await axios.post(`${API_URL}/orders/create`, items.map(i => ({ addonIds: i.addonIds, ...fd, productId: i.productId, storeId: i.storeId, userId: i.userId, selectedOffer: i.selectedOffer, variantDetailId: i.variantDetailId, selectedVariants: i.selectedVariants, platform: i.platform||'store', finalPrice: i.finalPrice, totalPrice: finalTotal, priceLivraison: +getLiv(), quantity: i.quantity, customerId: i.customerId||'', priceLoss: selW?.livraisonReturn??0 })));
       setSuccess(true); localStorage.removeItem(domain); setItems([]); initCount(0);
     } catch {} finally { setSubmitting(false); }
   };

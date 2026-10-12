@@ -5,6 +5,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import DOMPurify from 'isomorphic-dompurify';
 import axios from "axios";
+import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 import { useCartStore } from "@/store/useCartStore";
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 import {
@@ -70,8 +71,8 @@ const btnSecondary: React.CSSProperties = {
 const container: React.CSSProperties = { maxWidth: 1280, margin: "0 auto", padding: "0 1.5rem" };
 
 // ─── Helpers ──────────────────────────────────────────────────────
-const fetchWilayas = async (uid: string): Promise<Wilaya[]> => {
-  try { const r = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}`); return r.data || []; } catch { return []; }
+const fetchWilayas = async (uid: string, sid?: string): Promise<Wilaya[]> => {
+  try { const r = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}${sid ? `?storeId=${sid}` : ''}`); return r.data || []; } catch { return []; }
 };
 const fetchCommunes = async (wid: string): Promise<Commune[]> => {
   try { const r = await axios.get(`${API_URL}/shipping/get-communes/${wid}`); return r.data || []; } catch { return []; }
@@ -956,6 +957,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 
 // ─── ProductForm ──────────────────────────────────────────────────
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss: propPriceLoss, store }: ProductFormProps) {
+  const [addonIds, setAddonIds] = useState<string[]>([]);
   const t = T[getLang(store)];
   const isRTL = t.dir === "rtl";
   const currency = store?.currency || "DZD";
@@ -973,7 +975,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const router = useRouter();
   const initCount = useCartStore((s) => s.initCount);
 
-  useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
+  useEffect(() => { if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); }, [userId]);
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
     setLoadingC(true);
@@ -991,7 +993,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     return Number(product.price) || 0;
   }, [product, selectedOffer, selectedVariants]);
 
-  const fp = getFP();
+  const fp = getFP() + addonsTotal(product, addonIds);
   const supportQty = (store?.supportQty ?? product?.store?.supportQty) !== false;
   const qty = supportQty ? fd.quantity : 1;
   const selOfferObj = product.offers?.find((o) => o.id === selectedOffer);
@@ -1033,7 +1035,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const addToCart = () => {
     if (!validate()) return;
     const items = (() => { try { return JSON.parse(localStorage.getItem(domain) || "[]"); } catch { return []; } })();
-    items.push({ ...fd, quantity: qty, product, variantDetailId: getVId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform, finalPrice: getFP(), totalPrice: total(), priceLivraison: getLiv(), addedAt: new Date().toISOString() });
+    items.push({ addonIds, ...fd, quantity: qty, product, variantDetailId: getVId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform, finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: new Date().toISOString() });
     localStorage.setItem(domain, JSON.stringify(items));
     initCount(items.length);
     setAdded(true);
@@ -1049,7 +1051,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       const payload = product.isDigital
         ? { ...rest, ...(contactMethod === "email" ? { customerEmail } : { customerWhatsapp }) }
         : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
-      await axios.post(`${API_URL}/orders/create`, { ...payload, quantity: qty, product, variantDetailId: getVId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform, finalPrice: getFP(), totalPrice: total(), priceLivraison: getLiv() });
+      await axios.post(`${API_URL}/orders/create`, { addonIds, ...payload, quantity: qty, product, variantDetailId: getVId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform, finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       router.push(`/successfully?productId=${product.id}`);
     } catch (err: any) {
       setErrors({ submit: err?.response?.data?.message || t.errSubmit });
@@ -1066,6 +1068,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   return (
     <div style={{ background: C1, border: `1px solid ${BD}`, borderRadius: 10, padding: "1.25rem" }}>
+  <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#FF2A6D" />
       {added && (
         <div style={{ background: "rgba(0,245,212,.1)", border: `1px solid ${SUCCESS}`, color: SUCCESS, padding: "10px 14px", borderRadius: 8, marginBottom: 14, display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem", fontWeight: 700 }}>
           <CheckCircle size={15} />{t.addedMsg}
@@ -1246,7 +1249,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const initCount = useCartStore((s) => s.initCount);
 
   useEffect(() => { try { setItems(JSON.parse(localStorage.getItem(domain) || "[]")); } catch {} }, [domain]);
-  useEffect(() => { if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas); }, [store]);
+  useEffect(() => { if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas); }, [store]);
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
     setLoadingC(true);

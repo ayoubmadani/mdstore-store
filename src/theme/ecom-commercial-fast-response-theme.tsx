@@ -1,4 +1,5 @@
 'use client';
+import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 /*
  * MdStore Theme — "Hanouti COD Store"
@@ -71,9 +72,9 @@ function variantMatches(d: VariantDetail, sel: Record<string, string>) {
   return Object.entries(sel).every(([n, v]) => d.name.some((e) => e.attrName === n && e.value === v));
 }
 
-const fetchWilayas = async (uid: string): Promise<Wilaya[]> => {
+const fetchWilayas = async (uid: string, sid?: string): Promise<Wilaya[]> => {
   try {
-    const r = await fetch(`${API_URL}/shipping/public/get-shipping/${uid}`);
+    const r = await fetch(`${API_URL}/shipping/public/get-shipping/${uid}${sid ? `?storeId=${sid}` : ''}`);
     if (!r.ok) return [];
     return await r.json();
   } catch { return []; }
@@ -1188,6 +1189,7 @@ function navArrow(side: 'start' | 'end'): React.CSSProperties {
  * 10. ProductForm — order + add-to-cart
  * ========================================================== */
 export function ProductForm({ product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
+  const [addonIds, setAddonIds] = useState<string[]>([]);
   const store = storeprop || product?.store;
   const t = T[getLang(store)];
   const router = useRouter();
@@ -1213,7 +1215,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   });
   const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
 
-  useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
+  useEffect(() => { if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); }, [userId]);
 
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1242,7 +1244,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   };
 
   const supportQty = (store?.supportQty ?? product?.store?.supportQty) !== false;
-  const fp = getFP();
+  const fp = getFP() + addonsTotal(product, addonIds);
   const qty = supportQty ? fd.quantity : 1;
   const selOfferObj = product?.offers?.find((o: Offer) => o.id === selectedOffer);
   const orderFreeShipping = !!(product?.shippingFree || selOfferObj?.shippingFree ||
@@ -1281,7 +1283,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     const shipping = product?.isDigital
       ? { ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
       : { customerWelaya, customerCommune, typeLivraison, priceLoss };
-    return {
+    return { addonIds,
       ...rest,
       ...shipping,
       quantity: qty,
@@ -1318,7 +1320,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
       const res = await fetch(`${API_URL}/orders/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(buildPayload()),
+        body: JSON.stringify({ ...buildPayload(), addonIds }),
       });
       if (!res.ok) throw new Error('failed');
       const data = await res.json().catch(() => ({}));
@@ -1347,6 +1349,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
 
   return (
     <div style={{ paddingBottom: 12 }}>
+      <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#1F7A5E" />
       {/* qty */}
       {supportQty && !product?.isDigital && (
         <>
@@ -1530,7 +1533,7 @@ export function Cart({ domain, store }: any) {
     catch { setItems([]); }
   }, [domain]);
 
-  useEffect(() => { if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas); }, [store]);
+  useEffect(() => { if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas); }, [store]);
 
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }

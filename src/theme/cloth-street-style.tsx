@@ -4,6 +4,7 @@ import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
+import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
@@ -192,7 +193,7 @@ export interface ProductFormProps {
 
 const vm = (d: VariantDetail, s: Record<string, string>) =>
   Object.entries(s).every(([n, v]) => d.name.some(e => e.attrName === n && e.value === v));
-const fetchWilayas = async (uid: string): Promise<Wilaya[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}`); return data || []; } catch { return []; } };
+const fetchWilayas = async (uid: string, sid?: string): Promise<Wilaya[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}${sid ? `?storeId=${sid}` : ''}`); return data || []; } catch { return []; } };
 const fetchCommunes = async (wid: string): Promise<Commune[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/get-communes/${wid}`); return data || []; } catch { return []; } };
 
 const IS = (err?: boolean): React.CSSProperties => ({
@@ -1242,6 +1243,7 @@ export function Details({ product, store, toggleWishlist, isWishlisted, discount
    PRODUCT FORM
 ══════════════════════════════════════════════════════════════ */
 export function ProductForm({ product, store, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0 }: ProductFormProps) {
+  const [addonIds, setAddonIds] = useState<string[]>([]);
   const t = T[getLang(store)];
   const cur = store?.currency || t.currency;
   const router = useRouter();
@@ -1258,7 +1260,7 @@ export function ProductForm({ product, store, userId, domain, selectedOffer, set
   const [isAdded, setIsAdded] = useState(false);
   const initCount = useCartStore(s => s.initCount);
 
-  useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
+  useEffect(() => { if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); }, [userId]);
   useEffect(() => { if (typeof window !== 'undefined') { const id = localStorage.getItem('customerId'); if (id) setFd(p => ({ ...p, customerId: id })); } }, []);
   useEffect(() => { if (!fd.customerWelaya) { setCommunes([]); return; } setLC(true); fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLC(false); }); }, [fd.customerWelaya]);
 
@@ -1272,7 +1274,7 @@ export function ProductForm({ product, store, userId, domain, selectedOffer, set
     return base;
   }, [product, selectedOffer, selectedVariants]);
   const supportQty = (store?.supportQty ?? product.store?.supportQty) !== false;
-  const fp = getFP();
+  const fp = getFP() + addonsTotal(product, addonIds);
   const qty = supportQty ? fd.quantity : 1;
   const selOfferObj = product.offers?.find((o: any) => o.id === selectedOffer);
   const storeInfo = store || product.store;
@@ -1309,7 +1311,7 @@ export function ProductForm({ product, store, userId, domain, selectedOffer, set
   const addToCart = () => {
     setIsAdded(true);
     const cart = JSON.parse(localStorage.getItem(domain) || '[]');
-    cart.push({ ...fd, quantity: qty, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
+    cart.push({ addonIds, ...fd, quantity: qty, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
     localStorage.setItem(domain, JSON.stringify(cart)); initCount(cart.length);
     setTimeout(() => setIsAdded(false), 2000);
   };
@@ -1322,7 +1324,7 @@ export function ProductForm({ product, store, userId, domain, selectedOffer, set
       const payload = product.isDigital
         ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
         : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
-      await axios.post(`${API_URL}/orders/create`, { ...payload, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+      await axios.post(`${API_URL}/orders/create`, { addonIds, ...payload, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
       router.push(`/successfully?productId=${product?.id}`);
     } catch { } finally { setSub(false); }
@@ -1330,6 +1332,7 @@ export function ProductForm({ product, store, userId, domain, selectedOffer, set
 
   return (
     <div dir={t.dir} style={{ marginTop: '22px', paddingTop: '22px', borderTop: '2px solid var(--ink)' }}>
+  <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#FF2D00" />
         {product.store?.cart !== false && !product.isDigital && (
         <div className="cart-add-btns" style={{ marginBottom: '14px' }}>
           <button onClick={addToCart} disabled={isAdded} className="sm" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px', cursor: isAdded ? 'default' : 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', border: `1px solid ${isAdded ? '#22c55e' : 'var(--ink)'}`, background: isAdded ? 'rgba(34,197,94,0.08)' : 'transparent', color: isAdded ? '#22c55e' : 'var(--ink)', transition: 'all 0.25s' }}>
@@ -1486,7 +1489,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const initCount = useCartStore(s => s.initCount);
 
-  useEffect(() => { setItems(JSON.parse(localStorage.getItem(domain) || '[]')); if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas); }, [domain, store]);
+  useEffect(() => { setItems(JSON.parse(localStorage.getItem(domain) || '[]')); if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas); }, [domain, store]);
   useEffect(() => { if (!fd.customerWelaya) { setCommunes([]); return; } setLC(true); fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLC(false); }); }, [fd.customerWelaya]);
 
   const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
@@ -1509,7 +1512,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     if (Object.keys(er).length) { setErrors(er); return; }
     setErrors({}); setSubmitting(true);
     try {
-      await axios.post(`${API_URL}/orders/create`, items.map(i => ({ ...fd, productId: i.productId, storeId: i.storeId, userId: i.userId, selectedOffer: i.selectedOffer, variantDetailId: i.variantDetailId, selectedVariants: i.selectedVariants, platform: i.platform || 'store', finalPrice: i.finalPrice, totalPrice: finalTotal, priceLivraison: +getLiv(), quantity: i.quantity, customerId: i.customerId || '', priceLoss: selW?.livraisonReturn ?? 0 })));
+      await axios.post(`${API_URL}/orders/create`, items.map(i => ({ addonIds: i.addonIds, ...fd, productId: i.productId, storeId: i.storeId, userId: i.userId, selectedOffer: i.selectedOffer, variantDetailId: i.variantDetailId, selectedVariants: i.selectedVariants, platform: i.platform || 'store', finalPrice: i.finalPrice, totalPrice: finalTotal, priceLivraison: +getLiv(), quantity: i.quantity, customerId: i.customerId || '', priceLoss: selW?.livraisonReturn ?? 0 })));
       setSuccess(true); localStorage.removeItem(domain); setItems([]); initCount(0);
     } catch { } finally { setSubmitting(false); }
   };

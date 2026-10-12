@@ -87,8 +87,8 @@ function variantMatches(detail: VariantDetail, sel: Record<string, string>): boo
   );
 }
 
-const fetchWilayas  = async (userId: string): Promise<Wilaya[]>  => {
-  try { const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${userId}`); return data || [];}
+const fetchWilayas  = async (userId: string, sid?: string): Promise<Wilaya[]>  => {
+  try { const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${userId}${sid ? `?storeId=${sid}` : ''}`); return data || [];}
   
   
   catch { return []; }
@@ -198,7 +198,7 @@ export default function ProductForm({
 
   /* ── Effects ── */
   useEffect(() => {
-    if (userId) fetchWilayas(userId).then(setWilayas);
+    if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas);
   }, [userId]);
 
   useEffect(() => {

@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 import DOMPurify from 'isomorphic-dompurify';
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
@@ -216,9 +217,9 @@ function variantMatches(d: VariantDetail, sel: Record<string, string>) {
   return Object.entries(sel).every(([n, v]) => d.name.some(e => e.attrName === n && e.value === v));
 }
 
-const fetchWilayas = async (uid: string): Promise<Wilaya[]> => {
+const fetchWilayas = async (uid: string, sid?: string): Promise<Wilaya[]> => {
   try {
-    const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}`);
+    const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}${sid ? `?storeId=${sid}` : ''}`);
     return data || [];
   } catch { return []; }
 };
@@ -981,6 +982,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 /*  PRODUCT FORM                                                               */
 /* ═══════════════════════════════════════════════════════════════════════════ */
 export function ProductForm({ product, userId, domain, store: storeprop, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
+  const [addonIds, setAddonIds] = useState<string[]>([]);
   const store = storeprop || product?.store;
   const t = T[getLang(store)];
   const router = useRouter();
@@ -1005,7 +1007,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
 
   /* Fetch wilayas */
   useEffect(() => {
-    if (userId) fetchWilayas(userId).then(setWilayas);
+    if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas);
   }, [userId]);
 
   /* Fetch communes */
@@ -1037,7 +1039,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
     return match ? match.id : null;
   }, [product, selectedVariants]);
 
-  const fp = getFP();
+  const fp = getFP() + addonsTotal(product, addonIds);
   const supportQty = (store?.supportQty ?? product?.store?.supportQty) !== false;
   const qty = supportQty ? fd.quantity : 1;
   const selOfferObj = product?.offers?.find((o: Offer) => o.id === selectedOffer);
@@ -1073,7 +1075,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
   };
 
   const addToCart = () => {
-    const payload = {
+    const payload = { addonIds,
       ...fd,
       quantity: qty,
       product,
@@ -1107,7 +1109,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
       const shippingOrContact = product?.isDigital
         ? (contactMethod === 'email' ? { customerEmail } : { customerWhatsapp })
         : { customerWelaya, customerCommune, typeLivraison, priceLoss };
-      const payload = {
+      const payload = { addonIds,
         ...rest,
         ...shippingOrContact,
         quantity: qty,
@@ -1152,6 +1154,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
 
   return (
     <div style={{ background: '#fff', border: `1px solid ${BD}`, borderRadius: 10, padding: '1.25rem' }}>
+      <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#1E5A8E" />
       {/* Quantity */}
       {supportQty && !product?.isDigital && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, paddingBottom: 16, borderBottom: `1px solid ${BD}` }}>
@@ -1344,7 +1347,7 @@ export function Cart({ domain, store }: any) {
   }, [domain]);
 
   useEffect(() => {
-    if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas);
+    if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas);
   }, [store]);
 
   useEffect(() => {
@@ -1395,6 +1398,7 @@ export function Cart({ domain, store }: any) {
         product: it.product,
         variantDetailId: it.variantDetailId,
         productId: it.product?.id,
+        addonIds: it.addonIds,
         storeId: it.product?.store?.id,
         userId: it.product?.store?.userId,
         selectedOffer: it.selectedOffer,

@@ -1,4 +1,5 @@
 'use client';
+import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
@@ -328,9 +329,9 @@ function variantMatches(d: VariantDetail, sel: Record<string, string>) {
   return Object.entries(sel).every(([n, v]) => d.name.some((e) => e.attrName === n && e.value === v));
 }
 
-async function fetchWilayas(uid: string): Promise<Wilaya[]> {
+async function fetchWilayas(uid: string, sid?: string): Promise<Wilaya[]> {
   try {
-    const res = await fetch(`${API_URL}/shipping/public/get-shipping/${uid}`);
+    const res = await fetch(`${API_URL}/shipping/public/get-shipping/${uid}${sid ? `?storeId=${sid}` : ''}`);
     if (!res.ok) return [];
     const d = await res.json();
     return Array.isArray(d) ? d : [];
@@ -996,6 +997,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
    PRODUCT FORM
    ================================================================== */
 export function ProductForm({ product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
+  const [addonIds, setAddonIds] = useState<string[]>([]);
   const store = storeprop || product?.store;
   const t = Tt[getLang(store)];
   const router = useRouter();
@@ -1019,7 +1021,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
+  useEffect(() => { if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); }, [userId]);
 
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1041,7 +1043,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     return Number(product?.price || 0);
   }, [selectedOffer, product, selectedVariants]);
 
-  const fp = getFP();
+  const fp = getFP() + addonsTotal(product, addonIds);
   const supportQty = (store?.supportQty ?? product?.store?.supportQty) !== false;
   const qty = supportQty ? fd.quantity : 1;
   const selOfferObj = product?.offers?.find((o: Offer) => o.id === selectedOffer);
@@ -1080,7 +1082,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     if (!key) return;
     const arr = JSON.parse(localStorage.getItem(key) || '[]');
     arr.push({
-      ...fd, quantity: qty, product, variantDetailId: getVarId(product, selectedVariants || {}),
+      ...fd, quantity: qty, product, variantDetailId: getVarId(product, selectedVariants || { addonIds,}),
       productId: product?.id, storeId: store?.id, userId,
       selectedOffer, selectedVariants, platform,
       finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(),
@@ -1099,13 +1101,13 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
         ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
         : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
       const payload = {
-        ...fields, quantity: qty, product, variantDetailId: getVarId(product, selectedVariants || {}),
+        ...fields, quantity: qty, product, variantDetailId: getVarId(product, selectedVariants || { addonIds,}),
         productId: product?.id, storeId: store?.id, userId,
         selectedOffer, selectedVariants, platform,
         finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(),
       };
       const res = await fetch(`${API_URL}/orders/create`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...payload, addonIds }),
       });
       const d = await res.json();
       if (fd.customerId || d?.customerId) localStorage.setItem('customerId', d?.customerId || fd.customerId);
@@ -1118,6 +1120,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
 
   return (
     <div>
+  <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#C6FF33" />
       {(isOrderNow || product?.isDigital) && (
         <div style={{ border: `1px solid ${BD}`, borderRadius: 4, padding: '1rem', marginBottom: 16 }}>
           <div className="form-row-2">
@@ -1267,7 +1270,7 @@ export function Cart({ domain, store }: any) {
   }, [domain]);
 
   useEffect(() => {
-    if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas);
+    if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas);
   }, [store]);
 
   useEffect(() => {
@@ -1316,7 +1319,7 @@ export function Cart({ domain, store }: any) {
     try {
       const payload = items.map((it) => ({
         ...fd, product: it.product, variantDetailId: it.variantDetailId,
-        productId: it.productId, storeId: it.storeId, userId: it.userId,
+        addonIds: it.addonIds, productId: it.productId, storeId: it.storeId, userId: it.userId,
         selectedOffer: it.selectedOffer, selectedVariants: it.selectedVariants, platform: it.platform,
         finalPrice: it.finalPrice, quantity: it.quantity,
         totalPrice: it.finalPrice * it.quantity + getLiv(), priceLivraison: getLiv(),

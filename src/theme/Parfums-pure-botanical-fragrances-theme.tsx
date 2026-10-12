@@ -1,4 +1,5 @@
 'use client';
+import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 // ============================================================================
 // PURE BOTANICAL FRAGRANCES THEME
@@ -45,9 +46,9 @@ function variantMatches(d: VariantDetail, sel: Record<string, string>) {
   return Object.entries(sel).every(([n, v]) => d.name.some((e) => e.attrName === n && e.value === v));
 }
 
-const fetchWilayas = async (uid: string): Promise<Wilaya[]> => {
+const fetchWilayas = async (uid: string, sid?: string): Promise<Wilaya[]> => {
   try {
-    const res = await fetch(`${API_URL}/shipping/public/get-shipping/${uid}`);
+    const res = await fetch(`${API_URL}/shipping/public/get-shipping/${uid}${sid ? `?storeId=${sid}` : ''}`);
     if (!res.ok) return [];
     const data = await res.json();
     return Array.isArray(data) ? data : [];
@@ -911,6 +912,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 /* ============================== PRODUCT FORM ============================== */
 
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store: storeProp }: any) {
+  const [addonIds, setAddonIds] = useState<string[]>([]);
   const store = storeProp || product?.store;
   const t = T[getLang(store)];
   const router = useRouter();
@@ -934,7 +936,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   const initCount = useCartStore((s: any) => s.initCount);
 
-  useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
+  useEffect(() => { if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); }, [userId]);
 
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -956,7 +958,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     return Number(product?.price || 0);
   }, [selectedOffer, product, selectedVariants]);
 
-  const fp = getFP();
+  const fp = getFP() + addonsTotal(product, addonIds);
   const supportQty = (store?.supportQty ?? product?.store?.supportQty) !== false;
   const qty = supportQty ? fd.quantity : 1;
   const selOfferObj = product?.offers?.find((of: Offer) => of.id === selectedOffer);
@@ -995,7 +997,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     const shippingOrContact = product?.isDigital
       ? (contactMethod === 'email' ? { customerEmail } : { customerWhatsapp })
       : { customerWelaya, customerCommune, typeLivraison, priceLoss };
-    return {
+    return { addonIds,
       ...rest,
       ...shippingOrContact,
       quantity: qty,
@@ -1030,7 +1032,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       const res = await fetch(`${API_URL}/orders/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(buildPayload()),
+        body: JSON.stringify({ ...buildPayload(), addonIds }),
       });
       if (!res.ok) throw new Error('failed');
       const data = await res.json();
@@ -1045,6 +1047,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   return (
     <div style={{ marginTop: 24, borderTop: `1px solid ${BORDER}`, paddingTop: 24 }}>
+  <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#B3453A" />
       {(!isOrderNow && !product?.isDigital) ? (
         <>
           {supportQty && !product?.isDigital && (
@@ -1205,7 +1208,7 @@ export function Cart({ domain, store }: any) {
   }, [domain]);
 
   useEffect(() => {
-    if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas);
+    if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas);
   }, [store]);
 
   useEffect(() => {

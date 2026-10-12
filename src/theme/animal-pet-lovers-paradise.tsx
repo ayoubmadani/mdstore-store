@@ -4,6 +4,7 @@ import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
+import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
@@ -221,7 +222,7 @@ export interface ProductFormProps {
 
 const variantMatches = (d: VariantDetail, sel: Record<string, string>) =>
     Object.entries(sel).every(([n, v]) => d.name.some(e => e.attrName === n && e.value === v));
-const fetchWilayas = async (uid: string): Promise<Wilaya[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}`); return data || []; } catch { return []; } };
+const fetchWilayas = async (uid: string, sid?: string): Promise<Wilaya[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/public/get-shipping/${uid}${sid ? `?storeId=${sid}` : ''}`); return data || []; } catch { return []; } };
 const fetchCommunes = async (wid: string): Promise<Commune[]> => { try { const { data } = await axios.get(`${API_URL}/shipping/get-communes/${wid}`); return data || []; } catch { return []; } };
 
 /* ─── INPUT STYLE ─── */
@@ -1151,6 +1152,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
    PRODUCT FORM
 ══════════════════════════════════════════════════════════════ */
 export function ProductForm({ product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: ProductFormProps) {
+  const [addonIds, setAddonIds] = useState<string[]>([]);
     const t = T[getLang(storeprop || product?.store)];
     const router = useRouter();
     const [wilayas, setWilayas] = useState<Wilaya[]>([]);
@@ -1166,7 +1168,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     const [isAdded, setIsAdded] = useState(false);
     const initCount = useCartStore(s => s.initCount);
 
-    useEffect(() => { if (userId) fetchWilayas(userId).then(setWilayas); }, [userId]);
+    useEffect(() => { if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); }, [userId]);
     useEffect(() => { if (typeof window !== 'undefined') { const id = localStorage.getItem('customerId'); if (id) setFd(p => ({ ...p, customerId: id })); } }, []);
     useEffect(() => {
         if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1185,7 +1187,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
         return base;
     }, [product, selectedOffer, selectedVariants]);
     const supportQty = (storeprop?.supportQty ?? product.store?.supportQty) !== false;
-    const fp = getFP();
+    const fp = getFP() + addonsTotal(product, addonIds);
     const qty = supportQty ? fd.quantity : 1;
     const selOffer = product.offers?.find((o: any) => o.id === selectedOffer);
     const storeInfo = storeprop || product.store;
@@ -1222,7 +1224,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     const addToCart = () => {
         setIsAdded(true);
         const cart = JSON.parse(localStorage.getItem(domain) || '[]');
-        cart.push({ ...fd, quantity: qty, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
+        cart.push({ addonIds, ...fd, quantity: qty, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
         localStorage.setItem(domain, JSON.stringify(cart));
         initCount(cart.length);
         setTimeout(() => setIsAdded(false), 2000);
@@ -1237,7 +1239,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
             const payload = product.isDigital
                 ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
                 : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
-            await axios.post(`${API_URL}/orders/create`, { ...payload, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+            await axios.post(`${API_URL}/orders/create`, { addonIds, ...payload, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
             if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
             router.push(`/successfully?productId=${product?.id}`);
         } catch { } finally { setSub(false); }
@@ -1245,6 +1247,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
 
     return (
         <div style={{ paddingTop: '1.5rem', borderTop: '2px solid var(--amber-lt)', marginTop: '1.5rem' }}>
+  <ProductAddons product={product} store={product.store as any} selected={addonIds} onChange={setAddonIds} accent="#92400E" />
         {product.store?.cart && !product.isDigital && (
                 <div className="cart-add-btns" style={{ marginBottom: '1.25rem' }}>
                     <button onClick={addToCart} disabled={isAdded} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '0.875rem', borderRadius: 50, cursor: isAdded ? 'default' : 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: '0.9rem', border: `2px solid ${isAdded ? 'var(--green-dk)' : 'var(--amber)'}`, background: isAdded ? 'var(--green-lt)' : '#fff', color: isAdded ? 'var(--green-dk)' : 'var(--amber-dk)', transition: 'all 0.25s' }}>
@@ -1390,7 +1393,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const initCount = useCartStore(s => s.initCount);
 
-    useEffect(() => { setItems(JSON.parse(localStorage.getItem(domain) || '[]')); if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas); }, [domain, store]);
+    useEffect(() => { setItems(JSON.parse(localStorage.getItem(domain) || '[]')); if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas); }, [domain, store]);
     useEffect(() => { if (!fd.customerWelaya) { setCommunes([]); return; } setLC(true); fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLC(false); }); }, [fd.customerWelaya]);
 
     const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
@@ -1413,7 +1416,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         if (Object.keys(er).length) { setErrors(er); return; }
         setErrors({}); setSubmitting(true);
         try {
-            await axios.post(`${API_URL}/orders/create`, items.map(i => ({ ...fd, productId: i.productId, storeId: i.storeId, userId: i.userId, selectedOffer: i.selectedOffer, variantDetailId: i.variantDetailId, selectedVariants: i.selectedVariants, platform: i.platform || 'store', finalPrice: i.finalPrice, totalPrice: finalTotal, priceLivraison: +getLiv(), quantity: i.quantity, customerId: i.customerId || '', priceLoss: selW?.livraisonReturn ?? 0 })));
+            await axios.post(`${API_URL}/orders/create`, items.map(i => ({ addonIds: i.addonIds, ...fd, productId: i.productId, storeId: i.storeId, userId: i.userId, selectedOffer: i.selectedOffer, variantDetailId: i.variantDetailId, selectedVariants: i.selectedVariants, platform: i.platform || 'store', finalPrice: i.finalPrice, totalPrice: finalTotal, priceLivraison: +getLiv(), quantity: i.quantity, customerId: i.customerId || '', priceLoss: selW?.livraisonReturn ?? 0 })));
             setSuccess(true); localStorage.removeItem(domain); setItems([]); initCount(0);
         } catch { } finally { setSubmitting(false); }
     };

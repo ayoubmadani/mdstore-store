@@ -1,4 +1,5 @@
 'use client';
+import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 /**
  * DESIGN BRIEF — shoes-velocity-sneakers-theme
@@ -351,9 +352,9 @@ function variantMatches(d: VariantDetail, sel: Record<string, string>) {
   return Object.entries(sel || {}).every(([n, v]) => d.name?.some((e) => e.attrName === n && e.value === v));
 }
 
-const fetchWilayas = async (uid: string): Promise<Wilaya[]> => {
+const fetchWilayas = async (uid: string, sid?: string): Promise<Wilaya[]> => {
   try {
-    const r = await fetch(`${API_URL}/shipping/public/get-shipping/${uid}`);
+    const r = await fetch(`${API_URL}/shipping/public/get-shipping/${uid}${sid ? `?storeId=${sid}` : ''}`);
     if (!r.ok) return [];
     const d = await r.json();
     return Array.isArray(d) ? d : (d?.data || []);
@@ -1394,6 +1395,7 @@ export function Details({
 export function ProductForm({
   product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store: storeprop,
 }: any) {
+  const [addonIds, setAddonIds] = useState<string[]>([]);
   const store = storeprop || product?.store;
   const t = T[getLang(store)];
   const router = useRouter();
@@ -1421,7 +1423,7 @@ export function ProductForm({
   });
   const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
 
-  useEffect(() => { if (uid) fetchWilayas(uid).then(setWilayas); }, [uid]);
+  useEffect(() => { if (uid) fetchWilayas(uid, store?.id).then(setWilayas); }, [uid]);
 
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1444,7 +1446,7 @@ export function ProductForm({
     return vd ? vd.id : null;
   };
 
-  const fp = getFP();
+  const fp = getFP() + addonsTotal(product, addonIds);
   const supportQty = (store?.supportQty ?? product?.store?.supportQty) !== false;
   const qty = supportQty ? fd.quantity : 1;
   const selOfferObj = product?.offers?.find((o: Offer) => String(o.id) === String(selectedOffer));
@@ -1483,7 +1485,7 @@ export function ProductForm({
     const fields = product?.isDigital
       ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
       : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
-    return {
+    return { addonIds,
       ...fields,
       quantity: qty,
       product,
@@ -1520,7 +1522,7 @@ export function ProductForm({
       const r = await fetch(`${API_URL}/orders/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload()),
+        body: JSON.stringify({ ...payload(), addonIds }),
       });
       if (!r.ok) throw new Error('failed');
       const d = await r.json().catch(() => ({}));
@@ -1537,6 +1539,7 @@ export function ProductForm({
 
   return (
     <div>
+  <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#D9FF39" />
       {supportQty && !product?.isDigital && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 16 }}>
           <span style={{ fontSize: '.82rem', fontWeight: 700 }}>{t.qty}</span>
@@ -1747,7 +1750,7 @@ export function Cart({ domain, store }: any) {
     } catch (e) { setItems([]); }
   }, [domain]);
 
-  useEffect(() => { if (store?.user?.id) fetchWilayas(store.user.id).then(setWilayas); }, [store]);
+  useEffect(() => { if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas); }, [store]);
 
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1799,7 +1802,7 @@ export function Cart({ domain, store }: any) {
       const body = items.map((it) => ({
         ...fd,
         product: it.product,
-        productId: it.productId || it.product?.id,
+        addonIds: it.addonIds, productId: it.productId || it.product?.id,
         storeId: it.storeId || store?.id,
         userId: it.userId || store?.user?.id,
         variantDetailId: it.variantDetailId ?? null,
