@@ -69,6 +69,8 @@ const ESBUILD = {
     'next', 'next/*',
     'axios', 'zustand', 'zustand/*',
     'lucide-react', 'framer-motion', 'isomorphic-dompurify', 'uuid',
+    // يوفّره المتجر وقت التشغيل (src/components/theme/kit.ts)
+    '@mdstore/theme-kit',
   ],
   write:    false,
   logLevel: 'silent',

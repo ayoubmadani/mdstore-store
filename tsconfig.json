@@ -19,6 +19,7 @@
       }
     ],
     "paths": {
+      "@mdstore/theme-kit": ["./src/components/theme/kit.ts"],
       "@/*": ["./src/*"]
     }
   },

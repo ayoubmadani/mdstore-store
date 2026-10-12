@@ -10,6 +10,7 @@ import * as LucideReact from 'lucide-react'
 import * as FramerMotion from 'framer-motion'
 import * as UUID from 'uuid'
 import DOMPurify from 'isomorphic-dompurify'
+import * as ThemeKit from '@/components/theme/kit'
 
 const memCache = new Map<string, any>()
 
@@ -41,6 +42,7 @@ function makeRequire() {
     'framer-motion':        FramerMotion,
     'uuid':                 UUID,
     'isomorphic-dompurify': { default: DOMPurify, ...DOMPurify },
+    '@mdstore/theme-kit':   { ...ThemeKit, __esModule: true },
   }
   return (id: string) => pinned[id] ?? {}
 }

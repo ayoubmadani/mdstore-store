@@ -13,6 +13,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import NextLink from 'next/link';
 import NextImage from 'next/image';
 import * as NextNavigation from 'next/navigation';
+import * as ThemeKit from '@/components/theme/kit';
 
 const esm = (obj: Record<string, any>) => ({ ...obj, __esModule: true });
 
@@ -42,6 +43,7 @@ function makeRequire() {
     'next/image':           esm({ default: NextImage }),
     'next/navigation':      esm({ ...NextNavigation }),
     'next/router':          esm({ ...NextNavigation }),
+    '@mdstore/theme-kit':   esm({ ...ThemeKit }),
   };
   return (id: string) => mods[id] ?? {};
 }
