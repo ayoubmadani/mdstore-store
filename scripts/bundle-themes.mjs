@@ -59,6 +59,21 @@ if (args.includes('--list')) {
   process.exit(0)
 }
 
+// ─── skill (تعليمات صنع الثيمات الخاصة بـ Claude في md-store-api) ─────────────
+// node scripts/bundle-themes.mjs --skill  ← يرفع skills/mdstore-theme-creator إلى theme-skill/
+if (args.includes('--skill')) {
+  const dir = path.join(ROOT, 'skills/mdstore-theme-creator')
+  const files = ['SKILL.md', 'reference/theme-template.tsx', 'reference/existing-themes.md']
+  for (const rel of files) {
+    await s3.send(new PutObjectCommand({
+      Bucket: BUCKET, Key: `theme-skill/${rel}`,
+      Body: fs.readFileSync(path.join(dir, rel)), ContentType: 'text/plain; charset=utf-8',
+    }))
+    console.log(`✓ theme-skill/${rel}`)
+  }
+  process.exit(0)
+}
+
 // ─── esbuild config ──────────────────────────────────────────────────────────
 const ESBUILD = {
   bundle:   true,
