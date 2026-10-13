@@ -57,6 +57,15 @@ const SUC     = '#16a34a';
 
 /* ─────────── Lang / Translation ─────────── */
 type Lang = 'ar' | 'fr' | 'en';
+
+// نوع التوصيل المتاح في الولاية المختارة (منزل / مكتب) حسب حساب الشحن — قبل اختيار الولاية يظهر الاثنان
+const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office') => {
+  const w = (list || []).find((x: any) => String(x.id) === String(wilayaId));
+  return !w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false);
+};
+// خيار نوع التوصيل يظهر فقط بعد اختيار الولاية، وحسب ما هو متاح فيها
+const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office') => !!wilayaId && deliveryAllowed(list, wilayaId, type);
+
 const getLang = (store?: any): Lang => {
   if (store?.language === 'fr') return 'fr';
   if (store?.language === 'en') return 'en';
@@ -1163,6 +1172,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
 
   useEffect(() => { if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); }, [userId]);
+  // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
+  useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
+  // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
     setLoadingC(true);
@@ -1334,7 +1347,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 <div className="luxe-input-wrap">
                   <label>{t.wilaya}</label>
                   <div className="luxe-select-wrap">
-                    <select className={`luxe-select ${errors.wilaya ? 'err' : ''}`} value={fd.customerWelaya} onChange={e => setFd(p => ({...p, customerWelaya: e.target.value, customerCommune: ''}))} disabled={wilayas.length === 0}>
+                    <select className={`luxe-select ${errors.wilaya ? 'err' : ''}`} value={fd.customerWelaya} onChange={e => setFd(p => ({...p, customerWelaya: e.target.value, customerCommune: ''}))} disabled={wilayas.length <= 1}>
                       <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
                       {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>)}
                     </select>
@@ -1356,12 +1369,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               </div>
 
               <div className="luxe-delivery-toggle">
-                <button className={`luxe-delivery-btn ${fd.typeLivraison === 'home' ? 'active' : ''}`} onClick={() => setFd(p => ({...p, typeLivraison: 'home'}))}>
+                {deliveryShown(wilayas, fd.customerWelaya, 'home') && (<button data-delivery-option className={`luxe-delivery-btn ${fd.typeLivraison === 'home' ? 'active' : ''}`} onClick={() => setFd(p => ({...p, typeLivraison: 'home'}))}>
                   <Truck size={16} /> {t.deliveryHome}
-                </button>
-                <button className={`luxe-delivery-btn ${fd.typeLivraison === 'office' ? 'active' : ''}`} onClick={() => setFd(p => ({...p, typeLivraison: 'office'}))}>
+                </button>)}
+                {deliveryShown(wilayas, fd.customerWelaya, 'office') && (<button data-delivery-option className={`luxe-delivery-btn ${fd.typeLivraison === 'office' ? 'active' : ''}`} onClick={() => setFd(p => ({...p, typeLivraison: 'office'}))}>
                   <Package size={16} /> {t.deliveryOffice}
-                </button>
+                </button>)}
               </div>
             </>
           )}
@@ -1423,6 +1436,10 @@ export function Cart({ domain, store }: any) {
   }, [domain]);
 
   useEffect(() => { if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas); }, [store]);
+  // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
+  useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
+  // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
     setLoadingC(true);
@@ -1569,7 +1586,7 @@ export function Cart({ domain, store }: any) {
             <div className="luxe-input-wrap">
               <label>{t.wilaya}</label>
               <div className="luxe-select-wrap">
-                <select className={`luxe-select ${errors.wilaya ? 'err' : ''}`} value={fd.customerWelaya} onChange={e => setFd(p => ({...p, customerWelaya: e.target.value, customerCommune: ''}))} disabled={wilayas.length === 0}>
+                <select className={`luxe-select ${errors.wilaya ? 'err' : ''}`} value={fd.customerWelaya} onChange={e => setFd(p => ({...p, customerWelaya: e.target.value, customerCommune: ''}))} disabled={wilayas.length <= 1}>
                   <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
                   {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>)}
                 </select>
@@ -1591,12 +1608,12 @@ export function Cart({ domain, store }: any) {
           </div>
 
           <div className="luxe-delivery-toggle">
-            <button className={`luxe-delivery-btn ${fd.typeLivraison === 'home' ? 'active' : ''}`} onClick={() => setFd(p => ({...p, typeLivraison: 'home'}))}>
+            {deliveryShown(wilayas, fd.customerWelaya, 'home') && (<button data-delivery-option className={`luxe-delivery-btn ${fd.typeLivraison === 'home' ? 'active' : ''}`} onClick={() => setFd(p => ({...p, typeLivraison: 'home'}))}>
               <Truck size={16} /> {t.deliveryHome}
-            </button>
-            <button className={`luxe-delivery-btn ${fd.typeLivraison === 'office' ? 'active' : ''}`} onClick={() => setFd(p => ({...p, typeLivraison: 'office'}))}>
+            </button>)}
+            {deliveryShown(wilayas, fd.customerWelaya, 'office') && (<button data-delivery-option className={`luxe-delivery-btn ${fd.typeLivraison === 'office' ? 'active' : ''}`} onClick={() => setFd(p => ({...p, typeLivraison: 'office'}))}>
               <Package size={16} /> {t.deliveryOffice}
-            </button>
+            </button>)}
           </div>
 
           {errors.submit && <p style={{ color: ERR, fontSize: '0.85rem', marginBottom: 12, textAlign: 'center' }}>{errors.submit}</p>}

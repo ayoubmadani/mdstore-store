@@ -84,6 +84,15 @@ const S: Record<string, React.CSSProperties> = {
   error: { fontSize: '0.75rem', color: '#c00', marginTop: 3, display: 'flex', alignItems: 'center', gap: 4 },
 };
 
+
+// نوع التوصيل المتاح في الولاية المختارة (منزل / مكتب) حسب حساب الشحن — قبل اختيار الولاية يظهر الاثنان
+const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office') => {
+  const w = (list || []).find((x: any) => String(x.id) === String(wilayaId));
+  return !w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false);
+};
+// خيار نوع التوصيل يظهر فقط بعد اختيار الولاية، وحسب ما هو متاح فيها
+const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office') => !!wilayaId && deliveryAllowed(list, wilayaId, type);
+
 function variantMatches(detail: VariantDetail, sel: Record<string, string>): boolean {
   return Object.entries(sel).every(([attrName, val]) =>
     detail.name.some(e => e.attrName === attrName && e.value === val)
@@ -664,6 +673,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const initCount = useCartStore((s) => s.initCount);
 
   useEffect(() => { if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); }, [userId]);
+  // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
+  useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
+  // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
   useEffect(() => { const id = typeof window !== 'undefined' && localStorage.getItem('customerId'); if (id) setFd(p => ({ ...p, customerId: id as string })); }, []);
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -811,7 +824,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           <>
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '0.75rem', marginBottom: 0 }}>
               <FR label="الولاية" error={errors.customerWelaya}>
-                <select value={fd.customerWelaya} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...S.inputBase, appearance: 'none' as any }}>
+                <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...S.inputBase, appearance: 'none' as any }}>
                   <option value="">اختر الولاية</option>
                   {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                 </select>
@@ -826,8 +839,8 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
             <FR label="طريقة التوصيل">
               <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '0.5rem' }}>
-                {(['home', 'office'] as const).map(t => (
-                  <button key={t} type="button" onClick={() => setFd({ ...fd, typeLivraison: t })}
+                {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt)).map(t => (
+                  <button data-delivery-option key={t} type="button" onClick={() => setFd({ ...fd, typeLivraison: t })}
                     style={{ ...S.btnOutline, justifyContent: 'center', flexDirection: 'column', gap: 2, padding: '0.6rem', borderColor: fd.typeLivraison === t ? '#111' : '#ddd', background: fd.typeLivraison === t ? '#111' : '#fff', color: fd.typeLivraison === t ? '#fff' : '#333' }}>
                     {t === 'home' ? <HomeIcon size={14} /> : <Building2 size={14} />}
                     <span style={{ fontSize: '0.75rem' }}>{t === 'home' ? 'المنزل' : 'المكتب'}</span>

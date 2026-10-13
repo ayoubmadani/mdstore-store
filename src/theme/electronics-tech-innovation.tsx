@@ -68,6 +68,15 @@ const FONT_MONO = "'JetBrains Mono', 'Cairo', monospace";
 
 type Lang = 'ar' | 'fr' | 'en';
 
+
+// نوع التوصيل المتاح في الولاية المختارة (منزل / مكتب) حسب حساب الشحن — قبل اختيار الولاية يظهر الاثنان
+const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office') => {
+  const w = (list || []).find((x: any) => String(x.id) === String(wilayaId));
+  return !w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false);
+};
+// خيار نوع التوصيل يظهر فقط بعد اختيار الولاية، وحسب ما هو متاح فيها
+const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office') => !!wilayaId && deliveryAllowed(list, wilayaId, type);
+
 const getLang = (store?: any): Lang => {
   if (store?.language === 'fr') return 'fr';
   if (store?.language === 'en') return 'en';
@@ -1344,6 +1353,10 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   const [added, setAdded] = useState(false);
 
   useEffect(() => { if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); }, [userId]);
+  // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
+  useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
+  // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
 
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1572,7 +1585,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
                   <div style={{ position: 'relative' }}>
                     <ChevronDown size={13} aria-hidden="true" style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
                     <select id="ti-wilaya" className={`ti-input ${errors.customerWelaya ? 'err' : ''}`}
-                      disabled={wilayas.length === 0}
+                      disabled={wilayas.length <= 1}
                       value={fd.customerWelaya}
                       onChange={(e) => setFd((f) => ({ ...f, customerWelaya: e.target.value, customerCommune: '' }))}
                       style={{ paddingInlineEnd: 36 }}>
@@ -1605,10 +1618,10 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
 
               {/* Delivery type toggle */}
               <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10, marginBottom: '1rem' }}>
-                {(['home', 'office'] as const).map((type) => {
+                {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt)).map((type) => {
                   const active = fd.typeLivraison === type;
                   return (
-                    <button key={type} onClick={() => set('typeLivraison', type)} style={{
+                    <button data-delivery-option key={type} onClick={() => set('typeLivraison', type)} style={{
                       padding: '0.7rem', minHeight: 44, cursor: 'pointer', fontFamily: 'inherit',
                       border: active ? `2px solid ${A}` : `1px solid ${BD}`, borderRadius: 4,
                       background: active ? AL : 'transparent', color: active ? A : SUB, fontWeight: 700, fontSize: '0.85rem',
@@ -1686,6 +1699,10 @@ export function Cart({ domain, store }: any) {
   useEffect(() => {
     if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas);
   }, [store]);
+  // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
+  useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
+  // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
 
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1872,7 +1889,7 @@ export function Cart({ domain, store }: any) {
               <div style={{ position: 'relative' }}>
                 <ChevronDown size={13} aria-hidden="true" style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
                 <select id="ti-c-wilaya" className={`ti-input ${errors.customerWelaya ? 'err' : ''}`}
-                  disabled={wilayas.length === 0}
+                  disabled={wilayas.length <= 1}
                   value={fd.customerWelaya}
                   onChange={(e) => setFd((f) => ({ ...f, customerWelaya: e.target.value, customerCommune: '' }))}
                   style={{ paddingInlineEnd: 36 }}>
@@ -1904,10 +1921,10 @@ export function Cart({ domain, store }: any) {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10, marginBottom: '1rem' }}>
-            {(['home', 'office'] as const).map((type) => {
+            {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt)).map((type) => {
               const active = fd.typeLivraison === type;
               return (
-                <button key={type} onClick={() => set('typeLivraison', type)} style={{
+                <button data-delivery-option key={type} onClick={() => set('typeLivraison', type)} style={{
                   padding: '0.7rem', minHeight: 44, cursor: 'pointer', fontFamily: 'inherit',
                   border: active ? `2px solid ${A}` : `1px solid ${BD}`, borderRadius: 4,
                   background: active ? AL : 'transparent', color: active ? A : SUB, fontWeight: 700, fontSize: '0.85rem',

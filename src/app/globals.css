@@ -42,3 +42,9 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ثيمات المتجر: إذا ظهر نوع توصيل واحد فقط (منزل أو مكتب) يأخذ عرض السطر كاملاً */
+[data-delivery-option]:only-child {
+  grid-column: 1 / -1;
+  flex: 1 1 100%;
+}

@@ -46,13 +46,15 @@ Hero: نمط من القائمة أدناه
 - **بطاقات:** إطار بظل · صورة مع معلومات تظهر عند المرور · بسيطة بلا إطار · غلاف طويل (كتب/أزياء) · أفقية (قائمة).
 - **التصنيفات:** أزرار كبسولية قابلة للتمرير · شبكة بصور · قائمة جانبية.
 
-صور الهيرو والمعاينة: روابط مباشرة من `images.unsplash.com` (`?w=1600` للهيرو و`?w=800` للمعاينة) تطابق النشاط.
+صور الهيرو والمعاينة: روابط مباشرة من `images.unsplash.com` تطابق النشاط، بصيغة `?w=1200&q=70&auto=format` للهيرو و`?w=800&q=70&auto=format` للمعاينة (الجوال لا يحتاج أكبر).
 
 ## 2. العقد التقني (لا تخالفه)
 
 **الاستيرادات المسموحة فقط:**
 `react`، و`react-dom`، و`next/link`، و`next/image`، و`next/navigation`، و`axios`، و`zustand`، و`lucide-react`، و`framer-motion`، و`isomorphic-dompurify`، و`uuid`، و`@mdstore/theme-kit`.
 أي استيراد آخر (مثل `@/…`، أو ملف نسبي، أو رابط) يرفضه الخادم.
+- `lucide-react`: بالاسم فقط (`import { Home, ShoppingBag } from 'lucide-react'`). الخادم يدمج الأيقونات المستعملة فقط داخل الحزمة. `import * as` يُلغي ذلك ويجبر المتجر على تحميل كل المكتبة (~200KB).
+- `framer-motion`: ثقيلة ولا تُحمَّل إلا لثيم يستوردها. استعمل حركات CSS (`@keyframes` و`transition`) بدلها.
 
 **الـ exports المطلوبة:** `default` (الغلاف: Navbar + children + Footer)، و`Home`، و`Details`، و`Cart`، و`StaticPage`. والمستحسن أيضاً: `Success`، و`Navbar`، و`Footer`، و`Card`، و`ProductForm`، و`Privacy`، و`Terms`، و`Cookies`، و`Contact`.
 
@@ -89,7 +91,15 @@ import {
 9. **Footer:** الهاتف + واتساب + البريد **دائماً**، والناقص منها يُعرض بـ `comingSoon(store)`. الأرقام داخل `<span dir="ltr">`.
 10. **الشريط العلوي:** `store.topBar.enabled && store.topBar.text`. **الشعار:** `store.design.logoUrl`، وإلا اسم المتجر بتصميم الهوية.
 11. **وصف المنتج HTML:** يُعرض دائماً عبر `DOMPurify.sanitize`.
-12. **الجوال أولاً:** شبكات بـ `minmax(0,1fr)`، ولا overflow أفقي، وقائمة جوال، و`width:100%` للحاوية داخل flex.
+12. **ولاية واحدة فقط:** إذا أرجع `fetchWilayas` ولاية واحدة، تُختار تلقائياً عبر `useEffect` على مستوى المكوّن (لا داخل `useEffect` آخر) ويُقفل حقلها: `disabled={wilayas.length === 1}`. ينطبق ذلك في ProductForm وفي Cart، كما في القالب المرجعي.
+13. **نوع التوصيل لكل ولاية:** كل ولاية فيها `homeEnabled` و`officeEnabled`. لا تُظهر خيارات نوع التوصيل قبل اختيار الولاية، وبعدها اعرض المتاح فقط عبر `deliveryShown(wilayas, fd.customerWelaya, type)`. ضع `data-delivery-option` على زر كل نوع، واجعل الأزرار وحدها في حاويتها: المتجر يجعل الزر الوحيد بعرض السطر كاملاً. وإذا صار النوع المختار غير متاح، انقل `typeLivraison` للنوع الآخر في `useEffect` على مستوى المكوّن. كل هذا مطبّق في القالب المرجعي.
+14. **الجوال أولاً:** شبكات بـ `minmax(0,1fr)`، ولا overflow أفقي، وقائمة جوال، و`width:100%` للحاوية داخل flex.
+15. **السرعة (PageSpeed على الجوال)** — كما في القالب المرجعي:
+    - صورة الواجهة الأولى (hero) وصورة المنتج الرئيسية في Details: `fetchPriority="high" decoding="async"` بلا `loading="lazy"`.
+    - كل الصور الأخرى (بطاقات المنتجات، المصغّرات، السلة، البحث، الأقسام السفلية): `loading="lazy" decoding="async"`، مع `aspect-ratio` أو `width`/`height` للحاوية حتى لا تقفز الصفحة (CLS).
+    - الخطوط: عائلتان أو ثلاث كحد أقصى، وفقط الأوزان المستعملة، في `@import` واحد مع `display=swap`.
+    - لا حركة `infinite` على عناصر كبيرة أو صور كاملة العرض (مثل Ken Burns على الهيرو)، ولا `backdrop-filter` أو `filter: blur` على مساحات كبيرة. الحركة بـ `transform` و`opacity` فقط، وأوقفها مع `@media (prefers-reduced-motion: reduce)`.
+    - لا تحرّك خصائص تعيد الرسم أو التخطيط (`box-shadow`، `width`/`height`، `top`/`left`، `background-position`)، ولا عشرات العناصر المتحركة في نفس الوقت.
 
 ## 3. سير العمل
 
@@ -108,10 +118,11 @@ import {
 - [ ] `default` و`Home` و`Details` و`Cart` و`StaticPage` مُصدَّرة.
 - [ ] ثلاث ترجمات كاملة بنفس المفاتيح، وكل نص ظاهر يأتي من الترجمة.
 - [ ] الشحن بـ `storeId`، والإضافات في الطلب والسلة، وزر واتساب، وFooter التواصل.
-- [ ] منتج رقمي، وعروض، ومتغيرات، وتوصيل مجاني، و`store.cart === false`.
+- [ ] منتج رقمي، وعروض، ومتغيرات، وتوصيل مجاني، و`store.cart === false`، وولاية واحدة تُختار وتُقفل، ونوع التوصيل حسب الولاية.
 - [ ] لا يوجد `localStorage` أو `window` خارج `useEffect` أو معالجات الأحداث (الصفحة تُعرض على الخادم أيضاً).
 - [ ] لا تعليق JSX داخل `&& (…)`، ولا `pt` في CSS.
+- [ ] السرعة: الهيرو وصورة المنتج الرئيسية `fetchPriority="high"`، وباقي الصور `loading="lazy"`، وأيقونات lucide بالاسم، ولا framer-motion، ولا حركة `infinite` أو `blur` على مساحات كبيرة.
 
 ## المراجع
-- `reference/theme-template.tsx`: ثيم كامل يعمل (المكتبة العصرية) بكل الميزات أعلاه. **مرجع للمنطق، لا للتصميم.**
+- `reference/theme-template.tsx`: ثيم كامل يعمل (المكتبة العصرية) بكل الميزات أعلاه، ومنها قواعد السرعة. **مرجع للمنطق، لا للتصميم.**
 - `reference/existing-themes.md`: الخطوط والألوان المستعملة في الثيمات الحالية.

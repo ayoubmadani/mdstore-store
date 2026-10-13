@@ -41,6 +41,8 @@ const BUCKET = process.env.AWS_S3_BUCKET_NAME
 const args     = process.argv.slice(2)
 const onlySlug = args.find(a => a.startsWith('--slug='))?.split('=')[1]
 const doDelete = args.includes('--delete')
+// --out=<dir>: بناء محلي فقط (للاختبار) بدون رفع إلى R2
+const outDir   = args.find(a => a.startsWith('--out='))?.split('=')[1]
 
 // ─── delete ──────────────────────────────────────────────────────────────────
 if (doDelete) {
@@ -83,10 +85,13 @@ const ESBUILD = {
     'react', 'react-dom', 'react/jsx-runtime',
     'next', 'next/*',
     'axios', 'zustand', 'zustand/*',
-    'lucide-react', 'framer-motion', 'isomorphic-dompurify', 'uuid',
+    // lucide-react مدمجة في الحزمة: الأيقونات المستعملة فقط بدل تحميل كل المكتبة في المتجر
+    'framer-motion', 'isomorphic-dompurify', 'uuid',
     // يوفّره المتجر وقت التشغيل (src/components/theme/kit.ts)
     '@mdstore/theme-kit',
   ],
+  mainFields: ['module', 'main'], // نسخة ESM من lucide حتى يحذف esbuild الأيقونات غير المستعملة
+  minify:   true,
   write:    false,
   logLevel: 'silent',
 }
@@ -110,6 +115,13 @@ for (const slug of toProcess) {
   try {
     const result = await esbuild.build({ entryPoints: [entry], ...ESBUILD })
     const code = result.outputFiles[0].text
+    if (outDir) {
+      fs.mkdirSync(outDir, { recursive: true })
+      fs.writeFileSync(path.join(outDir, `${slug}.js`), code)
+      console.log(`✓ ${slug} (${(code.length / 1024).toFixed(1)}KB)`)
+      uploaded++
+      continue
+    }
     await s3.send(new PutObjectCommand({
       Bucket: BUCKET, Key: `themes/${slug}.js`,
       Body: code, ContentType: 'application/javascript',
@@ -122,4 +134,4 @@ for (const slug of toProcess) {
   }
 }
 
-console.log(`\n✅ Done: ${uploaded} uploaded, ${failed} failed`)
+console.log(`\n✅ Done: ${uploaded} ${outDir ? `built → ${outDir}` : 'uploaded'}, ${failed} failed`)

@@ -64,6 +64,15 @@ interface Product {
 
 type Lang = 'ar' | 'fr' | 'en';
 
+
+// نوع التوصيل المتاح في الولاية المختارة (منزل / مكتب) حسب حساب الشحن — قبل اختيار الولاية يظهر الاثنان
+const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office') => {
+  const w = (list || []).find((x: any) => String(x.id) === String(wilayaId));
+  return !w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false);
+};
+// خيار نوع التوصيل يظهر فقط بعد اختيار الولاية، وحسب ما هو متاح فيها
+const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office') => !!wilayaId && deliveryAllowed(list, wilayaId, type);
+
 const getLang = (store?: any): Lang => {
   if (store?.language === 'fr') return 'fr';
   if (store?.language === 'en') return 'en';
@@ -1515,6 +1524,10 @@ export function ProductForm({
   const [added, setAdded] = useState(false);
 
   useEffect(() => { if (uid) fetchWilayas(uid, store?.id).then(setWilayas); }, [uid]);
+  // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
+  useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
+  // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
 
   useEffect(() => {
     try {
@@ -1744,7 +1757,7 @@ export function ProductForm({
                 <Field label={t.wilaya} error={errors.customerWelaya}>
                   <SelectWrap>
                     <select
-                      disabled={wilayas.length === 0}
+                      disabled={wilayas.length <= 1}
                       style={{ ...inputBase, paddingInlineEnd: 36, ...(errors.customerWelaya ? { borderColor: ERR } : {}) }}
                       value={fd.customerWelaya}
                       onChange={(e) => { set('customerWelaya', e.target.value); set('customerCommune', ''); }}
@@ -1776,20 +1789,20 @@ export function ProductForm({
 
               <Field label={t.deliveryType}>
                 <div className="uvt-toggle">
-                  <button
+                  {deliveryShown(wilayas, fd.customerWelaya, 'home') && (<button data-delivery-option
                     type="button"
                     className={fd.typeLivraison === 'home' ? 'is-active' : ''}
                     onClick={() => set('typeLivraison', 'home')}
                   >
                     <Truck size={15} /> {t.deliveryHome}
-                  </button>
-                  <button
+                  </button>)}
+                  {deliveryShown(wilayas, fd.customerWelaya, 'office') && (<button data-delivery-option
                     type="button"
                     className={fd.typeLivraison === 'office' ? 'is-active' : ''}
                     onClick={() => set('typeLivraison', 'office')}
                   >
                     <MapPin size={15} /> {t.deliveryOffice}
-                  </button>
+                  </button>)}
                 </div>
               </Field>
             </>
@@ -2077,6 +2090,10 @@ export function Cart({ domain, store }: any) {
     if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas);
     else if (store?.userId) fetchWilayas(store.userId, store?.id).then(setWilayas);
   }, [store]);
+  // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
+  useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
+  // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
 
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -2269,7 +2286,7 @@ export function Cart({ domain, store }: any) {
               <Field label={t.wilaya} error={errors.customerWelaya}>
                 <SelectWrap>
                   <select
-                    disabled={wilayas.length === 0}
+                    disabled={wilayas.length <= 1}
                     style={{ ...inputBase, paddingInlineEnd: 36, ...(errors.customerWelaya ? { borderColor: ERR } : {}) }}
                     value={fd.customerWelaya}
                     onChange={(e) => { set('customerWelaya', e.target.value); set('customerCommune', ''); }}
@@ -2301,20 +2318,20 @@ export function Cart({ domain, store }: any) {
 
             <Field label={t.deliveryType}>
               <div className="uvt-toggle">
-                <button
+                {deliveryShown(wilayas, fd.customerWelaya, 'home') && (<button data-delivery-option
                   type="button"
                   className={fd.typeLivraison === 'home' ? 'is-active' : ''}
                   onClick={() => set('typeLivraison', 'home')}
                 >
                   <Truck size={15} /> {t.deliveryHome}
-                </button>
-                <button
+                </button>)}
+                {deliveryShown(wilayas, fd.customerWelaya, 'office') && (<button data-delivery-option
                   type="button"
                   className={fd.typeLivraison === 'office' ? 'is-active' : ''}
                   onClick={() => set('typeLivraison', 'office')}
                 >
                   <MapPin size={15} /> {t.deliveryOffice}
-                </button>
+                </button>)}
               </div>
             </Field>
 

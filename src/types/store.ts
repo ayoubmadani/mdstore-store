@@ -8,6 +8,15 @@ export interface Store {
   cart: boolean;
   theme?: { slug: string };
   pixels?: Pixel[];
+  seo?: {
+    metaTitle: string | null;
+    metaDescription: string | null;
+    keywords: string | null;
+    ogImageUrl: string | null;
+    googleVerification: string | null;
+    bingVerification: string | null;
+    allowIndexing: boolean;
+  } | null;
   domains?: { id: string; domain: string; scope?: 'store' | 'landing_page'; builderPageId?: string }[];
   design: {
     primaryColor: string;

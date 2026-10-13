@@ -184,6 +184,15 @@ const CSS = `
 `;
 
 /* ─── Fire SVG ─── */
+
+// نوع التوصيل المتاح في الولاية المختارة (منزل / مكتب) حسب حساب الشحن — قبل اختيار الولاية يظهر الاثنان
+const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office') => {
+  const w = (list || []).find((x: any) => String(x.id) === String(wilayaId));
+  return !w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false);
+};
+// خيار نوع التوصيل يظهر فقط بعد اختيار الولاية، وحسب ما هو متاح فيها
+const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office') => !!wilayaId && deliveryAllowed(list, wilayaId, type);
+
 function FireIcon({ size = 32 }: { size?: number }) {
   return (
     <svg width={size} height={size * 1.3} viewBox="0 0 32 42" fill="none" style={{ animation: 'flicker 1.8s ease-in-out infinite' }}>
@@ -1482,6 +1491,10 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   const initCount = useCartStore(s => s.initCount);
 
   useEffect(()=>{ if(userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); },[userId]);
+  // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
+  useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
+  // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
   useEffect(()=>{ if(typeof window!=='undefined'){const id=localStorage.getItem('customerId');if(id) setFd(p=>({...p,customerId:id}));} },[]);
   useEffect(()=>{ if(!fd.customerWelaya){setCommunes([]);return;} setLC(true); fetchCommunes(fd.customerWelaya).then(d=>{setCommunes(d);setLC(false);}); },[fd.customerWelaya]);
   useEffect(()=>{ if(selW) setFd(f=>({...f,priceLoss:selW.livraisonReturn})); },[]);
@@ -1619,7 +1632,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
                   <FR error={errors.customerWelaya} label={t.wilaya}>
                     <div style={{position:'relative'}}>
                       <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
-                      <select value={fd.customerWelaya} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})}
+                      <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})}
                         className={`inp${errors.customerWelaya?' inp-err':''}`} style={isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}}
                         onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerWelaya?'#ef4444':'var(--dim)';}}>
                         <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {isRTL?w.ar_name:w.name}</option>)}
@@ -1640,8 +1653,8 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
 
                 <FR label={t.deliveryType}>
                   <div className="dlv-2c">
-                    {(['home','office'] as const).map(dtype=>(
-                      <button key={dtype} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:dtype}))}
+                    {(['home','office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt)).map(dtype=>(
+                      <button data-delivery-option key={dtype} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:dtype}))}
                         style={{padding:'12px 10px',border:`1.5px solid ${fd.typeLivraison===dtype?'var(--fire)':'var(--dim)'}`,backgroundColor:fd.typeLivraison===dtype?'rgba(255,69,0,0.1)':'transparent',cursor:'pointer',textAlign:'start',transition:'all 0.2s',fontFamily:'inherit'}}>
                         <p className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:fd.typeLivraison===dtype?'var(--fire)':'var(--mid)',margin:'0 0 4px'}}>{dtype==='home'?t.homeDelivLabel:t.officeDelivLabel}</p>
                         {selW && (orderFreeShipping ? <p className="bb" style={{fontSize:'0.85rem',color:fd.typeLivraison===dtype?'var(--fire)':'var(--dim)',margin:0}}>{t.freeShippingBadge}</p> : <p className="bb" style={{fontSize:'1rem',color:fd.typeLivraison===dtype?'var(--fire)':'var(--dim)',margin:0}}>{(dtype==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'11px',color:'var(--dim)'}}>{storeprop?.currency || 'DZD'}</span></p>)}
@@ -1715,6 +1728,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const initCount = useCartStore(s => s.initCount);
 
   useEffect(()=>{ setItems(JSON.parse(localStorage.getItem(domain)||'[]')); if(store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas); },[domain,store]);
+  // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
+  useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
+  // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
   useEffect(()=>{ if(!fd.customerWelaya){setCommunes([]);return;} setLC(true); fetchCommunes(fd.customerWelaya).then(d=>{setCommunes(d);setLC(false);}); },[fd.customerWelaya]);
 
   const selW      = useMemo(()=>wilayas.find(w=>String(w.id)===String(fd.customerWelaya)),[wilayas,fd.customerWelaya]);
@@ -1834,7 +1851,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <FR error={errors.w} label={t.wilaya}>
                   <div style={{position:'relative'}}>
                     <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
-                    <select value={fd.customerWelaya} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})} className={`inp${errors.w?' inp-err':''}`} style={isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}}
+                    <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})} className={`inp${errors.w?' inp-err':''}`} style={isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}}
                       onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.w?'#ef4444':'var(--dim)';}}>
                       <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {isRTL?w.ar_name:w.name}</option>)}
                     </select>
@@ -1854,8 +1871,8 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               <div style={{marginBottom:'14px'}}>
                 <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.2em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'10px'}}>{t.cartDelivType}</p>
                 <div className="delivery-grid">
-                  {(['home','office'] as const).map(dtype=>(
-                    <button
+                  {(['home','office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt)).map(dtype=>(
+                    <button data-delivery-option
                       key={dtype}
                       type="button"
                       onClick={()=>setFd(p=>({...p,typeLivraison:dtype}))}

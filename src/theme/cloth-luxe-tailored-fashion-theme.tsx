@@ -374,6 +374,15 @@ const jsonFr = {
 };
 
 type Lang = 'ar' | 'fr' | 'en';
+
+// نوع التوصيل المتاح في الولاية المختارة (منزل / مكتب) حسب حساب الشحن — قبل اختيار الولاية يظهر الاثنان
+const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office') => {
+  const w = (list || []).find((x: any) => String(x.id) === String(wilayaId));
+  return !w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false);
+};
+// خيار نوع التوصيل يظهر فقط بعد اختيار الولاية، وحسب ما هو متاح فيها
+const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office') => !!wilayaId && deliveryAllowed(list, wilayaId, type);
+
 const getLang = (store?: any): Lang => {
   if (store?.language === 'fr') return 'fr';
   if (store?.language === 'en') return 'en';
@@ -797,6 +806,10 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
   const initCount=useCartStore(s=>s.initCount);
 
   useEffect(()=>{if(userId)fw(userId,product?.store?.id).then(setW)},[userId]);
+  // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
+  useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
+  // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
   useEffect(()=>{if(typeof window!=='undefined'){const id=localStorage.getItem('customerId');if(id)setFd(p=>({...p,customerId:id}))}},[]);
   useEffect(()=>{if(!fd.customerWelaya){setC([]);return}setLC(true);fc(fd.customerWelaya).then(d=>{setC(d);setLC(false)})},[fd.customerWelaya]);
 
@@ -882,7 +895,7 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
               <FR label={t.wilaya} error={errors.w}>
                 <div style={{position:'relative'}}>
                   <ChevronDown style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',width:12,height:12,color:'var(--mu)',pointerEvents:'none'}}/>
-                  <select value={fd.customerWelaya} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})} style={{...IS(!!errors.w),paddingLeft:30}} onFocus={onF} onBlur={e=>onBl(e,!!errors.w)}>
+                  <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})} style={{...IS(!!errors.w),paddingLeft:30}} onFocus={onF} onBlur={e=>onBl(e,!!errors.w)}>
                     <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
                   </select>
                 </div>
@@ -898,8 +911,8 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
             </div>
             <FR label={t.deliveryType}>
               <div style={{display:'grid',gridTemplateColumns:'minmax(0, 1fr) minmax(0, 1fr)',gap:8}}>
-                {(['home','office'] as const).map(type=>(
-                  <button key={type} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:type}))}
+                {(['home','office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt)).map(type=>(
+                  <button data-delivery-option key={type} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:type}))}
                     style={{padding:'11px',border:`1px solid ${fd.typeLivraison===type?'var(--cp)':'var(--br2)'}`,background:fd.typeLivraison===type?'var(--cl)':'transparent',cursor:'pointer',textAlign:'center',transition:'all .18s',fontFamily:"'Raleway',sans-serif"}}>
                     <p style={{fontSize:'10px',color:fd.typeLivraison===type?'var(--cp)':'var(--mu)',letterSpacing:'0.12em',textTransform:'uppercase',marginBottom:4}}>{type==='home'?t.forHome:t.forOffice}</p>
                     {selW&&<p style={{fontSize:'13px',fontWeight:700,color:fd.typeLivraison===type?'var(--cp)':'var(--tx)',fontFamily:"'Raleway',sans-serif"}}>{orderFreeShipping?t.freeShippingBadge:`${(type==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} ${cur}`}</p>}
@@ -970,6 +983,10 @@ export function Cart({domain,store}:{domain:string;store:any}){
   const userId=store?.user?.id||store?.userId;
 
   useEffect(()=>{setItems(JSON.parse(localStorage.getItem(domain)||'[]'));if(userId)fw(userId,store?.id).then(setW)},[domain,store]);
+  // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
+  useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
+  // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
   useEffect(()=>{if(!fd.customerWelaya){setC([]);return}setLC(true);fc(fd.customerWelaya).then(d=>{setC(d);setLC(false)})},[fd.customerWelaya]);
 
   const selW=useMemo(()=>wilayas.find(w=>String(w.id)===String(fd.customerWelaya)),[wilayas,fd.customerWelaya]);
@@ -1050,7 +1067,7 @@ export function Cart({domain,store}:{domain:string;store:any}){
             </div>
             <div className="f2">
               <FR label={t.wilaya} error={errors.w}>
-                <div style={{position:'relative'}}><ChevronDown style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',width:12,height:12,color:'var(--mu)',pointerEvents:'none'}}/><select value={fd.customerWelaya} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})} style={{...IS(!!errors.w),paddingLeft:30}} onFocus={onF} onBlur={e=>onBl(e,!!errors.w)}><option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}</select></div>
+                <div style={{position:'relative'}}><ChevronDown style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',width:12,height:12,color:'var(--mu)',pointerEvents:'none'}}/><select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})} style={{...IS(!!errors.w),paddingLeft:30}} onFocus={onF} onBlur={e=>onBl(e,!!errors.w)}><option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}</select></div>
               </FR>
               <FR label={t.commune} error={errors.c}>
                 <div style={{position:'relative'}}><ChevronDown style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',width:12,height:12,color:'var(--mu)',pointerEvents:'none'}}/><select value={fd.customerCommune} disabled={lcC||!fd.customerWelaya} onChange={e=>setFd({...fd,customerCommune:e.target.value})} style={{...IS(!!errors.c),paddingLeft:30,opacity:!fd.customerWelaya?0.5:1}} onFocus={onF} onBlur={e=>onBl(e,!!errors.c)}><option value="">{lcC?'...':t.communePh}</option>{communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}</select></div>

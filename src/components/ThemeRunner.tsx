@@ -6,8 +6,6 @@ import * as ReactJSX from 'react/jsx-runtime';
 import * as Zustand from 'zustand';
 import * as ZustandMiddleware from 'zustand/middleware';
 import axios from 'axios';
-import * as LucideReact from 'lucide-react';
-import * as FramerMotion from 'framer-motion';
 import * as UUID from 'uuid';
 import DOMPurify from 'isomorphic-dompurify';
 import NextLink from 'next/link';
@@ -27,7 +25,16 @@ const patchedCreateElement: typeof React.createElement = (type: any, props: any,
 };
 const patchedReact = { ...React, createElement: patchedCreateElement };
 
-function makeRequire() {
+// lucide-react (كل الأيقونات ~200KB) و framer-motion ثقيلة: الثيمات الحديثة تدمج أيقوناتها داخل الحزمة،
+// فلا نحمّل هذه المكتبات إلا لحزمة قديمة تطلبها فعلاً عبر require
+const LAZY_MODULES: Record<string, () => Promise<any>> = {
+  'lucide-react':  () => import('lucide-react'),
+  'framer-motion': () => import('framer-motion'),
+};
+const requiresModule = (code: string, id: string) =>
+  code.includes(`require("${id}")`) || code.includes(`require('${id}')`);
+
+function makeRequire(lazy: Record<string, any>) {
   const mods: Record<string, any> = {
     'react':                esm({ default: patchedReact, ...patchedReact }),
     'react-dom':            esm({ default: ReactDOM, ...ReactDOM }),
@@ -35,8 +42,6 @@ function makeRequire() {
     'zustand':              esm({ ...Zustand }),
     'zustand/middleware':   esm({ ...ZustandMiddleware }),
     'axios':                esm({ default: axios }),
-    'lucide-react':         esm({ ...LucideReact }),
-    'framer-motion':        esm({ ...FramerMotion }),
     'uuid':                 esm({ ...UUID }),
     'isomorphic-dompurify': esm({ default: DOMPurify }),
     'next/link':            esm({ default: NextLink }),
@@ -45,6 +50,7 @@ function makeRequire() {
     'next/router':          esm({ ...NextNavigation }),
     '@mdstore/theme-kit':   esm({ ...ThemeKit }),
   };
+  for (const [id, mod] of Object.entries(lazy)) mods[id] = esm({ ...mod });
   return (id: string) => mods[id] ?? {};
 }
 
@@ -63,11 +69,15 @@ export function loadThemeModule(bundleUrl: string): Promise<Record<string, any>>
         if (!r.ok) throw new Error(`R2 ${r.status}`);
         return r.text();
       })
-      .then((code) => {
+      .then(async (code) => {
+        const lazy: Record<string, any> = {};
+        await Promise.all(Object.entries(LAZY_MODULES)
+          .filter(([id]) => requiresModule(code, id))
+          .map(async ([id, load]) => { lazy[id] = await load(); }));
         const mod = { exports: {} as Record<string, any> };
         // eslint-disable-next-line no-new-func
         const fn = new Function('module', 'exports', 'require', 'React', 'console', 'process', code);
-        fn(mod, mod.exports, makeRequire(), patchedReact, console, {
+        fn(mod, mod.exports, makeRequire(lazy), patchedReact, console, {
           env: {
             NEXT_PUBLIC_API_URL:      process.env.NEXT_PUBLIC_API_URL      ?? '',
             NEXT_PUBLIC_ROOT_DOMAIN:  process.env.NEXT_PUBLIC_ROOT_DOMAIN  ?? '',
@@ -104,6 +114,7 @@ export default function ThemeRunner({
     () => bundleCache.get(`${bundleUrl}:${exportName}`) ?? null
   );
   const [error, setError] = useState<string | null>(null);
+  ReactDOM.preload(bundleUrl, { as: 'fetch', crossOrigin: 'anonymous' });
 
   useEffect(() => {
     const cacheKey = `${bundleUrl}:${exportName}`;

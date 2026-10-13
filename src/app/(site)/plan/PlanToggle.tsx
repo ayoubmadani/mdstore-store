@@ -88,7 +88,8 @@ export default function PlanToggle({ plans }: { plans: Plan[] }) {
       >
         {plans.map((plan, idx) => {
           const isFeatured = idx === featuredIndex;
-          const price = interval === 'year' ? Number(plan.yearlyPrice) : Number(plan.monthlyPrice);
+          // السنوي يُعرض بما يعادله شهرياً (12000/سنة ← 1000/شهر) مع سطر «تُدفع 12000 سنوياً»
+          const price = interval === 'year' ? Math.round(Number(plan.yearlyPrice) / 12) : Number(plan.monthlyPrice);
           const savings =
             plan.monthlyPrice > 0 && plan.yearlyPrice > 0
               ? Math.round((1 - Number(plan.yearlyPrice) / (Number(plan.monthlyPrice) * 12)) * 100)
@@ -131,12 +132,17 @@ export default function PlanToggle({ plans }: { plans: Plan[] }) {
                         {price.toLocaleString()}
                       </span>
                       <span className={`text-sm font-medium ms-1 ${isFeatured ? 'text-white/60 dark:text-zinc-500' : 'text-gray-400 dark:text-zinc-500'}`}>
-                        {plan.currency} / {interval === 'year' ? t('yr') : t('mo')}
+                        {plan.currency} / {t('mo')}
                       </span>
                     </>
                   )}
                 </div>
 
+                {interval === 'year' && !isFree && (
+                  <p className={`mt-1.5 text-xs font-medium ${isFeatured ? 'text-white/60 dark:text-zinc-500' : 'text-gray-400 dark:text-zinc-500'}`}>
+                    {t('billed_yearly', { price: Number(plan.yearlyPrice).toLocaleString(), currency: plan.currency })}
+                  </p>
+                )}
                 {interval === 'year' && savings > 0 && (
                   <p className="mt-2 text-[11px] font-bold text-emerald-500">{t('save_pct', { pct: savings })}</p>
                 )}

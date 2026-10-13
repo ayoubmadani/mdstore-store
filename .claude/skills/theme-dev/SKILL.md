@@ -283,6 +283,29 @@ node scripts/bundle-themes.mjs --slug=gaming-esports-epic-store-theme
 node scripts/bundle-themes.mjs
 ```
 
+بناء محلي للاختبار بدون رفع إلى R2:
+```bash
+node scripts/bundle-themes.mjs --out=/tmp/themes            # كل الثيمات
+node scripts/bundle-themes.mjs --slug=<name> --out=/tmp/themes
+```
+
+الحزمة تُبنى مصغّرة (minify)، وأيقونات `lucide-react` **مدمجة داخلها** (المستعملة فقط). المتجر لم يعد يحمّل lucide كاملة، إلا لحزمة قديمة ما زالت تطلبها عبر `require`. لذلك استورد الأيقونات بالاسم دائماً (`import { Home } from 'lucide-react'`) ولا تستعمل `import * as`.
+
+---
+
+## 11-ب. ميزات إلزامية في نموذج الطلب والسلة
+
+- **ولاية واحدة فقط:** إن أرجع `fetchWilayas` ولاية واحدة، تُختار تلقائياً في `useEffect` على مستوى المكوّن (لا داخل `useEffect` آخر)، ويُقفل الحقل بـ `disabled={wilayas.length === 1}`.
+- **نوع التوصيل لكل ولاية:** `homeEnabled`/`officeEnabled`. لا تُعرض الأزرار قبل اختيار الولاية، وبعدها المتاح فقط عبر `deliveryShown(...)`. ضع `data-delivery-option` على كل زر (الزر الوحيد يأخذ عرض السطر). إن صار النوع المختار غير متاح، انقل `typeLivraison` للآخر.
+- **الإضافات:** `ProductAddons` و`addonsTotal` من `@mdstore/theme-kit`، و`addonIds` في الطلب والسلة.
+- المرجع الكامل: `skills/mdstore-theme-creator/reference/theme-template.tsx` (= `src/theme/modern-bookstore-theme.tsx`).
+
+## 11-ج. السرعة (PageSpeed على الجوال)
+
+- صورة الهيرو وصورة المنتج الرئيسية: `fetchPriority="high" decoding="async"`. باقي الصور: `loading="lazy" decoding="async"` مع `aspect-ratio` للحاوية.
+- لا `framer-motion` (ثقيلة)، والحركة بـ CSS `transform`/`opacity` فقط مع `prefers-reduced-motion`.
+- لا حركة `infinite` ولا `blur`/`backdrop-filter` على مساحات كبيرة. خطّان أو ثلاثة بالأوزان المستعملة فقط.
+
 ---
 
 ## 12. خصائص CSS الاتجاهية — Logical vs Physical
@@ -401,4 +424,6 @@ import { whatsappHref } from '@/components/builderPages/buttonLinks';
 - [ ] لا يوجد `cite` attribute مرئي
 - [ ] زر «استفسر عبر واتساب» في ProductForm (whatsappEnabled + whatsappHref)
 - [ ] Footer التواصل: هاتف + واتساب + بريد دائماً، والناقص «سيتوفر لاحقاً»
+- [ ] ولاية واحدة تُختار وتُقفل، ونوع التوصيل حسب الولاية مع `data-delivery-option`، والإضافات في الطلب والسلة
+- [ ] أيقونات lucide بالاسم، والهيرو `fetchPriority="high"`، وباقي الصور `loading="lazy"`، ولا framer-motion
 - [ ] تم تشغيل `node scripts/bundle-themes.mjs --slug=<name>`

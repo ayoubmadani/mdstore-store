@@ -45,6 +45,15 @@ interface ProductFormProps {
 }
 
 /* ---------------- Helpers ---------------- */
+
+// نوع التوصيل المتاح في الولاية المختارة (منزل / مكتب) حسب حساب الشحن — قبل اختيار الولاية يظهر الاثنان
+const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office') => {
+  const w = (list || []).find((x: any) => String(x.id) === String(wilayaId));
+  return !w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false);
+};
+// خيار نوع التوصيل يظهر فقط بعد اختيار الولاية، وحسب ما هو متاح فيها
+const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office') => !!wilayaId && deliveryAllowed(list, wilayaId, type);
+
 function variantMatches(d: VariantDetail, sel: Record<string, string>) {
   return Object.entries(sel).every(([n, v]) => d.name.some((e) => e.attrName === n && e.value === v));
 }
@@ -1025,6 +1034,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       if (cid) setFd((f) => ({ ...f, customerId: cid }));
     } catch {}
   }, [userId]);
+  // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
+  useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
+  // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
 
   useEffect(() => {
     if (fd.customerWelaya) fetchCommunes(fd.customerWelaya).then(setCommunes);
@@ -1203,7 +1216,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <>
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
               <div>
-                <select value={fd.customerWelaya} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}
+                <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}
                   style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }}>
                   <option value="">{t.wilayaPh}</option>
                   {wilayas.map((w) => <option key={w.id} value={w.id}>{w.ar_name || w.name}</option>)}
@@ -1221,8 +1234,8 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
 
             <div style={{ display: 'flex', gap: 10 }}>
-              <button className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'home' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'home' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'home' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forHome}</button>
-              <button className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'office' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'office' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'office' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forOffice}</button>
+              {deliveryShown(wilayas, fd.customerWelaya, 'home') && (<button data-delivery-option className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'home' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'home' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'home' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forHome}</button>)}
+              {deliveryShown(wilayas, fd.customerWelaya, 'office') && (<button data-delivery-option className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'office' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'office' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'office' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forOffice}</button>)}
             </div>
             </>
             )}
@@ -1287,6 +1300,10 @@ export function Cart({ domain, store }: any) {
     const uid = items?.[0]?.userId || store?.userId;
     if (uid) fetchWilayas(uid, store?.id).then(setWilayas);
   }, [items, store]);
+  // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
+  useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
+  // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
 
   useEffect(() => {
     if (fd.customerWelaya) fetchCommunes(fd.customerWelaya).then(setCommunes);
@@ -1407,7 +1424,7 @@ export function Cart({ domain, store }: any) {
             {errors.customerPhone && <p style={{ color: 'var(--thread-red)', fontSize: 12, marginTop: 4 }}>{errors.customerPhone}</p>}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
-            <select value={fd.customerWelaya} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}
+            <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}
               style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }}>
               <option value="">{t.wilayaPh}</option>
               {wilayas.map((w) => <option key={w.id} value={w.id}>{w.ar_name || w.name}</option>)}
@@ -1421,8 +1438,8 @@ export function Cart({ domain, store }: any) {
           {(errors.customerWelaya || errors.customerCommune) && <p style={{ color: 'var(--thread-red)', fontSize: 12 }}>{errors.customerWelaya || errors.customerCommune}</p>}
 
           <div style={{ display: 'flex', gap: 10 }}>
-            <button className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'home' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'home' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'home' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forHome}</button>
-            <button className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'office' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'office' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'office' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forOffice}</button>
+            {deliveryShown(wilayas, fd.customerWelaya, 'home') && (<button data-delivery-option className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'home' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'home' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'home' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forHome}</button>)}
+            {deliveryShown(wilayas, fd.customerWelaya, 'office') && (<button data-delivery-option className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'office' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'office' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'office' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forOffice}</button>)}
           </div>
 
           <div style={{ borderTop: '2px dashed var(--cotton-300)', paddingTop: 12, fontSize: 13.5, display: 'flex', flexDirection: 'column', gap: 6 }}>

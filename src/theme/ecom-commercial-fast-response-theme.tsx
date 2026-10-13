@@ -68,6 +68,15 @@ interface Product {
  * ========================================================== */
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
+
+// نوع التوصيل المتاح في الولاية المختارة (منزل / مكتب) حسب حساب الشحن — قبل اختيار الولاية يظهر الاثنان
+const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office') => {
+  const w = (list || []).find((x: any) => String(x.id) === String(wilayaId));
+  return !w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false);
+};
+// خيار نوع التوصيل يظهر فقط بعد اختيار الولاية، وحسب ما هو متاح فيها
+const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office') => !!wilayaId && deliveryAllowed(list, wilayaId, type);
+
 function variantMatches(d: VariantDetail, sel: Record<string, string>) {
   return Object.entries(sel).every(([n, v]) => d.name.some((e) => e.attrName === n && e.value === v));
 }
@@ -1216,6 +1225,10 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
 
   useEffect(() => { if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); }, [userId]);
+  // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
+  useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
+  // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
 
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1410,7 +1423,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
           <label style={fieldLabel}>{t.wilaya}</label>
           <div style={{ position: 'relative', marginBottom: errors.customerWelaya ? 0 : 12 }}>
             <ChevronDown size={14} style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
-            <select className="hn-input" disabled={wilayaEmpty} value={fd.customerWelaya}
+            <select className="hn-input" disabled={(wilayaEmpty) || wilayas.length === 1} value={fd.customerWelaya}
               onChange={(e) => { set('customerWelaya', e.target.value); set('customerCommune', ''); }}
               style={{ paddingInlineEnd: 34, ...(errors.customerWelaya ? inputErr : {}) }}>
               <option value="">{wilayaEmpty ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
@@ -1435,10 +1448,10 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
           {/* delivery type */}
           <label style={fieldLabel}>{t.delivery}</label>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8, marginBottom: 14 }}>
-            {(['home', 'office'] as const).map((typ) => {
+            {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt)).map((typ) => {
               const on = fd.typeLivraison === typ;
               return (
-                <button key={typ} onClick={() => set('typeLivraison', typ)}
+                <button data-delivery-option key={typ} onClick={() => set('typeLivraison', typ)}
                   style={{ padding: '11px 8px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 800, fontSize: '0.85rem',
                     background: on ? AL : '#fff', color: on ? AD : TXT, border: `1.5px solid ${on ? A : BD}` }}>
                   {typ === 'home' ? t.deliveryHome : t.deliveryOffice}
@@ -1534,6 +1547,10 @@ export function Cart({ domain, store }: any) {
   }, [domain]);
 
   useEffect(() => { if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas); }, [store]);
+  // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
+  useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
+  // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
 
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1684,7 +1701,7 @@ export function Cart({ domain, store }: any) {
           <label style={fieldLabel}>{t.wilaya}</label>
           <div style={{ position: 'relative', marginBottom: errors.customerWelaya ? 0 : 12 }}>
             <ChevronDown size={14} style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
-            <select className="hn-input" disabled={wilayas.length === 0} value={fd.customerWelaya}
+            <select className="hn-input" disabled={wilayas.length <= 1} value={fd.customerWelaya}
               onChange={(e) => { set('customerWelaya', e.target.value); set('customerCommune', ''); }}
               style={{ paddingInlineEnd: 34, ...(errors.customerWelaya ? inputErr : {}) }}>
               <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
@@ -1707,10 +1724,10 @@ export function Cart({ domain, store }: any) {
 
           <label style={fieldLabel}>{t.delivery}</label>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8, marginBottom: 16 }}>
-            {(['home', 'office'] as const).map((typ) => {
+            {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt)).map((typ) => {
               const on = fd.typeLivraison === typ;
               return (
-                <button key={typ} onClick={() => set('typeLivraison', typ)}
+                <button data-delivery-option key={typ} onClick={() => set('typeLivraison', typ)}
                   style={{ padding: '11px 8px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 800, fontSize: '0.85rem',
                     background: on ? AL : '#fff', color: on ? AD : TXT, border: `1.5px solid ${on ? A : BD}` }}>
                   {typ === 'home' ? t.deliveryHome : t.deliveryOffice}

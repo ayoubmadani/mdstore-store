@@ -58,7 +58,8 @@ export async function GET(
     return new NextResponse(code, {
       headers: {
         'Content-Type':  'text/javascript; charset=utf-8',
-        'Cache-Control': 'no-store',
+        // كاش CDN: الحزمة نفسها لكل الزوار؛ ثيم مُحدَّث يظهر خلال دقائق (stale-while-revalidate)
+        'Cache-Control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=86400',
       },
     })
   } catch {

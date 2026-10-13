@@ -22,17 +22,37 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
   if (!store) return { title: 'Store Not Found' }
 
   const favicon = store.design?.faviconUrl || store.design?.logoUrl || '/default-logo.png'
+  // إعدادات SEO من لوحة التاجر (Statistiques & Support ← SEO)؛ الفارغ يرجع للقيم الافتراضية
+  const seo = store.seo
+  const title = seo?.metaTitle || store.name
+  const description = seo?.metaDescription || store.hero?.subtitle || store.name
+  const shareImage = seo?.ogImageUrl || store.hero?.imageUrl || store.design?.logoUrl
+  const keywords = seo?.keywords?.split(',').map((k) => k.trim()).filter(Boolean)
   return {
     title: {
-      default: store.isActive ? store.name : `${store.name} (Inactive)`,
+      default: store.isActive ? title : `${title} (Inactive)`,
       template: `%s | ${store.name}`,
     },
-    description: store.name,
+    description,
+    keywords: keywords?.length ? keywords : undefined,
     icons: { icon: favicon, shortcut: favicon, apple: favicon },
+    robots: seo?.allowIndexing === false || !store.isActive ? { index: false, follow: false } : undefined,
+    verification: {
+      google: seo?.googleVerification || undefined,
+      other: seo?.bingVerification ? { 'msvalidate.01': seo.bingVerification } : undefined,
+    },
     openGraph: {
-      title: store.name,
-      description: store.name,
-      images: [{ url: store.design?.logoUrl || '' }],
+      title,
+      description,
+      siteName: store.name,
+      type: 'website',
+      images: shareImage ? [{ url: shareImage }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: shareImage ? [shareImage] : undefined,
     },
   }
 }
