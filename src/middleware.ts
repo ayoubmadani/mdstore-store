@@ -33,6 +33,15 @@ function domainSegment(path: string): string | null {
   return /^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(first) && !STATIC_EXT.test(first) ? first.toLowerCase() : null;
 }
 
+// معاينة صفحة بعينها في اختبار A/B: ?ab=1 أو ?ab=2 … (للتاجر؛ لا تُحتسب في الإحصائيات)
+function withAbPreview(req: NextRequest) {
+  const ab = req.nextUrl.searchParams.get('ab');
+  if (!ab || !/^[1-3]$/.test(ab)) return undefined;
+  const headers = new Headers(req.headers);
+  headers.set('x-ab-preview', ab);
+  return { request: { headers } };
+}
+
 export function middleware(req: NextRequest) {
   const url = req.nextUrl;
   const path = url.pathname;
@@ -56,7 +65,7 @@ export function middleware(req: NextRequest) {
   if (isLocalHost(hostname) && !path.startsWith('/_next') && !path.startsWith('/api')) {
     const devDomain = domainSegment(path);
     if (devDomain) {
-      const res = NextResponse.next();
+      const res = NextResponse.next(withAbPreview(req));
       res.cookies.set(DEV_DOMAIN_COOKIE, devDomain, { path: '/', sameSite: 'lax' });
       return res;
     }
@@ -123,12 +132,12 @@ export function middleware(req: NextRequest) {
 
   // 6. حماية من الحلقات التكرارية (Loop Protection)
   if (path.startsWith(`/${storeIdentifier}`)) {
-    return NextResponse.next();
+    return NextResponse.next(withAbPreview(req));
   }
 
   // 7. التوجيه الداخلي (Rewrite)
   url.pathname = `/${storeIdentifier}${path}`;
-  return NextResponse.rewrite(url);
+  return NextResponse.rewrite(url, withAbPreview(req));
 }
 
 // 8. إضافة matcher استباقي لتصفية الطلبات قبل دخول الميدلوير اصلاً

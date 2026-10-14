@@ -118,10 +118,13 @@ export default function ProductFormBlock({
   language,
   pixels,        // «الموقع» بيكسلات الصفحة — حدث الشراء في صفحة "شكراً" الموحدة
   builderPageId, // «الموقع»
+  splitTestId,   // «الموقع» رابط اختبار A/B
 }) {
   const t = getProductFormStrings(language);
   const formatPrice = (n) => `${Number(n || 0).toLocaleString('ar-DZ')} ${t.currency}`;
   const [product, setProduct] = useState(null);
+  // «الموقع» المنتج محذوف أو غير مفعّل: لا نعرض نموذجاً لا يمكن إرسال الطلب منه
+  const [productMissing, setProductMissing] = useState(false);
   const [wilayas, setWilayas] = useState([]);
   const [communes, setCommunes] = useState([]);
   const [selectedVariants, setSelectedVariants] = useState({});
@@ -190,11 +193,15 @@ export default function ProductFormBlock({
       .get(`${baseURL}/builder-pages/product-info/${productId}`) // «الموقع» مسار عام
       .then((res) => {
         setProduct(res.data);
+        setProductMissing(false);
         // قيمة أولى افتراضية للخيارات والعروض
         setSelectedVariants(firstSelection(res.data));
         setSelectedOffer(res.data?.offers?.[0]?.id ?? null);
       })
-      .catch(() => setProduct(null));
+      .catch((err) => {
+        setProduct(null);
+        setProductMissing(err?.response?.status === 404);
+      });
   }, [productId]);
 
   useEffect(() => {
@@ -312,6 +319,7 @@ export default function ProductFormBlock({
           domain: product.domain,
           platform: 'mdstore',
           builderPageId, // «الموقع» إحصائيات الصفحة
+          splitTestId: splitTestId || undefined,
           quantity: form.quantity,
           totalPrice,
           customerId,
@@ -374,6 +382,13 @@ export default function ProductFormBlock({
     }
   };
 
+  if (productMissing) {
+    return (
+      <div style={{ padding: '28px 20px', margin: '12px', borderRadius: 16, textAlign: 'center', backgroundColor: containerBackgroundColor || '#f9fafb', color: textColor || '#374151', border: '1px dashed rgba(0,0,0,0.15)' }}>
+        <p style={{ fontWeight: 800, fontSize: 16 }}>{t.productUnavailable}</p>
+      </div>
+    );
+  }
 
   return (
     // Stable id a "jump to order form" button (see ElementsOverlay.jsx)

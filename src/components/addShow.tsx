@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 
-export default function AddShow({ productId, storeId, lpId, builderPageId }: any) {
+export default function AddShow({ productId, storeId, lpId, builderPageId, splitTestId }: any) {
   // Ref لمنع التنفيذ المزدوج
   const hasRecorded = useRef(false);
 
@@ -16,7 +16,7 @@ export default function AddShow({ productId, storeId, lpId, builderPageId }: any
       // productId alone isn't enough to distinguish two different, product-
       // less builder pages viewed in the same session — fold in whichever
       // page id is present too.
-      const trackKey = `shown_${storeId || ''}_${productId || 'main'}_${lpId || builderPageId || ''}`;
+      const trackKey = `shown_${storeId || ''}_${productId || 'main'}_${lpId || builderPageId || ''}${splitTestId ? `_ab_${splitTestId}` : ''}`;
       
       // التحقق من sessionStorage
       if (sessionStorage.getItem(trackKey)) {
@@ -36,12 +36,14 @@ export default function AddShow({ productId, storeId, lpId, builderPageId }: any
         const isValidUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
         const cleanLpId = (lpId && isValidUuid.test(lpId)) ? lpId : undefined;
         const cleanBuilderPageId = (builderPageId && isValidUuid.test(builderPageId)) ? builderPageId : undefined;
+        const cleanSplitTestId = (splitTestId && isValidUuid.test(splitTestId)) ? splitTestId : undefined;
 
         await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/shows`, {
           productId: productId || undefined,
           storeId: storeId || undefined,
           lpId: cleanLpId,
           builderPageId: cleanBuilderPageId,
+          splitTestId: cleanSplitTestId,
           visitorId: visitorId
         });
 

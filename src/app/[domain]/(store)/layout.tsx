@@ -1,6 +1,7 @@
 import { cache } from 'react'
 import { notFound } from 'next/navigation'
-import { getStoreByDomain, getBuilderPageById } from '@/lib/api'
+import { cookies, headers } from 'next/headers'
+import { getStoreByDomain, getBuilderPageById, resolveSplitTest } from '@/lib/api'
 import { StoreProvider } from '@/Hook/store-provider'
 import CustomerTracker from '@/components/CustomerTracker'
 import AddShow from '@/components/addShow'
@@ -66,8 +67,15 @@ export default async function DomainLayout({ children, params }: LayoutProps) {
   // الصفحة حصرياً عند الجذر (وأي مسار آخر تحته)، بدل واجهة المتجر العادية،
   // بلا أي chrome (نفس شكل /lp/[lpdomain] تماماً).
   const dedicatedDomain = store.domains?.find((d) => d.domain === domain && d.scope === 'landing_page')
-  if (dedicatedDomain?.builderPageId) {
-    const page = await getBuilderPageById(dedicatedDomain.builderPageId)
+  if (dedicatedDomain?.builderPageId || dedicatedDomain?.splitTestId) {
+    // دومين مربوط باختبار A/B: الصفحة التي رآها الزائر من قبل (cookie) وإلا قرعة حسب الأوزان
+    const page = dedicatedDomain.splitTestId
+      ? await resolveSplitTest(
+          dedicatedDomain.splitTestId,
+          (await cookies()).get(`mdab_${dedicatedDomain.splitTestId}`)?.value,
+          (await headers()).get('x-ab-preview') ?? undefined,
+        )
+      : await getBuilderPageById(dedicatedDomain.builderPageId!)
     if (!page) notFound()
     // /success يعرض صفحة "شكراً" الخاصة بالمتجر بعد الطلب
     return (

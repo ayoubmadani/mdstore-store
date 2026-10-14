@@ -46,6 +46,7 @@ const TRANSLATIONS = {
     errorPhone: 'رقم الهاتف غير صحيح (يجب أن يبدأ بـ 05 أو 06 أو 07)',
     submitError: 'تعذر إرسال الطلب، حاول مرة أخرى',
     outOfStock: 'هذا الخيار غير متوفر حاليًا',
+    productUnavailable: 'هذا المنتج غير متوفر حاليًا',
     currency: 'د.ج',
   },
   fr: {
@@ -89,6 +90,7 @@ const TRANSLATIONS = {
     errorPhone: 'Numéro de téléphone invalide (doit commencer par 05, 06 ou 07)',
     submitError: "Échec de l'envoi de la commande, réessayez",
     outOfStock: 'Cette option est actuellement indisponible',
+    productUnavailable: 'Ce produit est actuellement indisponible',
     currency: 'DA',
   },
   en: {
@@ -132,6 +134,7 @@ const TRANSLATIONS = {
     errorPhone: 'Invalid phone number (must start with 05, 06, or 07)',
     submitError: 'Failed to submit order, please try again',
     outOfStock: 'This option is currently unavailable',
+    productUnavailable: 'This product is currently unavailable',
     currency: 'DZD',
   },
 };

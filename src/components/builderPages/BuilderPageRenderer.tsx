@@ -188,6 +188,8 @@ interface BuilderPageData {
   settings?: { backgroundColor?: string; maxWidth?: number; padding?: number; language?: 'ar' | 'fr' | 'en' };
   tree: BuilderBlock[];
   pixels?: Pixel[];
+  // الصفحة معروضة عبر رابط اختبار A/B (null إذا كان الاختبار متوقفاً)
+  splitTestId?: string | null;
 }
 
 // View-only counterpart to dashboard/src/pages/editor/blocks/ElementsOverlay.jsx
@@ -544,6 +546,13 @@ export default function BuilderPageRenderer({ page, lpDomain, dedicated }: { pag
     .filter((b) => b.type === 'spacer' && b.props?.position === 'bottom')
     .reduce((sum, b) => sum + (Number(b.props?.height) || 60), 0);
 
+  // اختبار A/B: نفس الزائر يرى نفس الصفحة في زياراته التالية (يقرؤه الخادم للدومين المخصص)
+  const splitTestId = page.splitTestId || undefined;
+  useEffect(() => {
+    if (!splitTestId) return;
+    document.cookie = `mdab_${splitTestId}=${page.id}; path=/; max-age=${60 * 60 * 24 * 60}; SameSite=Lax`;
+  }, [splitTestId, page.id]);
+
   return (
     <div
       dir={(settings.language || 'ar') === 'ar' ? 'rtl' : 'ltr'}
@@ -559,7 +568,7 @@ export default function BuilderPageRenderer({ page, lpDomain, dedicated }: { pag
         paddingBottom: pinnedBottomHeight ? pinnedBottomHeight + pagePadding : undefined,
       }}
     >
-      <AddShow storeId={page.storeId} productId={page.productId} builderPageId={page.id} />
+      <AddShow storeId={page.storeId} productId={page.productId} builderPageId={page.id} splitTestId={splitTestId} />
       <CustomerTracker pixels={page.pixels ?? []} pageType="landing_page" landingPageId={page.id} />
       {page.tree.map((block, index) => {
         const isPinnedSpacer = block.type === 'spacer' && (block.props?.position === 'top' || block.props?.position === 'bottom');
@@ -574,6 +583,7 @@ export default function BuilderPageRenderer({ page, lpDomain, dedicated }: { pag
                 {...(block.props as Record<string, unknown>)}
                 productId={page.productId || (block.props?.productId as string | undefined)}
                 builderPageId={page.id}
+                splitTestId={splitTestId}
                 language={settings.language}
                 dedicated={dedicated}
                 pixels={page.pixels}

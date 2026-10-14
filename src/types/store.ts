@@ -17,7 +17,7 @@ export interface Store {
     bingVerification: string | null;
     allowIndexing: boolean;
   } | null;
-  domains?: { id: string; domain: string; scope?: 'store' | 'landing_page'; builderPageId?: string }[];
+  domains?: { id: string; domain: string; scope?: 'store' | 'landing_page'; builderPageId?: string; splitTestId?: string | null }[];
   design: {
     primaryColor: string;
     secondaryColor: string;
