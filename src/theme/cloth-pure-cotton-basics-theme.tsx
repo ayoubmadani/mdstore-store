@@ -58,10 +58,10 @@ function variantMatches(d: VariantDetail, sel: Record<string, string>) {
   return Object.entries(sel).every(([n, v]) => d.name.some((e) => e.attrName === n && e.value === v));
 }
 
-let __varCounter = 0;
-function getVarId() {
-  __varCounter += 1;
-  return `${Date.now()}-${__varCounter}`;
+// معرّف التركيبة المختارة (لون/مقاس…) — يُرسل مع الطلب حتى يراها التاجر وشركة التأكيد
+function variantIdOf(product: { variantDetails?: VariantDetail[] }, selected: Record<string, string>) {
+  if (!product.variantDetails?.length || !Object.keys(selected || {}).length) return undefined;
+  return product.variantDetails.find((v) => variantMatches(v, selected))?.id;
 }
 
 const fetchWilayas = async (uid: string, sid?: string): Promise<Wilaya[]> => {
@@ -1101,7 +1101,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         ...fd,
         quantity: qty,
         product,
-        variantDetailId: getVarId(),
+        variantDetailId: variantIdOf(product, selectedVariants),
         productId: product.id,
         storeId: product.store.id,
         userId,
@@ -1132,7 +1132,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         ...shipping,
         quantity: qty,
         product,
-        variantDetailId: getVarId(),
+        variantDetailId: variantIdOf(product, selectedVariants),
         productId: product.id,
         storeId: product.store.id,
         userId,

@@ -876,6 +876,11 @@ export function ProductForm({ product, userId, domain, selectedOffer, selectedVa
     }
     return base;
   }, [product, selectedOffer, selectedVariants]);
+  // التركيبة المختارة (لون/مقاس…) — تُرسل مع الطلب حتى يراها التاجر وشركة التأكيد
+  const getVarId = useCallback(() => {
+    if (!product.variantDetails?.length || !Object.keys(selectedVariants).length) return undefined;
+    return product.variantDetails.find((v: any) => variantMatches(v, selectedVariants))?.id;
+  }, [product.variantDetails, selectedVariants]);
 
   const fp = getFP() + addonsTotal(product, addonIds);
   const supportQty = (store?.supportQty ?? product.store?.supportQty) !== false;
@@ -907,7 +912,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, selectedVa
   const addToCart = () => {
     setIsAdded(true);
     const cart = JSON.parse(localStorage.getItem(domain) || '[]');
-    cart.push({ addonIds, ...fd, product, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, finalPrice: fp, quantity: qty });
+    cart.push({ addonIds, ...fd, product, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, variantDetailId: getVarId(), finalPrice: fp, quantity: qty });
     localStorage.setItem(domain, JSON.stringify(cart));
     initCount(cart.length);
     setTimeout(() => setIsAdded(false), 2000);
@@ -923,7 +928,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, selectedVa
       const payload = product.isDigital
         ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
         : { ...rest, customerWelaya, customerCommune, typeLivraison };
-      await axios.post(`${API_URL}/orders/create`, { addonIds, ...payload, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+      await axios.post(`${API_URL}/orders/create`, { addonIds, ...payload, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       router.push(`/successfully?productId=${product?.id}`);
     } catch { } finally { setSub(false); }
   };
