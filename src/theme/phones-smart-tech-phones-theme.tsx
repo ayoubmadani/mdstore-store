@@ -1,5 +1,6 @@
 'use client';
-import { isValidDzPhone, currencyLabel } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 /* =====================================================================
@@ -22,6 +23,10 @@ import {
   Truck, ShieldCheck, CreditCard, Headphones, Smartphone, Send, Cpu, Package, Download,
 } from 'lucide-react';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 /* ------------------------------ Tokens ------------------------------ */
 const A   = '#2F5BFF'; // electric cobalt accent
@@ -312,7 +317,7 @@ const productImg = (p: any): string | undefined =>
   p?.productImage || p?.imagesProduct?.[0]?.imageUrl;
 
 const useFmt = (store?: any) => {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const cur = store?.currency || currencyLabel(t.currency);
   return (n: number | string) => `${Number(n || 0).toLocaleString('fr-FR')} ${cur}`;
 };
@@ -494,7 +499,7 @@ const THEME_CSS = `
 
 /* ============================= Main ================================= */
 export default function Main({ store, children, domain }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
 
@@ -520,7 +525,7 @@ export default function Main({ store, children, domain }: any) {
 /* ============================= Navbar =============================== */
 // NAVBAR ARCHETYPE: B — Double Bar (utility strip + sticky main bar)
 export function Navbar({ store, domain }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const router = useRouter();
   const count = useCartStore((s: any) => s.count);
   const initCount = useCartStore((s: any) => s.initCount);
@@ -743,7 +748,7 @@ export function Navbar({ store, domain }: any) {
 
 /* ============================= Footer =============================== */
 export function Footer({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const cartOn = store?.cart !== false;
   const year = new Date().getFullYear();
 
@@ -820,7 +825,7 @@ export function Footer({ store }: any) {
 /* ============================== Card =============================== */
 // CARD ARCHETYPE: 2 — Overlay Reveal
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const fmt = useFmt(store);
   const [imgErr, setImgErr] = useState(false);
   const img = displayImage || productImg(product);
@@ -858,7 +863,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 
 /* ============================== Home =============================== */
 export function Home({ store, page }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const searchParams = useSearchParams();
   const activeCategory = searchParams.get('category');
   const searchTerm = searchParams.get('search');
@@ -1000,7 +1005,7 @@ export function Home({ store, page }: any) {
 /* ============================= Details ============================= */
 export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store: storeprop }: any) {
   const store = storeprop || product?.store;
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const fmt = useFmt(store);
   const [sel, setSel] = useState(0);
 
@@ -1158,7 +1163,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store: storeprop }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   const store = storeprop || product?.store;
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const fmt = useFmt(store);
   const router = useRouter();
   const initCount = useCartStore((s: any) => s.initCount);
@@ -1467,7 +1472,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
 /* ============================== Cart =============================== */
 export function Cart({ domain, store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const fmt = useFmt(store);
   const router = useRouter();
   const initCount = useCartStore((s: any) => s.initCount);
@@ -1712,7 +1717,7 @@ export function Cart({ domain, store }: any) {
 
 /* ========================= Success =========================== */
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const stepIcons = [Check, Phone, Package, Truck];
 
@@ -1794,20 +1799,20 @@ function InfoBlock({ title, body }: any) {
 }
 
 export function Privacy({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return <Shell title={t.privacyTitle}>{t.privacyBlocks.map((b: any, i: number) => <InfoBlock key={i} title={b.t} body={b.b} />)}</Shell>;
 }
 export function Terms({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return <Shell title={t.termsTitle}>{t.termsBlocks.map((b: any, i: number) => <InfoBlock key={i} title={b.t} body={b.b} />)}</Shell>;
 }
 export function Cookies({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return <Shell title={t.cookiesTitle}>{t.cookiesBlocks.map((b: any, i: number) => <InfoBlock key={i} title={b.t} body={b.b} />)}</Shell>;
 }
 
 export function Contact({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sending, setSending] = useState(false);
   const [ok, setOk] = useState(false);

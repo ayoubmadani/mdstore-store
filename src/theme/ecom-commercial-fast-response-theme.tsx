@@ -1,5 +1,6 @@
 'use client';
-import { isValidDzPhone } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 /*
@@ -29,6 +30,9 @@ import {
   Trash2, Plus, Minus, CheckCircle, AlertCircle, Package, ArrowLeft, ArrowRight, MessageCircle, Download,
 } from 'lucide-react';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 /* ============================================================
  * 0. Design tokens
@@ -442,7 +446,7 @@ function ProductThumb({ src, name, size = 52 }: { src?: string; name: string; si
  * 4. Main — wrapper
  * ========================================================== */
 export default function Main({ store, children, domain }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
 
@@ -470,7 +474,7 @@ export default function Main({ store, children, domain }: any) {
  * ========================================================== */
 export function Navbar({ store, domain }: any) {
   // NAVBAR ARCHETYPE: B — Double Bar
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const router = useRouter();
   const cartEnabled = store?.cart !== false;
 
@@ -699,7 +703,7 @@ export function Navbar({ store, domain }: any) {
  * 6. Footer
  * ========================================================== */
 export function Footer({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const cartEnabled = store?.cart !== false;
   const year = new Date().getFullYear();
 
@@ -771,7 +775,7 @@ export function Footer({ store }: any) {
  * ========================================================== */
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
   // CARD ARCHETYPE: 5 — Framed Label
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [imgErr, setImgErr] = useState(false);
   const img = displayImage || product.productImage || product.imagesProduct?.[0]?.imageUrl;
   const price = Number(product.price);
@@ -831,7 +835,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
  * 8. Home
  * ========================================================== */
 export function Home({ store, page }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const searchParams = useSearchParams();
   const activeCategory = searchParams.get('category');
   const searchTerm = searchParams.get('search');
@@ -989,7 +993,7 @@ function CheckIcon(props: any) { return <CheckCircle {...props} />; }
  * ========================================================== */
 export function Details({ product, store: storeprop, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
   const store = storeprop || product?.store;
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'دج';
 
   const images: string[] = (allImages && allImages.length ? allImages : [])
@@ -1201,7 +1205,7 @@ function navArrow(side: 'start' | 'end'): React.CSSProperties {
 export function ProductForm({ product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   const store = storeprop || product?.store;
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const router = useRouter();
   const currency = store?.currency || 'دج';
   const cartEnabled = store?.cart !== false;
@@ -1521,7 +1525,7 @@ function FieldErr({ msg }: { msg?: string }) {
  * 11. Cart
  * ========================================================== */
 export function Cart({ domain, store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const router = useRouter();
   const currency = store?.currency || 'دج';
   const cartEnabled = store?.cart !== false;
@@ -1767,7 +1771,7 @@ export function Cart({ domain, store }: any) {
 }
 
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const stepIcons = [CheckCircle, Phone, Package, Truck];
 
@@ -1852,7 +1856,7 @@ function InfoBlock({ title, body }: { title: string; body: string }) {
 }
 
 export function Privacy({ store }: any = {}) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const blocks: Record<Lang, { title: string; body: string }[]> = {
     ar: [
       { title: 'جمع البيانات', body: 'نجمع فقط المعلومات الضرورية لمعالجة طلبك: الاسم، رقم الهاتف، الولاية والبلدية. لا نطلب أي بيانات بنكية لأن الدفع يتم عند الاستلام.' },
@@ -1874,7 +1878,7 @@ export function Privacy({ store }: any = {}) {
 }
 
 export function Terms({ store }: any = {}) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const blocks: Record<Lang, { title: string; body: string }[]> = {
     ar: [
       { title: 'الطلبات', body: 'بتأكيد الطلب فإنك توافق على استلام المنتج ودفع ثمنه عند التوصيل. يُرجى التأكد من صحة رقم الهاتف والعنوان.' },
@@ -1896,7 +1900,7 @@ export function Terms({ store }: any = {}) {
 }
 
 export function Cookies({ store }: any = {}) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const blocks: Record<Lang, { title: string; body: string }[]> = {
     ar: [
       { title: 'ما هي الكوكيز', body: 'ملفات صغيرة تُحفظ في متصفحك لتحسين تجربتك، مثل تذكّر محتويات سلتك.' },
@@ -1915,7 +1919,7 @@ export function Cookies({ store }: any = {}) {
 }
 
 export function Contact({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);

@@ -58,9 +58,51 @@ export function sendContactMessage(payload: { name: string; email: string; phone
 // دولة المتجر وعملته — يضبطهما StoreProvider من بيانات المتجر (وأيضاً fetchWilayas)؛ الجزائر افتراضياً
 let storeCountry = 'DZ';
 let storeCurrency = 'DZD';
-export function setStoreLocale(country?: string | null, currency?: string | null) {
+type LevelNames = { ar?: string; fr?: string; en?: string };
+type Levels = { region?: LevelNames; locality?: LevelNames } | null;
+let storeLevels: Levels = null;
+export function setStoreLocale(country?: string | null, currency?: string | null, levels?: Levels) {
   if (country) storeCountry = country.toUpperCase();
   if (currency) storeCurrency = currency;
+  storeLevels = levels ?? null;
+}
+
+// يستبدل «الولاية/البلدية» (Wilaya/Commune) في نصوص الثيم بأسماء مستويات دولة المتجر
+// (تونس: الولاية/المعتمدية). الجزائر: النصوص كما هي.
+const stripAl = (w: string) => w.replace(/^ال/, '');
+function relabel(text: string, lang: string): string {
+  const reg = storeLevels?.region, loc = storeLevels?.locality;
+  const pick = (n?: LevelNames) => (n?.[lang as keyof LevelNames] || n?.en || n?.fr || '').trim();
+  const r = pick(reg), l = pick(loc);
+  let out = text;
+  if (lang === 'ar') {
+    const ra = (reg?.ar || '').trim(), la = (loc?.ar || '').trim();
+    if (ra) out = out.replace(/الولاية/g, ra).replace(/(^|[^ل])ولاية/g, (_m, p) => p + stripAl(ra));
+    if (la) out = out.replace(/البلدية/g, la).replace(/(^|[^ل])بلدية/g, (_m, p) => p + stripAl(la));
+    return out;
+  }
+  const keepCase = (orig: string, rep: string) => (orig[0] === orig[0].toUpperCase() ? rep[0].toUpperCase() + rep.slice(1) : rep[0].toLowerCase() + rep.slice(1));
+  if (r) out = out.replace(/wilaya/gi, (m) => keepCase(m, r));
+  if (l) out = out.replace(/commune/gi, (m) => keepCase(m, l));
+  return out;
+}
+const relabelCache = new Map<string, unknown>();
+/** نصوص الثيم بأسماء ولاية/بلدية دولة المتجر: const t = withLocationLabels(T)[lang] */
+export function withLocationLabels<D extends Record<string, any>>(dict: D): D {
+  if (storeCountry === 'DZ' || !storeLevels) return dict;
+  return new Proxy(dict, {
+    get(target, lang: string | symbol) {
+      const val = (target as any)[lang];
+      if (typeof lang !== 'string' || !val || typeof val !== 'object') return val;
+      const key = `${storeCountry}|${lang}|${Object.keys(target).join(',')}`;
+      const hit = relabelCache.get(key) as { src: unknown; out: unknown } | undefined;
+      if (hit && hit.src === val) return hit.out;
+      const out: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(val)) out[k] = typeof v === 'string' ? relabel(v, lang) : v;
+      relabelCache.set(key, { src: val, out });
+      return out;
+    },
+  });
 }
 /** رمز العملة: النص الذي يعرضه الثيم (دج/DA) في الجزائر، وعملة المتجر في الدول الأخرى */
 export const currencyLabel = (dzLabel: string) => (storeCountry === 'DZ' ? dzLabel : storeCurrency);

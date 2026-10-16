@@ -1,5 +1,6 @@
 'use client';
-import { isValidDzPhone } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
@@ -18,6 +19,9 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -735,7 +739,7 @@ export default function Main({ store, children, domain }: any) {
 ═══════════════════════════════════════════════════════════ */
 export function Navbar({ store, domain }: { store: any; domain: string }) {
   const lang = getLang(store);
-  const t = T[lang];
+  const t = withLocationLabels(T)[lang];
   const isRTL = lang === 'ar';
   const [open, setOpen]         = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -978,7 +982,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
    FOOTER — 3 أقسام
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const isRTL = t.dir === 'rtl';
   return (
     <footer dir={isRTL ? 'rtl' : 'ltr'} style={{backgroundColor:'var(--dark)',borderTop:'2px solid var(--fire)',fontFamily:"'Barlow',sans-serif"}}>
@@ -1108,7 +1112,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 ══════════════════════════════════════════════════════════════ */
 export function Home({ store, page }: any) {
   const lang = getLang(store);
-  const t = T[lang];
+  const t = withLocationLabels(T)[lang];
   const isRTL = lang === 'ar';
   const products: any[] = store.products || [];
   const cats: any[]     = store.categories || [];
@@ -1314,7 +1318,7 @@ export function Home({ store, page }: any) {
 ══════════════════════════════════════════════════════════════ */
 export function Details({ product, store: storeprop, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
   const lang = getLang(storeprop || product?.store);
-  const t = T[lang];
+  const t = withLocationLabels(T)[lang];
   const isRTL = lang === 'ar';
   const [sel, setSel] = useState(0);
   if (!product) return null;
@@ -1475,7 +1479,7 @@ export function Details({ product, store: storeprop, toggleWishlist, isWishliste
 ══════════════════════════════════════════════════════════════ */
 export function ProductForm({ product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss=0 }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
-  const t = T[getLang(storeprop || product?.store)];
+  const t = withLocationLabels(T)[getLang(storeprop || product?.store)];
   const isRTL = t.dir === 'rtl';
   const router = useRouter();
   const [wilayas, setWilayas]   = useState<Wilaya[]>([]);
@@ -1716,7 +1720,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
    CART
 ══════════════════════════════════════════════════════════════ */
 export function Cart({ domain, store }: { domain: string; store: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const isRTL = t.dir === 'rtl';
   const [items, setItems]       = useState<any[]>([]);
   const [wilayas, setWilayas]   = useState<Wilaya[]>([]);
@@ -1925,7 +1929,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
    SUCCESS
 ══════════════════════════════════════════════════════════════ */
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const isRTL = t.dir === 'rtl';
   const currency = store?.currency || 'DZD';
   const stepIcons = [CheckCircle2, Phone, Package, Truck];
@@ -2044,7 +2048,7 @@ const IB = ({ title, body, tag }: { title: string; body: string; tag?: string })
 );
 
 export function Privacy({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.privacyTitle} sub={t.privacySub} store={store}>
       <IB title={t.priv1Title} body={t.priv1Body} tag={t.priv1Tag}/>
@@ -2056,7 +2060,7 @@ export function Privacy({ store }: { store?: any }) {
 }
 
 export function Terms({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.termsTitle} sub={t.termsSub} store={store}>
       <IB title={t.terms1Title} body={t.terms1Body}/>
@@ -2067,7 +2071,7 @@ export function Terms({ store }: { store?: any }) {
 }
 
 export function Cookies({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.cookiesTitle} sub={t.cookiesSub} store={store}>
       <IB title={t.cookies1Title} body={t.cookies1Body} tag={t.cookies1Tag}/>
@@ -2083,7 +2087,7 @@ export function Cookies({ store }: { store?: any }) {
 }
 
 export function Contact({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const isRTL = t.dir === 'rtl';
   const [form, setForm] = useState({name:'',email:'',phone:'',message:''});
   const [sent, setSent] = useState(false);

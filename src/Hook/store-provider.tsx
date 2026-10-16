@@ -22,7 +22,7 @@ export function StoreProvider({
   theme: string; // القيمة القادمة من السيرفر (Layout)
 }) {
   // دولة المتجر وعملته لدوال الـ kit (فحص الهاتف، رمز العملة) في كل الثيمات
-  setStoreLocale((store as any)?.country, (store as any)?.currency);
+  setStoreLocale((store as any)?.country, (store as any)?.currency, (store as any)?.locationLevels);
 
   // 2. تمرير كائن يحتوي على الاثنين معاَ
   return (

@@ -1,5 +1,6 @@
 'use client';
-import { isValidDzPhone, currencyLabel } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -10,6 +11,10 @@ import DOMPurify from 'isomorphic-dompurify';
 import { Star, ChevronDown, AlertCircle, X, CheckCircle2, Shield, ArrowLeft, Plus, Minus, Search, ShoppingCart, Trash2, Loader2, ChevronLeft, ChevronRight, Phone, Package, Truck, Mail, MessageCircle, Download } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -393,7 +398,7 @@ const T: Record<Lang, typeof jsonAr> = { ar: jsonAr, fr: jsonFr as any, en: json
 
 export default function Main({store,children,domain}:any){
   const pathname = usePathname();
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return(
     <div dir={t.dir} style={{minHeight:'100vh',background:'var(--bg)',color:'var(--tx)',fontFamily:"'Raleway',sans-serif"}}>
@@ -410,7 +415,7 @@ export default function Main({store,children,domain}:any){
 
 /* ══ NAVBAR ══ */
 export function Navbar({store,domain}:{store:any;domain:string}){
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [sq,setSq]=useState('');
   const [ls,setLs]=useState<any[]>([]);
   const [ld,setLd]=useState(false);
@@ -538,7 +543,7 @@ export function Navbar({store,domain}:{store:any;domain:string}){
 
 /* ══ FOOTER ══ */
 export function Footer({store}:any){
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return(
     <footer dir={t.dir} style={{background:'var(--s1)',borderTop:'1px solid var(--br)',padding:'48px 24px 24px',fontFamily:"'Raleway',sans-serif"}}>
       <div className="footer-grid" style={{maxWidth:1200,margin:'0 auto',paddingBottom:32,borderBottom:'1px solid var(--br)'}}>
@@ -581,7 +586,7 @@ export function Footer({store}:any){
 /* ══ CARD ══ */
 export function Card({product,displayImage,discount,store}:any){
   if(!product||!store)return null;
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const price=parseFloat(product.price as string);
   const orig=product.priceOriginal?parseFloat(product.priceOriginal as string):0;
   return(
@@ -607,7 +612,7 @@ export function Card({product,displayImage,discount,store}:any){
 
 /* ══ HOME ══ */
 export function Home({store,page}:any){
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const products:any[]=store.products||[];
   const cats:any[]=store.categories||[];
   if(!page)page=1;
@@ -691,7 +696,7 @@ export function Home({store,page}:any){
 
 /* ══ DETAILS ══ */
 export function Details({product,discount,allImages,allAttrs,finalPrice,inStock,autoGen,selectedVariants,setSelectedOffer,selectedOffer,handleVariantSelection,domain,store}:any){
-  const t = T[getLang(store || product?.store)];
+  const t = withLocationLabels(T)[getLang(store || product?.store)];
   const cur = (store || product?.store)?.currency || currencyLabel(t.currency);
   const [sel,setSel]=useState(0);
   if(!product)return null;
@@ -792,7 +797,7 @@ export function Details({product,discount,allImages,allAttrs,finalPrice,inStock,
 /* ══ PRODUCT FORM ══ */
 export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffer,selectedVariants,platform,priceLoss=0,store}:ProductFormProps){
   const [addonIds, setAddonIds] = useState<string[]>([]);
-  const t = T[getLang(store || product?.store)];
+  const t = withLocationLabels(T)[getLang(store || product?.store)];
   const cur = (store || product?.store)?.currency || currencyLabel(t.currency);
   const router=useRouter();
   const [wilayas,setW]=useState<Wilaya[]>([]);
@@ -970,7 +975,7 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
 
 /* ══ CART ══ */
 export function Cart({domain,store}:{domain:string;store:any}){
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const cur = store?.currency || currencyLabel(t.currency);
   const [items,setItems]=useState<any[]>([]);
   const [wilayas,setW]=useState<Wilaya[]>([]);
@@ -1095,7 +1100,7 @@ export function Cart({domain,store}:{domain:string;store:any}){
 }
 
 export function Success({store,order}:{store:any;domain:string;order:any}){
-  const t=T[getLang(store)];
+  const t=withLocationLabels(T)[getLang(store)];
   const cur=store?.currency||'DZD';
   const steps=[
     {icon:CheckCircle2,title:t.successSteps[0].title,desc:t.successSteps[0].desc},
@@ -1181,12 +1186,12 @@ const Row=({title,body,tag}:{title:string;body:string;tag?:string})=>(
   </div>
 );
 
-export function Privacy({store}:{store?:any}={}){const t=T[getLang(store)];return<PageWrap title={t.privacyTitle} dir={t.dir}><Row title={t.priv1t} body={t.priv1b}/><Row title={t.priv2t} body={t.priv2b}/><Row title={t.priv3t} body={t.priv3b}/><Row title={t.priv4t} body={t.priv4b} tag={t.priv4tag}/></PageWrap>}
-export function Terms({store}:{store?:any}={}){const t=T[getLang(store)];return<PageWrap title={t.termsTitle} dir={t.dir}><Row title={t.terms1t} body={t.terms1b}/><Row title={t.terms2t} body={t.terms2b} tag={t.terms2tag}/><Row title={t.terms3t} body={t.terms3b}/><Row title={t.terms4t} body={t.terms4b}/></PageWrap>}
-export function Cookies({store}:{store?:any}={}){const t=T[getLang(store)];return<PageWrap title={t.cookiesTitle} dir={t.dir}><Row title={t.cook1t} body={t.cook1b} tag={t.cook1tag}/><Row title={t.cook2t} body={t.cook2b} tag={t.cook2tag}/><Row title={t.cook3t} body={t.cook3b} tag={t.cook3tag}/></PageWrap>}
+export function Privacy({store}:{store?:any}={}){const t=withLocationLabels(T)[getLang(store)];return<PageWrap title={t.privacyTitle} dir={t.dir}><Row title={t.priv1t} body={t.priv1b}/><Row title={t.priv2t} body={t.priv2b}/><Row title={t.priv3t} body={t.priv3b}/><Row title={t.priv4t} body={t.priv4b} tag={t.priv4tag}/></PageWrap>}
+export function Terms({store}:{store?:any}={}){const t=withLocationLabels(T)[getLang(store)];return<PageWrap title={t.termsTitle} dir={t.dir}><Row title={t.terms1t} body={t.terms1b}/><Row title={t.terms2t} body={t.terms2b} tag={t.terms2tag}/><Row title={t.terms3t} body={t.terms3b}/><Row title={t.terms4t} body={t.terms4b}/></PageWrap>}
+export function Cookies({store}:{store?:any}={}){const t=withLocationLabels(T)[getLang(store)];return<PageWrap title={t.cookiesTitle} dir={t.dir}><Row title={t.cook1t} body={t.cook1b} tag={t.cook1tag}/><Row title={t.cook2t} body={t.cook2b} tag={t.cook2tag}/><Row title={t.cook3t} body={t.cook3b} tag={t.cook3tag}/></PageWrap>}
 
 export function Contact({store}:{store?:any}){
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [form,setForm]=useState({name:'',email:'',phone:'',message:''});
   const [sent,setSent]=useState(false);
   const [loading,setL]=useState(false);

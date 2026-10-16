@@ -1,5 +1,6 @@
 'use client';
-import { isValidDzPhone } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
@@ -13,6 +14,9 @@ import {
 import DOMPurify from 'isomorphic-dompurify';
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 /* ============================================================
    NAVBAR ARCHETYPE : E — Icon-heavy Minimal
@@ -406,7 +410,7 @@ function ErrorMsg({ text }: { text: string }) {
    MAIN
    ================================================================== */
 export default function Main({ store, children, domain }: any) {
-  const t = Tt[getLang(store)];
+  const t = withLocationLabels(Tt)[getLang(store)];
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
 
@@ -431,7 +435,7 @@ export default function Main({ store, children, domain }: any) {
    NAVBAR — Archetype E: Icon-heavy Minimal
    ================================================================== */
 export function Navbar({ store, domain }: any) {
-  const t = Tt[getLang(store)];
+  const t = withLocationLabels(Tt)[getLang(store)];
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -641,7 +645,7 @@ export function Navbar({ store, domain }: any) {
    FOOTER
    ================================================================== */
 export function Footer({ store }: any) {
-  const t = Tt[getLang(store)];
+  const t = withLocationLabels(Tt)[getLang(store)];
   const year = new Date().getFullYear();
 
   const pageLinks = [
@@ -755,7 +759,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
    HOME — Hero Layout: Asymmetric
    ================================================================== */
 export function Home({ store, page }: any) {
-  const t = Tt[getLang(store)];
+  const t = withLocationLabels(Tt)[getLang(store)];
   const searchParams = useSearchParams();
   const activeCategory = searchParams.get('category');
   const searchQ = searchParams.get('search');
@@ -880,7 +884,7 @@ export function Home({ store, page }: any) {
    DETAILS
    ================================================================== */
 export function Details({ product, store: storeprop, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
-  const t = Tt[getLang(storeprop || product?.store)];
+  const t = withLocationLabels(Tt)[getLang(storeprop || product?.store)];
   const [sel, setSel] = useState(0);
   const images: string[] = allImages?.length ? allImages : [product?.productImage].filter(Boolean);
   const currency = product?.store?.currency || 'DA';
@@ -1009,7 +1013,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
 export function ProductForm({ product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   const store = storeprop || product?.store;
-  const t = Tt[getLang(store)];
+  const t = withLocationLabels(Tt)[getLang(store)];
   const router = useRouter();
   const initCount = useCartStore((s: any) => s.initCount);
   const currency = store?.currency || 'DA';
@@ -1265,7 +1269,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
    CART
    ================================================================== */
 export function Cart({ domain, store }: any) {
-  const t = Tt[getLang(store)];
+  const t = withLocationLabels(Tt)[getLang(store)];
   const router = useRouter();
   const initCount = useCartStore((s: any) => s.initCount);
   const currency = store?.currency || 'DA';
@@ -1475,7 +1479,7 @@ export function Cart({ domain, store }: any) {
    SUCCESS
    ================================================================== */
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
-  const t = Tt[getLang(store)];
+  const t = withLocationLabels(Tt)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const stepIcons = [Check, Phone, Package, Truck];
 
@@ -1558,7 +1562,7 @@ function InfoBlock({ title, body }: { title: string; body: string }) {
 }
 
 export function Privacy({ store }: any = {}) {
-  const t = Tt[getLang(store)];
+  const t = withLocationLabels(Tt)[getLang(store)];
   return (
     <Shell title={t.privacyTitle}>
       <InfoBlock title={t.priv1Title} body={t.priv1Body} />
@@ -1568,7 +1572,7 @@ export function Privacy({ store }: any = {}) {
 }
 
 export function Terms({ store }: any = {}) {
-  const t = Tt[getLang(store)];
+  const t = withLocationLabels(Tt)[getLang(store)];
   return (
     <Shell title={t.termsTitle}>
       <InfoBlock title={t.terms1Title} body={t.terms1Body} />
@@ -1578,7 +1582,7 @@ export function Terms({ store }: any = {}) {
 }
 
 export function Cookies({ store }: any = {}) {
-  const t = Tt[getLang(store)];
+  const t = withLocationLabels(Tt)[getLang(store)];
   return (
     <Shell title={t.cookiesTitle}>
       <InfoBlock title={t.cookies1Title} body={t.cookies1Body} />
@@ -1587,7 +1591,7 @@ export function Cookies({ store }: any = {}) {
 }
 
 export function Contact({ store }: any) {
-  const t = Tt[getLang(store)];
+  const t = withLocationLabels(Tt)[getLang(store)];
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);

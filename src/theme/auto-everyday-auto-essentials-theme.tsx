@@ -12,7 +12,8 @@
    CATEGORY ACTIVE  : filled square ink chip + letter-spacing shift
    ============================================================================= */
 
-import { isValidDzPhone } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -27,6 +28,9 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 /* ------------------------------------------------------------------ config */
 
@@ -644,7 +648,7 @@ function Placeholder({ size = 40 }: { size?: number }) {
 /* --------------------------------------------------------------- Main ---- */
 
 export default function Main({ store, children, domain }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
 
@@ -669,7 +673,7 @@ export default function Main({ store, children, domain }: any) {
 // NAVBAR ARCHETYPE: B — Double Bar (utility strip + sticky main bar)
 
 export function Navbar({ store, domain }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const router = useRouter();
   const pathname = usePathname();
@@ -924,7 +928,7 @@ export function Navbar({ store, domain }: any) {
 /* -------------------------------------------------------------- Footer --- */
 
 export function Footer({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const year = new Date().getFullYear();
 
   const links = [
@@ -1012,7 +1016,7 @@ export function Footer({ store }: any) {
 // CARD ARCHETYPE: 5 — Framed Label (technical eyebrow + bordered frame)
 
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const [imgErr, setImgErr] = useState(false);
   const img = displayImage || productImg(product);
@@ -1073,7 +1077,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 /* ---------------------------------------------------------------- Home --- */
 
 export function Home({ store, page }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const searchParams = useSearchParams();
   const activeCategory = searchParams?.get('category') || '';
@@ -1236,7 +1240,7 @@ export function Details({
   selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain,
 }: any) {
   const store = storeprop || product?.store;
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const images: any[] = (allImages && allImages.length ? allImages : product?.imagesProduct) || [];
   const gallery: string[] = images
@@ -1486,7 +1490,7 @@ export function ProductForm({
 }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   const store = storeprop || product?.store;
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const supportQty = store?.supportQty ?? true;
   const uid = userId || store?.user?.id || store?.userId || product?.store?.userId;
@@ -1868,7 +1872,7 @@ export function ProductForm({
 /* ---------------------------------------------------------------- Cart --- */
 
 export function Cart({ domain, store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const initCount = useCartStore((s: any) => s.initCount);
 
@@ -2180,7 +2184,7 @@ export function Cart({ domain, store }: any) {
 /* --------------------------------------------------------------- Success -- */
 
 export function Success({ store, order }: { store: any; domain?: string; order?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const stepIcons = [CheckCircle2, Phone, Package, Truck];
 
@@ -2278,7 +2282,7 @@ function InfoBlock({ title, body, dir }: any) {
 }
 
 export function Privacy({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const pg = t.pages.privacy;
   return (
     <Shell title={pg.title} dir={t.dir}>
@@ -2288,7 +2292,7 @@ export function Privacy({ store }: any) {
 }
 
 export function Terms({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const pg = t.pages.terms;
   return (
     <Shell title={pg.title} dir={t.dir}>
@@ -2298,7 +2302,7 @@ export function Terms({ store }: any) {
 }
 
 export function Cookies({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const pg = t.pages.cookies;
   return (
     <Shell title={pg.title} dir={t.dir}>
@@ -2308,7 +2312,7 @@ export function Cookies({ store }: any) {
 }
 
 export function Contact({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);

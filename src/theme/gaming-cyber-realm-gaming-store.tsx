@@ -1,5 +1,6 @@
 'use client';
-import { isValidDzPhone } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
@@ -19,6 +20,9 @@ import {
 import { Store } from '@/types/store';
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -790,7 +794,7 @@ const T: Record<Lang, typeof jsonAr> = { ar: jsonAr, fr: jsonFr as any, en: json
 
 export default function Main({ store, children, domain }: any) {
   const pathname = usePathname();
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
     <div dir={t.dir} style={{ minHeight: '100vh', backgroundColor: 'var(--navy)' }} className="hex-bg">
@@ -812,7 +816,7 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
   const [listSearch, setListSearch] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const isRTL = t.dir === 'rtl';
   const currency = store?.currency || 'DZD';
 
@@ -992,7 +996,7 @@ export function Footer({ store }: any) {
   const yr = new Date().getFullYear();
   const cyan = 'var(--cyan)';
   const pink = 'var(--pink)';
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const isRTL = t.dir === 'rtl';
   return (
     <footer dir={t.dir} style={{ backgroundColor: 'var(--navy-3)', borderTop: '2px solid var(--line)', fontFamily: "'Tajawal',sans-serif", marginTop: '80px', position: 'relative', overflow: 'hidden' }}>
@@ -1117,7 +1121,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 export function Home({ store, page }: any) {
   const products: any[] = store.products || [];
   const cats: any[] = store.categories || [];
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const isRTL = t.dir === 'rtl';
   const currency = store?.currency || 'DZD';
 
@@ -1378,7 +1382,7 @@ export function Home({ store, page }: any) {
 /* ── DETAILS ────────────────────────────────────────────────── */
 export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
   const [sel, setSel] = useState(0);
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const isRTL = t.dir === 'rtl';
   const currency = store?.currency || 'DZD';
   return (
@@ -1534,7 +1538,7 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0, store }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   const router = useRouter();
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const isRTL = t.dir === 'rtl';
   const currency = store?.currency || 'DZD';
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
@@ -1864,7 +1868,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const [fd, setFd] = useState({ customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '', typeLivraison: 'home' as 'home' | 'office' });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const initCount = useCartStore((state) => state.initCount);
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const isRTL = t.dir === 'rtl';
   const currency = store?.currency || 'DZD';
 
@@ -2187,7 +2191,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 }
 
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const stepIcons = [CheckCircle2, Phone, Package, Truck];
 
@@ -2255,7 +2259,7 @@ export function StaticPage({ staticPage, store }: { staticPage: string, store: S
 }
 
 const Shell = ({ children, title, sub, store }: { children: React.ReactNode; title: string; sub?: string; store?: any }) => {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <div dir={t.dir} style={{ backgroundColor: 'var(--navy)', minHeight: '100vh' }} className="hex-bg">
       <div style={{ background: 'linear-gradient(135deg,var(--navy-2),var(--navy-3))', padding: '72px 20px 48px', borderBottom: '1px solid var(--line)', position: 'relative', overflow: 'hidden' }} className="circuit-bg">
@@ -2289,7 +2293,7 @@ const IB = ({ title, body, tag }: { title: string; body: string; tag?: string })
 );
 
 export function Privacy({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.privacyTitle} sub={t.legalSub} store={store}>
       <IB title={t.privDataTitle} body={t.privDataBody} />
@@ -2302,7 +2306,7 @@ export function Privacy({ store }: { store?: any }) {
 }
 
 export function Terms({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.termsTitle} sub={t.legalSub} store={store}>
       <IB title={t.termsAccountTitle} body={t.termsAccountBody} />
@@ -2314,7 +2318,7 @@ export function Terms({ store }: { store?: any }) {
 }
 
 export function Cookies({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.cookiesTitle} sub={t.legalSub} store={store}>
       <IB title={t.cookEssTitle} body={t.cookEssBody} tag={t.cookEssTag} />
@@ -2331,7 +2335,7 @@ export function Cookies({ store }: { store?: any }) {
 export function Contact({ store }: { store: Store }) {
   const [form, setForm] = useState({ name: '', email: '', message: '', phone: '' });
   const [sent, setSent] = useState(false);
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const isRTL = t.dir === 'rtl';
 
   const handleSubmit = async (e: any) => {

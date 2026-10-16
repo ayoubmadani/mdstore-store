@@ -1,5 +1,6 @@
 'use client';
-import { isValidDzPhone } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 /* ============================================================================
@@ -25,6 +26,9 @@ import {
   Headphones, AlertCircle, CheckCircle2, Minus, Plus, Zap, Star, Send, Package, MessageCircle, Download,
 } from 'lucide-react';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 /* ========================= Types ========================= */
 
@@ -545,7 +549,7 @@ function SummaryRow({ l, v, big }: { l: string; v: string; big?: boolean }) {
 /* ========================= Main (§4) ========================= */
 
 export default function Main({ store, children, domain }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
 
@@ -572,7 +576,7 @@ export default function Main({ store, children, domain }: any) {
 /* ========================= Navbar (§5, ARCHETYPE C) ========================= */
 
 export function Navbar({ store, domain }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -808,7 +812,7 @@ export function Navbar({ store, domain }: any) {
 /* ========================= Footer (§6) ========================= */
 
 export function Footer({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const year = new Date().getFullYear();
 
   const links = [
@@ -894,7 +898,7 @@ export function Footer({ store }: any) {
 
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
   // CARD ARCHETYPE: 5 — Framed Label (eyebrow strip + mono price + corner brackets)
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const img = displayImage || getImg(product);
 
   return (
@@ -965,7 +969,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 /* ========================= Home (§8) ========================= */
 
 export function Home({ store, page }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const searchParams = useSearchParams();
   const activeCategory = searchParams.get('category');
   const searchTerm = searchParams.get('search');
@@ -1137,7 +1141,7 @@ export function Home({ store, page }: any) {
 
 export function Details({ product, store: storeprop, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
   const store = storeprop || product?.store; // §15.25 — storeprop has language, product.store often doesn't
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [sel, setSel] = useState(0);
 
   const images: string[] = (allImages && allImages.length > 0)
@@ -1331,7 +1335,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
 export function ProductForm({ product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   const store = storeprop || product?.store; // §15.25
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const router = useRouter();
   const initCount = useCartStore((s: any) => s.initCount);
 
@@ -1672,7 +1676,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
 /* ========================= Cart (§11) ========================= */
 
 export function Cart({ domain, store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const initCount = useCartStore((s: any) => s.initCount);
 
   const [items, setItems] = useState<any[]>([]);
@@ -1961,7 +1965,7 @@ export function Cart({ domain, store }: any) {
 }
 
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const stepIcons = [CheckCircle2, Phone, Package, Truck];
 
@@ -2047,7 +2051,7 @@ function InfoBlock({ title, body }: { title: string; body: string }) {
 }
 
 export function Privacy({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.privacyTitle}>
       {t.privacyBlocks.map((b) => <InfoBlock key={b.h} title={b.h} body={b.b} />)}
@@ -2056,7 +2060,7 @@ export function Privacy({ store }: any) {
 }
 
 export function Terms({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.termsTitle}>
       {t.termsBlocks.map((b) => <InfoBlock key={b.h} title={b.h} body={b.b} />)}
@@ -2065,7 +2069,7 @@ export function Terms({ store }: any) {
 }
 
 export function Cookies({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.cookiesTitle}>
       {t.cookiesBlocks.map((b) => <InfoBlock key={b.h} title={b.h} body={b.b} />)}
@@ -2074,7 +2078,7 @@ export function Cookies({ store }: any) {
 }
 
 export function Contact({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);

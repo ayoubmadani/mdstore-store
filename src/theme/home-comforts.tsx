@@ -1,5 +1,6 @@
 'use client';
-import { isValidDzPhone, currencyLabel } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -18,6 +19,10 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -465,7 +470,7 @@ const T: Record<Lang, typeof jsonAr> = { ar: jsonAr, fr: jsonFr as any, en: json
 
 export default function Main({ store, children, domain }: any) {
   const pathname = usePathname();
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
     <div dir={t.dir} style={{ minHeight: '100vh', background: BG }}>
@@ -489,7 +494,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const count = useCartStore((s) => s.count);
   const initCount = useCartStore((s) => s.initCount);
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
 
   useEffect(() => {
     if (typeof window !== 'undefined' && domain) {
@@ -643,7 +648,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 }
 
 export function Footer({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <footer dir={t.dir} style={{ background: '#2C1810', color: 'rgba(255,255,255,0.4)', marginTop: 80, padding: '3.5rem 1.5rem 1.5rem' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
@@ -703,7 +708,7 @@ export function Footer({ store }: any) {
 }
 
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
   const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
   return (
@@ -746,7 +751,7 @@ export function Home({ store, page }: any) {
   const cats: any[] = store.categories || [];
   const searchParams = useSearchParams();
   const activeCategory = searchParams.get('category');
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   if (!page) page = 1;
   const countPage = Math.ceil((store.count || products.length) / 48);
 
@@ -879,7 +884,7 @@ export function Home({ store, page }: any) {
 
 export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
   const [sel, setSel] = useState(0);
-  const t = T[getLang(store || product?.store)];
+  const t = withLocationLabels(T)[getLang(store || product?.store)];
   return (
     <div dir={t.dir} style={{ background: BG, paddingBottom: '4rem' }}>
       <div className="details-inner" style={{ maxWidth: 1280, margin: '0 auto' }}>
@@ -1004,7 +1009,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
   const [isAdded, setIsAdded] = useState(false);
   const initCount = useCartStore((s) => s.initCount);
-  const t = T[getLang(store || product?.store)];
+  const t = withLocationLabels(T)[getLang(store || product?.store)];
 
   useEffect(() => { if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); }, [userId]);
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
@@ -1220,7 +1225,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const [fd, setFd] = useState({ customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '', typeLivraison: 'home' as 'home' | 'office' });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const initCount = useCartStore((s) => s.initCount);
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
 
   useEffect(() => { setItems(JSON.parse(localStorage.getItem(domain) || '[]')); if (store?.user?.id) fetchWilayas(store.user.id, store?.id).then(setWilayas); }, [domain, store]);
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
@@ -1386,7 +1391,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 }
 
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const stepIcons = [CheckCircle2, Phone, Package, Truck];
 
@@ -1448,7 +1453,7 @@ export function Success({ store, order }: { store: any; domain: string; order: a
 }
 
 const Shell = ({ children, title, store }: { children: React.ReactNode; title: string; store?: any }) => {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
   <div dir={t.dir} style={{ minHeight: '100vh', background: BG }}>
     <div style={{ background: '#2C1810', paddingTop: 88, paddingBottom: 48, paddingLeft: 24, paddingRight: 24 }}>
@@ -1477,7 +1482,7 @@ const InfoBlock = ({ title, body }: { title: string; body: string }) => (
 );
 
 export function Privacy({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.privacyTitle} store={store}>
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 16, border: `1px solid ${BD}` }}>
@@ -1490,7 +1495,7 @@ export function Privacy({ store }: { store?: any }) {
 }
 
 export function Terms({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.termsTitle} store={store}>
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 16, border: `1px solid ${BD}` }}>
@@ -1503,7 +1508,7 @@ export function Terms({ store }: { store?: any }) {
 }
 
 export function Cookies({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.cookiesTitle} store={store}>
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 16, border: `1px solid ${BD}` }}>
@@ -1518,7 +1523,7 @@ export function Contact({ store }: { store: any }) {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);

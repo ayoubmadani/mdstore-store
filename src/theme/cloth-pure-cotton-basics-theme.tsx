@@ -1,5 +1,6 @@
 'use client';
-import { isValidDzPhone, currencyLabel } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
@@ -9,6 +10,10 @@ import DOMPurify from 'isomorphic-dompurify';
 import { ShoppingBag, Search, Menu, X, ChevronLeft, ChevronRight, Trash2, Plus, Minus, Check, MapPin, Phone, Mail, Package, Truck, MessageCircle, Download } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 /* ============================================================
    PURE COTTON BASICS — Structural + Visual Theme
@@ -476,7 +481,7 @@ const getLang = (store?: any): Lang => {
 const T: Record<Lang, typeof jsonAr> = { ar: jsonAr, fr: jsonFr as any, en: jsonFr as any };
 
 export default function Main({ store, children, domain }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const pathname = usePathname();
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
@@ -493,7 +498,7 @@ export default function Main({ store, children, domain }: any) {
    NAVBAR
    ============================================================ */
 export function Navbar({ store, domain }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -684,7 +689,7 @@ export function Navbar({ store, domain }: any) {
    FOOTER
    ============================================================ */
 export function Footer({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const showCart = store?.cart !== false;
   return (
     <footer style={{ background: 'var(--cotton-100)', borderTop: '2px dashed var(--cotton-300)', marginTop: 60 }}>
@@ -783,7 +788,7 @@ export function Card({ product, displayImage, discount, store }: any) {
    HOME
    ============================================================ */
 export function Home({ store, page }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const searchParams = useSearchParams();
   const category = searchParams.get('category');
   const products: Product[] = store?.products || [];
@@ -891,7 +896,7 @@ export function Home({ store, page }: any) {
    DETAILS
    ============================================================ */
 export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
-  const t = T[getLang(store || product?.store)];
+  const t = withLocationLabels(T)[getLang(store || product?.store)];
   const [sel, setSel] = useState(0);
   const images: string[] = allImages?.length ? allImages : [product?.productImage].filter(Boolean);
 
@@ -1006,7 +1011,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
    ============================================================ */
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
-  const t = T[getLang(store || product?.store)];
+  const t = withLocationLabels(T)[getLang(store || product?.store)];
   const cur = (store || product?.store)?.currency || currencyLabel(t.currency);
   const router = useRouter();
   const initCount = useCartStore((s: any) => s.initCount);
@@ -1275,7 +1280,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
    CART
    ============================================================ */
 export function Cart({ domain, store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const cur = store?.currency || currencyLabel(t.currency);
   const router = useRouter();
   const initCount = useCartStore((s: any) => s.initCount);
@@ -1459,7 +1464,7 @@ export function Cart({ domain, store }: any) {
 }
 
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const steps = [
     { icon: Check, ...t.successSteps[0] },
@@ -1544,7 +1549,7 @@ function InfoBlock({ title, body }: { title: string; body: string }) {
 }
 
 export function Privacy({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.privacyTitle} dir={t.dir}>
       <InfoBlock title={t.priv1t} body={t.priv1b} />
@@ -1555,7 +1560,7 @@ export function Privacy({ store }: { store?: any }) {
 }
 
 export function Terms({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.termsTitle} dir={t.dir}>
       <InfoBlock title={t.terms1t} body={t.terms1b} />
@@ -1566,7 +1571,7 @@ export function Terms({ store }: { store?: any }) {
 }
 
 export function Cookies({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.cookiesTitle} dir={t.dir}>
       <InfoBlock title={t.cook1t} body={t.cook1b} />
@@ -1577,7 +1582,7 @@ export function Cookies({ store }: { store?: any }) {
 }
 
 export function Contact({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);

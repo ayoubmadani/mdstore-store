@@ -1,5 +1,6 @@
 'use client';
-import { isValidDzPhone, currencyLabel } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -19,6 +20,10 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -447,7 +452,7 @@ export default function Main({ store, children, domain }: any) {
 }
 
 export function Navbar({ store, domain }: { store: any; domain: string }) {
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -624,7 +629,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 }
 
 export function Footer({ store }: any) {
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   return (
     <footer dir={isRTL ? 'rtl' : 'ltr'} style={{ background: DARK, borderTop: `3px solid ${OR}`, marginTop: 80, padding: '3.5rem 1.5rem 2rem' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
@@ -723,7 +728,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 }
 
 export function Home({ store, page }: any) {
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   const products: any[] = store.products || [];
   const cats: any[] = store.categories || [];
   const searchParams = useSearchParams();
@@ -867,7 +872,7 @@ export function Home({ store, page }: any) {
 }
 
 export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   const [sel, setSel] = useState(0);
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: BG, paddingBottom: '4rem' }}>
@@ -979,7 +984,7 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
 export function ProductForm({ product, store, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   const lang = getLang(store || product?.store);
-  const t = T[lang];
+  const t = withLocationLabels(T)[lang];
   const router = useRouter();
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -1360,7 +1365,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 }
 
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   const currency = store?.currency || 'DZD';
   const steps = [
     { icon: CheckCircle2, title: isRTL ? 'تم استلام طلبك' : lang === 'fr' ? 'Commande reçue' : 'Order received', desc: isRTL ? 'تم تسجيل طلبك بنجاح في نظامنا' : lang === 'fr' ? 'Votre commande a été enregistrée avec succès' : 'Your order has been registered successfully' },
@@ -1454,7 +1459,7 @@ const InfoBlock = ({ title, body }: { title: string; body: string }) => (
 );
 
 export function Privacy({ store }: { store?: any }) {
-  const lang = getLang(store); const t = T[lang];
+  const lang = getLang(store); const t = withLocationLabels(T)[lang];
   return (
     <Shell title={t.privacyTitle} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div style={{ background: CARD, padding: '1.5rem', borderRadius: 10, border: `1px solid ${BD}` }}>

@@ -1,5 +1,6 @@
 'use client';
-import { isValidDzPhone } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
@@ -18,6 +19,9 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -677,7 +681,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   const [loading, setLoading] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const router = useRouter();
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
 
   const count = useCartStore(s => s.count);
   const initCount = useCartStore(s => s.initCount);
@@ -892,7 +896,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 }
 
 export function Footer({ store }: any) {
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   return (
     <footer dir={isRTL ? 'rtl' : 'ltr'} style={{ backgroundColor:'var(--ink)', color:'var(--off)', fontFamily:"'Inter',sans-serif" }}>
       <div style={{
@@ -1048,7 +1052,7 @@ export function Home({ store, page }: any) {
   const cats: any[] = store.categories || [];
   if (!page) page = 1;
   const countPage = Math.ceil((store.count || products.length) / 48);
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'}>
@@ -1316,7 +1320,7 @@ export function Home({ store, page }: any) {
 
 export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
   const [sel, setSel] = useState(0);
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   if (!product) return null;
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background:'var(--off)' }}>
@@ -1527,7 +1531,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss=0, store }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   const router = useRouter();
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLC] = useState(false);
@@ -1779,7 +1783,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 }
 
 export function Cart({ domain, store }: { domain: string; store: any }) {
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   const [items, setItems] = useState<any[]>([]);
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -1968,7 +1972,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 }
 
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const stepIcons = [CheckCircle2, Phone, Package, Truck];
 
@@ -2078,7 +2082,7 @@ const IB = ({ title, body, tag }: { title: string; body: string; tag?: string })
 );
 
 export function Privacy({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.privacyTitle} sub={t.privacySub} store={store}>
       <IB title={t.privacyData} body={t.privacyDataBody}/>
@@ -2090,7 +2094,7 @@ export function Privacy({ store }: { store?: any }) {
 }
 
 export function Terms({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.termsTitle} sub={t.termsSub} store={store}>
       <IB title={t.termsOrders} body={t.termsOrdersBody}/>
@@ -2101,7 +2105,7 @@ export function Terms({ store }: { store?: any }) {
 }
 
 export function Cookies({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.cookiesTitle} sub={t.cookiesSub} store={store}>
       <IB title={t.cookiesEssential} body={t.cookiesEssentialBody} tag={t.cookiesEssentialTag}/>
@@ -2117,7 +2121,7 @@ export function Cookies({ store }: { store?: any }) {
 }
 
 export function Contact({ store }: { store?: any }) {
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   const [form, setForm] = useState({ name:'', email:'', phone:'', message:'' });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);

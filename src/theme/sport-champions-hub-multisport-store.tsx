@@ -1,5 +1,6 @@
 'use client';
-import { isValidDzPhone } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
@@ -17,6 +18,9 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -963,7 +967,7 @@ export default function Main({ store, children, domain }: any) {
    NAVBAR — dark navy bg
 ══════════════════════════════════════════════════════════════ */
 export function Navbar({ store, domain }: { store: any; domain: string }) {
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [sq, setSq] = useState('');
@@ -1152,7 +1156,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
    FOOTER — 3 أقسام
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   return (
     <footer dir={isRTL ? 'rtl' : 'ltr'} style={{ background: 'var(--primary)', color: 'var(--g500)', padding: '5rem 1.5rem 0' }}>
       <div style={{ maxWidth: 1400, margin: '0 auto' }}>
@@ -1308,7 +1312,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
    HOME
 ══════════════════════════════════════════════════════════════ */
 export function Home({ store, page }: any) {
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   const products: any[] = store.products || [];
   const cats: any[] = store.categories || [];
   if (!page) page = 1;
@@ -1488,7 +1492,7 @@ export function Home({ store, page }: any) {
    DETAILS
 ══════════════════════════════════════════════════════════════ */
 export function Details({ product, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   const [sel, setSel] = useState(0);
 
   return (
@@ -1666,7 +1670,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
 ══════════════════════════════════════════════════════════════ */
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
-  const lang = getLang(store); const t = T[lang];
+  const lang = getLang(store); const t = withLocationLabels(T)[lang];
   const router = useRouter();
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -1895,7 +1899,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
    CART
 ══════════════════════════════════════════════════════════════ */
 export function Cart({ domain, store }: { domain: string; store: any }) {
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   const [items, setItems] = useState<any[]>([]);
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -2100,7 +2104,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
    SUCCESS
 ══════════════════════════════════════════════════════════════ */
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const stepIcons = [CheckCircle2, Phone, Package, Truck];
 
@@ -2193,7 +2197,7 @@ const IB = ({ title, body, tag }: { title: string; body: string; tag?: string })
 );
 
 export function Privacy({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.privacyTitle} sub={t.legalTag} store={store}>
       <IB title={t.privacyData} body={t.privacyDataBody} />
@@ -2203,7 +2207,7 @@ export function Privacy({ store }: { store?: any }) {
   );
 }
 export function Terms({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.termsTitle} sub={t.legalTag} store={store}>
       <IB title={t.termsOrders} body={t.termsOrdersBody} />
@@ -2213,7 +2217,7 @@ export function Terms({ store }: { store?: any }) {
   );
 }
 export function Cookies({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <Shell title={t.cookiesTitle} sub={t.legalTag} store={store}>
       <IB title={t.cookiesEssential} body={t.cookiesEssentialBody} tag={t.cookiesEssentialTag} />
@@ -2223,7 +2227,7 @@ export function Cookies({ store }: { store?: any }) {
 }
 
 export function Contact({ store }: { store: any }) {
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);

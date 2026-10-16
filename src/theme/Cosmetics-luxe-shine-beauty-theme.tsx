@@ -4,7 +4,8 @@
 // HERO LAYOUT: full-bleed
 // TYPOGRAPHY PAIR: El Messiri + Tajawal
 
-import { isValidDzPhone } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -18,6 +19,9 @@ import {
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
 import { ProductAddons, addonsTotal } from '@/components/theme/ProductAddons';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -642,7 +646,7 @@ html, body { margin: 0; padding: 0; background: ${BG}; color: ${TXT}; font-famil
 
 /* ─────────── Main ─────────── */
 export default function Main({ store, children, domain }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
 
@@ -665,7 +669,7 @@ export default function Main({ store, children, domain }: any) {
 
 /* ─────────── Navbar ─────────── */
 export function Navbar({ store, domain }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -835,7 +839,7 @@ export function Navbar({ store, domain }: any) {
 
 /* ─────────── Footer ─────────── */
 export function Footer({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const year = new Date().getFullYear();
   const links = [
     { h: '/', l: t.home },
@@ -920,7 +924,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 
 /* ─────────── Home ─────────── */
 export function Home({ store, page }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const searchParams = useSearchParams();
   const activeCategory = searchParams.get('category');
   const searchQuery = searchParams.get('search');
@@ -1026,7 +1030,7 @@ export function Home({ store, page }: any) {
 
 /* ─────────── Details ─────────── */
 export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store: storeprop }: any) {
-  const t = T[getLang(storeprop || product?.store)];
+  const t = withLocationLabels(T)[getLang(storeprop || product?.store)];
   const [sel, setSel] = useState(0);
   const [imgErr, setImgErr] = useState<Record<number, boolean>>({});
 
@@ -1154,7 +1158,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, store: storeprop }: ProductFormProps & { store?: any }) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   const store = storeprop || product?.store;
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [orderNowState, setIsOrderNow] = useState(false);
   // بدون سلة: نموذج الطلب يظهر مباشرة (لا حاجة لزر «اطلب الآن»)
   const isOrderNow = orderNowState || (store ?? product?.store)?.cart === false;
@@ -1415,7 +1419,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
 /* ─────────── Cart ─────────── */
 export function Cart({ domain, store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [items, setItems] = useState<any[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -1629,7 +1633,7 @@ export function Cart({ domain, store }: any) {
 }
 
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const stepIcons = [Check, Phone, Package, Truck];
 
@@ -1690,7 +1694,7 @@ export function Success({ store, order }: { store: any; domain: string; order: a
 
 /* ─────────── Static Pages ─────────── */
 export function Privacy({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <div>
       <div className="luxe-static-header"><h1 className="luxe-static-title">{t.privacyTitle}</h1></div>
@@ -1702,7 +1706,7 @@ export function Privacy({ store }: any) {
 }
 
 export function Terms({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <div>
       <div className="luxe-static-header"><h1 className="luxe-static-title">{t.termsTitle}</h1></div>
@@ -1714,7 +1718,7 @@ export function Terms({ store }: any) {
 }
 
 export function Cookies({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <div>
       <div className="luxe-static-header"><h1 className="luxe-static-title">{t.cookiesTitle}</h1></div>
@@ -1726,7 +1730,7 @@ export function Cookies({ store }: any) {
 }
 
 export function Contact({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);

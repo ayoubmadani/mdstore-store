@@ -1,5 +1,6 @@
 'use client';
-import { isValidDzPhone, currencyLabel } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
@@ -17,6 +18,10 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -226,7 +231,7 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
 
 /* ─── Full-screen menu overlay ─── */
 function MenuOverlay({ store, onClose }: { store: any; onClose: () => void }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const yr = new Date().getFullYear();
   const links = [
     { h: '/', l: t.home },
@@ -613,7 +618,7 @@ export default function Main({ store, children, domain }: any) {
    NAVBAR
 ══════════════════════════════════════════════════════════════ */
 export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: string; onMenuOpen?: () => void }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const cur = store?.currency || currencyLabel(t.currency);
   const [sq, setSq] = useState('');
   const [ls, setLs] = useState<any[]>([]);
@@ -827,7 +832,7 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
    FOOTER — 3 أقسام
 ══════════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const yr = new Date().getFullYear();
   return (
     <footer dir={t.dir} className="noise-ov" style={{ backgroundColor: 'var(--ink)', color: 'var(--paper)', position: 'relative', overflow: 'hidden', fontFamily: "'Space Mono',monospace" }}>
@@ -915,7 +920,7 @@ export function Footer({ store }: any) {
    CARD — Zine Cell
 ══════════════════════════════════════════════════════════════ */
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const cur = store?.currency || currencyLabel(t.currency);
   const [hov, setHov] = useState(false);
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
@@ -977,7 +982,7 @@ const COUNTS = [2, 3, 1, 2, 3, 1, 2];
 const CLASSES = ['zs-half', 'zs-third', 'zs-wide', 'zs-half', 'zs-third', 'zs-wide', 'zs-flip'];
 
 export function Home({ store, page }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const products: any[] = store.products || [];
   const cats: any[] = store.categories || [];
   if (!page) page = 1;
@@ -1127,7 +1132,7 @@ export function Home({ store, page }: any) {
    DETAILS
 ══════════════════════════════════════════════════════════════ */
 export function Details({ product, store, toggleWishlist, isWishlisted, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const cur = store?.currency || currencyLabel(t.currency);
   const [sel, setSel] = useState(0);
   if (!product) return null;
@@ -1254,7 +1259,7 @@ export function Details({ product, store, toggleWishlist, isWishlisted, discount
 ══════════════════════════════════════════════════════════════ */
 export function ProductForm({ product, store, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0 }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const cur = store?.currency || currencyLabel(t.currency);
   const router = useRouter();
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
@@ -1491,7 +1496,7 @@ export function ProductForm({ product, store, userId, domain, selectedOffer, set
    CART
 ══════════════════════════════════════════════════════════════ */
 export function Cart({ domain, store }: { domain: string; store: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const cur = store?.currency || currencyLabel(t.currency);
   const [items, setItems] = useState<any[]>([]);
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
@@ -1658,7 +1663,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
    SUCCESS
 ══════════════════════════════════════════════════════════════ */
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const stepIcons = [CheckCircle2, Phone, Package, Truck];
 
@@ -1755,7 +1760,7 @@ const IB = ({ title, body, tag, tagColor = 'var(--punch)' }: { title: string; bo
 );
 
 export function Privacy({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <PageShell title={t.privacyTitle} code="DOC-001" dir={t.dir}>
       <IB title={t.priv1t} body={t.priv1b} />
@@ -1767,7 +1772,7 @@ export function Privacy({ store }: { store?: any }) {
 }
 
 export function Terms({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <PageShell title={t.termsTitle} code="DOC-002" dir={t.dir}>
       <IB title={t.terms1t} body={t.terms1b} />
@@ -1778,7 +1783,7 @@ export function Terms({ store }: { store?: any }) {
 }
 
 export function Cookies({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <PageShell title={t.cookiesTitle} code="DOC-003" dir={t.dir}>
       <IB title={t.cook1t} body={t.cook1b} tag={t.cook1tag} tagColor="var(--ink)" />
@@ -1796,7 +1801,7 @@ export function Cookies({ store }: { store?: any }) {
 }
 
 export function Contact({ store }: { store?: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);

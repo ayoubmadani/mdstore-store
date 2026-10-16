@@ -19,7 +19,8 @@
  *                   how it looks lit.
  */
 'use client';
-import { isValidDzPhone } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -33,6 +34,9 @@ import {
   Lightbulb, Star, Check, AlertCircle, Truck, ShieldCheck, CreditCard, Headphones, Package, Download,
 } from 'lucide-react';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 /* ============================================================================
    TYPES (preserved as-is)
@@ -455,7 +459,7 @@ function ProductImg({ src, alt, style, className }: any) {
    MAIN  (§4) — scroll reset + page-fade
    ========================================================================== */
 export default function Main({ store, children, domain }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
 
@@ -480,7 +484,7 @@ export default function Main({ store, children, domain }: any) {
    NAVBAR  (§5) — warm bar, centered search, cart guard, mobile overlay
    ========================================================================== */
 export function Navbar({ store, domain }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const router = useRouter();
   const count = useCartStore((s: any) => s.count);
   const initCount = useCartStore((s: any) => s.initCount);
@@ -712,7 +716,7 @@ export function Navbar({ store, domain }: any) {
    FOOTER  (§6)
    ========================================================================== */
 export function Footer({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const cartEnabled = store?.cart !== false;
   const year = new Date().getFullYear();
 
@@ -796,7 +800,7 @@ export function Footer({ store }: any) {
    CARD  (§7) — the lamp "turns on" on hover
    ========================================================================== */
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const img = displayImage || product.productImage || product.imagesProduct?.[0]?.imageUrl;
   const price = Number(product.price);
   const orig = Number(product.priceOriginal || 0);
@@ -850,7 +854,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
    HOME  (§8)
    ========================================================================== */
 export function Home({ store, page }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const searchParams = useSearchParams();
   const activeCategory = searchParams.get('category');
   const cartEnabled = store?.cart !== false;
@@ -1022,7 +1026,7 @@ function catChip(active: boolean): React.CSSProperties {
 export function ProductForm({ product, userId, domain, store: storeprop, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   const store = storeprop || product?.store;      // §25 — language from real store prop
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const router = useRouter();
   const initCount = useCartStore((s: any) => s.initCount);
 
@@ -1353,7 +1357,7 @@ function Field({ label, error, children }: any) {
    ========================================================================== */
 export function Details({ product, store: storeprop, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
   const store = storeprop || product?.store;             // §25
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [sel, setSel] = useState(0);
 
   const images: any[] = (allImages && allImages.length ? allImages : product?.imagesProduct || [])
@@ -1521,7 +1525,7 @@ function galBtn(side: 'start' | 'end'): React.CSSProperties {
    CART  (§11)
    ========================================================================== */
 export function Cart({ domain, store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const initCount = useCartStore((s: any) => s.initCount);
 
   const [items, setItems] = useState<any[]>([]);
@@ -1769,7 +1773,7 @@ export function Cart({ domain, store }: any) {
    SUCCESS
    ========================================================================== */
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const stepIcons = [Check, Phone, Package, Truck];
 
@@ -1910,25 +1914,25 @@ const STATIC_CONTENT = {
 };
 
 export function Privacy({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const blocks = STATIC_CONTENT[getLang(store)].privacy;
   return <Shell title={t.privacyTitle}>{blocks.map((b, i) => <InfoBlock key={i} {...b} />)}</Shell>;
 }
 
 export function Terms({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const blocks = STATIC_CONTENT[getLang(store)].terms;
   return <Shell title={t.termsTitle}>{blocks.map((b, i) => <InfoBlock key={i} {...b} />)}</Shell>;
 }
 
 export function Cookies({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const blocks = STATIC_CONTENT[getLang(store)].cookies;
   return <Shell title={t.cookiesTitle}>{blocks.map((b, i) => <InfoBlock key={i} {...b} />)}</Shell>;
 }
 
 export function Contact({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);

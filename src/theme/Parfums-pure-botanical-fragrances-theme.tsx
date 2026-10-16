@@ -1,5 +1,6 @@
 'use client';
-import { isValidDzPhone } from '@/components/theme/kit';
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 // ============================================================================
@@ -20,6 +21,9 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 /* ============================== TYPES ============================== */
 
@@ -354,7 +358,7 @@ const THEME_CSS = `
 /* ============================== MAIN ============================== */
 
 export default function Main({ store, children, domain }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
 
@@ -379,7 +383,7 @@ export default function Main({ store, children, domain }: any) {
 // NAVBAR ARCHETYPE: D — Full-width Logo Strip
 
 export function Navbar({ store, domain }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -560,7 +564,7 @@ export function Navbar({ store, domain }: any) {
 /* ============================== FOOTER ============================== */
 
 export function Footer({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const year = new Date().getFullYear();
 
   const links = [
@@ -633,7 +637,7 @@ export function Footer({ store }: any) {
 // CARD ARCHETYPE: 5 — Framed Label
 
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [imgErr, setImgErr] = useState(false);
   const img = displayImage || product?.productImage || product?.imagesProduct?.[0]?.imageUrl;
   const price = Number(product?.price || 0).toLocaleString();
@@ -675,7 +679,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 /* ============================== HOME ============================== */
 
 export function Home({ store, page }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const searchParams = useSearchParams();
   const activeCategory = searchParams.get('category');
   const searchQ = searchParams.get('search');
@@ -785,7 +789,7 @@ export function Home({ store, page }: any) {
 /* ============================== DETAILS ============================== */
 
 export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
-  const t = T[getLang(store || product?.store)];
+  const t = withLocationLabels(T)[getLang(store || product?.store)];
   const [sel, setSel] = useState(0);
   const images: string[] = allImages?.length ? allImages : (product?.imagesProduct?.map((i: ProductImage) => i.imageUrl) || [product?.productImage].filter(Boolean));
 
@@ -924,7 +928,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store: storeProp }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   const store = storeProp || product?.store;
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const router = useRouter();
 
   const [fd, setFd] = useState({
@@ -1202,7 +1206,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 /* ============================== CART ============================== */
 
 export function Cart({ domain, store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const [items, setItems] = useState<any[]>([]);
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -1421,7 +1425,7 @@ export function Cart({ domain, store }: any) {
 
 /* ============================== SUCCESS ============================== */
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
   const stepIcons = [Check, Phone, Package, Truck];
 
@@ -1516,7 +1520,7 @@ export function Cookies() {
 }
 
 export function Contact({ store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <div className="pbf-container" style={{ padding: '3.5rem 1.5rem', maxWidth: 720 }}>
       <h1 className="pbf-display" style={{ color: INK, fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', marginBottom: 24 }}>{t.contactTitle}</h1>
@@ -1542,7 +1546,7 @@ export function Contact({ store }: any) {
 }
 
 export function StaticPage({ staticPage, page, store }: any) {
-  const t = T[getLang(store)];
+  const t = withLocationLabels(T)[getLang(store)];
   return (
     <StaticShell title={staticPage?.title || page || t.home}>
       <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(staticPage?.content || '') }} />
