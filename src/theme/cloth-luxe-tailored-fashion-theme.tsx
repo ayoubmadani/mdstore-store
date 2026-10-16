@@ -1,4 +1,5 @@
 'use client';
+import { isValidDzPhone, currencyLabel } from '@/components/theme/kit';
 import { showError } from '@/lib/showError';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -479,7 +480,7 @@ export function Navbar({store,domain}:{store:any;domain:string}){
                             </div>
                             <div>
                               <p style={{fontSize:'12px',fontWeight:600,color:'var(--tx)',lineHeight:1.3,marginBottom:3}}>{p.name}</p>
-                              <p style={{fontSize:'12px',color:'var(--cp)',fontWeight:700}}>{p.price} {store?.currency || t.currency}</p>
+                              <p style={{fontSize:'12px',color:'var(--cp)',fontWeight:700}}>{p.price} {store?.currency || currencyLabel(t.currency)}</p>
                             </div>
                           </Link>
                         ))}
@@ -595,7 +596,7 @@ export function Card({product,displayImage,discount,store}:any){
         <div style={{padding:'12px 2px 0'}}>
           <p style={{fontSize:'13px',fontWeight:500,color:'var(--tx)',lineHeight:1.35,marginBottom:6,display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical',overflow:'hidden'}}>{product.name}</p>
           <div style={{display:'flex',alignItems:'center',gap:8}}>
-            <span style={{fontSize:'14px',fontWeight:700,color:'var(--cp)'}}>{price.toLocaleString()} {store?.currency || t.currency}</span>
+            <span style={{fontSize:'14px',fontWeight:700,color:'var(--cp)'}}>{price.toLocaleString()} {store?.currency || currencyLabel(t.currency)}</span>
             {orig>price&&<span style={{fontSize:'11px',textDecoration:'line-through',color:'var(--mu)'}}>{orig.toLocaleString()}</span>}
           </div>
         </div>
@@ -691,7 +692,7 @@ export function Home({store,page}:any){
 /* ══ DETAILS ══ */
 export function Details({product,discount,allImages,allAttrs,finalPrice,inStock,autoGen,selectedVariants,setSelectedOffer,selectedOffer,handleVariantSelection,domain,store}:any){
   const t = T[getLang(store || product?.store)];
-  const cur = (store || product?.store)?.currency || t.currency;
+  const cur = (store || product?.store)?.currency || currencyLabel(t.currency);
   const [sel,setSel]=useState(0);
   if(!product)return null;
   return(
@@ -792,7 +793,7 @@ export function Details({product,discount,allImages,allAttrs,finalPrice,inStock,
 export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffer,selectedVariants,platform,priceLoss=0,store}:ProductFormProps){
   const [addonIds, setAddonIds] = useState<string[]>([]);
   const t = T[getLang(store || product?.store)];
-  const cur = (store || product?.store)?.currency || t.currency;
+  const cur = (store || product?.store)?.currency || currencyLabel(t.currency);
   const router=useRouter();
   const [wilayas,setW]=useState<Wilaya[]>([]);
   const [communes,setC]=useState<Commune[]>([]);
@@ -829,7 +830,7 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
   const getLiv=useCallback(():any=>{if(product.isDigital)return 0;if(orderFreeShipping)return 0;if(!selW)return 0;return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice},[selW,fd.typeLivraison,orderFreeShipping,product.isDigital]);
   const total = () => Number(fp) * Number(qty) + Number(getLiv());
   const getVarId=useCallback(()=>{if(!product.variantDetails?.length||!Object.keys(selectedVariants).length)return undefined;return product.variantDetails.find((v:any)=>vm(v,selectedVariants))?.id},[product.variantDetails,selectedVariants]);
-  const validate=()=>{const e:Record<string,string>={};if(!fd.customerName.trim())e.name=t.errName;if(!fd.customerPhone.trim()||!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim()))e.phone=t.errPhoneInvalid;if(product.isDigital){if(contactMethod==='email'){if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim()))e.email=t.errEmail}else{if(!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim()))e.whatsapp=t.errWhatsapp}}else{if(!fd.customerWelaya)e.w=t.errWilaya;if(!fd.customerCommune)e.c=t.errCommune}return e};
+  const validate=()=>{const e:Record<string,string>={};if(!fd.customerName.trim())e.name=t.errName;if(!fd.customerPhone.trim()||!isValidDzPhone(fd.customerPhone.trim()))e.phone=t.errPhoneInvalid;if(product.isDigital){if(contactMethod==='email'){if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim()))e.email=t.errEmail}else{if(!isValidDzPhone(fd.customerWhatsapp.trim()))e.whatsapp=t.errWhatsapp}}else{if(!fd.customerWelaya)e.w=t.errWilaya;if(!fd.customerCommune)e.c=t.errCommune}return e};
 
   const addCart=()=>{
     setAdded(true);
@@ -970,7 +971,7 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
 /* ══ CART ══ */
 export function Cart({domain,store}:{domain:string;store:any}){
   const t = T[getLang(store)];
-  const cur = store?.currency || t.currency;
+  const cur = store?.currency || currencyLabel(t.currency);
   const [items,setItems]=useState<any[]>([]);
   const [wilayas,setW]=useState<Wilaya[]>([]);
   const [communes,setC]=useState<Commune[]>([]);
@@ -1003,7 +1004,7 @@ export function Cart({domain,store}:{domain:string;store:any}){
     e.preventDefault();
     const er:Record<string,string>={};
     if(!fd.customerName.trim())er.name=t.errName;
-    if(!fd.customerPhone.trim()||!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim()))er.phone=t.errPhoneInvalid;
+    if(!fd.customerPhone.trim()||!isValidDzPhone(fd.customerPhone.trim()))er.phone=t.errPhoneInvalid;
     if(!fd.customerWelaya)er.w=t.errWilaya;
     if(!fd.customerCommune)er.c=t.errCommune;
     if(Object.keys(er).length){setE(er);return}

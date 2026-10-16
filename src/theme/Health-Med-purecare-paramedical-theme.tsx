@@ -1,4 +1,5 @@
 'use client';
+import { isValidDzPhone } from '@/components/theme/kit';
 import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -1383,12 +1384,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = t.errName;
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
+    if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
     if (product.isDigital) {
       if (contactMethod === 'email') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
       } else {
-        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
+        if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
       if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
@@ -1628,7 +1629,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = t.errName;
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = t.errPhoneInvalid;
+    if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) er.phone = t.errPhoneInvalid;
     if (!fd.customerWelaya) er.welaya = t.errWilaya;
     if (!fd.customerCommune) er.commune = t.errCommune;
     if (Object.keys(er).length) { setErrors(er); return; }

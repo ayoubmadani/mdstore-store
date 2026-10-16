@@ -8,6 +8,7 @@
 // عند تعديل نموذج المحرر: انسخ التعديل هنا أيضاً.
 // ═══════════════════════════════════════════════════════════════════════════
 
+import { isValidDzPhone } from '@/components/theme/kit';
 import { useEffect, useState } from 'react';
 import {
   Minus, Plus, ShoppingCart, MapPin, Phone, User, Home,
@@ -300,7 +301,7 @@ export default function ProductFormBlock({
     if (!product) return;
 
     const normalizedPhone = form.customerPhone.trim().replace(/^\+213/, '0');
-    if (!/^(05|06|07)\d{8}$/.test(normalizedPhone)) {
+    if (!isValidDzPhone(normalizedPhone)) {
       setError(t.errorPhone);
       return;
     }
@@ -310,7 +311,7 @@ export default function ProductFormBlock({
           setError(t.errorEmail);
           return;
         }
-      } else if (!/^(0|\+213)[5-7][0-9]{8}$/.test(form.customerWhatsapp.trim().replace(/\s/g, ''))) {
+      } else if (!isValidDzPhone(form.customerWhatsapp.trim().replace(/\s/g, ''))) {
         setError(t.errorWhatsapp);
         return;
       }

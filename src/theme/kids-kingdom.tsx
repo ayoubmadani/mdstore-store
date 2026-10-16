@@ -1,5 +1,6 @@
 'use client';
 
+import { isValidDzPhone, currencyLabel } from '@/components/theme/kit';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
@@ -653,7 +654,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               />
               <div>
                 <div className='line-clamp-1' style={{ fontSize: '0.85rem', fontWeight: 700 }}>{p.name}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--coral)', fontWeight: 900 }}>{p.price} {t.currency}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--coral)', fontWeight: 900 }}>{p.price} {currencyLabel(t.currency)}</div>
               </div>
             </Link>
           ))}
@@ -904,7 +905,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div style={{ marginTop: 'auto' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', marginBottom: '0.75rem' }}>
             <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.4rem', color: 'var(--coral)' }}>{price.toLocaleString()}</span>
-            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-soft)' }}>{store?.currency || t.currency}</span>
+            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-soft)' }}>{store?.currency || currencyLabel(t.currency)}</span>
             {orig > price && <span style={{ fontSize: '0.75rem', color: 'var(--text-soft)', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
           </div>
           <Link href={`/product/${product.slug || product.id}`} className="btn-bouncy" style={{
@@ -1178,7 +1179,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
           <p style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--text-soft)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.2rem' }}>{t.price_label}</p>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
             <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', color: accent, lineHeight: 1 }}>{finalPrice.toLocaleString()}</span>
-            <span style={{ fontWeight: 700, color: 'var(--text-mid)', fontSize: '0.9rem' }}>{t.currency}</span>
+            <span style={{ fontWeight: 700, color: 'var(--text-mid)', fontSize: '0.9rem' }}>{currencyLabel(t.currency)}</span>
           </div>
         </div>
         <span style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', opacity: 0.45 }}>🏷️</span>
@@ -1188,7 +1189,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
       {(product.shippingFree || ((store || product?.store)?.supportFreeShipping && (store || product?.store)?.freeShippingMinAmount != null)) && (
         <div style={{ ...card, borderColor: accent, background: `${accent}10` }}>
           <p style={{ fontSize: '0.8rem', fontWeight: 800, color: accent, margin: 0 }}>
-            🚚 {product.shippingFree ? t.free_shipping_badge : t.free_shipping_threshold.replace('{{amount}}', `${Number((store || product?.store).freeShippingMinAmount).toLocaleString()} ${t.currency}`)}
+            🚚 {product.shippingFree ? t.free_shipping_badge : t.free_shipping_threshold.replace('{{amount}}', `${Number((store || product?.store).freeShippingMinAmount).toLocaleString()} ${currencyLabel(t.currency)}`)}
           </p>
         </div>
       )}
@@ -1210,7 +1211,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                   {o.shippingFree && <p style={{ fontSize: '0.68rem', color: accent, fontWeight: 700 }}>🚚 {t.free_shipping_badge}</p>}
                 </div>
               </div>
-              <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.05rem', color: accent, flexShrink: 0 }}>{o.price.toLocaleString()} {t.currency}</span>
+              <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.05rem', color: accent, flexShrink: 0 }}>{o.price.toLocaleString()} {currencyLabel(t.currency)}</span>
             </label>
           ))}
         </div>
@@ -1362,12 +1363,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = t.err_name;
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.err_phone;
+    if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) e.customerPhone = t.err_phone;
     if (product.isDigital) {
       if (contactMethod === 'email') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.err_email;
       } else {
-        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.err_whatsapp;
+        if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.err_whatsapp;
       }
     } else {
       if (!fd.customerWelaya) e.customerWelaya = t.err_wilaya;
@@ -1489,7 +1490,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                       <button data-delivery-option key={ty} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: ty }))} style={{ padding: '0.875rem', border: `3px solid ${fd.typeLivraison === ty ? 'var(--sky)' : 'var(--border)'}`, borderRadius: 16, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === ty ? 'rgba(78,205,196,0.1)' : '#fff', fontFamily: 'inherit', transition: 'all 0.2s' }}>
                         <span style={{ display: 'block', fontSize: '1.5rem', marginBottom: 4 }}>{ty === 'home' ? '🏠' : '🏢'}</span>
                         <p style={{ fontWeight: 800, fontSize: '0.8rem', color: fd.typeLivraison === ty ? 'var(--sky-dk)' : 'var(--text-soft)' }}>{ty === 'home' ? t.home_delivery : t.office_delivery}</p>
-                        {selW && <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: fd.typeLivraison === ty ? 'var(--text)' : 'var(--text-soft)' }}>{orderFreeShipping ? t.free_shipping_badge : `${Number(ty === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} ${t.currency}`}</p>}
+                        {selW && <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: fd.typeLivraison === ty ? 'var(--text)' : 'var(--text-soft)' }}>{orderFreeShipping ? t.free_shipping_badge : `${Number(ty === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} ${currencyLabel(t.currency)}`}</p>}
                       </button>
                     ))}
                   </div>
@@ -1513,9 +1514,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--coral)', textTransform: 'uppercase', marginBottom: '0.875rem' }}>{t.order_summary}</p>
               {[
                 { l: t.sum_product, v: product.name.slice(0, 24) + (product.name.length > 24 ? '...' : '') },
-                { l: t.sum_price, v: `${fp.toLocaleString()} ${t.currency}` },
+                { l: t.sum_price, v: `${fp.toLocaleString()} ${currencyLabel(t.currency)}` },
                 { l: t.sum_qty, v: `× ${qty}` },
-                ...(product.isDigital ? [] : [{ l: t.sum_delivery, v: !selW ? '---' : orderFreeShipping ? t.free_shipping_badge : `${getLiv().toLocaleString()} ${t.currency}` }]),
+                ...(product.isDigital ? [] : [{ l: t.sum_delivery, v: !selW ? '---' : orderFreeShipping ? t.free_shipping_badge : `${getLiv().toLocaleString()} ${currencyLabel(t.currency)}` }]),
               ].map(r => (
                 <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px dashed var(--border)' }}>
                   <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-soft)', textTransform: 'uppercase' }}>{r.l}</span>
@@ -1524,7 +1525,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', paddingTop: '0.5rem' }}>
                 <span style={{ fontWeight: 900, fontSize: '0.875rem', color: 'var(--coral)' }}>{t.sum_total}</span>
-                <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2rem', color: 'var(--coral)' }}>{total().toLocaleString()} <span style={{ fontSize: '0.9rem', fontFamily: 'inherit' }}>{t.currency}</span></span>
+                <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2rem', color: 'var(--coral)' }}>{total().toLocaleString()} <span style={{ fontSize: '0.9rem', fontFamily: 'inherit' }}>{currencyLabel(t.currency)}</span></span>
               </div>
             </div>
 
@@ -1586,7 +1587,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = t.err_name;
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = t.err_phone;
+    if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) er.phone = t.err_phone;
     if (!fd.customerWelaya) er.w = t.err_wilaya;
     if (!fd.customerCommune) er.c = t.err_commune;
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -1634,7 +1635,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             background: freeShippingReached ? 'rgba(110,231,183,0.12)' : '#fff', padding: '0.875rem 1.125rem', marginBottom: '1.5rem',
             color: freeShippingReached ? 'var(--mint-dk)' : 'var(--text-soft)', fontSize: '0.85rem', fontWeight: 800,
           }}>
-            {freeShippingReached ? t.free_shipping_reached : t.free_shipping_remaining.replace('{{amount}}', `${Number(freeShippingRemainingAmt).toLocaleString()} ${t.currency}`)}
+            {freeShippingReached ? t.free_shipping_reached : t.free_shipping_remaining.replace('{{amount}}', `${Number(freeShippingRemainingAmt).toLocaleString()} ${currencyLabel(t.currency)}`)}
           </div>
         )}
         <div className="cart-layout">
@@ -1650,7 +1651,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: 78, height: 78, borderRadius: 16, objectFit: 'cover', border: '2px solid var(--border)', flexShrink: 0 }} alt="" />
                 <div style={{ flex: 1 }}>
                   <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '0.95rem', color: 'var(--text)', marginBottom: '0.25rem' }}>{item.product?.name}</h4>
-                  <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: 'var(--coral)', marginBottom: '0.5rem' }}>{item.finalPrice?.toLocaleString()} {t.currency}</p>
+                  <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: 'var(--coral)', marginBottom: '0.5rem' }}>{item.finalPrice?.toLocaleString()} {currencyLabel(t.currency)}</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
                     <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--text)' }}>× {item.quantity}</span>
                     <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0.375rem 0.75rem', borderRadius: 10, border: '2px solid rgba(255,107,107,0.3)', background: 'transparent', color: 'var(--coral)', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -1662,7 +1663,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             ))}
             <div style={{ padding: '1rem', background: 'rgba(255,107,107,0.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontWeight: 800, fontSize: '0.875rem', color: 'var(--text-soft)' }}>{t.subtotal}</span>
-              <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.5rem', color: 'var(--coral)' }}>{cartTotal.toLocaleString()} {t.currency}</span>
+              <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.5rem', color: 'var(--coral)' }}>{cartTotal.toLocaleString()} {currencyLabel(t.currency)}</span>
             </div>
           </div>
 
@@ -1703,7 +1704,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     <button data-delivery-option key={ty} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: ty }))} style={{ padding: '0.75rem', border: `3px solid ${fd.typeLivraison === ty ? 'var(--sky)' : 'var(--border)'}`, borderRadius: 14, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === ty ? 'rgba(78,205,196,0.08)' : '#fff', fontFamily: 'inherit', transition: 'all 0.2s' }}>
                       <span style={{ display: 'block', fontSize: '1.25rem', marginBottom: 3 }}>{ty === 'home' ? '🏠' : '🏢'}</span>
                       <p style={{ fontWeight: 800, fontSize: '0.78rem', color: fd.typeLivraison === ty ? 'var(--sky-dk)' : 'var(--text-soft)' }}>{ty === 'home' ? t.home_delivery : t.office_delivery}</p>
-                      {selW && <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '0.9rem', color: fd.typeLivraison === ty ? 'var(--text)' : 'var(--text-soft)' }}>{freeShippingReached ? t.free_shipping_badge : `${Number(ty === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} ${t.currency}`}</p>}
+                      {selW && <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '0.9rem', color: fd.typeLivraison === ty ? 'var(--text)' : 'var(--text-soft)' }}>{freeShippingReached ? t.free_shipping_badge : `${Number(ty === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} ${currencyLabel(t.currency)}`}</p>}
                     </button>
                   ))}
                 </div>
@@ -1712,8 +1713,8 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               <div className="polka-dots" style={{ background: '#fff', border: '2.5px solid var(--border)', borderRadius: 18, padding: '1rem', marginBottom: '1rem' }}>
                 <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--coral)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>{t.summary}</p>
                 {[
-                  { l: t.subtotal, v: `${cartTotal.toLocaleString()} ${t.currency}` },
-                  { l: t.sum_delivery, v: !selW ? '---' : freeShippingReached ? t.free_shipping_badge : `${getLiv().toLocaleString()} ${t.currency}` },
+                  { l: t.subtotal, v: `${cartTotal.toLocaleString()} ${currencyLabel(t.currency)}` },
+                  { l: t.sum_delivery, v: !selW ? '---' : freeShippingReached ? t.free_shipping_badge : `${getLiv().toLocaleString()} ${currencyLabel(t.currency)}` },
                 ].map(r => (
                   <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px dashed var(--border)' }}>
                     <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-soft)' }}>{r.l}</span>
@@ -1722,7 +1723,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 ))}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', paddingTop: '0.375rem' }}>
                   <span style={{ fontWeight: 900, fontSize: '0.875rem', color: 'var(--coral)' }}>{t.total_label}</span>
-                  <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2rem', color: 'var(--coral)' }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.85rem', fontFamily: 'inherit' }}>{t.currency}</span></span>
+                  <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2rem', color: 'var(--coral)' }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.85rem', fontFamily: 'inherit' }}>{currencyLabel(t.currency)}</span></span>
                 </div>
               </div>
 

@@ -1,4 +1,5 @@
 'use client';
+import { isValidDzPhone, currencyLabel } from '@/components/theme/kit';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 /* =====================================================================
@@ -312,7 +313,7 @@ const productImg = (p: any): string | undefined =>
 
 const useFmt = (store?: any) => {
   const t = T[getLang(store)];
-  const cur = store?.currency || t.currency;
+  const cur = store?.currency || currencyLabel(t.currency);
   return (n: number | string) => `${Number(n || 0).toLocaleString('fr-FR')} ${cur}`;
 };
 
@@ -1261,12 +1262,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName || fd.customerName.trim().length < 3) e.customerName = t.errName;
-    if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhone;
+    if (!isValidDzPhone(fd.customerPhone.trim())) e.customerPhone = t.errPhone;
     if (product?.isDigital) {
       if (contactMethod === 'email') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
       } else {
-        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
+        if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
       if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
@@ -1528,7 +1529,7 @@ export function Cart({ domain, store }: any) {
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName || fd.customerName.trim().length < 3) e.customerName = t.errName;
-    if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhone;
+    if (!isValidDzPhone(fd.customerPhone.trim())) e.customerPhone = t.errPhone;
     if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
     if (!fd.customerCommune) e.customerCommune = t.errCommune;
     setErrors(e);

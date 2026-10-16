@@ -1,4 +1,5 @@
 'use client';
+import { isValidDzPhone } from '@/components/theme/kit';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
@@ -92,7 +93,6 @@ async function fetchCommunes(wid: string): Promise<Commune[]> {
   } catch { return []; }
 }
 
-const PHONE_RE = /^(0|\+213)[5-7]\d{8}$/;
 
 /* ---------------- Shared CSS ---------------- */
 const THEME_CSS = `
@@ -1149,12 +1149,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = t.errName;
-    if (!PHONE_RE.test(fd.customerPhone)) e.customerPhone = t.errPhoneInvalid;
+    if (!isValidDzPhone(fd.customerPhone)) e.customerPhone = t.errPhoneInvalid;
     if (product.isDigital) {
       if (contactMethod === 'email') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
       } else {
-        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
+        if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
       if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
@@ -1401,7 +1401,7 @@ export function Cart({ domain, store }: any) {
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = t.errName;
-    if (!PHONE_RE.test(fd.customerPhone)) e.customerPhone = t.errPhoneInvalid;
+    if (!isValidDzPhone(fd.customerPhone)) e.customerPhone = t.errPhoneInvalid;
     if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
     if (!fd.customerCommune) e.customerCommune = t.errCommune;
     setErrors(e);

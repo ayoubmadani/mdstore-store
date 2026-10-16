@@ -1,4 +1,5 @@
 'use client';
+import { isValidDzPhone, currencyLabel } from '@/components/theme/kit';
 import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -1032,12 +1033,12 @@ export function ProductForm({ product, store, userId, domain, selectedOffer, set
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'مطلوب';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم غير صالح';
+    if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) e.customerPhone = 'رقم غير صالح';
     if (product.isDigital) {
       if (contactMethod === 'email') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
       } else {
-        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
+        if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
       if (!fd.customerWelaya) e.customerWelaya = 'مطلوب';
@@ -1180,7 +1181,7 @@ export function ProductForm({ product, store, userId, domain, selectedOffer, set
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontWeight: 700, fontSize: '0.875rem', color: INK }}>المجموع</span>
-                <span className="price-mono" style={{ fontSize: '1.75rem', fontWeight: 700, color: GD }}>{total().toLocaleString()} <span style={{ fontSize: '0.75rem' }}>دج</span></span>
+                <span className="price-mono" style={{ fontSize: '1.75rem', fontWeight: 700, color: GD }}>{total().toLocaleString()} <span style={{ fontSize: '0.75rem' }}>{currencyLabel('دج')}</span></span>
               </div>
             </div>
             <button type="submit" disabled={sub} style={{ ...S.btnPrimary, opacity: sub ? 0.7 : 1 }}
@@ -1231,7 +1232,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'مطلوب';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم غير صالح';
+    if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) er.phone = 'رقم غير صالح';
     if (!fd.customerWelaya) er.w = 'مطلوب';
     if (!fd.customerCommune) er.c = 'مطلوب';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -1343,7 +1344,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontWeight: 700, color: INK }}>الإجمالي</span>
-                <span className="price-mono" style={{ fontSize: '1.875rem', fontWeight: 700, color: GD }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.75rem' }}>دج</span></span>
+                <span className="price-mono" style={{ fontSize: '1.875rem', fontWeight: 700, color: GD }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.75rem' }}>{currencyLabel('دج')}</span></span>
               </div>
             </div>
             <button type="submit" disabled={submitting} style={{ ...S.btnPrimary, opacity: submitting ? 0.7 : 1 }}

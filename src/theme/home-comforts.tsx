@@ -1,4 +1,5 @@
 'use client';
+import { isValidDzPhone, currencyLabel } from '@/components/theme/kit';
 import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -621,7 +622,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                     )}
                     <div className="glb-search-card-info">
                       <p style={{ fontSize: '0.82rem', fontWeight: 600, color: INK, marginBottom: 3, lineHeight: 1.35 }}>{p.name}</p>
-                      <p style={{ fontSize: '0.78rem', fontWeight: 700, color: W }}>{Number(p.price).toLocaleString()} {t.currency}</p>
+                      <p style={{ fontSize: '0.78rem', fontWeight: 700, color: W }}>{Number(p.price).toLocaleString()} {currencyLabel(t.currency)}</p>
                     </div>
                   </Link>
                 ))}
@@ -729,7 +730,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <h3 style={{ fontSize: '0.88rem', fontWeight: 600, color: INK, lineHeight: 1.45, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: '0.75rem' }}>{product.name}</h3>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: '0.875rem' }}>
           <span className="price-mono" style={{ fontSize: '1.375rem', fontWeight: 700, color: WD }}>{price.toLocaleString()}</span>
-          <span style={{ fontSize: '0.68rem', color: SUB }}>{store.currency || t.currency}</span>
+          <span style={{ fontSize: '0.68rem', color: SUB }}>{store.currency || currencyLabel(t.currency)}</span>
           {orig > price && <span className="price-mono" style={{ fontSize: '0.72rem', color: WB, textDecoration: 'line-through', marginRight: 2 }}>{orig.toLocaleString()}</span>}
         </div>
       </div>
@@ -914,12 +915,12 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               <p style={{ fontSize: '0.65rem', fontWeight: 600, color: SUB, marginBottom: '0.25rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>{t.price}</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
                 <span className="price-mono" style={{ fontSize: '2.5rem', fontWeight: 700, color: WD }}>{finalPrice.toLocaleString()}</span>
-                <span style={{ fontSize: '0.9rem', fontWeight: 600, color: SUB }}>{t.currency}</span>
+                <span style={{ fontSize: '0.9rem', fontWeight: 600, color: SUB }}>{currencyLabel(t.currency)}</span>
               </div>
             </div>
             {(product.shippingFree || ((store || product?.store)?.supportFreeShipping && (store || product?.store)?.freeShippingMinAmount != null)) && (
               <div style={{ marginBottom: '1.25rem', padding: '0.75rem 1rem', border: `1px solid ${W}`, borderRadius: 12, background: WL, fontSize: '0.8rem', fontWeight: 600, color: WD }}>
-                🚚 {product.shippingFree ? t.freeShippingBadge : t.freeShippingThreshold.replace('{{amount}}', `${Number((store || product?.store).freeShippingMinAmount).toLocaleString()} ${t.currency}`)}
+                🚚 {product.shippingFree ? t.freeShippingBadge : t.freeShippingThreshold.replace('{{amount}}', `${Number((store || product?.store).freeShippingMinAmount).toLocaleString()} ${currencyLabel(t.currency)}`)}
               </div>
             )}
             {product.offers?.length > 0 && (
@@ -939,7 +940,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                         {o.shippingFree && <p style={{ fontSize: '0.7rem', color: WD, fontWeight: 600 }}>🚚 {t.freeShippingBadge}</p>}
                       </div>
                     </div>
-                    <span className="price-mono" style={{ fontWeight: 700, color: WD }}>{o.price.toLocaleString()} {t.currency}</span>
+                    <span className="price-mono" style={{ fontWeight: 700, color: WD }}>{o.price.toLocaleString()} {currencyLabel(t.currency)}</span>
                   </label>
                 ))}
               </div>
@@ -1044,12 +1045,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = t.errName;
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
+    if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
     if (product.isDigital) {
       if (contactMethod === 'email') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
       } else {
-        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
+        if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
       if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
@@ -1163,7 +1164,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                     {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt)).map(tp => (
                       <button data-delivery-option key={tp} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: tp }))} style={{ padding: '0.75rem', border: `1.5px solid ${fd.typeLivraison === tp ? W : BD}`, borderRadius: 12, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === tp ? WL : CARD, transition: 'all 0.18s', fontFamily: 'inherit' }}>
                         <p style={{ fontWeight: 600, fontSize: '0.8rem', marginBottom: 3, color: fd.typeLivraison === tp ? WD : SUB }}>{tp === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
-                        {selW && <p className="price-mono" style={{ fontSize: '1rem', fontWeight: 700, color: fd.typeLivraison === tp ? WD : SUB }}>{orderFreeShipping ? t.freeShippingBadge : `${Number(tp === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} ${t.currency}`}</p>}
+                        {selW && <p className="price-mono" style={{ fontSize: '1rem', fontWeight: 700, color: fd.typeLivraison === tp ? WD : SUB }}>{orderFreeShipping ? t.freeShippingBadge : `${Number(tp === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} ${currencyLabel(t.currency)}`}</p>}
                       </button>
                     ))}
                   </div>
@@ -1182,9 +1183,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             )}
             <div style={{ background: WL, borderRadius: 14, border: `1px solid ${WB}`, padding: '1rem 1.125rem', marginBottom: '1rem' }}>
               {[
-                { l: product.name.slice(0, 26) + (product.name.length > 26 ? '...' : ''), v: `${fp.toLocaleString()} ${t.currency}` },
+                { l: product.name.slice(0, 26) + (product.name.length > 26 ? '...' : ''), v: `${fp.toLocaleString()} ${currencyLabel(t.currency)}` },
                 { l: t.qty, v: `× ${qty}` },
-                ...(product.isDigital ? [] : [{ l: t.delivery, v: !selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${getLiv().toLocaleString()} ${t.currency}` }]),
+                ...(product.isDigital ? [] : [{ l: t.delivery, v: !selW ? '—' : orderFreeShipping ? t.freeShippingBadge : `${getLiv().toLocaleString()} ${currencyLabel(t.currency)}` }]),
               ].map(r => (
                 <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: `1px solid ${WB}` }}>
                   <span style={{ fontSize: '0.78rem', color: SUB }}>{r.l}</span>
@@ -1193,7 +1194,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontWeight: 600, fontSize: '0.875rem', color: INK }}>{t.total}</span>
-                <span className="price-mono" style={{ fontSize: '1.75rem', fontWeight: 700, color: WD }}>{total().toLocaleString()} <span style={{ fontSize: '0.75rem' }}>{t.currency}</span></span>
+                <span className="price-mono" style={{ fontSize: '1.75rem', fontWeight: 700, color: WD }}>{total().toLocaleString()} <span style={{ fontSize: '0.75rem' }}>{currencyLabel(t.currency)}</span></span>
               </div>
             </div>
             <button type="submit" disabled={sub} style={{ ...S.btnPrimary, opacity: sub ? 0.7 : 1 }}
@@ -1251,7 +1252,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = t.errName;
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = t.errPhoneInvalid;
+    if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) er.phone = t.errPhoneInvalid;
     if (!fd.customerWelaya) er.w = t.errWilaya;
     if (!fd.customerCommune) er.c = t.errCommune;
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -1299,7 +1300,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
           background: freeShippingReached ? WL : CARD, padding: '0.875rem 1.125rem', marginBottom: '1.5rem',
           color: freeShippingReached ? WD : SUB, fontSize: '0.85rem', fontWeight: 600,
         }}>
-          {freeShippingReached ? t.freeShippingReached : t.freeShippingRemaining.replace('{{amount}}', `${Number(freeShippingRemainingAmt).toLocaleString()} ${t.currency}`)}
+          {freeShippingReached ? t.freeShippingReached : t.freeShippingRemaining.replace('{{amount}}', `${Number(freeShippingRemainingAmt).toLocaleString()} ${currencyLabel(t.currency)}`)}
         </div>
       )}
       <div className="cart-inner">
@@ -1309,7 +1310,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: 72, height: 72, objectFit: 'cover', flexShrink: 0, borderRadius: 10, border: `1px solid ${BD}` }} alt="" />
               <div style={{ flex: 1 }}>
                 <h4 style={{ fontWeight: 600, color: INK, marginBottom: '0.3rem', fontSize: '0.875rem', lineHeight: 1.4 }}>{item.product?.name}</h4>
-                <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 700, color: WD }}>{item.finalPrice?.toLocaleString()} {t.currency}</p>
+                <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 700, color: WD }}>{item.finalPrice?.toLocaleString()} {currencyLabel(t.currency)}</p>
                 <p style={{ fontSize: '0.68rem', color: SUB, marginTop: '0.15rem' }}>{t.qty}: {item.quantity}</p>
               </div>
               <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: WB, padding: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'flex-start', transition: 'color 0.15s' }}
@@ -1321,7 +1322,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
           ))}
           <div style={{ padding: '1rem', background: WL, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 600, color: SUB, fontSize: '0.875rem' }}>{t.subtotal}</span>
-            <span className="price-mono" style={{ fontSize: '1.25rem', fontWeight: 700, color: WD }}>{cartTotal.toLocaleString()} {t.currency}</span>
+            <span className="price-mono" style={{ fontSize: '1.25rem', fontWeight: 700, color: WD }}>{cartTotal.toLocaleString()} {currencyLabel(t.currency)}</span>
           </div>
         </div>
         <div style={{ background: CARD, borderRadius: 16, border: `1px solid ${BD}`, padding: '1.75rem', alignSelf: 'start' }}>
@@ -1355,13 +1356,13 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt)).map(tp => (
                   <button data-delivery-option key={tp} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: tp }))} style={{ padding: '0.75rem', border: `1.5px solid ${fd.typeLivraison === tp ? W : BD}`, borderRadius: 12, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === tp ? WL : CARD, fontFamily: 'inherit', transition: 'all 0.18s' }}>
                     <p style={{ fontWeight: 600, fontSize: '0.8rem', color: fd.typeLivraison === tp ? WD : SUB, marginBottom: 3 }}>{tp === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
-                    {selW && <p style={{ fontWeight: 700, fontSize: '0.95rem', color: fd.typeLivraison === tp ? WD : SUB }}>{freeShippingReached ? t.freeShippingBadge : `${Number(tp === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} ${t.currency}`}</p>}
+                    {selW && <p style={{ fontWeight: 700, fontSize: '0.95rem', color: fd.typeLivraison === tp ? WD : SUB }}>{freeShippingReached ? t.freeShippingBadge : `${Number(tp === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} ${currencyLabel(t.currency)}`}</p>}
                   </button>
                 ))}
               </div>
             </div>
             <div style={{ background: WL, borderRadius: 14, border: `1px solid ${WB}`, padding: '1rem', margin: '1rem 0' }}>
-              {[{ l: t.subtotal, v: `${cartTotal.toLocaleString()} ${t.currency}` }, { l: t.delivery, v: !selW ? '—' : freeShippingReached ? t.freeShippingBadge : `${getLiv().toLocaleString()} ${t.currency}` }].map(r => (
+              {[{ l: t.subtotal, v: `${cartTotal.toLocaleString()} ${currencyLabel(t.currency)}` }, { l: t.delivery, v: !selW ? '—' : freeShippingReached ? t.freeShippingBadge : `${getLiv().toLocaleString()} ${currencyLabel(t.currency)}` }].map(r => (
                 <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: `1px solid ${WB}` }}>
                   <span style={{ fontSize: '0.78rem', color: SUB }}>{r.l}</span>
                   <span style={{ fontWeight: 600, color: INK }}>{r.v}</span>
@@ -1369,7 +1370,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontWeight: 700, color: INK }}>{t.total}</span>
-                <span className="price-mono" style={{ fontSize: '1.875rem', fontWeight: 700, color: WD }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.75rem' }}>{t.currency}</span></span>
+                <span className="price-mono" style={{ fontSize: '1.875rem', fontWeight: 700, color: WD }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.75rem' }}>{currencyLabel(t.currency)}</span></span>
               </div>
             </div>
             <button type="submit" disabled={submitting} style={{ ...S.btnPrimary, opacity: submitting ? 0.7 : 1 }}

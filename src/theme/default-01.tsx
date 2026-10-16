@@ -1,4 +1,5 @@
 'use client';
+import { isValidDzPhone, currencyLabel } from '@/components/theme/kit';
 import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
@@ -572,7 +573,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
           <div>
             <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '0.5rem' }}>{product.name}</h1>
             <div style={{ fontSize: '1.6rem', fontWeight: 700, marginBottom: '1rem' }}>
-              {finalPrice.toLocaleString()} <span style={{ fontSize: '0.9rem', fontWeight: 400, color: '#666' }}>دج</span>
+              {finalPrice.toLocaleString()} <span style={{ fontSize: '0.9rem', fontWeight: 400, color: '#666' }}>{currencyLabel('دج')}</span>
             </div>
             <div style={{ display: 'inline-block', background: (inStock || autoGen) ? '#111' : '#e5e5e5', color: (inStock || autoGen) ? '#fff' : '#666', fontSize: '0.75rem', padding: '3px 10px', borderRadius: 3, marginBottom: '1.5rem', fontWeight: 600 }}>
               {(inStock || autoGen) ? 'متوفر' : 'غير متوفر'}
@@ -719,12 +720,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim() || fd.customerName.length < 3) e.customerName = 'الاسم مطلوب (3 أحرف على الأقل)';
-    if (!/^(0|\+213)[5-7][0-9]{8}$/.test(fd.customerPhone.replace(/\s/g, ''))) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
+    if (!isValidDzPhone(fd.customerPhone.replace(/\s/g, ''))) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (product.isDigital) {
       if (contactMethod === 'email') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = 'يرجى إدخال بريد إلكتروني صحيح';
       } else {
-        if (!/^(0|\+213)[5-7][0-9]{8}$/.test(fd.customerWhatsapp.replace(/\s/g, ''))) e.customerWhatsapp = 'رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)';
+        if (!isValidDzPhone(fd.customerWhatsapp.replace(/\s/g, ''))) e.customerWhatsapp = 'رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)';
       }
     } else {
       if (!fd.customerWelaya)  e.customerWelaya  = 'اختر الولاية';

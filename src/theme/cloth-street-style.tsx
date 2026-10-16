@@ -1,4 +1,5 @@
 'use client';
+import { isValidDzPhone, currencyLabel } from '@/components/theme/kit';
 import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
@@ -613,7 +614,7 @@ export default function Main({ store, children, domain }: any) {
 ══════════════════════════════════════════════════════════════ */
 export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: string; onMenuOpen?: () => void }) {
   const t = T[getLang(store)];
-  const cur = store?.currency || t.currency;
+  const cur = store?.currency || currencyLabel(t.currency);
   const [sq, setSq] = useState('');
   const [ls, setLs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -915,7 +916,7 @@ export function Footer({ store }: any) {
 ══════════════════════════════════════════════════════════════ */
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
   const t = T[getLang(store)];
-  const cur = store?.currency || t.currency;
+  const cur = store?.currency || currencyLabel(t.currency);
   const [hov, setHov] = useState(false);
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
   const orig = product.originalPrice ? (typeof product.originalPrice === 'string' ? parseFloat(product.originalPrice) : product.originalPrice) : 0;
@@ -1127,7 +1128,7 @@ export function Home({ store, page }: any) {
 ══════════════════════════════════════════════════════════════ */
 export function Details({ product, store, toggleWishlist, isWishlisted, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain }: any) {
   const t = T[getLang(store)];
-  const cur = store?.currency || t.currency;
+  const cur = store?.currency || currencyLabel(t.currency);
   const [sel, setSel] = useState(0);
   if (!product) return null;
   return (
@@ -1254,7 +1255,7 @@ export function Details({ product, store, toggleWishlist, isWishlisted, discount
 export function ProductForm({ product, store, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0 }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   const t = T[getLang(store)];
-  const cur = store?.currency || t.currency;
+  const cur = store?.currency || currencyLabel(t.currency);
   const router = useRouter();
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -1303,12 +1304,12 @@ export function ProductForm({ product, store, userId, domain, selectedOffer, set
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = t.errName;
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
+    if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
     if (product.isDigital) {
       if (contactMethod === 'email') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
       } else {
-        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
+        if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
       if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
@@ -1491,7 +1492,7 @@ export function ProductForm({ product, store, userId, domain, selectedOffer, set
 ══════════════════════════════════════════════════════════════ */
 export function Cart({ domain, store }: { domain: string; store: any }) {
   const t = T[getLang(store)];
-  const cur = store?.currency || t.currency;
+  const cur = store?.currency || currencyLabel(t.currency);
   const [items, setItems] = useState<any[]>([]);
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -1523,7 +1524,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = t.errName;
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = t.errPhoneInvalid;
+    if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) er.phone = t.errPhoneInvalid;
     if (!fd.customerWelaya) er.w = t.errWilaya;
     if (!fd.customerCommune) er.c = t.errCommune;
     if (Object.keys(er).length) { setErrors(er); return; }

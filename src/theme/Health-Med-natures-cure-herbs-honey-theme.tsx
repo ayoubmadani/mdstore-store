@@ -1,4 +1,5 @@
 'use client';
+import { isValidDzPhone, currencyLabel } from '@/components/theme/kit';
 import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
@@ -978,7 +979,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         </div>
         <div style={{ display:'flex', alignItems:'baseline', gap:'6px', marginTop:'auto' }}>
           <span className="pd" style={{ fontSize:'1.3rem', fontWeight:700, color:'var(--gold)' }}>{price.toLocaleString()}</span>
-          <span style={{ fontSize:'11px', color:'var(--dim)' }}>دج</span>
+          <span style={{ fontSize:'11px', color:'var(--dim)' }}>{currencyLabel('دج')}</span>
           {orig > price && (
             <span style={{ fontSize:'11px', color:'var(--dim)', textDecoration:'line-through' }}>{orig.toLocaleString()}</span>
           )}
@@ -1375,7 +1376,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                 <span className="pd" style={{ fontSize:'2.8rem', fontWeight:700, color:'var(--gold)', lineHeight:1 }}>
                   {finalPrice.toLocaleString()}
                 </span>
-                <span className="pd" style={{ fontSize:'13px', color:'var(--dim)', fontWeight:600 }}>دج</span>
+                <span className="pd" style={{ fontSize:'13px', color:'var(--dim)', fontWeight:600 }}>{currencyLabel('دج')}</span>
                 {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
                   <span style={{ fontSize:'14px', textDecoration:'line-through', color:'var(--dim)' }}>
                     {parseFloat(product.priceOriginal).toLocaleString()}
@@ -1418,7 +1419,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
                       </div>
                     </div>
                     <span className="pd" style={{ fontSize:'1.3rem', fontWeight:700, color:'var(--gold)' }}>
-                      {o.price.toLocaleString()} <span style={{ fontFamily:"'Inter',sans-serif", fontWeight:400, fontSize:'11px', color:'var(--dim)' }}>دج</span>
+                      {o.price.toLocaleString()} <span style={{ fontFamily:"'Inter',sans-serif", fontWeight:400, fontSize:'11px', color:'var(--dim)' }}>{currencyLabel('دج')}</span>
                     </span>
                   </label>
                 ))}
@@ -1545,12 +1546,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = ()=>{
     const e:Record<string,string>={};
     if(!fd.customerName.trim()) e.customerName=t.errName;
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
+    if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
     if (product.isDigital) {
       if (contactMethod === 'email') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
       } else {
-        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
+        if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
       if(!fd.customerWelaya) e.customerWelaya=t.errWilaya;
@@ -1784,7 +1785,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er:Record<string,string>={};
     if(!fd.customerName.trim()) er.name=t.errName;
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = t.errPhoneInvalid;
+    if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) er.phone = t.errPhoneInvalid;
     if(!fd.customerWelaya) er.w=t.errWilaya;
     if(!fd.customerCommune) er.c=t.errCommune;
     if(Object.keys(er).length){setErrors(er);return;}

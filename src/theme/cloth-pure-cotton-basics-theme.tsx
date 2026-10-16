@@ -1,4 +1,5 @@
 'use client';
+import { isValidDzPhone, currencyLabel } from '@/components/theme/kit';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
@@ -1006,7 +1007,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   const t = T[getLang(store || product?.store)];
-  const cur = (store || product?.store)?.currency || t.currency;
+  const cur = (store || product?.store)?.currency || currencyLabel(t.currency);
   const router = useRouter();
   const initCount = useCartStore((s: any) => s.initCount);
 
@@ -1077,12 +1078,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = t.errName;
-    if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone)) e.customerPhone = t.errPhoneInvalid;
+    if (!isValidDzPhone(fd.customerPhone)) e.customerPhone = t.errPhoneInvalid;
     if (product.isDigital) {
       if (contactMethod === 'email') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
       } else {
-        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
+        if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
       if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
@@ -1275,7 +1276,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
    ============================================================ */
 export function Cart({ domain, store }: any) {
   const t = T[getLang(store)];
-  const cur = store?.currency || t.currency;
+  const cur = store?.currency || currencyLabel(t.currency);
   const router = useRouter();
   const initCount = useCartStore((s: any) => s.initCount);
   const [items, setItems] = useState<any[]>([]);
@@ -1336,7 +1337,7 @@ export function Cart({ domain, store }: any) {
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = t.errName;
-    if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone)) e.customerPhone = t.errPhoneInvalid;
+    if (!isValidDzPhone(fd.customerPhone)) e.customerPhone = t.errPhoneInvalid;
     if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
     if (!fd.customerCommune) e.customerCommune = t.errCommune;
     setErrors(e);

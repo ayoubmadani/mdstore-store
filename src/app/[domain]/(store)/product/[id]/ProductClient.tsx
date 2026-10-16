@@ -1,5 +1,6 @@
 'use client'
 
+import { isValidDzPhone } from '@/components/theme/kit';
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { notFound, useRouter } from 'next/navigation'
 import { AlertCircle } from 'lucide-react'
@@ -177,7 +178,7 @@ export default function ProductClient({
     const errors: Record<string, string> = {}
     if (!formData.customerName.trim() || formData.customerName.length < 3)
       errors.customerName = 'الاسم الكامل مطلوب (3 أحرف على الأقل)'
-    if (!formData.customerPhone.trim() || !/^(0|\+213)[5-7][0-9]{8}$/.test(formData.customerPhone.replace(/\s/g, '')))
+    if (!formData.customerPhone.trim() || !isValidDzPhone(formData.customerPhone.replace(/\s/g, '')))
       errors.customerPhone = 'رقم هاتف جزائري صحيح مطلوب (مثال: 0550123456)'
     if (!formData.customerWelaya) errors.customerWelaya = 'اختر الولاية'
     if (!formData.customerCommune) errors.customerCommune = 'اختر البلدية'

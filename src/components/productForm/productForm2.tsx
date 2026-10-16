@@ -1,5 +1,6 @@
 'use client';
 
+import { isValidDzPhone } from '@/components/theme/kit';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   ShoppingCart, MapPin, Phone, User, Home,
@@ -160,7 +161,7 @@ export default function ProductForm({
     const e: Record<string, string> = {};
     if (!formData.customerName.trim() || formData.customerName.length < 3)
       e.customerName = 'الاسم الكامل مطلوب (3 أحرف على الأقل)';
-    if (!/^(0|\+213)[5-7][0-9]{8}$/.test(formData.customerPhone.replace(/\s/g, '')))
+    if (!isValidDzPhone(formData.customerPhone.replace(/\s/g, '')))
       e.customerPhone = 'رقم هاتف جزائري صحيح مطلوب';
     if (!formData.customerWelaya) e.customerWelaya = 'اختر الولاية';
     if (!formData.customerCommune) e.customerCommune = 'اختر البلدية';

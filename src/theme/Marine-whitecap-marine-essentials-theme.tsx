@@ -1,5 +1,6 @@
 'use client';
 
+import { isValidDzPhone } from '@/components/theme/kit';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -1072,12 +1073,12 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
   const validate = () => {
     const errs: Record<string, string> = {};
     if (!fd.customerName || fd.customerName.trim().length < 3) errs.name = t.errName;
-    if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone || '')) errs.phone = t.errPhone;
+    if (!isValidDzPhone(fd.customerPhone || '')) errs.phone = t.errPhone;
     if (product?.isDigital) {
       if (contactMethod === 'email') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((fd.customerEmail || '').trim())) errs.email = t.errEmail;
       } else {
-        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp || '')) errs.whatsapp = t.errWhatsapp;
+        if (!isValidDzPhone(fd.customerWhatsapp || '')) errs.whatsapp = t.errWhatsapp;
       }
     } else {
       if (!fd.customerWelaya) errs.wilaya = t.errWilaya;
@@ -1398,7 +1399,7 @@ export function Cart({ domain, store }: any) {
   const validate = () => {
     const errs: Record<string, string> = {};
     if (!fd.customerName || fd.customerName.trim().length < 3) errs.name = t.errName;
-    if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone || '')) errs.phone = t.errPhone;
+    if (!isValidDzPhone(fd.customerPhone || '')) errs.phone = t.errPhone;
     if (!fd.customerWelaya) errs.wilaya = t.errWilaya;
     if (!fd.customerCommune) errs.commune = t.errCommune;
     setErrors(errs);

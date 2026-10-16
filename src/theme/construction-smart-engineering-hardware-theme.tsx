@@ -1,4 +1,5 @@
 'use client';
+import { isValidDzPhone, currencyLabel } from '@/components/theme/kit';
 import { showError } from '@/lib/showError';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -800,7 +801,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               <p style={{ fontSize: '0.65rem', color: AD, fontWeight: 700, marginBottom: '0.2rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>السعر</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
                 <span className="price-mono" style={{ fontSize: '2.5rem', fontWeight: 800, color: AD }}>{finalPrice.toLocaleString()}</span>
-                <span style={{ fontSize: '1rem', fontWeight: 700, color: '#94A3B8' }}>دج</span>
+                <span style={{ fontSize: '1rem', fontWeight: 700, color: '#94A3B8' }}>{currencyLabel('دج')}</span>
               </div>
             </div>
             {(product.shippingFree || (store?.supportFreeShipping && store?.freeShippingMinAmount != null)) && (
@@ -931,12 +932,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = 'مطلوب';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح';
+    if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) e.customerPhone = 'رقم هاتف غير صالح';
     if (product.isDigital) {
       if (contactMethod === 'email') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = 'يرجى إدخال بريد إلكتروني صحيح';
       } else {
-        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = 'رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)';
+        if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = 'رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)';
       }
     } else {
       if (!fd.customerWelaya) e.customerWelaya = 'مطلوب';
@@ -1079,7 +1080,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.25rem' }}>
                 <span style={{ fontWeight: 700, fontSize: '0.875rem', color: SL }}>المجموع</span>
-                <span className="price-mono" style={{ fontSize: '1.75rem', fontWeight: 800, color: AD }}>{total().toLocaleString()} <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>دج</span></span>
+                <span className="price-mono" style={{ fontSize: '1.75rem', fontWeight: 800, color: AD }}>{total().toLocaleString()} <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>{currencyLabel('دج')}</span></span>
               </div>
             </div>
             <button type="submit" disabled={sub} style={{ ...S.btnPrimary, opacity: sub ? 0.7 : 1 }}
@@ -1138,7 +1139,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = 'مطلوب';
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = 'رقم هاتف غير صالح';
+    if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) er.phone = 'رقم هاتف غير صالح';
     if (!fd.customerWelaya) er.w = 'مطلوب';
     if (!fd.customerCommune) er.c = 'مطلوب';
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -1263,7 +1264,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontWeight: 700, color: SL }}>الإجمالي</span>
-                <span className="price-mono" style={{ fontSize: '2rem', fontWeight: 800, color: AD }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.8rem' }}>دج</span></span>
+                <span className="price-mono" style={{ fontSize: '2rem', fontWeight: 800, color: AD }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.8rem' }}>{currencyLabel('دج')}</span></span>
               </div>
             </div>
             <button type="submit" disabled={submitting} style={{ ...S.btnPrimary, opacity: submitting ? 0.7 : 1 }}

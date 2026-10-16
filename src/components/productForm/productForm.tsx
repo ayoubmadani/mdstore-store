@@ -1,5 +1,6 @@
 'use client';
 
+import { isValidDzPhone } from '@/components/theme/kit';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   ShoppingCart, MapPin, Phone, User, Home,
@@ -263,14 +264,14 @@ export default function ProductForm({
     const e: Record<string, string> = {};
     if (!formData.customerName.trim() || formData.customerName.length < 3)
       e.customerName  = t.errorName;
-    if (!/^(0|\+213)[5-7][0-9]{8}$/.test(formData.customerPhone.replace(/\s/g, '')))
+    if (!isValidDzPhone(formData.customerPhone.replace(/\s/g, '')))
       e.customerPhone = t.errorPhone;
     if (product.isDigital) {
       if (contactMethod === 'email') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.customerEmail.trim()))
           e.customerEmail = t.errorEmail;
       } else {
-        if (!/^(0|\+213)[5-7][0-9]{8}$/.test(formData.customerWhatsapp.replace(/\s/g, '')))
+        if (!isValidDzPhone(formData.customerWhatsapp.replace(/\s/g, '')))
           e.customerWhatsapp = t.errorWhatsapp;
       }
     } else {

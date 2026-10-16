@@ -4,6 +4,7 @@
 // HERO LAYOUT: full-bleed
 // TYPOGRAPHY PAIR: El Messiri + Tajawal
 
+import { isValidDzPhone } from '@/components/theme/kit';
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -1221,12 +1222,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = useCallback(() => {
     const e: Record<string, string> = {};
     if (!fd.customerName || fd.customerName.length < 3) e.name = t.errName;
-    if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone)) e.phone = t.errPhone;
+    if (!isValidDzPhone(fd.customerPhone)) e.phone = t.errPhone;
     if (product.isDigital) {
       if (contactMethod === 'email') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.email = t.errEmail;
       } else {
-        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.whatsapp = t.errWhatsapp;
+        if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.whatsapp = t.errWhatsapp;
       }
     } else {
       if (!fd.customerWelaya) e.wilaya = t.errWilaya;
@@ -1462,7 +1463,7 @@ export function Cart({ domain, store }: any) {
   const validate = useCallback(() => {
     const e: Record<string, string> = {};
     if (!fd.customerName || fd.customerName.length < 3) e.name = t.errName;
-    if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone)) e.phone = t.errPhone;
+    if (!isValidDzPhone(fd.customerPhone)) e.phone = t.errPhone;
     if (!fd.customerWelaya) e.wilaya = t.errWilaya;
     if (!fd.customerCommune) e.commune = t.errCommune;
     setErrors(e);

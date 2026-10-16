@@ -1,4 +1,5 @@
 'use client';
+import { isValidDzPhone } from '@/components/theme/kit';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 // ============================================================================
@@ -1088,12 +1089,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const errs: Record<string, string> = {};
     if (!fd.customerName || fd.customerName.trim().length < 3) errs.customerName = t.errName;
-    if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone)) errs.customerPhone = t.errPhone;
+    if (!isValidDzPhone(fd.customerPhone)) errs.customerPhone = t.errPhone;
     if (product?.isDigital) {
       if (contactMethod === 'email') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) errs.customerEmail = t.errEmail;
       } else {
-        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) errs.customerWhatsapp = t.errWhatsapp;
+        if (!isValidDzPhone(fd.customerWhatsapp.trim())) errs.customerWhatsapp = t.errWhatsapp;
       }
     } else {
       if (!fd.customerWelaya) errs.customerWelaya = t.errWilaya;
@@ -1359,7 +1360,7 @@ export function Cart({ domain, store }: any) {
   const validate = () => {
     const errs: Record<string, string> = {};
     if (!fd.customerName || fd.customerName.trim().length < 3) errs.customerName = t.errName;
-    if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone)) errs.customerPhone = t.errPhone;
+    if (!isValidDzPhone(fd.customerPhone)) errs.customerPhone = t.errPhone;
     if (!fd.customerWelaya) errs.customerWelaya = t.errWilaya;
     if (!fd.customerCommune) errs.customerCommune = t.errCommune;
     setErrors(errs);

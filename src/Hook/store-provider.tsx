@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext } from 'react';
 import { Store } from '@/types/store';
+import { setStoreLocale } from '@/components/theme/kit';
 
 // 1. تحديث نوع الـ Context ليشمل الثيم
 interface StoreContextType {
@@ -20,6 +21,9 @@ export function StoreProvider({
   store: Store; 
   theme: string; // القيمة القادمة من السيرفر (Layout)
 }) {
+  // دولة المتجر وعملته لدوال الـ kit (فحص الهاتف، رمز العملة) في كل الثيمات
+  setStoreLocale((store as any)?.country, (store as any)?.currency);
+
   // 2. تمرير كائن يحتوي على الاثنين معاَ
   return (
     <StoreContext.Provider value={{ store, theme }}>
