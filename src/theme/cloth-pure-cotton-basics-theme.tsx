@@ -53,12 +53,15 @@ interface ProductFormProps {
 /* ---------------- Helpers ---------------- */
 
 // نوع التوصيل المتاح في الولاية المختارة (منزل / مكتب) حسب حساب الشحن — قبل اختيار الولاية يظهر الاثنان
-const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office') => {
+const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office', communes?: any[], communeId?: any) => {
   const w = (list || []).find((x: any) => String(x.id) === String(wilayaId));
-  return !w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false);
+  // البلدية المختارة قد تكون مقيّدة (التوصيل للمنزل أو للمكتب فقط) من صفحة أسعار التوصيل
+  const c = communeId ? (communes || []).find((x: any) => String(x.id) === String(communeId)) : null;
+  const okC = !c || (type === 'home' ? c.homeEnabled !== false : c.officeEnabled !== false);
+  return okC && (!w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false));
 };
 // خيار نوع التوصيل يظهر فقط بعد اختيار الولاية، وحسب ما هو متاح فيها
-const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office') => !!wilayaId && deliveryAllowed(list, wilayaId, type);
+const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office', communes?: any[], communeId?: any) => !!wilayaId && deliveryAllowed(list, wilayaId, type, communes, communeId);
 
 function variantMatches(d: VariantDetail, sel: Record<string, string>) {
   return Object.entries(sel).every(([n, v]) => d.name.some((e) => e.attrName === n && e.value === v));
@@ -1043,7 +1046,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
   useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
   // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
-  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home', communes, fd.customerCommune)) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison, communes, fd.customerCommune]); // deliveryTypeGuard
 
   useEffect(() => {
     if (fd.customerWelaya) fetchCommunes(fd.customerWelaya).then(setCommunes);
@@ -1240,8 +1243,8 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
 
             <div style={{ display: 'flex', gap: 10 }}>
-              {deliveryShown(wilayas, fd.customerWelaya, 'home') && (<button data-delivery-option className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'home' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'home' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'home' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forHome}</button>)}
-              {deliveryShown(wilayas, fd.customerWelaya, 'office') && (<button data-delivery-option className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'office' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'office' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'office' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forOffice}</button>)}
+              {deliveryShown(wilayas, fd.customerWelaya, 'home', communes, fd.customerCommune) && (<button data-delivery-option className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'home' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'home' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'home' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forHome}</button>)}
+              {deliveryShown(wilayas, fd.customerWelaya, 'office', communes, fd.customerCommune) && (<button data-delivery-option className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'office' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'office' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'office' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forOffice}</button>)}
             </div>
             </>
             )}
@@ -1309,7 +1312,7 @@ export function Cart({ domain, store }: any) {
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
   useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
   // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
-  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home', communes, fd.customerCommune)) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison, communes, fd.customerCommune]); // deliveryTypeGuard
 
   useEffect(() => {
     if (fd.customerWelaya) fetchCommunes(fd.customerWelaya).then(setCommunes);
@@ -1444,8 +1447,8 @@ export function Cart({ domain, store }: any) {
           {(errors.customerWelaya || errors.customerCommune) && <p style={{ color: 'var(--thread-red)', fontSize: 12 }}>{errors.customerWelaya || errors.customerCommune}</p>}
 
           <div style={{ display: 'flex', gap: 10 }}>
-            {deliveryShown(wilayas, fd.customerWelaya, 'home') && (<button data-delivery-option className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'home' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'home' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'home' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forHome}</button>)}
-            {deliveryShown(wilayas, fd.customerWelaya, 'office') && (<button data-delivery-option className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'office' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'office' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'office' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forOffice}</button>)}
+            {deliveryShown(wilayas, fd.customerWelaya, 'home', communes, fd.customerCommune) && (<button data-delivery-option className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'home' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'home' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'home' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forHome}</button>)}
+            {deliveryShown(wilayas, fd.customerWelaya, 'office', communes, fd.customerCommune) && (<button data-delivery-option className="pc-btn" onClick={() => setFd({ ...fd, typeLivraison: 'office' })} style={{ flex: 1, padding: '10px', border: fd.typeLivraison === 'office' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: fd.typeLivraison === 'office' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>{t.forOffice}</button>)}
           </div>
 
           <div style={{ borderTop: '2px dashed var(--cotton-300)', paddingTop: 12, fontSize: 13.5, display: 'flex', flexDirection: 'column', gap: 6 }}>

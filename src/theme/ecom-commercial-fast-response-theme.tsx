@@ -75,12 +75,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
 
 // نوع التوصيل المتاح في الولاية المختارة (منزل / مكتب) حسب حساب الشحن — قبل اختيار الولاية يظهر الاثنان
-const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office') => {
+const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office', communes?: any[], communeId?: any) => {
   const w = (list || []).find((x: any) => String(x.id) === String(wilayaId));
-  return !w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false);
+  // البلدية المختارة قد تكون مقيّدة (التوصيل للمنزل أو للمكتب فقط) من صفحة أسعار التوصيل
+  const c = communeId ? (communes || []).find((x: any) => String(x.id) === String(communeId)) : null;
+  const okC = !c || (type === 'home' ? c.homeEnabled !== false : c.officeEnabled !== false);
+  return okC && (!w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false));
 };
 // خيار نوع التوصيل يظهر فقط بعد اختيار الولاية، وحسب ما هو متاح فيها
-const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office') => !!wilayaId && deliveryAllowed(list, wilayaId, type);
+const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office', communes?: any[], communeId?: any) => !!wilayaId && deliveryAllowed(list, wilayaId, type, communes, communeId);
 
 function variantMatches(d: VariantDetail, sel: Record<string, string>) {
   return Object.entries(sel).every(([n, v]) => d.name.some((e) => e.attrName === n && e.value === v));
@@ -1233,7 +1236,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
   useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
   // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
-  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home', communes, fd.customerCommune)) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison, communes, fd.customerCommune]); // deliveryTypeGuard
 
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1453,7 +1456,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
           {/* delivery type */}
           <label style={fieldLabel}>{t.delivery}</label>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8, marginBottom: 14 }}>
-            {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt)).map((typ) => {
+            {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt, communes, fd.customerCommune)).map((typ) => {
               const on = fd.typeLivraison === typ;
               return (
                 <button data-delivery-option key={typ} onClick={() => set('typeLivraison', typ)}
@@ -1555,7 +1558,7 @@ export function Cart({ domain, store }: any) {
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
   useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
   // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
-  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home', communes, fd.customerCommune)) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison, communes, fd.customerCommune]); // deliveryTypeGuard
 
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1729,7 +1732,7 @@ export function Cart({ domain, store }: any) {
 
           <label style={fieldLabel}>{t.delivery}</label>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8, marginBottom: 16 }}>
-            {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt)).map((typ) => {
+            {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt, communes, fd.customerCommune)).map((typ) => {
               const on = fd.typeLivraison === typ;
               return (
                 <button data-delivery-option key={typ} onClick={() => set('typeLivraison', typ)}

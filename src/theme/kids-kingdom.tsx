@@ -32,12 +32,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 type Lang = 'ar' | 'fr' | 'en';
 
 // نوع التوصيل المتاح في الولاية المختارة (منزل / مكتب) حسب حساب الشحن — قبل اختيار الولاية يظهر الاثنان
-const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office') => {
+const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office', communes?: any[], communeId?: any) => {
   const w = (list || []).find((x: any) => String(x.id) === String(wilayaId));
-  return !w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false);
+  // البلدية المختارة قد تكون مقيّدة (التوصيل للمنزل أو للمكتب فقط) من صفحة أسعار التوصيل
+  const c = communeId ? (communes || []).find((x: any) => String(x.id) === String(communeId)) : null;
+  const okC = !c || (type === 'home' ? c.homeEnabled !== false : c.officeEnabled !== false);
+  return okC && (!w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false));
 };
 // خيار نوع التوصيل يظهر فقط بعد اختيار الولاية، وحسب ما هو متاح فيها
-const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office') => !!wilayaId && deliveryAllowed(list, wilayaId, type);
+const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office', communes?: any[], communeId?: any) => !!wilayaId && deliveryAllowed(list, wilayaId, type, communes, communeId);
 
 const getLang = (store?: any): Lang => {
   if (store?.language === 'fr') return 'fr';
@@ -1333,7 +1336,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
   useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
   // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
-  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home', communes, fd.customerCommune)) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison, communes, fd.customerCommune]); // deliveryTypeGuard
   useEffect(() => { if (typeof window !== 'undefined') { const id = localStorage.getItem('customerId'); if (id) setFd(p => ({ ...p, customerId: id })); } }, []);
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1491,7 +1494,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 <div style={{ marginBottom: '0.875rem' }}>
                   <p style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--text-mid)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>{t.delivery_type}</p>
                   <div className="delivery-grid">
-                    {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt)).map(ty => (
+                    {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt, communes, fd.customerCommune)).map(ty => (
                       <button data-delivery-option key={ty} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: ty }))} style={{ padding: '0.875rem', border: `3px solid ${fd.typeLivraison === ty ? 'var(--sky)' : 'var(--border)'}`, borderRadius: 16, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === ty ? 'rgba(78,205,196,0.1)' : '#fff', fontFamily: 'inherit', transition: 'all 0.2s' }}>
                         <span style={{ display: 'block', fontSize: '1.5rem', marginBottom: 4 }}>{ty === 'home' ? '🏠' : '🏢'}</span>
                         <p style={{ fontWeight: 800, fontSize: '0.8rem', color: fd.typeLivraison === ty ? 'var(--sky-dk)' : 'var(--text-soft)' }}>{ty === 'home' ? t.home_delivery : t.office_delivery}</p>
@@ -1569,7 +1572,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
   useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
   // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
-  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home', communes, fd.customerCommune)) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison, communes, fd.customerCommune]); // deliveryTypeGuard
   useEffect(() => { if (!fd.customerWelaya) { setCommunes([]); return; } setLC(true); fetchCommunes(fd.customerWelaya).then(d => { setCommunes(d); setLC(false); }); }, [fd.customerWelaya]);
 
   const selW = useMemo(() => wilayas.find(w => String(w.id) === String(fd.customerWelaya)), [wilayas, fd.customerWelaya]);
@@ -1705,7 +1708,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               <div style={{ marginBottom: '1rem' }}>
                 <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--text-mid)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>{t.delivery_type}</p>
                 <div className="delivery-grid">
-                  {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt)).map(ty => (
+                  {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt, communes, fd.customerCommune)).map(ty => (
                     <button data-delivery-option key={ty} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: ty }))} style={{ padding: '0.75rem', border: `3px solid ${fd.typeLivraison === ty ? 'var(--sky)' : 'var(--border)'}`, borderRadius: 14, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === ty ? 'rgba(78,205,196,0.08)' : '#fff', fontFamily: 'inherit', transition: 'all 0.2s' }}>
                       <span style={{ display: 'block', fontSize: '1.25rem', marginBottom: 3 }}>{ty === 'home' ? '🏠' : '🏢'}</span>
                       <p style={{ fontWeight: 800, fontSize: '0.78rem', color: fd.typeLivraison === ty ? 'var(--sky-dk)' : 'var(--text-soft)' }}>{ty === 'home' ? t.home_delivery : t.office_delivery}</p>

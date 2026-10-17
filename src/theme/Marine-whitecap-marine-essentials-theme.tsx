@@ -55,12 +55,15 @@ type Lang = 'ar' | 'fr' | 'en';
 
 
 // نوع التوصيل المتاح في الولاية المختارة (منزل / مكتب) حسب حساب الشحن — قبل اختيار الولاية يظهر الاثنان
-const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office') => {
+const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office', communes?: any[], communeId?: any) => {
   const w = (list || []).find((x: any) => String(x.id) === String(wilayaId));
-  return !w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false);
+  // البلدية المختارة قد تكون مقيّدة (التوصيل للمنزل أو للمكتب فقط) من صفحة أسعار التوصيل
+  const c = communeId ? (communes || []).find((x: any) => String(x.id) === String(communeId)) : null;
+  const okC = !c || (type === 'home' ? c.homeEnabled !== false : c.officeEnabled !== false);
+  return okC && (!w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false));
 };
 // خيار نوع التوصيل يظهر فقط بعد اختيار الولاية، وحسب ما هو متاح فيها
-const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office') => !!wilayaId && deliveryAllowed(list, wilayaId, type);
+const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office', communes?: any[], communeId?: any) => !!wilayaId && deliveryAllowed(list, wilayaId, type, communes, communeId);
 
 const getLang = (store?: any): Lang => {
   if (store?.language === 'fr') return 'fr';
@@ -1026,7 +1029,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
   useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
   // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
-  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home', communes, fd.customerCommune)) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison, communes, fd.customerCommune]); // deliveryTypeGuard
 
   /* Fetch communes */
   useEffect(() => {
@@ -1288,11 +1291,11 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: 8, color: TXT }}>{t.delivery}</label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8 }}>
-                  {deliveryShown(wilayas, fd.customerWelaya, 'home') && (<button data-delivery-option onClick={() => setFd(p => ({ ...p, typeLivraison: 'home' }))}
+                  {deliveryShown(wilayas, fd.customerWelaya, 'home', communes, fd.customerCommune) && (<button data-delivery-option onClick={() => setFd(p => ({ ...p, typeLivraison: 'home' }))}
                     style={{ padding: '10px', borderRadius: 6, border: `1px solid ${fd.typeLivraison === 'home' ? A : BD}`, background: fd.typeLivraison === 'home' ? AL : '#fff', color: fd.typeLivraison === 'home' ? A : TXT, fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}>
                     {t.deliveryHome}
                   </button>)}
-                  {deliveryShown(wilayas, fd.customerWelaya, 'office') && (<button data-delivery-option onClick={() => setFd(p => ({ ...p, typeLivraison: 'office' }))}
+                  {deliveryShown(wilayas, fd.customerWelaya, 'office', communes, fd.customerCommune) && (<button data-delivery-option onClick={() => setFd(p => ({ ...p, typeLivraison: 'office' }))}
                     style={{ padding: '10px', borderRadius: 6, border: `1px solid ${fd.typeLivraison === 'office' ? A : BD}`, background: fd.typeLivraison === 'office' ? AL : '#fff', color: fd.typeLivraison === 'office' ? A : TXT, fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s' }}>
                     {t.deliveryOffice}
                   </button>)}
@@ -1370,7 +1373,7 @@ export function Cart({ domain, store }: any) {
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
   useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
   // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
-  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home', communes, fd.customerCommune)) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison, communes, fd.customerCommune]); // deliveryTypeGuard
 
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1569,11 +1572,11 @@ export function Cart({ domain, store }: any) {
               <div style={{ marginBottom: 16 }}>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: 8, color: TXT }}>{t.delivery}</label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8 }}>
-                  {deliveryShown(wilayas, fd.customerWelaya, 'home') && (<button data-delivery-option onClick={() => setFd(p => ({ ...p, typeLivraison: 'home' }))}
+                  {deliveryShown(wilayas, fd.customerWelaya, 'home', communes, fd.customerCommune) && (<button data-delivery-option onClick={() => setFd(p => ({ ...p, typeLivraison: 'home' }))}
                     style={{ padding: '10px', borderRadius: 6, border: `1px solid ${fd.typeLivraison === 'home' ? A : BD}`, background: fd.typeLivraison === 'home' ? AL : '#fff', color: fd.typeLivraison === 'home' ? A : TXT, fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer' }}>
                     {t.deliveryHome}
                   </button>)}
-                  {deliveryShown(wilayas, fd.customerWelaya, 'office') && (<button data-delivery-option onClick={() => setFd(p => ({ ...p, typeLivraison: 'office' }))}
+                  {deliveryShown(wilayas, fd.customerWelaya, 'office', communes, fd.customerCommune) && (<button data-delivery-option onClick={() => setFd(p => ({ ...p, typeLivraison: 'office' }))}
                     style={{ padding: '10px', borderRadius: 6, border: `1px solid ${fd.typeLivraison === 'office' ? A : BD}`, background: fd.typeLivraison === 'office' ? AL : '#fff', color: fd.typeLivraison === 'office' ? A : TXT, fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer' }}>
                     {t.deliveryOffice}
                   </button>)}
