@@ -870,7 +870,7 @@ export default function ProductFormBlock({
                     <span style={{ fontWeight: 700, opacity: 1, maxWidth: '55%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</span>
                   </div>
 
-                  {/* العرض والخيارات لا تُكرَّر في الملخص — اختارها الزبون في الأعلى */}
+                  {/* الملخص: المنتج، التوصيل، سعر القطعة، الإجمالي فقط */}
 
                   {!product.isDigital && (
                     <div style={{ display: 'flex', justifyContent: 'space-between', opacity: 0.75 }}>
@@ -885,12 +885,6 @@ export default function ProductFormBlock({
                     <span>{t.unitPrice}</span>
                     <span style={{ fontWeight: 700, opacity: 1 }}>{formatPrice(getUnitPrice())}</span>
                   </div>
-                  {supportQty && !product.isDigital && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', opacity: 0.75 }}>
-                      <span>{t.quantity}</span>
-                      <span style={{ fontWeight: 700, opacity: 1 }}>× {form.quantity}</span>
-                    </div>
-                  )}
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, borderTop: `1.5px dashed ${baseInputStyle.borderColor}` }}>
                     <span style={{ fontWeight: 700, fontSize: 14 }}>{t.total}</span>
