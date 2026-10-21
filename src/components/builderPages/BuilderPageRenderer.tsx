@@ -40,7 +40,7 @@ const FLOATING_BUTTON_POSITION_STYLE: Record<string, React.CSSProperties> = {
 // SpacerBlockRenderer's pinned bar already does, keeps it anchored to a
 // corner of the actual visible page at any viewport size.
 function FloatingActionButton({ props, referenceWidth }: { props: Record<string, unknown>; referenceWidth: number }) {
-  const { link, linkType, position, contentType, text, icon, width: w, height: h, backgroundColor, textColor, fontSize, animation, whatsappNumber, whatsappMessage } = props as FloatingButtonProps;
+  const { link, linkType, position, contentType, text, icon, width: w, height: h, backgroundColor, textColor, fontSize, animation, whatsappNumber, whatsappMessage, borderRadius } = props as FloatingButtonProps;
   const animClass = buttonAnimationClass(animation);
   const isFormLink = linkType === 'form';
   // Once a "jump to order form" button's own target has scrolled into view,
@@ -100,7 +100,8 @@ function FloatingActionButton({ props, referenceWidth }: { props: Record<string,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: isText ? 12 : '50%',
+          // الأزرار القديمة بلا قيمة تبقى كما كانت (نص 12، أيقونة دائرة)
+          borderRadius: borderRadius ?? (isText ? 12 : '50%'),
           backgroundColor: backgroundColor || '#10b981',
           color: textColor || '#ffffff',
           boxShadow: '0 10px 25px -5px rgba(0,0,0,0.25)',
@@ -178,6 +179,7 @@ interface FloatingButtonProps {
   backgroundColor?: string;
   textColor?: string;
   animation?: string;
+  borderRadius?: number;
 }
 
 interface BuilderPageData {
