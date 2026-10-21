@@ -802,10 +802,11 @@ export default function ProductFormBlock({
                             style={{
                               gridColumn: shown.length === 1 ? '1 / -1' : undefined,
                               display: 'flex',
-                              flexDirection: 'column',
+                              flexDirection: 'row', // الأيقونة بجانب النص
                               alignItems: 'center',
-                              gap: 6,
-                              padding: '12px 8px',
+                              justifyContent: 'center',
+                              gap: 8,
+                              padding: '12px 10px',
                               borderRadius: sectionRadius,
                               border: `2px solid ${isSelected ? activeBtnBorder : inactiveBtnBorder}`,
                               backgroundColor: isSelected ? accentColor : inactiveBtnBg,
@@ -814,7 +815,7 @@ export default function ProductFormBlock({
                             }}
                           >
                             <opt.Icon size={20} style={{ opacity: isSelected ? 1 : 0.5 }} />
-                            <span style={{ textAlign: 'center' }}>
+                            <span style={{ textAlign: 'start' }}>
                               <span style={{ display: 'block', fontSize: 13, fontWeight: 700 }}>{opt.label}</span>
                               {selectedWilaya && (
                                 <span style={{ display: 'block', fontSize: 10.5, marginTop: 2, opacity: isSelected ? 0.85 : 0.55 }}>
