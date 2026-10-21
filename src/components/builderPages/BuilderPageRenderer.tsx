@@ -267,7 +267,7 @@ function FloatingElements({ elements, referenceWidth }: { elements: unknown; ref
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: width ? 0 : '0.7em 1.6em',
-                borderRadius: 8,
+                borderRadius: el.borderRadius ?? 8, // قابل للتحكم؛ الأزرار القديمة 8
                 backgroundColor: el.backgroundColor || '#10b981',
                 color: el.textColor || '#ffffff',
                 fontWeight: 600,
