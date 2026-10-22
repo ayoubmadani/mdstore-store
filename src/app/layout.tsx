@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { getLocale } from "next-intl/server";
 import "./globals.css";
 import SetCustomerId from "@/components/setCustomerId";
+import NoWheelNumberInputs from '@/components/NoWheelNumberInputs';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,6 +43,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <NoWheelNumberInputs />
         {children}
       </body>
     </html>
