@@ -3,10 +3,10 @@ import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { Target, Users, Award } from 'lucide-react';
 
-import heroImageLight from '@/assets/site/light/about-hero.jpeg';
-import heroImageDark from '@/assets/site/dark/about-hero.jpeg';
-import teamOfficeLight from '@/assets/site/light/about-team.jpeg';
-import teamOfficeDark from '@/assets/site/dark/about-team.jpeg';
+import heroImageLight from '@/assets/site/light/about-hero.webp';
+import heroImageDark from '@/assets/site/dark/about-hero.webp';
+import teamOfficeLight from '@/assets/site/light/about-team.webp';
+import teamOfficeDark from '@/assets/site/dark/about-team.webp';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('about');

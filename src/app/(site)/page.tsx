@@ -4,9 +4,9 @@ import Image from 'next/image';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { ArrowRightLeft, ShieldCheckIcon, BarChart3, Truck, Code2, Headphones } from 'lucide-react';
 
-import dashboardMockupLight from '@/assets/site/light/dashboard-mockup.jpeg';
-import dashboardMockupDark from '@/assets/site/dark/dashboard-mockup.jpeg';
-import homeBgPattern from '@/assets/site/home-bg-pattern.png';
+import dashboardMockupLight from '@/assets/site/light/dashboard-mockup.webp';
+import dashboardMockupDark from '@/assets/site/dark/dashboard-mockup.webp';
+import homeBgPattern from '@/assets/site/home-bg-pattern.webp';
 
 const DASHBOARD_URL = process.env.NEXT_PUBLIC_DASHBOARD_URL || '';
 
