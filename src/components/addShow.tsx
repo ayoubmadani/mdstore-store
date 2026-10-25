@@ -3,10 +3,17 @@
 import { useEffect, useRef } from 'react';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+import { installAbandonedCapture, setAbandonedContext } from '@/lib/abandoned';
 
 export default function AddShow({ productId, storeId, lpId, builderPageId, splitTestId }: any) {
   // Ref لمنع التنفيذ المزدوج
   const hasRecorded = useRef(false);
+
+  // الطلبات المتروكة: كل صفحة تضيف ما تعرفه (المتجر/المنتج/صفحة الهبوط)
+  useEffect(() => {
+    setAbandonedContext({ storeId, productId, builderPageId, lpId });
+    installAbandonedCapture();
+  }, [storeId, productId, builderPageId, lpId]);
 
   useEffect(() => {
     // منع التنفيذ إذا كان قد تم بالفعل
