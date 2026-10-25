@@ -7,6 +7,7 @@ import CustomerTracker from '@/components/CustomerTracker'
 import AddShow from '@/components/addShow'
 import ThemeRunner from '@/components/ThemeRunner'
 import BuilderPageRenderer from '@/components/builderPages/BuilderPageRenderer'
+import { withImageSizes } from '@/lib/image-size'
 import DedicatedPageSwitch from '@/components/builderPages/DedicatedPageSwitch'
 import type { Metadata } from 'next'
 
@@ -69,14 +70,16 @@ export default async function DomainLayout({ children, params }: LayoutProps) {
   const dedicatedDomain = store.domains?.find((d) => d.domain === domain && d.scope === 'landing_page')
   if (dedicatedDomain?.builderPageId || dedicatedDomain?.splitTestId) {
     // دومين مربوط باختبار A/B: الصفحة التي رآها الزائر من قبل (cookie) وإلا قرعة حسب الأوزان
-    const page = dedicatedDomain.splitTestId
+    const picked = dedicatedDomain.splitTestId
       ? await resolveSplitTest(
           dedicatedDomain.splitTestId,
           (await cookies()).get(`mdab_${dedicatedDomain.splitTestId}`)?.value,
           (await headers()).get('x-ab-preview') ?? undefined,
         )
       : await getBuilderPageById(dedicatedDomain.builderPageId!)
-    if (!page) notFound()
+    if (!picked) notFound()
+    // أبعاد الصور من الخادم: يُحجز مكانها قبل وصولها فلا تقفز الصفحة
+    const page = await withImageSizes(picked)
     // /success يعرض صفحة "شكراً" الخاصة بالمتجر بعد الطلب
     return (
       <StoreProvider store={store} theme={store.theme?.slug || 'default'}>

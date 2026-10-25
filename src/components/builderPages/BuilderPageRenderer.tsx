@@ -151,6 +151,9 @@ interface ImageBlockProps {
   width?: number;
   align?: 'start' | 'center' | 'end';
   height?: number;
+  // يضيفها الخادم (withImageSizes) لصورة بلا ارتفاع محدد
+  naturalWidth?: number;
+  naturalHeight?: number;
 }
 
 interface SpacerBlockProps {
@@ -440,7 +443,7 @@ function ProductImagesBlockRenderer({ props }: { props: Record<string, unknown> 
 
 // Mirrors dashboard/src/pages/editor/blocks/ImageBlock.jsx.
 function ImageBlockRenderer({ props, referenceWidth }: { props: Record<string, unknown>; referenceWidth: number }) {
-  const { src, alt, caption, width, align, height } = props as ImageBlockProps;
+  const { src, alt, caption, width, align, height, naturalWidth, naturalHeight } = props as ImageBlockProps;
   if (!src) return null;
   const widthPct = width || 100;
   const justify = align === 'start' ? 'flex-start' : align === 'end' ? 'flex-end' : 'center';
@@ -465,6 +468,9 @@ function ImageBlockRenderer({ props, referenceWidth }: { props: Record<string, u
         <img
           src={src}
           alt={alt || ''}
+          // الأبعاد الحقيقية ← المتصفح يحجز مكان الصورة بنسبتها قبل تحميلها (لا قفز للصفحة)
+          width={aspectRatio ? undefined : naturalWidth}
+          height={aspectRatio ? undefined : naturalHeight}
           style={{
             width: '100%',
             height: aspectRatio ? '100%' : 'auto',
