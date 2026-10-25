@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { isStrayFile } from '@/lib/stray-file';
 
 const SUPPORTED_LOCALES = ['ar', 'en', 'fr'];
 const DEFAULT_LOCALE = 'ar';
@@ -58,6 +59,11 @@ export function middleware(req: NextRequest) {
 
   // 1. حظر فوري لمسارات فحص الثغرات المعروفة
   if (!path.startsWith('/api') && SCANNER_PATH_PATTERN.test(path)) {
+    return new NextResponse(null, { status: 404 });
+  }
+
+  // 1.1 ملف غير موجود في الجذر (/meta.json من زاحف فيسبوك…) → 404 فوراً بدل رندر متجر وهمي
+  if (isStrayFile(path)) {
     return new NextResponse(null, { status: 404 });
   }
 
