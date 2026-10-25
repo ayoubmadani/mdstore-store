@@ -2,6 +2,7 @@
 
 import { useStore } from "./store-provider";
 import type { Pixel } from "@/types/store";
+import { fbOrderEvent } from "@/lib/meta-capi";
 
 export const usePixel = () => {
   const { store } = useStore();
@@ -13,12 +14,7 @@ export const usePixel = () => {
 
       // 1. Facebook Purchase
       if (pixel.type === 'facebook' && typeof window !== 'undefined' && (window as any).fbq) {
-        (window as any).fbq('track', 'Purchase', {
-          value: total,
-          currency: currency,
-          content_type: 'product',
-          order_id: orderId
-        });
+        fbOrderEvent(pixel, orderId, total);
       }
 
       // 2. TikTok Purchase

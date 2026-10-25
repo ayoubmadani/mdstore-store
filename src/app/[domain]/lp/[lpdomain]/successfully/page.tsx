@@ -5,6 +5,7 @@
 // ==========================================
 
 import React, { useEffect, useState, useRef } from 'react';
+import { fbOrderEvent } from '@/lib/meta-capi';
 import Link from 'next/link';
 import axios from 'axios';
 import {
@@ -84,7 +85,7 @@ export default function SuccessPage({
         pixels.forEach(px => {
           if (!px.isActive) return;
           if (px.type === 'facebook' && (window as any).fbq) {
-            (window as any).fbq('track', 'Purchase', { value: total, currency: 'DZD', order_id: id });
+            fbOrderEvent(px, id, total);
           }
           if (px.type === 'tiktok' && (window as any).ttq) {
             (window as any).ttq.track('CompletePayment', { value: total, currency: 'DZD', order_id: id });

@@ -55,6 +55,8 @@ export interface Pixel {
   scope?: 'store' | 'landing_page';
   landingPageId?: string;
   builderPageId?: string;
+  // للبكسل Access Token (Conversions API): المتصفح يرسل Lead والخادم Purchase عند التأكيد
+  capi?: boolean;
 }
 
 export interface Product {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { fbOrderEvent } from '@/lib/meta-capi';
 import { CheckCircle, Check } from 'lucide-react';
 import axios from 'axios';
 import ProductForm from '@/components/productForm/productForm';
@@ -114,7 +115,7 @@ export default function ProductFormBlockRenderer({
       pixels.forEach((px) => {
         if (!px.isActive || !SAFE_PIXEL_ID.test(px.pixelId)) return;
         if (px.type === 'facebook' && (window as any).fbq) {
-          (window as any).fbq('track', 'Purchase', { value: orderResult.total, currency: 'DZD', order_id: orderResult.id });
+          fbOrderEvent(px, orderResult.id, orderResult.total);
         }
         if (px.type === 'tiktok' && (window as any).ttq) {
           (window as any).ttq.track('CompletePayment', { value: orderResult.total, currency: 'DZD', order_id: orderResult.id });

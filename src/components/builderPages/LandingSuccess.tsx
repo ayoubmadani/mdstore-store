@@ -3,6 +3,7 @@
 // صفحة "شكراً" موحدة لكل صفحات الهبوط — ألوانها تأتي من نموذج الطلب الذي أُرسل منه
 // الطلب (محفوظة في last_order.landing داخل EditorProductFormBlock قبل الانتقال).
 import { useEffect, useRef } from 'react'
+import { fbOrderEvent } from '@/lib/meta-capi';
 import { Check, PhoneCall, Truck, PackageCheck, ArrowRight, ArrowLeft } from 'lucide-react'
 import CustomerTracker from '@/components/CustomerTracker'
 import type { Pixel } from '@/types/store'
@@ -96,7 +97,7 @@ function firePurchasePixels(pixels: Pixel[] | undefined, order: { id: string; to
   setTimeout(() => {
     pixels.forEach((px) => {
       if (!px.isActive || !SAFE_PIXEL_ID.test(px.pixelId)) return
-      if (px.type === 'facebook' && w.fbq) w.fbq('track', 'Purchase', { value: order.total, currency: 'DZD', order_id: order.id })
+      if (px.type === 'facebook' && w.fbq) fbOrderEvent(px, order.id, order.total)
       if (px.type === 'tiktok' && w.ttq) w.ttq.track('CompletePayment', { value: order.total, currency: 'DZD', order_id: order.id })
       if (px.type === 'google' && w.gtag) w.gtag('event', 'purchase', { transaction_id: order.id, value: order.total, currency: 'DZD' })
     })

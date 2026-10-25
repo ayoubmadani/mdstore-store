@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { installCapiCapture } from '@/lib/meta-capi';
 import Script from 'next/script';
 import type { Pixel } from '@/types/store';
 
@@ -15,6 +16,8 @@ interface CustomerTrackerProps {
 const SAFE_PIXEL_ID = /^[\w-]{1,64}$/;
 
 const CustomerTracker = ({ pixels, pageType = 'store', landingPageId }: CustomerTrackerProps) => {
+  // كل طلب يُنشأ من هذه الصفحة يحمل fbp/fbc ورابطها (Meta CAPI)
+  useEffect(() => { if (pixels?.some((p) => p.type === 'facebook' && p.capi)) installCapiCapture(); }, [pixels]);
   if (!pixels || pixels.length === 0) return null;
 
   const scopedPixels = pixels.filter((pixel) => {
@@ -49,8 +52,8 @@ const CustomerTracker = ({ pixels, pageType = 'store', landingPageId }: Customer
                     s.parentNode.insertBefore(t,s)}(window, document,'script',
                     'https://connect.facebook.net/en_US/fbevents.js');
                     fbq('init', '${pixel.pixelId}');
-                    fbq('track', 'PageView');
-                    ${pixel.events?.includes('ViewContent') ? "fbq('track', 'ViewContent');" : ""}
+                    fbq('trackSingle', '${pixel.pixelId}', 'PageView');
+                    ${pixel.events?.includes('ViewContent') ? `fbq('trackSingle', '${pixel.pixelId}', 'ViewContent');` : ""}
                   `}
                 </Script>
                 <noscript>
