@@ -22,17 +22,13 @@ function sessionKey() {
   }
 }
 
-export const isDzMobile = (raw: string) => {
-  let d = raw.replace(/\D/g, '');
-  if (d.startsWith('00213')) d = d.slice(5); else if (d.startsWith('213')) d = d.slice(3);
-  if (d.length === 9) d = `0${d}`;
-  return /^0[567]\d{8}$/.test(d) ? d : null;
-};
+import { isDzMobile, selectText } from './abandoned-rules';
+export { isDzMobile };
 
 type Field = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 const hint = (el: Field) => [el.name, el.id, (el as HTMLInputElement).placeholder, el.getAttribute('autocomplete'), el.getAttribute('aria-label'),
   el.closest('label')?.textContent, el.id ? document.querySelector(`label[for="${CSS.escape(el.id)}"]`)?.textContent : ''].filter(Boolean).join(' ').toLowerCase();
-const valueOf = (el: Field) => (el instanceof HTMLSelectElement ? (el.selectedOptions[0]?.textContent ?? '') : el.value).trim();
+const valueOf = (el: Field) => (el instanceof HTMLSelectElement ? selectText(el.value, el.selectedOptions[0]?.textContent ?? '') : el.value.trim());
 
 /** يقرأ نموذج الطلب: الهاتف (أي خانة رقمها هاتف جزائري صحيح)، الاسم، الولاية، البلدية، العنوان */
 export function readForm(root: ParentNode) {
@@ -60,25 +56,41 @@ const cookie = (n: string) => document.cookie.split('; ').find((c) => c.startsWi
 const productFromUrl = () => window.location.pathname.match(/\/product\/([0-9a-f-]{36})/i)?.[1];
 
 let timer: ReturnType<typeof setTimeout> | undefined;
+let pendingEl: Element | null = null; // آخر خانة كُتب فيها ولم يُرسل بعد
 let lastSent = '';
+
+function send(el: Element, keepalive = false) {
+  const form = readForm(el.closest('form') ?? document);
+  if (!form) return;
+  const body = {
+    sessionKey: sessionKey(), storeId: ctx.storeId, ...form,
+    productId: ctx.productId || productFromUrl(), builderPageId: ctx.builderPageId, lpId: ctx.lpId,
+    url: window.location.href, fbp: cookie('_fbp') && decodeURIComponent(cookie('_fbp')!), fbc: cookie('_fbc') && decodeURIComponent(cookie('_fbc')!),
+  };
+  const sig = JSON.stringify(body);
+  if (sig === lastSent || !body.sessionKey) return; // لا شيء جديد
+  lastSent = sig;
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/abandoned`;
+  // عند مغادرة الصفحة/تحديثها: keepalive يكمل الطلب حتى بعد إغلاقها
+  if (keepalive) fetch(url, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' }, body: sig }).catch(() => { lastSent = ''; });
+  else axios.post(url, body).catch(() => { lastSent = ''; });
+}
 
 function scheduleSend(target: EventTarget | null) {
   const el = target instanceof Element ? target : null;
   if (!el || !el.matches('input, select, textarea') || !ctx.storeId) return;
+  pendingEl = el;
   clearTimeout(timer);
-  timer = setTimeout(() => {
-    const form = readForm(el.closest('form') ?? document);
-    if (!form) return;
-    const body = {
-      sessionKey: sessionKey(), storeId: ctx.storeId, ...form,
-      productId: ctx.productId || productFromUrl(), builderPageId: ctx.builderPageId, lpId: ctx.lpId,
-      url: window.location.href, fbp: cookie('_fbp') && decodeURIComponent(cookie('_fbp')!), fbc: cookie('_fbc') && decodeURIComponent(cookie('_fbc')!),
-    };
-    const sig = JSON.stringify(body);
-    if (sig === lastSent || !body.sessionKey) return; // لا شيء جديد
-    lastSent = sig;
-    axios.post(`${process.env.NEXT_PUBLIC_API_URL}/abandoned`, body).catch(() => { lastSent = ''; });
-  }, 1500);
+  timer = setTimeout(() => { pendingEl = null; send(el); }, 1500);
+}
+
+// إرسال فوري بلا انتظار: عند مغادرة الخانة، أو إخفاء/تحديث/إغلاق الصفحة
+function flush(keepalive = false) {
+  if (!pendingEl) return;
+  const el = pendingEl;
+  pendingEl = null;
+  clearTimeout(timer);
+  send(el, keepalive);
 }
 
 const isOrderCreate = (url?: string, method?: string) => (method ?? 'get').toLowerCase() === 'post' && /\/orders(\/create)?\/?(\?|$)/.test(url ?? '');
@@ -89,7 +101,7 @@ const withKey = (b: unknown) => {
   return b && typeof b === 'object' ? { abandonedKey: k, ...(b as object) } : b;
 };
 // بعد إرسال الطلب: جلسة جديدة (طلب ثانٍ من نفس الزبون يكون «متروكاً» مستقلاً)
-const rotate = () => { try { sessionStorage.removeItem(KEY); } catch { /* */ } lastSent = ''; clearTimeout(timer); };
+const rotate = () => { try { sessionStorage.removeItem(KEY); } catch { /* */ } lastSent = ''; pendingEl = null; clearTimeout(timer); };
 
 let installed = false;
 export function installAbandonedCapture() {
@@ -97,6 +109,9 @@ export function installAbandonedCapture() {
   installed = true;
   document.addEventListener('input', (e) => scheduleSend(e.target), true);
   document.addEventListener('change', (e) => scheduleSend(e.target), true);
+  document.addEventListener('focusout', () => flush(), true);
+  window.addEventListener('pagehide', () => flush(true));
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(true); });
   axios.interceptors.request.use((config) => {
     if (isOrderCreate(config.url, config.method)) { config.data = withKey(config.data); setTimeout(rotate, 0); }
     return config;
