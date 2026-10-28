@@ -21,5 +21,7 @@
   "feat_pages": "Landing Pages",
   "feat_commission": "Commission",
   "feat_notifications": "Instant Notifications",
-  "billed_yearly": "Billed {price} {currency} yearly"
+  "billed_yearly": "Billed {price} {currency} yearly",
+  "trial_banner": "Try any paid plan free for {days} days — no upfront payment",
+  "trial_badge": "{days} days free"
 }

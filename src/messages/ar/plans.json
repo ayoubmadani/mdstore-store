@@ -21,5 +21,7 @@
   "feat_pages": "صفحات هبوط",
   "feat_commission": "عمولة",
   "feat_notifications": "إشعارات فورية",
-  "billed_yearly": "تُدفع {price} {currency} سنوياً"
+  "billed_yearly": "تُدفع {price} {currency} سنوياً",
+  "trial_banner": "جرّب أي خطة مدفوعة {days} أيام مجاناً — بدون دفع مسبق",
+  "trial_badge": "{days} أيام مجاناً"
 }

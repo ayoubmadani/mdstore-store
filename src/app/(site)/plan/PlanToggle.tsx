@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { CheckCircle2, Zap, Store, Package, FileText, Bell, TrendingUp } from 'lucide-react';
+import { CheckCircle2, Zap, Store, Package, FileText, Bell, TrendingUp, Gift } from 'lucide-react';
 import type { Plan } from '@/lib/api';
 
 type Interval = 'month' | 'year';
+
+// التجربة المجانية لأي خطة مدفوعة عند التسجيل (نفس TRIAL_DAYS في الـ API)
+const TRIAL_DAYS = 7;
 
 type TFunc = ReturnType<typeof useTranslations<'plans'>>;
 
@@ -48,6 +51,13 @@ export default function PlanToggle({ plans }: { plans: Plan[] }) {
 
   return (
     <div dir={isRtl ? 'rtl' : 'ltr'}>
+      {paidPlans.length > 0 && (
+        <div className="flex justify-center mb-5">
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 text-sm font-bold">
+            <Gift size={16} className="shrink-0" /> {t('trial_banner', { days: TRIAL_DAYS })}
+          </span>
+        </div>
+      )}
       <div className="flex justify-center mb-10">
         <div className="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800 rounded-2xl p-1">
           <button
@@ -121,6 +131,11 @@ export default function PlanToggle({ plans }: { plans: Plan[] }) {
                 <p className={`text-xl font-black mb-2 ${isFeatured ? 'text-white dark:text-zinc-900' : 'text-gray-900 dark:text-white'}`}>
                   {plan.name}
                 </p>
+                {!isFree && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[11px] font-black">
+                    <Gift size={11} /> {t('trial_badge', { days: TRIAL_DAYS })}
+                  </span>
+                )}
               </div>
 
               <div className="mb-2">
