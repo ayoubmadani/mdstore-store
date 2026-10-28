@@ -34,9 +34,10 @@ export default function PlanToggle({ plans }: { plans: Plan[] }) {
   const isRtl = locale === 'ar';
   const [interval, setInterval] = useState<Interval>('month');
 
-  const featuredIndex = plans.length === 3 ? 1 : 0;
-
-  const paidPlans = plans.filter((p) => p.monthlyPrice > 0 && p.yearlyPrice > 0);
+  // الأسعار تصل نصاً من الـ API ("0.00") — المقارنة بالأرقام
+  const paidPlans = plans.filter((p) => Number(p.monthlyPrice) > 0 && Number(p.yearlyPrice) > 0);
+  // «موصى بها» = الخطة المدفوعة الوسطى (الخطة المجانية لا تُبرَز)
+  const featuredId = paidPlans[Math.floor((paidPlans.length - 1) / 2)]?.id;
   const avgSavings = paidPlans.length
     ? Math.round(
         (paidPlans.reduce((acc, p) => acc + (1 - Number(p.yearlyPrice) / (Number(p.monthlyPrice) * 12)), 0) /
@@ -83,19 +84,21 @@ export default function PlanToggle({ plans }: { plans: Plan[] }) {
             ? 'grid-cols-1 max-w-sm'
             : plans.length === 2
               ? 'grid-cols-1 sm:grid-cols-2 max-w-2xl'
-              : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+              : plans.length === 4
+                ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 max-w-6xl'
+                : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
         }`}
       >
-        {plans.map((plan, idx) => {
-          const isFeatured = idx === featuredIndex;
+        {plans.map((plan) => {
+          const isFeatured = plan.id === featuredId;
           // السنوي يُعرض بما يعادله شهرياً (12000/سنة ← 1000/شهر) مع سطر «تُدفع 12000 سنوياً»
           const price = interval === 'year' ? Math.round(Number(plan.yearlyPrice) / 12) : Number(plan.monthlyPrice);
           const savings =
-            plan.monthlyPrice > 0 && plan.yearlyPrice > 0
+            Number(plan.monthlyPrice) > 0 && Number(plan.yearlyPrice) > 0
               ? Math.round((1 - Number(plan.yearlyPrice) / (Number(plan.monthlyPrice) * 12)) * 100)
               : 0;
           const featureRows = buildFeatureRows(plan.features, t);
-          const isFree = plan.monthlyPrice === 0 && plan.yearlyPrice === 0;
+          const isFree = Number(plan.monthlyPrice) === 0 && Number(plan.yearlyPrice) === 0;
 
           return (
             <div
