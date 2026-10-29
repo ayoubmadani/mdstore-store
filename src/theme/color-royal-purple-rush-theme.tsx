@@ -17,7 +17,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -807,12 +807,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
             {/* إذا كان هناك رابط مخصص للصورة، نعرض الشعار */}
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <img
-                src={store.design.logoUrl}
-                style={{ height: 34, objectFit: 'contain', display: 'block' }}
-                alt={store?.name || 'Store Logo'}
-                onError={() => setImgError(true)}
-              />
+              <LogoWithName store={store} color="#111">
+                <img
+                  src={store.design.logoUrl}
+                  style={{ height: 34, objectFit: 'contain', display: 'block' }}
+                  alt={store?.name || 'Store Logo'}
+                  onError={() => setImgError(true)}
+                />
+              </LogoWithName>
             ) : (
               // وإذا لم يكن هناك رابط أو حدث خطأ، نعرض اللوجو المستطيل بالتصميم الجديد
               <div style={{ display: 'flex', alignItems: 'center' }}>

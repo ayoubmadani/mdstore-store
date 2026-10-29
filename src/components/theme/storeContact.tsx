@@ -1,6 +1,6 @@
 // أدوات تواصل مشتركة لكل الثيمات (تُدمج في bundle كل ثيم):
 // «سيتوفر لاحقاً» لجهات التواصل الناقصة في Footer، أيقونة واتساب، وزر «استفسر عبر واتساب» في صفحة المنتج.
-import type { CSSProperties, SVGProps } from 'react';
+import type { CSSProperties, ReactNode, SVGProps } from 'react';
 import { whatsappHref } from '@/components/builderPages/buttonLinks';
 
 export { whatsappHref };
@@ -58,5 +58,18 @@ export function WhatsAppOrderButton({ product, store, style }: { product: Produc
       <WhatsAppGlyph size={20} />
       {t.orderViaWhatsapp}
     </a>
+  );
+}
+
+type LogoStore = { name?: string | null; design?: { showStoreName?: boolean | null } | null } | null | undefined;
+
+/** الشعار + اسم المتجر بجانبه إذا فعّله التاجر (design.showStoreName) — وإلا يُعاد الشعار كما هو */
+export function LogoWithName({ store, children, color, style }: { store: LogoStore; children: ReactNode; color?: string; style?: CSSProperties }) {
+  if (!store?.design?.showStoreName || !store?.name) return <>{children}</>;
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+      {children}
+      <span style={{ fontWeight: 800, fontSize: '1.05rem', lineHeight: 1.2, color: color || 'inherit', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200, ...style }}>{store.name}</span>
+    </span>
   );
 }
