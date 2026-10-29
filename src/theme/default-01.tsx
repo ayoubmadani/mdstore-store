@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { Store } from '@/types/store';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -300,7 +300,7 @@ export function Navbar({ store }: { store: Store }) {
       <div style={{ ...S.container, display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
         <Link href="/" style={{ fontWeight: 700, fontSize: '1rem', color: '#111', textDecoration: 'none' }}>
           {store.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
-            ? <img src={store.design.logoUrl} alt={store.name} style={{ height: 32, display: 'block' }} />
+            ? <LogoWithName store={store}><img src={store.design.logoUrl} alt={store.name} style={{ height: 32, display: 'block' }} /></LogoWithName>
             : store.name}
         </Link>
 

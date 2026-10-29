@@ -27,7 +27,7 @@ import {
   Glasses, Watch, Truck, ShieldCheck, CreditCard, Headphones,
   Star, Plus, Minus, ArrowRight, Send, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1021,7 +1021,7 @@ export function Navbar({ store, domain }: any) {
 
         <Link href="/" className="uvt-wordmark" aria-label={store?.name}>
           {logo && !imgError
-            ? <img src={logo} alt={store?.name} onError={() => setImgError(true)} />
+            ? <LogoWithName store={store}><img src={logo} alt={store?.name} onError={() => setImgError(true)} /></LogoWithName>
             : <>{store?.name || 'URBAN VISION'}<small>&middot; VISION &amp; TIME &middot;</small></>}
         </Link>
 

@@ -18,7 +18,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -848,12 +848,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Logo */}
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <img
+              <LogoWithName store={store}><img
                 src={store.design.logoUrl}
                 style={{ height: 40, objectFit: 'contain', display: 'block' }}
                 alt={store?.name || 'Store Logo'}
                 onError={() => setImgError(true)}
-              />
+              /></LogoWithName>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span style={{
@@ -1164,8 +1164,8 @@ export function Home({ store, page }: any) {
         {store.hero?.imageUrl ? (
           <div style={{ position: 'relative', minHeight: '320px' }}>
             <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', maxHeight: '400px' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to left, rgba(107,45,139,0.65), rgba(26,18,40,0.4))', display: 'flex', alignItems: 'center', padding: '0 8vw' }}>
-              <div>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', padding: '0 8vw' }}>
+              <div style={heroTextPanel(store)}>
                 <h1 className="fu serif" style={{ fontSize: 'clamp(1.6rem,4vw,3rem)', fontWeight: 700, fontStyle: 'italic', color: '#fff', lineHeight: 1.15, marginBottom: '10px' }}>
                   {store.hero.title?.replace(/<[^>]+>/g, '') || store.name}
                 </h1>

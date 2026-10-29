@@ -29,7 +29,7 @@ import {
   ChevronLeft, ChevronRight, Star, Truck, ShieldCheck, Lock, Headphones,
   Trash2, Plus, Minus, CheckCircle, AlertCircle, Package, ArrowLeft, ArrowRight, MessageCircle, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -540,8 +540,8 @@ export function Navbar({ store, domain }: any) {
 
   const Logo = () => (
     logoUrl && !logoErr ? (
-      <img src={logoUrl} alt={store?.name} onError={() => setLogoErr(true)}
-        style={{ height: 40, width: 'auto', objectFit: 'contain', display: 'block' }} />
+      <LogoWithName store={store}><img src={logoUrl} alt={store?.name} onError={() => setLogoErr(true)}
+        style={{ height: 40, width: 'auto', objectFit: 'contain', display: 'block' }} /></LogoWithName>
     ) : (
       <span className="hn-display" style={{ fontWeight: 900, fontSize: '1.35rem', color: INK, letterSpacing: '-0.01em' }}>
         {store?.name || 'Store'}
@@ -864,12 +864,11 @@ export function Home({ store, page }: any) {
         {heroImg && (
           <>
             <img src={heroImg} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-            <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(${t.dir === 'rtl' ? '270deg' : '90deg'}, rgba(15,26,21,0.92) 0%, rgba(15,26,21,0.72) 45%, rgba(15,26,21,0.35) 100%)` }} />
           </>
         )}
         {!heroImg && <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(135deg, ${INK} 0%, ${AD} 100%)` }} className="hn-float" />}
 
-        <div className="hn-container" dir={t.dir} style={{ position: 'relative', zIndex: 2, padding: '3rem 1.5rem', width: '100%' }}>
+        <div className="hn-container" dir={t.dir} style={{ position: 'relative', zIndex: 2, padding: '3rem 1.5rem', width: '100%', ...heroTextBox(store) }}>
           <span className="hn-entry-1" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(127,227,192,0.16)', color: '#7FE3C0', padding: '7px 16px', borderRadius: 999, fontSize: '0.82rem', fontWeight: 800, marginBottom: 20 }}>
             <ShieldCheck size={15} /> {t.codBadge}
           </span>

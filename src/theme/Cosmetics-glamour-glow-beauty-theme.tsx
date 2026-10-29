@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { showError } from '@/lib/showError';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, heroTextPanel } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -766,9 +766,8 @@ export function Home({ store, domain, page }: { store: any; domain: string; page
       {store?.hero?.imageUrl ? (
         <section style={{ position: 'relative', minHeight: 480, overflow: 'hidden' }}>
           <img src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to left, rgba(26,10,18,0.7) 0%, rgba(26,10,18,0.35) 60%, transparent 100%)' }} />
           <div style={{ position: 'relative', zIndex: 2, maxWidth: 1360, margin: '0 auto', padding: '80px 24px', display: 'flex', alignItems: 'center', minHeight: 480 }}>
-            <div style={{ maxWidth: 540 }}>
+            <div style={{ maxWidth: 540, ...heroTextPanel(store) }}>
               <p className="gg-hero-eyebrow" style={{ color: 'var(--gold-lt)' }}>{t.heroEyebrow}</p>
               <h1 className="gg-hero-h1" style={{ color: '#fff' }}>
                 {store.hero.title?.replace(/<[^>]+>/g, '') || t.heroTitle}

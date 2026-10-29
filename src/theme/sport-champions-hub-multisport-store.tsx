@@ -17,7 +17,7 @@ import {
   Trash2, Loader2, Package, Shield, Truck, Lock, RotateCcw, Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, heroTextPanel } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1329,7 +1329,7 @@ export function Home({ store, page }: any) {
         {/* BG image */}
         {store.hero?.imageUrl && (
           <div style={{ position: 'absolute', inset: 0 }}>
-            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.15 }} />
+            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         )}
         {/* Radial pattern */}
@@ -1339,7 +1339,7 @@ export function Home({ store, page }: any) {
 
         <div className="hero-layout" style={{ maxWidth: 1400, margin: '0 auto', position: 'relative', zIndex: 1, width: '100%' }}>
           {/* Text */}
-          <div>
+          <div style={heroTextPanel(store)}>
             <div className="anim-fade-up" style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
               {[t.heroBadge1, t.heroBadge2, t.heroBadge3].map((b, i) => (
                 <span key={i} className="hero-badge">{b}</span>

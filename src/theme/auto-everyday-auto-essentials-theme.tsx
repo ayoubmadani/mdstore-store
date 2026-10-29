@@ -27,7 +27,7 @@ import {
   Send, Home as HomeIcon, Wrench, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -775,8 +775,8 @@ export function Navbar({ store, domain }: any) {
           <div className="ae-nb-top">
             <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#fff' }}>
               {logo && !imgError ? (
-                <img src={logo} alt={store?.name || 'logo'} onError={() => setImgError(true)}
-                  style={{ height: 30, width: 'auto', objectFit: 'contain', display: 'block' }} />
+                <LogoWithName store={store}><img src={logo} alt={store?.name || 'logo'} onError={() => setImgError(true)}
+                  style={{ height: 30, width: 'auto', objectFit: 'contain', display: 'block' }} /></LogoWithName>
               ) : (
                 <span className="ae-display" style={{ fontSize: '1.05rem', fontWeight: 700, letterSpacing: '0.02em' }}>
                   {store?.name || 'AUTO'}
@@ -1104,12 +1104,12 @@ export function Home({ store, page }: any) {
         <div style={{
           position: 'absolute', inset: 0,
           background: heroImg
-            ? `linear-gradient(to ${t.dir === 'rtl' ? 'left' : 'right'}, rgba(10,14,18,0.92) 0%, rgba(10,14,18,0.55) 55%, rgba(10,14,18,0.2) 100%)`
+            ? 'transparent'
             : `linear-gradient(135deg, ${INK} 0%, #23303B 100%)`,
         }} />
 
         <div className="ae-container" style={{ position: 'relative', zIndex: 1, minHeight: 'clamp(480px,70vh,720px)', display: 'flex', alignItems: 'center', width: '100%', padding: '3rem 1.25rem' }}>
-          <div className="ae-hero-text" style={{ maxWidth: 560 }}>
+          <div className="ae-hero-text" style={{ maxWidth: 560, ...heroTextPanel(store) }}>
             <span className="ae-hero-badge">
               <Wrench size={13} /> {t.heroBadge}
             </span>

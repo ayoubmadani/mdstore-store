@@ -16,7 +16,7 @@ import {
   Search, ShoppingCart, Trash2, Loader2, Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -850,7 +850,7 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
         {/* Logo */}
         <Link href="/" style={{flexShrink:0,display:'flex',alignItems:'center',gap:'12px'}}>
           {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
-            ? <img src={store.design.logoUrl} alt={store.name} style={{height:'36px',width:'auto'}}/>
+            ? <LogoWithName store={store} color="#fff"><img src={store.design.logoUrl} alt={store.name} style={{height:'36px',width:'auto'}}/></LogoWithName>
             : <>
                 <div style={{width:'38px',height:'38px',borderRadius:'10px',backgroundColor:'var(--blue)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
                   <Zap style={{width:'20px',height:'20px',color:'white'}}/>
@@ -1087,12 +1087,11 @@ export function Home({ store, page }: any) {
         {store.hero?.imageUrl && (
           <>
             <img src={store.hero.imageUrl} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
-            <div style={{position:'absolute',inset:0,background:'linear-gradient(to left,rgba(13,27,42,0.95) 20%,rgba(13,27,42,0.6) 50%,rgba(13,27,42,0.2) 100%)'}}/>
           </>
         )}
         {!store.hero?.imageUrl && <div style={{position:'absolute',inset:0,backgroundColor:'var(--navy-2)',opacity:0.5}} className="dot-bg"/>}
 
-        <div style={{position:'relative',zIndex:2,width:'100%',maxWidth:'1280px',padding:'80px 6vw',display:'flex',flexDirection:'column',alignItems:'flex-start'}}>
+        <div style={{position:'relative',zIndex:2,width:'100%',maxWidth:'1280px',padding:'80px 6vw',display:'flex',flexDirection:'column',alignItems:'flex-start',...heroTextBox(store)}}>
           <div className="fu" style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'20px'}}>
             <span style={{width:'30px',height:'2px',backgroundColor:'var(--blue)'}}/>
             <span className="bc" style={{fontSize:'14px',fontWeight:800,color:'var(--white)',letterSpacing:'0.15em'}}>{store?.name}</span>

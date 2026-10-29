@@ -409,7 +409,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
           <Link href="/" style={{ fontSize: '1.3rem', fontWeight: 900, color: '#000' }}>
-            {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' ? <img src={store.design.logoUrl} style={{ height: 30 }} /> : store?.name}
+            {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}><img src={store.design.logoUrl} style={{ height: 30 }} />{store.design.showStoreName && store?.name}</span> : store?.name}
           </Link>
 
           <nav className="lg-flex" style={{ gap: '1.5rem', fontSize: '0.85rem', fontWeight: 600 }}>
@@ -586,7 +586,7 @@ export function Home({ store, page }: any) {
       <section style={{
         // إضافة طبقة تظليل (Overlay) مع الصورة لتحسين التباين
         background: store.hero.imageUrl
-          ? `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${store.hero.imageUrl})`
+          ? `url(${store.hero.imageUrl})`
           : 'var(--bg-alt)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -597,7 +597,7 @@ export function Home({ store, page }: any) {
         alignItems: 'center',
         minHeight: '400px' // لضمان ظهور الصورة بشكل جيد
       }}>
-        <div className="container anim-fade-in" style={{ width: '100%' }}>
+        <div className="container anim-fade-in" style={{ width: '100%', ...(store.hero.imageUrl ? { background: 'rgba(10,10,12,.45)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', padding: 'clamp(16px, 3vw, 28px)', borderRadius: 18, width: 'fit-content', maxWidth: 'min(720px, calc(100% - 2rem))', marginInline: 'clamp(1rem, 5vw, 4rem)' } : {}) }}>
           <h1 style={{
             fontSize: 'clamp(2rem, 5vw, 3.5rem)',
             // إذا كانت هناك صورة، نستخدم الأبيض للتباين، وإلا نستخدم لون المتجر الأساسي

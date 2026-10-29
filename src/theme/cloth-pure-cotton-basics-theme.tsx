@@ -9,7 +9,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import { ShoppingBag, Search, Menu, X, ChevronLeft, ChevronRight, Trash2, Plus, Minus, Check, MapPin, Phone, Mail, Package, Truck, MessageCircle, Download } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -572,7 +572,7 @@ export function Navbar({ store, domain }: any) {
           {/* logo */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
             {store?.design?.logoUrl && !imgError ? (
-              <img src={store.design.logoUrl} alt={store?.name} onError={() => setImgError(true)} style={{ height: 38, objectFit: 'contain', maxWidth: 160 }} />
+              <LogoWithName store={store}><img src={store.design.logoUrl} alt={store?.name} onError={() => setImgError(true)} style={{ height: 38, objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
             ) : (
               <span className="pc-display" style={{ fontSize: 21, fontWeight: 900, color: 'var(--thread-ink)' }}>
                 {store?.name || 'متجر'}
@@ -803,9 +803,11 @@ export function Home({ store, page }: any) {
       {/* HERO */}
       <section style={{ position: 'relative', background: 'var(--cotton-100)', overflow: 'hidden' }}>
         {store?.hero?.imageUrl && (
-          <img src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: .22 }} />
+          <img src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         )}
-        <div style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', padding: '90px 20px 70px', textAlign: 'center' }}>
+        <div style={store?.hero?.imageUrl
+          ? { position: 'relative', margin: '70px auto 50px', textAlign: 'center', ...heroTextBox(store, 'light'), marginInline: 'auto' }
+          : { position: 'relative', maxWidth: 1240, margin: '0 auto', padding: '90px 20px 70px', textAlign: 'center' }}>
           <span style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: 2, color: 'var(--thread-red)', textTransform: 'uppercase' }}>{t.heroBadge}</span>
           <h1
             className="pc-display"

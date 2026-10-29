@@ -18,7 +18,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -736,7 +736,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
           <Link href="/" style={{ flexShrink: 0 }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <img src={store.design.logoUrl} style={{ height: 36, objectFit: 'contain', maxWidth: 160, display: 'block' }} alt={store?.name || ''} onError={() => setImgError(true)} />
+              <LogoWithName store={store}><img src={store.design.logoUrl} style={{ height: 36, objectFit: 'contain', maxWidth: 160, display: 'block' }} alt={store?.name || ''} onError={() => setImgError(true)} /></LogoWithName>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ width: 32, height: 32, background: `linear-gradient(135deg, ${G} 0%, ${GA} 100%)`, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -960,7 +960,7 @@ export function Home({ store, page }: any) {
         <div style={{ position: 'absolute', top: -60, right: -60, width: 320, height: 320, background: 'rgba(82,183,136,0.18)', borderRadius: '60% 40% 70% 30% / 50% 60% 40% 50%' }} />
         <div style={{ position: 'absolute', bottom: -40, left: -40, width: 240, height: 240, background: 'rgba(45,106,79,0.1)', borderRadius: '40% 60% 30% 70% / 60% 40% 60% 40%' }} />
         {store.hero?.imageUrl && (
-          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '38%', overflow: 'hidden', opacity: 0.13 }}>
+          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '38%', overflow: 'hidden' }}>
             <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           </div>
         )}

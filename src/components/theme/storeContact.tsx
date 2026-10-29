@@ -61,7 +61,7 @@ export function WhatsAppOrderButton({ product, store, style }: { product: Produc
   );
 }
 
-type LogoStore = { name?: string | null; design?: { showStoreName?: boolean | null } | null } | null | undefined;
+type LogoStore = { name?: string | null; design?: { logoUrl?: string | null; showStoreName?: boolean | null } | null } | null | undefined;
 
 /** الشعار + اسم المتجر بجانبه إذا فعّله التاجر (design.showStoreName) — وإلا يُعاد الشعار كما هو */
 export function LogoWithName({ store, children, color, style }: { store: LogoStore; children: ReactNode; color?: string; style?: CSSProperties }) {
@@ -72,4 +72,23 @@ export function LogoWithName({ store, children, color, style }: { store: LogoSto
       <span style={{ fontWeight: 800, fontSize: '1.05rem', lineHeight: 1.2, color: color || 'inherit', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200, ...style }}>{store.name}</span>
     </span>
   );
+}
+
+/** لوحة ضبابية خلف نص الغلاف حين توجد صورة — الصورة نفسها تبقى واضحة بلا طبقة داكنة.
+ *  tone: dark (نص فاتح) أو light (نص داكن) */
+export function heroTextPanel(store: { hero?: { imageUrl?: string | null } | null } | null | undefined, tone: 'dark' | 'light' = 'dark'): CSSProperties {
+  if (!store?.hero?.imageUrl) return {};
+  return {
+    background: tone === 'dark' ? 'rgba(10,10,12,.45)' : 'rgba(255,255,255,.62)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    padding: 'clamp(16px, 3vw, 28px)',
+    borderRadius: 18,
+  };
+}
+
+/** نفس اللوحة لحاوية بعرض كامل: تضيق على محتواها وتبدأ من جهة النص */
+export function heroTextBox(store: { hero?: { imageUrl?: string | null } | null } | null | undefined, tone: 'dark' | 'light' = 'dark'): CSSProperties {
+  if (!store?.hero?.imageUrl) return {};
+  return { ...heroTextPanel(store, tone), width: 'fit-content', maxWidth: 'min(720px, calc(100% - 2rem))', marginInline: 'clamp(1rem, 5vw, 4rem)' };
 }

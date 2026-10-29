@@ -32,7 +32,7 @@ import {
   Phone, Mail, MapPin, Star, Trash2, Minus, Plus, Check, AlertCircle,
   Truck, ShieldCheck, Award, Headphones, Send, Footprints, ArrowRight, Package, MessageCircle, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -791,8 +791,8 @@ export function Navbar({ store, domain }: any) {
 
           <Link href="/" className="lx-word">
             {logo && !imgError ? (
-              <img src={logo} alt={store?.name || 'logo'} onError={() => setImgError(true)}
-                style={{ height: scrolled ? 32 : 46, width: 'auto', objectFit: 'contain', display: 'block', transition: 'height .3s' }} />
+              <LogoWithName store={store}><img src={logo} alt={store?.name || 'logo'} onError={() => setImgError(true)}
+                style={{ height: scrolled ? 32 : 46, width: 'auto', objectFit: 'contain', display: 'block', transition: 'height .3s' }} /></LogoWithName>
             ) : (store?.name || 'MAISON')}
           </Link>
 
@@ -1008,12 +1008,9 @@ export function Home({ store, page }: any) {
           <img src={heroImg} alt="" aria-hidden="true"
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block', zIndex: 0 }} />
         )}
-        {onImg && (
-          <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(180deg, rgba(28,25,23,.62) 0%, rgba(28,25,23,.78) 100%)' }} />
-        )}
 
         <div className="lx-wrap" style={{ position: 'relative', zIndex: 2 }}>
-          <div className="lx-hero-in">
+          <div className="lx-hero-in" style={onImg ? { ...heroTextBox(store), minHeight: 0, marginBlock: 'clamp(2.5rem,7vw,5rem)' } : undefined}>
             <p style={{ ...eyebrow, color: onImg ? '#D9A97A' : A, animation: 'lxIn .6s ease both' }}>{t.heroEyebrow}</p>
 
             <h1 dir="auto" className="lx-hero-title" style={{ color: TXT }}

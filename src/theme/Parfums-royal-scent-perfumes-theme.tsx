@@ -20,7 +20,7 @@ import {
   ChevronLeft, ChevronRight, Trash2, Check, Minus, Plus, Package, Truck, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -550,8 +550,8 @@ export function Navbar({ store, domain }: any) {
       <header className={`rsp-pill ${scrolled ? 'scrolled' : ''}`}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', flexShrink: 0 }}>
           {logoUrl && !imgError ? (
-            <img src={logoUrl} alt={store?.name} onError={() => setImgError(true)}
-              style={{ height: 34, width: 'auto', objectFit: 'contain' }} />
+            <LogoWithName store={store}><img src={logoUrl} alt={store?.name} onError={() => setImgError(true)}
+              style={{ height: 34, width: 'auto', objectFit: 'contain' }} /></LogoWithName>
           ) : (
             <span className="rsp-display" style={{ color: GOLD_LIGHT, fontSize: '1.15rem', fontWeight: 700, letterSpacing: '0.04em' }}>
               {store?.name || 'Royal Scent'}
@@ -799,10 +799,9 @@ export function Home({ store, page }: any) {
         {store?.hero?.imageUrl && (
           <div className="rsp-hero-bg">
             <img src={store.hero.imageUrl} alt="" aria-hidden="true" />
-            <div className="rsp-hero-bg-overlay" />
           </div>
         )}
-        <div className="rsp-container rsp-hero-grid">
+        <div className="rsp-container rsp-hero-grid" style={store?.hero?.imageUrl ? { ...heroTextBox(store), marginBlock: '3rem' } : undefined}>
           {store?.hero?.badge && (
             <span style={{ display: 'inline-block', border: `1px solid ${BORDER}`, color: GOLD_LIGHT, fontSize: '0.75rem', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '5px 14px', borderRadius: 999, marginBottom: 20, alignSelf: 'flex-start' }}>
               {store.hero.badge}

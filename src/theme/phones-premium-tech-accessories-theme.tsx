@@ -36,7 +36,7 @@ import {
   Phone, Mail, MessageCircle, MapPin, Star, Trash2, Minus, Plus, Check, AlertCircle, Home as HomeIcon,
   Truck, ShieldCheck, Headphones, Send, Smartphone, ArrowRight, BadgeCheck, CreditCard, Cable, Package, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -820,8 +820,8 @@ export function Navbar({ store, domain }: any) {
 
             <Link href="/" className="tk-word tk-m">
               {logo && !imgError ? (
-                <img src={logo} alt={store?.name || 'logo'}
-                  style={{ height: 28, objectFit: 'contain', display: 'block' }} />
+                <LogoWithName store={store}><img src={logo} alt={store?.name || 'logo'}
+                  style={{ height: 28, objectFit: 'contain', display: 'block' }} /></LogoWithName>
               ) : (store?.name || 'ACCESSORIES')}
             </Link>
 
@@ -1041,7 +1041,7 @@ export function Home({ store, page }: any) {
         {heroImg && (
           <img src={heroImg} alt="" aria-hidden="true" className="tk-hero-bg" />
         )}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: heroImg ? 'linear-gradient(180deg, rgba(242,243,246,.86) 0%, rgba(242,243,246,.92) 100%)' : `radial-gradient(90% 70% at 80% 0%, ${AL} 0%, rgba(242,243,246,0) 70%)` }} />
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: heroImg ? 'transparent' : `radial-gradient(90% 70% at 80% 0%, ${AL} 0%, rgba(242,243,246,0) 70%)` }} />
 
         <div className="tk-wrap" style={{ position: 'relative', zIndex: 2 }}>
           <div className="tk-bento">

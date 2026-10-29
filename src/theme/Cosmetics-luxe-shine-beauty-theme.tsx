@@ -17,7 +17,7 @@ import {
   Package, Clock, Heart, MessageCircle, Download
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel } from '@/components/theme/storeContact';
 import { ProductAddons, addonsTotal } from '@/components/theme/ProductAddons';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
@@ -728,7 +728,7 @@ export function Navbar({ store, domain }: any) {
           <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
             <Link href="/" className="luxe-nav-logo">
               {!imgError && store?.design?.logoUrl ? (
-                <img src={store.design.logoUrl} alt={store.name} onError={() => setImgError(true)} style={{ height: 40, width: 'auto', objectFit: 'contain', maxWidth: 160 }} />
+                <LogoWithName store={store}><img src={store.design.logoUrl} alt={store.name} onError={() => setImgError(true)} style={{ height: 40, width: 'auto', objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
               ) : (
                 <span>{store?.name || 'Luxe'}</span>
               )}
@@ -944,9 +944,9 @@ export function Home({ store, page }: any) {
       {/* Hero */}
       <section className="luxe-hero">
         {store?.hero?.imageUrl && <img src={store.hero.imageUrl} alt="hero" className="luxe-hero-bg" />}
-        <div className="luxe-hero-scrim" />
+        {!store?.hero?.imageUrl && <div className="luxe-hero-scrim" />}
         <div className="luxe-container luxe-hero-content">
-          <div style={{ maxWidth: 720, marginInlineEnd: 'auto' }}>
+          <div style={{ maxWidth: 720, marginInlineEnd: 'auto', ...heroTextPanel(store, 'light') }}>
             <h1 className="luxe-hero-title" style={{ animation: 'fadeUp 0.7s ease 0.1s both' }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroTitle) }} />
             <p className="luxe-hero-sub" style={{ animation: 'fadeUp 0.7s ease 0.25s both' }}>{heroSub}</p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', animation: 'fadeUp 0.7s ease 0.4s both' }}>

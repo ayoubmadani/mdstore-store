@@ -33,7 +33,7 @@ import {
   Phone, Mail, MapPin, Star, Trash2, Minus, Plus, Check, AlertCircle, Zap,
   Truck, ShieldCheck, Headphones, Send, Footprints, ArrowRight, Flame, PackageCheck, MessageCircle, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -792,8 +792,8 @@ export function Navbar({ store, domain }: any) {
             <div className="vx-pill">
               <Link href="/" className="vx-logo" aria-label={store?.name || 'store'}>
                 {logo && !imgError ? (
-                  <img src={logo} alt={store?.name || 'logo'} onError={() => setImgError(true)}
-                    style={{ height: scrolled ? 28 : 34, width: 'auto', objectFit: 'contain', display: 'block', transition: 'height .28s' }} />
+                  <LogoWithName store={store}><img src={logo} alt={store?.name || 'logo'} onError={() => setImgError(true)}
+                    style={{ height: scrolled ? 28 : 34, width: 'auto', objectFit: 'contain', display: 'block', transition: 'height .28s' }} /></LogoWithName>
                 ) : (
                   <>
                     <span style={{ width: 30, height: 30, borderRadius: 9, background: A, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
@@ -1054,11 +1054,11 @@ export function Home({ store, page }: any) {
           <img src={heroImg} alt="" aria-hidden="true"
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block', zIndex: 0 }} />
         )}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: heroImg ? 'linear-gradient(180deg, rgba(11,13,16,.72) 0%, rgba(11,13,16,.84) 60%, rgba(11,13,16,.95) 100%)' : `radial-gradient(120% 80% at 50% 0%, ${CARD2} 0%, ${BG} 72%)` }} />
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: heroImg ? 'transparent' : `radial-gradient(120% 80% at 50% 0%, ${CARD2} 0%, ${BG} 72%)` }} />
         <div style={{ position: 'absolute', top: '18%', insetInlineStart: '-10%', width: 320, height: 320, borderRadius: '50%', background: 'rgba(217,255,57,.09)', filter: 'blur(70px)', zIndex: 1, animation: 'vxFloat 7s ease-in-out infinite' }} />
 
         <div className="vx-wrap" style={{ position: 'relative', zIndex: 2 }}>
-          <div className="vx-hero-in">
+          <div className="vx-hero-in" style={heroImg ? { ...heroTextBox(store), minHeight: 0, marginInline: 'auto', marginBlock: 'clamp(3rem,8vw,6rem)' } : undefined}>
             <span style={{ ...eyebrow, background: AL, border: `1px solid ${BD}`, padding: '8px 16px', borderRadius: 999, animation: 'vxPop .5s ease both' }}>
               <Flame size={13} /> {t.heroEyebrow}
             </span>

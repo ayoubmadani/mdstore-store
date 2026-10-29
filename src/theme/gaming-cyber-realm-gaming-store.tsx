@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { Store } from '@/types/store';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -912,7 +912,7 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
         {/* Logo */}
         <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
           {(store.design.logoUrl && store.design.logoUrl !== '/default-logo.png')
-            ? <img src={store.design.logoUrl} style={{ height: '32px' }} alt={store.name} />
+            ? <LogoWithName store={store}><img src={store.design.logoUrl} style={{ height: '32px' }} alt={store.name} /></LogoWithName>
             : <span className="neon-cyan orb" style={{ fontWeight: 900, fontSize: '1.1rem' }}>{store?.name}</span>
           }
         </Link>
@@ -1148,13 +1148,12 @@ export function Home({ store, page }: any) {
       <section style={{ position: 'relative', minHeight: '92vh', display: 'flex', alignItems: 'center', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }} className="circuit-bg">
         {store.hero?.imageUrl && (
           <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.4, display: 'block' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to left, rgba(5,11,26,0.95) 30%, rgba(5,11,26,0.4) 100%)' }} />
+            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           </div>
         )}
         <div style={{ position: 'absolute', top: '-20%', left: '-10%', width: '60vw', height: '60vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 1 }} />
         <div style={{ position: 'absolute', bottom: '-20%', right: '-10%', width: '50vw', height: '50vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,45,138,0.08) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 1 }} />
-        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '80px 20px 60px', position: 'relative', zIndex: 10, width: '100%' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '80px 20px 60px', position: 'relative', zIndex: 10, width: '100%', ...heroTextBox(store) }}>
           <div className="fu" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', border: '1px solid var(--line)', borderRadius: '4px', padding: '6px 14px', marginBottom: '24px', background: 'rgba(5,11,26,0.8)', backdropFilter: 'blur(4px)' }}>
             <Gamepad2 style={{ width: '14px', height: '14px', color: 'var(--cyan)' }} />
             <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--cyan)', textTransform: 'uppercase' }}>{store.name}</span>

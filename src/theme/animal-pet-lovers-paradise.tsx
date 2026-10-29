@@ -16,7 +16,7 @@ import {
     Shield, Truck, Sparkles, Lock, Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -642,7 +642,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 {/* Logo */}
                 <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
                     {(store.design?.logoUrl && store.design.logoUrl !== '/default-logo.png') ? (
-                        <img src={store.design.logoUrl} style={{ height: 44, width: 'auto', maxWidth: 160, objectFit: 'contain' }} alt={store?.name || ''} />
+                        <LogoWithName store={store}><img src={store.design.logoUrl} style={{ height: 44, width: 'auto', maxWidth: 160, objectFit: 'contain' }} alt={store?.name || ''} /></LogoWithName>
                     ) : (
                         <>
                             <div style={{ width: 44, height: 44, borderRadius: 14, background: 'linear-gradient(135deg, #FBBF24 0%, #FB923C 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
@@ -910,11 +910,11 @@ export function Home({ store, page }: any) {
 
                 {store.hero?.imageUrl && (
                     <div style={{ position: 'absolute', inset: 0 }}>
-                        <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.1 }} />
+                        <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </div>
                 )}
 
-                <div style={{ maxWidth: 1280, margin: '0 auto', padding: '7rem 1.5rem 4rem', position: 'relative', zIndex: 1, width: '100%' }}>
+                <div style={{ maxWidth: 1280, margin: '0 auto', padding: '7rem 1.5rem 4rem', position: 'relative', zIndex: 1, width: '100%', ...(store.hero?.imageUrl ? { ...heroTextBox(store, 'light'), marginBlock: '5rem 3rem' } : {}) }}>
                     <div className="anim-fade" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.5rem 1.25rem', borderRadius: 50, background: 'rgba(251,191,36,0.15)', border: '1.5px solid rgba(251,191,36,0.4)', marginBottom: '1.5rem' }}>
                         <PawDeco style={{ width: 18, height: 18, color: 'var(--amber-dk)' }} />
                         <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--amber-dk)' }}>{store?.name} — {t.heroTag}</span>

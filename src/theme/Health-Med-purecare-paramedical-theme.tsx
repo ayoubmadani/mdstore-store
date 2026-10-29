@@ -18,7 +18,7 @@ import {
   Trash2, Loader2, Phone, MapPin, Mail, Activity, Zap, User, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -770,7 +770,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Logo */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
-              ? <img src={store.design.logoUrl} alt={store.name} style={{ height: '36px', width: 'auto', objectFit: 'contain', maxWidth: 160 }} />
+              ? <LogoWithName store={store}><img src={store.design.logoUrl} alt={store.name} style={{ height: '36px', width: 'auto', objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
               : <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'linear-gradient(135deg,var(--blue),var(--teal))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <HeartPulse style={{ width: '16px', height: '16px', color: 'white' }} />
@@ -1037,8 +1037,8 @@ export function Home({ store, page }: any) {
             ? <img src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             : <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg,#0c2f6b 0%,#1A6ED4 40%,var(--teal) 100%)' }} />
           }
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right,rgba(12,47,107,0.88) 0%,rgba(12,47,107,0.5) 55%,transparent 100%)', display: 'flex', alignItems: 'center' }}>
-            <div className="fi" style={{ padding: '32px 5vw', zIndex: 2, maxWidth: 460 }}>
+          <div style={{ position: 'absolute', inset: 0, background: store.hero?.imageUrl ? 'transparent' : 'linear-gradient(to right,rgba(12,47,107,0.88) 0%,rgba(12,47,107,0.5) 55%,transparent 100%)', display: 'flex', alignItems: 'center', padding: store.hero?.imageUrl ? '16px 4vw' : 0 }}>
+            <div className="fi" style={{ padding: '32px 5vw', zIndex: 2, maxWidth: 460, ...heroTextPanel(store) }}>
               {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && <img src={store.design.logoUrl} alt="" style={{ height: '36px', filter: 'brightness(0) invert(1)', opacity: 0.9, marginBottom: '12px', display: 'block' }} />}
               <h1 className="pjs" style={{ fontSize: 'clamp(1.6rem,5vw,3.2rem)', fontWeight: 800, color: 'white', lineHeight: 1.05, marginBottom: '10px', letterSpacing: '-0.01em' }}>
                 {store.hero?.title || t.heroTitle}

@@ -18,7 +18,7 @@ import {
   Leaf, Flower2, Droplets, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -741,7 +741,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         }}>
           <Link href="/" style={{ display:'flex', alignItems:'center', gap:'10px', flexShrink:0 }}>
             {(store.design?.logoUrl && store.design.logoUrl !== '/default-logo.png')
-              ? <img src={store.design.logoUrl} alt={store.name} style={{ height:'32px', width:'auto', objectFit:'contain', maxWidth: 160 }} />
+              ? <LogoWithName store={store}><img src={store.design.logoUrl} alt={store.name} style={{ height:'32px', width:'auto', objectFit:'contain', maxWidth: 160 }} /></LogoWithName>
               : <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
                   <HerbLeaf size={24} />
                   <span className="pd" style={{ fontSize:'1.2rem', fontWeight:700, color:'var(--green)' }}>
@@ -1018,13 +1018,13 @@ export function Home({ store, page }: any) {
         {store.hero?.imageUrl && (
           <img src={store.hero.imageUrl} alt="" style={{
             position:'absolute', inset:0, width:'100%', height:'100%',
-            objectFit:'cover', opacity:0.06, zIndex:1
+            objectFit:'cover', zIndex:1
           }} />
         )}
-        <div style={{
+        {!store.hero?.imageUrl && <div style={{
           position:'absolute', inset:0, zIndex:2, pointerEvents:'none',
           background:'linear-gradient(to bottom, rgba(240,245,238,0.5) 0%, transparent 50%, rgba(253,251,247,0.8) 100%)'
-        }} />
+        }} />}
         <div style={{
           position:'absolute', inset:0, zIndex:3, pointerEvents:'none',
           backgroundImage:'radial-gradient(circle at 20% 50%, rgba(201,149,44,0.04) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(45,90,39,0.04) 0%, transparent 50%)'
@@ -1037,7 +1037,8 @@ export function Home({ store, page }: any) {
         <div style={{
           position:'relative', zIndex:5, padding:'0 5vw', width:'100%',
           maxWidth:'1100px', margin:'0 auto', textAlign:'center',
-          display:'flex', flexDirection:'column', alignItems:'center'
+          display:'flex', flexDirection:'column', alignItems:'center',
+          ...(store.hero?.imageUrl ? { ...heroTextBox(store, 'light'), marginInline: 'auto' } : {})
         }} className="fi">
           <div style={{
             display:'inline-flex', alignItems:'center', gap:'6px',

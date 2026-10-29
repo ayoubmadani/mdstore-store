@@ -859,13 +859,16 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
             {/* إذا كان هناك رابط مخصص للصورة، نعرض الشعار */}
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <img
-                decoding="async"
-                src={store.design.logoUrl}
-                style={{ height: 34, objectFit: 'contain', display: 'block' }}
-                alt={store?.name || 'Store Logo'}
-                onError={() => setImgError(true)}
-              />
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+                <img
+                  decoding="async"
+                  src={store.design.logoUrl}
+                  style={{ height: 34, objectFit: 'contain', display: 'block' }}
+                  alt={store?.name || 'Store Logo'}
+                  onError={() => setImgError(true)}
+                />
+                {(store.design as any)?.showStoreName && <span style={{ fontWeight: 800, fontSize: '1.05rem', color: 'inherit', whiteSpace: 'nowrap' }}>{store.name}</span>}
+              </span>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ width: 38, height: 38, borderRadius: 12, background: '#B5532F', color: '#C9A44C', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 0 #7E3820', transform: 'rotate(-6deg)', flexShrink: 0 }}>
@@ -1119,13 +1122,13 @@ export function Home({ store, page }: any) {
       <section className="br-stripes" style={{ position: 'relative', background: '#1F2A44', overflow: 'hidden', display: 'flex', alignItems: 'center', minHeight: 'min(86vh, 720px)' }}>
         {store.hero?.imageUrl && (
           <div className="br-hero-bg" style={{ position: 'absolute', inset: 0 }}>
-            <img fetchPriority="high" decoding="async" src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.22 }} />
+            <img fetchPriority="high" decoding="async" src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         )}
         <div style={{ position: 'absolute', top: -120, ...(isRTL ? { left: -120 } : { right: -120 }), width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle, rgba(181,83,47,0.45), transparent 70%)', pointerEvents: 'none' }} />
 
         <div style={{ maxWidth: 1280, margin: '0 auto', width: '100%', padding: '4.5rem 1.5rem 5.5rem', position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'minmax(0,1fr)', gap: '2rem', alignItems: 'center' }} className="hero-grid">
-          <div style={{ textAlign: align }}>
+          <div style={{ textAlign: align, ...(store.hero?.imageUrl ? { background: 'rgba(10,10,12,.45)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', padding: 'clamp(16px, 3vw, 28px)', borderRadius: 18 } : {}) }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#C9A44C', color: '#1F2A44', borderRadius: 999, padding: '0.4rem 1rem', marginBottom: '1.5rem', fontWeight: 800, fontSize: '0.82rem', transform: 'rotate(-2deg)' }}>
               <PenLine size={15} color="#B5532F" /> {t.heroBadge}
             </div>

@@ -18,7 +18,7 @@ import {
   HeartPulse, Stethoscope, Ambulance, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -793,7 +793,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         }}>
           <Link href="/" style={{ display:'flex', alignItems:'center', gap:'10px', flexShrink:0 }}>
             {(store.design?.logoUrl && store.design.logoUrl !== '/default-logo.png')
-              ? <img src={store.design.logoUrl} alt={store.name} style={{ height:'32px', width:'auto', objectFit:'contain', maxWidth: 160 }} />
+              ? <LogoWithName store={store}><img src={store.design.logoUrl} alt={store.name} style={{ height:'32px', width:'auto', objectFit:'contain', maxWidth: 160 }} /></LogoWithName>
               : <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
                   <HeartPulse size={26} style={{ color:'var(--sky)' }} />
                   <span className="pjs" style={{ fontSize:'1.2rem', fontWeight:800, color:'var(--ink)' }}>
@@ -1066,13 +1066,13 @@ export function Home({ store, page }: any) {
         {store.hero?.imageUrl && (
           <img src={store.hero.imageUrl} alt="" style={{
             position:'absolute', inset:0, width:'100%', height:'100%',
-            objectFit:'cover', opacity:0.08, zIndex:1
+            objectFit:'cover', zIndex:1
           }} />
         )}
-        <div style={{
+        {!store.hero?.imageUrl && <div style={{
           position:'absolute', inset:0, zIndex:2, pointerEvents:'none',
           background:'linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(255,255,255,0.8) 100%)'
-        }} />
+        }} />}
         <div style={{
           position:'absolute', bottom:0, left:0, right:0, height:'3px',
           background:'linear-gradient(90deg, transparent, var(--sky), var(--teal), transparent)', zIndex:3
@@ -1081,7 +1081,8 @@ export function Home({ store, page }: any) {
         <div style={{
           position:'relative', zIndex:4, padding:'0 5vw', width:'100%',
           maxWidth:'1100px', margin:'0 auto', textAlign:'center',
-          display:'flex', flexDirection:'column', alignItems:'center'
+          display:'flex', flexDirection:'column', alignItems:'center',
+          ...(store.hero?.imageUrl ? { ...heroTextBox(store, 'light'), marginInline: 'auto' } : {})
         }} className="fi">
           <div style={{
             display:'inline-flex', alignItems:'center', gap:'6px',

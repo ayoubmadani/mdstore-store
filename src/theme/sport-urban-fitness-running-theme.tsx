@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import DOMPurify from 'isomorphic-dompurify';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -504,7 +504,7 @@ export function Navbar({ store, domain }: any) {
         {/* Logo — small, left */}
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           {logoUrl && !imgError ? (
-            <img src={logoUrl} alt={store?.name} onError={() => setImgError(true)} style={{ height: 34, width: 'auto', objectFit: 'contain', maxWidth: 160 }} />
+            <LogoWithName store={store}><img src={logoUrl} alt={store?.name} onError={() => setImgError(true)} style={{ height: 34, width: 'auto', objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
           ) : (
             <span className="display-font" style={{ fontSize: '1.15rem', fontWeight: 700, color: A }}>{store?.name || 'SPORT'}</span>
           )}
@@ -776,7 +776,7 @@ export function Home({ store, page }: any) {
     <div>
       {/* HERO — asymmetric: oversized headline overlapping a smaller image tile */}
       <section style={{ background: DARK, position: 'relative', overflow: 'hidden', minHeight: 'clamp(480px, 68vh, 760px)', display: 'flex', alignItems: 'center' }}>
-        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '1rem', width: '100%', position: 'relative', zIndex: 2, padding: '4rem 1.5rem' }}>
+        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '1rem', width: '100%', position: 'relative', zIndex: 2, padding: '4rem 1.5rem', ...(store?.hero?.imageUrl ? { ...heroTextBox(store), marginBlock: '3rem' } : {}) }}>
           <span className="hero-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: AL, color: A, fontSize: '0.75rem', fontWeight: 800, padding: '6px 14px', borderRadius: 999, width: 'fit-content', letterSpacing: '0.05em' }}>
             <Zap size={13} /> {t.heroTag}
           </span>
@@ -797,17 +797,12 @@ export function Home({ store, page }: any) {
           </div>
         </div>
 
-        {store?.hero?.imageUrl && (
-          <div className="hero-float" style={{ position: 'absolute', insetInlineEnd: '6%', bottom: '8%', width: 'clamp(180px, 26vw, 340px)', aspectRatio: '3/4', borderRadius: 8, overflow: 'hidden', boxShadow: '0 30px 60px rgba(0,0,0,0.5)', border: `3px solid ${A}`, zIndex: 1, display: 'none' }} id="hero-float-img">
-            <img src={store.hero.imageUrl} alt={store?.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          </div>
-        )}
         <img
           src={store?.hero?.imageUrl}
           alt=""
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: store?.hero?.imageUrl ? 0.18 : 0 }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: store?.hero?.imageUrl ? 1 : 0 }}
         />
-        <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, ${DARK} 0%, rgba(14,14,16,0.55) 60%, ${DARK} 100%)` }} />
+        {!store?.hero?.imageUrl && <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, ${DARK} 0%, rgba(14,14,16,0.55) 60%, ${DARK} 100%)` }} />}
       </section>
 
       {/* TRUST BAR */}

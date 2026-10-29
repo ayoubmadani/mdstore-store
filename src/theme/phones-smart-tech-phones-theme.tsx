@@ -22,7 +22,7 @@ import {
   ChevronLeft, ChevronRight, Star, Trash2, Plus, Minus, Check, AlertCircle,
   Truck, ShieldCheck, CreditCard, Headphones, Smartphone, Send, Cpu, Package, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -605,8 +605,8 @@ export function Navbar({ store, domain }: any) {
   const Logo = () => (
     <Link href="/" className="pt-logoscan" style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
       {logo && !imgError ? (
-        <img src={logo} alt={store?.name} onError={() => setImgError(true)}
-          style={{ height: 38, width: 'auto', objectFit: 'contain', display: 'block' }} />
+        <LogoWithName store={store}><img src={logo} alt={store?.name} onError={() => setImgError(true)}
+          style={{ height: 38, width: 'auto', objectFit: 'contain', display: 'block' }} /></LogoWithName>
       ) : (
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontWeight: 900, fontSize: '1.2rem', color: TXT, letterSpacing: '-0.02em' }}>
           <Cpu size={22} color={A} /> {store?.name}
@@ -892,13 +892,13 @@ export function Home({ store, page }: any) {
         ) : (
           <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(120% 120% at 80% 0%, #1a2440 0%, ${INK} 60%)` }} />
         )}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(7,10,18,0.92) 0%, rgba(7,10,18,0.45) 45%, rgba(7,10,18,0.15) 100%)' }} />
+        {!hero.imageUrl && <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(7,10,18,0.92) 0%, rgba(7,10,18,0.45) 45%, rgba(7,10,18,0.15) 100%)' }} />}
         {/* scan-line signature */}
         <div style={{ position: 'absolute', top: 0, insetInlineStart: 0, right: 0, height: 3, overflow: 'hidden', zIndex: 2 }}>
           <div style={{ position: 'absolute', top: 0, bottom: 0, width: '30%', background: `linear-gradient(90deg, transparent, ${A}, transparent)`, animation: 'ptScan 4s ease-in-out infinite' }} />
         </div>
 
-        <div className="pt-container" style={{ position: 'relative', zIndex: 3, paddingBottom: 'clamp(2.2rem, 6vw, 5rem)', paddingTop: '3rem', width: '100%' }}>
+        <div className="pt-container" style={{ position: 'relative', zIndex: 3, paddingBottom: 'clamp(2.2rem, 6vw, 5rem)', paddingTop: '3rem', width: '100%', ...(hero.imageUrl ? { ...heroTextBox(store), marginBlock: 'clamp(2rem,6vw,4rem)' } : {}) }}>
           <span className="pt-mono" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#9FBBFF', fontSize: '0.78rem', letterSpacing: '0.08em', textTransform: 'uppercase', border: `1px solid ${A}66`, background: 'rgba(47,91,255,0.12)', padding: '5px 12px', borderRadius: 999, marginBottom: 18 }}>
             <span style={{ width: 6, height: 6, borderRadius: 999, background: A }} /> {t.heroEyebrow}
           </span>

@@ -16,7 +16,7 @@ import {
   Mail, MessageCircle, Download, Flame, Clock, Bike, Pizza, ChefHat, Leaf,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel } from '@/components/theme/storeContact';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
@@ -856,12 +856,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
             {/* إذا كان هناك رابط مخصص للصورة، نعرض الشعار */}
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <img
+              <LogoWithName store={store}><img
                 src={store.design.logoUrl}
                 style={{ height: 34, objectFit: 'contain', display: 'block' }}
                 alt={store?.name || 'Store Logo'}
                 onError={() => setImgError(true)}
-              />
+              /></LogoWithName>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ width: 38, height: 38, borderRadius: 12, background: '#C8281E', color: '#F2A541', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 0 #8A1A12', transform: 'rotate(-6deg)', flexShrink: 0 }}>
@@ -1115,13 +1115,13 @@ export function Home({ store, page }: any) {
       <section className="br-stripes" style={{ position: 'relative', background: '#2A1A12', overflow: 'hidden', display: 'flex', alignItems: 'center', minHeight: 'min(86vh, 720px)' }}>
         {store.hero?.imageUrl && (
           <div className="br-hero-bg" style={{ position: 'absolute', inset: 0 }}>
-            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.22 }} />
+            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         )}
         <div style={{ position: 'absolute', top: -120, ...(isRTL ? { left: -120 } : { right: -120 }), width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle, rgba(47,125,50,0.45), transparent 70%)', pointerEvents: 'none' }} />
 
         <div style={{ maxWidth: 1280, margin: '0 auto', width: '100%', padding: '4.5rem 1.5rem 5.5rem', position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'minmax(0,1fr)', gap: '2rem', alignItems: 'center' }} className="hero-grid">
-          <div style={{ textAlign: align }}>
+          <div style={{ textAlign: align, ...heroTextPanel(store) }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#F2A541', color: '#2A1A12', borderRadius: 999, padding: '0.4rem 1rem', marginBottom: '1.5rem', fontWeight: 800, fontSize: '0.82rem', transform: 'rotate(-2deg)' }}>
               <Leaf size={15} fill="#2F7D32" color="#2F7D32" /> {t.heroBadge}
             </div>

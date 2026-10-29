@@ -18,7 +18,7 @@ import {
     ArrowLeft, Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, heroTextPanel } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -964,7 +964,7 @@ export function Home({ store, page }: any) {
                 style={{
                     position: 'relative',
                     // دمج طبقة تعتيم متدرجة مع صورة الخلفية لضمان بروز النصوص
-                    background: `linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.7) 100%), url(${store.hero?.imageUrl || 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=2070'})`,
+                    background: store.hero?.imageUrl ? `url(${store.hero.imageUrl})` : `linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.7) 100%), url(https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=2070)`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundAttachment: 'fixed', // تأثير بارالاكس عند التمرير
@@ -981,7 +981,7 @@ export function Home({ store, page }: any) {
                     <div className="hero-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '4rem', alignItems: 'center' }}>
 
                         {/* الجانب الأيسر: النصوص والأزرار */}
-                        <div className="hero-text-content">
+                        <div className="hero-text-content" style={heroTextPanel(store)}>
                             {/* ملصق الترحيب (Badge) */}
                             <div className="anim-slide-up" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.6rem 1.25rem', borderRadius: 50, background: 'var(--yellow)', marginBottom: '1.5rem', boxShadow: '0 4px 15px rgba(255, 224, 0, 0.3)' }}>
                                 <Rocket size={16} style={{ color: 'var(--dark)' }} />

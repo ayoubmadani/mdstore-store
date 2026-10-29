@@ -25,7 +25,7 @@ import {
   ChevronLeft, ChevronRight, Trash2, Cpu, Truck, ShieldCheck, Lock,
   Headphones, AlertCircle, CheckCircle2, Minus, Plus, Zap, Star, Send, Package, MessageCircle, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -670,8 +670,8 @@ export function Navbar({ store, domain }: any) {
         {/* Logo */}
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, minHeight: 44 }}>
           {store?.design?.logoUrl && !imgError ? (
-            <img src={store.design.logoUrl} alt={store?.name || 'logo'} onError={() => setImgError(true)}
-              style={{ height: 34, width: 'auto', display: 'block' }} />
+            <LogoWithName store={store}><img src={store.design.logoUrl} alt={store?.name || 'logo'} onError={() => setImgError(true)}
+              style={{ height: 34, width: 'auto', display: 'block' }} /></LogoWithName>
           ) : (
             <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Zap size={18} color={A} aria-hidden="true" />
@@ -1000,14 +1000,13 @@ export function Home({ store, page }: any) {
         {store?.hero?.imageUrl && (
           <>
             <img src={store.hero.imageUrl} alt=""
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.4 }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(6,10,18,0.96) 10%, rgba(6,10,18,0.55) 60%, rgba(6,10,18,0.75) 100%)' }} />
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
           </>
         )}
         <div className="ti-grid-overlay" />
 
         <div className="ti-container" style={{ position: 'relative', zIndex: 2, padding: '5rem 1.5rem', width: '100%' }}>
-          <div style={{ maxWidth: 720, marginInlineEnd: 'auto', textAlign: t.dir === 'rtl' ? 'right' : 'left' }}>
+          <div style={{ maxWidth: 720, marginInlineEnd: 'auto', textAlign: t.dir === 'rtl' ? 'right' : 'left', ...heroTextPanel(store) }}>
             <span className="ti-hero-badge ti-mono" style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               border: `1px solid ${A}`, color: A, background: AL,

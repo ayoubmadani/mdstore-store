@@ -17,7 +17,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -776,7 +776,7 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
       {/* Logo */}
       <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
         {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
-          ? <img src={store.design.logoUrl} alt={store.name} style={{ height: '28px', width: 'auto', objectFit: 'contain', maxWidth: 160 }} />
+          ? <LogoWithName store={store}><img src={store.design.logoUrl} alt={store.name} style={{ height: '28px', width: 'auto', objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
           : <span className="ub" style={{ fontWeight: 900, fontSize: '1rem', color: 'var(--ink)', letterSpacing: '0.02em' }}>{store?.name?.toUpperCase()}</span>
         }
       </Link>
@@ -998,7 +998,7 @@ export function Home({ store, page }: any) {
       <section className="noise-ov" style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--ink)', overflow: 'hidden' }}>
         {store.hero?.imageUrl && (
           <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.1, filter: 'grayscale(100%) contrast(1.5)' }} />
+            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         )}
         {/* Number watermark */}
@@ -1008,7 +1008,7 @@ export function Home({ store, page }: any) {
         {/* Left stripe */}
         <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '5px', background: 'var(--punch)', zIndex: 3 }} />
 
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '8vw 6vw 0 7vw', position: 'relative', zIndex: 4 }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '8vw 6vw 0 7vw', position: 'relative', zIndex: 4, ...(store.hero?.imageUrl ? { ...heroTextBox(store), flex: 'none', marginTop: 'auto', marginBottom: '3vw' } : {}) }}>
           {/* Issue tag */}
           <div className="rise" style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '28px' }}>
             <div style={{ width: '36px', height: '1.5px', background: 'var(--punch)' }} />

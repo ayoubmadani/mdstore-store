@@ -18,7 +18,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -394,7 +394,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', height: 62, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <img src={store.design.logoUrl} style={{ height: 36, objectFit: 'contain', maxWidth: 160, display: 'block' }} alt={store?.name || ''} onError={() => setImgError(true)} />
+              <LogoWithName store={store}><img src={store.design.logoUrl} style={{ height: 36, objectFit: 'contain', maxWidth: 160, display: 'block' }} alt={store?.name || ''} onError={() => setImgError(true)} /></LogoWithName>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 34, height: 34, background: A, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -633,13 +633,15 @@ export function Home({ store, page }: any) {
       <section style={{ position: 'relative', overflow: 'hidden', background: SL, minHeight: 'clamp(460px, 60vh, 680px)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
         {store.hero?.imageUrl && (
           <div style={{ position: 'absolute', inset: 0 }}>
-            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: 0.25 }} />
+            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           </div>
         )}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg, rgba(30,41,59,0.88) 0%, rgba(30,41,59,0.70) 50%, rgba(180,120,0,0.35) 100%)' }} />
+        {!store.hero?.imageUrl && <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg, rgba(30,41,59,0.88) 0%, rgba(30,41,59,0.70) 50%, rgba(180,120,0,0.35) 100%)' }} />}
         <div style={{ position: 'absolute', top: 0, right: 0, width: 5, height: '100%', background: A }} />
 
-        <div style={{ position: 'relative', maxWidth: 1280, margin: '0 auto', width: '100%', padding: 'clamp(5rem,10vw,8rem) 1.5rem clamp(3rem,6vw,5rem)' }}>
+        <div style={store.hero?.imageUrl
+          ? { position: 'relative', maxWidth: 720, margin: 'clamp(4rem,8vw,6rem) clamp(1rem,4vw,3rem) clamp(2rem,5vw,4rem)', ...heroTextPanel(store) }
+          : { position: 'relative', maxWidth: 1280, margin: '0 auto', width: '100%', padding: 'clamp(5rem,10vw,8rem) 1.5rem clamp(3rem,6vw,5rem)' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(245,158,11,0.15)', border: `1px solid rgba(245,158,11,0.4)`, borderRadius: 6, padding: '0.35rem 0.875rem', marginBottom: '1.25rem' }}>
             <Ruler size={11} color={A} />
             <span style={{ fontSize: '0.72rem', fontWeight: 600, color: A }}>أدوات هندسية متخصصة</span>

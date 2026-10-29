@@ -10,7 +10,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import { Star, ChevronDown, AlertCircle, X, CheckCircle2, Shield, ArrowLeft, Plus, Minus, Search, ShoppingCart, Trash2, Loader2, ChevronLeft, ChevronRight, Phone, Package, Truck, Mail, MessageCircle, Download } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -453,7 +453,7 @@ export function Navbar({store,domain}:{store:any;domain:string}){
         {/* Logo */}
         <Link href="/" style={{flexShrink:0}}>
           {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
-            ?<img src={store.design.logoUrl} alt={store.name} style={{height:'28px',objectFit:'contain', maxWidth: 160}}/>
+            ?<LogoWithName store={store}><img src={store.design.logoUrl} alt={store.name} style={{height:'28px',objectFit:'contain', maxWidth: 160}}/></LogoWithName>
             :<span className="bn" style={{fontSize:'1.5rem',color:'var(--tx)',letterSpacing:'0.08em'}}>{store?.name}</span>
           }
         </Link>

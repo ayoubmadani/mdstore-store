@@ -20,7 +20,7 @@ import {
   ChevronLeft, ChevronRight, Trash2, Check, Minus, Plus, Leaf, Package, Truck, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -449,8 +449,8 @@ export function Navbar({ store, domain }: any) {
       <div className="pbf-nav-top">
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
           {logoUrl && !imgError ? (
-            <img src={logoUrl} alt={store?.name} onError={() => setImgError(true)}
-              style={{ height: 46, width: 'auto', objectFit: 'contain' }} />
+            <LogoWithName store={store}><img src={logoUrl} alt={store?.name} onError={() => setImgError(true)}
+              style={{ height: 46, width: 'auto', objectFit: 'contain' }} /></LogoWithName>
           ) : (
             <span className="pbf-display" style={{ color: INK, fontSize: '1.8rem', fontWeight: 600, letterSpacing: '0.02em', display: 'flex', alignItems: 'center', gap: 8 }}>
               <Leaf size={22} color={SAGE_DARK} /> {store?.name || 'Pure Botanical'}

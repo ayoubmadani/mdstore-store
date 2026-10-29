@@ -15,7 +15,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -755,7 +755,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Logo */}
           <Link href="/" style={{ flexShrink:0, display:'flex', alignItems:'center', gap:10 }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <img src={store.design.logoUrl} style={{ height:36, objectFit:'contain', maxWidth: 160 }} alt={store?.name||''} onError={() => setImgError(true)} />
+              <LogoWithName store={store}><img src={store.design.logoUrl} style={{ height:36, objectFit:'contain', maxWidth: 160 }} alt={store?.name||''} onError={() => setImgError(true)} /></LogoWithName>
             ) : (
               <>
                 <div style={{ width:34, height:34, borderRadius:'50%', background:`linear-gradient(135deg,${RO},${ROD})`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
@@ -1015,7 +1015,7 @@ export function Home({ store, page }: any) {
           : <div style={{ position:'absolute', inset:0, background:`linear-gradient(135deg,${CR} 0%,rgba(193,123,142,0.3) 100%)` }} />
         }
         {/* Gradient overlay */}
-        <div style={{ position:'absolute', inset:0, background:'linear-gradient(to left, rgba(26,18,21,0.06) 0%, rgba(26,18,21,0.5) 40%, rgba(26,18,21,0.88) 100%)' }} />
+        {!store.hero?.imageUrl && <div style={{ position:'absolute', inset:0, background:'linear-gradient(to left, rgba(26,18,21,0.06) 0%, rgba(26,18,21,0.5) 40%, rgba(26,18,21,0.88) 100%)' }} />}
 
         {/* Decorative petal */}
         <div className="anim-petals" style={{ position:'absolute', bottom:'-40px', left:'-40px', zIndex:1, opacity:0.08, pointerEvents:'none' }}>
@@ -1025,7 +1025,7 @@ export function Home({ store, page }: any) {
         {/* Content */}
         <div style={{ position:'relative', zIndex:2, width:'100%', minHeight:'clamp(580px,88vh,820px)', display:'flex', alignItems:'center' }}>
           <div style={{ maxWidth:1320, margin:'0 auto', width:'100%', padding:'clamp(3rem,8vw,6rem) clamp(1.25rem,4vw,3rem)', display:'flex', justifyContent:'flex-start' }}>
-            <div className="anim-fade-up" style={{ maxWidth:540, width:'100%' }}>
+            <div className="anim-fade-up" style={{ maxWidth:540, width:'100%', ...heroTextPanel(store) }}>
               {/* Eyebrow */}
               <div style={{ display:'inline-flex', alignItems:'center', gap:10, marginBottom:'1.75rem', background:'rgba(255,255,255,0.1)', backdropFilter:'blur(8px)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:50, padding:'6px 16px' }}>
                 <Flower2 size={11} color={RO} />

@@ -19,7 +19,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -518,7 +518,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Logo */}
           <Link href="/" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <img src={store.design.logoUrl} style={{ height: 32, objectFit: 'contain', maxWidth: 160, display: 'block' }} alt={store?.name || ''} onError={() => setImgError(true)} />
+              <LogoWithName store={store}><img src={store.design.logoUrl} style={{ height: 32, objectFit: 'contain', maxWidth: 160, display: 'block' }} alt={store?.name || ''} onError={() => setImgError(true)} /></LogoWithName>
             ) : (
               <>
                 <div style={{ width: 32, height: 32, background: OR, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -749,11 +749,11 @@ export function Home({ store, page }: any) {
           : <div style={{ position: 'absolute', inset: 0, background: DARK, opacity: 0.97 }} />
         }
         {/* Overlay: dark left-to-right gradient so text is readable */}
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to left, rgba(19,31,16,0.35) 0%, rgba(19,31,16,0.82) 45%, rgba(19,31,16,0.97) 100%)' }} />
+        {!store.hero?.imageUrl && <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to left, rgba(19,31,16,0.35) 0%, rgba(19,31,16,0.82) 45%, rgba(19,31,16,0.97) 100%)' }} />}
 
         {/* Content */}
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 1280, margin: '0 auto', width: '100%', padding: 'clamp(3rem,7vw,5rem) clamp(1.5rem,4vw,3rem)' }}>
-          <div style={{ maxWidth: 620 }}>
+          <div style={{ maxWidth: 620, ...heroTextPanel(store) }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(212,98,42,0.15)', border: '1px solid rgba(212,98,42,0.3)', borderRadius: 3, padding: '0.35rem 0.875rem', marginBottom: '1.5rem' }}>
               <Compass size={11} color={OR} />
               <span style={{ fontSize: '0.62rem', fontWeight: 700, color: OR, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: "'Barlow Condensed', sans-serif" }}>{t.heroBadge}</span>

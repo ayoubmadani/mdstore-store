@@ -17,7 +17,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -830,12 +830,12 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
             {/* إذا كان هناك رابط مخصص للصورة، نعرض الشعار */}
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <img
+              <LogoWithName store={store}><img
                 src={store.design.logoUrl}
                 style={{ height: 34, objectFit: 'contain', display: 'block' }}
                 alt={store?.name || 'Store Logo'}
                 onError={() => setImgError(true)}
-              />
+              /></LogoWithName>
             ) : (
               // وإذا لم يكن هناك رابط أو حدث خطأ، نعرض اللوجو المستطيل بالتصميم الجديد
               <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -1126,7 +1126,7 @@ export function Home({ store, page }: any) {
       <section style={{ position: 'relative', background: '#111', overflow: 'hidden' }}>
         {store.hero?.imageUrl && (
           <div style={{ position: 'absolute', inset: 0 }}>
-            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.25 }} />
+            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         )}
         {/* Geometric accent */}
@@ -1135,7 +1135,7 @@ export function Home({ store, page }: any) {
 
         <div className="hero-inner" style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           {/* Text */}
-          <div>
+          <div style={heroTextPanel(store)}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(29,78,216,0.15)', border: '1px solid rgba(29,78,216,0.3)', borderRadius: 6, padding: '0.375rem 0.875rem', marginBottom: '1.5rem' }}>
               <Zap size={13} color="#1D4ED8" fill="#1D4ED8" />
               <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1D4ED8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{store.name}</span>
