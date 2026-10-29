@@ -97,3 +97,6 @@ export function heroTextBox(store: { hero?: { imageUrl?: string | null } | null 
   if (!store?.hero?.imageUrl) return {};
   return { ...heroTextPanel(store, tone), width: 'fit-content', maxWidth: 'min(720px, calc(100% - 2rem))', marginInline: 'clamp(1rem, 5vw, 4rem)' };
 }
+
+// ربط اللون بصورة المنتج (مشترك بين الثيمات)
+export { imageIndexForSelection, variantForImage } from '@/lib/variant-image';

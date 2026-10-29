@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, type SyntheticEvent } from 'react'
+import { useEffect, useMemo, useState, type SyntheticEvent } from 'react'
 import ThemeRunner from '@/components/ThemeRunner'
 import { buildPreviewStore, PREVIEW_DOMAIN, PREVIEW_WILAYAS, PREVIEW_COMMUNES, type PreviewLang } from '@/lib/mock-preview-store'
 import { installPreviewMockApi, setPreviewSearchLang } from '@/lib/preview-mock-api'
@@ -71,6 +71,8 @@ function PreviewProductDetails({ product, store, domain, bundleUrl }: { product:
   const discount = product.priceOriginal
     ? Math.round(((product.priceOriginal - product.price) / product.priceOriginal) * 100)
     : 0
+  // اختيار الخصائص تفاعلي في المعاينة (مثلاً اللون المربوط بصورة يغيّر الصورة)
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({})
 
   return (
     <ThemeRunner
@@ -86,7 +88,7 @@ function PreviewProductDetails({ product, store, domain, bundleUrl }: { product:
         inStock: true,
         autoGen: false,
         discount,
-        selectedVariants: {},
+        selectedVariants,
         selectedOffer: product.offers?.[0]?.id ?? null,
         isWishlisted: false,
         formData: { customerId: '', customerName: '', customerPhone: '', customerWelaya: '', customerCommune: '', quantity: 1, typeLivraison: 'home' as const },
@@ -97,7 +99,7 @@ function PreviewProductDetails({ product, store, domain, bundleUrl }: { product:
         loadingCommunes: false,
         setFormData: noop,
         setSelectedOffer: noop,
-        handleVariantSelection: noop,
+        handleVariantSelection: (name: string, value: string) => setSelectedVariants((v) => ({ ...v, [name]: value })),
         handleSubmit: (e: SyntheticEvent) => e.preventDefault(),
         handleShare: noop,
         toggleWishlist: noop,
