@@ -901,7 +901,7 @@ export function Home({ store, page }: any) {
             </div>
             <div className="hero-float" style={{ position: 'relative', aspectRatio: '4/5', borderRadius: 28, overflow: 'hidden', boxShadow: '0 30px 60px rgba(255,77,109,0.25)' }}>
               {store?.hero?.imageUrl ? (
-                <img src={store.hero.imageUrl} alt={store?.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt={store?.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(160deg, ${A}, ${GOLD})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Sparkles size={70} color="#fff" />

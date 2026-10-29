@@ -1126,7 +1126,7 @@ export function Home({ store, page }: any) {
       <section style={{ position: 'relative', background: '#111', overflow: 'hidden' }}>
         {store.hero?.imageUrl && (
           <div style={{ position: 'absolute', inset: 0 }}>
-            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         )}
         {/* Geometric accent */}

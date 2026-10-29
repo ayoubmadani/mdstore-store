@@ -710,7 +710,7 @@ export function Home({ store, page }: any) {
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: `repeating-linear-gradient(90deg, ${E} 0, ${E} 20px, transparent 20px, transparent 30px)` }} />
         {store.hero?.imageUrl && (
           <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '40%', overflow: 'hidden' }}>
-            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           </div>
         )}
         <div style={{ position: 'relative', maxWidth: 1280, margin: '0 auto', width: '100%', padding: 'clamp(3rem,6vw,5rem) 1.5rem' }}>

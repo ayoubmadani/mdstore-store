@@ -1099,7 +1099,7 @@ export function Home({ store, page }: any) {
       {/* HERO LAYOUT: full-bleed background image behind text, dark gradient overlay for contrast */}
       <section style={{ position: 'relative', minHeight: 'clamp(480px,70vh,720px)', overflow: 'hidden', background: INK }}>
         {heroImg && (
-          <img src={heroImg} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={heroImg} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         )}
         <div style={{
           position: 'absolute', inset: 0,

@@ -744,7 +744,7 @@ export function Home({ store, page }: any) {
       <section style={{ position: 'relative', overflow: 'hidden', background: '#0A1929', minHeight: 'clamp(420px, 56vh, 640px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {store.hero?.imageUrl && (
           <div style={{ position: 'absolute', inset: 0 }}>
-            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           </div>
         )}
         {!store.hero?.imageUrl && <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(14,30,54,0.98) 0%, rgba(27,87,126,0.7) 60%, rgba(14,30,54,0.9) 100%)' }} />}

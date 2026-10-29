@@ -1372,7 +1372,7 @@ export function Home({ store, page }: any) {
             </div>
 
             <div className="uvt-hero-panel">
-              {heroImg && <img src={heroImg} alt={store?.name || ''} />}
+              {heroImg && <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={heroImg} alt={store?.name || ''} />}
               <div className="uvt-hero-scrim" />
               <div className="uvt-hero-ring" />
               <div className="uvt-hero-sweep" />

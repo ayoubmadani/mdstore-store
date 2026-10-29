@@ -1051,7 +1051,7 @@ export function Home({ store, page }: any) {
     <div>
       <section className="vx-hero">
         {heroImg && (
-          <img src={heroImg} alt="" aria-hidden="true"
+          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={heroImg} alt="" aria-hidden="true"
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block', zIndex: 0 }} />
         )}
         <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: heroImg ? 'transparent' : `radial-gradient(120% 80% at 50% 0%, ${CARD2} 0%, ${BG} 72%)` }} />

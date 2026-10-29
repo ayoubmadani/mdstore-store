@@ -961,7 +961,7 @@ export function Home({ store, page }: any) {
         <div style={{ position: 'absolute', bottom: -40, left: -40, width: 240, height: 240, background: 'rgba(45,106,79,0.1)', borderRadius: '40% 60% 30% 70% / 60% 40% 60% 40%' }} />
         {store.hero?.imageUrl && (
           <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '38%', overflow: 'hidden' }}>
-            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           </div>
         )}
         <div style={{ position: 'relative', maxWidth: 1280, margin: '0 auto', width: '100%', padding: 'clamp(3.5rem,7vw,6rem) 1.5rem' }}>

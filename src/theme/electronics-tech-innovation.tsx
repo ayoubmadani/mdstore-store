@@ -999,7 +999,7 @@ export function Home({ store, page }: any) {
       }}>
         {store?.hero?.imageUrl && (
           <>
-            <img src={store.hero.imageUrl} alt=""
+            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt=""
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
           </>
         )}

@@ -879,7 +879,7 @@ export function Home({ store, page }: any) {
       <section style={{ position: 'relative', overflow: 'hidden', background: `linear-gradient(135deg, ${BG} 0%, #FDEFD8 55%, ${AL} 100%)`, borderBottom: `1px solid ${BD}` }}>
         {heroImg && (
           <>
-            <img src={heroImg} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={heroImg} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
           </>
         )}
         <div style={{ ...container, position: 'relative', minHeight: 'clamp(460px, 62vh, 660px)', display: 'flex', alignItems: 'center', padding: '3rem 1.5rem' }}>

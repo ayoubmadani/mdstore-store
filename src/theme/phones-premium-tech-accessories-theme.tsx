@@ -1039,7 +1039,7 @@ export function Home({ store, page }: any) {
     <div>
       <section className="tk-hero">
         {heroImg && (
-          <img src={heroImg} alt="" aria-hidden="true" className="tk-hero-bg" />
+          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={heroImg} alt="" aria-hidden="true" className="tk-hero-bg" />
         )}
         <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: heroImg ? 'transparent' : `radial-gradient(90% 70% at 80% 0%, ${AL} 0%, rgba(242,243,246,0) 70%)` }} />
 

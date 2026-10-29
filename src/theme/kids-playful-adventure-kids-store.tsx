@@ -697,7 +697,10 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                             ? <img src={store.design.logoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
                             : <span className="font-boogaloo" style={{ fontSize: '1.2rem', color: '#fff' }}>{initials}</span>}
                     </div>
-                    <span className="font-boogaloo" style={{ fontSize: '1.5rem', color: 'var(--text)', letterSpacing: '0.01em' }}>{store?.name}</span>
+                    {/* مع شعار: الاسم فقط إذا فعّل التاجر «إظهار اسم المتجر بجانب الشعار» */}
+                    {(!(store.design?.logoUrl && store.design.logoUrl !== '/default-logo.png') || (store.design as any)?.showStoreName) && (
+                      <span className="font-boogaloo" style={{ fontSize: '1.5rem', color: 'var(--text)', letterSpacing: '0.01em' }}>{store?.name}</span>
+                    )}
                 </Link>
 
                 {/* Desktop search */}

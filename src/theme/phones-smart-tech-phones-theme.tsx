@@ -888,7 +888,7 @@ export function Home({ store, page }: any) {
       {/* HERO — full-bleed */}
       <section className="pt-hero" style={{ position: 'relative', minHeight: 'clamp(460px, 66vh, 720px)', overflow: 'hidden' }}>
         {hero.imageUrl ? (
-          <img src={hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
         ) : (
           <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(120% 120% at 80% 0%, #1a2440 0%, ${INK} 60%)` }} />
         )}

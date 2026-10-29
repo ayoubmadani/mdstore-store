@@ -803,7 +803,7 @@ export function Home({ store, page }: any) {
       {/* HERO */}
       <section style={{ position: 'relative', background: 'var(--cotton-100)', overflow: 'hidden' }}>
         {store?.hero?.imageUrl && (
-          <img src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         )}
         <div style={store?.hero?.imageUrl
           ? { position: 'relative', margin: '70px auto 50px', textAlign: 'center', ...heroTextBox(store, 'light'), marginInline: 'auto' }

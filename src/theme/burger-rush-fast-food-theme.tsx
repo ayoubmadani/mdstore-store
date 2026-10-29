@@ -1115,7 +1115,7 @@ export function Home({ store, page }: any) {
       <section className="br-stripes" style={{ position: 'relative', background: '#1C1412', overflow: 'hidden', display: 'flex', alignItems: 'center', minHeight: 'min(86vh, 720px)' }}>
         {store.hero?.imageUrl && (
           <div className="br-hero-bg" style={{ position: 'absolute', inset: 0 }}>
-            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         )}
         <div style={{ position: 'absolute', top: -120, ...(isRTL ? { left: -120 } : { right: -120 }), width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle, rgba(230,50,40,0.45), transparent 70%)', pointerEvents: 'none' }} />
@@ -1149,7 +1149,7 @@ export function Home({ store, page }: any) {
             <div className="br-hero-img" style={{ justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
               <div className="br-spin-slow" style={{ position: 'absolute', width: '92%', aspectRatio: '1/1', borderRadius: '50%', border: '3px dashed rgba(255,197,41,0.35)' }} />
               <div className="br-float" style={{ width: '78%', aspectRatio: '1/1', borderRadius: '50%', overflow: 'hidden', border: '10px solid #FFC529', boxShadow: '0 30px 60px rgba(0,0,0,0.45)' }}>
-                <img src={store.hero.imageUrl} alt={store.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt={store.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             </div>
           ) : (

@@ -1086,7 +1086,7 @@ export function Home({ store, page }: any) {
       <section style={{position:'relative',minHeight:'85vh',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',backgroundColor:'var(--navy)'}}>
         {store.hero?.imageUrl && (
           <>
-            <img src={store.hero.imageUrl} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
+            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
           </>
         )}
         {!store.hero?.imageUrl && <div style={{position:'absolute',inset:0,backgroundColor:'var(--navy-2)',opacity:0.5}} className="dot-bg"/>}

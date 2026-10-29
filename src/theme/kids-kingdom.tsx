@@ -703,7 +703,10 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               ? <img src={store.design.logoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
               : <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: '#fff' }}>{initials}</span>}
           </div>
-          <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.3rem', color: 'var(--text)' }}>{store?.name}</span>
+          {/* مع شعار: الاسم فقط إذا فعّل التاجر «إظهار اسم المتجر بجانب الشعار» */}
+          {(!(store.design?.logoUrl && store.design.logoUrl !== '/default-logo.png') || (store.design as any)?.showStoreName) && (
+            <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.3rem', color: 'var(--text)' }}>{store?.name}</span>
+          )}
         </Link>
 
         {/* Desktop search */}
@@ -951,7 +954,7 @@ export function Home({ store, page }: any) {
         <Confetti />
         {store.hero?.imageUrl && (
           <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-            <img
+            <img onError={(e) => { e.currentTarget.style.display = 'none'; }}
               src={store.hero.imageUrl}
               alt=""
               style={{

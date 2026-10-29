@@ -633,7 +633,7 @@ export function Home({ store, page }: any) {
       <section style={{ position: 'relative', overflow: 'hidden', background: SL, minHeight: 'clamp(460px, 60vh, 680px)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
         {store.hero?.imageUrl && (
           <div style={{ position: 'absolute', inset: 0 }}>
-            <img src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           </div>
         )}
         {!store.hero?.imageUrl && <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg, rgba(30,41,59,0.88) 0%, rgba(30,41,59,0.70) 50%, rgba(180,120,0,0.35) 100%)' }} />}

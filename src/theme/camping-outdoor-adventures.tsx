@@ -745,7 +745,7 @@ export function Home({ store, page }: any) {
       <section style={{ position: 'relative', overflow: 'hidden', minHeight: 'clamp(520px,75vh,760px)', display: 'flex', alignItems: 'center' }}>
         {/* Background image - always visible */}
         {store.hero?.imageUrl
-          ? <img src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          ? <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           : <div style={{ position: 'absolute', inset: 0, background: DARK, opacity: 0.97 }} />
         }
         {/* Overlay: dark left-to-right gradient so text is readable */}

@@ -841,7 +841,7 @@ export function Home({ store, page }: any) {
       {/* HERO — marquee + centered headline */}
       <section style={{ position: 'relative', overflow: 'hidden', background: BG }}>
         {store.hero?.imageUrl && (
-          <img src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
         )}
         {!store.hero?.imageUrl && <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 30%, rgba(140,123,110,0.08) 0%, rgba(245,243,239,0.7) 60%, rgba(245,243,239,0.98) 100%)' }} />}
         <div style={store.hero?.imageUrl

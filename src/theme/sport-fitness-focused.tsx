@@ -1132,7 +1132,7 @@ export function Home({ store, page }: any) {
       {/* ── HERO ── */}
       <section style={{position:'relative',overflow:'hidden',backgroundColor:'var(--black)',minHeight:'80vh',display:'flex',alignItems:'center',justifyContent:'center',paddingTop:30 , paddingBottom: 25}}>
         {store.hero?.imageUrl && (
-          <img src={store.hero.imageUrl} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',zIndex:1}}/>
+          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',zIndex:1}}/>
         )}
         {!store.hero?.imageUrl && (
           <div style={{position:'absolute',inset:0,background:'linear-gradient(135deg,var(--dark) 0%,var(--panel) 100%)',zIndex:1}}/>

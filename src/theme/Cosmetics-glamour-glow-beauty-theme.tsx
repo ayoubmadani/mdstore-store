@@ -765,7 +765,7 @@ export function Home({ store, domain, page }: { store: any; domain: string; page
       {/* Hero */}
       {store?.hero?.imageUrl ? (
         <section style={{ position: 'relative', minHeight: 480, overflow: 'hidden' }}>
-          <img src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           <div style={{ position: 'relative', zIndex: 2, maxWidth: 1360, margin: '0 auto', padding: '80px 24px', display: 'flex', alignItems: 'center', minHeight: 480 }}>
             <div style={{ maxWidth: 540, ...heroTextPanel(store) }}>
               <p className="gg-hero-eyebrow" style={{ color: 'var(--gold-lt)' }}>{t.heroEyebrow}</p>

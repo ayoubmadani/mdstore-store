@@ -798,7 +798,7 @@ export function Home({ store, page }: any) {
       <section className="rsp-hero" style={{ background: `linear-gradient(160deg, ${BG} 0%, ${BG_ALT} 100%)` }}>
         {store?.hero?.imageUrl && (
           <div className="rsp-hero-bg">
-            <img src={store.hero.imageUrl} alt="" aria-hidden="true" />
+            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" aria-hidden="true" />
           </div>
         )}
         <div className="rsp-container rsp-hero-grid" style={store?.hero?.imageUrl ? { ...heroTextBox(store), marginBlock: '3rem' } : undefined}>

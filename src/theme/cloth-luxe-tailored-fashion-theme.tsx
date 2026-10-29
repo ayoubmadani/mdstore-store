@@ -627,7 +627,7 @@ export function Home({store,page}:any){
       {/* HERO */}
       <section style={{position:'relative',height:'90vh',overflow:'hidden',display:'flex',alignItems:'flex-end'}}>
         {store.hero?.imageUrl?(
-          <img src={store.hero.imageUrl} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
+          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
         ):<div style={{position:'absolute',inset:0,background:'var(--s1)'}}/>}
 
         <div style={{position:'relative',zIndex:2,padding:'0 32px 48px',width:'100%'}}>

@@ -943,7 +943,7 @@ export function Home({ store, page }: any) {
     <div>
       {/* Hero */}
       <section className="luxe-hero">
-        {store?.hero?.imageUrl && <img src={store.hero.imageUrl} alt="hero" className="luxe-hero-bg" />}
+        {store?.hero?.imageUrl && <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="hero" className="luxe-hero-bg" />}
         {!store?.hero?.imageUrl && <div className="luxe-hero-scrim" />}
         <div className="luxe-container luxe-hero-content">
           <div style={{ maxWidth: 720, marginInlineEnd: 'auto', ...heroTextPanel(store, 'light') }}>

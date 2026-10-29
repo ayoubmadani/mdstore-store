@@ -1005,7 +1005,7 @@ export function Home({ store, page }: any) {
     <div>
       <section className="lx-hero" style={{ background: onImg ? DARK : BG }}>
         {onImg && (
-          <img src={heroImg} alt="" aria-hidden="true"
+          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={heroImg} alt="" aria-hidden="true"
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block', zIndex: 0 }} />
         )}
 

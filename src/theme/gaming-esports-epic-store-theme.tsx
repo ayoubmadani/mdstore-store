@@ -725,7 +725,7 @@ export function Home({ store, page }: { store: any; page: number }) {
       {/* Hero */}
       <section style={{ position: "relative", minHeight: "clamp(440px,65vh,720px)", display: "flex", alignItems: "center", overflow: "hidden", background: C0 }}>
         {store?.hero?.imageUrl && (
-          <img src={store.hero.imageUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
         )}
         {!store?.hero?.imageUrl && <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to ${t.dir === "rtl" ? "left" : "right"}, ${C0} 45%, rgba(10,10,15,.4) 100%)` }} />}
         <div style={{ ...container, position: "relative", zIndex: 1, padding: "3rem 1.5rem", width: "100%" }}>
