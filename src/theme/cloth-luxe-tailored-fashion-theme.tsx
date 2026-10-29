@@ -627,19 +627,17 @@ export function Home({store,page}:any){
       {/* HERO */}
       <section style={{position:'relative',height:'90vh',overflow:'hidden',display:'flex',alignItems:'flex-end'}}>
         {store.hero?.imageUrl?(
-          <>
-            <img src={store.hero.imageUrl} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
-            <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(14,12,10,.85) 0%,rgba(14,12,10,.2) 60%,transparent 100%)'}}/>
-          </>
+          <img src={store.hero.imageUrl} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
         ):<div style={{position:'absolute',inset:0,background:'var(--s1)'}}/>}
 
         <div style={{position:'relative',zIndex:2,padding:'0 32px 48px',width:'100%'}}>
           <div className="fu" style={{display:'flex',alignItems:'flex-end',justifyContent:'space-between',gap:24,flexWrap:'wrap'}}>
-            <div>
+            {/* الصورة تبقى واضحة: الضبابية خلف النص فقط */}
+            <div style={store.hero?.imageUrl?{background:'rgba(14,12,10,.45)',backdropFilter:'blur(12px)',WebkitBackdropFilter:'blur(12px)',padding:'20px 24px',borderRadius:16,maxWidth:'100%'}:undefined}>
               <h1 className="bn" style={{fontSize:'clamp(4rem,12vw,10rem)',color:'var(--tx)',lineHeight:.88,letterSpacing:'0.03em',marginBottom:16}}>
                 {store.hero?.title||<><span>LUXE</span><br/><span style={{color:'var(--cp)'}}>FASHION</span></>}
               </h1>
-              <p style={{fontSize:'13px',color:'rgba(245,241,235,0.55)',letterSpacing:'0.06em',maxWidth:340,lineHeight:1.8}}>
+              <p style={{fontSize:'13px',color:store.hero?.imageUrl?'rgba(245,241,235,0.85)':'rgba(245,241,235,0.55)',letterSpacing:'0.06em',maxWidth:340,lineHeight:1.8}}>
                 {store.hero?.subtitle||t.heroSubFallback}
               </p>
             </div>
