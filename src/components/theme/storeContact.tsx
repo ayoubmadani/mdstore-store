@@ -61,9 +61,10 @@ export function WhatsAppOrderButton({ product, store, style }: { product: Produc
   );
 }
 
-type LogoStore = { name?: string | null; design?: { logoUrl?: string | null; showStoreName?: boolean | null } | null } | null | undefined;
+type LogoStore = { name?: string | null; design?: { logoUrl?: string | null; showStoreName?: boolean | null; nameBeforeLogo?: boolean | null } | null } | null | undefined;
 
 /** الشعار + اسم المتجر بجانبه إذا فعّله التاجر (design.showStoreName) — وإلا يُعاد الشعار كما هو.
+ *  nameBeforeLogo: قلب الترتيب (الاسم ثم الشعار).
  *  nameClass/nameStyle: نفس تنسيق اسم المتجر في الثيم (حين لا يوجد شعار) حتى يبقى الاسم بهوية الثيم */
 export function LogoWithName({ store, children, color, style, nameClass, nameStyle }: { store: LogoStore; children: ReactNode; color?: string; style?: CSSProperties; nameClass?: string; nameStyle?: CSSProperties }) {
   if (!store?.design?.showStoreName || !store?.name) return <>{children}</>;
@@ -71,7 +72,7 @@ export function LogoWithName({ store, children, color, style, nameClass, nameSty
     ? { ...nameStyle, display: 'block' }
     : { fontWeight: 800, fontSize: '1.05rem', lineHeight: 1.2, color: color || 'inherit' };
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, minWidth: 0, flexDirection: store.design?.nameBeforeLogo ? 'row-reverse' : 'row' }}>
       {children}
       <span className={nameClass} style={{ ...look, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200, ...style }}>{store.name}</span>
     </span>

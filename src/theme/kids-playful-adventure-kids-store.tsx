@@ -691,7 +691,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
 
                 {/* Logo */}
-                <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+                <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0, flexDirection: (store.design as any)?.nameBeforeLogo ? 'row-reverse' : 'row' }}>
                     <div style={{ width: 46, height: 46, borderRadius: 14, background: 'var(--blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative', border: '3px solid var(--yellow)' }}>
                         {(store.design.logoUrl && store.design.logoUrl !== '/default-logo.png')
                             ? <img src={store.design.logoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />

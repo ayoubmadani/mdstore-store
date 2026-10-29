@@ -409,7 +409,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
           <Link href="/" style={{ fontSize: '1.3rem', fontWeight: 900, color: '#000' }}>
-            {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}><img src={store.design.logoUrl} style={{ height: 30 }} />{store.design.showStoreName && store?.name}</span> : store?.name}
+            {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, flexDirection: (store.design as any).nameBeforeLogo ? 'row-reverse' : 'row' }}><img src={store.design.logoUrl} style={{ height: 30 }} />{store.design.showStoreName && store?.name}</span> : store?.name}
           </Link>
 
           <nav className="lg-flex" style={{ gap: '1.5rem', fontSize: '0.85rem', fontWeight: 600 }}>

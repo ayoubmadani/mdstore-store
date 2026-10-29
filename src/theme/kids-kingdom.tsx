@@ -695,7 +695,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem', height: 70, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
 
         {/* Logo */}
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0, flexDirection: (store.design as any)?.nameBeforeLogo ? 'row-reverse' : 'row' }}>
           <div style={{ width: 46, height: 46, borderRadius: 14, background: 'linear-gradient(135deg, var(--coral), var(--grape))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden', transition: 'transform 0.3s' }}
             onMouseEnter={e => (e.currentTarget.style.transform = 'rotate(8deg) scale(1.1)')}
             onMouseLeave={e => (e.currentTarget.style.transform = '')}>
