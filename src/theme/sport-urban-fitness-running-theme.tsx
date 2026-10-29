@@ -504,7 +504,7 @@ export function Navbar({ store, domain }: any) {
         {/* Logo — small, left */}
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           {logoUrl && !imgError ? (
-            <LogoWithName store={store}><img src={logoUrl} alt={store?.name} onError={() => setImgError(true)} style={{ height: 34, width: 'auto', objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
+            <LogoWithName store={store} nameClass="display-font" nameStyle={{ fontSize: '1.15rem', fontWeight: 700, color: A }}><img src={logoUrl} alt={store?.name} onError={() => setImgError(true)} style={{ height: 34, width: 'auto', objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
           ) : (
             <span className="display-font" style={{ fontSize: '1.15rem', fontWeight: 700, color: A }}>{store?.name || 'SPORT'}</span>
           )}

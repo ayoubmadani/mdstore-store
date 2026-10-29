@@ -820,14 +820,14 @@ export function Navbar({ store, domain }: any) {
 
             <Link href="/" className="tk-word tk-m">
               {logo && !imgError ? (
-                <LogoWithName store={store}><img src={logo} alt={store?.name || 'logo'}
+                <LogoWithName store={store} nameStyle={{}}><img src={logo} alt={store?.name || 'logo'}
                   style={{ height: 28, objectFit: 'contain', display: 'block' }} /></LogoWithName>
               ) : (store?.name || 'ACCESSORIES')}
             </Link>
 
             {logo && !imgError ? (
-              <img src={logo} alt={store?.name || 'logo'} className="tk-d"
-                style={{ height: 30, objectFit: 'contain', display: 'block' }} />
+              <span className="tk-d"><LogoWithName store={store} nameClass="tk-word"><img src={logo} alt={store?.name || 'logo'}
+                style={{ height: 30, objectFit: 'contain', display: 'block' }} /></LogoWithName></span>
             ) : (
               <span className="tk-tagline">{store?.hero?.subtitle || t.tagline}</span>
             )}

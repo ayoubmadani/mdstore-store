@@ -883,7 +883,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Logo */}
           <Link href="/" style={{display:'flex', alignItems:'center', gap:'10px', flexShrink:0, textDecoration:'none'}}>
             {(store.design.logoUrl && store.design.logoUrl !== '/default-logo.png')
-              ? <LogoWithName store={store}><img src={store.design.logoUrl} alt={store.name} style={{height:'32px', width:'auto', objectFit:'contain', maxWidth: 160}}/></LogoWithName>
+              ? <LogoWithName store={store} nameStyle={{fontSize:'1.4rem', fontWeight:900, color:'var(--white)', letterSpacing:'-0.02em', fontFamily:"'Barlow Condensed',sans-serif", textTransform:'uppercase'}}><img src={store.design.logoUrl} alt={store.name} style={{height:'32px', width:'auto', objectFit:'contain', maxWidth: 160}}/></LogoWithName>
               : <span style={{fontSize:'1.4rem', fontWeight:900, color:'var(--white)', letterSpacing:'-0.02em', fontFamily:"'Barlow Condensed',sans-serif" , textTransform : 'uppercase'}}>
                   {(store?.name||'').split(' ')[0]}<span style={{color:'var(--fire)'}}>{' '}{(store?.name||'').split(' ').slice(1).join(' ')}</span>
                 </span>

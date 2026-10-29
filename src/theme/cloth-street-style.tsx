@@ -776,7 +776,7 @@ export function Navbar({ store, domain, onMenuOpen }: { store: any; domain: stri
       {/* Logo */}
       <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
         {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
-          ? <LogoWithName store={store}><img src={store.design.logoUrl} alt={store.name} style={{ height: '28px', width: 'auto', objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
+          ? <LogoWithName store={store} nameClass="ub" nameStyle={{ fontWeight: 900, fontSize: '1rem', color: 'var(--ink)', letterSpacing: '0.02em', textTransform: 'uppercase' }}><img src={store.design.logoUrl} alt={store.name} style={{ height: '28px', width: 'auto', objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
           : <span className="ub" style={{ fontWeight: 900, fontSize: '1rem', color: 'var(--ink)', letterSpacing: '0.02em' }}>{store?.name?.toUpperCase()}</span>
         }
       </Link>

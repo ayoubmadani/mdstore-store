@@ -186,7 +186,7 @@ function StoreLogo({ store, size = 40 }: any) {
   const [err, setErr] = useState(false);
   const url = store?.design?.logoUrl;
   if (url && !err) {
-    return <LogoWithName store={store}><img src={url} alt={store?.name} onError={() => setErr(true)} style={{ height: 48, width: 'auto', maxWidth: 160, objectFit: 'contain' }} /></LogoWithName>;
+    return <LogoWithName store={store} nameStyle={{ fontFamily: FONT_HEAD, fontWeight: 700, fontSize: 20, color: TXT }}><img src={url} alt={store?.name} onError={() => setErr(true)} style={{ height: 48, width: 'auto', maxWidth: 160, objectFit: 'contain' }} /></LogoWithName>;
   }
   const initials = (store?.name || 'S').trim().slice(0, 2);
   return (

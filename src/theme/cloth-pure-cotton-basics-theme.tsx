@@ -572,7 +572,7 @@ export function Navbar({ store, domain }: any) {
           {/* logo */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
             {store?.design?.logoUrl && !imgError ? (
-              <LogoWithName store={store}><img src={store.design.logoUrl} alt={store?.name} onError={() => setImgError(true)} style={{ height: 38, objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
+              <LogoWithName store={store} nameClass="pc-display" nameStyle={{ fontSize: 21, fontWeight: 900, color: 'var(--thread-ink)' }}><img src={store.design.logoUrl} alt={store?.name} onError={() => setImgError(true)} style={{ height: 38, objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
             ) : (
               <span className="pc-display" style={{ fontSize: 21, fontWeight: 900, color: 'var(--thread-ink)' }}>
                 {store?.name || 'متجر'}

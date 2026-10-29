@@ -775,7 +775,7 @@ export function Navbar({ store, domain }: any) {
           <div className="ae-nb-top">
             <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#fff' }}>
               {logo && !imgError ? (
-                <LogoWithName store={store}><img src={logo} alt={store?.name || 'logo'} onError={() => setImgError(true)}
+                <LogoWithName store={store} nameClass="ae-display" nameStyle={{ fontSize: '1.05rem', fontWeight: 700, letterSpacing: '0.02em' }}><img src={logo} alt={store?.name || 'logo'} onError={() => setImgError(true)}
                   style={{ height: 30, width: 'auto', objectFit: 'contain', display: 'block' }} /></LogoWithName>
               ) : (
                 <span className="ae-display" style={{ fontSize: '1.05rem', fontWeight: 700, letterSpacing: '0.02em' }}>

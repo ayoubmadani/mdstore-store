@@ -850,7 +850,7 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
         {/* Logo */}
         <Link href="/" style={{flexShrink:0,display:'flex',alignItems:'center',gap:'12px'}}>
           {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
-            ? <LogoWithName store={store} color="#fff"><img src={store.design.logoUrl} alt={store.name} style={{height:'36px',width:'auto'}}/></LogoWithName>
+            ? <LogoWithName store={store} color="#fff" nameClass="bc" nameStyle={{fontSize:'1.3rem',fontWeight:900,color:'white',letterSpacing:'0.04em',lineHeight:1}}><img src={store.design.logoUrl} alt={store.name} style={{height:'36px',width:'auto'}}/></LogoWithName>
             : <>
                 <div style={{width:'38px',height:'38px',borderRadius:'10px',backgroundColor:'var(--blue)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
                   <Zap style={{width:'20px',height:'20px',color:'white'}}/>

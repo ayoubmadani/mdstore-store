@@ -736,7 +736,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
           <Link href="/" style={{ flexShrink: 0 }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <LogoWithName store={store}><img src={store.design.logoUrl} style={{ height: 36, objectFit: 'contain', maxWidth: 160, display: 'block' }} alt={store?.name || ''} onError={() => setImgError(true)} /></LogoWithName>
+              <LogoWithName store={store} nameStyle={{ fontSize: '0.9rem', fontWeight: 700, color: INK, display: 'block', lineHeight: 1.15 }}><img src={store.design.logoUrl} style={{ height: 36, objectFit: 'contain', maxWidth: 160, display: 'block' }} alt={store?.name || ''} onError={() => setImgError(true)} /></LogoWithName>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ width: 32, height: 32, background: `linear-gradient(135deg, ${G} 0%, ${GA} 100%)`, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

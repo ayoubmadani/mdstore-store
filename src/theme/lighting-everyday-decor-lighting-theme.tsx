@@ -586,7 +586,7 @@ export function Navbar({ store, domain }: any) {
               <Lightbulb size={20} color={A} fill={A} strokeWidth={1.5} />
             </span>
             {logoUrl && !imgError ? (
-              <LogoWithName store={store}><img src={logoUrl} alt={store?.name} onError={() => setImgError(true)} style={{ height: 34, objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
+              <LogoWithName store={store} nameClass="lm-display" nameStyle={{ fontSize: '1.3rem', fontWeight: 700, color: TXT, letterSpacing: '-.01em' }}><img src={logoUrl} alt={store?.name} onError={() => setImgError(true)} style={{ height: 34, objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
             ) : (
               <span className="lm-display" style={{ fontSize: '1.3rem', fontWeight: 700, color: TXT, letterSpacing: '-.01em' }}>{store?.name}</span>
             )}

@@ -791,7 +791,7 @@ export function Navbar({ store, domain }: any) {
 
           <Link href="/" className="lx-word">
             {logo && !imgError ? (
-              <LogoWithName store={store}><img src={logo} alt={store?.name || 'logo'} onError={() => setImgError(true)}
+              <LogoWithName store={store} nameClass="lx-serif" nameStyle={{ fontSize: '1.15rem', letterSpacing: '.16em', textTransform: 'uppercase' }}><img src={logo} alt={store?.name || 'logo'} onError={() => setImgError(true)}
                 style={{ height: scrolled ? 32 : 46, width: 'auto', objectFit: 'contain', display: 'block', transition: 'height .3s' }} /></LogoWithName>
             ) : (store?.name || 'MAISON')}
           </Link>

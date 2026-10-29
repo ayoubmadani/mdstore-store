@@ -63,13 +63,17 @@ export function WhatsAppOrderButton({ product, store, style }: { product: Produc
 
 type LogoStore = { name?: string | null; design?: { logoUrl?: string | null; showStoreName?: boolean | null } | null } | null | undefined;
 
-/** الشعار + اسم المتجر بجانبه إذا فعّله التاجر (design.showStoreName) — وإلا يُعاد الشعار كما هو */
-export function LogoWithName({ store, children, color, style }: { store: LogoStore; children: ReactNode; color?: string; style?: CSSProperties }) {
+/** الشعار + اسم المتجر بجانبه إذا فعّله التاجر (design.showStoreName) — وإلا يُعاد الشعار كما هو.
+ *  nameClass/nameStyle: نفس تنسيق اسم المتجر في الثيم (حين لا يوجد شعار) حتى يبقى الاسم بهوية الثيم */
+export function LogoWithName({ store, children, color, style, nameClass, nameStyle }: { store: LogoStore; children: ReactNode; color?: string; style?: CSSProperties; nameClass?: string; nameStyle?: CSSProperties }) {
   if (!store?.design?.showStoreName || !store?.name) return <>{children}</>;
+  const look: CSSProperties = nameStyle || nameClass
+    ? { ...nameStyle, display: 'block' }
+    : { fontWeight: 800, fontSize: '1.05rem', lineHeight: 1.2, color: color || 'inherit' };
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
       {children}
-      <span style={{ fontWeight: 800, fontSize: '1.05rem', lineHeight: 1.2, color: color || 'inherit', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200, ...style }}>{store.name}</span>
+      <span className={nameClass} style={{ ...look, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200, ...style }}>{store.name}</span>
     </span>
   );
 }

@@ -792,7 +792,7 @@ export function Navbar({ store, domain }: any) {
             <div className="vx-pill">
               <Link href="/" className="vx-logo" aria-label={store?.name || 'store'}>
                 {logo && !imgError ? (
-                  <LogoWithName store={store}><img src={logo} alt={store?.name || 'logo'} onError={() => setImgError(true)}
+                  <LogoWithName store={store} nameClass="vx-logo-tx"><img src={logo} alt={store?.name || 'logo'} onError={() => setImgError(true)}
                     style={{ height: scrolled ? 28 : 34, width: 'auto', objectFit: 'contain', display: 'block', transition: 'height .28s' }} /></LogoWithName>
                 ) : (
                   <>

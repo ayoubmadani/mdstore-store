@@ -540,7 +540,7 @@ export function Navbar({ store, domain }: any) {
 
   const Logo = () => (
     logoUrl && !logoErr ? (
-      <LogoWithName store={store}><img src={logoUrl} alt={store?.name} onError={() => setLogoErr(true)}
+      <LogoWithName store={store} nameClass="hn-display" nameStyle={{ fontWeight: 900, fontSize: '1.35rem', color: INK, letterSpacing: '-0.01em' }}><img src={logoUrl} alt={store?.name} onError={() => setLogoErr(true)}
         style={{ height: 40, width: 'auto', objectFit: 'contain', display: 'block' }} /></LogoWithName>
     ) : (
       <span className="hn-display" style={{ fontWeight: 900, fontSize: '1.35rem', color: INK, letterSpacing: '-0.01em' }}>

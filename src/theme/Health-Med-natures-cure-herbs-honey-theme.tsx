@@ -741,7 +741,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         }}>
           <Link href="/" style={{ display:'flex', alignItems:'center', gap:'10px', flexShrink:0 }}>
             {(store.design?.logoUrl && store.design.logoUrl !== '/default-logo.png')
-              ? <LogoWithName store={store}><img src={store.design.logoUrl} alt={store.name} style={{ height:'32px', width:'auto', objectFit:'contain', maxWidth: 160 }} /></LogoWithName>
+              ? <LogoWithName store={store} nameClass="pd" nameStyle={{ fontSize:'1.2rem', fontWeight:700, color:'var(--green)' }}><img src={store.design.logoUrl} alt={store.name} style={{ height:'32px', width:'auto', objectFit:'contain', maxWidth: 160 }} /></LogoWithName>
               : <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
                   <HerbLeaf size={24} />
                   <span className="pd" style={{ fontSize:'1.2rem', fontWeight:700, color:'var(--green)' }}>

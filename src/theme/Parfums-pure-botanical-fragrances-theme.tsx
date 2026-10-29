@@ -449,7 +449,7 @@ export function Navbar({ store, domain }: any) {
       <div className="pbf-nav-top">
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
           {logoUrl && !imgError ? (
-            <LogoWithName store={store}><img src={logoUrl} alt={store?.name} onError={() => setImgError(true)}
+            <LogoWithName store={store} nameClass="pbf-display" nameStyle={{ color: INK, fontSize: '1.5rem', fontWeight: 600, letterSpacing: '0.02em' }}><img src={logoUrl} alt={store?.name} onError={() => setImgError(true)}
               style={{ height: 46, width: 'auto', objectFit: 'contain' }} /></LogoWithName>
           ) : (
             <span className="pbf-display" style={{ color: INK, fontSize: '1.8rem', fontWeight: 600, letterSpacing: '0.02em', display: 'flex', alignItems: 'center', gap: 8 }}>

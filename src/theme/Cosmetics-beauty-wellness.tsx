@@ -848,7 +848,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Logo */}
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <LogoWithName store={store}><img
+              <LogoWithName store={store} nameStyle={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: '1.25rem', fontWeight: 700, fontStyle: 'italic', color: 'var(--plum)', letterSpacing: '0.01em', whiteSpace: 'nowrap', }}><img
                 src={store.design.logoUrl}
                 style={{ height: 40, objectFit: 'contain', display: 'block' }}
                 alt={store?.name || 'Store Logo'}

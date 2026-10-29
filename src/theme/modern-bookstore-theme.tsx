@@ -867,7 +867,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                   alt={store?.name || 'Store Logo'}
                   onError={() => setImgError(true)}
                 />
-                {(store.design as any)?.showStoreName && <span style={{ fontWeight: 800, fontSize: '1.05rem', color: 'inherit', whiteSpace: 'nowrap' }}>{store.name}</span>}
+                {(store.design as any)?.showStoreName && <span className="br-display" style={{ fontSize: '1.35rem', color: '#1F2A44', whiteSpace: 'nowrap', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis' }}>{store.name}</span>}
               </span>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

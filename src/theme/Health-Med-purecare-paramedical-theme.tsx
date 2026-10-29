@@ -770,7 +770,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           {/* Logo */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
-              ? <LogoWithName store={store}><img src={store.design.logoUrl} alt={store.name} style={{ height: '36px', width: 'auto', objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
+              ? <LogoWithName store={store} nameClass="pjs" nameStyle={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--ink)', display: 'block', lineHeight: 1 }}><img src={store.design.logoUrl} alt={store.name} style={{ height: '36px', width: 'auto', objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
               : <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'linear-gradient(135deg,var(--blue),var(--teal))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <HeartPulse style={{ width: '16px', height: '16px', color: 'white' }} />

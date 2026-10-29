@@ -605,7 +605,7 @@ export function Navbar({ store, domain }: any) {
   const Logo = () => (
     <Link href="/" className="pt-logoscan" style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
       {logo && !imgError ? (
-        <LogoWithName store={store}><img src={logo} alt={store?.name} onError={() => setImgError(true)}
+        <LogoWithName store={store} nameStyle={{ fontWeight: 900, fontSize: '1.2rem', color: TXT, letterSpacing: '-0.02em' }}><img src={logo} alt={store?.name} onError={() => setImgError(true)}
           style={{ height: 38, width: 'auto', objectFit: 'contain', display: 'block' }} /></LogoWithName>
       ) : (
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontWeight: 900, fontSize: '1.2rem', color: TXT, letterSpacing: '-0.02em' }}>

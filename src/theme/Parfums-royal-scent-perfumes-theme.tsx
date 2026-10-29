@@ -550,7 +550,7 @@ export function Navbar({ store, domain }: any) {
       <header className={`rsp-pill ${scrolled ? 'scrolled' : ''}`}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', flexShrink: 0 }}>
           {logoUrl && !imgError ? (
-            <LogoWithName store={store}><img src={logoUrl} alt={store?.name} onError={() => setImgError(true)}
+            <LogoWithName store={store} nameClass="rsp-display" nameStyle={{ color: GOLD_LIGHT, fontSize: '1.15rem', fontWeight: 700, letterSpacing: '0.04em' }}><img src={logoUrl} alt={store?.name} onError={() => setImgError(true)}
               style={{ height: 34, width: 'auto', objectFit: 'contain' }} /></LogoWithName>
           ) : (
             <span className="rsp-display" style={{ color: GOLD_LIGHT, fontSize: '1.15rem', fontWeight: 700, letterSpacing: '0.04em' }}>

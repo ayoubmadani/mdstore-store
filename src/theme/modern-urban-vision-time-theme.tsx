@@ -1021,7 +1021,7 @@ export function Navbar({ store, domain }: any) {
 
         <Link href="/" className="uvt-wordmark" aria-label={store?.name}>
           {logo && !imgError
-            ? <LogoWithName store={store}><img src={logo} alt={store?.name} onError={() => setImgError(true)} /></LogoWithName>
+            ? <LogoWithName store={store} nameStyle={{}}><img src={logo} alt={store?.name} onError={() => setImgError(true)} /></LogoWithName>
             : <>{store?.name || 'URBAN VISION'}<small>&middot; VISION &amp; TIME &middot;</small></>}
         </Link>
 

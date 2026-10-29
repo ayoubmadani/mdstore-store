@@ -300,7 +300,7 @@ export function Navbar({ store }: { store: Store }) {
       <div style={{ ...S.container, display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
         <Link href="/" style={{ fontWeight: 700, fontSize: '1rem', color: '#111', textDecoration: 'none' }}>
           {store.design?.logoUrl && store.design.logoUrl !== '/default-logo.png'
-            ? <LogoWithName store={store}><img src={store.design.logoUrl} alt={store.name} style={{ height: 32, display: 'block' }} /></LogoWithName>
+            ? <LogoWithName store={store} nameStyle={{}}><img src={store.design.logoUrl} alt={store.name} style={{ height: 32, display: 'block' }} /></LogoWithName>
             : store.name}
         </Link>
 

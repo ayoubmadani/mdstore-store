@@ -807,7 +807,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
             {/* إذا كان هناك رابط مخصص للصورة، نعرض الشعار */}
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <LogoWithName store={store} color="#111">
+              <LogoWithName store={store} color="#111" nameStyle={{ fontSize: '1rem', fontWeight: 800, color: 'rgb(124, 58, 237)', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
                 <img
                   src={store.design.logoUrl}
                   style={{ height: 34, objectFit: 'contain', display: 'block' }}

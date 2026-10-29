@@ -728,7 +728,7 @@ export function Navbar({ store, domain }: any) {
           <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
             <Link href="/" className="luxe-nav-logo">
               {!imgError && store?.design?.logoUrl ? (
-                <LogoWithName store={store}><img src={store.design.logoUrl} alt={store.name} onError={() => setImgError(true)} style={{ height: 40, width: 'auto', objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
+                <LogoWithName store={store} nameStyle={{}}><img src={store.design.logoUrl} alt={store.name} onError={() => setImgError(true)} style={{ height: 40, width: 'auto', objectFit: 'contain', maxWidth: 160 }} /></LogoWithName>
               ) : (
                 <span>{store?.name || 'Luxe'}</span>
               )}
