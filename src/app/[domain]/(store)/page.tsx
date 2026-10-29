@@ -1,4 +1,6 @@
 import { cache } from 'react'
+import { headers } from 'next/headers'
+import { heroForDevice } from '@/lib/hero-device'
 import { getStoreByDomain } from '@/lib/api'
 import ThemeRunner from '@/components/ThemeRunner'
 
@@ -51,7 +53,7 @@ export default async function StorePage(props: {
     <ThemeRunner
       bundleUrl={bundleUrl}
       exportName="Home"
-      themeProps={{ store, page: +(page || 1), domain }}
+      themeProps={{ store: heroForDevice(store, (await headers()).get('user-agent')), page: +(page || 1), domain }}
     />
   )
 }
