@@ -27,7 +27,7 @@ import {
   Glasses, Watch, Truck, ShieldCheck, CreditCard, Headphones,
   Star, Plus, Minus, ArrowRight, Send, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1893,9 +1893,20 @@ export function Details({
 
   const step = (d: number) => {
     if (!flat.length) return;
-    setSel((p) => (p + d + flat.length) % flat.length);
+    showImage((p) => (p + d + flat.length) % flat.length);
   };
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, flat);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, flat[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div className="uvt-wrap">
       <div className="uvt-details">
@@ -1943,7 +1954,7 @@ export function Details({
                 <button
                   key={i}
                   className={`uvt-thumb${sel === i ? ' is-active' : ''}`}
-                  onClick={() => setSel(i)}
+                  onClick={() => showImage(i)}
                   aria-label={`${i + 1}`}
                 >
                   <img src={im} alt="" />

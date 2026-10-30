@@ -18,7 +18,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, heroTextBox } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -1113,7 +1113,8 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
   const t = withLocationLabels(T)[lang];
   const isRTL = lang === 'ar';
   const ACCENTS = ['#FF6B6B', '#4ECDC4', '#A855F7', '#F97316', '#10B981'];
-  const accent = ACCENTS[parseInt(product.id || '0') % ACCENTS.length];
+  // لون ثابت لكل منتج — parseInt على معرّف UUID يعطي NaN فيختفي إطار الاختيار
+  const accent = ACCENTS[[...String(product?.id || '')].reduce((n, c) => n + c.charCodeAt(0), 0) % ACCENTS.length];
   const stockLabel = autoGen
     ? (isRTL ? '📦 متوفر دائماً' : '📦 Toujours dispo')
     : inStock
@@ -1141,10 +1142,10 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
         )}
         {allImages.length > 1 && (
           <>
-            <button onClick={() => setSel(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', [isRTL ? 'right' : 'left']: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.92)', border: '2px solid rgba(0,0,0,0.06)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
+            <button onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', [isRTL ? 'right' : 'left']: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.92)', border: '2px solid rgba(0,0,0,0.06)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
               {isRTL ? <ChevronRight size={17} /> : <ChevronLeft size={17} />}
             </button>
-            <button onClick={() => setSel(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.92)', border: '2px solid rgba(0,0,0,0.06)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
+            <button onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.92)', border: '2px solid rgba(0,0,0,0.06)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
               {isRTL ? <ChevronLeft size={17} /> : <ChevronRight size={17} />}
             </button>
             <div style={{ position: 'absolute', bottom: 10, left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 5, pointerEvents: 'none', zIndex: 2 }}>
@@ -1158,7 +1159,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
       {allImages.length > 1 && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', paddingBottom: 4, marginTop: 10 }}>
           {allImages.map((img: string, idx: number) => (
-            <button key={idx} onClick={() => setSel(idx)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 12, overflow: 'hidden', border: `3px solid ${sel === idx ? accent : 'var(--border)'}`, opacity: sel === idx ? 1 : 0.5, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.2s' }}>
+            <button key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 12, overflow: 'hidden', border: `3px solid ${sel === idx ? accent : 'var(--border)'}`, opacity: sel === idx ? 1 : 0.5, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.2s' }}>
               <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </button>
           ))}
@@ -1293,6 +1294,17 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
     </div>
   );
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, allImages);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, allImages[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: '4rem' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '1rem' }}>

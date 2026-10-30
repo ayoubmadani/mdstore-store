@@ -33,7 +33,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown, Trash2, Plus, Minus,
   Lightbulb, Star, Check, AlertCircle, Truck, ShieldCheck, CreditCard, Headphones, Package, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1372,8 +1372,19 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
   const price = Number(finalPrice ?? product?.price);
   const orig = Number(product?.priceOriginal || 0);
 
-  const nav = (dir: number) => setSel((s) => (gallery.length ? (s + dir + gallery.length) % gallery.length : 0));
+  const nav = (dir: number) => showImage((s) => (gallery.length ? (s + dir + gallery.length) % gallery.length : 0));
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, gallery);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, gallery[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div style={{ ...container, padding: '2rem 1.5rem 3.5rem' }}>
       <div className="lm-details">
@@ -1394,7 +1405,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
           {gallery.length > 1 && (
             <div style={{ display: 'flex', gap: 10, marginTop: 14, flexWrap: 'wrap' }}>
               {gallery.map((im: string, i: number) => (
-                <button key={i} onClick={() => setSel(i)}
+                <button key={i} onClick={() => showImage(i)}
                   style={{ width: 68, height: 68, borderRadius: 14, overflow: 'hidden', cursor: 'pointer', padding: 0, background: SURF2, border: `2px solid ${i === sel ? A : BD}`, boxShadow: i === sel ? `0 0 14px rgba(${GLOW}, .5)` : 'none' }}>
                   <ProductImg src={im} alt="" />
                 </button>

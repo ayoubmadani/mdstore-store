@@ -21,6 +21,25 @@ import { Store } from '@/types/store';
 import { useCartStore } from '@/store/useCartStore';
 import { whatsappHref } from '@/components/builderPages/buttonLinks';
 
+// ربط اللون بصورة المنتج (نسخة مستقلة من src/lib/variant-image.ts)
+type __VAttr = { name: string; variants?: { value: string; imageUrl?: string | null }[] };
+const imageIndexForSelection = (attributes: __VAttr[] | undefined, selected: Record<string, string>, images: string[]): number => {
+  for (const a of attributes || []) {
+    const url = a.variants?.find((v) => v.value === selected[a.name])?.imageUrl;
+    const i = url ? images.indexOf(url) : -1;
+    if (i >= 0) return i;
+  }
+  return -1;
+};
+const variantForImage = (attributes: __VAttr[] | undefined, url: string): { name: string; value: string } | null => {
+  for (const a of attributes || []) {
+    const v = a.variants?.find((x) => x.imageUrl && x.imageUrl === url);
+    if (v) return { name: a.name, value: v.value };
+  }
+  return null;
+};
+
+
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
 
@@ -715,6 +734,17 @@ export function Home({ store, page }: any) {
 ═══════════════════════════════════════════════════════════ */
 export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
   const [sel, setSel] = useState(0);
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, allImages);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, allImages[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div dir="rtl" className="container" style={{ padding: '3rem 1.5rem' }}>
       <div className="grid-2" style={{ gap: '3rem', alignItems: 'start' }}>
@@ -728,7 +758,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           {allImages.length > 1 && (
             <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
               {allImages.map((img: string, idx: number) => (
-                <button key={idx} onClick={() => setSel(idx)} style={{ width: 60, height: 60, flexShrink: 0, border: `1px solid ${sel === idx ? 'var(--primary)' : 'var(--border-color)'}`, borderRadius: '4px', padding: 0, cursor: 'pointer', overflow: 'hidden' }}>
+                <button key={idx} onClick={() => showImage(idx)} style={{ width: 60, height: 60, flexShrink: 0, border: `1px solid ${sel === idx ? 'var(--primary)' : 'var(--border-color)'}`, borderRadius: '4px', padding: 0, cursor: 'pointer', overflow: 'hidden' }}>
                   <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: sel === idx ? 1 : 0.6 }} alt="" />
                 </button>
               ))}

@@ -16,7 +16,7 @@ import {
   Search, ShoppingCart, Trash2, Loader2, Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1244,6 +1244,17 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
   const currency = store?.currency || 'DZD';
   const [sel, setSel] = useState(0);
   if(!product) return null;
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, allImages);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, allImages[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} style={{backgroundColor:'var(--off)'}}>
 
@@ -1262,10 +1273,10 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
             {discount>0 && <div style={{position:'absolute',top:'12px',right:'12px',backgroundColor:'var(--blue)',color:'white',fontSize:'12px',fontWeight:700,padding:'4px 12px'}}>-{discount}%</div>}
             {allImages.length>1 && (
               <>
-                <button onClick={()=>setSel(p=>p===0?allImages.length-1:p-1)} style={{position:'absolute',right:'10px',top:'50%',transform:'translateY(-50%)',width:'36px',height:'36px',border:'1px solid var(--line)',backgroundColor:'rgba(255,255,255,0.9)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                <button onClick={()=>showImage(p=>p===0?allImages.length-1:p-1)} style={{position:'absolute',right:'10px',top:'50%',transform:'translateY(-50%)',width:'36px',height:'36px',border:'1px solid var(--line)',backgroundColor:'rgba(255,255,255,0.9)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
                   ›
                 </button>
-                <button onClick={()=>setSel(p=>p===allImages.length-1?0:p+1)} style={{position:'absolute',left:'10px',top:'50%',transform:'translateY(-50%)',width:'36px',height:'36px',border:'1px solid var(--line)',backgroundColor:'rgba(255,255,255,0.9)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                <button onClick={()=>showImage(p=>p===allImages.length-1?0:p+1)} style={{position:'absolute',left:'10px',top:'50%',transform:'translateY(-50%)',width:'36px',height:'36px',border:'1px solid var(--line)',backgroundColor:'rgba(255,255,255,0.9)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
                   ‹
                 </button>
               </>
@@ -1275,7 +1286,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
           {allImages.length>1 && (
             <div style={{display:'flex',gap:'8px',marginTop:'10px',flexWrap:'wrap'}}>
               {allImages.slice(0,5).map((img:string,idx:number)=>(
-                <button key={idx} onClick={()=>setSel(idx)} style={{width:'54px',height:'54px',overflow:'hidden',border:`2px solid ${sel===idx?'var(--blue)':'var(--line)'}`,cursor:'pointer',padding:0,background:'none',opacity:sel===idx?1:0.55}}>
+                <button key={idx} onClick={()=>showImage(idx)} style={{width:'54px',height:'54px',overflow:'hidden',border:`2px solid ${sel===idx?'var(--blue)':'var(--line)'}`,cursor:'pointer',padding:0,background:'none',opacity:sel===idx?1:0.55}}>
                   <img src={img} alt="" style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
                 </button>
               ))}

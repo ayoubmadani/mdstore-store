@@ -13,7 +13,7 @@ import {
   Gift, Truck, ShieldCheck, Headphones, Check, Package, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -985,6 +985,17 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
   const [sel, setSel] = useState(0);
   const images: string[] = allImages?.length ? allImages : (product.imagesProduct?.map((i: ProductImage) => i.imageUrl) || (product.productImage ? [product.productImage] : []));
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, images);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, images[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div className="container" style={{ padding: '2.5rem 1.5rem 4rem' }}>
       <div className="details-inner">
@@ -1001,15 +1012,15 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             )}
             {images.length > 1 && (
               <>
-                <button onClick={() => setSel((s) => (s === 0 ? images.length - 1 : s - 1))} style={{ position: 'absolute', top: '50%', right: 12, transform: 'translateY(-50%)', background: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}><ChevronRight size={18} /></button>
-                <button onClick={() => setSel((s) => (s === images.length - 1 ? 0 : s + 1))} style={{ position: 'absolute', top: '50%', left: 12, transform: 'translateY(-50%)', background: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}><ChevronLeft size={18} /></button>
+                <button onClick={() => showImage((s) => (s === 0 ? images.length - 1 : s - 1))} style={{ position: 'absolute', top: '50%', right: 12, transform: 'translateY(-50%)', background: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}><ChevronRight size={18} /></button>
+                <button onClick={() => showImage((s) => (s === images.length - 1 ? 0 : s + 1))} style={{ position: 'absolute', top: '50%', left: 12, transform: 'translateY(-50%)', background: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}><ChevronLeft size={18} /></button>
               </>
             )}
           </div>
           {images.length > 1 && (
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               {images.map((im, i) => (
-                <button key={i} onClick={() => setSel(i)} style={{ width: 66, height: 66, borderRadius: 12, overflow: 'hidden', border: `2px solid ${sel === i ? A : BD}`, padding: 0, cursor: 'pointer', flexShrink: 0 }}>
+                <button key={i} onClick={() => showImage(i)} style={{ width: 66, height: 66, borderRadius: 12, overflow: 'hidden', border: `2px solid ${sel === i ? A : BD}`, padding: 0, cursor: 'pointer', flexShrink: 0 }}>
                   <img src={im} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
               ))}

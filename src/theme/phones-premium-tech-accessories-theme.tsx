@@ -36,7 +36,7 @@ import {
   Phone, Mail, MessageCircle, MapPin, Star, Trash2, Minus, Plus, Check, AlertCircle, Home as HomeIcon,
   Truck, ShieldCheck, Headphones, Send, Smartphone, ArrowRight, BadgeCheck, CreditCard, Cable, Package, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1207,6 +1207,17 @@ export function Details({
     </div>
   );
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, imgs);
+    if (idx >= 0) goDot(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, imgs[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div className="tk-wrap" style={{ paddingTop: '22px', paddingBottom: '70px' }}>
 
@@ -1217,7 +1228,7 @@ export function Details({
               const el = e.currentTarget;
               if (!el.clientWidth) return;
               const i = Math.round(el.scrollLeft / el.clientWidth);
-              setSel(Math.abs(i));
+              setSel(Math.abs(i)); // السحب لا يغيّر اللون (التمرير الآلي يمر بصور أخرى)
             }}>
             {imgs.length === 0 && (
               <div className="tk-shot"><Placeholder size={56} /></div>
@@ -1242,7 +1253,7 @@ export function Details({
             <div className="tk-dots">
               {imgs.map((_, i) => (
                 <button key={i} type="button" className={`tk-dot${i === sel ? ' is-active' : ''}`}
-                  onClick={() => goDot(i)} aria-label={`${i + 1}`} />
+                  onClick={() => { showImage(i); goDot(i); }} aria-label={`${i + 1}`} />
               ))}
             </div>
           )}

@@ -33,7 +33,7 @@ import {
   Phone, Mail, MapPin, Star, Trash2, Minus, Plus, Check, AlertCircle, Zap,
   Truck, ShieldCheck, Headphones, Send, Footprints, ArrowRight, Flame, PackageCheck, MessageCircle, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1208,7 +1208,7 @@ export function Details({
   const go = (dir: number) => {
     if (imgs.length < 2) return;
     setImgErr(false);
-    setSel((s) => (s + dir + imgs.length) % imgs.length);
+    showImage((s) => (s + dir + imgs.length) % imgs.length);
   };
 
   const scrollToBuy = () => {
@@ -1231,6 +1231,17 @@ export function Details({
     </div>
   );
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, imgs);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, imgs[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div className="vx-wrap" style={{ paddingTop: '20px', paddingBottom: '90px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '.75rem', color: SUB, marginBottom: 16 }}>
@@ -1245,7 +1256,7 @@ export function Details({
             {imgs.length > 1 && (
               <div className="vx-film">
                 {imgs.map((u, i) => (
-                  <button key={i} type="button" onClick={() => { setSel(i); setImgErr(false); }}
+                  <button key={i} type="button" onClick={() => { showImage(i); setImgErr(false); }}
                     className={`vx-thumb${i === sel ? ' is-active' : ''}`} aria-label={`${i + 1}`}>
                     <img src={u} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   </button>

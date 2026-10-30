@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import DOMPurify from 'isomorphic-dompurify';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -887,6 +887,17 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
   const images: string[] = allImages?.length ? allImages : [product?.productImage].filter(Boolean);
   const currency = product?.store?.currency || 'DA';
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, images);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, images[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div className="container" style={{ padding: '2rem 1.5rem 4rem' }}>
       <div className="details-inner">
@@ -903,15 +914,15 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
             )}
             {images.length > 1 && (
               <>
-                <button onClick={() => setSel((s) => (s - 1 + images.length) % images.length)} style={{ position: 'absolute', insetInlineStart: 10, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 36, height: 36 }}>{t.dir === 'rtl' ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}</button>
-                <button onClick={() => setSel((s) => (s + 1) % images.length)} style={{ position: 'absolute', insetInlineEnd: 10, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 36, height: 36 }}>{t.dir === 'rtl' ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}</button>
+                <button onClick={() => showImage((s) => (s - 1 + images.length) % images.length)} style={{ position: 'absolute', insetInlineStart: 10, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 36, height: 36 }}>{t.dir === 'rtl' ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}</button>
+                <button onClick={() => showImage((s) => (s + 1) % images.length)} style={{ position: 'absolute', insetInlineEnd: 10, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: 36, height: 36 }}>{t.dir === 'rtl' ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}</button>
               </>
             )}
           </div>
           {images.length > 1 && (
             <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
               {images.map((img, i) => (
-                <button key={i} onClick={() => setSel(i)} style={{ width: 60, height: 60, flexShrink: 0, borderRadius: 4, overflow: 'hidden', border: `2px solid ${i === sel ? A : BD}`, padding: 0, background: 'none' }}>
+                <button key={i} onClick={() => showImage(i)} style={{ width: 60, height: 60, flexShrink: 0, borderRadius: 4, overflow: 'hidden', border: `2px solid ${i === sel ? A : BD}`, padding: 0, background: 'none' }}>
                   <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
               ))}

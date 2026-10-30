@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { showError } from '@/lib/showError';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, heroTextPanel } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -874,6 +874,17 @@ export function Home({ store, domain, page }: { store: any; domain: string; page
 ══════════════════════════════════════════════════════════════ */
 export function Details({ product, discount, allImages, domain, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, store }: any) {
   const [sel, setSel] = useState(0);
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, allImages);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, allImages[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   if (!product) return null;
   const t = withLocationLabels(T)[getLang(store || product?.store)];
   const isRTL = t.dir === 'rtl';
@@ -902,10 +913,10 @@ export function Details({ product, discount, allImages, domain, allAttrs, finalP
             
             {allImages?.length > 1 && (
               <>
-                <button onClick={() => setSel(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, border: '1px solid var(--line)', background: 'rgba(255,255,255,0.9)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+                <button onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, border: '1px solid var(--line)', background: 'rgba(255,255,255,0.9)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
                   <ChevronRight size={14} style={{ color: 'var(--ink)' }} />
                 </button>
-                <button onClick={() => setSel(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, border: '1px solid var(--line)', background: 'rgba(255,255,255,0.9)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+                <button onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, border: '1px solid var(--line)', background: 'rgba(255,255,255,0.9)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
                   <ChevronLeft size={14} style={{ color: 'var(--ink)' }} />
                 </button>
               </>
@@ -914,7 +925,7 @@ export function Details({ product, discount, allImages, domain, allAttrs, finalP
           {allImages?.length > 1 && (
             <div className="gg-gallery-thumbs">
               {allImages.map((src: string, i: number) => (
-                <div key={i} className={`gg-gallery-thumb${i === sel ? ' active' : ''}`} onClick={() => setSel(i)}>
+                <div key={i} className={`gg-gallery-thumb${i === sel ? ' active' : ''}`} onClick={() => showImage(i)}>
                   <img src={src} alt="" />
                 </div>
               ))}

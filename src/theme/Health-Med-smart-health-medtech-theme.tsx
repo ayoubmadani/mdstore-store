@@ -18,7 +18,7 @@ import {
   HeartPulse, Stethoscope, Ambulance, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1324,6 +1324,17 @@ export function Home({ store, page }: any) {
 
 export function Details({ product, toggleWishlist, isWishlisted, handleShare, discount, allImages, allAttrs, finalPrice, inStock, autoGen, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
   const [sel, setSel] = useState(0);
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, allImages);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, allImages[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   if (!product) return null;
   return (
@@ -1357,13 +1368,13 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
               )}
               {allImages.length > 1 && (
                 <>
-                  <button onClick={() => setSel(p => p===0?allImages.length-1:p-1)} style={{
+                  <button onClick={() => showImage(p => p===0?allImages.length-1:p-1)} style={{
                     position:'absolute', right:10, top:'50%', transform:'translateY(-50%)',
                     width:'34px', height:'34px', border:'1px solid var(--line)', borderRadius:'50%',
                     background:'rgba(255,255,255,0.9)', cursor:'pointer', display:'flex',
                     alignItems:'center', justifyContent:'center', color:'var(--sky)'
                   }}><ChevronRight size={14} /></button>
-                  <button onClick={() => setSel(p => p===allImages.length-1?0:p+1)} style={{
+                  <button onClick={() => showImage(p => p===allImages.length-1?0:p+1)} style={{
                     position:'absolute', left:10, top:'50%', transform:'translateY(-50%)',
                     width:'34px', height:'34px', border:'1px solid var(--line)', borderRadius:'50%',
                     background:'rgba(255,255,255,0.9)', cursor:'pointer', display:'flex',
@@ -1375,7 +1386,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             {allImages.length > 1 && (
               <div className="thumb-row">
                 {allImages.slice(0,5).map((img:string, idx:number) => (
-                  <button key={idx} onClick={() => setSel(idx)} style={{
+                  <button key={idx} onClick={() => showImage(idx)} style={{
                     width:'54px', height:'54px', overflow:'hidden', borderRadius:'8px',
                     border:`2px solid ${sel===idx?'var(--sky)':'var(--line)'}`,
                     cursor:'pointer', padding:0, background:'none', opacity:sel===idx?1:0.6

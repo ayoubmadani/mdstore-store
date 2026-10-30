@@ -17,7 +17,7 @@ import {
   Package, Clock, Heart, MessageCircle, Download
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 import { ProductAddons, addonsTotal } from '@/components/theme/ProductAddons';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
@@ -1041,6 +1041,17 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
     ? allImages
     : [product?.productImage, product?.imagesProduct?.[0]?.imageUrl].filter(Boolean) as string[];
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, imgs);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, imgs[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div className="luxe-container">
       <div className="luxe-details">
@@ -1056,14 +1067,14 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             )}
             {imgs.length > 1 && (
               <>
-                <button className="luxe-gallery-nav luxe-gallery-prev" onClick={() => setSel(s => (s - 1 + imgs.length) % imgs.length)}><ArrowRight size={20} style={{ transform: t.dir === 'rtl' ? 'none' : 'rotate(180deg)' }} /></button>
-                <button className="luxe-gallery-nav luxe-gallery-next" onClick={() => setSel(s => (s + 1) % imgs.length)}><ArrowRight size={20} style={{ transform: t.dir === 'rtl' ? 'rotate(180deg)' : 'none' }} /></button>
+                <button className="luxe-gallery-nav luxe-gallery-prev" onClick={() => showImage(s => (s - 1 + imgs.length) % imgs.length)}><ArrowRight size={20} style={{ transform: t.dir === 'rtl' ? 'none' : 'rotate(180deg)' }} /></button>
+                <button className="luxe-gallery-nav luxe-gallery-next" onClick={() => showImage(s => (s + 1) % imgs.length)}><ArrowRight size={20} style={{ transform: t.dir === 'rtl' ? 'rotate(180deg)' : 'none' }} /></button>
               </>
             )}
           </div>
           <div className="luxe-gallery-thumbs">
             {imgs.map((im, i) => (
-              <button key={i} className={`luxe-gallery-thumb ${sel === i ? 'active' : ''}`} onClick={() => setSel(i)}>
+              <button key={i} className={`luxe-gallery-thumb ${sel === i ? 'active' : ''}`} onClick={() => showImage(i)}>
                 <img src={im} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display='none'; }} />
               </button>
             ))}

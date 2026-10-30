@@ -17,7 +17,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -1138,6 +1138,17 @@ export function Details({ product, store, toggleWishlist, isWishlisted, discount
   const t = withLocationLabels(T)[getLang(store)];
   const cur = store?.currency || currencyLabel(t.currency);
   const [sel, setSel] = useState(0);
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, allImages);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, allImages[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   if (!product) return null;
   return (
     <div dir={t.dir} style={{ backgroundColor: 'var(--paper)', fontFamily: "'Space Mono',monospace" }}>
@@ -1163,7 +1174,7 @@ export function Details({ product, store, toggleWishlist, isWishlisted, discount
             {allImages.length > 1 && (
               <div style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', display: 'flex', flexDirection: 'column', gap: '5px' }}>
                 {allImages.slice(0, 5).map((img: string, idx: number) => (
-                  <button key={idx} onClick={() => setSel(idx)} style={{ width: '40px', height: '40px', overflow: 'hidden', border: `2px solid ${sel === idx ? 'var(--punch)' : 'rgba(255,255,255,0.3)'}`, cursor: 'pointer', opacity: sel === idx ? 1 : 0.5, padding: 0, background: 'none' }}>
+                  <button key={idx} onClick={() => showImage(idx)} style={{ width: '40px', height: '40px', overflow: 'hidden', border: `2px solid ${sel === idx ? 'var(--punch)' : 'rgba(255,255,255,0.3)'}`, cursor: 'pointer', opacity: sel === idx ? 1 : 0.5, padding: 0, background: 'none' }}>
                     <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   </button>
                 ))}

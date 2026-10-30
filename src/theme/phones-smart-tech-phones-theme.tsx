@@ -22,7 +22,7 @@ import {
   ChevronLeft, ChevronRight, Star, Trash2, Plus, Minus, Check, AlertCircle,
   Truck, ShieldCheck, CreditCard, Headphones, Smartphone, Send, Cpu, Package, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -1019,8 +1019,19 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
   const userId = store?.user?.id || product?.store?.userId;
 
   const mainImg = images[sel];
-  const move = (d: number) => setSel((p) => (images.length ? (p + d + images.length) % images.length : 0));
+  const move = (d: number) => showImage((p) => (images.length ? (p + d + images.length) % images.length : 0));
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, images);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, images[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div className="pt-container" style={{ padding: '2rem 1.5rem' }}>
       <div className="pt-details">
@@ -1049,7 +1060,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           {images.length > 1 && (
             <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap', paddingBottom: 4 }}>
               {images.map((im, i) => (
-                <button key={i} onClick={() => setSel(i)}
+                <button key={i} onClick={() => showImage(i)}
                   style={{ width: 72, height: 72, borderRadius: 12, overflow: 'hidden', flexShrink: 0, padding: 0, cursor: 'pointer', border: `2px solid ${i === sel ? A : BD}`, background: BG }}>
                   <img src={im} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 </button>

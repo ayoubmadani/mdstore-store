@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { Store } from '@/types/store';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -541,6 +541,17 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
   const [selImg, setSelImg] = useState(0);
   const isRTL = true;
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, allImages);
+    if (idx >= 0) setSelImg(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(selImg) : next;
+    setSelImg(idx);
+    const v = variantForImage(product?.attributes, allImages[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div style={S.body} dir={isRTL ? 'rtl' : 'ltr'}>
 
@@ -568,7 +579,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
             {allImages.length > 1 && (
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
                 {allImages.map((img: string, i: number) => (
-                  <button key={i} onClick={() => setSelImg(i)} style={{ width: 56, height: 56, flexShrink: 0, border: `2px solid ${selImg === i ? '#111' : '#e5e5e5'}`, borderRadius: 3, padding: 0, cursor: 'pointer', overflow: 'hidden', background: 'none' }}>
+                  <button key={i} onClick={() => showImage(i)} style={{ width: 56, height: 56, flexShrink: 0, border: `2px solid ${selImg === i ? '#111' : '#e5e5e5'}`, borderRadius: 3, padding: 0, cursor: 'pointer', overflow: 'hidden', background: 'none' }}>
                     <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
                   </button>
                 ))}

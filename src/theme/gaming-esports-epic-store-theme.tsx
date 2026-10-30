@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import axios from "axios";
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 import { useCartStore } from "@/store/useCartStore";
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 import {
   ShoppingCart, Search, Menu, X, ChevronDown, ChevronLeft, ChevronRight,
   Star, Trash2, Phone, Mail, MapPin, Send, AlertCircle, Minus, Plus,
@@ -847,6 +847,17 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 
   const mainSrc = imgs[sel] || "";
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, imgs);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, imgs[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div dir={t.dir} style={{ padding: "2rem 0" }}>
       <div style={container}>
@@ -861,10 +872,10 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               )}
               {imgs.length > 1 && (
                 <>
-                  <button onClick={() => { setSel((s) => (s - 1 + imgs.length) % imgs.length); setImgErr(false); }} style={{ position: "absolute", insetInlineStart: 10, top: "50%", transform: "translateY(-50%)", width: 34, height: 34, borderRadius: "50%", background: "rgba(10,10,15,.7)", border: `1px solid ${BD}`, color: TXT, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <button onClick={() => { showImage((s) => (s - 1 + imgs.length) % imgs.length); setImgErr(false); }} style={{ position: "absolute", insetInlineStart: 10, top: "50%", transform: "translateY(-50%)", width: 34, height: 34, borderRadius: "50%", background: "rgba(10,10,15,.7)", border: `1px solid ${BD}`, color: TXT, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     {t.dir === "rtl" ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
                   </button>
-                  <button onClick={() => { setSel((s) => (s + 1) % imgs.length); setImgErr(false); }} style={{ position: "absolute", insetInlineEnd: 10, top: "50%", transform: "translateY(-50%)", width: 34, height: 34, borderRadius: "50%", background: "rgba(10,10,15,.7)", border: `1px solid ${BD}`, color: TXT, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <button onClick={() => { showImage((s) => (s + 1) % imgs.length); setImgErr(false); }} style={{ position: "absolute", insetInlineEnd: 10, top: "50%", transform: "translateY(-50%)", width: 34, height: 34, borderRadius: "50%", background: "rgba(10,10,15,.7)", border: `1px solid ${BD}`, color: TXT, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     {t.dir === "rtl" ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
                   </button>
                 </>
@@ -876,7 +887,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             {imgs.length > 1 && (
               <div style={{ display: "flex", gap: 6, flexWrap: 'wrap', paddingBottom: 4 }}>
                 {imgs.map((url: string, i: number) => (
-                  <button key={i} onClick={() => { setSel(i); setImgErr(false); }} style={{ width: 64, height: 64, borderRadius: 6, overflow: "hidden", border: `2px solid ${sel === i ? A : BD}`, padding: 0, cursor: "pointer", flexShrink: 0, background: C2 }}>
+                  <button key={i} onClick={() => { showImage(i); setImgErr(false); }} style={{ width: 64, height: 64, borderRadius: 6, overflow: "hidden", border: `2px solid ${sel === i ? A : BD}`, padding: 0, cursor: "pointer", flexShrink: 0, background: C2 }}>
                     <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   </button>
                 ))}

@@ -27,7 +27,7 @@ import {
   Send, Home as HomeIcon, Wrench, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1257,12 +1257,12 @@ export function Details({
   const original = Number(product?.priceOriginal || 0);
   const price = Number(finalPrice ?? product?.price ?? 0);
 
-  useEffect(() => { setSel(0); setImgErr(false); }, [product?.id]);
+  useEffect(() => { showImage(0); setImgErr(false); }, [product?.id]);
 
   const go = (dir: number) => {
     if (gallery.length < 2) return;
     setImgErr(false);
-    setSel((s) => (s + dir + gallery.length) % gallery.length);
+    showImage((s) => (s + dir + gallery.length) % gallery.length);
   };
 
   const navBtn: React.CSSProperties = {
@@ -1272,6 +1272,17 @@ export function Details({
     cursor: 'pointer', zIndex: 3, color: INK,
   };
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, gallery);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, gallery[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div className="ae-container" style={{ padding: '2rem 1.25rem 0' }}>
       <Styles />
@@ -1306,7 +1317,7 @@ export function Details({
           {gallery.length > 1 ? (
             <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap', paddingBottom: 4 }}>
               {gallery.map((g, i) => (
-                <button key={i} onClick={() => { setSel(i); setImgErr(false); }} aria-label={`${t.prevImg} ${i + 1}`}
+                <button key={i} onClick={() => { showImage(i); setImgErr(false); }} aria-label={`${t.prevImg} ${i + 1}`}
                   style={{
                     width: 66, height: 66, flexShrink: 0, padding: 0, cursor: 'pointer', overflow: 'hidden',
                     border: `2px solid ${i === sel ? INK : BD}`, borderRadius: 2, background: SURF,

@@ -18,7 +18,7 @@ import {
     ArrowLeft, Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, heroTextPanel } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1144,11 +1144,21 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
     const isRTL = lang === 'ar';
     const [sel, setSel] = useState(0);
     // توليد رقم عشوائي بين 0 و 10000
-    const id = Math.floor(Math.random() * 10001);
-
-    // اختيار لوحة الألوان باستخدام "باقي القسمة" لضمان عدم تخطي طول المصفوفة
+    // لوحة ثابتة لكل منتج (لا عشوائية — كانت تتغير مع كل اختيار)
+    const id = [...String(product?.id || '')].reduce((n, c) => n + c.charCodeAt(0), 0);
     const pal = PALETTES[id % PALETTES.length];
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, allImages);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, allImages[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
     return (
         <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: '4rem' }}>
             <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2.5rem 1.5rem' }}>
@@ -1163,15 +1173,15 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                             {discount > 0 && <div style={{ position: 'absolute', top: 14, right: 14, background: pal.accent, color: '#fff', padding: '4px 14px', borderRadius: 8, fontFamily: "'Boogaloo',cursive", fontSize: '1rem' }}>{discount}% خصم</div>}
                             {allImages.length > 1 && (
                                 <>
-                                    <button onClick={() => setSel(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,0.9)', border: `2px solid ${pal.border}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={18} /></button>
-                                    <button onClick={() => setSel(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,0.9)', border: `2px solid ${pal.border}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={18} /></button>
+                                    <button onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,0.9)', border: `2px solid ${pal.border}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={18} /></button>
+                                    <button onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,0.9)', border: `2px solid ${pal.border}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={18} /></button>
                                 </>
                             )}
                         </div>
                         {allImages.length > 1 && (
                             <div className="thumb-row">
                                 {allImages.map((img: string, idx: number) => (
-                                    <button key={idx} onClick={() => setSel(idx)} style={{ flexShrink: 0, width: 62, height: 62, borderRadius: 12, overflow: 'hidden', border: `3px solid ${sel === idx ? pal.border : 'var(--border)'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.2s' }}>
+                                    <button key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 62, height: 62, borderRadius: 12, overflow: 'hidden', border: `3px solid ${sel === idx ? pal.border : 'var(--border)'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.2s' }}>
                                         <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     </button>
                                 ))}

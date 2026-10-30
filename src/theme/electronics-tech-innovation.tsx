@@ -25,7 +25,7 @@ import {
   ChevronLeft, ChevronRight, Trash2, Cpu, Truck, ShieldCheck, Lock,
   Headphones, AlertCircle, CheckCircle2, Minus, Plus, Zap, Star, Send, Package, MessageCircle, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1150,9 +1150,20 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
     ? allImages
     : [getImg(product)].filter(Boolean);
 
-  const next = () => setSel((s) => (s + 1) % Math.max(images.length, 1));
-  const prev = () => setSel((s) => (s - 1 + Math.max(images.length, 1)) % Math.max(images.length, 1));
+  const next = () => showImage((s) => (s + 1) % Math.max(images.length, 1));
+  const prev = () => showImage((s) => (s - 1 + Math.max(images.length, 1)) % Math.max(images.length, 1));
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, images);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, images[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div className="ti-container" style={{ padding: '2rem 1.5rem 3rem' }}>
       <div className="ti-details-inner">
@@ -1187,7 +1198,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
           {images.length > 1 && (
             <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap', paddingBottom: 4 }}>
               {images.map((img, i) => (
-                <button key={i} onClick={() => setSel(i)} aria-label={`image ${i + 1}`} style={{
+                <button key={i} onClick={() => showImage(i)} aria-label={`image ${i + 1}`} style={{
                   width: 68, height: 68, flexShrink: 0, borderRadius: 4, overflow: 'hidden', cursor: 'pointer',
                   border: sel === i ? `2px solid ${A}` : `1px solid ${BD}`, background: CARD, padding: 0,
                 }}>

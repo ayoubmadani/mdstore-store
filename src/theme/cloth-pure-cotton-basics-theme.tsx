@@ -9,7 +9,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import { ShoppingBag, Search, Menu, X, ChevronLeft, ChevronRight, Trash2, Plus, Minus, Check, MapPin, Phone, Mail, Package, Truck, MessageCircle, Download } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -905,6 +905,17 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
   const [sel, setSel] = useState(0);
   const images: string[] = allImages?.length ? allImages : [product?.productImage].filter(Boolean);
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, images);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, images[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div className="pc-det-grid" style={{ maxWidth: 1240, margin: '0 auto', padding: '36px 20px 70px' }}>
       {/* GALLERY */}
@@ -916,15 +927,15 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           )}
           {images.length > 1 && (
             <>
-              <button className="pc-btn" onClick={() => setSel((s) => (s - 1 + images.length) % images.length)} style={{ position: 'absolute', top: '50%', insetInlineStart: 10, transform: 'translateY(-50%)', background: '#fff', borderRadius: '50%', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={18} /></button>
-              <button className="pc-btn" onClick={() => setSel((s) => (s + 1) % images.length)} style={{ position: 'absolute', top: '50%', insetInlineEnd: 10, transform: 'translateY(-50%)', background: '#fff', borderRadius: '50%', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={18} /></button>
+              <button className="pc-btn" onClick={() => showImage((s) => (s - 1 + images.length) % images.length)} style={{ position: 'absolute', top: '50%', insetInlineStart: 10, transform: 'translateY(-50%)', background: '#fff', borderRadius: '50%', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={18} /></button>
+              <button className="pc-btn" onClick={() => showImage((s) => (s + 1) % images.length)} style={{ position: 'absolute', top: '50%', insetInlineEnd: 10, transform: 'translateY(-50%)', background: '#fff', borderRadius: '50%', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={18} /></button>
             </>
           )}
         </div>
         {images.length > 1 && (
           <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
             {images.map((img, i) => (
-              <button key={i} className="pc-btn" onClick={() => setSel(i)} style={{ padding: 0, width: 64, height: 64, border: i === sel ? '2px solid var(--thread-red)' : '1.5px dashed var(--cotton-300)', borderRadius: 2, overflow: 'hidden', background: 'none' }}>
+              <button key={i} className="pc-btn" onClick={() => showImage(i)} style={{ padding: 0, width: 64, height: 64, border: i === sel ? '2px solid var(--thread-red)' : '1.5px dashed var(--cotton-300)', borderRadius: 2, overflow: 'hidden', background: 'none' }}>
                 <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </button>
             ))}

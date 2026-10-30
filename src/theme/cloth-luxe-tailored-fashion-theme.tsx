@@ -10,7 +10,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import { Star, ChevronDown, AlertCircle, X, CheckCircle2, Shield, ArrowLeft, Plus, Minus, Search, ShoppingCart, Trash2, Loader2, ChevronLeft, ChevronRight, Phone, Package, Truck, Mail, MessageCircle, Download } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -700,6 +700,17 @@ export function Details({product,discount,allImages,allAttrs,finalPrice,inStock,
   const t = withLocationLabels(T)[getLang(store || product?.store)];
   const cur = (store || product?.store)?.currency || currencyLabel(t.currency);
   const [sel,setSel]=useState(0);
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, allImages);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, allImages[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   if(!product)return null;
   return(
     <div dir={t.dir} style={{background:'var(--bg)',fontFamily:"'Raleway',sans-serif"}}>
@@ -714,10 +725,10 @@ export function Details({product,discount,allImages,allAttrs,finalPrice,inStock,
             
             {allImages.length>1&&(
               <>
-                <button onClick={()=>setSel(p=>p===0?allImages.length-1:p-1)} style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',width:34,height:34,background:'rgba(14,12,10,.6)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--tx)'}}><ChevronRight size={14}/></button>
-                <button onClick={()=>setSel(p=>p===allImages.length-1?0:p+1)} style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',width:34,height:34,background:'rgba(14,12,10,.6)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--tx)'}}><ChevronLeft size={14}/></button>
+                <button onClick={()=>showImage(p=>p===0?allImages.length-1:p-1)} style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',width:34,height:34,background:'rgba(14,12,10,.6)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--tx)'}}><ChevronRight size={14}/></button>
+                <button onClick={()=>showImage(p=>p===allImages.length-1?0:p+1)} style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',width:34,height:34,background:'rgba(14,12,10,.6)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--tx)'}}><ChevronLeft size={14}/></button>
                 <div style={{position:'absolute',bottom:12,left:0,right:0,display:'flex',justifyContent:'center',gap:4}}>
-                  {allImages.map((_:string,i:number)=><button key={i} onClick={()=>setSel(i)} style={{width:i===sel?20:6,height:6,background:i===sel?'var(--cp)':'rgba(245,241,235,0.3)',border:'none',cursor:'pointer',borderRadius:3,transition:'all .25s'}}/>)}
+                  {allImages.map((_:string,i:number)=><button key={i} onClick={()=>showImage(i)} style={{width:i===sel?20:6,height:6,background:i===sel?'var(--cp)':'rgba(245,241,235,0.3)',border:'none',cursor:'pointer',borderRadius:3,transition:'all .25s'}}/>)}
                 </div>
               </>
             )}

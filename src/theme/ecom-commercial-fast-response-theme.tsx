@@ -29,7 +29,7 @@ import {
   ChevronLeft, ChevronRight, Star, Truck, ShieldCheck, Lock, Headphones,
   Trash2, Plus, Minus, CheckCircle, AlertCircle, Package, ArrowLeft, ArrowRight, MessageCircle, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1010,6 +1010,17 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
   const original = Number(product?.priceOriginal || 0);
   const mainImg = uniqueImages[sel];
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, uniqueImages);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, uniqueImages[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div className="hn-container hn-details-wrap" style={{ padding: '2rem 1.5rem 3rem' }}>
       {/* breadcrumb */}
@@ -1033,9 +1044,9 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
               )}
               {uniqueImages.length > 1 && (
                 <>
-                  <button onClick={() => { setSel((s) => (s - 1 + uniqueImages.length) % uniqueImages.length); setMainErr(false); }}
+                  <button onClick={() => { showImage((s) => (s - 1 + uniqueImages.length) % uniqueImages.length); setMainErr(false); }}
                     style={navArrow('start')}>{t.dir === 'rtl' ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}</button>
-                  <button onClick={() => { setSel((s) => (s + 1) % uniqueImages.length); setMainErr(false); }}
+                  <button onClick={() => { showImage((s) => (s + 1) % uniqueImages.length); setMainErr(false); }}
                     style={navArrow('end')}>{t.dir === 'rtl' ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}</button>
                 </>
               )}
@@ -1046,7 +1057,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
           {uniqueImages.length > 1 && (
             <div className="hn-thumbs">
               {uniqueImages.map((im, i) => (
-                <button key={i} onClick={() => { setSel(i); setMainErr(false); }}
+                <button key={i} onClick={() => { showImage(i); setMainErr(false); }}
                   style={{ width: 72, height: 72, borderRadius: 10, overflow: 'hidden', flexShrink: 0, cursor: 'pointer', padding: 0, background: BG, border: `2px solid ${i === sel ? A : BD}` }}>
                   <img src={im} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 </button>
