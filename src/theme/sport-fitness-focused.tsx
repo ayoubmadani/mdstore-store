@@ -1654,7 +1654,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
                       <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})}
                         className={`inp${errors.customerWelaya?' inp-err':''}`} style={isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}}
                         onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerWelaya?'#ef4444':'var(--dim)';}}>
-                        <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {isRTL?w.ar_name:w.name}</option>)}
+                        <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.code ?? w.id} - {isRTL?w.ar_name:w.name}</option>)}
                       </select>
                     </div>
                   </FR>
@@ -1872,7 +1872,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
                     <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})} className={`inp${errors.w?' inp-err':''}`} style={isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}}
                       onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.w?'#ef4444':'var(--dim)';}}>
-                      <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {isRTL?w.ar_name:w.name}</option>)}
+                      <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.code ?? w.id} - {isRTL?w.ar_name:w.name}</option>)}
                     </select>
                   </div>
                 </FR>

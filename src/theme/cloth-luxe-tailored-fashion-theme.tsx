@@ -915,7 +915,7 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
                 <div style={{position:'relative'}}>
                   <ChevronDown style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',width:12,height:12,color:'var(--mu)',pointerEvents:'none'}}/>
                   <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})} style={{...IS(!!errors.w),paddingLeft:30}} onFocus={onF} onBlur={e=>onBl(e,!!errors.w)}>
-                    <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                    <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.code ?? w.id} - {w.ar_name}</option>)}
                   </select>
                 </div>
               </FR>
@@ -1086,7 +1086,7 @@ export function Cart({domain,store}:{domain:string;store:any}){
             </div>
             <div className="f2">
               <FR label={t.wilaya} error={errors.w}>
-                <div style={{position:'relative'}}><ChevronDown style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',width:12,height:12,color:'var(--mu)',pointerEvents:'none'}}/><select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})} style={{...IS(!!errors.w),paddingLeft:30}} onFocus={onF} onBlur={e=>onBl(e,!!errors.w)}><option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}</select></div>
+                <div style={{position:'relative'}}><ChevronDown style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',width:12,height:12,color:'var(--mu)',pointerEvents:'none'}}/><select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})} style={{...IS(!!errors.w),paddingLeft:30}} onFocus={onF} onBlur={e=>onBl(e,!!errors.w)}><option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.code ?? w.id} - {w.ar_name}</option>)}</select></div>
               </FR>
               <FR label={t.commune} error={errors.c}>
                 <div style={{position:'relative'}}><ChevronDown style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',width:12,height:12,color:'var(--mu)',pointerEvents:'none'}}/><select value={fd.customerCommune} disabled={lcC||!fd.customerWelaya} onChange={e=>setFd({...fd,customerCommune:e.target.value})} style={{...IS(!!errors.c),paddingLeft:30,opacity:!fd.customerWelaya?0.5:1}} onFocus={onF} onBlur={e=>onBl(e,!!errors.c)}><option value="">{lcC?'...':t.communePh}</option>{communes.map(c=><option key={c.id} value={c.id}>{c.ar_name}</option>)}</select></div>

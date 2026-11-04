@@ -255,7 +255,7 @@ interface Attribute { id: string; type: string; name: string; displayMode?: 'col
 interface ProductImage { id: string; imageUrl: string; }
 interface VariantAttributeEntry { attrId: string; attrName: string; displayMode: 'color' | 'image' | 'text'; value: string; }
 interface VariantDetail { id: string | number; name: VariantAttributeEntry[]; price: number; stock: number; autoGenerate: boolean; }
-interface Wilaya { id: string; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
+interface Wilaya { id: string; code?: number; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
 interface Commune { id: string; name: string; ar_name: string; wilayaId: string; }
 export interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
@@ -1772,7 +1772,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                         className={`inp${errors.customerWelaya ? ' inp-err' : ''}`} style={{ paddingInlineEnd: '34px' }}
                         onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.customerWelaya ? 'var(--pink)' : 'var(--dim)'; }}>
                         <option value="">{t.wilayaPh}</option>
-                        {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                        {wilayas.map(w => <option key={w.id} value={w.id}>{w.code ?? w.id} - {w.ar_name}</option>)}
                       </select>
                     </div>
                   </FR>
@@ -2113,7 +2113,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                         className={`inp${errors.welaya ? ' inp-err' : ''}`} style={{ paddingInlineEnd: '34px' }}
                         onFocus={e => { e.target.style.borderColor = 'var(--cyan)'; }} onBlur={e => { e.target.style.borderColor = errors.welaya ? 'var(--pink)' : 'var(--dim)'; }}>
                         <option value="">{t.wilayaPh}</option>
-                        {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                        {wilayas.map(w => <option key={w.id} value={w.id}>{w.code ?? w.id} - {w.ar_name}</option>)}
                       </select>
                     </div>
                     {errors.welaya && <p style={{ fontSize: '11px', color: 'var(--pink)', marginTop: '4px' }}>{errors.welaya}</p>}

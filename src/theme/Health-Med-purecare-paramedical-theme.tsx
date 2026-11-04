@@ -187,7 +187,7 @@ interface Attribute { id: string; type: string; name: string; displayMode?: 'col
 interface ProductImage { id: string; imageUrl: string; }
 interface VariantAttributeEntry { attrId: string; attrName: string; displayMode: 'color' | 'image' | 'text'; value: string; }
 interface VariantDetail { id: string | number; name: VariantAttributeEntry[]; price: number; stock: number; autoGenerate: boolean; }
-interface Wilaya { id: string; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
+interface Wilaya { id: string; code?: number; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
 interface Commune { id: string; name: string; ar_name: string; wilayaId: string; }
 export interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
@@ -1525,7 +1525,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                       <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}
                         style={{ ...INP(!!errors.customerWelaya), paddingRight: '30px' }}
                         onFocus={onF} onBlur={e => onB(e, !!errors.customerWelaya)}>
-                        <option value="">{t.wilayaPh}</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                        <option value="">{t.wilayaPh}</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.code ?? w.id} - {w.ar_name}</option>)}
                       </select>
                     </div>
                   </FR>
@@ -1742,7 +1742,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               ))}
 
               <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '12px' }}>
-                {[{ label: t.wilaya, key: 'customerWelaya', err: 'welaya', disabled: wilayas.length === 1, opts: wilayas.map(w => ({ value: w.id, label: `${w.id} - ${w.ar_name}` })) }, { label: t.commune, key: 'customerCommune', err: 'commune', opts: communes.map(c => ({ value: c.id, label: c.ar_name })), disabled: loadingC || !fd.customerWelaya }].map(f => (
+                {[{ label: t.wilaya, key: 'customerWelaya', err: 'welaya', disabled: wilayas.length === 1, opts: wilayas.map(w => ({ value: w.id, label: `${w.code ?? w.id} - ${w.ar_name}` })) }, { label: t.commune, key: 'customerCommune', err: 'commune', opts: communes.map(c => ({ value: c.id, label: c.ar_name })), disabled: loadingC || !fd.customerWelaya }].map(f => (
                   <div key={f.key}>
                     <label style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--mid)', marginBottom: '6px', display: 'block' }}>{f.label} *</label>
                     <div style={{ position: 'relative' }}>

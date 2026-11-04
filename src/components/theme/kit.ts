@@ -9,7 +9,7 @@ export { ProductAddons, activeAddons, addonsTotal, addonsLabel } from './Product
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
-export interface Wilaya { id: string; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number }
+export interface Wilaya { id: string; code?: number; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number }
 export interface Commune { id: string; name: string; ar_name: string; wilayaId: string }
 
 /** ولايات وأسعار التوصيل لحساب الشحن الذي يستعمله المتجر */
@@ -57,6 +57,8 @@ export function sendContactMessage(payload: { name: string; email: string; phone
 /** هاتف جزائري صالح: 05/06/07 + 8 أرقام (أو +213) */
 // دولة المتجر وعملته — يضبطهما StoreProvider من بيانات المتجر (وأيضاً fetchWilayas)؛ الجزائر افتراضياً
 let storeCountry = 'DZ';
+// الجزائر بتقسيم 69 ولاية (DN) تُعامل كالجزائر: نفس العملة والهاتف وأسماء الثيمات
+const isAlgeria = () => storeCountry === 'DZ' || storeCountry === 'DN';
 let storeCurrency = 'DZD';
 type LevelNames = { ar?: string; fr?: string; en?: string };
 type Levels = { region?: LevelNames; locality?: LevelNames } | null;
@@ -89,7 +91,7 @@ function relabel(text: string, lang: string): string {
 const relabelCache = new Map<string, unknown>();
 /** نصوص الثيم بأسماء ولاية/بلدية دولة المتجر: const t = withLocationLabels(T)[lang] */
 export function withLocationLabels<D extends Record<string, any>>(dict: D): D {
-  if (storeCountry === 'DZ' || !storeLevels) return dict;
+  if (isAlgeria() || !storeLevels) return dict;
   return new Proxy(dict, {
     get(target, lang: string | symbol) {
       const val = (target as any)[lang];
@@ -105,9 +107,10 @@ export function withLocationLabels<D extends Record<string, any>>(dict: D): D {
   });
 }
 /** رمز العملة: النص الذي يعرضه الثيم (دج/DA) في الجزائر، وعملة المتجر في الدول الأخرى */
-export const currencyLabel = (dzLabel: string) => (storeCountry === 'DZ' ? dzLabel : storeCurrency);
+export const currencyLabel = (dzLabel: string) => (isAlgeria() ? dzLabel : storeCurrency);
 const PHONE_PATTERNS: Record<string, RegExp> = {
   DZ: /^(0|\+213)[5-7]\d{8}$/,
+  DN: /^(0|\+213)[5-7]\d{8}$/,
   TN: /^(\+216)?[2459]\d{7}$/,
 };
 /** يفحص الهاتف حسب دولة المتجر (الاسم باقٍ للتوافق مع الثيمات المرفوعة) */

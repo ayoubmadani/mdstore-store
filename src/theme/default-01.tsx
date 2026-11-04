@@ -845,7 +845,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <FR label="الولاية" error={errors.customerWelaya}>
                 <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...S.inputBase, appearance: 'none' as any }}>
                   <option value="">اختر الولاية</option>
-                  {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                  {wilayas.map(w => <option key={w.id} value={w.id}>{w.code ?? w.id} - {w.ar_name}</option>)}
                 </select>
               </FR>
               <FR label="البلدية" error={errors.customerCommune}>

@@ -1566,7 +1566,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                       <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})}
                         style={{...INP(!!errors.customerWelaya),paddingInlineEnd:'34px'}}
                         onFocus={onFocus} onBlur={e=>onBlur(e,!!errors.customerWelaya)}>
-                        <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                        <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.code ?? w.id} - {w.ar_name}</option>)}
                       </select>
                     </div>
                   </FR>
@@ -1799,7 +1799,7 @@ export function Cart({ domain, store }: { domain:string; store:any }) {
                   <div style={{position:'relative'}}>
                     <ChevronDown style={{position:'absolute',top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none',...(isRTL?{right:'12px'}:{left:'12px'})}}/>
                     <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})} style={{...INP(!!errors.w),paddingInlineEnd:'34px'}} onFocus={onFocus} onBlur={e=>onBlur(e,!!errors.w)}>
-                      <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                      <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.code ?? w.id} - {w.ar_name}</option>)}
                     </select>
                   </div>
                 </FR>

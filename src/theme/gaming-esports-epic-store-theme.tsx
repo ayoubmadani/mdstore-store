@@ -27,7 +27,7 @@ interface Attribute { id: string; type: string; name: string; displayMode?: "col
 interface ProductImage { id: string; imageUrl: string; }
 interface VariantAttributeEntry { attrId: string; attrName: string; displayMode: "color" | "image" | "text"; value: string; }
 interface VariantDetail { id: string | number; name: VariantAttributeEntry[]; price: number; stock: number; autoGenerate: boolean; }
-interface Wilaya { id: string; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
+interface Wilaya { id: string; code?: number; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
 interface Commune { id: string; name: string; ar_name: string; wilayaId: string; }
 interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
@@ -1189,7 +1189,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                     <ChevronDown size={12} style={{ position: "absolute", insetInlineStart: 10, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: SUB }} />
                     <select value={fd.customerWelaya} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: "" })} disabled={wilayas.length <= 1} style={{ ...inputBase, paddingInlineStart: 30, direction: isRTL ? "rtl" : "ltr", borderColor: errors.customerWelaya ? "#EF4444" : BD }}>
                       <option value="">{wilayas.length === 0 ? t.wilayaNA : t.wilayaPh}</option>
-                      {wilayas.map((w) => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                      {wilayas.map((w) => <option key={w.id} value={w.id}>{w.code ?? w.id} - {w.ar_name}</option>)}
                     </select>
                   </div>
                 </FormField>
@@ -1420,7 +1420,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     <ChevronDown size={12} style={{ position: "absolute", insetInlineStart: 10, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: SUB }} />
                     <select value={fd.customerWelaya} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: "" })} disabled={wilayas.length <= 1} style={{ ...inputBase, paddingInlineStart: 30, direction: isRTL ? "rtl" : "ltr", borderColor: errors.customerWelaya ? "#EF4444" : BD }}>
                       <option value="">{wilayas.length === 0 ? t.wilayaNA : t.wilayaPh}</option>
-                      {wilayas.map((w) => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                      {wilayas.map((w) => <option key={w.id} value={w.id}>{w.code ?? w.id} - {w.ar_name}</option>)}
                     </select>
                   </div>
                   {errors.customerWelaya && <p style={{ fontSize: "0.73rem", color: "#EF4444", marginTop: 4, display: "flex", alignItems: "center", gap: 3 }}><AlertCircle size={10} />{errors.customerWelaya}</p>}

@@ -38,7 +38,7 @@ interface Attribute { id: string; type: string; name: string; displayMode?: 'col
 interface ProductImage { id: string; imageUrl: string; }
 interface VariantAttributeEntry { attrId: string; attrName: string; displayMode: 'color' | 'image' | 'text'; value: string; }
 interface VariantDetail { id: string | number; name: VariantAttributeEntry[]; price: number; stock: number; autoGenerate: boolean; }
-interface Wilaya { id: string; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
+interface Wilaya { id: string; code?: number; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
 interface Commune { id: string; name: string; ar_name: string; wilayaId: string; }
 
 interface Product {
@@ -1609,7 +1609,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
                       style={{ paddingInlineEnd: 36 }}>
                       <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
                       {wilayas.map((w) => (
-                        <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>
+                        <option key={w.id} value={w.id}>{w.code ?? w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>
                       ))}
                     </select>
                   </div>
@@ -1913,7 +1913,7 @@ export function Cart({ domain, store }: any) {
                   style={{ paddingInlineEnd: 36 }}>
                   <option value="">{wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
                   {wilayas.map((w) => (
-                    <option key={w.id} value={w.id}>{w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>
+                    <option key={w.id} value={w.id}>{w.code ?? w.id} - {t.dir === 'rtl' ? w.ar_name : w.name}</option>
                   ))}
                 </select>
               </div>

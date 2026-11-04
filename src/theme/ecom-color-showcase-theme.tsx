@@ -287,7 +287,7 @@ interface Attribute { id: string; type: string; name: string; displayMode?: 'col
 interface ProductImage { id: string; imageUrl: string; }
 interface VariantAttributeEntry { attrId: string; attrName: string; displayMode: 'color' | 'image' | 'text'; value: string; }
 interface VariantDetail { id: string | number; name: VariantAttributeEntry[]; price: number; stock: number; autoGenerate: boolean; }
-interface Wilaya { id: string; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
+interface Wilaya { id: string; code?: number; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
 interface Commune { id: string; name: string; ar_name: string; wilayaId: string; }
 export interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
@@ -1176,7 +1176,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                       <MapPin size={16} /><ChevronDown size={15} className="cs-chev" />
                       <select className={cls(errors.customerWelaya)} value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}>
                         <option value="">{wilayas.length ? t.wilayaPh : t.wilayaNA}</option>
-                        {wilayas.map((w) => <option key={w.id} value={w.id}>{w.id} - {lang === 'ar' ? w.ar_name : w.name}</option>)}
+                        {wilayas.map((w) => <option key={w.id} value={w.id}>{w.code ?? w.id} - {lang === 'ar' ? w.ar_name : w.name}</option>)}
                       </select>
                     </div>
                   </FR>
@@ -1355,7 +1355,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               <FR error={errors.w} label={t.wilaya}>
                 <div className="cs-field"><MapPin size={16} /><ChevronDown size={15} className="cs-chev" />
                   <select className={cls(errors.w)} value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={(e) => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })}>
-                    <option value="">{t.wilayaPh}</option>{wilayas.map((w) => <option key={w.id} value={w.id}>{w.id} - {lang === 'ar' ? w.ar_name : w.name}</option>)}
+                    <option value="">{t.wilayaPh}</option>{wilayas.map((w) => <option key={w.id} value={w.id}>{w.code ?? w.id} - {lang === 'ar' ? w.ar_name : w.name}</option>)}
                   </select>
                 </div>
               </FR>

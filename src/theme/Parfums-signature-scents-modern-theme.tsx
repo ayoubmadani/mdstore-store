@@ -47,7 +47,7 @@ interface Attribute { id: string; type: string; name: string; displayMode?: 'col
 interface ProductImage { id: string; imageUrl: string; }
 interface VariantAttributeEntry { attrId: string; attrName: string; displayMode: 'color' | 'image' | 'text'; value: string; }
 interface VariantDetail { id: string | number; name: VariantAttributeEntry[]; price: number; stock: number; autoGenerate: boolean; }
-interface Wilaya { id: string; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
+interface Wilaya { id: string; code?: number; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
 interface Commune { id: string; name: string; ar_name: string; wilayaId: string; }
 
 interface Product {
@@ -1305,7 +1305,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                   <ChevronDown size={12} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
                   <select disabled={wilayas.length <= 1} value={fd.customerWelaya} onChange={(e) => setFd((s) => ({ ...s, customerWelaya: e.target.value, customerCommune: '' }))} className="input-field" style={{ ...inputBase, paddingLeft: 36, ...(errors.customerWelaya ? { borderColor: '#EF4444' } : {}) }}>
                     <option value="">{wilayas.length === 0 ? t.wilayaNA : t.wilayaPh}</option>
-                    {wilayas.map((w) => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                    {wilayas.map((w) => <option key={w.id} value={w.id}>{w.code ?? w.id} - {w.ar_name}</option>)}
                   </select>
                 </div>
                 <div style={{ position: 'relative' }}>
@@ -1521,7 +1521,7 @@ export function Cart({ domain, store }: any) {
             <div className="form-row-2">
               <select disabled={wilayas.length <= 1} value={fd.customerWelaya} onChange={(e) => setFd((s) => ({ ...s, customerWelaya: e.target.value, customerCommune: '' }))} className="input-field" style={inputBase}>
                 <option value="">{wilayas.length === 0 ? t.wilayaNA : t.wilayaPh}</option>
-                {wilayas.map((w) => <option key={w.id} value={w.id}>{w.id} - {w.ar_name}</option>)}
+                {wilayas.map((w) => <option key={w.id} value={w.id}>{w.code ?? w.id} - {w.ar_name}</option>)}
               </select>
               <select disabled={!fd.customerWelaya || loadingC} value={fd.customerCommune} onChange={(e) => setFd((s) => ({ ...s, customerCommune: e.target.value }))} className="input-field" style={inputBase}>
                 <option value="">{loadingC ? t.communeLoading : t.communePh}</option>

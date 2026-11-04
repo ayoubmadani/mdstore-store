@@ -179,7 +179,7 @@ interface Attribute { id: string; type: string; name: string; displayMode?: 'col
 interface ProductImage { id: string; imageUrl: string; }
 interface VariantAttributeEntry { attrId: string; attrName: string; displayMode: 'color' | 'image' | 'text'; value: string; }
 interface VariantDetail { id: string | number; name: VariantAttributeEntry[]; price: number; stock: number; autoGenerate: boolean; }
-interface Wilaya { id: string; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
+interface Wilaya { id: string; code?: number; name: string; ar_name: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number; }
 interface Commune { id: string; name: string; ar_name: string; wilayaId: string; }
 export interface Product {
   id: string; name: string; price: string | number; priceOriginal?: string | number; desc?: string;
@@ -1647,7 +1647,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                         style={{ ...INP_ST(!!errors.customerWelaya), paddingInlineEnd: '32px', fontFamily: 'inherit' }}
                         onFocus={e => { e.target.style.borderColor = 'var(--plum)'; }} onBlur={e => { e.target.style.borderColor = errors.customerWelaya ? 'var(--rose)' : 'var(--line-dk)'; }}>
                         <option value="">{t.wilayaPh}</option>
-                        {wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {isRTL ? w.ar_name : w.name}</option>)}
+                        {wilayas.map(w => <option key={w.id} value={w.id}>{w.code ?? w.id} - {isRTL ? w.ar_name : w.name}</option>)}
                       </select>
                     </div>
                   </FR>
@@ -1850,7 +1850,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <div style={{ position: 'relative' }}>
                   <ChevronDown style={{ position: 'absolute', ...(isRTL ? { left: '11px' } : { right: '11px' }), top: '50%', transform: 'translateY(-50%)', width: '13px', height: '13px', color: 'var(--dim)', pointerEvents: 'none' }} />
                   <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...INP_ST(!!errors.w), paddingInlineEnd: '32px', fontFamily: 'inherit' }}>
-                    <option value="">{t.wilayaPh}</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.id} - {isRTL ? w.ar_name : w.name}</option>)}
+                    <option value="">{t.wilayaPh}</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.code ?? w.id} - {isRTL ? w.ar_name : w.name}</option>)}
                   </select>
                 </div>
               </FR>
