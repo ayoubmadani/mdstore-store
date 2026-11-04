@@ -166,6 +166,31 @@ background: `linear-gradient(${t.dir === 'rtl' ? '270deg' : '90deg'}, ...)`
 
 ---
 
+## 5-ب. نص الغلاف فوق الصورة — لا صندوق خلف العنوان
+
+ممنوع: صندوق/لوحة ضبابية خلف العنوان والوصف (`background: rgba(..)` + `backdropFilter: blur` + `borderRadius`).
+الدوال القديمة `heroTextPanel` / `heroTextBox` لم تعد تُستعمل في الثيمات الجديدة.
+
+المعتمد: تدرّج فوق الصورة نفسها من `@mdstore/theme-kit` (أو `@/components/theme/storeContact` داخل المستودع):
+
+```tsx
+import { HeroShade, heroTextClear } from '@mdstore/theme-kit';
+
+<section style={{ position: 'relative', overflow: 'hidden' }}>
+  {store.hero?.imageUrl && (
+    <div style={{ position: 'absolute', inset: 0 }}>
+      <img fetchPriority="high" decoding="async" src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      <HeroShade store={store} rtl={isRTL} />            {/* نص داكن: tone="light" — صورة لها zIndex: z={1} */}
+    </div>
+  )}
+  <div style={{ position: 'relative', zIndex: 1, ...heroTextClear(store) }}>…العنوان والوصف والأزرار…</div>
+</section>
+```
+
+- `HeroShade` = تدرّج أسود (أو أبيض مع `tone="light"`) يبدأ من جهة النص ولا يصل للشفافية الكاملة.
+- **غلاف الهاتف:** المتجر يبدّل `imageUrl` بـ `hero.mobileImageUrl` لزائر الهاتف (نسبة 4:5). `HeroShade` يعطي `<section>` الغلاف على الهاتف `min-height: 125vw` فتظهر الصورة كاملة — لذلك الغلاف يجب أن يكون `<section>`، ولا ارتفاع ثابت ولا `maxHeight` ولا `aspect-ratio` على الصورة أو حاويتها في الهاتف.
+- مرجع مطبّق: `src/theme/ecom-color-showcase-theme.tsx` و ثيمات `color-*-rush`.
+
 ## 6. أخطاء متكررة وحلولها
 
 | الخطأ | السبب | الحل |
@@ -426,4 +451,5 @@ import { whatsappHref } from '@/components/builderPages/buttonLinks';
 - [ ] Footer التواصل: هاتف + واتساب + بريد دائماً، والناقص «سيتوفر لاحقاً»
 - [ ] ولاية واحدة تُختار وتُقفل، ونوع التوصيل حسب الولاية مع `data-delivery-option`، والإضافات في الطلب والسلة
 - [ ] أيقونات lucide بالاسم، والهيرو `fetchPriority="high"`، وباقي الصور `loading="lazy"`، ولا framer-motion
+- [ ] الغلاف: لا صندوق خلف النص — `<HeroShade>` فوق الصورة و`heroTextClear` على النص، والغلاف `<section>`
 - [ ] تم تشغيل `node scripts/bundle-themes.mjs --slug=<name>`

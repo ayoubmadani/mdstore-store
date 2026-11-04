@@ -16,7 +16,7 @@ import {
 // كل ما يحتاجه الثيم من المتجر يأتي من @mdstore/theme-kit — الثيم ملف واحد مستقل يُبنى ويُرفع من الـ API
 import {
   useCartStore, WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref,
-  ProductAddons, addonsTotal, addonsLabel,
+  ProductAddons, addonsTotal, addonsLabel, HeroShade,
 } from '@mdstore/theme-kit';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
@@ -1112,6 +1112,8 @@ export function Home({ store, page }: any) {
         {store.hero?.imageUrl && (
           <div className="br-hero-bg" style={{ position: 'absolute', inset: 0 }}>
             <img fetchPriority="high" decoding="async" src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.22 }} />
+            {/* تدرّج فوق الصورة (لا صندوق خلف النص) + غلاف الهاتف كامل */}
+            <HeroShade store={store} rtl={isRTL} />
           </div>
         )}
         <div style={{ position: 'absolute', top: -120, ...(isRTL ? { left: -120 } : { right: -120 }), width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle, rgba(181,83,47,0.45), transparent 70%)', pointerEvents: 'none' }} />
