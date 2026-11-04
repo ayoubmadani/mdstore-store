@@ -18,7 +18,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -763,11 +763,11 @@ export function Home({ store, page }: any) {
       {/* HERO */}
       <section style={{ position: 'relative', overflow: 'hidden', background: '#2C1810' }}>
         {store.hero?.imageUrl && (
-          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} /></>
         )}
         {!store.hero?.imageUrl && <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(44,24,16,0.92) 0%, rgba(44,24,16,0.7) 100%)' }} />}
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 1280, margin: '0 auto', padding: 'clamp(4rem,10vw,7rem) 1.5rem clamp(3.5rem,8vw,6rem)' }}>
-          <div style={{ maxWidth: 700, ...heroTextPanel(store) }}>
+          <div style={{ maxWidth: 700, ...heroTextClear(store) }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(196,154,108,0.18)', border: '1px solid rgba(196,154,108,0.35)', borderRadius: 6, padding: '0.35rem 1rem', marginBottom: '1.75rem' }}>
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: W, display: 'inline-block' }} />
               <span style={{ fontSize: '0.68rem', fontWeight: 700, color: WB, letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>{t.heroBadge}</span>

@@ -18,7 +18,7 @@ import {
   ShoppingCart, Trash2, Loader2, Minus, Plus, MapPin, Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1132,7 +1132,7 @@ export function Home({ store, page }: any) {
       {/* ── HERO ── */}
       <section style={{position:'relative',overflow:'hidden',backgroundColor:'var(--black)',minHeight:'80vh',display:'flex',alignItems:'center',justifyContent:'center',paddingTop:30 , paddingBottom: 25}}>
         {store.hero?.imageUrl && (
-          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',zIndex:1}}/>
+          <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',zIndex:1}}/><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} z={1} /></>
         )}
         {!store.hero?.imageUrl && (
           <div style={{position:'absolute',inset:0,background:'linear-gradient(135deg,var(--dark) 0%,var(--panel) 100%)',zIndex:1}}/>
@@ -1141,7 +1141,7 @@ export function Home({ store, page }: any) {
         <div style={{position:'absolute',inset:0,backgroundImage:'linear-gradient(rgba(255,69,0,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,69,0,0.05) 1px,transparent 1px)',backgroundSize:'35px 35px',zIndex:3,opacity:0.4,pointerEvents:'none'}}/>
         <div style={{position:'absolute',bottom:0,left:0,right:0,height:'3px',background:'linear-gradient(90deg,transparent,var(--fire),var(--gold),transparent)',zIndex:4}}/>
 
-        <div style={{position:'relative',zIndex:5,padding:'0 5vw',width:'100%',maxWidth:'1100px',margin:'0 auto',textAlign:'center',display:'flex',flexDirection:'column',alignItems:'center',...(store.hero?.imageUrl ? {...heroTextBox(store),marginInline:'auto'} : {})}} className="fu-1">
+        <div style={{position:'relative',zIndex:5,padding:'0 5vw',width:'100%',maxWidth:'1100px',margin:'0 auto',textAlign:'center',display:'flex',flexDirection:'column',alignItems:'center',...(store.hero?.imageUrl ? {...heroTextClear(store),marginInline:'auto'} : {})}} className="fu-1">
           {/* Badge */}
           <div style={{display:'inline-flex',alignItems:'center',gap:'6px',border:'1px solid var(--fire)',padding:'4px 12px',marginBottom:'16px',backgroundColor:'rgba(255,69,0,0.12)'}}>
             <Flame style={{width:'12px',height:'12px',color:'var(--fire)',animation:'flicker 1.2s ease-in-out infinite'}}/>

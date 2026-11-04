@@ -33,7 +33,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown, Trash2, Plus, Minus,
   Lightbulb, Star, Check, AlertCircle, Truck, ShieldCheck, CreditCard, Headphones, Package, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -879,12 +879,12 @@ export function Home({ store, page }: any) {
       <section style={{ position: 'relative', overflow: 'hidden', background: `linear-gradient(135deg, ${BG} 0%, #FDEFD8 55%, ${AL} 100%)`, borderBottom: `1px solid ${BD}` }}>
         {heroImg && (
           <>
-            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={heroImg} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+            <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={heroImg} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} tone="light" /></>
           </>
         )}
         <div style={{ ...container, position: 'relative', minHeight: 'clamp(460px, 62vh, 660px)', display: 'flex', alignItems: 'center', padding: '3rem 1.5rem' }}>
           <div className="lm-hero-grid" style={{ width: '100%' }}>
-            <div style={{ maxWidth: 620, marginInlineEnd: 'auto', ...heroTextPanel(store, 'light') }}>
+            <div style={{ maxWidth: 620, marginInlineEnd: 'auto', ...heroTextClear(store, 'light') }}>
               <span className="hero-badge" style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8, background: SURF, color: AD,
                 border: `1px solid ${BD}`, padding: '7px 15px', borderRadius: 999, fontSize: '.82rem', fontWeight: 800,

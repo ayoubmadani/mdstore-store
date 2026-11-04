@@ -9,7 +9,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import axios from "axios";
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 import { useCartStore } from "@/store/useCartStore";
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 import {
   ShoppingCart, Search, Menu, X, ChevronDown, ChevronLeft, ChevronRight,
   Star, Trash2, Phone, Mail, MapPin, Send, AlertCircle, Minus, Plus,
@@ -725,11 +725,11 @@ export function Home({ store, page }: { store: any; page: number }) {
       {/* Hero */}
       <section style={{ position: "relative", minHeight: "clamp(440px,65vh,720px)", display: "flex", alignItems: "center", overflow: "hidden", background: C0 }}>
         {store?.hero?.imageUrl && (
-          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block" }} /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} /></>
         )}
         {!store?.hero?.imageUrl && <div style={{ position: "absolute", inset: 0, background: `linear-gradient(to ${t.dir === "rtl" ? "left" : "right"}, ${C0} 45%, rgba(10,10,15,.4) 100%)` }} />}
         <div style={{ ...container, position: "relative", zIndex: 1, padding: "3rem 1.5rem", width: "100%" }}>
-          <div style={{ maxWidth: 580, ...heroTextPanel(store) }}>
+          <div style={{ maxWidth: 580, ...heroTextClear(store) }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: AL, border: `1px solid ${A}`, color: A, padding: "5px 12px", borderRadius: 20, fontSize: "0.75rem", fontWeight: 700, marginBottom: 18 }}>
               <Trophy size={13} />
               {t.heroBadge}

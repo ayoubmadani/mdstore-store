@@ -18,7 +18,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1163,9 +1163,9 @@ export function Home({ store, page }: any) {
       <section style={{ position: 'relative', overflow: 'hidden', borderBottom: '1px solid var(--line)' }}>
         {store.hero?.imageUrl ? (
           <div style={{ position: 'relative', minHeight: '320px' }}>
-            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', maxHeight: '400px' }} />
+            <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', maxHeight: '400px' }} /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} /></>
             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', padding: '0 8vw' }}>
-              <div style={heroTextPanel(store)}>
+              <div style={heroTextClear(store)}>
                 <h1 className="fu serif" style={{ fontSize: 'clamp(1.6rem,4vw,3rem)', fontWeight: 700, fontStyle: 'italic', color: '#fff', lineHeight: 1.15, marginBottom: '10px' }}>
                   {store.hero.title?.replace(/<[^>]+>/g, '') || store.name}
                 </h1>

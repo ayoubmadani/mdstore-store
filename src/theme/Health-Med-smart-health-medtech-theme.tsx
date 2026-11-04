@@ -18,7 +18,7 @@ import {
   HeartPulse, Stethoscope, Ambulance, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1064,10 +1064,10 @@ export function Home({ store, page }: any) {
         minHeight:'80vh', display:'flex', alignItems:'center', justifyContent:'center', paddingTop:30, paddingBottom:25
       }}>
         {store.hero?.imageUrl && (
-          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{
+          <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{
             position:'absolute', inset:0, width:'100%', height:'100%',
             objectFit:'cover', zIndex:1
-          }} />
+          }} /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} tone="light" z={1} /></>
         )}
         {!store.hero?.imageUrl && <div style={{
           position:'absolute', inset:0, zIndex:2, pointerEvents:'none',
@@ -1082,7 +1082,7 @@ export function Home({ store, page }: any) {
           position:'relative', zIndex:4, padding:'0 5vw', width:'100%',
           maxWidth:'1100px', margin:'0 auto', textAlign:'center',
           display:'flex', flexDirection:'column', alignItems:'center',
-          ...(store.hero?.imageUrl ? { ...heroTextBox(store, 'light'), marginInline: 'auto' } : {})
+          ...(store.hero?.imageUrl ? { ...heroTextClear(store, 'light'), marginInline: 'auto' } : {})
         }} className="fi">
           <div style={{
             display:'inline-flex', alignItems:'center', gap:'6px',

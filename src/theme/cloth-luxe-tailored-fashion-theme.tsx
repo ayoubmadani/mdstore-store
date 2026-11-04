@@ -10,7 +10,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import { Star, ChevronDown, AlertCircle, X, CheckCircle2, Shield, ArrowLeft, Plus, Minus, Search, ShoppingCart, Trash2, Loader2, ChevronLeft, ChevronRight, Phone, Package, Truck, Mail, MessageCircle, Download } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -629,11 +629,12 @@ export function Home({store,page}:any){
         {store.hero?.imageUrl?(
           <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
         ):<div style={{position:'absolute',inset:0,background:'var(--s1)'}}/>}
+        <HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} />
 
         <div style={{position:'relative',zIndex:2,padding:'0 32px 48px',width:'100%'}}>
           <div className="fu" style={{display:'flex',alignItems:'flex-end',justifyContent:'space-between',gap:24,flexWrap:'wrap'}}>
             {/* الصورة تبقى واضحة: الضبابية خلف النص فقط */}
-            <div style={store.hero?.imageUrl?{background:'rgba(14,12,10,.45)',backdropFilter:'blur(12px)',WebkitBackdropFilter:'blur(12px)',padding:'20px 24px',borderRadius:16,maxWidth:'100%'}:undefined}>
+            <div style={store.hero?.imageUrl?{...heroTextClear(store),maxWidth:'100%'}:undefined}>
               <h1 className="bn" style={{fontSize:'clamp(4rem,12vw,10rem)',color:'var(--tx)',lineHeight:.88,letterSpacing:'0.03em',marginBottom:16}}>
                 {store.hero?.title||<><span>LUXE</span><br/><span style={{color:'var(--cp)'}}>FASHION</span></>}
               </h1>

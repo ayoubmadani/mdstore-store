@@ -25,7 +25,7 @@ import {
   ChevronLeft, ChevronRight, Trash2, Cpu, Truck, ShieldCheck, Lock,
   Headphones, AlertCircle, CheckCircle2, Minus, Plus, Zap, Star, Send, Package, MessageCircle, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -999,14 +999,14 @@ export function Home({ store, page }: any) {
       }}>
         {store?.hero?.imageUrl && (
           <>
-            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt=""
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+            <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt=""
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} /></>
           </>
         )}
         <div className="ti-grid-overlay" />
 
         <div className="ti-container" style={{ position: 'relative', zIndex: 2, padding: '5rem 1.5rem', width: '100%' }}>
-          <div style={{ maxWidth: 720, marginInlineEnd: 'auto', textAlign: t.dir === 'rtl' ? 'right' : 'left', ...heroTextPanel(store) }}>
+          <div style={{ maxWidth: 720, marginInlineEnd: 'auto', textAlign: t.dir === 'rtl' ? 'right' : 'left', ...heroTextClear(store) }}>
             <span className="ti-hero-badge ti-mono" style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               border: `1px solid ${A}`, color: A, background: AL,

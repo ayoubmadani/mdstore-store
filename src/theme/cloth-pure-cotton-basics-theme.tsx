@@ -9,7 +9,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import { ShoppingBag, Search, Menu, X, ChevronLeft, ChevronRight, Trash2, Plus, Minus, Check, MapPin, Phone, Mail, Package, Truck, MessageCircle, Download } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -803,10 +803,10 @@ export function Home({ store, page }: any) {
       {/* HERO */}
       <section style={{ position: 'relative', background: 'var(--cotton-100)', overflow: 'hidden' }}>
         {store?.hero?.imageUrl && (
-          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+          <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} tone="light" /></>
         )}
         <div style={store?.hero?.imageUrl
-          ? { position: 'relative', margin: '70px auto 50px', textAlign: 'center', ...heroTextBox(store, 'light'), marginInline: 'auto' }
+          ? { position: 'relative', margin: '70px auto 50px', textAlign: 'center', ...heroTextClear(store, 'light'), marginInline: 'auto' }
           : { position: 'relative', maxWidth: 1240, margin: '0 auto', padding: '90px 20px 70px', textAlign: 'center' }}>
           <span style={{ fontSize: 12.5, fontWeight: 700, letterSpacing: 2, color: 'var(--thread-red)', textTransform: 'uppercase' }}>{t.heroBadge}</span>
           <h1

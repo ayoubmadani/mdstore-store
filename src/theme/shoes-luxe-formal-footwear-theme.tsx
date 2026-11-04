@@ -32,7 +32,7 @@ import {
   Phone, Mail, MapPin, Star, Trash2, Minus, Plus, Check, AlertCircle,
   Truck, ShieldCheck, Award, Headphones, Send, Footprints, ArrowRight, Package, MessageCircle, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1005,12 +1005,12 @@ export function Home({ store, page }: any) {
     <div>
       <section className="lx-hero" style={{ background: onImg ? DARK : BG }}>
         {onImg && (
-          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={heroImg} alt="" aria-hidden="true"
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block', zIndex: 0 }} />
+          <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={heroImg} alt="" aria-hidden="true"
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block', zIndex: 0 }} /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} z={0} /></>
         )}
 
         <div className="lx-wrap" style={{ position: 'relative', zIndex: 2 }}>
-          <div className="lx-hero-in" style={onImg ? { ...heroTextBox(store), minHeight: 0, marginBlock: 'clamp(2.5rem,7vw,5rem)' } : undefined}>
+          <div className="lx-hero-in" style={onImg ? { ...heroTextClear(store), minHeight: 0, marginBlock: 'clamp(2.5rem,7vw,5rem)' } : undefined}>
             <p style={{ ...eyebrow, color: onImg ? '#D9A97A' : A, animation: 'lxIn .6s ease both' }}>{t.heroEyebrow}</p>
 
             <h1 dir="auto" className="lx-hero-title" style={{ color: TXT }}

@@ -10,7 +10,7 @@ import axios from 'axios';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 import DOMPurify from 'isomorphic-dompurify';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -725,11 +725,11 @@ export function Home({ store, page }: any) {
       {/* Hero */}
       <section style={{ position: 'relative', minHeight: 'clamp(480px, 68vh, 760px)', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
         {heroImage && (
-          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={heroImage} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={heroImage} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} /></>
         )}
         {!heroImage && <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(15,23,42,0.85) 0%, rgba(15,23,42,0.4) 60%, rgba(15,23,42,0.2) 100%)' }} />}
         <div style={{ position: 'relative', zIndex: 2, maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', width: '100%' }}>
-          <div style={{ maxWidth: 640, marginInlineEnd: 'auto', ...heroTextPanel(store) }}>
+          <div style={{ maxWidth: 640, marginInlineEnd: 'auto', ...heroTextClear(store) }}>
             <h1 className="wc-hero-title" style={{ color: '#fff', fontSize: 'clamp(1.75rem, 5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.15, margin: '0 0 1rem', animation: 'fadeUp 0.7s ease 0.1s both' }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store?.hero?.title || '') }} />
             <p className="wc-hero-sub" style={{ color: 'rgba(255,255,255,0.85)', fontSize: 'clamp(1rem, 2vw, 1.25rem)', lineHeight: 1.6, margin: '0 0 1.75rem', maxWidth: 520, animation: 'fadeUp 0.7s ease 0.25s both' }}>
               {store?.hero?.subtitle || ''}

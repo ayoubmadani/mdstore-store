@@ -18,7 +18,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -744,7 +744,7 @@ export function Home({ store, page }: any) {
       <section style={{ position: 'relative', overflow: 'hidden', background: '#0A1929', minHeight: 'clamp(420px, 56vh, 640px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {store.hero?.imageUrl && (
           <div style={{ position: 'absolute', inset: 0 }}>
-            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} /></>
           </div>
         )}
         {!store.hero?.imageUrl && <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(14,30,54,0.98) 0%, rgba(27,87,126,0.7) 60%, rgba(14,30,54,0.9) 100%)' }} />}
@@ -754,7 +754,7 @@ export function Home({ store, page }: any) {
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 5, background: `repeating-linear-gradient(90deg, ${R} 0px, ${R} 24px, transparent 24px, transparent 32px)` }} />
 
         <div style={store.hero?.imageUrl
-          ? { position: 'relative', maxWidth: 860, margin: 'clamp(4rem,8vw,6rem) auto 3rem', width: 'calc(100% - 2rem)', textAlign: 'center', ...heroTextPanel(store) }
+          ? { position: 'relative', maxWidth: 860, margin: 'clamp(4rem,8vw,6rem) auto 3rem', width: 'calc(100% - 2rem)', textAlign: 'center', ...heroTextClear(store) }
           : { position: 'relative', maxWidth: 860, margin: '0 auto', width: '100%', padding: 'clamp(5rem,10vw,8rem) 2rem 4rem', textAlign: 'center' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(226,0,21,0.15)', border: `1px solid rgba(226,0,21,0.3)`, padding: '0.3rem 0.875rem', marginBottom: '1.5rem' }}>
             <Zap size={11} style={{ color: R }} />

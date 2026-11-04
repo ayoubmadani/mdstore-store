@@ -18,7 +18,7 @@ import {
     ArrowLeft, Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -976,6 +976,7 @@ export function Home({ store, page }: any) {
                     alignItems: 'center'
                 }}
             >
+                <HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} z={1} />
                 {/* الدوائر الضوئية الجمالية (Geometric Accents) */}
                 <div style={{ position: 'absolute', top: -150, left: -150, width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(0, 102, 255, 0.2), transparent 70%)', pointerEvents: 'none', zIndex: 1 }} />
                 <div style={{ position: 'absolute', bottom: -100, right: -100, width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255, 224, 0, 0.15), transparent 70%)', pointerEvents: 'none', zIndex: 1 }} />
@@ -984,7 +985,7 @@ export function Home({ store, page }: any) {
                     <div className="hero-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '4rem', alignItems: 'center' }}>
 
                         {/* الجانب الأيسر: النصوص والأزرار */}
-                        <div className="hero-text-content" style={heroTextPanel(store)}>
+                        <div className="hero-text-content" style={heroTextClear(store)}>
                             {/* ملصق الترحيب (Badge) */}
                             <div className="anim-slide-up" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.6rem 1.25rem', borderRadius: 50, background: 'var(--yellow)', marginBottom: '1.5rem', boxShadow: '0 4px 15px rgba(255, 224, 0, 0.3)' }}>
                                 <Rocket size={16} style={{ color: 'var(--dark)' }} />

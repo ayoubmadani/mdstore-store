@@ -20,7 +20,7 @@ import {
   ChevronLeft, ChevronRight, Trash2, Check, Minus, Plus, Package, Truck, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -798,10 +798,10 @@ export function Home({ store, page }: any) {
       <section className="rsp-hero" style={{ background: `linear-gradient(160deg, ${BG} 0%, ${BG_ALT} 100%)` }}>
         {store?.hero?.imageUrl && (
           <div className="rsp-hero-bg">
-            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" aria-hidden="true" />
+            <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" aria-hidden="true" /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} /></>
           </div>
         )}
-        <div className="rsp-container rsp-hero-grid" style={store?.hero?.imageUrl ? { ...heroTextBox(store), marginBlock: '3rem' } : undefined}>
+        <div className="rsp-container rsp-hero-grid" style={store?.hero?.imageUrl ? { ...heroTextClear(store), marginBlock: '3rem' } : undefined}>
           {store?.hero?.badge && (
             <span style={{ display: 'inline-block', border: `1px solid ${BORDER}`, color: GOLD_LIGHT, fontSize: '0.75rem', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '5px 14px', borderRadius: 999, marginBottom: 20, alignSelf: 'flex-start' }}>
               {store.hero.badge}

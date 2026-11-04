@@ -8,6 +8,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 import { useRouter, usePathname } from 'next/navigation';
+import { HeroShade, heroTextClear } from '@/components/theme/storeContact';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
@@ -614,9 +615,11 @@ export function Home({ store, page }: any) {
         borderBottom: '1px solid var(--border-color)',
         display: 'flex',
         alignItems: 'center',
-        minHeight: '400px' // لضمان ظهور الصورة بشكل جيد
+        minHeight: '400px', // لضمان ظهور الصورة بشكل جيد
+        position: 'relative',
       }}>
-        <div className="container anim-fade-in" style={{ width: '100%', ...(store.hero.imageUrl ? { background: 'rgba(10,10,12,.45)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', padding: 'clamp(16px, 3vw, 28px)', borderRadius: 18, width: 'fit-content', maxWidth: 'min(720px, calc(100% - 2rem))', marginInline: 'clamp(1rem, 5vw, 4rem)' } : {}) }}>
+        <HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} />
+        <div className="container anim-fade-in" style={{ width: '100%', position: 'relative', ...(store.hero.imageUrl ? { ...heroTextClear(store), width: 'fit-content', maxWidth: 'min(720px, calc(100% - 2rem))', marginInline: 'clamp(1rem, 5vw, 4rem)' } : {}) }}>
           <h1 style={{
             fontSize: 'clamp(2rem, 5vw, 3.5rem)',
             // إذا كانت هناك صورة، نستخدم الأبيض للتباين، وإلا نستخدم لون المتجر الأساسي

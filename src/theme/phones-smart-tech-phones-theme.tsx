@@ -22,7 +22,7 @@ import {
   ChevronLeft, ChevronRight, Star, Trash2, Plus, Minus, Check, AlertCircle,
   Truck, ShieldCheck, CreditCard, Headphones, Smartphone, Send, Cpu, Package, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -888,7 +888,7 @@ export function Home({ store, page }: any) {
       {/* HERO — full-bleed */}
       <section className="pt-hero" style={{ position: 'relative', minHeight: 'clamp(460px, 66vh, 720px)', overflow: 'hidden' }}>
         {hero.imageUrl ? (
-          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} /></>
         ) : (
           <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(120% 120% at 80% 0%, #1a2440 0%, ${INK} 60%)` }} />
         )}
@@ -898,7 +898,7 @@ export function Home({ store, page }: any) {
           <div style={{ position: 'absolute', top: 0, bottom: 0, width: '30%', background: `linear-gradient(90deg, transparent, ${A}, transparent)`, animation: 'ptScan 4s ease-in-out infinite' }} />
         </div>
 
-        <div className="pt-container" style={{ position: 'relative', zIndex: 3, paddingBottom: 'clamp(2.2rem, 6vw, 5rem)', paddingTop: '3rem', width: '100%', ...(hero.imageUrl ? { ...heroTextBox(store), marginBlock: 'clamp(2rem,6vw,4rem)' } : {}) }}>
+        <div className="pt-container" style={{ position: 'relative', zIndex: 3, paddingBottom: 'clamp(2.2rem, 6vw, 5rem)', paddingTop: '3rem', width: '100%', ...(hero.imageUrl ? { ...heroTextClear(store), marginBlock: 'clamp(2rem,6vw,4rem)' } : {}) }}>
           <span className="pt-mono" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#9FBBFF', fontSize: '0.78rem', letterSpacing: '0.08em', textTransform: 'uppercase', border: `1px solid ${A}66`, background: 'rgba(47,91,255,0.12)', padding: '5px 12px', borderRadius: 999, marginBottom: 18 }}>
             <span style={{ width: 6, height: 6, borderRadius: 999, background: A }} /> {t.heroEyebrow}
           </span>

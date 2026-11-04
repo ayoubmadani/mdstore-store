@@ -15,7 +15,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1011,7 +1011,7 @@ export function Home({ store, page }: any) {
       <section style={{ position:'relative', minHeight:'clamp(580px,88vh,820px)', overflow:'hidden' }}>
         {/* Background image */}
         {store.hero?.imageUrl
-          ? <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', objectPosition:'center', display:'block' }} />
+          ? <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', objectPosition:'center', display:'block' }} /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} /></>
           : <div style={{ position:'absolute', inset:0, background:`linear-gradient(135deg,${CR} 0%,rgba(193,123,142,0.3) 100%)` }} />
         }
         {/* Gradient overlay */}
@@ -1025,7 +1025,7 @@ export function Home({ store, page }: any) {
         {/* Content */}
         <div style={{ position:'relative', zIndex:2, width:'100%', minHeight:'clamp(580px,88vh,820px)', display:'flex', alignItems:'center' }}>
           <div style={{ maxWidth:1320, margin:'0 auto', width:'100%', padding:'clamp(3rem,8vw,6rem) clamp(1.25rem,4vw,3rem)', display:'flex', justifyContent:'flex-start' }}>
-            <div className="anim-fade-up" style={{ maxWidth:540, width:'100%', ...heroTextPanel(store) }}>
+            <div className="anim-fade-up" style={{ maxWidth:540, width:'100%', ...heroTextClear(store) }}>
               {/* Eyebrow */}
               <div style={{ display:'inline-flex', alignItems:'center', gap:10, marginBottom:'1.75rem', background:'rgba(255,255,255,0.1)', backdropFilter:'blur(8px)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:50, padding:'6px 16px' }}>
                 <Flower2 size={11} color={RO} />

@@ -18,7 +18,7 @@ import {
   Headphones, Volume2, Mail, Sparkles, ShieldCheck, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -841,11 +841,11 @@ export function Home({ store, page }: any) {
       {/* HERO — marquee + centered headline */}
       <section style={{ position: 'relative', overflow: 'hidden', background: BG }}>
         {store.hero?.imageUrl && (
-          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+          <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} tone="light" /></>
         )}
         {!store.hero?.imageUrl && <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 30%, rgba(140,123,110,0.08) 0%, rgba(245,243,239,0.7) 60%, rgba(245,243,239,0.98) 100%)' }} />}
         <div style={store.hero?.imageUrl
-          ? { position: 'relative', textAlign: 'center', maxWidth: 760, margin: 'clamp(3rem,7vw,5rem) auto 2rem', width: 'calc(100% - 2rem)', ...heroTextPanel(store, 'light') }
+          ? { position: 'relative', textAlign: 'center', maxWidth: 760, margin: 'clamp(3rem,7vw,5rem) auto 2rem', width: 'calc(100% - 2rem)', ...heroTextClear(store, 'light') }
           : { position: 'relative', textAlign: 'center', maxWidth: 760, margin: '0 auto', padding: 'clamp(4.5rem,9vw,7rem) 1.5rem 3rem' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${BD}`, padding: '0.35rem 1rem', marginBottom: '1.5rem' }}>
             <Sparkles size={11} color={A} />

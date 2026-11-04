@@ -27,7 +27,7 @@ import {
   Send, Home as HomeIcon, Wrench, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1099,7 +1099,7 @@ export function Home({ store, page }: any) {
       {/* HERO LAYOUT: full-bleed background image behind text, dark gradient overlay for contrast */}
       <section style={{ position: 'relative', minHeight: 'clamp(480px,70vh,720px)', overflow: 'hidden', background: INK }}>
         {heroImg && (
-          <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={heroImg} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+          <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={heroImg} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} /></>
         )}
         <div style={{
           position: 'absolute', inset: 0,
@@ -1109,7 +1109,7 @@ export function Home({ store, page }: any) {
         }} />
 
         <div className="ae-container" style={{ position: 'relative', zIndex: 1, minHeight: 'clamp(480px,70vh,720px)', display: 'flex', alignItems: 'center', width: '100%', padding: '3rem 1.25rem' }}>
-          <div className="ae-hero-text" style={{ maxWidth: 560, ...heroTextPanel(store) }}>
+          <div className="ae-hero-text" style={{ maxWidth: 560, ...heroTextClear(store) }}>
             <span className="ae-hero-badge">
               <Wrench size={13} /> {t.heroBadge}
             </span>

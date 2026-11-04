@@ -19,7 +19,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -745,7 +745,7 @@ export function Home({ store, page }: any) {
       <section style={{ position: 'relative', overflow: 'hidden', minHeight: 'clamp(520px,75vh,760px)', display: 'flex', alignItems: 'center' }}>
         {/* Background image - always visible */}
         {store.hero?.imageUrl
-          ? <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          ? <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} /></>
           : <div style={{ position: 'absolute', inset: 0, background: DARK, opacity: 0.97 }} />
         }
         {/* Overlay: dark left-to-right gradient so text is readable */}
@@ -753,7 +753,7 @@ export function Home({ store, page }: any) {
 
         {/* Content */}
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 1280, margin: '0 auto', width: '100%', padding: 'clamp(3rem,7vw,5rem) clamp(1.5rem,4vw,3rem)' }}>
-          <div style={{ maxWidth: 620, ...heroTextPanel(store) }}>
+          <div style={{ maxWidth: 620, ...heroTextClear(store) }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(212,98,42,0.15)', border: '1px solid rgba(212,98,42,0.3)', borderRadius: 3, padding: '0.35rem 0.875rem', marginBottom: '1.5rem' }}>
               <Compass size={11} color={OR} />
               <span style={{ fontSize: '0.62rem', fontWeight: 700, color: OR, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: "'Barlow Condensed', sans-serif" }}>{t.heroBadge}</span>

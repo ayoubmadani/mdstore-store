@@ -17,7 +17,7 @@ import {
   Package, Clock, Heart, MessageCircle, Download
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextPanel, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 import { ProductAddons, addonsTotal } from '@/components/theme/ProductAddons';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
@@ -943,10 +943,10 @@ export function Home({ store, page }: any) {
     <div>
       {/* Hero */}
       <section className="luxe-hero">
-        {store?.hero?.imageUrl && <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="hero" className="luxe-hero-bg" />}
+        {store?.hero?.imageUrl && <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="hero" className="luxe-hero-bg" /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} tone="light" /></>}
         {!store?.hero?.imageUrl && <div className="luxe-hero-scrim" />}
         <div className="luxe-container luxe-hero-content">
-          <div style={{ maxWidth: 720, marginInlineEnd: 'auto', ...heroTextPanel(store, 'light') }}>
+          <div style={{ maxWidth: 720, marginInlineEnd: 'auto', ...heroTextClear(store, 'light') }}>
             <h1 className="luxe-hero-title" style={{ animation: 'fadeUp 0.7s ease 0.1s both' }} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(heroTitle) }} />
             <p className="luxe-hero-sub" style={{ animation: 'fadeUp 0.7s ease 0.25s both' }}>{heroSub}</p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', animation: 'fadeUp 0.7s ease 0.4s both' }}>

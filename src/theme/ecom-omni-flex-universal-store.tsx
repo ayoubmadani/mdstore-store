@@ -16,7 +16,7 @@ import {
   Search, ShoppingCart, Trash2, Loader2, Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1086,12 +1086,12 @@ export function Home({ store, page }: any) {
       <section style={{position:'relative',minHeight:'85vh',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',backgroundColor:'var(--navy)'}}>
         {store.hero?.imageUrl && (
           <>
-            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
+            <><img onError={(e) => { e.currentTarget.style.display = 'none'; }} src={store.hero.imageUrl} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',display:'block'}}/><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} /></>
           </>
         )}
         {!store.hero?.imageUrl && <div style={{position:'absolute',inset:0,backgroundColor:'var(--navy-2)',opacity:0.5}} className="dot-bg"/>}
 
-        <div style={{position:'relative',zIndex:2,width:'100%',maxWidth:'1280px',padding:'80px 6vw',display:'flex',flexDirection:'column',alignItems:'flex-start',...heroTextBox(store)}}>
+        <div style={{position:'relative',zIndex:2,width:'100%',maxWidth:'1280px',padding:'80px 6vw',display:'flex',flexDirection:'column',alignItems:'flex-start',...heroTextClear(store)}}>
           <div className="fu" style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'20px'}}>
             <span style={{width:'30px',height:'2px',backgroundColor:'var(--blue)'}}/>
             <span className="bc" style={{fontSize:'14px',fontWeight:800,color:'var(--white)',letterSpacing:'0.15em'}}>{store?.name}</span>

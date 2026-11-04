@@ -4,7 +4,7 @@
 import axios from 'axios';
 
 export { useCartStore } from '@/store/useCartStore';
-export { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, whatsappHref } from './storeContact';
+export { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, whatsappHref, HeroShade, heroShade, heroTextClear } from './storeContact';
 export { ProductAddons, activeAddons, addonsTotal, addonsLabel } from './ProductAddons';
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';

@@ -18,7 +18,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, heroTextBox, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
@@ -954,7 +954,7 @@ export function Home({ store, page }: any) {
         <Confetti />
         {store.hero?.imageUrl && (
           <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-            <img onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            <><img onError={(e) => { e.currentTarget.style.display = 'none'; }}
               src={store.hero.imageUrl}
               alt=""
               style={{
@@ -962,7 +962,7 @@ export function Home({ store, page }: any) {
                 height: '100%',
                 objectFit: 'cover',
               }}
-            />
+            /><HeroShade store={store} rtl={(store?.language || 'ar') === 'ar'} tone="light" /></>
           </div>
         )}
         {/* Floating emojis */}
@@ -972,7 +972,7 @@ export function Home({ store, page }: any) {
         <Star5 color="var(--sun)" size={26} delay="0s" style={{ position: 'absolute', top: '12%', [isRTL ? 'right' : 'left']: '10%' }} />
         <Star5 color="var(--coral)" size={18} delay="0.8s" style={{ position: 'absolute', top: '22%', [isRTL ? 'left' : 'right']: '8%' }} />
 
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '7rem 1.5rem 4rem', position: 'relative', zIndex: 1, width: '100%', ...(store.hero?.imageUrl ? { ...heroTextBox(store, 'light'), marginBlock: '5rem 3rem' } : {}) }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '7rem 1.5rem 4rem', position: 'relative', zIndex: 1, width: '100%', ...(store.hero?.imageUrl ? { ...heroTextClear(store, 'light'), marginBlock: '5rem 3rem' } : {}) }}>
           <div className="anim-pop-in" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.5rem 1.25rem', borderRadius: 50, background: 'rgba(255,107,107,0.12)', border: '2px solid rgba(255,107,107,0.25)', marginBottom: '1.5rem' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--coral)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.hero_badge}</span>
           </div>

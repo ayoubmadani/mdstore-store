@@ -92,6 +92,38 @@ export function heroTextPanel(store: { hero?: { imageUrl?: string | null } | nul
   };
 }
 
+/** تدرّج أسود فوق صورة الغلاف من جهة النص (بدل اللوحة الضبابية): ضعه داخل حاوية الصورة (position: relative/absolute) */
+export function heroShade(store: { hero?: { imageUrl?: string | null } | null } | null | undefined, isRTL: boolean, tone: 'dark' | 'light' = 'dark', zIndex?: number): CSSProperties {
+  if (!store?.hero?.imageUrl) return { display: 'none' };
+  // dark: أسود خلف نص فاتح — light: أبيض خلف نص داكن (ثيمات النص الداكن)
+  const c = tone === 'dark' ? '0,0,0' : '255,255,255';
+  // لا يصل للشفافية: النص في الوسط (ثيمات النص المتوسّط) يبقى مقروءاً
+  const a = tone === 'dark' ? [0.7, 0.5, 0.28] : [0.88, 0.72, 0.45];
+  return {
+    position: 'absolute', inset: 0, pointerEvents: 'none', ...(zIndex != null ? { zIndex } : {}),
+    background: `linear-gradient(${isRTL ? 'to left' : 'to right'}, rgba(${c},${a[0]}), rgba(${c},${a[1]}) 50%, rgba(${c},${a[2]}))`,
+  };
+}
+
+/** طبقة التدرّج فوق صورة الغلاف + غلاف الهاتف كامل: إن وُجد غلاف هاتف (نسبة 4:5 في المحرر)
+ *  يأخذ قسم الغلاف على الهاتف ارتفاع 125vw فتظهر الصورة كاملة بلا قصّ */
+export function HeroShade({ store, rtl, tone = 'dark', z }: { store: any; rtl: boolean; tone?: 'dark' | 'light'; z?: number }) {
+  return (
+    <>
+      <div data-hero-shade="" style={heroShade(store, rtl, tone, z)} />
+      {store?.hero?.mobileImageUrl && (
+        <style>{'@media (max-width: 640px) { section:has([data-hero-shade]), :has(> [data-hero-shade]) { min-height: 125vw !important; height: auto !important; aspect-ratio: auto !important; max-height: none !important; } :has(> [data-hero-shade]) > img { max-height: none !important; min-height: 125vw; height: 100% !important; object-fit: cover; } }'}</style>
+      )}
+    </>
+  );
+}
+
+/** نص الغلاف فوق heroShade: بلا صندوق، مع ظل خفيف للنص */
+export function heroTextClear(store: { hero?: { imageUrl?: string | null } | null } | null | undefined, tone: 'dark' | 'light' = 'dark'): CSSProperties {
+  if (!store?.hero?.imageUrl) return {};
+  return { textShadow: tone === 'dark' ? '0 2px 14px rgba(0,0,0,.35)' : '0 1px 10px rgba(255,255,255,.6)' };
+}
+
 /** نفس اللوحة لحاوية بعرض كامل: تضيق على محتواها وتبدأ من جهة النص */
 export function heroTextBox(store: { hero?: { imageUrl?: string | null } | null } | null | undefined, tone: 'dark' | 'light' = 'dark'): CSSProperties {
   if (!store?.hero?.imageUrl) return {};
