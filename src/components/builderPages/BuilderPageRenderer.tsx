@@ -10,6 +10,8 @@ import AddShow from '@/components/addShow';
 import CustomerTracker from '@/components/CustomerTracker';
 import WhatsAppIcon from './WhatsAppIcon';
 import { BUTTON_ANIMATION_CSS, buttonAnimationClass } from './buttonAnimations';
+import { marqueeOf, marqueeRepeat } from './marquee';
+import MarqueeTrack from './MarqueeTrack';
 import { buttonHref, type ButtonLinkType } from './buttonLinks';
 import type { Pixel } from '@/types/store';
 
@@ -140,6 +142,11 @@ interface FloatingElement {
   backgroundColor?: string;
   textColor?: string;
   animation?: string;
+  borderRadius?: number;
+  // نص متحرك: 'rtl' من اليمين لليسار، 'ltr' العكس، marqueeSpeed = ثوانٍ لكل دورة
+  marquee?: string;
+  marqueeSpeed?: number;
+  marqueeRepeat?: number;
   src?: string;
   alt?: string;
 }
@@ -298,6 +305,7 @@ function FloatingElements({ elements, referenceWidth }: { elements: unknown; ref
 
         // text element
         const basePx = el.fontSize || 24;
+        const marquee = marqueeOf(el);
         return (
           <div
             key={el.id}
@@ -308,12 +316,14 @@ function FloatingElements({ elements, referenceWidth }: { elements: unknown; ref
               fontStyle: el.fontStyle || 'normal',
               textDecoration: el.textDecoration || 'none',
               color: el.color || '#ffffff',
+              backgroundColor: el.backgroundColor || undefined,
               textAlign: 'center',
               lineHeight: 1.3,
-              overflow: boxHeight ? 'hidden' : 'visible',
+              overflow: boxHeight || marquee ? 'hidden' : 'visible',
+              ...(marquee ? { display: 'flex', alignItems: 'center' } : {}),
             }}
           >
-            {el.content}
+            {marquee ? <MarqueeTrack text={el.content} dir={marquee.dir} seconds={marquee.seconds} repeat={marqueeRepeat(el)} /> : el.content}
           </div>
         );
       })}
