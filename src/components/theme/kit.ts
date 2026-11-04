@@ -57,8 +57,8 @@ export function sendContactMessage(payload: { name: string; email: string; phone
 /** هاتف جزائري صالح: 05/06/07 + 8 أرقام (أو +213) */
 // دولة المتجر وعملته — يضبطهما StoreProvider من بيانات المتجر (وأيضاً fetchWilayas)؛ الجزائر افتراضياً
 let storeCountry = 'DZ';
-// الجزائر بتقسيم 69 ولاية (DN) تُعامل كالجزائر: نفس العملة والهاتف وأسماء الثيمات
-const isAlgeria = () => storeCountry === 'DZ' || storeCountry === 'DN';
+// الجزائر (58 أو 69 ولاية — نفس الدولة DZ بتقسيم مختلف): نفس العملة والهاتف وأسماء الثيمات
+const isAlgeria = () => storeCountry === 'DZ';
 let storeCurrency = 'DZD';
 type LevelNames = { ar?: string; fr?: string; en?: string };
 type Levels = { region?: LevelNames; locality?: LevelNames } | null;
@@ -110,7 +110,6 @@ export function withLocationLabels<D extends Record<string, any>>(dict: D): D {
 export const currencyLabel = (dzLabel: string) => (isAlgeria() ? dzLabel : storeCurrency);
 const PHONE_PATTERNS: Record<string, RegExp> = {
   DZ: /^(0|\+213)[5-7]\d{8}$/,
-  DN: /^(0|\+213)[5-7]\d{8}$/,
   TN: /^(\+216)?[2459]\d{7}$/,
 };
 /** يفحص الهاتف حسب دولة المتجر (الاسم باقٍ للتوافق مع الثيمات المرفوعة) */
