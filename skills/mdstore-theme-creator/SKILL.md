@@ -11,7 +11,7 @@ description: Create a complete MdStore storefront theme with its own visual iden
 
 | الخطوة | الأداة |
 |---|---|
-| أنواع الثيمات | `admin_list_theme_types` (تجنّب `hidden`: custom وtesting) |
+| المجالات | `admin_list_niches`: مجال أساسي واحد (`nicheId`، بلا = ثيم عام) + مجالات ثانوية يناسبها أيضاً (`secondaryNicheIds`، بلا حد). النوع (`typeId`) قديم: فقط لإخفاء ثيم تجريبي بنوع `testing`/`custom` |
 | نوع جديد إن لم يناسب أي نوع | `admin_create_theme_type` (PIN) |
 | سجل الثيم (الأسماء/الأوصاف/الصورة/الوسوم/السعر) | `admin_create_theme` (PIN) |
 | الكود | `admin_request_pin` ← اطلب الـ PIN من المستخدم ← `admin_publish_theme_code` |
@@ -108,8 +108,8 @@ import {
 
 ## 3. سير العمل
 
-1. افهم النشاط، ثم `admin_list_theme_types`.
-2. اكتب **بطاقة الهوية** والـ JSON (الأسماء والأوصاف بثلاث لغات، و`slug` إنجليزي ينتهي بـ `-theme`، والوسوم، وصورة المعاينة، و`typeId`، والسعر) واعرضهما.
+1. افهم النشاط، ثم `admin_list_niches` واختر المجال الأساسي الذي صُمم له الثيم والمجالات الثانوية التي يناسبها.
+2. اكتب **بطاقة الهوية** والـ JSON (الأسماء والأوصاف بثلاث لغات، و`slug` إنجليزي ينتهي بـ `-theme`، والوسوم، وصورة المعاينة، و`nicheId` و`secondaryNicheIds`، والسعر) واعرضهما.
 3. `admin_create_theme` مع PIN.
 4. اكتب الكود كاملاً انطلاقاً من **منطق** القالب المرجعي، مع تصميم جديد بالكامل حسب البطاقة. راجع قائمة التحقق أدناه.
 5. `admin_request_pin` ← PIN ← `admin_publish_theme_code` (الكود في الأداة، **لا في المحادثة**).
