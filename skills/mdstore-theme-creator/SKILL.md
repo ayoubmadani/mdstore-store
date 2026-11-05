@@ -11,7 +11,7 @@ description: Create a complete MdStore storefront theme with its own visual iden
 
 | الخطوة | الأداة |
 |---|---|
-| المجالات | `admin_list_niches`: مجال أساسي واحد (`nicheId`، بلا = ثيم عام) + مجالات ثانوية يناسبها أيضاً (`secondaryNicheIds`، بلا حد). النوع (`typeId`) قديم: فقط لإخفاء ثيم تجريبي بنوع `testing`/`custom` |
+| المجالات | `admin_list_niches`: مجال أساسي واحد (`nicheId`، بلا = ثيم عام) + مجالات ثانوية يناسبها أيضاً (`secondaryNicheIds`، بلا حد). الثيم يُنشأ دائماً «في مرحلة التجربة» (مخفي عن التجار) ويُطلق بـ `admin_update_theme` (`isTesting=false`) بعد مراجعته؛ `ownerEmail` = ثيم مخصص لتاجر واحد. لا أنواع بعد الآن |
 | نوع جديد إن لم يناسب أي نوع | `admin_create_theme_type` (PIN) |
 | سجل الثيم (الأسماء/الأوصاف/الصورة/الوسوم/السعر) | `admin_create_theme` (PIN) |
 | الكود | `admin_request_pin` ← اطلب الـ PIN من المستخدم ← `admin_publish_theme_code` |
