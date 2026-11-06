@@ -343,6 +343,8 @@ export default function ProductFormBlock({
           builderPageId, // «الموقع» إحصائيات الصفحة
           splitTestId: splitTestId || undefined,
           quantity: form.quantity,
+          // سعر القطعة (بلا توصيل) — الخادم كان يأخذ totalPrice كسعر قطعة فيُحسب التوصيل مرتين
+          finalPrice: Number(getUnitPrice()),
           totalPrice,
           customerId,
           customerName: form.customerName,

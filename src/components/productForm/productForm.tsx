@@ -295,6 +295,7 @@ export default function ProductForm({
         offerId:           selectedOffer ?? undefined,
         platform,
         quantity:          formData.quantity,
+        finalPrice:        getFinalPrice(), // سعر القطعة بلا توصيل
         totalPrice:        getTotalPrice(),
         customerId:        formData.customerId,
         customerName:      formData.customerName,
