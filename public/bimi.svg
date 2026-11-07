@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny-ps" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>MdStore</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#16A34A"/>
+      <stop offset="1" stop-color="#065F35"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <path fill="#FFFFFF" d="M110 337V175h40l35 80 35-80h40v162h-35v-92l-29 67h-22l-29-67v92z"/>
+  <path fill="#FFFFFF" fill-rule="evenodd" d="M275 175h60a70 81 0 0 1 0 162h-60zM310 207h25a38 49 0 0 1 0 98h-25z"/>
+  <rect x="319" y="233" width="20" height="20" rx="4" fill="#4ADE80"/>
+  <rect x="345" y="233" width="20" height="20" rx="4" fill="#4ADE80"/>
+  <rect x="319" y="259" width="20" height="20" rx="4" fill="#4ADE80"/>
+  <rect x="345" y="259" width="20" height="20" rx="4" fill="#4ADE80"/>
+</svg>
