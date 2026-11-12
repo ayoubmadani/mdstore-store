@@ -23,3 +23,16 @@ export function withPageAttribution(url: string | undefined, method: string | un
   if (!data || typeof data !== 'object' || Array.isArray(data)) return data
   return { ...(data as object), builderPageId, ...(splitTestId ? { splitTestId } : {}) }
 }
+
+/**
+ * CSS الثيم داخل صفحة هبوط بعرض maxWidth: قواعد الشاشة تُحسب كأن الشاشة لا تتجاوز maxWidth
+ * (عمود واحد كما على الهاتف/الصفحة الضيقة) — min-width أكبر منه لا يتحقق أبداً، وmax-width ≥ منه يتحقق دائماً
+ */
+export function capMediaQueries(css: string, maxWidth: number): string {
+  return css.replace(/\((min|max)-width:(\s*)(\d+(?:\.\d+)?)px\)/g, (all, kind: string, sp: string, n: string) => {
+    const px = Number(n)
+    if (kind === 'min' && px > maxWidth) return `(min-width:${sp}99999px)`
+    if (kind === 'max' && px >= maxWidth) return `(min-width:${sp}0px)`
+    return all
+  })
+}

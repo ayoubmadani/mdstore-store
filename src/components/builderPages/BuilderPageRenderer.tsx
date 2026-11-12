@@ -614,6 +614,7 @@ export default function BuilderPageRenderer({ page, lpDomain, dedicated, store }
                 splitTestId={splitTestId}
                 product={page.themeProduct}
                 store={store}
+                maxWidth={pageMaxWidth}
               />
             )}
             {block.type === 'productForm' && (

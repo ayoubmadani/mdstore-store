@@ -8,7 +8,7 @@ import ThemeRunner from '@/components/ThemeRunner';
 import { StoreProvider } from '@/Hook/store-provider';
 import { getProduct, getStoreByDomain } from '@/lib/api';
 import ProductClient from '@/app/[domain]/(store)/product/[id]/ProductClient';
-import { BARE_CSS, cartOff, withPageAttribution } from './themeBare';
+import { BARE_CSS, capMediaQueries, cartOff, withPageAttribution } from './themeBare';
 
 type Props = {
   productId?: string;
@@ -16,9 +16,10 @@ type Props = {
   splitTestId?: string | null;
   product?: any;
   store?: any;
+  maxWidth?: number;
 };
 
-export default function ThemeProductBlock({ productId, builderPageId, splitTestId, product: initialProduct, store: initialStore }: Props) {
+export default function ThemeProductBlock({ productId, builderPageId, splitTestId, product: initialProduct, store: initialStore, maxWidth = 720 }: Props) {
   const [product, setProduct] = useState<any>(initialProduct ?? null);
   const [store, setStore] = useState<any>(initialStore ?? null);
   const [domain, setDomain] = useState('');
@@ -44,6 +45,22 @@ export default function ThemeProductBlock({ productId, builderPageId, splitTestI
     return () => mo.disconnect();
   }, [product, store]);
 
+  // الثيم يقرر عدد الأعمدة حسب عرض الشاشة ← داخل الصفحة (maxWidth) تُحسب قواعده كأن الشاشة بعرض الصفحة: عمود واحد
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return undefined;
+    const cap = () => el.querySelectorAll('style').forEach((st) => {
+      if (st.dataset.capped === String(maxWidth)) return;
+      const next = capMediaQueries(st.textContent ?? '', maxWidth);
+      if (next !== st.textContent) st.textContent = next;
+      st.dataset.capped = String(maxWidth);
+    });
+    cap();
+    const mo = new MutationObserver(cap);
+    mo.observe(el, { childList: true, subtree: true });
+    return () => mo.disconnect();
+  }, [product, store, maxWidth]);
+
   useEffect(() => {
     const host = window.location.hostname;
     setDomain(host);
@@ -68,9 +85,7 @@ export default function ThemeProductBlock({ productId, builderPageId, splitTestI
   return (
     <StoreProvider store={off.store} theme={slug}>
       <style>{BARE_CSS}</style>
-      {/* الثيم يقرر شكله حسب عرض الشاشة (لا عرض الصفحة 720px) ← القسم بعرض الشاشة كاملاً كما في المتجر */}
-      <style>{'body{overflow-x:clip}'}</style>
-      <div ref={root} className="mds-bare mds-embed" style={{ width: '100vw', marginInline: 'calc(50% - 50vw)' }}>
+      <div ref={root} className="mds-bare mds-embed">
         <ThemeRunner bundleUrl={`/api/themes/${slug}`} exportName="default" themeProps={{ store: off.store, domain: host }}>
           <ProductClient product={off.product} store={off.store} domain={host} noTracker />
         </ThemeRunner>
