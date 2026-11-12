@@ -1,0 +1,25 @@
+// صفحة المنتج بثيم المتجر خارج المتجر (دومين المنتج، أو قسم «المنتج بثيم المتجر» في صفحة المحرر):
+// غلاف الثيم (خلفيته وتنسيقه) بلا رأس المتجر وتذييله — كل ما بجانب <main> — ولا مسافة الرأس فوق <main>،
+// وطلب مباشر فقط: السلة تُعامل كأنها معطّلة، و[data-add-to-cart] مخفي احتياطاً
+
+export const BARE_CSS =
+  '.mds-bare :has(> main) > :not(main):not(style){display:none!important}' +
+  '.mds-bare main{padding-top:0!important}' +
+  '.mds-bare [data-add-to-cart]{display:none!important}' +
+  // داخل صفحة المحرر: لا يأخذ الغلاف ارتفاع الشاشة كاملة
+  '.mds-embed :has(> main){min-height:0!important}.mds-embed main{min-height:0!important}'
+
+/** المنتج والمتجر بسلة معطّلة ← نموذج الطلب يظهر مباشرة في كل الثيمات */
+export function cartOff<P extends { store?: any }, S>(product: P, store: S): { product: P; store: S } {
+  return {
+    product: { ...product, store: { ...(product.store ?? {}), cart: false } },
+    store: { ...(store as any), cart: false },
+  }
+}
+
+/** طلبات الثيم من داخل صفحة المحرر تُنسب لها (إحصائيات الصفحة واختبار A/B) */
+export function withPageAttribution(url: string | undefined, method: string | undefined, data: unknown, builderPageId: string, splitTestId?: string | null) {
+  if (String(method).toLowerCase() !== 'post' || !/\/orders(\/create)?\/?$/.test(url ?? '')) return data
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return data
+  return { ...(data as object), builderPageId, ...(splitTestId ? { splitTestId } : {}) }
+}

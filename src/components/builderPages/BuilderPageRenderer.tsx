@@ -12,6 +12,7 @@ import WhatsAppIcon from './WhatsAppIcon';
 import { BUTTON_ANIMATION_CSS, buttonAnimationClass } from './buttonAnimations';
 import { marqueeOf, marqueeRepeat } from './marquee';
 import MarqueeTrack from './MarqueeTrack';
+import ThemeProductBlock from './ThemeProductBlock';
 import { buttonHref, type ButtonLinkType } from './buttonLinks';
 import type { Pixel } from '@/types/store';
 
@@ -202,6 +203,8 @@ interface BuilderPageData {
   pixels?: Pixel[];
   // الصفحة معروضة عبر رابط اختبار A/B (null إذا كان الاختبار متوقفاً)
   splitTestId?: string | null;
+  // قسم «المنتج بثيم المتجر»: المنتج محمّل من الخادم مع الصفحة (وإلا يحمّله القسم من المتصفح)
+  themeProduct?: any;
 }
 
 // View-only counterpart to dashboard/src/pages/editor/blocks/ElementsOverlay.jsx
@@ -547,7 +550,7 @@ function SpacerBlockRenderer({ props, elements, maxWidth }: { props: Record<stri
 // of the storefront's theme system (no ThemeRunner, no eval): the published
 // artifact is plain JSON, and every block type here has a fixed, built-in
 // renderer, the same way componentsMap.js drives the editor.
-export default function BuilderPageRenderer({ page, lpDomain, dedicated }: { page: BuilderPageData; lpDomain: string; dedicated?: boolean }) {
+export default function BuilderPageRenderer({ page, lpDomain, dedicated, store }: { page: BuilderPageData; lpDomain: string; dedicated?: boolean; store?: any }) {
   const settings = page.settings || {};
   const pagePadding = settings.padding || 0;
   const pageMaxWidth = settings.maxWidth || 720;
@@ -596,6 +599,15 @@ export default function BuilderPageRenderer({ page, lpDomain, dedicated }: { pag
             {block.type === 'image' && <ImageBlockRenderer props={block.props} referenceWidth={pageMaxWidth} />}
             {block.type === 'productImages' && <ProductImagesBlockRenderer props={block.props} />}
             {block.type === 'spacer' && <SpacerBlockRenderer props={block.props} elements={isPinnedSpacer ? block.props?.elements : undefined} maxWidth={pageMaxWidth} />}
+            {block.type === 'themeProduct' && (
+              <ThemeProductBlock
+                productId={page.productId || (block.props?.productId as string | undefined)}
+                builderPageId={page.id}
+                splitTestId={splitTestId}
+                product={page.themeProduct}
+                store={store}
+              />
+            )}
             {block.type === 'productForm' && (
               <EditorProductFormBlock
                 {...(block.props as Record<string, unknown>)}

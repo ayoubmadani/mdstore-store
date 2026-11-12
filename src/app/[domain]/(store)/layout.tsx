@@ -10,6 +10,7 @@ import ThemeRunner from '@/components/ThemeRunner'
 import BuilderPageRenderer from '@/components/builderPages/BuilderPageRenderer'
 import { withImageSizes } from '@/lib/image-size'
 import DedicatedPageSwitch from '@/components/builderPages/DedicatedPageSwitch'
+import { BARE_CSS, cartOff } from '@/components/builderPages/themeBare'
 import type { Metadata } from 'next'
 
 const getStoreCached = cache(async (domain: string) => getStoreByDomain(domain))
@@ -80,14 +81,18 @@ export default async function DomainLayout({ children, params }: LayoutProps) {
       : await getBuilderPageById(dedicatedDomain.builderPageId!)
     if (!picked) notFound()
     // أبعاد الصور من الخادم: يُحجز مكانها قبل وصولها فلا تقفز الصفحة
-    const page = await withImageSizes(picked)
+    const page: any = await withImageSizes(picked)
+    // قسم «المنتج بثيم المتجر»: المنتج يُحمَّل هنا فتظهر الصفحة كاملة من الخادم
+    const themeBlock = page.tree?.find((b: any) => b.type === 'themeProduct')
+    const themeProductId = themeBlock && (page.productId || themeBlock.props?.productId)
+    if (themeProductId) page.themeProduct = await getProduct(domain, themeProductId)
     // /success يعرض صفحة "شكراً" الخاصة بالمتجر بعد الطلب
     return (
       <StoreProvider store={store} theme={store.theme?.slug || 'default'}>
         <div dir={(page.settings?.language || 'ar') === 'ar' ? 'rtl' : 'ltr'}>
           <CustomerTracker pixels={page.pixels ?? []} pageType="landing_page" landingPageId={page.id} />
           <DedicatedPageSwitch
-            page={<BuilderPageRenderer page={page} lpDomain={domain} dedicated />}
+            page={<BuilderPageRenderer page={page} lpDomain={domain} dedicated store={store} />}
             success={children}
           />
         </div>
@@ -110,10 +115,10 @@ export default async function DomainLayout({ children, params }: LayoutProps) {
               : <CustomerTracker pixels={store.pixels ?? []} />}
             {/* مثل صفحة الهبوط: غلاف الثيم (خلفيته وتنسيقه) بلا رأس المتجر وتذييله (كل ما بجانب <main>)،
                 وطلب مباشر فقط: السلة تُعامل كأنها معطّلة فيظهر نموذج الطلب مباشرة (بلا «أضف إلى السلة» ولا «اطلب الآن») */}
-            <style>{'.mds-bare :has(> main) > :not(main):not(style){display:none!important}.mds-bare [data-add-to-cart]{display:none!important}.mds-bare main{padding-top:0!important}'}</style>
+            <style>{BARE_CSS}</style>
             <div className="mds-bare">
               <ThemeRunner bundleUrl={`/api/themes/${store.theme?.slug || 'default'}`} exportName="default" themeProps={{ store, domain }}>
-                <DedicatedPageSwitch page={<ProductClient product={{ ...product, store: { ...product.store, cart: false } }} store={{ ...store, cart: false }} domain={domain} noTracker />} success={children} />
+                <DedicatedPageSwitch page={<ProductClient product={cartOff(product, store).product} store={cartOff(product, store).store} domain={domain} noTracker />} success={children} />
               </ThemeRunner>
             </div>
           </div>
