@@ -12,6 +12,14 @@ import { Star, ChevronDown, AlertCircle, X, CheckCircle2, Shield, ArrowLeft, Plu
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
+
+// اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
+const __colorName = (attr: any, sel: any) => {
+  const v = attr?.variants?.find((x: any) => x.value === sel?.[attr?.name]);
+  return (attr?.displayMode === 'color' || attr?.displayMode === 'image') && v?.name && v.name !== v.value
+    ? <span style={{ fontWeight: 500, opacity: 0.75, textTransform: 'none' }}> : {v.name}</span> : null;
+};
+
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -776,7 +784,7 @@ export function Details({product,discount,allImages,allAttrs,finalPrice,inStock,
 
           {allAttrs.map((attr:any)=>(
             <div key={attr.id} style={{marginBottom:20,paddingBottom:20,borderBottom:'1px solid var(--br)'}}>
-              <span className="lbl">{attr.name}</span>
+              <span className="lbl">{attr.name}{__colorName(attr, selectedVariants)}</span>
               {attr.displayMode==='color'?(
                 <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
                   {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value;const available=!product.variantDetails?.length||product.variantDetails.some((vd:any)=>Object.entries({...selectedVariants,[attr.name]:v.value}).every(([n,val])=>vd.name.some((e:any)=>e.attrName===n&&e.value===val)));return<button key={v.id} onClick={()=>available&&handleVariantSelection(attr.name,v.value)} title={v.name} style={{width:26,height:26,backgroundColor:v.value,border:`2px solid ${s?'var(--cp)':'transparent'}`,cursor:available?'pointer':'not-allowed',outline:s?'2px solid var(--cp)':'none',outlineOffset:2,borderRadius:'50%',transition:'outline .15s',opacity:available?1:0.35}}/>;})}</div>

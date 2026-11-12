@@ -22,6 +22,14 @@ import { Store } from '@/types/store';
 import { useCartStore } from '@/store/useCartStore';
 import { whatsappHref } from '@/components/builderPages/buttonLinks';
 
+
+// اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
+const __colorName = (attr: any, sel: any) => {
+  const v = attr?.variants?.find((x: any) => x.value === sel?.[attr?.name]);
+  return (attr?.displayMode === 'color' || attr?.displayMode === 'image') && v?.name && v.name !== v.value
+    ? <span style={{ fontWeight: 500, opacity: 0.75, textTransform: 'none' }}> : {v.name}</span> : null;
+};
+
 // ربط اللون بصورة المنتج (نسخة مستقلة من src/lib/variant-image.ts)
 type __VAttr = { name: string; variants?: { value: string; imageUrl?: string | null }[] };
 const imageIndexForSelection = (attributes: __VAttr[] | undefined, selected: Record<string, string>, images: string[]): number => {
@@ -803,7 +811,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           {/* Attributes */}
           {allAttrs.map((attr: any) => (
             <div key={attr.id} style={{ marginBottom: '1.5rem' }}>
-              <p style={{ fontWeight: 600, marginBottom: '0.5rem' }}>{attr.name}</p>
+              <p style={{ fontWeight: 600, marginBottom: '0.5rem' }}>{attr.name}{__colorName(attr, selectedVariants)}</p>
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 {attr.displayMode === 'color' ? (
                   attr.variants.map((v: any) => {

@@ -19,6 +19,14 @@ import {
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
+
+// اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
+const __colorName = (attr: any, sel: any) => {
+  const v = attr?.variants?.find((x: any) => x.value === sel?.[attr?.name]);
+  return (attr?.displayMode === 'color' || attr?.displayMode === 'image') && v?.name && v.name !== v.value
+    ? <span style={{ fontWeight: 500, opacity: 0.75, textTransform: 'none' }}> : {v.name}</span> : null;
+};
+
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1236,7 +1244,7 @@ export function Details({ product, store, toggleWishlist, isWishlisted, discount
           {/* Attributes */}
           {allAttrs.map((attr: any) => (
             <div key={attr.id} style={{ marginBottom: '18px', paddingBottom: '18px', borderBottom: '1px solid var(--paper-dk)' }}>
-              <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)', marginBottom: '9px' }}>/ {attr.name.toUpperCase()}</p>
+              <p className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'var(--ash)', marginBottom: '9px' }}>/ {attr.name.toUpperCase()}{__colorName(attr, selectedVariants)}</p>
               {attr.displayMode === 'color' ? (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px' }}>
                   {attr.variants.map((v: any) => { const s = selectedVariants[attr.name] === v.value; const available = !product.variantDetails?.length || product.variantDetails.some((vd: any) => Object.entries({ ...selectedVariants, [attr.name]: v.value }).every(([n, val]) => vd.name.some((e: any) => e.attrName === n && e.value === val))); return <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.name} style={{ width: '30px', height: '30px', backgroundColor: v.value, border: `3px solid ${s ? 'var(--ink)' : 'transparent'}`, cursor: available ? 'pointer' : 'not-allowed', outline: s ? '2px solid var(--punch)' : 'none', outlineOffset: '2px', opacity: available ? 1 : 0.35 }} />; })}

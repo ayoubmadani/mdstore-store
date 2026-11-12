@@ -20,6 +20,14 @@ import {
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
+
+// اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
+const __colorName = (attr: any, sel: any) => {
+  const v = attr?.variants?.find((x: any) => x.value === sel?.[attr?.name]);
+  return (attr?.displayMode === 'color' || attr?.displayMode === 'image') && v?.name && v.name !== v.value
+    ? <span style={{ fontWeight: 500, opacity: 0.75, textTransform: 'none' }}> : {v.name}</span> : null;
+};
+
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
@@ -1448,7 +1456,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
 
             {allAttrs.map((attr: any) => (
               <div key={attr.id} style={{ marginBottom:'18px', paddingBottom:'18px', borderBottom:'1px solid var(--tan)' }}>
-                <p className="pd" style={{ fontSize:'11px', fontWeight:600, color:'var(--green)', marginBottom:'10px' }}>{attr.name}</p>
+                <p className="pd" style={{ fontSize:'11px', fontWeight:600, color:'var(--green)', marginBottom:'10px' }}>{attr.name}{__colorName(attr, selectedVariants)}</p>
                 {attr.displayMode === 'color' ? (
                   <div style={{ display:'flex', flexWrap:'wrap', gap:'8px' }}>
                     {attr.variants.map((v: any) => {

@@ -18,6 +18,14 @@ import {
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
+
+// اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
+const __colorName = (attr: any, sel: any) => {
+  const v = attr?.variants?.find((x: any) => x.value === sel?.[attr?.name]);
+  return (attr?.displayMode === 'color' || attr?.displayMode === 'image') && v?.name && v.name !== v.value
+    ? <span style={{ fontWeight: 500, opacity: 0.75, textTransform: 'none' }}> : {v.name}</span> : null;
+};
+
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
@@ -1354,7 +1362,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
           {/* Attributes */}
           {allAttrs.map((attr:any)=>(
             <div key={attr.id} style={{marginBottom:'18px',paddingBottom:'18px',borderBottom:'1px solid var(--line)'}}>
-              <p className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.16em',color:'var(--mid)',marginBottom:'10px'}}>// {attr.name}</p>
+              <p className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.16em',color:'var(--mid)',marginBottom:'10px'}}>// {attr.name}{__colorName(attr, selectedVariants)}</p>
               {attr.displayMode==='color' ? (
                 <div style={{display:'flex',flexWrap:'wrap',gap:'8px'}}>
                   {attr.variants.map((v:any)=>{const s=selectedVariants[attr.name]===v.value; const available=!product.variantDetails?.length||product.variantDetails.some((vd:any)=>Object.entries({...selectedVariants,[attr.name]:v.value}).every(([n,val])=>vd.name.some((e:any)=>e.attrName===n&&e.value===val))); return <button key={v.id} onClick={()=>available&&handleVariantSelection(attr.name,v.value)} title={v.name} style={{width:'28px',height:'28px',backgroundColor:v.value,border:'none',cursor:available?'pointer':'not-allowed',outline:`3px solid ${s?'var(--blue)':'transparent'}`,outlineOffset:'3px',opacity:available?1:0.35}}/>;})}

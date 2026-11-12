@@ -34,6 +34,14 @@ import {
 } from 'lucide-react';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
+
+// اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
+const __colorName = (attr: any, sel: any) => {
+  const v = attr?.variants?.find((x: any) => x.value === sel?.[attr?.name]);
+  return (attr?.displayMode === 'color' || attr?.displayMode === 'image') && v?.name && v.name !== v.value
+    ? <span style={{ fontWeight: 500, opacity: 0.75, textTransform: 'none' }}> : {v.name}</span> : null;
+};
+
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
@@ -1277,7 +1285,7 @@ export function Details({
               <p style={{ ...eyebrow, marginBottom: 12 }}>{t.optionsTitle}</p>
               {attrs.map((attr: Attribute) => (
                 <div key={attr.id} style={{ marginBottom: 20 }}>
-                  <p style={label}>{attr.name}</p>
+                  <p style={label}>{attr.name}{__colorName(attr, selectedVariants)}</p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 9 }}>
                     {(attr.variants || []).map((v: Variant) => {
                       const active = selectedVariants?.[attr.name] === v.value;

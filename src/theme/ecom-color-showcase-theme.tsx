@@ -15,6 +15,14 @@ import {
   useCartStore, WhatsAppOrderButton, WhatsAppGlyph, comingSoon,
 } from '@mdstore/theme-kit';
 
+
+// اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
+const __colorName = (attr: any, sel: any) => {
+  const v = attr?.variants?.find((x: any) => x.value === sel?.[attr?.name]);
+  return (attr?.displayMode === 'color' || attr?.displayMode === 'image') && v?.name && v.name !== v.value
+    ? <span style={{ fontWeight: 500, opacity: 0.75, textTransform: 'none' }}> : {v.name}</span> : null;
+};
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
 /*
@@ -960,7 +968,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 
           {allAttrs.map((attr: any) => (
             <div key={attr.id} style={{ marginBottom: '1.25rem' }}>
-              <p className="cs-attr-name">{attr.name}</p>
+              <p className="cs-attr-name">{attr.name}{__colorName(attr, selectedVariants)}</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                 {attr.variants.map((v: any) => {
                   const on = selectedVariants[attr.name] === v.value;
