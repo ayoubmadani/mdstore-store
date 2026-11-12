@@ -23,5 +23,7 @@
   "feat_notifications": "إشعارات فورية",
   "billed_yearly": "تُدفع {price} {currency} سنوياً",
   "trial_banner": "جرّب أي خطة مدفوعة {days} أيام مجاناً — بدون دفع مسبق",
-  "trial_badge": "{days} أيام مجاناً"
+  "trial_badge": "{days} أيام مجاناً",
+  "feat_orders": "طلب / شهر",
+  "feat_extra_order": "د.ج لكل طلب زائد"
 }

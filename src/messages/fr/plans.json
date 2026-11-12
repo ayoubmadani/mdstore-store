@@ -23,5 +23,7 @@
   "feat_notifications": "Notifications instantanées",
   "billed_yearly": "Facturé {price} {currency} par an",
   "trial_banner": "Essayez n'importe quel plan payant {days} jours gratuitement — sans paiement à l'avance",
-  "trial_badge": "{days} jours gratuits"
+  "trial_badge": "{days} jours gratuits",
+  "feat_orders": "commandes / mois",
+  "feat_extra_order": "DA par commande en plus"
 }

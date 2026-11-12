@@ -12,19 +12,24 @@ const TRIAL_DAYS = 7;
 
 type TFunc = ReturnType<typeof useTranslations<'plans'>>;
 
+// -1 = بلا حد
+const lim = (n?: number | null) => (n == null ? null : Number(n) < 0 ? '∞' : n);
+
 const buildFeatureRows = (features: Plan['features'], t: TFunc) => {
   if (!features) return [];
   const rows: { icon: typeof Store | null; label: string; value: string | number | null }[] = [
-    { icon: Store, label: t('feat_stores'), value: features.storeNumber ?? null },
-    { icon: Package, label: t('feat_products'), value: features.productNumber ?? null },
-    { icon: FileText, label: t('feat_pages'), value: features.landingPageNumber ?? null },
-    { icon: TrendingUp, label: t('feat_commission'), value: `${Number(features.commission ?? 0).toFixed(1)}%` },
+    { icon: Store, label: t('feat_stores'), value: lim(features.storeNumber) },
+    { icon: Package, label: t('feat_products'), value: lim(features.productNumber) },
+    { icon: FileText, label: t('feat_pages'), value: lim(features.landingPageNumber) },
   ];
+  const f = features as Plan['features'] & { orderNumber?: number };
+  if (f.orderNumber != null) rows.push({ icon: Package, label: t('feat_orders'), value: lim(f.orderNumber) });
+  if (Number(f.orderNumber) >= 0 && Number(features.commission) > 0) rows.push({ icon: TrendingUp, label: t('feat_extra_order'), value: Number(features.commission) });
   if (features.isNtfy) rows.push({ icon: Bell, label: t('feat_notifications'), value: '✓' });
   if ((features.pixelFacebookNumber ?? 0) > 0 || (features.pixelTiktokNumber ?? 0) > 0) {
     rows.push({
       icon: null,
-      label: `FB ×${features.pixelFacebookNumber ?? 0} · TT ×${features.pixelTiktokNumber ?? 0}`,
+      label: `FB ×${lim(features.pixelFacebookNumber ?? 0)} · TT ×${lim(features.pixelTiktokNumber ?? 0)}`,
       value: null,
     });
   }
