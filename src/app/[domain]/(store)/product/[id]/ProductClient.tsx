@@ -62,12 +62,15 @@ export default function ProductClient({
   store,
   domain,
   noTracker = false,
+  noStats = false,
 }: {
   product: any
   store: any
   domain: string
   // دومين المنتج: البكسلات يطلقها الإطار (المنتج أو المتجر) — لا تكرار
   noTracker?: boolean
+  // معاينة المحرر: لا تُحسب زيارة
+  noStats?: boolean
 }) {
   const { theme: contextThemeSlug } = useStore()
   const router = useRouter()
@@ -264,7 +267,7 @@ export default function ProductClient({
 
   return (
     <>
-      <AddShow productId={product.id} />
+      {!noStats && <AddShow productId={product.id} />}
       {/* بكسلات خاصة بهذا المنتج (بكسلات المتجر يطلقها الإطار) */}
       {!noTracker && <CustomerTracker pixels={store.pixels ?? []} pageType="product" productId={product.id} />}
       <MobilePaddingClamp>

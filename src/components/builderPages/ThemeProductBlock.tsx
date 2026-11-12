@@ -18,9 +18,11 @@ type Props = {
   store?: any;
   maxWidth?: number;
   backgroundColor?: string;
+  // معاينة المحرر (إطار): بلا إحصائيات ولا نسب طلبات
+  preview?: boolean;
 };
 
-export default function ThemeProductBlock({ productId, builderPageId, splitTestId, product: initialProduct, store: initialStore, maxWidth = 720, backgroundColor }: Props) {
+export default function ThemeProductBlock({ productId, builderPageId, splitTestId, product: initialProduct, store: initialStore, maxWidth = 720, backgroundColor, preview = false }: Props) {
   const [product, setProduct] = useState<any>(initialProduct ?? null);
   const [store, setStore] = useState<any>(initialStore ?? null);
   const [domain, setDomain] = useState('');
@@ -88,7 +90,7 @@ export default function ThemeProductBlock({ productId, builderPageId, splitTestI
       <style>{BARE_CSS}</style>
       <div ref={root} className="mds-bare mds-embed" style={backgroundColor ? { backgroundColor } : undefined}>
         <ThemeRunner bundleUrl={`/api/themes/${slug}`} exportName="default" themeProps={{ store: off.store, domain: host }}>
-          <ProductClient product={off.product} store={off.store} domain={host} noTracker />
+          <ProductClient product={off.product} store={off.store} domain={host} noTracker noStats={preview} />
         </ThemeRunner>
       </div>
     </StoreProvider>
