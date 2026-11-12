@@ -7,8 +7,8 @@ import type { Plan } from '@/lib/api';
 
 type Interval = 'month' | 'year';
 
-// التجربة المجانية لأي خطة مدفوعة عند التسجيل (نفس TRIAL_DAYS في الـ API)
-const TRIAL_DAYS = 7;
+// التجربة المجانية: لكل خطة أيامها (trialDays يحددها الأدمن، 0 = بلا تجربة)
+const trialOf = (p: Plan) => Number((p as Plan & { trialDays?: number }).trialDays) || 0;
 
 type TFunc = ReturnType<typeof useTranslations<'plans'>>;
 
@@ -56,10 +56,10 @@ export default function PlanToggle({ plans }: { plans: Plan[] }) {
 
   return (
     <div dir={isRtl ? 'rtl' : 'ltr'}>
-      {paidPlans.length > 0 && (
+      {paidPlans.some((p) => trialOf(p) > 0) && (
         <div className="flex justify-center mb-5">
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 text-sm font-bold">
-            <Gift size={16} className="shrink-0" /> {t('trial_banner', { days: TRIAL_DAYS })}
+            <Gift size={16} className="shrink-0" /> {t('trial_banner', { days: Math.max(...paidPlans.map(trialOf)) })}
           </span>
         </div>
       )}
@@ -136,9 +136,9 @@ export default function PlanToggle({ plans }: { plans: Plan[] }) {
                 <p className={`text-xl font-black mb-2 ${isFeatured ? 'text-white dark:text-zinc-900' : 'text-gray-900 dark:text-white'}`}>
                   {plan.name}
                 </p>
-                {!isFree && (
+                {!isFree && trialOf(plan) > 0 && (
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[11px] font-black">
-                    <Gift size={11} /> {t('trial_badge', { days: TRIAL_DAYS })}
+                    <Gift size={11} /> {t('trial_badge', { days: trialOf(plan) })}
                   </span>
                 )}
               </div>
