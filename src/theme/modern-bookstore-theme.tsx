@@ -1422,7 +1422,15 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             {/* Attributes - تم تغيير اللون للأحمر المتناسق */}
             {allAttrs.map((attr: any) => (
               <div key={attr.id} style={{ marginBottom: '1.125rem' }}>
-                <p style={{ fontSize: '0.825rem', fontWeight: 700, color: '#1F2A44', marginBottom: '0.625rem', textTransform: 'uppercase' }}>{attr.name}</p>
+                <p style={{ fontSize: '0.825rem', fontWeight: 700, color: '#1F2A44', marginBottom: '0.625rem', textTransform: 'uppercase' }}>
+                  {attr.name}
+                  {/* اسم اللون المختار (أحمر) إن كتبه التاجر — بجانب اسم الخاصية */}
+                  {(() => {
+                    const sel = attr.variants.find((v: any) => v.value === selectedVariants[attr.name]);
+                    return (attr.displayMode === 'color' || attr.displayMode === 'image') && sel?.name && sel.name !== sel.value
+                      ? <span style={{ fontWeight: 600, color: '#B5532F', textTransform: 'none' }}> : {sel.name}</span> : null;
+                  })()}
+                </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                   {attr.variants.map((v: any) => {
                     const isSelected = selectedVariants[attr.name] === v.value;
@@ -1436,6 +1444,8 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                     return (
                       <button
                         key={v.id}
+                        title={v.name && v.name !== v.value ? v.name : undefined}
+                        aria-label={v.name || v.value}
                         onClick={() => available && handleVariantSelection(attr.name, v.value)}
                         style={
                           attr.displayMode === 'color' ? {
