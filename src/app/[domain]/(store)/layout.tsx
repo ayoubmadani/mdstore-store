@@ -90,7 +90,7 @@ export default async function DomainLayout({ children, params }: LayoutProps) {
     return (
       <StoreProvider store={store} theme={store.theme?.slug || 'default'}>
         <div dir={(page.settings?.language || 'ar') === 'ar' ? 'rtl' : 'ltr'}>
-          <CustomerTracker pixels={page.pixels ?? []} pageType="landing_page" landingPageId={page.id} />
+          <CustomerTracker pixels={page.pixels ?? []} pageType="landing_page" landingPageId={page.id} productId={page.productId} />
           <DedicatedPageSwitch
             page={<BuilderPageRenderer page={page} lpDomain={domain} dedicated store={store} />}
             success={children}

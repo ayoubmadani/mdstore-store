@@ -598,7 +598,7 @@ export default function BuilderPageRenderer({ page, lpDomain, dedicated, store }
       }}
     >
       <AddShow storeId={page.storeId} productId={page.productId} builderPageId={page.id} splitTestId={splitTestId} />
-      <CustomerTracker pixels={page.pixels ?? []} pageType="landing_page" landingPageId={page.id} />
+      <CustomerTracker pixels={page.pixels ?? []} pageType="landing_page" landingPageId={page.id} productId={page.productId} />
       {page.tree.map((block, index) => {
         const isPinnedSpacer = block.type === 'spacer' && (block.props?.position === 'top' || block.props?.position === 'bottom');
         if (block.type === 'floatingButton') return <FloatingActionButton key={block.id ?? index} props={block.props} referenceWidth={pageMaxWidth} />;

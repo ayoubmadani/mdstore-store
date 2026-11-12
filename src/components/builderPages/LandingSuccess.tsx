@@ -14,6 +14,7 @@ export interface LandingOrderInfo {
   productName?: string
   landing: {
     builderPageId?: string
+    productId?: string
     backUrl?: string
     language?: 'ar' | 'fr' | 'en'
     productImage?: string
@@ -143,7 +144,7 @@ export default function LandingSuccess({ order }: { order: LandingOrderInfo }) {
         color: text, fontFamily: 'inherit',
       }}
     >
-      <CustomerTracker pixels={landing.pixels ?? []} pageType="landing_page" landingPageId={landing.builderPageId} />
+      <CustomerTracker pixels={landing.pixels ?? []} pageType="landing_page" landingPageId={landing.builderPageId} productId={landing.productId} />
       <style>{`@keyframes md-success-pop { 0% { transform: scale(.4); opacity: 0 } 70% { transform: scale(1.08) } 100% { transform: scale(1); opacity: 1 } }`}</style>
 
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '40px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>

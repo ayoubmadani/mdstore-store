@@ -372,6 +372,7 @@ export default function ProductFormBlock({
         // «الموقع» صفحة "شكراً" الموحدة لصفحات الهبوط (LandingSuccess) بألوان هذا النموذج
         landing: {
           builderPageId,
+          productId: product.id, // بيكسل المنتج يعمل في صفحة «شكراً» أيضاً
           backUrl: window.location.pathname + window.location.search,
           language,
           productImage: product.productImage,

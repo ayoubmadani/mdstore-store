@@ -1,5 +1,6 @@
 'use client';
 
+import { pixelInScope } from '@/lib/pixel-scope';
 import React, { useEffect } from 'react';
 import { installCapiCapture } from '@/lib/meta-capi';
 import Script from 'next/script';
@@ -22,15 +23,7 @@ const CustomerTracker = ({ pixels, pageType = 'store', landingPageId, productId 
   useEffect(() => { if (pixels?.some((p) => p.type === 'facebook' && p.capi)) installCapiCapture(); }, [pixels]);
   if (!pixels || pixels.length === 0) return null;
 
-  const scopedPixels = pixels.filter((pixel) => {
-    const scope = pixel.scope ?? 'store';
-    if (pageType === 'store') return scope === 'store';
-    if (pageType === 'product') return scope === 'product' && pixel.productId === productId;
-    // landing_page-scoped pixels carry exactly one of these two FKs,
-    // depending on whether they were created via the old LandingPage module
-    // or the page-builder editor (builderPageId) — either can match here.
-    return scope === 'landing_page' && (pixel.builderPageId ?? pixel.landingPageId) === landingPageId;
-  });
+  const scopedPixels = pixels.filter((pixel) => pixelInScope(pixel as any, { pageType, landingPageId, productId }));
 
   if (scopedPixels.length === 0) return null;
 
