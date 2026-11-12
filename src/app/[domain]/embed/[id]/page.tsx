@@ -14,7 +14,9 @@ export default async function EmbedPage({
 }) {
   const { domain, id } = await params
   const { w, bg } = await searchParams
-  const [store, product] = await Promise.all([getStoreByDomain(domain), getProduct(domain, id)])
+  // من قاعدة البيانات مباشرة: المتجر برقمه المختصر (subdomain) والمنتج برقمه — لا يعتمد على الدومينات المربوطة
+  const key = domain.replace(/\.mdstore\.top$/, '')
+  const [store, product] = await Promise.all([getStoreByDomain(key), getProduct(key, id)])
   if (!store || !product) notFound()
   const maxWidth = Math.min(1600, Math.max(320, Number(w) || 720))
   const background = /^#[0-9a-f]{3,8}$/i.test(bg ?? '') ? bg : undefined
