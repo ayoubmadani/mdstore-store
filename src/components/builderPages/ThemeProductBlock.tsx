@@ -17,9 +17,10 @@ type Props = {
   product?: any;
   store?: any;
   maxWidth?: number;
+  backgroundColor?: string;
 };
 
-export default function ThemeProductBlock({ productId, builderPageId, splitTestId, product: initialProduct, store: initialStore, maxWidth = 720 }: Props) {
+export default function ThemeProductBlock({ productId, builderPageId, splitTestId, product: initialProduct, store: initialStore, maxWidth = 720, backgroundColor }: Props) {
   const [product, setProduct] = useState<any>(initialProduct ?? null);
   const [store, setStore] = useState<any>(initialStore ?? null);
   const [domain, setDomain] = useState('');
@@ -85,7 +86,7 @@ export default function ThemeProductBlock({ productId, builderPageId, splitTestI
   return (
     <StoreProvider store={off.store} theme={slug}>
       <style>{BARE_CSS}</style>
-      <div ref={root} className="mds-bare mds-embed">
+      <div ref={root} className="mds-bare mds-embed" style={backgroundColor ? { backgroundColor } : undefined}>
         <ThemeRunner bundleUrl={`/api/themes/${slug}`} exportName="default" themeProps={{ store: off.store, domain: host }}>
           <ProductClient product={off.product} store={off.store} domain={host} noTracker />
         </ThemeRunner>

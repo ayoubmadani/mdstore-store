@@ -7,7 +7,9 @@ export const BARE_CSS =
   '.mds-bare main{padding-top:0!important}' +
   '.mds-bare [data-add-to-cart]{display:none!important}' +
   // داخل صفحة المحرر: لا يأخذ الغلاف ارتفاع الشاشة كاملة
-  '.mds-embed :has(> main){min-height:0!important}.mds-embed main{min-height:0!important}'
+  '.mds-embed :has(> main){min-height:0!important}.mds-embed main{min-height:0!important}' +
+  // داخل صفحة المحرر: خلفية الصفحة (أو لون القسم) بدل خلفية الثيم
+  '.mds-embed :has(> main),.mds-embed main{background:transparent!important}'
 
 /** المنتج والمتجر بسلة معطّلة ← نموذج الطلب يظهر مباشرة في كل الثيمات */
 export function cartOff<P extends { store?: any }, S>(product: P, store: S): { product: P; store: S } {

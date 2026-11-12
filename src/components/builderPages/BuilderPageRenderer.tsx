@@ -615,6 +615,7 @@ export default function BuilderPageRenderer({ page, lpDomain, dedicated, store }
                 product={page.themeProduct}
                 store={store}
                 maxWidth={pageMaxWidth}
+                backgroundColor={block.props?.backgroundColor as string | undefined}
               />
             )}
             {block.type === 'productForm' && (
