@@ -58,8 +58,23 @@ export default function ThemeProductBlock({ productId, builderPageId, splitTestI
       if (next !== st.textContent) st.textContent = next;
       st.dataset.capped = String(maxWidth);
     });
-    cap();
-    const mo = new MutationObserver(cap);
+    // خلفية الثيم تتكرر على حاويات داخلية (لا الغلاف فقط) ← كل عنصر بلون خلفية الثيم نفسه يصير شفافاً
+    // فيظهر لون القسم أو الصفحة؛ البطاقات والأزرار بألوان أخرى تبقى كما هي
+    const clearThemeBg = () => {
+      const shell = el.querySelector('main')?.parentElement;
+      const themeBg = shell?.style.backgroundColor;
+      if (!themeBg || themeBg === 'transparent') return;
+      el.querySelectorAll<HTMLElement>('main, main *').forEach((n) => {
+        if (n.dataset.bgCleared) return;
+        if (getComputedStyle(n).backgroundColor === themeBg) {
+          n.style.setProperty('background-color', 'transparent', 'important');
+          n.dataset.bgCleared = '1';
+        }
+      });
+    };
+    const run = () => { cap(); clearThemeBg(); };
+    run();
+    const mo = new MutationObserver(run);
     mo.observe(el, { childList: true, subtree: true });
     return () => mo.disconnect();
   }, [product, store, maxWidth]);
