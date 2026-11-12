@@ -68,7 +68,9 @@ export default function ThemeProductBlock({ productId, builderPageId, splitTestI
   return (
     <StoreProvider store={off.store} theme={slug}>
       <style>{BARE_CSS}</style>
-      <div ref={root} className="mds-bare mds-embed">
+      {/* الثيم يقرر شكله حسب عرض الشاشة (لا عرض الصفحة 720px) ← القسم بعرض الشاشة كاملاً كما في المتجر */}
+      <style>{'body{overflow-x:clip}'}</style>
+      <div ref={root} className="mds-bare mds-embed" style={{ width: '100vw', marginInline: 'calc(50% - 50vw)' }}>
         <ThemeRunner bundleUrl={`/api/themes/${slug}`} exportName="default" themeProps={{ store: off.store, domain: host }}>
           <ProductClient product={off.product} store={off.store} domain={host} noTracker />
         </ThemeRunner>
