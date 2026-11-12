@@ -1215,7 +1215,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
       {(!isOrderNow && !product?.isDigital) ? (
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           {store?.cart !== false && (
-            <button onClick={addToCart} style={{ flex: 1, minHeight: 44, background: '#fff', color: A, border: `1px solid ${A}`, borderRadius: 6, fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s' }}
+            <button data-add-to-cart onClick={addToCart} style={{ flex: 1, minHeight: 44, background: '#fff', color: A, border: `1px solid ${A}`, borderRadius: 6, fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.2s' }}
               onMouseEnter={e => { e.currentTarget.style.background = AL; }}
               onMouseLeave={e => { e.currentTarget.style.background = '#fff'; }}>
               {t.addToCart}

@@ -1269,7 +1269,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
       {!isOrderNow && !product?.isDigital && (
         <div style={{ display: 'flex', gap: 10 }}>
           {store?.cart !== false && (
-            <button onClick={addToCart} className="btn-primary" style={{ ...btnOutline, flex: 1 }}>
+            <button data-add-to-cart onClick={addToCart} className="btn-primary" style={{ ...btnOutline, flex: 1 }}>
               {t.addToCart}
             </button>
           )}

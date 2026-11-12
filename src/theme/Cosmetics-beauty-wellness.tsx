@@ -1573,7 +1573,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#6B2D8B" />
       {product.store?.cart && !product.isDigital && (
         <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-          <button onClick={addToCart} disabled={isAdded} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '11px', border: `1.5px solid ${isAdded ? 'var(--plum)' : 'var(--line-dk)'}`, background: isAdded ? 'var(--soft)' : 'transparent', color: isAdded ? 'var(--plum)' : 'var(--mid)', fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: '13px', cursor: 'pointer', borderRadius: '4px', transition: 'all 0.2s' }}>
+          <button data-add-to-cart onClick={addToCart} disabled={isAdded} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '11px', border: `1.5px solid ${isAdded ? 'var(--plum)' : 'var(--line-dk)'}`, background: isAdded ? 'var(--soft)' : 'transparent', color: isAdded ? 'var(--plum)' : 'var(--mid)', fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: '13px', cursor: 'pointer', borderRadius: '4px', transition: 'all 0.2s' }}>
             {isAdded ? <><CheckCircle2 style={{ width: '14px', height: '14px' }} className="anim-check" />{t.addedMsg}</> : <><ShoppingCart style={{ width: '14px', height: '14px' }} />{t.addToCart}</>}
           </button>
           <button onClick={() => setIsOrderNow(true)} className="btn-plum" style={{ flex: 1, padding: '11px' }}>

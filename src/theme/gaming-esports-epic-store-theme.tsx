@@ -1144,7 +1144,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {product.store?.cart === true && !product.isDigital && (
-              <button onClick={addToCart} style={{ ...btnPrimary, background: C3, color: TXT, border: `1px solid ${BD}` }}>
+              <button data-add-to-cart onClick={addToCart} style={{ ...btnPrimary, background: C3, color: TXT, border: `1px solid ${BD}` }}>
                 <ShoppingCart size={16} />{t.addToCart}
               </button>
             )}

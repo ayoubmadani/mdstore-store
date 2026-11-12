@@ -1319,7 +1319,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
               <Check size={18} /> {t.orderNow}
             </button>
             {cartEnabled && (
-              <button onClick={addToCart} className="lm-btn" style={btnGhost}>
+              <button data-add-to-cart onClick={addToCart} className="lm-btn" style={btnGhost}>
                 <ShoppingBag size={17} /> {t.addToCart}
               </button>
             )}

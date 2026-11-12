@@ -1060,7 +1060,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, selectedVa
         <div className="grid-2" style={{ gap: '1rem' }}>
           <button type="submit" className="btn-primary" disabled={sub}>{sub ? <Loader2 className="anim-pulse" size={18} /> : 'تأكيد الطلب'}</button>
         {product.store.cart && !product.isDigital && (
-            <button type="button" className="btn-outline" onClick={addToCart} disabled={isAdded}>
+            <button data-add-to-cart type="button" className="btn-outline" onClick={addToCart} disabled={isAdded}>
               {isAdded ? <CheckCircle2 size={18} color="green" /> : <ShoppingCart size={18} />}
               {isAdded ? 'تمت الإضافة' : 'أضف للسلة'}
             </button>

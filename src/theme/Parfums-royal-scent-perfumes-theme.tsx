@@ -1202,7 +1202,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <button className="rsp-btn-primary" onClick={() => setIsOrderNow(true)} style={{ flex: 1 }}>{t.orderNow}</button>
             {store?.cart !== false && (
-              <button className="rsp-btn-outline" onClick={addToCart} style={{ flex: 1 }}>{t.addToCart}</button>
+              <button data-add-to-cart className="rsp-btn-outline" onClick={addToCart} style={{ flex: 1 }}>{t.addToCart}</button>
             )}
           </div>
         </>

@@ -1322,7 +1322,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             {t.orderNow}
           </button>
           {store?.cart !== false && (
-            <button className="luxe-btn-secondary" onClick={addToCart} style={{ marginTop: 0 }}>
+            <button data-add-to-cart className="luxe-btn-secondary" onClick={addToCart} style={{ marginTop: 0 }}>
               <ShoppingCart size={18} /> {t.addToCart}
             </button>
           )}

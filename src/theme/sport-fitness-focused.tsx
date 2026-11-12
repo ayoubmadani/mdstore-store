@@ -1595,7 +1595,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
       {/* Cart + Order buttons */}
         {product.store?.cart && !product.isDigital && (
         <div style={{display:'flex',gap:'8px',marginBottom:'16px'}}>
-          <button onClick={addToCart} disabled={isAdded} className="bc" style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:7,padding:'12px',cursor:isAdded?'default':'pointer',fontFamily:'inherit',fontWeight:800,fontSize:'13px',letterSpacing:'0.08em',textTransform:'uppercase',border:`1.5px solid ${isAdded?'var(--green)':'var(--dim)'}`,background:isAdded?'rgba(57,255,20,0.1)':'transparent',color:isAdded?'var(--green)':'var(--mid)',transition:'all 0.25s'}}>
+          <button data-add-to-cart onClick={addToCart} disabled={isAdded} className="bc" style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:7,padding:'12px',cursor:isAdded?'default':'pointer',fontFamily:'inherit',fontWeight:800,fontSize:'13px',letterSpacing:'0.08em',textTransform:'uppercase',border:`1.5px solid ${isAdded?'var(--green)':'var(--dim)'}`,background:isAdded?'rgba(57,255,20,0.1)':'transparent',color:isAdded?'var(--green)':'var(--mid)',transition:'all 0.25s'}}>
             {isAdded?<><CheckCircle2 size={14} className="anim-check"/>{t.addedToCart}</>:<><ShoppingCart size={14}/>{t.addToCart}</>}
           </button>
           <button onClick={()=>setIsOrderNow(true)} className="btn-fire" style={{flex:1,clipPath:'none',padding:'12px'}}>

@@ -912,7 +912,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             {submitting ? <><Loader2 size={14} /> جاري الإرسال...</> : <><ShoppingCart size={14} /> تأكيد الطلب</>}
           </button>
         {product.store.cart && !product.isDigital && (
-            <button type="button" onClick={addToCart} disabled={isAdded} style={{ ...S.btnOutline, padding: '0.65rem 0.9rem' }}>
+            <button data-add-to-cart type="button" onClick={addToCart} disabled={isAdded} style={{ ...S.btnOutline, padding: '0.65rem 0.9rem' }}>
               {isAdded ? <Check size={16} color="green" /> : <ShoppingCart size={16} />}
             </button>
           )}

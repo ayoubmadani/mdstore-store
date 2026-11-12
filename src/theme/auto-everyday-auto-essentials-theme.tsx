@@ -1702,7 +1702,7 @@ export function ProductForm({
             {t.orderNow}
           </button>
           {store?.cart !== false && !product?.isDigital ? (
-            <button type="button" className="ae-btn ae-btn-ghost" style={{ width: '100%' }} onClick={addToCart}>
+            <button data-add-to-cart type="button" className="ae-btn ae-btn-ghost" style={{ width: '100%' }} onClick={addToCart}>
               <ShoppingCart size={16} /> {t.addToCart}
             </button>
           ) : null}

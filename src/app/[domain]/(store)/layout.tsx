@@ -108,7 +108,9 @@ export default async function DomainLayout({ children, params }: LayoutProps) {
             {productPixels.length
               ? <CustomerTracker pixels={productPixels} pageType="product" productId={product.id} />
               : <CustomerTracker pixels={store.pixels ?? []} />}
-            <DedicatedPageSwitch page={<ProductClient product={product} store={store} domain={domain} noTracker />} success={children} />
+            {/* مثل صفحة الهبوط: طلب مباشر فقط — زر «أضف إلى السلة» (data-add-to-cart في الثيمات) مخفي، ومسافة حول الصفحة */}
+            <style>{'.mds-no-cart [data-add-to-cart]{display:none!important}'}</style>
+            <DedicatedPageSwitch page={<div className="mds-no-cart" style={{ padding: '16px 16px 24px' }}><ProductClient product={product} store={store} domain={domain} noTracker /></div>} success={children} />
           </div>
         </StoreProvider>
       )

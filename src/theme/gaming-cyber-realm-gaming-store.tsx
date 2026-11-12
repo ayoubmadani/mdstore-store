@@ -1669,7 +1669,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         {product.store.cart && !product.isDigital && (
         <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
           {/* زر إضافة للسلة */}
-          <button onClick={addToCart} disabled={isAdded}
+          <button data-add-to-cart onClick={addToCart} disabled={isAdded}
             className={isAdded ? 'animate-cart' : ''}
             style={{
               flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',

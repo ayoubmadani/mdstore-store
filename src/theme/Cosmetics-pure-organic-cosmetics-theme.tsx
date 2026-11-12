@@ -1432,7 +1432,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#DC2626" />
         {product.store.cart && !product.isDigital && (
         <div className="cart-add-btns" style={{ marginBottom:'1.25rem' }}>
-          <button onClick={addToCart} disabled={isAdded} style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:6, padding:'0.85rem 1rem', border:`1.5px solid ${isAdded ? '#22C55E' : BD}`, borderRadius:12, fontSize:'0.875rem', fontWeight:500, cursor:'pointer', background: isAdded ? 'rgba(34,197,94,0.06)' : CARD, color: isAdded ? '#22C55E' : SUB, transition:'all 0.2s', fontFamily:'inherit' }}>
+          <button data-add-to-cart onClick={addToCart} disabled={isAdded} style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:6, padding:'0.85rem 1rem', border:`1.5px solid ${isAdded ? '#22C55E' : BD}`, borderRadius:12, fontSize:'0.875rem', fontWeight:500, cursor:'pointer', background: isAdded ? 'rgba(34,197,94,0.06)' : CARD, color: isAdded ? '#22C55E' : SUB, transition:'all 0.2s', fontFamily:'inherit' }}>
             {isAdded ? <><CheckCircle2 size={14} className="anim-check"/>{t.addedShort}</> : <><ShoppingCart size={14}/>{t.addToCartShort}</>}
           </button>
           <button onClick={() => setON(true)} style={{ flex:1, ...S.btnPrimary, width:'auto', background:`linear-gradient(135deg,${RO},${ROD})`, borderRadius:12 }}

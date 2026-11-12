@@ -1131,7 +1131,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       <AddonsPicker product={product} store={store || product.store} value={addonQty} onChange={setAddonQty} pieces={pieces} />
       {product.store.cart && !product.isDigital && !isOrderNow && (
         <div className="cs-two">
-          <button type="button" onClick={addToCart} disabled={isAdded} className="cs-btn ghost" style={isAdded ? { borderColor: '#10B981', color: '#059669' } : undefined}>
+          <button data-add-to-cart type="button" onClick={addToCart} disabled={isAdded} className="cs-btn ghost" style={isAdded ? { borderColor: '#10B981', color: '#059669' } : undefined}>
             {isAdded ? <><CheckCircle2 size={16} className="cs-pop" />{t.addedMsg}</> : <><ShoppingCart size={16} />{t.addToCart}</>}
           </button>
           <button type="button" onClick={() => setIsOrderNow(true)} className="cs-btn">{t.orderNow}</button>

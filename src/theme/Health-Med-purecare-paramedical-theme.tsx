@@ -1459,7 +1459,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       {/* Cart + Order buttons */}
         {product.store?.cart && !product.isDigital && (
         <div className="cart-btns" style={{ marginBottom: '20px' }}>
-          <button onClick={addToCart} disabled={isAdded}
+          <button data-add-to-cart onClick={addToCart} disabled={isAdded}
             style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', borderRadius: '8px', border: isAdded ? '2px solid var(--green)' : '2px solid var(--line-dk)', backgroundColor: isAdded ? 'rgba(22,197,94,0.05)' : 'var(--white)', color: isAdded ? 'var(--green)' : 'var(--ink)', cursor: isAdded ? 'default' : 'pointer', fontWeight: 700, transition: 'all 0.3s ease', fontFamily: 'inherit' }}>
             {isAdded
               ? <><CheckCircle2 size={18} className="anim-check" style={{ color: 'var(--green)' }} /><span>{t.addedText}</span></>

@@ -1354,7 +1354,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <button className="pt-btn" onClick={() => setIsOrderNow(true)}>{t.orderNow}</button>
           {cartOn && (
-            <button className="pt-btn pt-btn-ghost" onClick={addToCart}>
+            <button data-add-to-cart className="pt-btn pt-btn-ghost" onClick={addToCart}>
               <ShoppingCart size={18} /> {t.addToCart}
             </button>
           )}

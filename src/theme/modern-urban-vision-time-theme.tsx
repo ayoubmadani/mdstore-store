@@ -1863,7 +1863,7 @@ export function ProductForm({
             <ArrowRight size={15} style={{ transform: t.dir === 'rtl' ? 'scaleX(-1)' : 'none' }} />
           </button>
           {showCart && (
-            <button type="button" style={btnGhost} onClick={addToCart}>
+            <button data-add-to-cart type="button" style={btnGhost} onClick={addToCart}>
               {added ? <CheckCircle2 size={15} color={A} /> : <ShoppingBag size={15} />}
               {added ? t.cart : t.addToCart}
             </button>

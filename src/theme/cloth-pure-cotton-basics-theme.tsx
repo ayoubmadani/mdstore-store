@@ -1193,7 +1193,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       {!isOrderNow && !product.isDigital ? (
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           {product.store?.cart !== false && (
-            <button className="pc-btn pc-btn-outline" onClick={addToCart} style={{ flex: 1, minWidth: 160 }}>{t.addToCartBtn}</button>
+            <button data-add-to-cart className="pc-btn pc-btn-outline" onClick={addToCart} style={{ flex: 1, minWidth: 160 }}>{t.addToCartBtn}</button>
           )}
           <button className="pc-btn pc-btn-primary" onClick={() => setIsOrderNow(true)} style={{ flex: 1, minWidth: 160 }}>{t.orderNow}</button>
         </div>

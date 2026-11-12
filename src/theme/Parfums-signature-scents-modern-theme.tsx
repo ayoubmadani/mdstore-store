@@ -1256,7 +1256,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       {!product.isDigital && (
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           {canCart && (
-            <button onClick={addToCart} className="btn-primary" style={{ ...btnPrimary, background: 'transparent', color: A, border: `1.5px solid ${A}`, flex: 1 }}>
+            <button data-add-to-cart onClick={addToCart} className="btn-primary" style={{ ...btnPrimary, background: 'transparent', color: A, border: `1.5px solid ${A}`, flex: 1 }}>
               {added ? <><Check size={17} /> {t.addedBtn}</> : <><ShoppingBag size={17} /> {t.addBtn}</>}
             </button>
           )}

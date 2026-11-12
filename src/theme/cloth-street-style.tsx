@@ -1376,7 +1376,7 @@ export function ProductForm({ product, store, userId, domain, selectedOffer, set
   <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#FF2D00" />
         {product.store?.cart !== false && !product.isDigital && (
         <div className="cart-add-btns" style={{ marginBottom: '14px' }}>
-          <button onClick={addToCart} disabled={isAdded} className="sm" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px', cursor: isAdded ? 'default' : 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', border: `1px solid ${isAdded ? '#22c55e' : 'var(--ink)'}`, background: isAdded ? 'rgba(34,197,94,0.08)' : 'transparent', color: isAdded ? '#22c55e' : 'var(--ink)', transition: 'all 0.25s' }}>
+          <button data-add-to-cart onClick={addToCart} disabled={isAdded} className="sm" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px', cursor: isAdded ? 'default' : 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', border: `1px solid ${isAdded ? '#22c55e' : 'var(--ink)'}`, background: isAdded ? 'rgba(34,197,94,0.08)' : 'transparent', color: isAdded ? '#22c55e' : 'var(--ink)', transition: 'all 0.25s' }}>
             {isAdded ? <><CheckCircle2 size={12} className="anim-check" />{t.addedToCartMsg}</> : <><ShoppingCart size={12} />{t.addToCart}</>}
           </button>
           <button onClick={() => setIsOrderNow(true)} className="btn-punch" style={{ flex: 1, clipPath: 'none', padding: '12px' }}>

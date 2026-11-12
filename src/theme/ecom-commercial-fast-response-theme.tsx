@@ -1520,7 +1520,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
       </button>
 
       {cartEnabled && !product?.isDigital && (
-        <button className="hn-btn" onClick={addToCart} disabled={submitting} style={{ ...btnOutline, marginTop: 10 }}>
+        <button data-add-to-cart className="hn-btn" onClick={addToCart} disabled={submitting} style={{ ...btnOutline, marginTop: 10 }}>
           <ShoppingCart size={18} /> {t.addToCart}
         </button>
       )}

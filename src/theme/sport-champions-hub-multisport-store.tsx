@@ -1786,7 +1786,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#E94560" />
         {product.store?.cart && !product.isDigital && (
         <div className="cart-add-btns" style={{ marginBottom: '1.25rem' }}>
-          <button onClick={addToCart} disabled={isAdded} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '0.875rem', borderRadius: 50, cursor: isAdded ? 'default' : 'pointer', fontFamily: "'Inter',sans-serif", fontWeight: 600, fontSize: '0.9rem', border: `1.5px solid ${isAdded ? 'var(--success)' : 'var(--g300)'}`, background: isAdded ? 'rgba(46,204,113,0.1)' : '#fff', color: isAdded ? 'var(--success)' : 'var(--g600)', transition: 'all 0.25s' }}>
+          <button data-add-to-cart onClick={addToCart} disabled={isAdded} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '0.875rem', borderRadius: 50, cursor: isAdded ? 'default' : 'pointer', fontFamily: "'Inter',sans-serif", fontWeight: 600, fontSize: '0.9rem', border: `1.5px solid ${isAdded ? 'var(--success)' : 'var(--g300)'}`, background: isAdded ? 'rgba(46,204,113,0.1)' : '#fff', color: isAdded ? 'var(--success)' : 'var(--g600)', transition: 'all 0.25s' }}>
             {isAdded ? <><CheckCircle2 size={15} className="anim-check" />{t.addedToCart}</> : <><ShoppingCart size={15} />{t.addToCartBtn}</>}
           </button>
           <button onClick={() => setIsOrderNow(true)} className="btn-pri" style={{ flex: 1, padding: '0.875rem', borderRadius: 50 }}>

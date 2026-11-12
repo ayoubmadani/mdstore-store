@@ -1519,7 +1519,7 @@ export function ProductForm({
             {t.orderNow}
           </button>
           {store?.cart !== false && (
-            <button type="button" className="lx-btng" style={btnGhost} onClick={addToCart}>
+            <button data-add-to-cart type="button" className="lx-btng" style={btnGhost} onClick={addToCart}>
               {added ? <><Check size={15} /> {t.added}</> : <><ShoppingBag size={15} /> {t.addToCart}</>}
             </button>
           )}

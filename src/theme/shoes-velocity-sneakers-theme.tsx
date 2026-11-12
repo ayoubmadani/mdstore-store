@@ -1603,7 +1603,7 @@ export function ProductForm({
             <Zap size={16} strokeWidth={2.4} /> {t.orderNow}
           </button>
           {store?.cart !== false && (
-            <button type="button" className="vx-btng" style={btnGhost} onClick={addToCart}>
+            <button data-add-to-cart type="button" className="vx-btng" style={btnGhost} onClick={addToCart}>
               {added ? <><Check size={16} /> {t.added}</> : <><ShoppingBag size={16} /> {t.addToCart}</>}
             </button>
           )}

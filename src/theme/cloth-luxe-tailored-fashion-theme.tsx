@@ -877,7 +877,7 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
       <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#C88B6A" />
       {product.store?.cart!==false&&!product.isDigital&&(
         <div style={{display:'flex',gap:8,marginBottom:14}}>
-          <button onClick={addCart} disabled={added} className="btn-ghost" style={{flex:1,padding:'12px',opacity:added?1:undefined,borderColor:added?'#22c55e':undefined,color:added?'#22c55e':undefined}}>
+          <button data-add-to-cart onClick={addCart} disabled={added} className="btn-ghost" style={{flex:1,padding:'12px',opacity:added?1:undefined,borderColor:added?'#22c55e':undefined,color:added?'#22c55e':undefined}}>
             {added?<><CheckCircle2 size={13}/>{t.addedToCart}</>:<><ShoppingCart size={13}/>{t.addToCart}</>}
           </button>
           <button onClick={()=>setON(true)} className="btn-dark" style={{flex:1,padding:'12px'}}>{t.orderNow}</button>

@@ -1540,7 +1540,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
             <Zap size={16} aria-hidden="true" /> {t.orderNow}
           </button>
           {store?.cart !== false && !product?.isDigital && ( // §15.27 — never === true
-            <button className="ti-btn ti-btn-outline" onClick={addToCart}>
+            <button data-add-to-cart className="ti-btn ti-btn-outline" onClick={addToCart}>
               <ShoppingCart size={16} aria-hidden="true" /> {added ? t.addedToCart : t.addToCart}
             </button>
           )}

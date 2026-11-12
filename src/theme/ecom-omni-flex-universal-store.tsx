@@ -1498,7 +1498,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#C0392B" />
         {product.store?.cart && !product.isDigital && (
         <div className="cart-add-btns" style={{marginBottom:'14px'}}>
-          <button onClick={addToCart} disabled={isAdded} className="bc"
+          <button data-add-to-cart onClick={addToCart} disabled={isAdded} className="bc"
             style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:7,padding:'12px',cursor:isAdded?'default':'pointer',fontFamily:'inherit',fontWeight:700,fontSize:'13px',letterSpacing:'0.1em',border:`1.5px solid ${isAdded?'#22c55e':'var(--line)'}`,background:isAdded?'rgba(34,197,94,0.08)':'var(--white)',color:isAdded?'#22c55e':'var(--mid)',transition:'all 0.25s'}}>
             {isAdded?<><CheckCircle2 size={14} className="anim-check"/>{t.addedShort}</>:<><ShoppingCart size={14}/>{t.addToCartShort}</>}
           </button>

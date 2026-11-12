@@ -1622,7 +1622,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#C9952C" />
         {product.store?.cart && !product.isDigital && (
         <div style={{ display:'flex', gap:'8px', marginBottom:'16px' }}>
-          <button onClick={addToCart} disabled={isAdded} className="pd" style={{
+          <button data-add-to-cart onClick={addToCart} disabled={isAdded} className="pd" style={{
             flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:7,
             padding:'12px', borderRadius:'10px', cursor:isAdded?'default':'pointer',
             fontWeight:700, fontSize:'13px',

@@ -1105,7 +1105,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <button className="pbf-btn-primary" onClick={() => setIsOrderNow(true)}>{t.orderNow}</button>
             {store?.cart !== false && (
-              <button className="pbf-btn-outline" onClick={addToCart}>{t.addToCart}</button>
+              <button data-add-to-cart className="pbf-btn-outline" onClick={addToCart}>{t.addToCart}</button>
             )}
           </div>
         </>
