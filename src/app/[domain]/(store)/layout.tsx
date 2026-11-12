@@ -109,11 +109,11 @@ export default async function DomainLayout({ children, params }: LayoutProps) {
               ? <CustomerTracker pixels={productPixels} pageType="product" productId={product.id} />
               : <CustomerTracker pixels={store.pixels ?? []} />}
             {/* مثل صفحة الهبوط: غلاف الثيم (خلفيته وتنسيقه) بلا رأس المتجر وتذييله (كل ما بجانب <main>)،
-                وطلب مباشر فقط — زر «أضف إلى السلة» (data-add-to-cart في الثيمات) مخفي */}
+                وطلب مباشر فقط: السلة تُعامل كأنها معطّلة فيظهر نموذج الطلب مباشرة (بلا «أضف إلى السلة» ولا «اطلب الآن») */}
             <style>{'.mds-bare :has(> main) > :not(main):not(style){display:none!important}.mds-bare [data-add-to-cart]{display:none!important}'}</style>
             <div className="mds-bare">
               <ThemeRunner bundleUrl={`/api/themes/${store.theme?.slug || 'default'}`} exportName="default" themeProps={{ store, domain }}>
-                <DedicatedPageSwitch page={<ProductClient product={product} store={store} domain={domain} noTracker />} success={children} />
+                <DedicatedPageSwitch page={<ProductClient product={{ ...product, store: { ...product.store, cart: false } }} store={{ ...store, cart: false }} domain={domain} noTracker />} success={children} />
               </ThemeRunner>
             </div>
           </div>
