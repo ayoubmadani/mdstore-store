@@ -17,7 +17,7 @@ export interface Store {
     bingVerification: string | null;
     allowIndexing: boolean;
   } | null;
-  domains?: { id: string; domain: string; scope?: 'store' | 'landing_page'; builderPageId?: string; splitTestId?: string | null }[];
+  domains?: { id: string; domain: string; scope?: 'store' | 'landing_page' | 'product'; builderPageId?: string; splitTestId?: string | null; productId?: string | null }[];
   design: {
     primaryColor: string;
     secondaryColor: string;
@@ -52,9 +52,10 @@ export interface Pixel {
   pixelId: string;
   isActive: boolean;
   events?: string[];
-  scope?: 'store' | 'landing_page';
+  scope?: 'store' | 'landing_page' | 'product';
   landingPageId?: string;
   builderPageId?: string;
+  productId?: string | null;
   // للبكسل Access Token (Conversions API): المتصفح يرسل Lead والخادم Purchase عند التأكيد
   capi?: boolean;
 }

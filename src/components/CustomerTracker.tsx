@@ -9,13 +9,15 @@ interface CustomerTrackerProps {
   pixels: Pixel[];
   // 'store' (الافتراضي) لصفحات المتجر العادية، 'landing_page' لصفحات الهبوط
   // (مع تمرير landingPageId الخاص بالصفحة الحالية لمطابقتها)
-  pageType?: 'store' | 'landing_page';
+  pageType?: 'store' | 'landing_page' | 'product';
   landingPageId?: string;
+  // pageType = 'product': بكسلات هذا المنتج فقط (scope = 'product')
+  productId?: string;
 }
 
 const SAFE_PIXEL_ID = /^[\w-]{1,64}$/;
 
-const CustomerTracker = ({ pixels, pageType = 'store', landingPageId }: CustomerTrackerProps) => {
+const CustomerTracker = ({ pixels, pageType = 'store', landingPageId, productId }: CustomerTrackerProps) => {
   // كل طلب يُنشأ من هذه الصفحة يحمل fbp/fbc ورابطها (Meta CAPI)
   useEffect(() => { if (pixels?.some((p) => p.type === 'facebook' && p.capi)) installCapiCapture(); }, [pixels]);
   if (!pixels || pixels.length === 0) return null;
@@ -23,6 +25,7 @@ const CustomerTracker = ({ pixels, pageType = 'store', landingPageId }: Customer
   const scopedPixels = pixels.filter((pixel) => {
     const scope = pixel.scope ?? 'store';
     if (pageType === 'store') return scope === 'store';
+    if (pageType === 'product') return scope === 'product' && pixel.productId === productId;
     // landing_page-scoped pixels carry exactly one of these two FKs,
     // depending on whether they were created via the old LandingPage module
     // or the page-builder editor (builderPageId) — either can match here.

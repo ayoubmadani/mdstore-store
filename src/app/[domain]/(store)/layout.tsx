@@ -1,7 +1,8 @@
 import { cache } from 'react'
 import { notFound } from 'next/navigation'
 import { cookies, headers } from 'next/headers'
-import { getStoreByDomain, getBuilderPageById, resolveSplitTest } from '@/lib/api'
+import { getStoreByDomain, getBuilderPageById, resolveSplitTest, getProduct } from '@/lib/api'
+import ProductClient from './product/[id]/ProductClient'
 import { StoreProvider } from '@/Hook/store-provider'
 import CustomerTracker from '@/components/CustomerTracker'
 import AddShow from '@/components/addShow'
@@ -92,6 +93,26 @@ export default async function DomainLayout({ children, params }: LayoutProps) {
         </div>
       </StoreProvider>
     )
+  }
+
+  // دومين مخصص لمنتج واحد (حملة): صفحة المنتج وحدها بثيم المتجر، بلا رأس المتجر وتذييله —
+  // بكسلات المنتج إن وُجدت وإلا بكسلات المتجر. /success و/successfully بعد الطلب كما هي
+  const productDomain = store.domains?.find((d) => d.domain === domain && d.scope === 'product' && d.productId)
+  if (productDomain?.productId) {
+    const product = await getProduct(domain, productDomain.productId)
+    if (product?.isActive) {
+      const productPixels = (store.pixels ?? []).filter((p) => p.scope === 'product' && p.productId === product.id)
+      return (
+        <StoreProvider store={store} theme={store.theme?.slug || 'default'}>
+          <div dir={(store.language || 'ar') === 'ar' ? 'rtl' : 'ltr'}>
+            {productPixels.length
+              ? <CustomerTracker pixels={productPixels} pageType="product" productId={product.id} />
+              : <CustomerTracker pixels={store.pixels ?? []} />}
+            <DedicatedPageSwitch page={<ProductClient product={product} store={store} domain={domain} noTracker />} success={children} />
+          </div>
+        </StoreProvider>
+      )
+    }
   }
 
   const slug     = store.theme?.slug || 'default'

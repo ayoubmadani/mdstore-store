@@ -7,6 +7,7 @@ import { AlertCircle } from 'lucide-react'
 import axios from 'axios'
 import AddShow from '@/components/addShow'
 import ThemeRunner from '@/components/ThemeRunner'
+import CustomerTracker from '@/components/CustomerTracker'
 import MobilePaddingClamp from '@/components/theme/MobilePaddingClamp'
 import { useStore } from '@/Hook/store-provider'
 
@@ -60,10 +61,13 @@ export default function ProductClient({
   product,
   store,
   domain,
+  noTracker = false,
 }: {
   product: any
   store: any
   domain: string
+  // دومين المنتج: البكسلات يطلقها الإطار (المنتج أو المتجر) — لا تكرار
+  noTracker?: boolean
 }) {
   const { theme: contextThemeSlug } = useStore()
   const router = useRouter()
@@ -261,6 +265,8 @@ export default function ProductClient({
   return (
     <>
       <AddShow productId={product.id} />
+      {/* بكسلات خاصة بهذا المنتج (بكسلات المتجر يطلقها الإطار) */}
+      {!noTracker && <CustomerTracker pixels={store.pixels ?? []} pageType="product" productId={product.id} />}
       <MobilePaddingClamp>
         <ThemeRunner
           bundleUrl={bundleUrl}
