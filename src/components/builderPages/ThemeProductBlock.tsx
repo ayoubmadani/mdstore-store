@@ -2,7 +2,7 @@
 
 // قسم «المنتج بثيم المتجر» في صفحة المحرر: صفحة المنتج كما يرسمها ثيم المتجر (صور، خيارات، نموذج طلب مباشر)
 // والمنتج يبقى متصلاً (أي تعديل عليه يظهر هنا). يُحمَّل من الخادم مع الصفحة إن أمكن، وإلا من المتصفح
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import ThemeRunner from '@/components/ThemeRunner';
 import { StoreProvider } from '@/Hook/store-provider';
@@ -22,6 +22,27 @@ export default function ThemeProductBlock({ productId, builderPageId, splitTestI
   const [product, setProduct] = useState<any>(initialProduct ?? null);
   const [store, setStore] = useState<any>(initialStore ?? null);
   const [domain, setDomain] = useState('');
+  const root = useRef<HTMLDivElement>(null);
+
+  // الأزرار «الانتقال إلى نموذج الطلب» تبحث عن #md-product-form ← نضعه على نموذج الثيم حين يُرسم
+  // (إلا إذا كان في الصفحة قسم «نموذج طلب» يحمله)
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return undefined;
+    const mark = () => {
+      if (document.getElementById('md-product-form')) return true;
+      const input = el.querySelector('main input');
+      if (!input) return false;
+      const box = (input.closest('form') ?? input.parentElement?.parentElement ?? input) as HTMLElement;
+      box.id = 'md-product-form';
+      box.style.scrollMarginTop = '16px';
+      return true;
+    };
+    if (mark()) return undefined;
+    const mo = new MutationObserver(() => { if (mark()) mo.disconnect(); });
+    mo.observe(el, { childList: true, subtree: true });
+    return () => mo.disconnect();
+  }, [product, store]);
 
   useEffect(() => {
     const host = window.location.hostname;
@@ -47,7 +68,7 @@ export default function ThemeProductBlock({ productId, builderPageId, splitTestI
   return (
     <StoreProvider store={off.store} theme={slug}>
       <style>{BARE_CSS}</style>
-      <div className="mds-bare mds-embed">
+      <div ref={root} className="mds-bare mds-embed">
         <ThemeRunner bundleUrl={`/api/themes/${slug}`} exportName="default" themeProps={{ store: off.store, domain: host }}>
           <ProductClient product={off.product} store={off.store} domain={host} noTracker />
         </ThemeRunner>

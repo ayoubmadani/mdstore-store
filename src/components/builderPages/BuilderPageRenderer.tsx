@@ -55,11 +55,19 @@ function FloatingActionButton({ props, referenceWidth }: { props: Record<string,
 
   useEffect(() => {
     if (!isFormLink) return undefined;
-    const target = document.getElementById('md-product-form');
-    if (!target) return undefined;
-    const observer = new IntersectionObserver(([entry]) => setFormInView(entry.isIntersecting), { threshold: 0.2 });
-    observer.observe(target);
-    return () => observer.disconnect();
+    // نموذج «المنتج بثيم المتجر» يُرسم بعد تحميل الثيم ← ننتظر ظهوره
+    let observer: IntersectionObserver | null = null;
+    const watch = () => {
+      const target = document.getElementById('md-product-form');
+      if (!target) return false;
+      observer = new IntersectionObserver(([entry]) => setFormInView(entry.isIntersecting), { threshold: 0.2 });
+      observer.observe(target);
+      return true;
+    };
+    if (watch()) return () => observer?.disconnect();
+    const mo = new MutationObserver(() => { if (watch()) mo.disconnect(); });
+    mo.observe(document.body, { childList: true, subtree: true });
+    return () => { mo.disconnect(); observer?.disconnect(); };
   }, [isFormLink]);
 
   if (isFormLink && formInView) return null;
