@@ -309,6 +309,7 @@ const jsonAr = {
   home: 'الرئيسية',
   contact: 'اتصل بنا',
   cart: 'السلة',
+  menu: 'القائمة',
   search: 'ابحث...',
   searching: 'جاري البحث...',
   noResults: 'لا توجد نتائج',
@@ -460,6 +461,7 @@ const jsonFr = {
   home: 'Accueil',
   contact: 'Contact',
   cart: 'Panier',
+  menu: 'Menu',
   search: 'Rechercher un produit...',
   searching: 'Recherche...',
   noResults: 'Aucun résultat',
@@ -606,7 +608,7 @@ const jsonFr = {
 
 const jsonEn = {
   dir: 'ltr',
-  home: 'Home', contact: 'Contact', cart: 'Cart',
+  home: 'Home', contact: 'Contact', cart: 'Cart', menu: 'Menu',
   search: 'Search...', searching: 'Searching...', noResults: 'No results found',
   showAll: 'View all results →',
   all: 'All', noProducts: 'No products available at the moment.',
@@ -833,7 +835,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               <LogoWithName store={store} nameStyle={{ fontSize: '1rem', fontWeight: 800, color: 'rgb(29, 78, 216)', textTransform: 'uppercase', letterSpacing: '0.02em' }}><img
                 src={store.design.logoUrl}
                 style={{ height: 34, objectFit: 'contain', display: 'block' }}
-                alt={store?.name || 'Store Logo'}
+                alt={store?.design?.showStoreName ? '' : (store?.name || 'Store Logo')}
                 onError={() => setImgError(true)}
               /></LogoWithName>
             ) : (
@@ -880,7 +882,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 onMouseLeave={e => (e.currentTarget.style.color = '#444')}>{i.l}</Link>
             ))}
             {store?.cart !== false && (
-              <Link href="/cart" style={{ position: 'relative', background: '#111', color: '#fff', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}
+              <Link href="/cart" aria-label={t.cart} style={{ position: 'relative', background: '#111', color: '#fff', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#1D4ED8')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#111')}>
                 <ShoppingCart size={17} />
@@ -892,17 +894,17 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
           {/* Mobile */}
           <div className="nav-mobile">
-            <button onClick={() => setShowSearch(!showSearch)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <button aria-label={t.search} onClick={() => setShowSearch(!showSearch)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
               <Search size={16} />
             </button>
             {store?.cart !== false && (
-              <Link href="/cart" style={{ position: 'relative', width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#333' }}>
+              <Link href="/cart" aria-label={t.cart} style={{ position: 'relative', width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#333' }}>
                 <ShoppingCart size={16} />
                 {count > 0 && <span style={{ position: 'absolute', top: -4, right: -4, background: '#1D4ED8', color: '#fff', fontSize: 9, fontWeight: 800, width: 15, height: 15, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
               </Link>
             )}
 
-            <button onClick={() => setOpen(!open)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <button aria-label={t.menu} aria-expanded={open} onClick={() => setOpen(!open)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
               {open ? <X size={16} /> : <Menu size={16} />}
             </button>
           </div>
@@ -956,10 +958,10 @@ export function Footer({ store }: any) {
               </div>
               <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>{store?.name}</span>
             </div>
-            <p style={{ fontSize: '0.875rem', lineHeight: 1.8, color: '#666', maxWidth: 320 }}>
+            <p style={{ fontSize: '0.875rem', lineHeight: 1.8, color: '#999', maxWidth: 320 }}>
               {store?.hero?.subtitle?.substring(0, 100) || t.footerDesc}
             </p>
-            <p style={{ marginTop: '2rem', fontSize: '0.75rem', color: '#333' }}>
+            <p style={{ marginTop: '2rem', fontSize: '0.75rem', color: '#888' }}>
               © {new Date().getFullYear()} {store?.name}. {t.rightsReserved}
             </p>
           </div>
@@ -968,9 +970,9 @@ export function Footer({ store }: any) {
           <div>
             <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1.25rem' }}>{t.quickLinks}</h4>
             {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
-              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: '#666', marginBottom: '0.625rem', transition: 'color 0.15s' }}
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: '#999', marginBottom: '0.625rem', transition: 'color 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#1D4ED8')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#666')}>
+                onMouseLeave={e => (e.currentTarget.style.color = '#999')}>
                 {lnk.l}
               </Link>
             ))}
@@ -980,9 +982,9 @@ export function Footer({ store }: any) {
           <div>
             <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1.25rem' }}>{t.legalNav}</h4>
             {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
-              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: '#666', marginBottom: '0.625rem', transition: 'color 0.15s' }}
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: '#999', marginBottom: '0.625rem', transition: 'color 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#1D4ED8')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#666')}>
+                onMouseLeave={e => (e.currentTarget.style.color = '#999')}>
                 {lnk.l}
               </Link>
             ))}
@@ -997,7 +999,7 @@ export function Footer({ store }: any) {
               { icon: <Mail size={14} />, val: store?.contact?.email || comingSoon(store) },
               { icon: <MapPin size={14} />, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
             ].filter(r => r.val).map((r, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem', color: '#666', fontSize: '0.875rem' }}>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem', color: '#999', fontSize: '0.875rem' }}>
                 <span style={{ color: '#1D4ED8' }}>{r.icon}</span>{r.val}
               </div>
             ))}
@@ -1064,8 +1066,8 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div style={{ marginTop: 'auto' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', marginBottom: '0.75rem' }}>
             <span className="price-mono" style={{ fontSize: '1.375rem', fontWeight: 800, color: '#111' }}>{price.toLocaleString()}</span>
-            <span style={{ fontSize: '0.75rem', color: '#999', fontWeight: 500 }}>{store.currency || 'DZD'}</span>
-            {orig > price && <span style={{ fontSize: '0.75rem', color: '#ccc', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
+            <span style={{ fontSize: '0.75rem', color: '#6B6B6B', fontWeight: 500 }}>{store.currency || 'DZD'}</span>
+            {orig > price && <span style={{ fontSize: '0.75rem', color: '#737373', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
           </div>
           <Link
             href={`/product/${product.slug || product.id}`}
@@ -1138,8 +1140,8 @@ export function Home({ store, page }: any) {
           {/* Text */}
           <div style={heroTextClear(store)}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(29,78,216,0.15)', border: '1px solid rgba(29,78,216,0.3)', borderRadius: 6, padding: '0.375rem 0.875rem', marginBottom: '1.5rem' }}>
-              <Zap size={13} color="#1D4ED8" fill="#1D4ED8" />
-              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1D4ED8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{store.name}</span>
+              <Zap size={13} color="#60A5FA" fill="#60A5FA" />
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#60A5FA', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{store.name}</span>
             </div>
             <h1 style={{ fontSize: 'clamp(2.25rem,6vw,4.5rem)', fontWeight: 800, color: '#fff', lineHeight: 1.1, letterSpacing: '-0.03em', marginBottom: '1.25rem' }}
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || t.heroTitle) }} />
@@ -1174,7 +1176,7 @@ export function Home({ store, page }: any) {
             <div key={i} style={{ padding: '1.125rem 1rem', textAlign: 'center', borderLeft: i < 3 ? '1px solid #EBEBEB' : 'none' }}>
               <div style={{ color: '#1D4ED8', marginBottom: '0.375rem', display: 'flex', justifyContent: 'center' }}>{icon}</div>
               <p style={{ fontSize: '0.8rem', fontWeight: 700, color: '#111', marginBottom: '0.2rem' }}>{item.t}</p>
-              <p style={{ fontSize: '0.72rem', color: '#999' }}>{item.d}</p>
+              <p style={{ fontSize: '0.72rem', color: '#6B6B6B' }}>{item.d}</p>
             </div>
             );
           })}
