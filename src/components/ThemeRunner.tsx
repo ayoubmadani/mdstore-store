@@ -12,6 +12,7 @@ import NextLink from 'next/link';
 import NextImage from 'next/image';
 import * as NextNavigation from 'next/navigation';
 import * as ThemeKit from '@/components/theme/kit';
+import { createThemeRegistry, pickComponent } from '@/lib/theme-exports';
 
 const esm = (obj: Record<string, any>) => ({ ...obj, __esModule: true });
 
@@ -56,7 +57,10 @@ function makeRequire(lazy: Record<string, any>) {
 
 // module-level cache: one eval per bundle URL → shared Zustand stores across exports
 const moduleCache = new Map<string, Promise<Record<string, any>>>();
-const bundleCache = new Map<string, React.ComponentType<any>>();
+// الحزم التي قُيّمت فعلاً: مكوّناتها تُقرأ فوراً عند أول رسم (بلا قفزة للتذييل)
+const loadedThemes = createThemeRegistry();
+const readyComponent = (bundleUrl: string, exportName: string) =>
+  loadedThemes.component(bundleUrl, exportName) as React.ComponentType<any> | null;
 
 // يجلب حزمة الثيم ويُقيّمها (أو يعيد نفس الـ promise المخزّن إن كانت مطلوبة من قبل
 // لنفس bundleUrl عبر ThemeRunner) ويرجّع كل الـ exports الخام — مفيد لقراءة قيم بيانات
@@ -84,6 +88,7 @@ export function loadThemeModule(bundleUrl: string): Promise<Record<string, any>>
             NODE_ENV:                 process.env.NODE_ENV                  ?? 'production',
           },
         });
+        loadedThemes.remember(bundleUrl, mod.exports);
         return mod.exports;
       })
       .catch((err) => {
@@ -111,26 +116,22 @@ export default function ThemeRunner({
   fallback = null,
 }: ThemeRunnerProps) {
   const [Component, setComponent] = useState<React.ComponentType<any> | null>(
-    () => bundleCache.get(`${bundleUrl}:${exportName}`) ?? null
+    () => readyComponent(bundleUrl, exportName)
   );
   const [error, setError] = useState<string | null>(null);
   ReactDOM.preload(bundleUrl, { as: 'fetch', crossOrigin: 'anonymous' });
 
   useEffect(() => {
-    const cacheKey = `${bundleUrl}:${exportName}`;
-    if (bundleCache.has(cacheKey)) {
-      setComponent(() => bundleCache.get(cacheKey)!);
+    const ready = readyComponent(bundleUrl, exportName);
+    if (ready) {
+      setComponent(() => ready);
       return;
     }
 
     loadThemeModule(bundleUrl)
       .then((exports) => {
-        const comp: React.ComponentType<any> =
-          exports[exportName] ?? exports['default'] ?? exports['Main'];
-
-        if (typeof comp !== 'function') throw new Error(`export "${exportName}" not found`);
-
-        bundleCache.set(cacheKey, comp);
+        const comp = pickComponent(exports, exportName) as React.ComponentType<any> | null;
+        if (!comp) throw new Error(`export "${exportName}" not found`);
         setComponent(() => comp);
       })
       .catch((err) => {

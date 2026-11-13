@@ -15,6 +15,7 @@ import MarqueeTrack from './MarqueeTrack';
 import ThemeProductBlock from './ThemeProductBlock';
 import { buttonHref, type ButtonLinkType } from './buttonLinks';
 import type { Pixel } from '@/types/store';
+import { firstImageBlock, imgLoading } from '@/lib/image-priority';
 
 // Matches dashboard/src/pages/editor/blocks/floatingButtonIcons.jsx's own
 // name→icon map exactly — the stored value is just this portable string,
@@ -234,7 +235,7 @@ interface BuilderPageData {
 // proportional to *that specific block's* rendered width at any viewport
 // size — clamped so it never renders smaller than 10px or bigger than the
 // original px value the merchant actually set.
-function FloatingElements({ elements, referenceWidth }: { elements: unknown; referenceWidth: number }) {
+function FloatingElements({ elements, referenceWidth, lazy }: { elements: unknown; referenceWidth: number; lazy?: boolean }) {
   const items = Array.isArray(elements) ? (elements as FloatingElement[]) : [];
   if (items.length === 0) return null;
 
@@ -309,7 +310,7 @@ function FloatingElements({ elements, referenceWidth }: { elements: unknown; ref
           return (
             <div key={el.id} style={{ ...commonStyle, borderRadius: 8, overflow: 'hidden' }}>
               {/* eslint-disable-next-line @next/next/no-img-element -- dynamic per-page src, not a static build-time asset */}
-              {el.src && <img src={el.src} alt={el.alt || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+              {el.src && <img src={el.src} alt={el.alt || ''} {...(lazy ? imgLoading(false) : {})} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
             </div>
           );
         }
@@ -365,7 +366,7 @@ const arrowBtnStyle = (side: 'left' | 'right'): React.CSSProperties => ({
 // side is read-only: `images` is whatever the merchant's editing session
 // already baked into the published tree (seeded from the product once, then
 // independently managed there), never fetched or re-synced here.
-function ProductImagesBlockRenderer({ props }: { props: Record<string, unknown> }) {
+function ProductImagesBlockRenderer({ props, first }: { props: Record<string, unknown>; first: boolean }) {
   const { layout, images, borderRadius, showDots, showArrows, showThumbnails, backgroundColor, padding, borderColor, borderWidth, imageGap } = props as {
     layout?: string; images?: string[];
     borderRadius?: number; showDots?: boolean; showArrows?: boolean; showThumbnails?: boolean;
@@ -386,7 +387,7 @@ function ProductImagesBlockRenderer({ props }: { props: Record<string, unknown> 
         {list.map((src, pos) => (
           <div key={pos} style={{ position: 'relative', width: '100%', aspectRatio: '1 / 1', minWidth: 0, minHeight: 0, borderRadius: radius, overflow: 'hidden', border: mainBorder, boxSizing: 'border-box' }}>
             {/* eslint-disable-next-line @next/next/no-img-element -- dynamic per-product src, not a static build-time asset */}
-            <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <img src={src} alt="" {...imgLoading(first && pos === 0)} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           </div>
         ))}
       </div>
@@ -400,7 +401,7 @@ function ProductImagesBlockRenderer({ props }: { props: Record<string, unknown> 
     <div style={{ backgroundColor: backgroundColor || undefined, padding: padding || undefined }}>
       <div style={{ position: 'relative', width: '100%', aspectRatio: '1 / 1', minWidth: 0, minHeight: 0, borderRadius: radius, overflow: 'hidden', border: mainBorder, boxSizing: 'border-box' }}>
         {/* eslint-disable-next-line @next/next/no-img-element -- dynamic per-product src, not a static build-time asset */}
-        <img src={list[activeIndex]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        <img src={list[activeIndex]} alt="" {...imgLoading(first)} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
         {showArrows !== false && list.length > 1 && (
           <>
             <button type="button" onClick={() => goTo(activeIndex - 1)} style={arrowBtnStyle('left')}>
@@ -453,7 +454,7 @@ function ProductImagesBlockRenderer({ props }: { props: Record<string, unknown> 
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- dynamic per-product src, not a static build-time asset */}
-              <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <img src={src} alt="" {...imgLoading(false)} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </button>
           ))}
         </div>
@@ -463,7 +464,7 @@ function ProductImagesBlockRenderer({ props }: { props: Record<string, unknown> 
 }
 
 // Mirrors dashboard/src/pages/editor/blocks/ImageBlock.jsx.
-function ImageBlockRenderer({ props, referenceWidth }: { props: Record<string, unknown>; referenceWidth: number }) {
+function ImageBlockRenderer({ props, referenceWidth, first }: { props: Record<string, unknown>; referenceWidth: number; first: boolean }) {
   const { src, alt, caption, width, align, height, naturalWidth, naturalHeight } = props as ImageBlockProps;
   if (!src) return null;
   const widthPct = width || 100;
@@ -489,6 +490,7 @@ function ImageBlockRenderer({ props, referenceWidth }: { props: Record<string, u
         <img
           src={src}
           alt={alt || ''}
+          {...imgLoading(first)}
           // الأبعاد الحقيقية ← المتصفح يحجز مكان الصورة بنسبتها قبل تحميلها (لا قفز للصفحة)
           width={aspectRatio ? undefined : naturalWidth}
           height={aspectRatio ? undefined : naturalHeight}
@@ -562,6 +564,8 @@ export default function BuilderPageRenderer({ page, lpDomain, dedicated, store }
   const settings = page.settings || {};
   const pagePadding = settings.padding || 0;
   const pageMaxWidth = settings.maxWidth || 720;
+  // صورة أول قسم تُحمَّل بأولوية عالية (LCP)، وما بعدها يُؤجَّل
+  const firstImage = firstImageBlock(page.tree);
 
   // Pinned spacers render position:fixed and are taken out of document flow
   // entirely, so nothing below would otherwise know to leave room for them —
@@ -604,8 +608,8 @@ export default function BuilderPageRenderer({ page, lpDomain, dedicated, store }
         if (block.type === 'floatingButton') return <FloatingActionButton key={block.id ?? index} props={block.props} referenceWidth={pageMaxWidth} />;
         return (
           <div key={block.id ?? index} style={{ position: 'relative', containerType: 'inline-size' }}>
-            {block.type === 'image' && <ImageBlockRenderer props={block.props} referenceWidth={pageMaxWidth} />}
-            {block.type === 'productImages' && <ProductImagesBlockRenderer props={block.props} />}
+            {block.type === 'image' && <ImageBlockRenderer props={block.props} referenceWidth={pageMaxWidth} first={index === firstImage} />}
+            {block.type === 'productImages' && <ProductImagesBlockRenderer props={block.props} first={index === firstImage} />}
             {block.type === 'spacer' && <SpacerBlockRenderer props={block.props} elements={isPinnedSpacer ? block.props?.elements : undefined} maxWidth={pageMaxWidth} />}
             {block.type === 'themeProduct' && (
               <ThemeProductBlock
@@ -631,7 +635,7 @@ export default function BuilderPageRenderer({ page, lpDomain, dedicated, store }
                 pixels={page.pixels}
               />
             )}
-            {!isPinnedSpacer && <FloatingElements elements={block.props?.elements} referenceWidth={pageMaxWidth} />}
+            {!isPinnedSpacer && <FloatingElements elements={block.props?.elements} referenceWidth={pageMaxWidth} lazy={index > firstImage} />}
           </div>
         );
       })}
