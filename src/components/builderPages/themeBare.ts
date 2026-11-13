@@ -49,6 +49,7 @@ type LandingCtxInput = {
   language?: string
   pixels?: unknown[]
   accent?: string
+  accentText?: string
   section?: string
 }
 
@@ -64,7 +65,7 @@ export function landingContextFromOrder(page: LandingCtxInput, order: { quantity
     quantity: order.quantity,
     customerName: order.customerName,
     customerPhone: order.customerPhone,
-    colors: clean({ accent: page.accent, section: page.section }),
+    colors: clean({ accent: page.accent, accentText: page.accentText, section: page.section }),
   })
 }
 
@@ -82,4 +83,16 @@ export function withLandingContext<O extends { landing?: unknown }>(
   if (order.landing || !fresh) return order
   // last_order قديم من طلب سابق ممكن: رقم الطلب ومبلغه من السياق الأحدث
   return { ...order, ...(saved!.order ?? {}), landing: saved!.landing }
+}
+
+/** لون زر الطلب في الثيم (أعرض زر بخلفية ملوّنة: لا شفافة ولا بيضاء/فاتحة جداً) ← ألوان صفحة «شكراً» */
+export function buttonAccent(buttons: { bg: string; color: string; width: number }[]): { accent: string; accentText: string } | null {
+  const light = (c: string) => {
+    if (/^#fff(fff)?$/i.test(c)) return true
+    const n = c.match(/\d+(\.\d+)?/g)?.map(Number) ?? []
+    return n.length >= 3 && n[0] > 225 && n[1] > 225 && n[2] > 225
+  }
+  const solid = buttons.filter((b) => b.bg && b.bg !== 'transparent' && !/^rgba\([^)]*,\s*0\)$/.test(b.bg) && !light(b.bg))
+  const best = solid.reduce<typeof solid[number] | null>((m, b) => (!m || b.width > m.width ? b : m), null)
+  return best ? { accent: best.bg, accentText: best.color } : null
 }

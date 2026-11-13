@@ -1,7 +1,7 @@
 // node --test src/components/builderPages/themeBare.test.ts
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { capMediaQueries, cartOff, landingContextFromOrder, withLandingContext, withPageAttribution } from './themeBare.ts';
+import { buttonAccent, capMediaQueries, cartOff, landingContextFromOrder, withLandingContext, withPageAttribution } from './themeBare.ts';
 
 test('cart is off on both the product store and the store, nothing else changes', () => {
   const { product, store } = cartOff({ id: 'p', store: { id: 's', cart: true } }, { id: 's', cart: true, name: 'x' });
@@ -53,4 +53,16 @@ test('the thank-you page uses a fresh landing context only when the order has no
   assert.deepEqual(withLandingContext({ id: 'old', total: 1 }, { at: now, landing, order: { id: 'o9', total: 300 } }, now), { id: 'o9', total: 300, landing });
   assert.equal(withLandingContext(null, null, now), null);
   assert.deepEqual(withLandingContext({ id: 'o' }, null, now), { id: 'o' });
+});
+
+test('the thank-you page takes the colour of the theme order button (widest solid, non-white button)', () => {
+  assert.deepEqual(buttonAccent([
+    { bg: 'rgb(255, 255, 255)', color: 'rgb(0, 0, 0)', width: 40 },
+    { bg: 'rgba(0, 0, 0, 0)', color: 'rgb(0, 0, 0)', width: 900 },
+    { bg: 'rgb(58, 134, 255)', color: 'rgb(255, 255, 255)', width: 688 },
+    { bg: 'rgb(37, 211, 102)', color: 'rgb(255, 255, 255)', width: 688 },
+    { bg: 'rgb(240, 240, 240)', color: 'x', width: 300 },
+  ]), { accent: 'rgb(58, 134, 255)', accentText: 'rgb(255, 255, 255)' });
+  assert.equal(buttonAccent([{ bg: 'rgba(0, 0, 0, 0)', color: 'x', width: 10 }, { bg: '#ffffff', color: 'x', width: 10 }]), null);
+  assert.equal(buttonAccent([]), null);
 });

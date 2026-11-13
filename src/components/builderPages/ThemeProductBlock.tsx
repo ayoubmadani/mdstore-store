@@ -8,7 +8,7 @@ import ThemeRunner from '@/components/ThemeRunner';
 import { StoreProvider } from '@/Hook/store-provider';
 import { getProduct, getStoreByDomain } from '@/lib/api';
 import ProductClient from '@/app/[domain]/(store)/product/[id]/ProductClient';
-import { BARE_CSS, capMediaQueries, cartOff, LANDING_CTX_KEY, landingContextFromOrder, withPageAttribution } from './themeBare';
+import { BARE_CSS, buttonAccent, capMediaQueries, cartOff, LANDING_CTX_KEY, landingContextFromOrder, withPageAttribution } from './themeBare';
 
 type Props = {
   productId?: string;
@@ -98,6 +98,21 @@ export default function ThemeProductBlock({ productId, builderPageId, splitTestI
     return () => axios.interceptors.request.eject(id);
   }, [builderPageId, splitTestId]);
 
+  // لون زر الطلب في الثيم (أعرض زر ملوّن في القسم) يُقرأ لحظة الضغط — قبل أن يغيّره الثيم أثناء الإرسال
+  const accentRef = useRef<{ accent: string; accentText: string } | null>(null);
+  useEffect(() => {
+    const el = root.current;
+    if (!el || preview) return undefined;
+    const read = () => {
+      const btns = [...el.querySelectorAll<HTMLElement>('main button')]
+        .map((b) => { const cs = getComputedStyle(b); return { bg: cs.backgroundColor, color: cs.color, width: b.getBoundingClientRect().width }; });
+      accentRef.current = buttonAccent(btns) ?? accentRef.current;
+    };
+    el.addEventListener('pointerdown', read, true);
+    el.addEventListener('keydown', read, true);
+    return () => { el.removeEventListener('pointerdown', read, true); el.removeEventListener('keydown', read, true); };
+  }, [product, store, preview]);
+
   // طلب نجح من الثيم هنا ← سياق الصفحة لصفحة «شكراً» (الثيم يحفظ last_order بلا سياق صفحة الهبوط)
   useEffect(() => {
     if (preview) return undefined;
@@ -107,8 +122,9 @@ export default function ThemeProductBlock({ productId, builderPageId, splitTestI
         try {
           const body = typeof cfg.data === 'string' ? JSON.parse(cfg.data) : cfg.data ?? {};
           const first = Array.isArray(body) ? body[0] ?? {} : body;
+          const themed = accentRef.current;
           const landing = landingContextFromOrder(
-            { builderPageId, productId: product?.id, backUrl: window.location.pathname + window.location.search, language, pixels, accent: store?.design?.primaryColor, section: backgroundColor },
+            { builderPageId, productId: product?.id, backUrl: window.location.pathname + window.location.search, language, pixels, accent: themed?.accent ?? store?.design?.primaryColor, accentText: themed?.accentText, section: backgroundColor },
             { quantity: Number(first.quantity) || undefined, customerName: first.customerName, customerPhone: first.customerPhone, productImage: product?.productImage },
           );
           const total = Number(first.totalPrice);
