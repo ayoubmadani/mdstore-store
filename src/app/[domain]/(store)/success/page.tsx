@@ -6,6 +6,7 @@ import { usePixel } from '@/Hook/pixel-provider'
 import { useStore } from '@/Hook/store-provider'
 import ThemeRunner from '@/components/ThemeRunner'
 import LandingSuccess, { type LandingOrderInfo } from '@/components/builderPages/LandingSuccess'
+import { LANDING_CTX_KEY, withLandingContext } from '@/components/builderPages/themeBare'
 
 interface OrderInfo {
   id?: string
@@ -52,7 +53,10 @@ export default function SuccessPage() {
     const saved = localStorage.getItem('last_order')
     if (saved) {
       try {
-        const parsed = JSON.parse(saved)
+        // طلب من قسم «المنتج بثيم المتجر» في صفحة هبوط: سياق الصفحة محفوظ بجانبه
+        let ctx = null
+        try { ctx = JSON.parse(sessionStorage.getItem(LANDING_CTX_KEY) || 'null'); sessionStorage.removeItem(LANDING_CTX_KEY) } catch {}
+        const parsed = withLandingContext(JSON.parse(saved), ctx)
         setOrder(parsed)
         // طلب من صفحة هبوط: LandingSuccess يطلق حدث الشراء ببيكسلات الصفحة نفسها
         if (!parsed.landing) trackPurchase(parsed.total, 'DZD', parsed.id)

@@ -1,7 +1,7 @@
 // node --test src/components/builderPages/themeBare.test.ts
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { capMediaQueries, cartOff, withPageAttribution } from './themeBare.ts';
+import { capMediaQueries, cartOff, landingContextFromOrder, withLandingContext, withPageAttribution } from './themeBare.ts';
 
 test('cart is off on both the product store and the store, nothing else changes', () => {
   const { product, store } = cartOff({ id: 'p', store: { id: 's', cart: true } }, { id: 's', cart: true, name: 'x' });
@@ -27,4 +27,26 @@ test('theme CSS inside a 720px landing page behaves as if the screen were at mos
   assert.equal(capMediaQueries(css, 720),
     '@media (min-width: 99999px){.a{x:1}}@media (min-width:99999px){.b{x:1}}@media (min-width: 640px){.c{x:1}}'
     + '@media (max-width:480px){.d{x:1}}@media (min-width: 0px){.e{x:1}}@media (min-width: 99999px) and (min-width: 0px){.f{x:1}}');
+});
+
+test('an order sent from the theme block keeps the landing page context (thank-you page of the landing)', () => {
+  const ctx = landingContextFromOrder(
+    { builderPageId: 'bp', productId: 'p', backUrl: '/', language: 'ar', pixels: [{ id: 'x' }], accent: '#f00', section: '#111' },
+    { quantity: 2, customerName: 'ali', customerPhone: '0555', productImage: 'img' },
+  );
+  assert.deepEqual(ctx, {
+    builderPageId: 'bp', productId: 'p', backUrl: '/', language: 'ar', pixels: [{ id: 'x' }],
+    productImage: 'img', quantity: 2, customerName: 'ali', customerPhone: '0555',
+    colors: { accent: '#f00', section: '#111' },
+  });
+});
+
+test('the thank-you page uses a fresh landing context only when the order has none', () => {
+  const landing = { builderPageId: 'bp', colors: {} };
+  const now = 1_000_000;
+  assert.deepEqual(withLandingContext({ id: 'o' }, { at: now - 60_000, landing }, now), { id: 'o', landing });
+  assert.deepEqual(withLandingContext({ id: 'o' }, { at: now - 31 * 60_000, landing }, now), { id: 'o' });
+  assert.deepEqual(withLandingContext({ id: 'o', landing: { colors: { accent: 'a' } } }, { at: now, landing }, now), { id: 'o', landing: { colors: { accent: 'a' } } });
+  assert.equal(withLandingContext(null, { at: now, landing }, now), null);
+  assert.deepEqual(withLandingContext({ id: 'o' }, null, now), { id: 'o' });
 });

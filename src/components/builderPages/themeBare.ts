@@ -38,3 +38,38 @@ export function capMediaQueries(css: string, maxWidth: number): string {
     return all
   })
 }
+
+/** سياق صفحة الهبوط لطلب أرسله الثيم من قسم «المنتج بثيم المتجر» ← صفحة «شكراً» الموحدة لصفحات الهبوط */
+export const LANDING_CTX_KEY = 'mds_landing_ctx'
+
+type LandingCtxInput = {
+  builderPageId: string
+  productId?: string
+  backUrl?: string
+  language?: string
+  pixels?: unknown[]
+  accent?: string
+  section?: string
+}
+
+export function landingContextFromOrder(page: LandingCtxInput, order: { quantity?: number; customerName?: string; customerPhone?: string; productImage?: string }) {
+  const clean = <T extends object>(o: T) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined && v !== '')) as T
+  return clean({
+    builderPageId: page.builderPageId,
+    productId: page.productId,
+    backUrl: page.backUrl,
+    language: page.language,
+    pixels: page.pixels,
+    productImage: order.productImage,
+    quantity: order.quantity,
+    customerName: order.customerName,
+    customerPhone: order.customerPhone,
+    colors: clean({ accent: page.accent, section: page.section }),
+  })
+}
+
+/** طلب بلا سياق صفحة هبوط + سياق محفوظ حديث (30 دقيقة) ← الطلب مع السياق */
+export function withLandingContext<O extends { landing?: unknown } | null>(order: O, saved: { at: number; landing: unknown } | null, now = Date.now()): O {
+  if (!order || order.landing || !saved?.landing || now - saved.at > 30 * 60_000) return order
+  return { ...order, landing: saved.landing }
+}

@@ -8,7 +8,7 @@ import ThemeRunner from '@/components/ThemeRunner';
 import { StoreProvider } from '@/Hook/store-provider';
 import { getProduct, getStoreByDomain } from '@/lib/api';
 import ProductClient from '@/app/[domain]/(store)/product/[id]/ProductClient';
-import { BARE_CSS, capMediaQueries, cartOff, withPageAttribution } from './themeBare';
+import { BARE_CSS, capMediaQueries, cartOff, LANDING_CTX_KEY, landingContextFromOrder, withPageAttribution } from './themeBare';
 
 type Props = {
   productId?: string;
@@ -20,9 +20,12 @@ type Props = {
   backgroundColor?: string;
   // معاينة المحرر (إطار): بلا إحصائيات ولا نسب طلبات
   preview?: boolean;
+  // صفحة «شكراً» بعد طلب من هذا القسم: صفحة الهبوط الموحدة بلغة الصفحة وبيكسلاتها
+  language?: string;
+  pixels?: unknown[];
 };
 
-export default function ThemeProductBlock({ productId, builderPageId, splitTestId, product: initialProduct, store: initialStore, maxWidth = 720, backgroundColor, preview = false }: Props) {
+export default function ThemeProductBlock({ productId, builderPageId, splitTestId, product: initialProduct, store: initialStore, maxWidth = 720, backgroundColor, preview = false, language, pixels }: Props) {
   const [product, setProduct] = useState<any>(initialProduct ?? null);
   const [store, setStore] = useState<any>(initialStore ?? null);
   const [domain, setDomain] = useState('');
@@ -94,6 +97,27 @@ export default function ThemeProductBlock({ productId, builderPageId, splitTestI
     });
     return () => axios.interceptors.request.eject(id);
   }, [builderPageId, splitTestId]);
+
+  // طلب نجح من الثيم هنا ← سياق الصفحة لصفحة «شكراً» (الثيم يحفظ last_order بلا سياق صفحة الهبوط)
+  useEffect(() => {
+    if (preview) return undefined;
+    const id = axios.interceptors.response.use((res) => {
+      const cfg = res.config ?? {};
+      if (String(cfg.method).toLowerCase() === 'post' && /\/orders(\/create)?\/?$/.test(cfg.url ?? '')) {
+        try {
+          const body = typeof cfg.data === 'string' ? JSON.parse(cfg.data) : cfg.data ?? {};
+          const first = Array.isArray(body) ? body[0] ?? {} : body;
+          const landing = landingContextFromOrder(
+            { builderPageId, productId: product?.id, backUrl: window.location.pathname + window.location.search, language, pixels, accent: store?.design?.primaryColor, section: backgroundColor },
+            { quantity: Number(first.quantity) || undefined, customerName: first.customerName, customerPhone: first.customerPhone, productImage: product?.productImage },
+          );
+          sessionStorage.setItem(LANDING_CTX_KEY, JSON.stringify({ at: Date.now(), landing }));
+        } catch { /* وضع خاص */ }
+      }
+      return res;
+    });
+    return () => axios.interceptors.response.eject(id);
+  }, [builderPageId, product, store, language, pixels, backgroundColor, preview]);
 
   if (!product?.isActive || !store) return null;
   const off = cartOff(product, store);
