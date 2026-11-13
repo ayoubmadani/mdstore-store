@@ -313,6 +313,11 @@ export default function ProductFormBlock({
       setError(t.errorPhone);
       return;
     }
+    // البلدية إجبارية (منتج يُوصَّل، والولاية لها بلديات)
+    if (!product.isDigital && communes.length > 0 && !form.communeId) {
+      setError(t.errorCommune);
+      return;
+    }
     if (product.isDigital) {
       if (contactMethod === 'email') {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.customerEmail.trim())) {
@@ -766,13 +771,14 @@ export default function ProductFormBlock({
                         <ChevronDown size={14} style={chevronInFieldStyle} />
                       </div>
                     </FieldWrapper>
-                    <FieldWrapper label={showLabels ? t.commune : undefined} labelColor={muted} plain>
+                    <FieldWrapper label={showLabels ? t.commune : undefined} labelColor={muted} plain required>
                       <div style={{ position: 'relative' }}>
                         <MapPin size={15} style={iconInFieldStyle} />
                         <select
                           value={form.communeId}
                           aria-label={t.commune}
                           onChange={(e) => setForm((f) => ({ ...f, communeId: e.target.value }))}
+                          required={communes.length > 0}
                           disabled={!form.wilayaId}
                           style={fieldStyle('communeId', { paddingInlineStart: 34, paddingInlineEnd: 28, appearance: 'none', cursor: 'pointer', opacity: form.wilayaId ? 1 : 0.6 })}
                           {...fieldHandlers('communeId')}
