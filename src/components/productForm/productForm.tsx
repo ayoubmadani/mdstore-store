@@ -193,7 +193,6 @@ export default function ProductForm({
     typeLivraison:    'home' as 'home' | 'office',
   });
   // منتج رقمي فقط — أي طريقة يستخدمها الزائر للتواصل بدل الشحن
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -266,14 +265,12 @@ export default function ProductForm({
       e.customerName  = t.errorName;
     if (!isValidDzPhone(formData.customerPhone.replace(/\s/g, '')))
       e.customerPhone = t.errorPhone;
+    // المنتج الرقمي: البريد والواتساب اختياريان — يُفحص المكتوب فقط
     if (product.isDigital) {
-      if (contactMethod === 'email') {
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.customerEmail.trim()))
-          e.customerEmail = t.errorEmail;
-      } else {
-        if (!isValidDzPhone(formData.customerWhatsapp.replace(/\s/g, '')))
-          e.customerWhatsapp = t.errorWhatsapp;
-      }
+      if (formData.customerEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.customerEmail.trim()))
+        e.customerEmail = t.errorEmail;
+      if (formData.customerWhatsapp.trim() && !isValidDzPhone(formData.customerWhatsapp.replace(/\s/g, '')))
+        e.customerWhatsapp = t.errorWhatsapp;
     } else {
       if (!formData.customerWelaya)  e.customerWelaya  = t.errorWilaya;
       if (!formData.customerCommune) e.customerCommune = t.errorCommune;
@@ -281,7 +278,7 @@ export default function ProductForm({
     if (formData.quantity < 1)     e.quantity        = t.errorQuantity;
     setFormErrors(e);
     return Object.keys(e).length === 0;
-  }, [formData, t, product.isDigital, contactMethod]);
+  }, [formData, t, product.isDigital]);
 
   /* ── Submit ── */
   const handleSubmit = async (e: React.FormEvent) => {
@@ -301,9 +298,10 @@ export default function ProductForm({
         customerName:      formData.customerName,
         customerPhone:     formData.customerPhone,
         ...(product.isDigital
-          ? (contactMethod === 'email'
-              ? { customerEmail: formData.customerEmail }
-              : { customerWhatsapp: formData.customerWhatsapp })
+          ? {
+              ...(formData.customerEmail.trim() ? { customerEmail: formData.customerEmail.trim() } : {}),
+              ...(formData.customerWhatsapp.trim() ? { customerWhatsapp: formData.customerWhatsapp.trim() } : {}),
+            }
           : {
               typeShip:          formData.typeLivraison,
               priceShip:         getPriceLivraison(),
@@ -392,29 +390,8 @@ export default function ProductForm({
         </div>
 
         {product.isDigital ? (
-          /* Email or WhatsApp — digital products need no shipping info */
+          /* البريد والواتساب معاً، كلاهما اختياري — المنتج الرقمي بلا توصيل */
           <div className="space-y-3">
-            <p className="text-xs font-bold uppercase tracking-wider" style={{ color: cardText, opacity: 0.6 }}>{t.contactQuestion}</p>
-            <div className="flex rounded-lg overflow-hidden border" style={{ borderColor: fieldBorder }}>
-              <button type="button" onClick={() => setContactMethod('email')}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium transition-colors"
-                style={contactMethod === 'email'
-                  ? { backgroundColor: accent, color: btnText }
-                  : { backgroundColor: inactiveBtnBg, color: inactiveBtnText, opacity: 0.6 }}>
-                <Mail className="w-4 h-4" />
-                {t.contactViaEmail}
-              </button>
-              <button type="button" onClick={() => setContactMethod('whatsapp')}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium transition-colors"
-                style={contactMethod === 'whatsapp'
-                  ? { backgroundColor: accent, color: btnText }
-                  : { backgroundColor: inactiveBtnBg, color: inactiveBtnText, opacity: 0.6 }}>
-                <MessageCircle className="w-4 h-4" />
-                {t.contactViaWhatsapp}
-              </button>
-            </div>
-
-            {contactMethod === 'email' ? (
               <FieldWrapper error={formErrors.customerEmail} label={t.email} labelColor={cardText}>
                 <div className="relative">
                   <Mail className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
@@ -424,7 +401,6 @@ export default function ProductForm({
                     style={fieldStyle(!!formErrors.customerEmail)} />
                 </div>
               </FieldWrapper>
-            ) : (
               <FieldWrapper error={formErrors.customerWhatsapp} label={t.whatsapp} labelColor={cardText}>
                 <div className="relative">
                   <MessageCircle className="absolute right-3 top-3.5 w-4 h-4" style={{ opacity: 0.4 }} />
@@ -434,7 +410,6 @@ export default function ProductForm({
                     style={fieldStyle(!!formErrors.customerWhatsapp)} />
                 </div>
               </FieldWrapper>
-            )}
           </div>
         ) : (
           <>
