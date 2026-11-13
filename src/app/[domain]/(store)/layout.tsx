@@ -1,7 +1,7 @@
-import { cache } from 'react'
 import { notFound } from 'next/navigation'
 import { cookies, headers } from 'next/headers'
-import { getStoreByDomain, getBuilderPageById, resolveSplitTest, getProduct } from '@/lib/api'
+import { getBuilderPageById, resolveSplitTest, getProduct } from '@/lib/api'
+import { getStoreForRequest as getStoreCached } from '@/lib/store-request'
 import ProductClient from './product/[id]/ProductClient'
 import { StoreProvider } from '@/Hook/store-provider'
 import CustomerTracker from '@/components/CustomerTracker'
@@ -13,7 +13,6 @@ import DedicatedPageSwitch from '@/components/builderPages/DedicatedPageSwitch'
 import { BARE_CSS, cartOff } from '@/components/builderPages/themeBare'
 import type { Metadata } from 'next'
 
-const getStoreCached = cache(async (domain: string) => getStoreByDomain(domain))
 
 interface LayoutProps {
   children: React.ReactNode

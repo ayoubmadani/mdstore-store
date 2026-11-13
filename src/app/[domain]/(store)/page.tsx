@@ -1,14 +1,10 @@
-import { cache } from 'react'
 import { headers } from 'next/headers'
 import { heroForDevice } from '@/lib/hero-device'
-import { getStoreByDomain } from '@/lib/api'
+import { getStoreForRequest as getStoreCached } from '@/lib/store-request'
 import ThemeRunner from '@/components/ThemeRunner'
 
 export const dynamic = 'force-dynamic'
 
-const getStoreCached = cache(async (domain: string, category?: string, search?: string, page?: string) =>
-  getStoreByDomain(domain, category, search, page),
-)
 
 function StoreNotFound({ domain }: { domain: string }) {
   return (

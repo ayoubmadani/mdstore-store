@@ -1,10 +1,9 @@
 import { notFound } from 'next/navigation'
-import { cache } from 'react'
-import { getStoreByDomain, getProduct } from '@/lib/api'
+import { getProduct } from '@/lib/api'
+import { getStoreForRequest as getStoreCached } from '@/lib/store-request'
 import ProductClient from './ProductClient'
 import type { Metadata } from 'next'
 
-const getStoreCached = cache(async (domain: string) => getStoreByDomain(domain))
 
 export async function generateMetadata({
   params,
