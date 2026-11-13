@@ -111,7 +111,9 @@ export default function ThemeProductBlock({ productId, builderPageId, splitTestI
             { builderPageId, productId: product?.id, backUrl: window.location.pathname + window.location.search, language, pixels, accent: store?.design?.primaryColor, section: backgroundColor },
             { quantity: Number(first.quantity) || undefined, customerName: first.customerName, customerPhone: first.customerPhone, productImage: product?.productImage },
           );
-          sessionStorage.setItem(LANDING_CTX_KEY, JSON.stringify({ at: Date.now(), landing }));
+          const total = Number(first.totalPrice);
+          const order = { id: res.data?.order?.id ?? res.data?.id ?? (Array.isArray(res.data) ? res.data[0]?.id : undefined), ...(total > 0 ? { total } : {}), productName: product?.name };
+          sessionStorage.setItem(LANDING_CTX_KEY, JSON.stringify({ at: Date.now(), landing, order }));
         } catch { /* وضع خاص */ }
       }
       return res;

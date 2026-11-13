@@ -68,8 +68,18 @@ export function landingContextFromOrder(page: LandingCtxInput, order: { quantity
   })
 }
 
-/** طلب بلا سياق صفحة هبوط + سياق محفوظ حديث (30 دقيقة) ← الطلب مع السياق */
-export function withLandingContext<O extends { landing?: unknown } | null>(order: O, saved: { at: number; landing: unknown } | null, now = Date.now()): O {
-  if (!order || order.landing || !saved?.landing || now - saved.at > 30 * 60_000) return order
-  return { ...order, landing: saved.landing }
+/**
+ * طلب بلا سياق صفحة هبوط + سياق محفوظ حديث (30 دقيقة) ← الطلب مع السياق.
+ * بعض الثيمات لا تحفظ last_order أصلاً ← الطلب من السياق نفسه (رقمه ومبلغه)
+ */
+export function withLandingContext<O extends { landing?: unknown }>(
+  order: O | null,
+  saved: { at: number; landing: unknown; order?: { id?: string; total?: number } } | null,
+  now = Date.now(),
+): O | (Record<string, unknown> & { landing: unknown }) | null {
+  const fresh = !!saved?.landing && now - saved.at <= 30 * 60_000
+  if (!order) return fresh ? { ...(saved!.order ?? {}), landing: saved!.landing } : null
+  if (order.landing || !fresh) return order
+  // last_order قديم من طلب سابق ممكن: رقم الطلب ومبلغه من السياق الأحدث
+  return { ...order, ...(saved!.order ?? {}), landing: saved!.landing }
 }

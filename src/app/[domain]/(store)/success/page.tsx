@@ -50,18 +50,18 @@ export default function SuccessPage() {
 
   useEffect(() => {
     if (!domain || hasTracked.current) return
-    const saved = localStorage.getItem('last_order')
-    if (saved) {
-      try {
-        // طلب من قسم «المنتج بثيم المتجر» في صفحة هبوط: سياق الصفحة محفوظ بجانبه
-        let ctx = null
-        try { ctx = JSON.parse(sessionStorage.getItem(LANDING_CTX_KEY) || 'null'); sessionStorage.removeItem(LANDING_CTX_KEY) } catch {}
-        const parsed = withLandingContext(JSON.parse(saved), ctx)
-        setOrder(parsed)
-        // طلب من صفحة هبوط: LandingSuccess يطلق حدث الشراء ببيكسلات الصفحة نفسها
-        if (!parsed.landing) trackPurchase(parsed.total, 'DZD', parsed.id)
-        hasTracked.current = true
-      } catch {}
+    // طلب من قسم «المنتج بثيم المتجر» في صفحة هبوط: سياق الصفحة محفوظ (sessionStorage لهذا الدومين) —
+    // وبعض الثيمات لا تحفظ last_order أصلاً، فيُبنى الطلب من السياق
+    let ctx = null
+    try { ctx = JSON.parse(sessionStorage.getItem(LANDING_CTX_KEY) || 'null') } catch {}
+    let saved = null
+    try { saved = JSON.parse(localStorage.getItem('last_order') || 'null') } catch {}
+    const parsed: any = withLandingContext(saved, ctx)
+    if (parsed) {
+      setOrder(parsed)
+      // طلب من صفحة هبوط: LandingSuccess يطلق حدث الشراء ببيكسلات الصفحة نفسها
+      if (!parsed.landing) trackPurchase(parsed.total, 'DZD', parsed.id)
+      hasTracked.current = true
     }
     setReady(true)
   }, [domain, trackPurchase])

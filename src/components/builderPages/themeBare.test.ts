@@ -47,6 +47,10 @@ test('the thank-you page uses a fresh landing context only when the order has no
   assert.deepEqual(withLandingContext({ id: 'o' }, { at: now - 60_000, landing }, now), { id: 'o', landing });
   assert.deepEqual(withLandingContext({ id: 'o' }, { at: now - 31 * 60_000, landing }, now), { id: 'o' });
   assert.deepEqual(withLandingContext({ id: 'o', landing: { colors: { accent: 'a' } } }, { at: now, landing }, now), { id: 'o', landing: { colors: { accent: 'a' } } });
-  assert.equal(withLandingContext(null, { at: now, landing }, now), null);
+  // الثيم لا يحفظ last_order: الطلب من السياق نفسه (رقمه ومبلغه)
+  assert.deepEqual(withLandingContext(null, { at: now, landing, order: { id: 'o9', total: 300 } }, now), { id: 'o9', total: 300, landing });
+  assert.deepEqual(withLandingContext(null, { at: now, landing }, now), { landing });
+  assert.deepEqual(withLandingContext({ id: 'old', total: 1 }, { at: now, landing, order: { id: 'o9', total: 300 } }, now), { id: 'o9', total: 300, landing });
+  assert.equal(withLandingContext(null, null, now), null);
   assert.deepEqual(withLandingContext({ id: 'o' }, null, now), { id: 'o' });
 });
