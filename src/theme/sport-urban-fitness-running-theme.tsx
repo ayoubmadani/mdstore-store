@@ -1043,7 +1043,6 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',
   });
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
@@ -1100,9 +1099,9 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     if (!fd.customerName || fd.customerName.trim().length < 3) e.customerName = t.errName;
     if (!isValidDzPhone(fd.customerPhone)) e.customerPhone = t.errPhone;
     if (product?.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
-      } else {
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
         if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
@@ -1134,7 +1133,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     try {
       const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
       const fields = product?.isDigital
-        ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+        ? { ...rest, ...({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) }) }
         : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
       const payload = {
         ...fields, quantity: qty, product, variantDetailId: getVarId(product, selectedVariants || { addonIds,}),
@@ -1171,25 +1170,16 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
           </div>
           {product?.isDigital ? (
             <div style={{ marginBottom: 14 }}>
-              <div style={{ display: 'flex', border: `1px solid ${BD}`, borderRadius: 4, overflow: 'hidden', marginBottom: 10 }}>
-                <button type="button" onClick={() => { setContactMethod('email'); setFd({ ...fd, customerWhatsapp: '' }); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.8rem', fontWeight: 700, background: contactMethod === 'email' ? A : 'transparent', color: contactMethod === 'email' ? DARK : SUB }}>
-                  <Mail size={14} />{t.contactViaEmail}
-                </button>
-                <button type="button" onClick={() => { setContactMethod('whatsapp'); setFd({ ...fd, customerEmail: '' }); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.8rem', fontWeight: 700, background: contactMethod === 'whatsapp' ? A : 'transparent', color: contactMethod === 'whatsapp' ? DARK : SUB }}>
-                  <MessageCircle size={14} />{t.contactViaWhatsapp}
-                </button>
-              </div>
-              {contactMethod === 'email' ? (
+              <>
                 <div>
                   <input type="email" dir="ltr" placeholder={t.emailPh} value={fd.customerEmail} onChange={(e) => setFd({ ...fd, customerEmail: e.target.value })} style={inputBase(!!errors.customerEmail)} />
                   {errors.customerEmail && <ErrorMsg text={errors.customerEmail} />}
                 </div>
-              ) : (
                 <div>
                   <input type="tel" dir="ltr" placeholder={t.whatsappPh} value={fd.customerWhatsapp} onChange={(e) => setFd({ ...fd, customerWhatsapp: e.target.value })} style={inputBase(!!errors.customerWhatsapp)} />
                   {errors.customerWhatsapp && <ErrorMsg text={errors.customerWhatsapp} />}
                 </div>
-              )}
+              </>
             </div>
           ) : (
             <>

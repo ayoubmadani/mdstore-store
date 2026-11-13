@@ -1,5 +1,7 @@
 'use client';
 
+// دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __kit from '@mdstore/theme-kit';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
@@ -16,8 +18,30 @@ import {
 // كل ما يحتاجه الثيم من المتجر يأتي من @mdstore/theme-kit — الثيم ملف واحد مستقل يُبنى ويُرفع من الـ API
 import {
   useCartStore, WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref,
-  ProductAddons, addonsTotal, addonsLabel, HeroShade,
+  ProductAddons, addonsTotal, addonsLabel,
 } from '@mdstore/theme-kit';
+
+// ربط اللون بصورة المنتج (نسخة مستقلة من src/lib/variant-image.ts)
+type __VAttr = { name: string; variants?: { value: string; imageUrl?: string | null }[] };
+const imageIndexForSelection = (attributes: __VAttr[] | undefined, selected: Record<string, string>, images: string[]): number => {
+  for (const a of attributes || []) {
+    const url = a.variants?.find((v) => v.value === selected[a.name])?.imageUrl;
+    const i = url ? images.indexOf(url) : -1;
+    if (i >= 0) return i;
+  }
+  return -1;
+};
+const variantForImage = (attributes: __VAttr[] | undefined, url: string): { name: string; value: string } | null => {
+  for (const a of attributes || []) {
+    const v = a.variants?.find((x) => x.imageUrl && x.imageUrl === url);
+    if (v) return { name: a.name, value: v.value };
+  }
+  return null;
+};
+
+
+const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
@@ -281,12 +305,15 @@ export interface ProductFormProps {
 
 
 // نوع التوصيل المتاح في الولاية المختارة (منزل / مكتب) حسب حساب الشحن — قبل اختيار الولاية يظهر الاثنان
-const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office') => {
+const deliveryAllowed = (list: any[], wilayaId: any, type: 'home' | 'office', communes?: any[], communeId?: any) => {
   const w = (list || []).find((x: any) => String(x.id) === String(wilayaId));
-  return !w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false);
+  // البلدية المختارة قد تكون مقيّدة (التوصيل للمنزل أو للمكتب فقط) من صفحة أسعار التوصيل
+  const c = communeId ? (communes || []).find((x: any) => String(x.id) === String(communeId)) : null;
+  const okC = !c || (type === 'home' ? c.homeEnabled !== false : c.officeEnabled !== false);
+  return okC && (!w || (type === 'home' ? w.homeEnabled !== false : w.officeEnabled !== false));
 };
 // خيار نوع التوصيل يظهر فقط بعد اختيار الولاية، وحسب ما هو متاح فيها
-const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office') => !!wilayaId && deliveryAllowed(list, wilayaId, type);
+const deliveryShown = (list: any[], wilayaId: any, type: 'home' | 'office', communes?: any[], communeId?: any) => !!wilayaId && deliveryAllowed(list, wilayaId, type, communes, communeId);
 
 function variantMatches(d: VariantDetail, sel: Record<string, string>) {
   return Object.entries(sel).every(([n, v]) => d.name.some(e => e.attrName === n && e.value === v));
@@ -734,7 +761,7 @@ const getLang = (store?: any): Lang => {
 export default function Main({ store, children, domain }: any) {
   const pathname = usePathname();
   const lang = getLang(store);
-  const t = T[lang];
+  const t = withLocationLabels(T)[lang];
   const isRTL = lang === 'ar';
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
@@ -752,7 +779,7 @@ export default function Main({ store, children, domain }: any) {
 ═══════════════════════════════════════════════════════════ */
 export function Navbar({ store, domain }: { store: any; domain: string }) {
   const lang = getLang(store);
-  const t = T[lang];
+  const t = withLocationLabels(T)[lang];
   const isRTL = lang === 'ar';
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -851,13 +878,16 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
             {/* إذا كان هناك رابط مخصص للصورة، نعرض الشعار */}
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <img
-                decoding="async"
-                src={store.design.logoUrl}
-                style={{ height: 34, objectFit: 'contain', display: 'block' }}
-                alt={store?.name || 'Store Logo'}
-                onError={() => setImgError(true)}
-              />
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, flexDirection: (store.design as any)?.nameBeforeLogo ? 'row-reverse' : 'row' }}>
+                <img
+                  decoding="async"
+                  src={store.design.logoUrl}
+                  style={{ height: 34, objectFit: 'contain', display: 'block' }}
+                  alt={store?.name || 'Store Logo'}
+                  onError={() => setImgError(true)}
+                />
+                {(store.design as any)?.showStoreName && <span className="br-display" style={{ fontSize: '1.35rem', color: '#1F2A44', whiteSpace: 'nowrap', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis' }}>{store.name}</span>}
+              </span>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ width: 38, height: 38, borderRadius: 12, background: '#B5532F', color: '#C9A44C', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 3px 0 #7E3820', transform: 'rotate(-6deg)', flexShrink: 0 }}>
@@ -949,7 +979,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 ═══════════════════════════════════════════════════════════ */
 export function Footer({ store }: any) {
   const lang = getLang(store);
-  const t = T[lang];
+  const t = withLocationLabels(T)[lang];
   const isRTL = lang === 'ar';
   return (
     <footer dir={isRTL ? 'rtl' : 'ltr'} className="br-stripes" style={{ background: '#1F2A44', color: '#C7CCD8', marginTop: 80, padding: '4rem 1.5rem 1.5rem', borderTop: '6px solid #C9A44C' }}>
@@ -1086,7 +1116,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 ═══════════════════════════════════════════════════════════ */
 export function Home({ store, page }: any) {
   const lang = getLang(store);
-  const t = T[lang];
+  const t = withLocationLabels(T)[lang];
   const isRTL = lang === 'ar';
   const align = isRTL ? 'right' : 'left';
   const products: any[] = store.products || [];
@@ -1111,15 +1141,13 @@ export function Home({ store, page }: any) {
       <section className="br-stripes" style={{ position: 'relative', background: '#1F2A44', overflow: 'hidden', display: 'flex', alignItems: 'center', minHeight: 'min(86vh, 720px)' }}>
         {store.hero?.imageUrl && (
           <div className="br-hero-bg" style={{ position: 'absolute', inset: 0 }}>
-            <img fetchPriority="high" decoding="async" src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.22 }} />
-            {/* تدرّج فوق الصورة (لا صندوق خلف النص) + غلاف الهاتف كامل */}
-            <HeroShade store={store} rtl={isRTL} />
+            <img onError={(e) => { e.currentTarget.style.display = 'none'; }} fetchPriority="high" decoding="async" src={store.hero.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         )}
         <div style={{ position: 'absolute', top: -120, ...(isRTL ? { left: -120 } : { right: -120 }), width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle, rgba(181,83,47,0.45), transparent 70%)', pointerEvents: 'none' }} />
 
         <div style={{ maxWidth: 1280, margin: '0 auto', width: '100%', padding: '4.5rem 1.5rem 5.5rem', position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: 'minmax(0,1fr)', gap: '2rem', alignItems: 'center' }} className="hero-grid">
-          <div style={{ textAlign: align }}>
+          <div style={{ textAlign: align, ...(store.hero?.imageUrl ? { background: 'rgba(10,10,12,.45)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', padding: 'clamp(16px, 3vw, 28px)', borderRadius: 18 } : {}) }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#C9A44C', color: '#1F2A44', borderRadius: 999, padding: '0.4rem 1rem', marginBottom: '1.5rem', fontWeight: 800, fontSize: '0.82rem', transform: 'rotate(-2deg)' }}>
               <PenLine size={15} color="#B5532F" /> {t.heroBadge}
             </div>
@@ -1147,7 +1175,7 @@ export function Home({ store, page }: any) {
             <div className="br-hero-img" style={{ justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
               <div className="br-spin-slow" style={{ position: 'absolute', width: '92%', aspectRatio: '1/1', borderRadius: '50%', border: '3px dashed rgba(201,164,76,0.35)' }} />
               <div className="br-float" style={{ width: '78%', aspectRatio: '1/1', borderRadius: '50%', overflow: 'hidden', border: '10px solid #C9A44C', boxShadow: '0 30px 60px rgba(0,0,0,0.45)' }}>
-                <img fetchPriority="high" decoding="async" src={store.hero.imageUrl} alt={store.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img onError={(e) => { e.currentTarget.style.display = 'none'; }} fetchPriority="high" decoding="async" src={store.hero.imageUrl} alt={store.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             </div>
           ) : (
@@ -1263,10 +1291,21 @@ export function Home({ store, page }: any) {
 ═══════════════════════════════════════════════════════════ */
 export function Details({ product, discount, allImages, allAttrs, finalPrice, selectedVariants, setSelectedOffer, selectedOffer, handleVariantSelection, domain, store }: any) {
   const lang = getLang(store || product?.store);
-  const t = T[lang];
+  const t = withLocationLabels(T)[lang];
   const isRTL = lang === 'ar';
   const [sel, setSel] = useState(0);
 
+  // اللون المربوط بصورة: اختياره يعرض صورته، والضغط على الصورة (أو الأسهم) يختار لونها
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, allImages);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (next: number | ((p: number) => number)) => {
+    const idx = typeof next === 'function' ? next(sel) : next;
+    setSel(idx);
+    const v = variantForImage(product?.attributes, allImages[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: '#F8F3E9', paddingBottom: '4rem' }}>
       <div className="details-inner" style={{ maxWidth: 1280, margin: '0 auto' }}>
@@ -1286,8 +1325,8 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 
             {allImages.length > 1 && (
               <>
-                <button onClick={() => setSel(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 8, background: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.12)' }}><ChevronRight size={18} /></button>
-                <button onClick={() => setSel(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 8, background: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.12)' }}><ChevronLeft size={18} /></button>
+                <button onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 8, background: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.12)' }}><ChevronRight size={18} /></button>
+                <button onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 8, background: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.12)' }}><ChevronLeft size={18} /></button>
               </>
             )}
           </div>
@@ -1296,7 +1335,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           {allImages.length > 1 && (
             <div className="thumb-row">
               {allImages.map((img: string, idx: number) => (
-                <button key={idx} onClick={() => setSel(idx)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 8, overflow: 'hidden', border: `2px solid ${sel === idx ? '#B5532F' : '#E8E8E8'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.18s' }}>
+                <button key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 8, overflow: 'hidden', border: `2px solid ${sel === idx ? '#B5532F' : '#E8E8E8'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.18s' }}>
                   <img loading="lazy" decoding="async" src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
               ))}
@@ -1383,7 +1422,15 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             {/* Attributes - تم تغيير اللون للأحمر المتناسق */}
             {allAttrs.map((attr: any) => (
               <div key={attr.id} style={{ marginBottom: '1.125rem' }}>
-                <p style={{ fontSize: '0.825rem', fontWeight: 700, color: '#1F2A44', marginBottom: '0.625rem', textTransform: 'uppercase' }}>{attr.name}</p>
+                <p style={{ fontSize: '0.825rem', fontWeight: 700, color: '#1F2A44', marginBottom: '0.625rem', textTransform: 'uppercase' }}>
+                  {attr.name}
+                  {/* اسم اللون المختار (أحمر) إن كتبه التاجر — بجانب اسم الخاصية */}
+                  {(() => {
+                    const sel = attr.variants.find((v: any) => v.value === selectedVariants[attr.name]);
+                    return (attr.displayMode === 'color' || attr.displayMode === 'image') && sel?.name && sel.name !== sel.value
+                      ? <span style={{ fontWeight: 600, color: '#B5532F', textTransform: 'none' }}> : {sel.name}</span> : null;
+                  })()}
+                </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                   {attr.variants.map((v: any) => {
                     const isSelected = selectedVariants[attr.name] === v.value;
@@ -1397,6 +1444,8 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                     return (
                       <button
                         key={v.id}
+                        title={v.name && v.name !== v.value ? v.name : undefined}
+                        aria-label={v.name || v.value}
                         onClick={() => available && handleVariantSelection(attr.name, v.value)}
                         style={
                           attr.displayMode === 'color' ? {
@@ -1452,14 +1501,13 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
 
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: ProductFormProps) {
   const lang = getLang(store || product?.store);
-  const t = T[lang];
+  const t = withLocationLabels(T)[lang];
   const isRTL = lang === 'ar';
   const router = useRouter();
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLC] = useState(false);
   const [fd, setFd] = useState({ customerId: '', customerName: '', customerPhone: '', customerEmail: '', customerWhatsapp: '', customerWelaya: '', customerCommune: '', quantity: 1, priceLoss: 0, typeLivraison: 'home' as 'home' | 'office' });
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sub, setSub] = useState(false);
   const [orderNowState, setIsOrderNow] = useState(false);
@@ -1474,7 +1522,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
   useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
   // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
-  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home', communes, fd.customerCommune)) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison, communes, fd.customerCommune]); // deliveryTypeGuard
   useEffect(() => { if (typeof window !== 'undefined') { const id = localStorage.getItem('customerId'); if (id) setFd(p => ({ ...p, customerId: id })); } }, []);
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1510,12 +1558,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = t.errName;
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
+    if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
     if (product.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
-      } else {
-        if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
+        if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
       if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
@@ -1544,7 +1592,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     try {
       const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
       const payload = product.isDigital
-        ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+        ? { ...rest, ...({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) }) }
         : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
       await axios.post(`${API_URL}/orders/create`, { ...payload, addonIds, quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
@@ -1559,7 +1607,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#B5532F" />
         {product.store.cart && !product.isDigital && (
         <div className="cart-add-btns" style={{ marginBottom: '1.25rem' }}>
-          <button onClick={addToCart} disabled={isAdded} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.8rem 1rem', border: `1.5px solid ${isAdded ? '#22C55E' : '#E8E8E8'}`, borderRadius: 10, fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', background: isAdded ? 'rgba(34,197,94,0.07)' : '#fff', color: isAdded ? '#22C55E' : '#1F2A44', transition: 'all 0.2s', fontFamily: 'inherit' }}>
+          <button data-add-to-cart onClick={addToCart} disabled={isAdded} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.8rem 1rem', border: `1.5px solid ${isAdded ? '#22C55E' : '#E8E8E8'}`, borderRadius: 10, fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', background: isAdded ? 'rgba(34,197,94,0.07)' : '#fff', color: isAdded ? '#22C55E' : '#1F2A44', transition: 'all 0.2s', fontFamily: 'inherit' }}>
             {isAdded ? <><CheckCircle2 size={14} className="anim-check" />{t.addedMsg}</> : <><ShoppingCart size={14} />{t.addToCart}</>}
           </button>
           <button onClick={() => setIsOrderNow(true)} style={{ flex: 1, ...S.btnPrimary, width: 'auto', borderRadius: 10 }}
@@ -1589,24 +1637,14 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
             {product.isDigital ? (
               <div style={{ marginBottom: '0.875rem' }}>
-                <p style={{ fontSize: '0.775rem', fontWeight: 700, color: '#555', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.contactQuestion}</p>
-                <div style={{ display: 'flex', borderRadius: 10, overflow: 'hidden', border: '1.5px solid #E8E8E8', marginBottom: '0.75rem' }}>
-                  <button type="button" onClick={() => { setContactMethod('email'); setFd(p => ({ ...p, customerWhatsapp: '' })); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.7rem 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.8rem', fontWeight: 700, background: contactMethod === 'email' ? '#B5532F' : 'transparent', color: contactMethod === 'email' ? '#fff' : '#555' }}>
-                    <Mail size={14} />{t.contactViaEmail}
-                  </button>
-                  <button type="button" onClick={() => { setContactMethod('whatsapp'); setFd(p => ({ ...p, customerEmail: '' })); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.7rem 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.8rem', fontWeight: 700, background: contactMethod === 'whatsapp' ? '#B5532F' : 'transparent', color: contactMethod === 'whatsapp' ? '#fff' : '#555' }}>
-                    <MessageCircle size={14} />{t.contactViaWhatsapp}
-                  </button>
-                </div>
-                {contactMethod === 'email' ? (
+                <>
                   <FR error={errors.customerEmail} label={t.orderEmail}>
                     <input type="email" dir="ltr" value={fd.customerEmail} onChange={e => setFd({ ...fd, customerEmail: e.target.value })} placeholder={t.emailPh} style={inp(!!errors.customerEmail)} />
                   </FR>
-                ) : (
                   <FR error={errors.customerWhatsapp} label={t.whatsapp}>
                     <input type="tel" dir="ltr" value={fd.customerWhatsapp} onChange={e => setFd({ ...fd, customerWhatsapp: e.target.value })} placeholder={t.whatsappPh} style={inp(!!errors.customerWhatsapp)} />
                   </FR>
-                )}
+                </>
               </div>
             ) : (
               <>
@@ -1632,7 +1670,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 <div style={{ marginBottom: '0.875rem' }}>
                   <p style={{ fontSize: '0.775rem', fontWeight: 700, color: '#555', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.delivery}</p>
                   <div className="delivery-grid">
-                    {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt)).map(dt => (
+                    {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt, communes, fd.customerCommune)).map(dt => (
                       <button data-delivery-option key={dt} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: dt }))} style={{ padding: '0.875rem', border: `1.5px solid ${fd.typeLivraison === dt ? '#B5532F' : '#E8E8E8'}`, borderRadius: 10, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === dt ? 'rgba(181,83,47,0.05)' : '#fff', transition: 'all 0.18s', fontFamily: 'inherit' }}>
                         <p style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: 4, color: fd.typeLivraison === dt ? '#B5532F' : '#555' }}>{dt === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
                         {selW && <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 800, color: fd.typeLivraison === dt ? '#1F2A44' : '#ccc' }}>{orderFreeShipping ? t.freeShippingBadge : `${(dt === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} DZD`}</p>}
@@ -1692,7 +1730,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 ═══════════════════════════════════════════════════════════ */
 export function Cart({ domain, store }: { domain: string; store: any }) {
   const lang = getLang(store);
-  const t = T[lang];
+  const t = withLocationLabels(T)[lang];
   const isRTL = lang === 'ar';
   const [items, setItems] = useState<any[]>([]);
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
@@ -1717,7 +1755,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
   useEffect(() => { if (wilayas.length === 1) setFd((p: any) => (String(p.customerWelaya) === String(wilayas[0].id) ? p : { ...p, customerWelaya: String(wilayas[0].id), customerCommune: '' })); }, [wilayas]); // onlyOneWilaya
   // نوع التوصيل غير متاح في الولاية المختارة ← ينتقل للنوع المتاح
-  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home')) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison]); // deliveryTypeGuard
+  useEffect(() => { if (!deliveryAllowed(wilayas, fd.customerWelaya, fd.typeLivraison === 'office' ? 'office' : 'home', communes, fd.customerCommune)) setFd((p: any) => ({ ...p, typeLivraison: p.typeLivraison === 'office' ? 'home' : 'office' })); }, [wilayas, fd.customerWelaya, fd.typeLivraison, communes, fd.customerCommune]); // deliveryTypeGuard
 
   useEffect(() => {
     if (!fd.customerWelaya) { setCommunes([]); return; }
@@ -1746,7 +1784,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (!fd.customerName.trim()) er.name = t.errName;
-    if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) er.phone = t.errPhoneInvalid;
+    if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) er.phone = t.errPhoneInvalid;
     if (!fd.customerWelaya) er.w = t.errWilaya;
     if (!fd.customerCommune) er.c = t.errCommune;
     if (Object.keys(er).length) { setErrors(er); return; }
@@ -1862,7 +1900,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             <div style={{ margin: '1rem 0' }}>
               <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#888', textTransform: 'uppercase', marginBottom: '0.5rem', letterSpacing: '0.04em' }}>{t.deliveryType}</p>
               <div className="delivery-grid">
-                {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt)).map(dt => (
+                {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt, communes, fd.customerCommune)).map(dt => (
                   <button data-delivery-option
                     key={dt}
                     type="button"
@@ -1914,7 +1952,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 }
 
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
-  const lang = getLang(store); const t = T[lang]; const isRTL = lang === 'ar';
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   const currency = store?.currency || 'DZD';
   const ACCENT = '#B5532F';
   const stepIcons = [CheckCircle2, Phone, Package, Truck];
@@ -2002,7 +2040,7 @@ const InfoBlock = ({ title, body }: { title: string; body: string }) => (
 );
 
 export function Privacy({ store }: { store?: any }) {
-  const lang = getLang(store); const t = T[lang]; const pg = t.pages.privacy;
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const pg = t.pages.privacy;
   return (
     <Shell title={pg.title} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div style={{ background: '#fff', padding: '2rem', borderRadius: 14, border: '1.5px solid #E8E8E8' }}>
@@ -2013,7 +2051,7 @@ export function Privacy({ store }: { store?: any }) {
 }
 
 export function Terms({ store }: { store?: any }) {
-  const lang = getLang(store); const t = T[lang]; const pg = t.pages.terms;
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const pg = t.pages.terms;
   return (
     <Shell title={pg.title} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div style={{ background: '#fff', padding: '2rem', borderRadius: 14, border: '1.5px solid #E8E8E8' }}>
@@ -2024,7 +2062,7 @@ export function Terms({ store }: { store?: any }) {
 }
 
 export function Cookies({ store }: { store?: any }) {
-  const lang = getLang(store); const t = T[lang]; const pg = t.pages.cookies;
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const pg = t.pages.cookies;
   return (
     <Shell title={pg.title} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div style={{ background: '#fff', padding: '2rem', borderRadius: 14, border: '1.5px solid #E8E8E8' }}>
@@ -2036,7 +2074,7 @@ export function Cookies({ store }: { store?: any }) {
 
 export function Contact({ store }: { store: any }) {
   const lang = getLang(store);
-  const t = T[lang];
+  const t = withLocationLabels(T)[lang];
   const isRTL = lang === 'ar';
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sent, setSent] = useState(false);

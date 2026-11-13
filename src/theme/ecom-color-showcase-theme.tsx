@@ -1023,7 +1023,6 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLC] = useState(false);
   const [fd, setFd] = useState({ customerId: '', customerName: '', customerPhone: '', customerEmail: '', customerWhatsapp: '', customerWelaya: '', customerCommune: '', quantity: 1, priceLoss: 0, typeLivraison: 'home' as 'home' | 'office' });
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sub, setSub] = useState(false);
   const [orderNowState, setIsOrderNow] = useState(false);
@@ -1087,9 +1086,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if (!fd.customerName.trim()) e.customerName = t.errName;
     if (!fd.customerPhone.trim() || !/^(0|\+213)[5-7]\d{8}$/.test(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
     if (product.isDigital) {
-      if (contactMethod === 'email') { if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail; }
+      if (String(fd.customerEmail ?? '').trim()) { if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail; }
       else if (!/^(0|\+213)[5-7]\d{8}$/.test(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
-    } else {
+    } if (String(fd.customerWhatsapp ?? '').trim()) {
       if (!fd.customerWelaya) e.customerWelaya = t.errWilaya;
       if (!fd.customerCommune) e.customerCommune = t.errCommune;
     }
@@ -1116,7 +1115,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     try {
       const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
       const payload = product.isDigital
-        ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+        ? { ...rest, ...({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) }) }
         : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
       await axios.post(`${API_URL}/orders/create`, { ...payload, ...(Object.keys(addonQty).length ? { addonQty } : {}), quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
@@ -1157,24 +1156,14 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
             {product.isDigital ? (
               <div style={{ marginBottom: '.85rem' }}>
-                <label className="cs-label">{t.contactQuestion}</label>
-                <div className="cs-deliv" style={{ marginBottom: '.75rem' }}>
-                  {(['email', 'whatsapp'] as const).map((m) => (
-                    <button key={m} type="button" className={contactMethod === m ? 'on' : ''}
-                      onClick={() => { setContactMethod(m); setFd((p) => (m === 'email' ? { ...p, customerWhatsapp: '' } : { ...p, customerEmail: '' })); }}>
-                      {m === 'email' ? <Mail size={20} /> : <MessageCircle size={20} />}<b>{m === 'email' ? t.contactViaEmail : t.contactViaWhatsapp}</b>
-                    </button>
-                  ))}
-                </div>
-                {contactMethod === 'email' ? (
+                <>
                   <FR error={errors.customerEmail} label={t.orderEmail}>
                     <div className="cs-field"><Mail size={16} /><input type="email" dir="ltr" className={cls(errors.customerEmail)} value={fd.customerEmail} onChange={(e) => setFd({ ...fd, customerEmail: e.target.value })} placeholder={t.emailPh} /></div>
                   </FR>
-                ) : (
                   <FR error={errors.customerWhatsapp} label={t.whatsapp}>
                     <div className="cs-field"><MessageCircle size={16} /><input type="tel" dir="ltr" className={cls(errors.customerWhatsapp)} value={fd.customerWhatsapp} onChange={(e) => setFd({ ...fd, customerWhatsapp: e.target.value })} placeholder={t.whatsappPh} /></div>
                   </FR>
-                )}
+                </>
               </div>
             ) : (
               <>

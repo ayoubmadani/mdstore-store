@@ -1424,7 +1424,6 @@ export function ProductForm({
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',
   });
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
 
   useEffect(() => { if (uid) fetchWilayas(uid, store?.id).then(setWilayas); }, [uid]);
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
@@ -1474,9 +1473,9 @@ export function ProductForm({
     if (!fd.customerName || fd.customerName.trim().length < 3) e.customerName = t.errName;
     if (!isValidDzPhone((fd.customerPhone || '').replace(/\s/g, ''))) e.customerPhone = t.errPhone;
     if (product?.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
-      } else {
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
         if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
@@ -1490,7 +1489,7 @@ export function ProductForm({
   const payload = () => {
     const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
     const shippingOrContact = product?.isDigital
-      ? (contactMethod === 'email' ? { customerEmail } : { customerWhatsapp })
+      ? ({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) })
       : { customerWelaya, customerCommune, typeLivraison, priceLoss };
     return { addonIds,
       ...rest,
@@ -1599,30 +1598,7 @@ export function ProductForm({
 
           {product?.isDigital ? (
             <div style={{ marginBottom: 16 }}>
-              <span style={label}>{t.contactQuestion}</span>
-              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8, marginBottom: 13 }}>
-                <button type="button" onClick={() => { setContactMethod('email'); set('customerWhatsapp', ''); }}
-                  style={{
-                    minHeight: 46, padding: '0 10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                    cursor: 'pointer', fontFamily: 'inherit', fontSize: '.8rem',
-                    borderRadius: 10, background: contactMethod === 'email' ? AL : CARD,
-                    border: `1px solid ${contactMethod === 'email' ? A : BD}`, color: contactMethod === 'email' ? A : SUB,
-                    fontWeight: contactMethod === 'email' ? 600 : 400, transition: 'all .2s',
-                  }}>
-                  <Mail size={14} />{t.contactViaEmail}
-                </button>
-                <button type="button" onClick={() => { setContactMethod('whatsapp'); set('customerEmail', ''); }}
-                  style={{
-                    minHeight: 46, padding: '0 10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                    cursor: 'pointer', fontFamily: 'inherit', fontSize: '.8rem',
-                    borderRadius: 10, background: contactMethod === 'whatsapp' ? AL : CARD,
-                    border: `1px solid ${contactMethod === 'whatsapp' ? A : BD}`, color: contactMethod === 'whatsapp' ? A : SUB,
-                    fontWeight: contactMethod === 'whatsapp' ? 600 : 400, transition: 'all .2s',
-                  }}>
-                  <MessageCircle size={14} />{t.contactViaWhatsapp}
-                </button>
-              </div>
-              {contactMethod === 'email' ? (
+              <>
                 <div>
                   <label style={label} htmlFor="tk-email">{t.orderEmail}</label>
                   <input id="tk-email" type="email" dir="ltr" inputMode="email"
@@ -1631,7 +1607,6 @@ export function ProductForm({
                     onChange={(e) => set('customerEmail', e.target.value)} />
                   <ErrLine msg={errs.customerEmail} />
                 </div>
-              ) : (
                 <div>
                   <label style={label} htmlFor="tk-whatsapp">{t.whatsapp}</label>
                   <input id="tk-whatsapp" type="tel" dir="ltr" inputMode="tel"
@@ -1640,7 +1615,7 @@ export function ProductForm({
                     onChange={(e) => set('customerWhatsapp', e.target.value)} />
                   <ErrLine msg={errs.customerWhatsapp} />
                 </div>
-              )}
+              </>
             </div>
           ) : (
             <>

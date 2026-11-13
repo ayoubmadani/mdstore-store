@@ -960,7 +960,6 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',
   });
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
@@ -1019,9 +1018,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if (!fd.customerName || fd.customerName.trim().length < 3) errs.customerName = t.errName;
     if (!isValidDzPhone(fd.customerPhone)) errs.customerPhone = t.errPhone;
     if (product?.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) errs.customerEmail = t.errEmail;
-      } else {
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
         if (!isValidDzPhone(fd.customerWhatsapp.trim())) errs.customerWhatsapp = t.errWhatsapp;
       }
     } else {
@@ -1035,7 +1034,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const buildPayload = () => {
     const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
     const shippingOrContact = product?.isDigital
-      ? (contactMethod === 'email' ? { customerEmail } : { customerWhatsapp })
+      ? ({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) })
       : { customerWelaya, customerCommune, typeLivraison, priceLoss };
     return { addonIds,
       ...rest,
@@ -1125,32 +1124,20 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </div>
           {product?.isDigital ? (
             <div>
-              <label className="pbf-label">{t.contactQuestion}</label>
-              <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
-                <button type="button" onClick={() => { setContactMethod('email'); setFd((f) => ({ ...f, customerWhatsapp: '' })); }}
-                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px', borderRadius: 4, border: `1px solid ${contactMethod === 'email' ? SAGE_DARK : BORDER}`, background: contactMethod === 'email' ? SAGE_DARK : 'none', color: contactMethod === 'email' ? '#fff' : MUTED, cursor: 'pointer', minHeight: 44 }}>
-                  <Mail size={14} />{t.contactViaEmail}
-                </button>
-                <button type="button" onClick={() => { setContactMethod('whatsapp'); setFd((f) => ({ ...f, customerEmail: '' })); }}
-                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px', borderRadius: 4, border: `1px solid ${contactMethod === 'whatsapp' ? SAGE_DARK : BORDER}`, background: contactMethod === 'whatsapp' ? SAGE_DARK : 'none', color: contactMethod === 'whatsapp' ? '#fff' : MUTED, cursor: 'pointer', minHeight: 44 }}>
-                  <MessageCircle size={14} />{t.contactViaWhatsapp}
-                </button>
-              </div>
-              {contactMethod === 'email' ? (
+              <>
                 <div>
                   <label className="pbf-label">{t.orderEmail}</label>
                   <input className="pbf-input-field" type="email" dir="ltr" placeholder={t.emailPh} value={fd.customerEmail}
                     onChange={(e) => setFd((f) => ({ ...f, customerEmail: e.target.value }))} />
                   {errors.customerEmail && <span style={{ color: '#b3453a', fontSize: '0.75rem' }}>{errors.customerEmail}</span>}
                 </div>
-              ) : (
                 <div>
                   <label className="pbf-label">{t.whatsapp}</label>
                   <input className="pbf-input-field" type="tel" dir="ltr" placeholder={t.whatsappPh} value={fd.customerWhatsapp}
                     onChange={(e) => setFd((f) => ({ ...f, customerWhatsapp: e.target.value }))} />
                   {errors.customerWhatsapp && <span style={{ color: '#b3453a', fontSize: '0.75rem' }}>{errors.customerWhatsapp}</span>}
                 </div>
-              )}
+              </>
             </div>
           ) : (
             <>

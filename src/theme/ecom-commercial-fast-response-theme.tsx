@@ -1248,7 +1248,6 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',
   });
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
 
   useEffect(() => { if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); }, [userId]);
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
@@ -1304,9 +1303,9 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     if (!fd.customerName || fd.customerName.trim().length < 3) e.customerName = t.errName;
     if (!isValidDzPhone(fd.customerPhone.trim())) e.customerPhone = t.errPhone;
     if (product?.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
-      } else {
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
         if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
@@ -1320,7 +1319,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   const buildPayload = () => {
     const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
     const shipping = product?.isDigital
-      ? { ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+      ? { ...({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) }) }
       : { customerWelaya, customerCommune, typeLivraison, priceLoss };
     return { addonIds,
       ...rest,
@@ -1416,32 +1415,20 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
       {product?.isDigital ? (
         <>
           {/* digital contact method */}
-          <label style={fieldLabel}>{t.contactQuestion}</label>
-          <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', border: `1px solid ${BD}`, marginBottom: 12 }}>
-            <button type="button" onClick={() => { setContactMethod('email'); set('customerWhatsapp', ''); }}
-              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.85rem', fontWeight: 800, background: contactMethod === 'email' ? A : 'transparent', color: contactMethod === 'email' ? '#fff' : TXT }}>
-              <Mail size={14} />{t.contactViaEmail}
-            </button>
-            <button type="button" onClick={() => { setContactMethod('whatsapp'); set('customerEmail', ''); }}
-              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.85rem', fontWeight: 800, background: contactMethod === 'whatsapp' ? A : 'transparent', color: contactMethod === 'whatsapp' ? '#fff' : TXT }}>
-              <MessageCircle size={14} />{t.contactViaWhatsapp}
-            </button>
-          </div>
-          {contactMethod === 'email' ? (
+          <>
             <>
               <label style={fieldLabel}>{t.orderEmail}</label>
               <input className="hn-input" type="email" dir="ltr" value={fd.customerEmail} onChange={(e) => set('customerEmail', e.target.value)}
                 placeholder={t.emailPh} style={errors.customerEmail ? inputErr : undefined} />
               <FieldErr msg={errors.customerEmail} />
             </>
-          ) : (
             <>
               <label style={fieldLabel}>{t.whatsapp}</label>
               <input className="hn-input" type="tel" dir="ltr" value={fd.customerWhatsapp} onChange={(e) => set('customerWhatsapp', e.target.value)}
                 placeholder={t.whatsappPh} style={errors.customerWhatsapp ? inputErr : undefined} />
               <FieldErr msg={errors.customerWhatsapp} />
             </>
-          )}
+          </>
         </>
       ) : (
         <>

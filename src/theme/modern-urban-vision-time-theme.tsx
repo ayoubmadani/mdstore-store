@@ -1526,7 +1526,6 @@ export function ProductForm({
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',
   });
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
 
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
@@ -1602,9 +1601,9 @@ export function ProductForm({
     if (!fd.customerName || fd.customerName.trim().length < 3) e.customerName = t.errName;
     if (!isValidDzPhone(fd.customerPhone.replace(/\s/g, ''))) e.customerPhone = t.errPhone;
     if (product?.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
-      } else {
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
         if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
@@ -1618,7 +1617,7 @@ export function ProductForm({
   const basePayload = () => {
     const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
     const shippingOrContact = product?.isDigital
-      ? (contactMethod === 'email' ? { customerEmail } : { customerWhatsapp })
+      ? ({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) })
       : { customerWelaya, customerCommune, typeLivraison, priceLoss };
     return { addonIds,
       ...rest,
@@ -1724,24 +1723,7 @@ export function ProductForm({
 
           {product?.isDigital ? (
             <div style={{ marginBottom: '0.9rem' }}>
-              <span className="uvt-label" style={{ marginBottom: 6, display: 'block' }}>{t.contactQuestion}</span>
-              <div className="uvt-toggle" style={{ marginBottom: 10 }}>
-                <button
-                  type="button"
-                  className={contactMethod === 'email' ? 'is-active' : ''}
-                  onClick={() => { setContactMethod('email'); setFd(p => ({ ...p, customerWhatsapp: '' })); }}
-                >
-                  <Mail size={15} /> {t.contactViaEmail}
-                </button>
-                <button
-                  type="button"
-                  className={contactMethod === 'whatsapp' ? 'is-active' : ''}
-                  onClick={() => { setContactMethod('whatsapp'); setFd(p => ({ ...p, customerEmail: '' })); }}
-                >
-                  <MessageCircle size={15} /> {t.contactViaWhatsapp}
-                </button>
-              </div>
-              {contactMethod === 'email' ? (
+              <>
                 <Field label={t.orderEmail} error={errors.customerEmail}>
                   <input
                     type="email"
@@ -1753,7 +1735,6 @@ export function ProductForm({
                     placeholder={t.emailPh}
                   />
                 </Field>
-              ) : (
                 <Field label={t.whatsapp} error={errors.customerWhatsapp}>
                   <input
                     type="tel"
@@ -1765,7 +1746,7 @@ export function ProductForm({
                     placeholder={t.whatsappPh}
                   />
                 </Field>
-              )}
+              </>
             </div>
           ) : (
             <>

@@ -1373,7 +1373,6 @@ export function ProductForm({
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',
   });
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
 
   useEffect(() => { if (uid) fetchWilayas(uid, store?.id).then(setWilayas); }, [uid]);
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
@@ -1423,9 +1422,9 @@ export function ProductForm({
     if (!fd.customerName || fd.customerName.trim().length < 3) e.customerName = t.errName;
     if (!isValidDzPhone((fd.customerPhone || '').replace(/\s/g, ''))) e.customerPhone = t.errPhone;
     if (product?.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
-      } else {
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
         if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
@@ -1439,7 +1438,7 @@ export function ProductForm({
   const payload = () => {
     const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
     const fields = product?.isDigital
-      ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+      ? { ...rest, ...({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) }) }
       : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
     return { addonIds,
       ...fields,
@@ -1551,28 +1550,7 @@ export function ProductForm({
 
           {product?.isDigital ? (
             <div style={{ marginBottom: 18 }}>
-              <span style={label}>{t.contactQuestion}</span>
-              <div style={{ display: 'flex', border: `1px solid ${BD}`, marginBottom: 12 }}>
-                <button type="button" onClick={() => { setContactMethod('email'); setFd((s) => ({ ...s, customerWhatsapp: '' })); }}
-                  style={{
-                    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                    minHeight: 44, cursor: 'pointer', fontFamily: 'inherit', fontSize: '.78rem', border: 'none',
-                    background: contactMethod === 'email' ? AL : 'transparent',
-                    color: contactMethod === 'email' ? A : SUB, fontWeight: contactMethod === 'email' ? 600 : 400,
-                  }}>
-                  <Mail size={14} />{t.contactViaEmail}
-                </button>
-                <button type="button" onClick={() => { setContactMethod('whatsapp'); setFd((s) => ({ ...s, customerEmail: '' })); }}
-                  style={{
-                    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                    minHeight: 44, cursor: 'pointer', fontFamily: 'inherit', fontSize: '.78rem', border: 'none',
-                    background: contactMethod === 'whatsapp' ? AL : 'transparent',
-                    color: contactMethod === 'whatsapp' ? A : SUB, fontWeight: contactMethod === 'whatsapp' ? 600 : 400,
-                  }}>
-                  <MessageCircle size={14} />{t.contactViaWhatsapp}
-                </button>
-              </div>
-              {contactMethod === 'email' ? (
+              <>
                 <div>
                   <label style={label} htmlFor="lx-email">{t.orderEmail}</label>
                   <input id="lx-email" type="email" dir="ltr"
@@ -1583,7 +1561,6 @@ export function ProductForm({
                     onBlur={(e) => { e.currentTarget.style.borderColor = errs.customerEmail ? ERR : BD; }} />
                   <ErrLine msg={errs.customerEmail} />
                 </div>
-              ) : (
                 <div>
                   <label style={label} htmlFor="lx-whatsapp">{t.whatsapp}</label>
                   <input id="lx-whatsapp" type="tel" dir="ltr"
@@ -1594,7 +1571,7 @@ export function ProductForm({
                     onBlur={(e) => { e.currentTarget.style.borderColor = errs.customerWhatsapp ? ERR : BD; }} />
                   <ErrLine msg={errs.customerWhatsapp} />
                 </div>
-              )}
+              </>
             </div>
           ) : (
             <>

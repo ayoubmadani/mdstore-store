@@ -84,12 +84,13 @@ import {
 2. **الشحن:** `fetchWilayas(userId, product.store.id)` في ProductForm، و`fetchWilayas(store.user.id, store.id)` في Cart. لا تحذف `storeId`، فكل متجر له حساب شحن.
 3. **الإضافات:** `const [addonIds, setAddonIds] = useState<string[]>([])`، و`<ProductAddons product store selected={addonIds} onChange={setAddonIds} accent={…} />` في أعلى ProductForm، و`fp = getFP() + addonsTotal(product, addonIds)`. أرسل `addonIds` مع الطلب، واحفظه في عنصر السلة، وأرسل `addonIds: i.addonIds` من Cart.
 4. **الطلب:** الحقول `customerName`، و`customerPhone` (تحقّق بـ `isValidDzPhone`)، و`customerWelaya`، و`customerCommune`، و`typeLivraison: 'home'|'office'`، و`quantity`، و`finalPrice`، و`totalPrice`، و`priceLivraison`، و`productId`، و`storeId`، و`userId`، و`selectedOffer`، و`variantDetailId`، و`platform`. بعد النجاح: `router.push('/successfully?productId=…')`.
-5. **السلة:** إذا `store.cart === false` يظهر النموذج مباشرة بدون أزرار السلة. وإلا يظهر «أضف للسلة» و«اطلب الآن».
-6. **منتج رقمي** (`product.isDigital`): لا ولاية ولا توصيل. يُطلب بريد **أو** واتساب.
+5. **السلة:** إذا `store.cart === false` يظهر النموذج مباشرة بدون أزرار السلة. وإلا يظهر «أضف للسلة» و«اطلب الآن». ضع `data-add-to-cart` على زر «أضف للسلة» (صفحة المنتج خارج المتجر تخفيه به).
+6. **منتج رقمي** (`product.isDigital`): لا ولاية ولا توصيل. حقلا **البريد والواتساب معاً، كلاهما اختياري** (لا سؤال «بريد أو واتساب» ولا أزرار اختيار): يُفحص المكتوب فقط (`if (fd.customerEmail.trim() && !emailOk) …`)، ويُرسل غير الفارغ فقط.
 7. **العروض والمتغيرات:** `product.offers` (سعر لكمية)، و`allAttrs` بأنماط `displayMode` (color وimage وtext)، والمتغير غير المتوفر معطّل.
 8. **التوصيل المجاني:** `product.shippingFree`، و`offer.shippingFree`، و`store.supportFreeShipping` مع `freeShippingMinAmount`.
 9. **Footer:** الهاتف + واتساب + البريد **دائماً**، والناقص منها يُعرض بـ `comingSoon(store)`. الأرقام داخل `<span dir="ltr">`.
-10. **الشريط العلوي:** `store.topBar.enabled && store.topBar.text`. **الشعار:** `store.design.logoUrl`، وإلا اسم المتجر بتصميم الهوية.
+10. **الغلاف `default` (Main):** المحتوى داخل `<main>`، والـ Navbar والـ Footer **أخوة** لـ `<main>` في نفس العنصر الأب (لا داخله). صفحة المنتج خارج المتجر (دومين منتج، قسم «المنتج بثيم المتجر» في المحرر) تخفي كل ما بجانب `<main>` وتلغي `padding-top` عليه.
+10-ب. **الشريط العلوي:** `store.topBar.enabled && store.topBar.text`. **الشعار:** `store.design.logoUrl`، وإلا اسم المتجر بتصميم الهوية.
 11. **وصف المنتج HTML:** يُعرض دائماً عبر `DOMPurify.sanitize`.
 12. **ولاية واحدة فقط:** إذا أرجع `fetchWilayas` ولاية واحدة، تُختار تلقائياً عبر `useEffect` على مستوى المكوّن (لا داخل `useEffect` آخر) ويُقفل حقلها: `disabled={wilayas.length === 1}`. ينطبق ذلك في ProductForm وفي Cart، كما في القالب المرجعي.
 13. **نوع التوصيل لكل ولاية:** كل ولاية فيها `homeEnabled` و`officeEnabled`. لا تُظهر خيارات نوع التوصيل قبل اختيار الولاية، وبعدها اعرض المتاح فقط عبر `deliveryShown(wilayas, fd.customerWelaya, type)`. ضع `data-delivery-option` على زر كل نوع، واجعل الأزرار وحدها في حاويتها: المتجر يجعل الزر الوحيد بعرض السطر كاملاً. وإذا صار النوع المختار غير متاح، انقل `typeLivraison` للنوع الآخر في `useEffect` على مستوى المكوّن. كل هذا مطبّق في القالب المرجعي.
@@ -123,7 +124,7 @@ import {
 - [ ] `default` و`Home` و`Details` و`Cart` و`StaticPage` مُصدَّرة.
 - [ ] ثلاث ترجمات كاملة بنفس المفاتيح، وكل نص ظاهر يأتي من الترجمة.
 - [ ] الشحن بـ `storeId`، والإضافات في الطلب والسلة، وزر واتساب، وFooter التواصل.
-- [ ] منتج رقمي، وعروض، ومتغيرات، وتوصيل مجاني، و`store.cart === false`، وولاية واحدة تُختار وتُقفل، ونوع التوصيل حسب الولاية.
+- [ ] منتج رقمي (بريد وواتساب اختياريان معاً)، و`data-add-to-cart` على زر السلة، و`<main>` في الغلاف، وعروض، ومتغيرات، وتوصيل مجاني، و`store.cart === false`، وولاية واحدة تُختار وتُقفل، ونوع التوصيل حسب الولاية.
 - [ ] لا يوجد `localStorage` أو `window` خارج `useEffect` أو معالجات الأحداث (الصفحة تُعرض على الخادم أيضاً).
 - [ ] لا تعليق JSX داخل `&& (…)`، ولا `pt` في CSS.
 - [ ] الغلاف: لا صندوق خلف العنوان والوصف، `<HeroShade>` فوق الصورة و`heroTextClear` على النص، والغلاف `<section>` بلا ارتفاع ثابت على الهاتف.

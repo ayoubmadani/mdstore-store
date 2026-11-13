@@ -693,7 +693,6 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [communes,        setCommunes]        = useState<Commune[]>([]);
   const [loadingCommunes, setLoadingCommunes] = useState(false);
   const [fd, setFd] = useState({ customerId: '', customerName: '', customerPhone: '', customerEmail: '', customerWhatsapp: '', customerWelaya: '', customerCommune: '', quantity: 1, priceLoss: 0, typeLivraison: 'home' as 'home' | 'office' });
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [errors,  setErrors]  = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
@@ -748,9 +747,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if (!fd.customerName.trim() || fd.customerName.length < 3) e.customerName = 'الاسم مطلوب (3 أحرف على الأقل)';
     if (!isValidDzPhone(fd.customerPhone.replace(/\s/g, ''))) e.customerPhone = 'رقم هاتف غير صالح (مثال: 0550123456)';
     if (product.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = 'يرجى إدخال بريد إلكتروني صحيح';
-      } else {
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
         if (!isValidDzPhone(fd.customerWhatsapp.replace(/\s/g, ''))) e.customerWhatsapp = 'رقم واتساب جزائري صحيح مطلوب (مثال: 0550123456)';
       }
     } else {
@@ -781,7 +780,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         quantity: qty, totalPrice: getTotal(), priceLoss: fd.priceLoss, customerId: fd.customerId,
         customerName: fd.customerName, customerPhone: fd.customerPhone,
         ...(product.isDigital
-          ? (contactMethod === 'email' ? { customerEmail: fd.customerEmail } : { customerWhatsapp: fd.customerWhatsapp })
+          ? ({ ...(String(fd.customerEmail ?? '').trim() ? { customerEmail: fd.customerEmail } : {}), ...(String(fd.customerWhatsapp ?? '').trim() ? { customerWhatsapp: fd.customerWhatsapp } : {}) })
           : { typeShip: fd.typeLivraison, priceShip: getLiv(), customerWilayaId: fd.customerWelaya, customerCommuneId: fd.customerCommune }),
       };
       const res = await axios.post(`${API_URL}/orders`, payload);
@@ -823,29 +822,18 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         {product.isDigital ? (
           <div style={{ marginBottom: '0.85rem' }}>
             <label style={S.label}>هل تملك بريداً إلكترونياً أم واتساب؟</label>
-            <div style={{ display: 'flex', borderRadius: 4, overflow: 'hidden', border: '1px solid #ddd', marginBottom: '0.5rem' }}>
-              <button type="button" onClick={() => { setContactMethod('email'); setFd(p => ({ ...p, customerWhatsapp: '' })); }}
-                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.6rem 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.8rem', fontWeight: 700, background: contactMethod === 'email' ? '#111' : 'transparent', color: contactMethod === 'email' ? '#fff' : '#333' }}>
-                <Mail size={14} />البريد الإلكتروني
-              </button>
-              <button type="button" onClick={() => { setContactMethod('whatsapp'); setFd(p => ({ ...p, customerEmail: '' })); }}
-                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.6rem 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.8rem', fontWeight: 700, background: contactMethod === 'whatsapp' ? '#111' : 'transparent', color: contactMethod === 'whatsapp' ? '#fff' : '#333' }}>
-                <MessageCircle size={14} />واتساب
-              </button>
-            </div>
-            {contactMethod === 'email' ? (
+            <>
               <FR label="البريد الإلكتروني" error={errors.customerEmail}>
                 <input type="email" dir="ltr" value={fd.customerEmail} placeholder="example@email.com"
                   onChange={e => setFd({ ...fd, customerEmail: e.target.value })}
                   style={S.inputBase} />
               </FR>
-            ) : (
               <FR label="رقم واتساب" error={errors.customerWhatsapp}>
                 <input type="tel" dir="ltr" value={fd.customerWhatsapp} placeholder="0550123456"
                   onChange={e => setFd({ ...fd, customerWhatsapp: e.target.value })}
                   style={S.inputBase} />
               </FR>
-            )}
+            </>
           </div>
         ) : (
           <>

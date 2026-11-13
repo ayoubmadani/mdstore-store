@@ -1528,7 +1528,6 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLC] = useState(false);
   const [fd, setFd] = useState({ customerId:'', customerName:'', customerPhone:'', customerWelaya:'', customerCommune:'', quantity:1, priceLoss:0, typeLivraison:'home' as 'home'|'office', customerEmail:'', customerWhatsapp:'' });
-  const [contactMethod, setContactMethod] = useState<'email'|'whatsapp'>('email');
   const [errors, setErrors] = useState<Record<string,string>>({});
   const [sub, setSub] = useState(false);
   const [orderNowState, setIsOrderNow] = useState(false);
@@ -1576,9 +1575,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if(!fd.customerName.trim()) e.customerName=t.errName;
     if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
     if (product.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
-      } else {
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
         if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
@@ -1609,7 +1608,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     try{
       const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
       const payload = product.isDigital
-        ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+        ? { ...rest, ...({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) }) }
         : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
       await axios.post(`${API_URL}/orders/create`,{ addonIds,...payload,quantity:qty,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});
       if(fd.customerId) localStorage.setItem('customerId',fd.customerId);
@@ -1663,24 +1662,14 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
             {product.isDigital ? (
               <div style={{ marginBottom:'14px' }}>
-                <p className="pd" style={{ fontSize:'12px', fontWeight:600, color:'var(--dim)', margin:'0 0 8px' }}>{t.contactQuestion}</p>
-                <div style={{ display:'flex', borderRadius:'10px', overflow:'hidden', border:'1.5px solid var(--tan)', marginBottom:'12px' }}>
-                  <button type="button" onClick={()=>{setContactMethod('email'); setFd(p=>({...p, customerWhatsapp: ''}));}} style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:6, padding:'11px 0', border:'none', cursor:'pointer', fontFamily:'inherit', fontSize:'13px', fontWeight:700, background:contactMethod==='email'?'var(--gold)':'transparent', color:contactMethod==='email'?'#fff':'var(--warm)' }}>
-                    <Mail size={14}/>{t.contactViaEmail}
-                  </button>
-                  <button type="button" onClick={()=>{setContactMethod('whatsapp'); setFd(p=>({...p, customerEmail: ''}));}} style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:6, padding:'11px 0', border:'none', cursor:'pointer', fontFamily:'inherit', fontSize:'13px', fontWeight:700, background:contactMethod==='whatsapp'?'var(--gold)':'transparent', color:contactMethod==='whatsapp'?'#fff':'var(--warm)' }}>
-                    <MessageCircle size={14}/>{t.contactViaWhatsapp}
-                  </button>
-                </div>
-                {contactMethod === 'email' ? (
+                <>
                   <FR error={errors.customerEmail} label={t.orderEmail}>
                     <input type="email" dir="ltr" value={fd.customerEmail} onChange={e=>setFd({...fd,customerEmail:e.target.value})} placeholder={t.emailPh} style={INP_S(!!errors.customerEmail)}/>
                   </FR>
-                ) : (
                   <FR error={errors.customerWhatsapp} label={t.whatsapp}>
                     <input type="tel" dir="ltr" value={fd.customerWhatsapp} onChange={e=>setFd({...fd,customerWhatsapp:e.target.value})} placeholder={t.whatsappPh} style={INP_S(!!errors.customerWhatsapp)}/>
                   </FR>
-                )}
+                </>
               </div>
             ) : (
               <>

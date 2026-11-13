@@ -1198,7 +1198,6 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',
   });
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
@@ -1256,7 +1255,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const buildPayload = () => {
     const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
     const shippingOrContact = product?.isDigital
-      ? (contactMethod === 'email' ? { customerEmail } : { customerWhatsapp })
+      ? ({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) })
       : { customerWelaya, customerCommune, typeLivraison, priceLoss };
     return { addonIds,
       ...rest,
@@ -1291,9 +1290,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if (!fd.customerName || fd.customerName.trim().length < 3) e.customerName = t.errName;
     if (!isValidDzPhone(fd.customerPhone.trim())) e.customerPhone = t.errPhone;
     if (product?.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
-      } else {
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
         if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
@@ -1380,32 +1379,20 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
           {product?.isDigital ? (
             <div>
-              <label style={label}>{t.contactQuestion}</label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10, marginBottom: 14 }}>
-                <button type="button" onClick={() => { setContactMethod('email'); set('customerWhatsapp', ''); }}
-                  style={{ padding: '0.75rem', borderRadius: 12, cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem', minHeight: 46, border: `1.5px solid ${contactMethod === 'email' ? A : BD}`, background: contactMethod === 'email' ? AL : CARD, color: contactMethod === 'email' ? A : SUB, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                  <Mail size={16} /> {t.contactViaEmail}
-                </button>
-                <button type="button" onClick={() => { setContactMethod('whatsapp'); set('customerEmail', ''); }}
-                  style={{ padding: '0.75rem', borderRadius: 12, cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem', minHeight: 46, border: `1.5px solid ${contactMethod === 'whatsapp' ? A : BD}`, background: contactMethod === 'whatsapp' ? AL : CARD, color: contactMethod === 'whatsapp' ? A : SUB, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                  <MessageCircle size={16} /> {t.contactViaWhatsapp}
-                </button>
-              </div>
-              {contactMethod === 'email' ? (
+              <>
                 <div>
                   <label style={label}>{t.orderEmail}</label>
                   <input className="pt-input" dir="ltr" type="email" style={errors.customerEmail ? { borderColor: ERR } : undefined}
                     value={fd.customerEmail} onChange={(e) => set('customerEmail', e.target.value)} placeholder={t.emailPh} />
                   {errors.customerEmail && <p style={errStyle}><AlertCircle size={12} /> {errors.customerEmail}</p>}
                 </div>
-              ) : (
                 <div>
                   <label style={label}>{t.whatsapp}</label>
                   <input className="pt-input pt-mono" dir="ltr" type="tel" style={errors.customerWhatsapp ? { borderColor: ERR } : undefined}
                     value={fd.customerWhatsapp} onChange={(e) => set('customerWhatsapp', e.target.value)} placeholder={t.whatsappPh} inputMode="tel" />
                   {errors.customerWhatsapp && <p style={errStyle}><AlertCircle size={12} /> {errors.customerWhatsapp}</p>}
                 </div>
-              )}
+              </>
             </div>
           ) : (
             <>

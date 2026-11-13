@@ -1030,7 +1030,6 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office'
   });
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
@@ -1101,9 +1100,9 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
     if (!fd.customerName || fd.customerName.trim().length < 3) errs.name = t.errName;
     if (!isValidDzPhone(fd.customerPhone || '')) errs.phone = t.errPhone;
     if (product?.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((fd.customerEmail || '').trim())) errs.email = t.errEmail;
-      } else {
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
         if (!isValidDzPhone(fd.customerWhatsapp || '')) errs.whatsapp = t.errWhatsapp;
       }
     } else {
@@ -1147,7 +1146,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
     try {
       const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
       const shippingOrContact = product?.isDigital
-        ? (contactMethod === 'email' ? { customerEmail } : { customerWhatsapp })
+        ? ({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) })
         : { customerWelaya, customerCommune, typeLivraison, priceLoss };
       const payload = { addonIds,
         ...rest,
@@ -1247,32 +1246,20 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
 
           {product?.isDigital ? (
             <div style={{ marginBottom: '0.875rem' }}>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: 6, color: TXT }}>{t.contactQuestion}</label>
-              <div style={{ display: 'flex', borderRadius: 6, overflow: 'hidden', border: `1px solid ${BD}`, marginBottom: 10 }}>
-                <button type="button" onClick={() => { setContactMethod('email'); setFd(p => ({ ...p, customerWhatsapp: '' })); }}
-                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.85rem', fontWeight: 700, background: contactMethod === 'email' ? A : '#fff', color: contactMethod === 'email' ? '#fff' : TXT }}>
-                  <IconMail size={14} />{t.contactViaEmail}
-                </button>
-                <button type="button" onClick={() => { setContactMethod('whatsapp'); setFd(p => ({ ...p, customerEmail: '' })); }}
-                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.85rem', fontWeight: 700, background: contactMethod === 'whatsapp' ? A : '#fff', color: contactMethod === 'whatsapp' ? '#fff' : TXT }}>
-                  <IconMessageCircle size={14} />{t.contactViaWhatsapp}
-                </button>
-              </div>
-              {contactMethod === 'email' ? (
+              <>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: 6, color: TXT }}>{t.orderEmail}</label>
                   <input type="email" dir="ltr" value={fd.customerEmail} onChange={e => setFd(p => ({ ...p, customerEmail: e.target.value }))} placeholder={t.emailPh}
                     style={{ ...inputBase, borderColor: errors.email ? ERR : BD }} />
                   {errors.email && <p style={{ fontSize: '0.75rem', color: ERR, marginTop: '0.3rem', display: 'flex', alignItems: 'center', gap: 4 }}><IconAlert size={11} color={ERR} /> {errors.email}</p>}
                 </div>
-              ) : (
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, marginBottom: 6, color: TXT }}>{t.whatsapp}</label>
                   <input type="tel" dir="ltr" value={fd.customerWhatsapp} onChange={e => setFd(p => ({ ...p, customerWhatsapp: e.target.value }))} placeholder={t.whatsappPh}
                     style={{ ...inputBase, borderColor: errors.whatsapp ? ERR : BD }} />
                   {errors.whatsapp && <p style={{ fontSize: '0.75rem', color: ERR, marginTop: '0.3rem', display: 'flex', alignItems: 'center', gap: 4 }}><IconAlert size={11} color={ERR} /> {errors.whatsapp}</p>}
                 </div>
-              )}
+              </>
             </div>
           ) : (
             <>

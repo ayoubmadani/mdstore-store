@@ -1120,7 +1120,6 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',
   });
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
@@ -1177,9 +1176,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if (!fd.customerName.trim()) e.customerName = t.errName;
     if (!isValidDzPhone(fd.customerPhone)) e.customerPhone = t.errPhoneInvalid;
     if (product.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
-      } else {
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
         if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
@@ -1193,7 +1192,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const buildPayload = () => {
     const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
     const shippingOrContact = product.isDigital
-      ? (contactMethod === 'email' ? { customerEmail } : { customerWhatsapp })
+      ? ({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) })
       : { customerWelaya, customerCommune, typeLivraison, priceLoss };
     return { addonIds,
       ...rest, ...shippingOrContact, quantity: qty, product, productId: product.id, storeId: product.store?.id, userId,
@@ -1279,32 +1278,16 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
           {product.isDigital ? (
             <div style={{ marginBottom: 18 }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: SUB, marginBottom: 8 }}>{t.contactQuestion}</p>
-              <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
-                <button type="button" onClick={() => { setContactMethod('email'); setFd((s) => ({ ...s, customerWhatsapp: '' })); }} style={{
-                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px', borderRadius: 12, fontWeight: 700, fontSize: 13.5, cursor: 'pointer', minHeight: 44,
-                  background: contactMethod === 'email' ? AL : 'transparent', border: `1.5px solid ${contactMethod === 'email' ? A : BD}`, color: contactMethod === 'email' ? A : TXT,
-                }}>
-                  <Mail size={15} /> {t.contactViaEmail}
-                </button>
-                <button type="button" onClick={() => { setContactMethod('whatsapp'); setFd((s) => ({ ...s, customerEmail: '' })); }} style={{
-                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '12px', borderRadius: 12, fontWeight: 700, fontSize: 13.5, cursor: 'pointer', minHeight: 44,
-                  background: contactMethod === 'whatsapp' ? AL : 'transparent', border: `1.5px solid ${contactMethod === 'whatsapp' ? A : BD}`, color: contactMethod === 'whatsapp' ? A : TXT,
-                }}>
-                  <MessageCircle size={15} /> {t.contactViaWhatsapp}
-                </button>
-              </div>
-              {contactMethod === 'email' ? (
+              <>
                 <div>
                   <input placeholder={t.orderEmailPh} type="email" dir="ltr" value={fd.customerEmail} onChange={(e) => setFd((s) => ({ ...s, customerEmail: e.target.value }))} className="input-field" style={{ ...inputBase, ...(errors.customerEmail ? { borderColor: '#EF4444' } : {}) }} />
                   {errors.customerEmail && <p style={{ fontSize: 12, color: '#EF4444', marginTop: 5, display: 'flex', alignItems: 'center', gap: 4 }}><AlertCircle size={11} /> {errors.customerEmail}</p>}
                 </div>
-              ) : (
                 <div>
                   <input placeholder={t.whatsappPh} type="tel" dir="ltr" value={fd.customerWhatsapp} onChange={(e) => setFd((s) => ({ ...s, customerWhatsapp: e.target.value }))} className="input-field" style={{ ...inputBase, ...(errors.customerWhatsapp ? { borderColor: '#EF4444' } : {}) }} />
                   {errors.customerWhatsapp && <p style={{ fontSize: 12, color: '#EF4444', marginTop: 5, display: 'flex', alignItems: 'center', gap: 4 }}><AlertCircle size={11} /> {errors.customerWhatsapp}</p>}
                 </div>
-              )}
+              </>
             </div>
           ) : (
             <>

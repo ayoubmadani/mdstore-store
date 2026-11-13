@@ -1526,7 +1526,6 @@ export function ProductForm({
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',
   });
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [wilayas, setWilayas] = useState<Wilaya[]>([]);
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLoadingC] = useState(false);
@@ -1591,9 +1590,9 @@ export function ProductForm({
     if (!fd.customerName || fd.customerName.trim().length < 3) e.customerName = t.errName;
     if (!isValidDzPhone((fd.customerPhone || '').replace(/\s/g, ''))) e.customerPhone = t.errPhone;
     if (product?.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((fd.customerEmail || '').trim())) e.customerEmail = t.errEmail;
-      } else {
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
         if (!isValidDzPhone((fd.customerWhatsapp || '').replace(/\s/g, ''))) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
@@ -1607,7 +1606,7 @@ export function ProductForm({
   const buildPayload = () => {
     const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
     const shipping = product?.isDigital
-      ? { ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+      ? { ...({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) }) }
       : { customerWelaya, customerCommune, typeLivraison, priceLoss };
     return { addonIds,
       ...rest,
@@ -1732,18 +1731,7 @@ export function ProductForm({
 
           {product?.isDigital ? (
             <div style={{ marginBottom: '0.85rem' }}>
-              {label(t.contactQuestion)}
-              <div style={{ display: 'flex', borderRadius: 2, overflow: 'hidden', border: `2px solid ${BD}`, marginBottom: 10 }}>
-                <button type="button" onClick={() => { setContactMethod('email'); setFd(p => ({ ...p, customerWhatsapp: '' })); }}
-                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.65rem 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.82rem', fontWeight: 700, background: contactMethod === 'email' ? A : 'transparent', color: contactMethod === 'email' ? '#fff' : SUB }}>
-                  <Mail size={14} />{t.contactViaEmail}
-                </button>
-                <button type="button" onClick={() => { setContactMethod('whatsapp'); setFd(p => ({ ...p, customerEmail: '' })); }}
-                  style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.65rem 0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '0.82rem', fontWeight: 700, background: contactMethod === 'whatsapp' ? A : 'transparent', color: contactMethod === 'whatsapp' ? '#fff' : SUB }}>
-                  <MessageCircle size={14} />{t.contactViaWhatsapp}
-                </button>
-              </div>
-              {contactMethod === 'email' ? (
+              <>
                 <div>
                   {label(t.orderEmail)}
                   <input className={`ae-input${errors.customerEmail ? ' ae-err' : ''}`} type="email" value={fd.customerEmail}
@@ -1751,7 +1739,6 @@ export function ProductForm({
                     autoComplete="email" dir="ltr" />
                   {errLine(errors.customerEmail)}
                 </div>
-              ) : (
                 <div>
                   {label(t.whatsapp)}
                   <input className={`ae-input ae-num${errors.customerWhatsapp ? ' ae-err' : ''}`} value={fd.customerWhatsapp}
@@ -1759,7 +1746,7 @@ export function ProductForm({
                     type="tel" inputMode="tel" autoComplete="tel" dir="ltr" />
                   {errLine(errors.customerWhatsapp)}
                 </div>
-              )}
+              </>
             </div>
           ) : (
           <>

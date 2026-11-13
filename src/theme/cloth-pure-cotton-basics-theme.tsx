@@ -1055,7 +1055,6 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',
   });
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
 
   useEffect(() => {
     if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas);
@@ -1109,9 +1108,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if (!fd.customerName.trim()) e.customerName = t.errName;
     if (!isValidDzPhone(fd.customerPhone)) e.customerPhone = t.errPhoneInvalid;
     if (product.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
-      } else {
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
         if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
@@ -1155,7 +1154,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     try {
       const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
       const shipping = product.isDigital
-        ? { ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+        ? { ...({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) }) }
         : { customerWelaya, customerCommune, typeLivraison, priceLoss };
       const payload = { addonIds,
         ...rest,
@@ -1219,28 +1218,18 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             </div>
             {product.isDigital ? (
               <div>
-                <p style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>{t.contactQuestion}</p>
-                <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
-                  <button type="button" className="pc-btn" onClick={() => { setContactMethod('email'); setFd(p => ({ ...p, customerWhatsapp: '' })); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px', border: contactMethod === 'email' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: contactMethod === 'email' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>
-                    <Mail size={14} />{t.contactViaEmail}
-                  </button>
-                  <button type="button" className="pc-btn" onClick={() => { setContactMethod('whatsapp'); setFd(p => ({ ...p, customerEmail: '' })); }} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px', border: contactMethod === 'whatsapp' ? '2px solid var(--thread-red)' : '1.5px solid var(--cotton-300)', background: contactMethod === 'whatsapp' ? 'var(--cotton-100)' : 'transparent', fontSize: 13 }}>
-                    <MessageCircle size={14} />{t.contactViaWhatsapp}
-                  </button>
-                </div>
-                {contactMethod === 'email' ? (
+                <>
                   <div>
                     <input type="email" dir="ltr" placeholder={t.orderEmailPh} value={fd.customerEmail} onChange={(e) => setFd({ ...fd, customerEmail: e.target.value })}
                       style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }} />
                     {errors.customerEmail && <p style={{ color: 'var(--thread-red)', fontSize: 12, marginTop: 4 }}>{errors.customerEmail}</p>}
                   </div>
-                ) : (
                   <div>
                     <input type="tel" dir="ltr" placeholder={t.whatsappPh} value={fd.customerWhatsapp} onChange={(e) => setFd({ ...fd, customerWhatsapp: e.target.value })}
                       style={{ width: '100%', padding: '11px 13px', border: '1.5px solid var(--cotton-300)', borderRadius: 2, fontSize: 13.5, fontFamily: 'inherit' }} />
                     {errors.customerWhatsapp && <p style={{ color: 'var(--thread-red)', fontSize: 12, marginTop: 4 }}>{errors.customerWhatsapp}</p>}
                   </div>
-                )}
+                </>
               </div>
             ) : (
             <>

@@ -1508,7 +1508,6 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   const [communes, setCommunes] = useState<Commune[]>([]);
   const [loadingC, setLC]       = useState(false);
   const [fd, setFd] = useState({customerId:'',customerName:'',customerPhone:'',customerWelaya:'',customerCommune:'',customerEmail:'',customerWhatsapp:'',quantity:1,priceLoss:0,typeLivraison:'home' as 'home'|'office'});
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
   const [errors, setErrors]   = useState<Record<string,string>>({});
   const [sub, setSub]         = useState(false);
   const [orderNowState, setIsOrderNow] = useState(false);
@@ -1549,9 +1548,9 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     if(!fd.customerName.trim())  e.customerName=t.errName;
     if (!fd.customerPhone.trim() || !isValidDzPhone(fd.customerPhone.trim())) e.customerPhone = t.errPhoneInvalid;
     if (product.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
-      } else {
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
         if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
@@ -1581,7 +1580,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     try{
       const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
       const payload = product.isDigital
-        ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+        ? { ...rest, ...({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) }) }
         : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
       await axios.post(`${API_URL}/orders/create`,{ addonIds,...payload,quantity:qty,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});
       if(fd.customerId) localStorage.setItem('customerId',fd.customerId);
@@ -1628,31 +1627,22 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
               </FR>
             </div>
             {product.isDigital ? (
-              <FR label={t.contactQuestion}>
+              <div>
                 <div>
-                  <div style={{display:'flex',border:'1.5px solid var(--dim)',overflow:'hidden',marginBottom:'10px'}}>
-                    <button type="button" onClick={()=>{setContactMethod('email');setFd(p=>({...p,customerWhatsapp:''}));}} style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:6,padding:'10px 0',border:'none',cursor:'pointer',fontFamily:'inherit',fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',backgroundColor:contactMethod==='email'?'var(--fire)':'transparent',color:contactMethod==='email'?'#fff':'var(--mid)'}}>
-                      <Mail style={{width:'13px',height:'13px'}}/>{t.contactViaEmail}
-                    </button>
-                    <button type="button" onClick={()=>{setContactMethod('whatsapp');setFd(p=>({...p,customerEmail:''}));}} style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:6,padding:'10px 0',border:'none',cursor:'pointer',fontFamily:'inherit',fontSize:'12px',fontWeight:700,letterSpacing:'0.06em',textTransform:'uppercase',backgroundColor:contactMethod==='whatsapp'?'var(--fire)':'transparent',color:contactMethod==='whatsapp'?'#fff':'var(--mid)'}}>
-                      <MessageCircle style={{width:'13px',height:'13px'}}/>{t.contactViaWhatsapp}
-                    </button>
-                  </div>
-                  {contactMethod==='email' ? (
+                  <>
                     <FR error={errors.customerEmail} label={t.orderEmail}>
                       <input type="email" dir="ltr" value={fd.customerEmail} onChange={e=>setFd({...fd,customerEmail:e.target.value})} placeholder={t.emailPh}
                         style={INP_S(!!errors.customerEmail)} className={`inp${errors.customerEmail?' inp-err':''}`}
                         onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerEmail?'#ef4444':'var(--dim)';}}/>
                     </FR>
-                  ) : (
                     <FR error={errors.customerWhatsapp} label={t.whatsapp}>
                       <input type="tel" dir="ltr" value={fd.customerWhatsapp} onChange={e=>setFd({...fd,customerWhatsapp:e.target.value})} placeholder={t.whatsappPh}
                         style={INP_S(!!errors.customerWhatsapp)} className={`inp${errors.customerWhatsapp?' inp-err':''}`}
                         onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerWhatsapp?'#ef4444':'var(--dim)';}}/>
                     </FR>
-                  )}
+                  </>
                 </div>
-              </FR>
+              </div>
             ) : (
               <>
                 <div className="form-2c">

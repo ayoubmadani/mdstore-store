@@ -1196,7 +1196,6 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     quantity: 1, typeLivraison: 'home' as 'home' | 'office', priceLoss: 0,
     customerEmail: '', customerWhatsapp: '',
   });
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
 
   useEffect(() => { if (userId) fetchWilayas(userId, product?.store?.id).then(setWilayas); }, [userId]);
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
@@ -1250,9 +1249,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if (!fd.customerName || fd.customerName.length < 3) e.name = t.errName;
     if (!isValidDzPhone(fd.customerPhone)) e.phone = t.errPhone;
     if (product.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.email = t.errEmail;
-      } else {
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
         if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.whatsapp = t.errWhatsapp;
       }
     } else {
@@ -1261,7 +1260,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     }
     setErrors(e);
     return Object.keys(e).length === 0;
-  }, [fd, t, product.isDigital, contactMethod]);
+  }, [fd, t, product.isDigital]);
 
   const addToCart = useCallback(() => {
     const payload = {
@@ -1283,7 +1282,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     try {
       const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
       const payload = product.isDigital
-        ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+        ? { ...rest, ...({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) }) }
         : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
       const r = await fetch(`${API_URL}/orders/create`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -1300,7 +1299,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       } else { setErrors({ submit: t.errSubmit }); }
     } catch { setErrors({ submit: t.errSubmit }); }
     setSubmitting(false);
-  }, [fd, qty, product, userId, getVarId, selectedOffer, selectedVariants, unitFP, total, getLiv, validate, t, contactMethod]);
+  }, [fd, qty, product, userId, getVarId, selectedOffer, selectedVariants, unitFP, total, getLiv, validate, t]);
 
   if (success) {
     return (
@@ -1345,28 +1344,18 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
           {product.isDigital ? (
             <div className="luxe-input-wrap">
-              <label>{t.contactQuestion}</label>
-              <div className="luxe-delivery-toggle">
-                <button type="button" className={`luxe-delivery-btn ${contactMethod === 'email' ? 'active' : ''}`} onClick={() => { setContactMethod('email'); setFd(p => ({ ...p, customerWhatsapp: '' })); }}>
-                  <Mail size={16} /> {t.contactViaEmail}
-                </button>
-                <button type="button" className={`luxe-delivery-btn ${contactMethod === 'whatsapp' ? 'active' : ''}`} onClick={() => { setContactMethod('whatsapp'); setFd(p => ({ ...p, customerEmail: '' })); }}>
-                  <MessageCircle size={16} /> {t.contactViaWhatsapp}
-                </button>
-              </div>
-              {contactMethod === 'email' ? (
+              <>
                 <div className="luxe-input-wrap" style={{ marginTop: '0.75rem' }}>
                   <label>{t.orderEmail}</label>
                   <input className={`luxe-input ${errors.email ? 'err' : ''}`} type="email" dir="ltr" placeholder={t.emailPh} value={fd.customerEmail} onChange={e => setFd(p => ({...p, customerEmail: e.target.value}))} />
                   {errors.email && <p style={{ color: ERR, fontSize: '0.75rem', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}><AlertCircle size={11} /> {errors.email}</p>}
                 </div>
-              ) : (
                 <div className="luxe-input-wrap" style={{ marginTop: '0.75rem' }}>
                   <label>{t.whatsapp}</label>
                   <input className={`luxe-input ${errors.whatsapp ? 'err' : ''}`} type="tel" dir="ltr" placeholder={t.whatsappPh} value={fd.customerWhatsapp} onChange={e => setFd(p => ({...p, customerWhatsapp: e.target.value}))} />
                   {errors.whatsapp && <p style={{ color: ERR, fontSize: '0.75rem', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}><AlertCircle size={11} /> {errors.whatsapp}</p>}
                 </div>
-              )}
+              </>
             </div>
           ) : (
             <>

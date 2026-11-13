@@ -1457,7 +1457,6 @@ export function ProductForm({
     quantity: 1, priceLoss: 0,
     typeLivraison: 'home' as 'home' | 'office',
   });
-  const [contactMethod, setContactMethod] = useState<'email' | 'whatsapp'>('email');
 
   useEffect(() => { if (uid) fetchWilayas(uid, store?.id).then(setWilayas); }, [uid]);
   // ولاية واحدة فقط في حساب الشحن: تُختار تلقائياً (والحقل مقفل)
@@ -1507,9 +1506,9 @@ export function ProductForm({
     if (!fd.customerName || fd.customerName.trim().length < 3) e.customerName = t.errName;
     if (!isValidDzPhone((fd.customerPhone || '').replace(/\s/g, ''))) e.customerPhone = t.errPhone;
     if (product?.isDigital) {
-      if (contactMethod === 'email') {
+      if (String(fd.customerEmail ?? '').trim()) {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim())) e.customerEmail = t.errEmail;
-      } else {
+      } if (String(fd.customerWhatsapp ?? '').trim()) {
         if (!isValidDzPhone(fd.customerWhatsapp.trim())) e.customerWhatsapp = t.errWhatsapp;
       }
     } else {
@@ -1523,7 +1522,7 @@ export function ProductForm({
   const payload = () => {
     const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
     const fields = product?.isDigital
-      ? { ...rest, ...(contactMethod === 'email' ? { customerEmail } : { customerWhatsapp }) }
+      ? { ...rest, ...({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) }) }
       : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
     return { addonIds,
       ...fields,
@@ -1631,28 +1630,7 @@ export function ProductForm({
 
           {product?.isDigital ? (
             <div style={{ marginBottom: 16 }}>
-              <span style={label}>{t.contactQuestion}</span>
-              <div style={{ display: 'flex', border: `1px solid ${BD}`, borderRadius: 12, overflow: 'hidden', marginBottom: 12 }}>
-                <button type="button" onClick={() => { setContactMethod('email'); setFd((s) => ({ ...s, customerWhatsapp: '' })); }}
-                  style={{
-                    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                    minHeight: 46, cursor: 'pointer', fontFamily: 'inherit', fontSize: '.8rem', border: 'none',
-                    background: contactMethod === 'email' ? AL : 'transparent',
-                    color: contactMethod === 'email' ? A : SUB, fontWeight: contactMethod === 'email' ? 700 : 500,
-                  }}>
-                  <Mail size={15} />{t.contactViaEmail}
-                </button>
-                <button type="button" onClick={() => { setContactMethod('whatsapp'); setFd((s) => ({ ...s, customerEmail: '' })); }}
-                  style={{
-                    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                    minHeight: 46, cursor: 'pointer', fontFamily: 'inherit', fontSize: '.8rem', border: 'none',
-                    background: contactMethod === 'whatsapp' ? AL : 'transparent',
-                    color: contactMethod === 'whatsapp' ? A : SUB, fontWeight: contactMethod === 'whatsapp' ? 700 : 500,
-                  }}>
-                  <MessageCircle size={15} />{t.contactViaWhatsapp}
-                </button>
-              </div>
-              {contactMethod === 'email' ? (
+              <>
                 <div>
                   <label style={label} htmlFor="vx-email">{t.orderEmail}</label>
                   <input id="vx-email" type="email" dir="ltr"
@@ -1661,7 +1639,6 @@ export function ProductForm({
                     onChange={(e) => set('customerEmail', e.target.value)} />
                   <ErrLine msg={errs.customerEmail} />
                 </div>
-              ) : (
                 <div>
                   <label style={label} htmlFor="vx-whatsapp">{t.whatsapp}</label>
                   <input id="vx-whatsapp" type="tel" dir="ltr"
@@ -1670,7 +1647,7 @@ export function ProductForm({
                     onChange={(e) => set('customerWhatsapp', e.target.value)} />
                   <ErrLine msg={errs.customerWhatsapp} />
                 </div>
-              )}
+              </>
             </div>
           ) : (
             <>
