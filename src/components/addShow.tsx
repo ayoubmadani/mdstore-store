@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { installAbandonedCapture, setAbandonedContext } from '@/lib/abandoned';
+import { installSourceCapture } from '@/lib/traffic-source';
 
 export default function AddShow({ productId, storeId, lpId, builderPageId, splitTestId }: any) {
   // Ref لمنع التنفيذ المزدوج
@@ -13,6 +14,7 @@ export default function AddShow({ productId, storeId, lpId, builderPageId, split
   useEffect(() => {
     setAbandonedContext({ storeId, productId, builderPageId, lpId });
     installAbandonedCapture();
+    installSourceCapture(); // مصدر الزبون (فيسبوك، تيك توك، غوغل…) يُرسل مع الطلب
   }, [storeId, productId, builderPageId, lpId]);
 
   useEffect(() => {
