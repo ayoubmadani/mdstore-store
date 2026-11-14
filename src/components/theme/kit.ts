@@ -6,6 +6,10 @@ import axios from 'axios';
 export { useCartStore } from '@/store/useCartStore';
 export { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, whatsappHref, HeroShade, heroShade, heroTextClear } from './storeContact';
 export { ProductAddons, activeAddons, addonsTotal, addonsLabel } from './ProductAddons';
+// بطاقات العرض: بطاقة لكل وحدة من الكمية، وفيها قطع العرض بخياراتها وإضافاتها؛ الطلب يُرسل سطوراً (boxLines)
+export { OfferPieces, needsPieces } from './OfferPieces';
+export { boxLines, linesTotal, fitBoxes, piecesPerBox, pieceVariantId } from './orderPieces';
+export type { Box, Piece, PieceLine } from './orderPieces';
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
