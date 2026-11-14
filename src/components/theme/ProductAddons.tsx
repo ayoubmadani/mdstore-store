@@ -1,33 +1,19 @@
 // إضافات المنتج (مثلاً: جبن إضافي +100) — مشتركة بين الثيمات وتُدمج في bundle كل ثيم.
 // الزبون يختار ما يشاء منها، وسعرها يُضاف لسعر الوحدة؛ الطلب يرسل addonIds والسيرفر يحفظ نسخة الاسم والسعر.
+// كمية لكل قطعة (حتى «أقصى كمية» عند التاجر) = تكرار المعرّف في addonIds.
 import type { CSSProperties } from 'react';
+import { activeAddons, addonCount, addonMax, setAddonCount, type ProductLike } from './addonPicks';
 
-export type ProductAddon = { id: string; name: string; price: number | string; isActive?: boolean };
-type ProductLike = { id?: string | number; addons?: ProductAddon[] | null };
+export { activeAddons, addonsTotal, addonsLabel, addonCount, addonMax, setAddonCount } from './addonPicks';
+export type { ProductAddon } from './addonPicks';
 type StoreLike = { language?: string | null; currency?: string | null } | null | undefined;
 
 const STRINGS = {
-  ar: { title: 'إضافات', free: 'مجاناً' },
-  fr: { title: 'Suppléments', free: 'Gratuit' },
-  en: { title: 'Add-ons', free: 'Free' },
+  ar: { title: 'إضافات', free: 'مجاناً', less: 'إنقاص', more: 'زيادة' },
+  fr: { title: 'Suppléments', free: 'Gratuit', less: 'Moins', more: 'Plus' },
+  en: { title: 'Add-ons', free: 'Free', less: 'Less', more: 'More' },
 };
 const lang = (store: StoreLike) => (store?.language === 'fr' ? 'fr' : store?.language === 'en' ? 'en' : 'ar');
-
-/** الإضافات المفعّلة فقط */
-export const activeAddons = (product?: ProductLike | null): ProductAddon[] =>
-  (product?.addons ?? []).filter((a) => a && a.isActive !== false && a.name);
-
-/** مجموع أسعار الإضافات المختارة */
-export const addonsTotal = (product: ProductLike | null | undefined, ids: string[]) => {
-  const wanted = new Set(ids);
-  return activeAddons(product).reduce((sum, a) => sum + (wanted.has(a.id) ? Number(a.price) || 0 : 0), 0);
-};
-
-/** أسماء الإضافات المختارة (للعرض في السلة) */
-export const addonsLabel = (product: ProductLike | null | undefined, ids: string[] = []) => {
-  const wanted = new Set(ids);
-  return activeAddons(product).filter((a) => wanted.has(a.id)).map((a) => a.name).join('، ');
-};
 
 export function ProductAddons({ product, store, selected, onChange, accent = '#E63228', style }: {
   product: ProductLike;
@@ -41,20 +27,23 @@ export function ProductAddons({ product, store, selected, onChange, accent = '#E
   if (!list.length) return null;
   const t = STRINGS[lang(store)];
   const currency = store?.currency || 'DZD';
-  const toggle = (id: string) => onChange(selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id]);
 
   return (
     <div style={{ marginBottom: '1rem', ...style }}>
       <p style={{ fontSize: '0.8rem', fontWeight: 800, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.8 }}>{t.title}</p>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {list.map((a) => {
-          const on = selected.includes(a.id);
+          // الكمية لكل قطعة = تكرار المعرّف في selected (الخادم يقرأ نفس الشكل)
+          const n = Math.min(addonCount(selected, a.id), addonMax(a));
+          const on = n > 0;
+          const max = addonMax(a);
           const price = Number(a.price) || 0;
+          const set = (k: number) => onChange(setAddonCount(selected, a, k));
           return (
+            <span key={a.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <button
-              key={a.id}
               type="button"
-              onClick={() => toggle(a.id)}
+              onClick={() => set(on ? 0 : 1)}
               aria-pressed={on}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.55rem 0.9rem', borderRadius: 999,
@@ -71,9 +60,23 @@ export function ProductAddons({ product, store, selected, onChange, accent = '#E
                 {price ? `+${price.toLocaleString()} ${currency}` : t.free}
               </span>
             </button>
+            {/* «أقصى كمية لكل قطعة» > 1: − الكمية + */}
+            {on && max > 1 && (
+              <span dir="ltr" style={{ display: 'inline-flex', alignItems: 'center', border: `2px solid ${accent}`, borderRadius: 999, overflow: 'hidden', fontWeight: 800 }}>
+                <button type="button" aria-label={t.less} onClick={() => set(n - 1)} style={qtyBtn(accent)}>−</button>
+                <span aria-live="polite" style={{ minWidth: 26, textAlign: 'center', fontSize: '0.9rem' }}>{n}</span>
+                <button type="button" aria-label={t.more} disabled={n >= max} onClick={() => set(n + 1)} style={{ ...qtyBtn(accent), opacity: n >= max ? 0.35 : 1 }}>+</button>
+              </span>
+            )}
+            </span>
           );
         })}
       </div>
     </div>
   );
 }
+
+const qtyBtn = (accent: string): CSSProperties => ({
+  width: 34, height: 34, border: 'none', background: 'transparent', color: accent, fontSize: '1.1rem', fontWeight: 800,
+  cursor: 'pointer', fontFamily: 'inherit', lineHeight: 1,
+});
