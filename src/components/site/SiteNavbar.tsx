@@ -77,7 +77,7 @@ export default function SiteNavbar() {
   };
 
   const currentLang = LANGUAGES.find((l) => l.code === locale) || LANGUAGES[0];
-  const navLinks = ['home', 'about', 'contact', 'plan'] as const;
+  const navLinks = ['home', 'features', 'about', 'contact', 'plan'] as const;
 
   return (
     <>

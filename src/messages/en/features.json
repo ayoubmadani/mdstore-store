@@ -1,0 +1,195 @@
+{
+    "meta_title": "All features: store, delivery, confirmation and stock",
+    "meta_description": "Online store, AI landing pages, 26 delivery companies, confirmation companies, stock, in-shop sales and net profit. Every MdStore feature on one page.",
+    "badge": "Everything in the platform",
+    "title": "Everything you need to sell,",
+    "title_accent": "in one place",
+    "subtitle": "From the first visit to your store to the parcel arriving and your net profit. These are all of MdStore's features, grouped by your daily work.",
+    "cta_start": "Get started",
+    "cta_plans": "See pricing",
+    "jump_label": "Jump to",
+    "stats": [
+        {
+            "value": "26",
+            "label": "delivery companies connected"
+        },
+        {
+            "value": "3",
+            "label": "store languages"
+        },
+        {
+            "value": "1,541",
+            "label": "communes ready in the order form"
+        }
+    ],
+    "groups": [
+        {
+            "id": "store",
+            "title": "A store ready in minutes",
+            "desc": "A store with your name, logo and colours, with no technical skills.",
+            "items": [
+                "Ready themes for every niche: beauty, clothing, shoes, electronics, food and more",
+                "A theme of your own, designed by AI from your description",
+                "Three languages: Arabic, French, English",
+                "One hero image for desktop and a different one for phones",
+                "Free delivery above an amount you set",
+                "A free link straight away, or connect your own domain",
+                "The domain shows the whole store, a landing page or a single product",
+                "Several stores in one account, with combined statistics"
+            ]
+        },
+        {
+            "id": "products",
+            "title": "Products with every detail",
+            "desc": "Show your product the way you really sell it, with its options and offers.",
+            "items": [
+                "Sizes and colours, each with its own price, stock and image",
+                "Quantity offers: buy more, pay less",
+                "Optional add-ons with the product",
+                "The old price crossed out next to the new one",
+                "Digital products with no delivery",
+                "An \"Ask on WhatsApp\" button on each product",
+                "Barcodes and label printing",
+                "Import a product from AliExpress with one link",
+                "Statistics per product: views, orders, conversion rate"
+            ]
+        },
+        {
+            "id": "landing",
+            "title": "Landing pages that sell",
+            "desc": "A page for every product and every campaign, ready in minutes.",
+            "items": [
+                "Drag-and-drop editor, no code at all",
+                "A full page written by AI from the product description",
+                "Product images and page sections made by AI",
+                "A/B test: one link splits visitors across two or three pages and shows the winner",
+                "Its own domain and pixel for each page",
+                "Duplicate, publish or unpublish a page in one click"
+            ]
+        },
+        {
+            "id": "orders",
+            "title": "Your orders under control",
+            "desc": "Every order in its place, from the first call to delivery.",
+            "items": [
+                "Clear statuses: pending, call attempts, confirmed, in delivery, delivered, returned",
+                "Notes with ready reasons: no answer, phone off, changed their mind",
+                "Create an order by hand and edit it",
+                "The source of every order: Facebook, TikTok, Google",
+                "Abandoned orders: the customer typed a number and did not finish, so you can call them",
+                "Excel export",
+                "Sync with Google Sheets, and change the status from the sheet itself"
+            ]
+        },
+        {
+            "id": "protect",
+            "title": "Protection from fake and duplicate orders",
+            "desc": "Know your customer before you send the parcel.",
+            "items": [
+                "A colour and an alert on every order show the customer's history: new, trusted, returns often, duplicate",
+                "Works across all your stores together, not just one",
+                "Recognises the same number even when it is written differently",
+                "A duplicate order stays with you and is not sent to confirmation automatically",
+                "A list of the numbers of customers who return often",
+                "The wilayas with the most returns, so you can decide where to sell"
+            ]
+        },
+        {
+            "id": "confirm",
+            "title": "Confirmation companies",
+            "desc": "Let a professional team call your customers.",
+            "items": [
+                "A directory of confirmation companies, searchable by name and wilaya",
+                "Send orders by hand or automatically",
+                "Preferred agents who take your orders first",
+                "You choose what is not sent automatically: duplicates, customers who return often",
+                "Take an order back from the company at any time",
+                "A full log for every order: who called and when"
+            ]
+        },
+        {
+            "id": "delivery",
+            "title": "26 delivery companies",
+            "desc": "Send your orders and track them without leaving the dashboard.",
+            "items": [
+                "Yalidine, ZR Express, Maystro Delivery, Yalitec and 22 other companies",
+                "Send orders to the company in bulk",
+                "Automatic tracking: the parcel status updates by itself",
+                "Print shipping labels in bulk",
+                "Scan the barcode when handing parcels to the courier and on return",
+                "An alert to call the customer before the parcel comes back",
+                "Prices per wilaya, for home and office, imported from the delivery company",
+                "Switch off a wilaya or specific communes"
+            ]
+        },
+        {
+            "id": "stock",
+            "title": "Stock and in-shop sales",
+            "desc": "One stock for your online store and your shop.",
+            "items": [
+                "Stock goes down on confirmation and comes back on cancellation or return",
+                "An alert when stock is running low",
+                "Stock value and expected profit",
+                "A log of every movement: who, why and which order",
+                "Sell in your shop from the phone: scan the barcode with the camera and print a receipt",
+                "Sell on credit with partial payments",
+                "Sell services: phone top-ups, bills, repairs",
+                "A list of customers, their orders and their debts"
+            ]
+        },
+        {
+            "id": "profit",
+            "title": "Your real profit",
+            "desc": "Not the sales figure, but what stays in your pocket.",
+            "items": [
+                "Net profit after ads, purchase cost, delivery, returns and confirmation fees",
+                "Ad cost per order",
+                "A warning when the ad costs more than the product's margin",
+                "Return rate",
+                "Revenue today and this month, compared with last week",
+                "Best products and best wilayas"
+            ]
+        },
+        {
+            "id": "tracking",
+            "title": "Pixels and search engines",
+            "desc": "Your ads know who really bought.",
+            "items": [
+                "Facebook, TikTok and Google Analytics with no code",
+                "Conversions API: the event arrives even with ad blockers",
+                "A \"Purchase\" event when the order is confirmed, not only when the form is filled",
+                "Pixels on three levels: store, page, product",
+                "Google title and description, and the share image",
+                "Google Search Console and Bing verification"
+            ]
+        },
+        {
+            "id": "team",
+            "title": "Team and wallet",
+            "desc": "Share the work and stay informed about everything.",
+            "items": [
+                "Invite a member by email or phone number",
+                "Detailed permissions: who sees orders, who edits products, who sells in the shop",
+                "An activity log of everything the team did",
+                "Top up the wallet by card: CIB and Edahabia",
+                "Top up with Binance Pay and USDT",
+                "Automatic subscription renewal from the wallet"
+            ]
+        },
+        {
+            "id": "app",
+            "title": "App and integrations",
+            "desc": "Your store in your pocket, connected to your tools.",
+            "items": [
+                "A phone app installed from the browser, on iPhone and Android",
+                "An instant phone notification for every new order",
+                "Manage the store by conversation from Claude and ChatGPT",
+                "API keys for developers",
+                "A media library with automatic compression and a crop tool",
+                "An inbox for customer messages from the \"Contact us\" form"
+            ]
+        }
+    ],
+    "cta_title": "Ready to start?",
+    "cta_desc": "Create your store now and try the features yourself."
+}

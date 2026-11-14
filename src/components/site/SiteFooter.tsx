@@ -35,6 +35,7 @@ export default async function SiteFooter() {
             <h4 className="font-bold text-gray-900 dark:text-white mb-6 text-lg">{tFooter('quick_links')}</h4>
             <ul className="space-y-4">
               <FooterLink href="/" label={tNav('home')} />
+              <FooterLink href="/features" label={tNav('features')} />
               <FooterLink href="/about" label={tNav('about')} />
               <FooterLink href="/contact" label={tNav('contact')} />
               <FooterLink href={`${DASHBOARD_URL}/select-lang/${locale}`} label={tHome('get_started')} />

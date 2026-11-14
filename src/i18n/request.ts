@@ -9,6 +9,7 @@ const NAMESPACES = [
   'about',
   'contact',
   'cookies',
+  'features',
   'home',
   'plans',
   'privacy',

@@ -1,0 +1,195 @@
+{
+    "meta_title": "Toutes les fonctionnalités : boutique, livraison, confirmation et stock",
+    "meta_description": "Boutique en ligne, pages de vente générées par l'IA, 26 sociétés de livraison, sociétés de confirmation, stock, vente en magasin et bénéfice net. Toutes les fonctionnalités de MdStore sur une seule page.",
+    "badge": "Tout ce que contient la plateforme",
+    "title": "Tout ce qu'il vous faut pour vendre,",
+    "title_accent": "au même endroit",
+    "subtitle": "De la première visite sur votre boutique jusqu'à la livraison du colis et au calcul de votre bénéfice net. Voici toutes les fonctionnalités de MdStore, regroupées selon votre travail quotidien.",
+    "cta_start": "Commencer",
+    "cta_plans": "Voir les tarifs",
+    "jump_label": "Aller à",
+    "stats": [
+        {
+            "value": "26",
+            "label": "sociétés de livraison connectées"
+        },
+        {
+            "value": "3",
+            "label": "langues pour la boutique"
+        },
+        {
+            "value": "1 541",
+            "label": "communes prêtes dans le formulaire de commande"
+        }
+    ],
+    "groups": [
+        {
+            "id": "store",
+            "title": "Une boutique prête en quelques minutes",
+            "desc": "Une boutique à votre nom, avec votre logo et vos couleurs, sans aucune compétence technique.",
+            "items": [
+                "Thèmes prêts pour chaque secteur : beauté, vêtements, chaussures, électronique, alimentation et plus",
+                "Un thème rien qu'à vous, conçu par l'IA à partir de votre description",
+                "Trois langues : arabe, français, anglais",
+                "Une image d'accueil pour ordinateur et une autre pour mobile",
+                "Livraison gratuite au-delà d'un montant que vous fixez",
+                "Lien gratuit immédiat, ou votre propre nom de domaine",
+                "Le domaine affiche toute la boutique, une page de vente ou un seul produit",
+                "Plusieurs boutiques dans un seul compte, avec des statistiques unifiées"
+            ]
+        },
+        {
+            "id": "products",
+            "title": "Des produits dans tous leurs détails",
+            "desc": "Présentez votre produit comme vous le vendez vraiment, avec ses options et ses offres.",
+            "items": [
+                "Tailles et couleurs, chacune avec son prix, son stock et son image",
+                "Offres par quantité : achetez plus, payez moins",
+                "Options supplémentaires avec le produit",
+                "Ancien prix barré à côté du nouveau",
+                "Produits numériques sans livraison",
+                "Bouton « Une question ? WhatsApp » sur chaque produit",
+                "Code-barres et impression d'étiquettes",
+                "Import d'un produit AliExpress avec un simple lien",
+                "Statistiques par produit : vues, commandes, taux de conversion"
+            ]
+        },
+        {
+            "id": "landing",
+            "title": "Des pages de vente qui vendent",
+            "desc": "Une page pour chaque produit et chaque campagne, prête en quelques minutes.",
+            "items": [
+                "Éditeur glisser-déposer, sans aucun code",
+                "Page complète générée par l'IA à partir de la description du produit",
+                "Images de produits et sections de page générées par l'IA",
+                "Test A/B : un seul lien répartit les visiteurs sur deux ou trois pages et montre la gagnante",
+                "Un domaine et un pixel propres à chaque page",
+                "Dupliquer, publier ou dépublier une page en un clic"
+            ]
+        },
+        {
+            "id": "orders",
+            "title": "Vos commandes sous contrôle",
+            "desc": "Chaque commande à sa place, du premier appel jusqu'à la livraison.",
+            "items": [
+                "Statuts clairs : en attente, tentatives d'appel, confirmée, en livraison, livrée, retournée",
+                "Notes avec motifs prêts : ne répond pas, téléphone éteint, a changé d'avis",
+                "Création et modification manuelles d'une commande",
+                "Source de chaque commande : Facebook, TikTok, Google",
+                "Commandes abandonnées : le client a saisi son numéro sans terminer, vous pouvez le rappeler",
+                "Export Excel",
+                "Synchronisation avec Google Sheets, et changement de statut depuis la feuille"
+            ]
+        },
+        {
+            "id": "protect",
+            "title": "Protection contre les fausses commandes et les doublons",
+            "desc": "Connaissez votre client avant de lui envoyer le colis.",
+            "items": [
+                "Une couleur et une alerte sur chaque commande montrent l'historique du client : nouveau, fiable, retourne souvent, doublon",
+                "Fonctionne sur toutes vos boutiques à la fois, pas sur une seule",
+                "Reconnaît le même numéro même s'il est écrit différemment",
+                "Une commande en double reste chez vous et n'est pas envoyée automatiquement en confirmation",
+                "Liste des numéros des clients qui retournent souvent",
+                "Les wilayas avec le plus de retours, pour décider où vendre"
+            ]
+        },
+        {
+            "id": "confirm",
+            "title": "Sociétés de confirmation",
+            "desc": "Laissez une équipe professionnelle appeler vos clients.",
+            "items": [
+                "Annuaire des sociétés de confirmation, recherche par nom et par wilaya",
+                "Envoi des commandes manuel ou automatique",
+                "Des agents préférés qui prennent vos commandes en premier",
+                "Vous choisissez ce qui n'est pas envoyé automatiquement : les doublons, les clients qui retournent souvent",
+                "Récupération d'une commande auprès de la société à tout moment",
+                "Journal complet de chaque commande : qui a appelé et quand"
+            ]
+        },
+        {
+            "id": "delivery",
+            "title": "26 sociétés de livraison",
+            "desc": "Envoyez vos commandes et suivez-les sans quitter le tableau de bord.",
+            "items": [
+                "Yalidine, ZR Express, Maystro Delivery, Yalitec et 22 autres sociétés",
+                "Envoi groupé des commandes à la société",
+                "Suivi automatique : le statut du colis se met à jour tout seul",
+                "Impression groupée des étiquettes d'expédition",
+                "Scan du code-barres à la remise des colis au livreur et au retour",
+                "Alerte pour appeler le client avant que le colis ne revienne",
+                "Tarifs par wilaya, à domicile et au bureau, importés depuis la société de livraison",
+                "Désactivation d'une wilaya ou de certaines communes"
+            ]
+        },
+        {
+            "id": "stock",
+            "title": "Stock et vente en magasin",
+            "desc": "Un seul stock pour votre boutique en ligne et votre magasin.",
+            "items": [
+                "Le stock diminue à la confirmation et revient en cas d'annulation ou de retour",
+                "Alerte quand le stock est bientôt épuisé",
+                "Valeur du stock et bénéfice attendu",
+                "Journal de chaque mouvement : qui, pourquoi et quelle commande",
+                "Vente en magasin depuis le téléphone : scan du code-barres avec la caméra et impression du reçu",
+                "Vente à crédit avec paiements partiels",
+                "Vente de services : recharge de crédit, factures, réparation",
+                "Liste des clients, leurs commandes et leurs dettes"
+            ]
+        },
+        {
+            "id": "profit",
+            "title": "Votre vrai bénéfice",
+            "desc": "Pas le chiffre des ventes, mais ce qui reste dans votre poche.",
+            "items": [
+                "Bénéfice net après publicité, achat, livraison, retours et frais de confirmation",
+                "Coût publicitaire par commande",
+                "Alerte quand la publicité coûte plus que la marge du produit",
+                "Taux de retour",
+                "Revenus du jour et du mois, comparés à la semaine dernière",
+                "Meilleurs produits et meilleures wilayas"
+            ]
+        },
+        {
+            "id": "tracking",
+            "title": "Pixels et moteurs de recherche",
+            "desc": "Vos publicités savent qui a vraiment acheté.",
+            "items": [
+                "Facebook, TikTok et Google Analytics sans aucun code",
+                "Conversions API : l'événement arrive même avec les bloqueurs de publicité",
+                "Événement « Achat » à la confirmation de la commande, pas seulement à l'envoi du formulaire",
+                "Pixels à trois niveaux : boutique, page, produit",
+                "Titre et description Google, image de partage",
+                "Vérification Google Search Console et Bing"
+            ]
+        },
+        {
+            "id": "team",
+            "title": "Équipe et portefeuille",
+            "desc": "Répartissez le travail et gardez un œil sur tout.",
+            "items": [
+                "Invitation d'un membre par e-mail ou par numéro de téléphone",
+                "Permissions détaillées : qui voit les commandes, qui modifie les produits, qui vend en magasin",
+                "Journal d'activité de tout ce que fait l'équipe",
+                "Recharge du portefeuille par carte : CIB et Edahabia",
+                "Recharge par Binance Pay et USDT",
+                "Renouvellement automatique de l'abonnement depuis le portefeuille"
+            ]
+        },
+        {
+            "id": "app",
+            "title": "Application et intégrations",
+            "desc": "Votre boutique dans votre poche, connectée à vos outils.",
+            "items": [
+                "Application mobile installée depuis le navigateur, sur iPhone et Android",
+                "Notification immédiate sur le téléphone à chaque nouvelle commande",
+                "Gestion de la boutique par conversation depuis Claude et ChatGPT",
+                "Clés API pour les développeurs",
+                "Médiathèque avec compression automatique et outil de recadrage",
+                "Boîte de réception des messages clients du formulaire « Contactez-nous »"
+            ]
+        }
+    ],
+    "cta_title": "Prêt à commencer ?",
+    "cta_desc": "Créez votre boutique maintenant et essayez les fonctionnalités vous-même."
+}

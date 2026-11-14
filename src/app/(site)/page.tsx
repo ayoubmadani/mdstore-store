@@ -137,6 +137,15 @@ export default async function HomePage() {
               desc={t('feat6_desc')}
             />
           </div>
+
+          <div className="text-center mt-14">
+            <Link
+              href="/features"
+              className="inline-block px-10 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg hover:bg-indigo-700 shadow-xl shadow-indigo-200 dark:shadow-none transition-all"
+            >
+              {t('all_features')}
+            </Link>
+          </div>
         </div>
       </section>
     </div>
