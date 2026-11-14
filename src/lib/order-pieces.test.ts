@@ -70,3 +70,20 @@ test('an offer that does not split evenly keeps its exact price per card', () =>
   const lines = boxLines(product, 'o3', [[M, M, M]], addons);
   assert.equal(linesTotal(lines), 1000);
 });
+
+// السلة: بطاقة لكل عرض (كما في صفحة المنتج) — وتتحول لسطور عند إرسال الطلب
+import { boxEntries, variantText } from '../components/theme/orderPieces.ts';
+
+test('cart: one entry per card, with its own lines and the card total', () => {
+  const entries = boxEntries(product, 'o2', [[M, L], [M, { ...M, addonIds: ['c'] }]], addons);
+  assert.equal(entries.length, 2);
+  assert.deepEqual(entries[0].lines.map((l) => [l.variantDetailId, l.quantity, l.finalPrice]), [['vM-r', 1, 1750], ['vL-b', 1, 1750]]);
+  assert.equal(entries[0].total, 3500);
+  assert.equal(entries[1].total, 3600);
+});
+
+test('options as text use the value names the merchant gave', () => {
+  const p = { attributes: [{ name: 'اللون', variants: [{ value: '#f00', name: 'أحمر' }] }, { name: 'المقاس', variants: [{ value: 'M', name: 'M' }] }] };
+  assert.equal(variantText(p, { 'اللون': '#f00', 'المقاس': 'M' }), 'أحمر · M');
+  assert.equal(variantText(p, {}), '');
+});

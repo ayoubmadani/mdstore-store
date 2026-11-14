@@ -98,3 +98,24 @@ export function boxLines(product: ProductLike, offerId: string | null | undefine
 }
 
 export const linesTotal = (lines: PieceLine[]) => lines.reduce((s, l) => s + l.finalPrice * l.quantity, 0);
+
+/** السلة: مدخل لكل بطاقة (عرض) بسطورها ومجموعها — تُعرض كبطاقة وتتحول لسطور عند إرسال الطلب */
+export function boxEntries(product: ProductLike, offerId: string | null | undefined, boxes: Box[], addonsPrice: (ids: string[]) => number) {
+  return boxes.map((box) => {
+    const lines = boxLines(product, offerId, [box], addonsPrice);
+    return { lines, total: linesTotal(lines) };
+  });
+}
+
+type AttrWithValues = { name: string; variants?: { value: string; name?: string }[] };
+/** الخيارات كنص بأسماء التاجر: «أحمر · M» (اللون يظهر باسمه لا برمزه) */
+export function variantText(product: { attributes?: AttrWithValues[] | null }, variants: Record<string, string> = {}): string {
+  return (product.attributes ?? [])
+    .map((a) => {
+      const v = variants[a.name];
+      if (!v) return '';
+      return a.variants?.find((x) => x.value === v)?.name || v;
+    })
+    .filter(Boolean)
+    .join(' · ');
+}

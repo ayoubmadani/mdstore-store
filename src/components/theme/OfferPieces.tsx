@@ -94,8 +94,8 @@ export function OfferPieces({ product, store, accent = '#1D4ED8', offerId, boxes
                     {summary(piece)}
                   </div>
                   <button type="button" data-offer-edit onClick={() => toggle(k)} aria-expanded={isOpen}
-                    style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 4, padding: '0.35rem 0.75rem', borderRadius: 8, border: `1.5px solid ${accent}`, background: isOpen ? accent : '#fff', color: isOpen ? '#fff' : accent, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer', fontFamily: 'inherit' }}>
-                    {isOpen ? t.done : t.edit}
+                    style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 4, padding: '0.35rem 0.75rem', borderRadius: 8, border: `1.5px solid ${accent}`, background: isOpen ? `${accent}14` : '#fff', color: accent, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    {t.edit}
                     <span aria-hidden="true" style={{ display: 'inline-block', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▾</span>
                   </button>
                 </div>

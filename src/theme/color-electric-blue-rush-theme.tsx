@@ -7,7 +7,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 import { OfferPieces, needsPieces } from '@/components/theme/OfferPieces';
-import { boxLines, linesTotal, fitBoxes, piecesPerBox, type Box } from '@/components/theme/orderPieces';
+import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, variantText, type Box } from '@/components/theme/orderPieces';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
@@ -1557,7 +1557,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     setIsAdded(true);
     const cart = JSON.parse(localStorage.getItem(domain) || '[]');
     if (lines) {
-      for (const l of lines) cart.push({ ...fd, addonIds: l.addonIds, quantity: l.quantity, product, variantDetailId: l.variantDetailId, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants: l.selectedVariants, platform: platform || 'store', finalPrice: l.finalPrice, totalPrice: l.finalPrice * l.quantity, priceLivraison: getLiv(), addedAt: Date.now() });
+      // مدخل لكل بطاقة عرض (بسطور قطعها) — تظهر في السلة كبطاقة، وتتحول لسطور عند إرسال الطلب
+      for (const e of boxEntries(product as any, selectedOffer, boxes, (ids) => addonsTotal(product, ids))) {
+        cart.push({ ...fd, quantity: 1, product, productId: product.id, storeId: product.store.id, userId, selectedOffer, platform: platform || 'store', finalPrice: e.total, totalPrice: e.total, priceLivraison: getLiv(), addedAt: Date.now(), offerBox: { lines: e.lines } });
+      }
     } else {
       cart.push({ addonIds, ...fd, quantity: qty, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
     }
@@ -1804,7 +1807,11 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     if (Object.keys(er).length) { setErrors(er); return; }
     setErrors({}); setSubmitting(true);
     try {
-      await axios.post(`${API_URL}/orders/create`, items.map(i => ({ addonIds: i.addonIds,
+      // بطاقة العرض ← سطور قطعها (كطلب السلة العادي)
+      const flat = items.flatMap((i) => (i.offerBox?.lines?.length
+        ? i.offerBox.lines.map((l: any) => ({ ...i, addonIds: l.addonIds, variantDetailId: l.variantDetailId, selectedVariants: l.selectedVariants, finalPrice: l.finalPrice, quantity: l.quantity }))
+        : [i]));
+      await axios.post(`${API_URL}/orders/create`, flat.map(i => ({ addonIds: i.addonIds,
         ...fd,
         productId: i.productId,
         storeId: i.storeId,
@@ -1864,9 +1871,36 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             <div key={i} style={{ display: 'flex', gap: '1rem', padding: '1rem', borderBottom: '1px solid #F0F0F0' }}>
               <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: 76, height: 76, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }} alt="" />
               <div style={{ flex: 1 }}>
-                <h4 style={{ fontWeight: 600, color: '#111', marginBottom: '0.25rem', fontSize: '0.875rem', lineHeight: 1.4 }}>{item.product?.name}</h4>
-                <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 800, color: '#1D4ED8' }}>{item.finalPrice?.toLocaleString()} {store.currency || 'DZD'}</p>
-                <p style={{ fontSize: '0.72rem', color: '#aaa', marginTop: '0.25rem' }}>{t.qty}: {item.quantity}</p>
+                {item.offerBox?.lines?.length ? (() => {
+                  // بطاقة عرض: اسم العرض وسعره، المنتج، وخيارات كل قطعة
+                  const offer = item.product?.offers?.find((o: any) => o.id === item.selectedOffer);
+                  return (
+                    <div style={{ border: '1.5px solid #1D4ED8', borderRadius: 10, overflow: 'hidden' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, padding: '0.5rem 0.75rem', background: 'rgba(29,78,216,0.05)' }}>
+                        <div style={{ minWidth: 0 }}>
+                          <p style={{ fontWeight: 800, color: '#111', fontSize: '0.85rem' }}>{offer?.name || item.product?.name}</p>
+                          <p style={{ fontSize: '0.72rem', color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.product?.name}</p>
+                        </div>
+                        <span className="price-mono" style={{ fontWeight: 800, color: '#1D4ED8', whiteSpace: 'nowrap' }}>{Number(item.finalPrice).toLocaleString()} {store.currency || 'DZD'}</span>
+                      </div>
+                      {item.offerBox.lines.map((l: any, k: number) => (
+                        <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 8, padding: '0.45rem 0.75rem', borderTop: '1px dashed #E5E7EB', fontSize: '0.8rem' }}>
+                          <span style={{ color: '#333', fontWeight: 600 }}>
+                            {variantText(item.product, l.selectedVariants) || '—'}
+                            {l.addonIds?.length > 0 && <span style={{ color: '#1D4ED8' }}> + {addonsLabel(item.product, l.addonIds)}</span>}
+                          </span>
+                          {l.quantity > 1 && <span style={{ color: '#888' }}>× {l.quantity}</span>}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })() : (
+                  <>
+                    <h4 style={{ fontWeight: 600, color: '#111', marginBottom: '0.25rem', fontSize: '0.875rem', lineHeight: 1.4 }}>{item.product?.name}</h4>
+                    <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 800, color: '#1D4ED8' }}>{item.finalPrice?.toLocaleString()} {store.currency || 'DZD'}</p>
+                    <p style={{ fontSize: '0.72rem', color: '#aaa', marginTop: '0.25rem' }}>{t.qty}: {item.quantity}</p>
+                  </>
+                )}
               </div>
               <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: '#ccc', padding: '0.375rem', borderRadius: 6, background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'center', transition: 'color 0.18s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = '#1D4ED8')}
