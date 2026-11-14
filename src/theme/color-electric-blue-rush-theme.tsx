@@ -1869,15 +1869,16 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #E8E8E8', overflow: 'hidden', alignSelf: 'start' }}>
           {items.map((item, i) => (
             <div key={i} style={{ display: 'flex', gap: '1rem', padding: '1rem', borderBottom: '1px solid #F0F0F0' }}>
-              <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: 76, height: 76, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }} alt="" />
-              <div style={{ flex: 1 }}>
+              {!item.offerBox?.lines?.length && <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: 76, height: 76, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }} alt="" />}
+              <div style={{ flex: 1, minWidth: 0 }}>
                 {item.offerBox?.lines?.length ? (() => {
                   // بطاقة عرض: اسم العرض وسعره، المنتج، وخيارات كل قطعة
                   const offer = item.product?.offers?.find((o: any) => o.id === item.selectedOffer);
                   return (
                     <div style={{ border: '1.5px solid #1D4ED8', borderRadius: 10, overflow: 'hidden' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, padding: '0.5rem 0.75rem', background: 'rgba(29,78,216,0.05)' }}>
-                        <div style={{ minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0.6rem 0.75rem', background: 'rgba(29,78,216,0.05)' }}>
+                        <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: 52, height: 52, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} alt="" />
+                        <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{ fontWeight: 800, color: '#111', fontSize: '0.85rem' }}>{offer?.name || item.product?.name}</p>
                           <p style={{ fontSize: '0.72rem', color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.product?.name}</p>
                         </div>
