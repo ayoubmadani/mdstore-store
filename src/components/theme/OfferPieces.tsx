@@ -1,6 +1,6 @@
 // بطاقات العرض في صفحة المنتج: بطاقة لكل وحدة من الكمية، تحمل اسم العرض وسعره والمنتج،
 // وتحتها قطع العرض، ولكل قطعة خياراتها (مقاس، لون…) وإضافاتها. مشتركة بين الثيمات (لون الثيم في accent).
-import type { CSSProperties } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { ProductAddons } from './ProductAddons';
 import { activeAddons } from './addonPicks';
 import { valueAvailable, type Box, type Piece } from './orderPieces';
@@ -10,9 +10,9 @@ type Attr = { id?: string; name: string; displayMode?: string; variants: Variant
 type StoreLike = { language?: string | null; currency?: string | null } | null | undefined;
 
 const STRINGS = {
-  ar: { piece: 'القطعة', card: 'الطلب' },
-  fr: { piece: 'Pièce', card: 'Commande' },
-  en: { piece: 'Piece', card: 'Order' },
+  ar: { piece: 'القطعة', card: 'الطلب', edit: 'تعديل', done: 'تم' },
+  fr: { piece: 'Pièce', card: 'Commande', edit: 'Modifier', done: 'OK' },
+  en: { piece: 'Piece', card: 'Order', edit: 'Edit', done: 'Done' },
 };
 const lang = (store: StoreLike) => (store?.language === 'fr' ? 'fr' : store?.language === 'en' ? 'en' : 'ar');
 const isUrl = (v: string) => /^https?:\/\/|^\//.test(v);
@@ -31,8 +31,29 @@ export function OfferPieces({ product, store, accent = '#1D4ED8', offerId, boxes
   onVariant?: (attrName: string, value: string) => void;
   style?: CSSProperties;
 }) {
+  // البطاقة مطوية: ملخص خيارات كل قطعة + زر «تعديل ▾» يفتح الخيارات تحتها
+  // المفتوح: «بطاقة-قطعة» — كل قطعة لها زر تعديل يفتح خياراتها هي فقط
+  const [open, setOpen] = useState<string[]>([]);
   if (!needsPieces(product)) return null;
   const t = STRINGS[lang(store)];
+  const keyOf = (b: number, i: number) => `${b}-${i}`;
+  const toggle = (k: string) => setOpen((o) => (o.includes(k) ? o.filter((x) => x !== k) : [...o, k]));
+  const addons = activeAddons(product);
+  // ملخص القطعة: «L · أزرق · test ×2» (اللون باسمه وبنقطة لونه)
+  const summary = (piece: Piece) => (
+    <span style={{ display: 'inline-flex', flexWrap: 'wrap', alignItems: 'center', gap: 6 }}>
+      {attrs.map((attr) => {
+        const v = attr.variants.find((x) => x.value === piece.variants[attr.name]);
+        if (!v) return null;
+        const dot = attr.displayMode === 'color' ? <span style={{ width: 12, height: 12, borderRadius: '50%', display: 'inline-block', border: '1px solid #ddd', background: isUrl(v.value) ? `url(${v.value}) center/cover` : v.value }} /> : null;
+        return <span key={attr.name} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', borderRadius: 999, background: '#F3F4F6', fontSize: '0.78rem', fontWeight: 700, color: '#333' }}>{dot}{v.name && v.name !== v.value ? v.name : attr.displayMode === 'color' ? '' : v.value}</span>;
+      })}
+      {addons.filter((a) => piece.addonIds.includes(a.id)).map((a) => {
+        const n = piece.addonIds.filter((x) => x === a.id).length;
+        return <span key={a.id} style={{ padding: '2px 8px', borderRadius: 999, background: `${accent}14`, color: accent, fontSize: '0.78rem', fontWeight: 700 }}>+ {a.name}{n > 1 ? ` ×${n}` : ''}</span>;
+      })}
+    </span>
+  );
   const currency = store?.currency || 'DZD';
   const offer = offerId ? product.offers?.find((o: any) => o.id === offerId) : undefined;
   const attrs: Attr[] = product.attributes ?? [];
@@ -61,56 +82,74 @@ export function OfferPieces({ product, store, accent = '#1D4ED8', offerId, boxes
             )}
           </div>
 
-          {/* القطع: خيارات كل قطعة ثم إضافاتها */}
-          {box.map((piece, i) => (
-            <div key={i} style={{ padding: '0.75rem 0.9rem', borderTop: i ? '1px dashed #E5E7EB' : 'none' }}>
-              {box.length > 1 && <p style={{ margin: '0 0 0.5rem', fontSize: '0.75rem', fontWeight: 800, color: accent }}>{t.piece} {i + 1}</p>}
-              {attrs.map((attr) => {
-                const chosen = attr.variants.find((v) => v.value === piece.variants[attr.name]);
-                return (
-                  <div key={attr.id ?? attr.name} style={{ marginBottom: '0.6rem' }}>
-                    <p style={{ margin: '0 0 0.35rem', fontSize: '0.78rem', fontWeight: 700, color: '#333' }}>
-                      {attr.name}
-                      {(attr.displayMode === 'color' || attr.displayMode === 'image') && chosen?.name && chosen.name !== chosen.value
-                        ? <span style={{ color: accent, fontWeight: 600 }}> : {chosen.name}</span> : null}
-                    </p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                      {attr.variants.map((v) => {
-                        const on = piece.variants[attr.name] === v.value;
-                        const ok = valueAvailable(product, piece.variants, attr.name, v.value);
-                        const pick = () => {
-                          if (!ok) return;
-                          setPiece(b, i, { ...piece, variants: { ...piece.variants, [attr.name]: v.value } });
-                          onVariant?.(attr.name, v.value);
-                        };
-                        const common: CSSProperties = { cursor: ok ? 'pointer' : 'not-allowed', opacity: ok ? 1 : 0.35, fontFamily: 'inherit' };
-                        return (
-                          <button key={v.id ?? v.value} type="button" onClick={pick} aria-pressed={on} disabled={!ok}
-                            aria-label={v.name || v.value} title={v.name && v.name !== v.value ? v.name : undefined}
-                            style={attr.displayMode === 'color' ? {
-                              ...common, width: 30, height: 30, borderRadius: '50%', border: '1px solid #ddd', padding: 0,
-                              background: isUrl(v.value) ? `url(${v.value}) center/cover` : v.value,
-                              outline: `2.5px solid ${on ? accent : 'transparent'}`, outlineOffset: 2,
-                            } : attr.displayMode === 'image' ? {
-                              ...common, width: 52, height: 52, borderRadius: 8, padding: 0, background: `url(${v.value}) center/cover`,
-                              border: `2.5px solid ${on ? accent : '#E5E7EB'}`,
-                            } : {
-                              ...common, padding: '0.4rem 0.9rem', borderRadius: 8, fontSize: '0.82rem', fontWeight: 700,
-                              border: `1.5px solid ${on ? accent : '#E5E7EB'}`, background: on ? `${accent}12` : '#fff',
-                              color: on ? accent : '#444', textDecoration: ok ? 'none' : 'line-through',
-                            }}>
-                            {attr.displayMode !== 'color' && attr.displayMode !== 'image' && (v.name || v.value)}
-                          </button>
-                        );
-                      })}
-                    </div>
+          {/* كل قطعة: ملخص خياراتها + زر «تعديل ▾» يفتح خياراتها هي تحتها */}
+          {box.map((piece, i) => {
+            const k = keyOf(b, i);
+            const isOpen = open.includes(k);
+            return (
+              <div key={i} style={{ borderTop: i ? '1px dashed #E5E7EB' : 'none' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0.6rem 0.9rem' }}>
+                  <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                    {box.length > 1 && <span style={{ fontSize: '0.75rem', fontWeight: 800, color: accent }}>{t.piece} {i + 1}:</span>}
+                    {summary(piece)}
                   </div>
-                );
-              })}
-              <ProductAddons product={product} store={store} accent={accent} style={{ marginBottom: 0 }}
-                selected={piece.addonIds} onChange={(ids) => setPiece(b, i, { ...piece, addonIds: ids })} />
-            </div>
-          ))}
+                  <button type="button" data-offer-edit onClick={() => toggle(k)} aria-expanded={isOpen}
+                    style={{ flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 4, padding: '0.35rem 0.75rem', borderRadius: 8, border: `1.5px solid ${accent}`, background: isOpen ? accent : '#fff', color: isOpen ? '#fff' : accent, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer', fontFamily: 'inherit' }}>
+                    {isOpen ? t.done : t.edit}
+                    <span aria-hidden="true" style={{ display: 'inline-block', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▾</span>
+                  </button>
+                </div>
+                {isOpen && (
+                  <div style={{ padding: '0.2rem 0.9rem 0.8rem', background: `${accent}06` }}>
+                    {attrs.map((attr) => {
+                      const chosen = attr.variants.find((v) => v.value === piece.variants[attr.name]);
+                      return (
+                        <div key={attr.id ?? attr.name} style={{ marginBottom: '0.6rem' }}>
+                          <p style={{ margin: '0 0 0.35rem', fontSize: '0.78rem', fontWeight: 700, color: '#333' }}>
+                            {attr.name}
+                            {(attr.displayMode === 'color' || attr.displayMode === 'image') && chosen?.name && chosen.name !== chosen.value
+                              ? <span style={{ color: accent, fontWeight: 600 }}> : {chosen.name}</span> : null}
+                          </p>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                            {attr.variants.map((v) => {
+                              const on = piece.variants[attr.name] === v.value;
+                              const ok = valueAvailable(product, piece.variants, attr.name, v.value);
+                              const pick = () => {
+                                if (!ok) return;
+                                setPiece(b, i, { ...piece, variants: { ...piece.variants, [attr.name]: v.value } });
+                                onVariant?.(attr.name, v.value);
+                              };
+                              const common: CSSProperties = { cursor: ok ? 'pointer' : 'not-allowed', opacity: ok ? 1 : 0.35, fontFamily: 'inherit' };
+                              return (
+                                <button key={v.id ?? v.value} type="button" onClick={pick} aria-pressed={on} disabled={!ok}
+                                  aria-label={v.name || v.value} title={v.name && v.name !== v.value ? v.name : undefined}
+                                  style={attr.displayMode === 'color' ? {
+                                    ...common, width: 30, height: 30, borderRadius: '50%', border: '1px solid #ddd', padding: 0,
+                                    background: isUrl(v.value) ? `url(${v.value}) center/cover` : v.value,
+                                    outline: `2.5px solid ${on ? accent : 'transparent'}`, outlineOffset: 2,
+                                  } : attr.displayMode === 'image' ? {
+                                    ...common, width: 52, height: 52, borderRadius: 8, padding: 0, background: `url(${v.value}) center/cover`,
+                                    border: `2.5px solid ${on ? accent : '#E5E7EB'}`,
+                                  } : {
+                                    ...common, padding: '0.4rem 0.9rem', borderRadius: 8, fontSize: '0.82rem', fontWeight: 700,
+                                    border: `1.5px solid ${on ? accent : '#E5E7EB'}`, background: on ? `${accent}12` : '#fff',
+                                    color: on ? accent : '#444', textDecoration: ok ? 'none' : 'line-through',
+                                  }}>
+                                  {attr.displayMode !== 'color' && attr.displayMode !== 'image' && (v.name || v.value)}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <ProductAddons product={product} store={store} accent={accent} style={{ marginBottom: 0 }}
+                      selected={piece.addonIds} onChange={(ids) => setPiece(b, i, { ...piece, addonIds: ids })} />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       ))}
     </div>

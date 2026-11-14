@@ -1593,18 +1593,27 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       {(product.offers?.length ?? 0) > 0 && (
         <div style={{ marginBottom: '1rem' }}>
           <p style={{ fontSize: '0.775rem', fontWeight: 700, color: '#555', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.offersTitle}</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {product.offers?.map((o: any) => {
-              const on = selectedOffer === o.id;
-              return (
-                <button key={o.id} type="button" aria-pressed={on} onClick={() => setSelectedOffer(o.id)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, padding: '0.6rem 0.9rem', borderRadius: 10, cursor: 'pointer', fontFamily: 'inherit', border: `1.5px solid ${on ? '#1D4ED8' : '#E8E8E8'}`, background: on ? 'rgba(29,78,216,0.05)' : '#fff' }}>
-                  <span style={{ fontWeight: 700, fontSize: '0.85rem', color: '#111' }}>{o.name}</span>
-                  <span className="price-mono" style={{ fontWeight: 800, color: '#1D4ED8', fontSize: '0.95rem' }}>{Number(o.price).toLocaleString()} DZD</span>
-                  {o.shippingFree && <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#1D4ED8' }}>{t.freeShippingBadge}</span>}
-                </button>
-              );
-            })}
-          </div>
+          {/* عرض تحت عرض، كما كانت في الأصل */}
+          {product.offers?.map((o: any) => {
+            const on = selectedOffer === o.id;
+            return (
+              <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1rem', border: `1.5px solid ${on ? '#1D4ED8' : '#E8E8E8'}`, borderRadius: 10, cursor: 'pointer', marginBottom: '0.5rem', background: on ? 'rgba(29, 78, 216, 0.04)' : 'transparent', transition: 'all 0.18s' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+                  <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${on ? '#1D4ED8' : '#ccc'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {on && <div style={{ width: 9, height: 9, borderRadius: '50%', background: '#1D4ED8' }} />}
+                  </div>
+                  <input type="radio" name="offer" checked={on} onChange={() => setSelectedOffer(o.id)} style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }} />
+                  <div>
+                    <p style={{ fontWeight: 600, color: '#111', fontSize: '0.875rem' }}>{o.name}</p>
+                    {o.subTitle && <p style={{ fontSize: '0.75rem', color: '#999', marginTop: 2 }}>{o.subTitle}</p>}
+                    <p style={{ fontSize: '0.72rem', color: '#999' }}>{t.qty}: {o.quantity}</p>
+                    {o.shippingFree && <p style={{ fontSize: '0.7rem', fontWeight: 700, color: '#1D4ED8', marginTop: 2 }}>{t.freeShippingBadge}</p>}
+                  </div>
+                </div>
+                <span className="price-mono" style={{ fontWeight: 800, color: '#1D4ED8', fontSize: '1.1rem' }}>{Number(o.price).toLocaleString()} DZD</span>
+              </label>
+            );
+          })}
         </div>
       )}
       {/* 2. الكمية */}
