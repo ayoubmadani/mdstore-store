@@ -26,13 +26,30 @@ const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.wi
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
+/* ── ألوان المتجر: الثيم كله يتبع «اللون الأساسي» من إعدادات المتجر (design.primaryColor) ──
+   كل لون صالح يُطبَّق كما هو (الأسود أيضاً)؛ بلا لون صالح → الأزرق.
+   CSS: var(--acc) اللون، --acc-dark للتمرير، --acc-soft خلفية فاتحة، --acc-light لون فاتح، --acc-rgb للشفافية */
+const DEFAULT_ACCENT = '#1D4ED8';
+const hexOk = (v?: string | null) => {
+  const h = String(v || '').trim();
+  return /^#[0-9a-f]{6}$/i.test(h) ? h : null;
+};
+const accentOf = (store?: any): string => hexOk(store?.design?.primaryColor) || DEFAULT_ACCENT;
+const rgbOf = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+const mix = (hex: string, to: number, t: number) =>
+  '#' + rgbOf(hex).map((c) => Math.round(c + (to - c) * t).toString(16).padStart(2, '0')).join('');
+const accentVars = (store?: any) => {
+  const a = accentOf(store);
+  return `:root{--acc:${a};--acc-dark:${mix(a, 0, 0.18)};--acc-soft:${mix(a, 255, 0.92)};--acc-light:${mix(a, 255, 0.35)};--acc-rgb:${rgbOf(a).join(',')}}`;
+};
+
 /*
   ██████╗  ██████╗ ██╗     ██████╗     ██╗   ██╗██████╗ ██████╗  █████╗ ███╗  ██╗
   ██╔══██╗██╔═══██╗██║     ██╔══██╗    ██║   ██║██╔══██╗██╔══██╗██╔══██╗████╗ ██║
   ██████╦╝██║   ██║██║     ██║  ██║    ██║   ██║██████╔╝██████╦╝███████║██╔██╗██║
   ██╔══██╗██║   ██║██║     ██║  ██║    ██║   ██║██╔══██╗██╔══██╗██╔══██║██║╚████║
   ██████╦╝╚██████╔╝███████╗██████╔╝    ╚██████╔╝██║  ██║██████╔╝██║  ██║██║ ╚███║
-  ═══════ THEME: ELECTRIC / COLOR: #1D4ED8 + #1D1D1D + #F8F8F6
+  ═══════ THEME: ELECTRIC / COLOR: var(--acc) + #1D1D1D + #F8F8F6
 */
 
 const THEME_CSS = `
@@ -50,7 +67,7 @@ const THEME_CSS = `
   /* ── Scrollbar ── */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: #F8F8F6; }
-  ::-webkit-scrollbar-thumb { background: #1D4ED8; border-radius: 2px; }
+  ::-webkit-scrollbar-thumb { background: var(--acc); border-radius: 2px; }
 
   /* ── Keyframes ── */
   @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
@@ -64,7 +81,7 @@ const THEME_CSS = `
   .anim-check      { animation: checkPop 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }
 
   /* ── Ticker ── */
-  .ticker-wrap { overflow: hidden; background: #1D4ED8; color: #fff; height: 36px; display: flex; align-items: center; }
+  .ticker-wrap { overflow: hidden; background: var(--acc); color: #fff; height: 36px; display: flex; align-items: center; }
   .ticker-track { display: flex; white-space: nowrap; animation: ticker 28s linear infinite; }
   .ticker-item  { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; padding: 0 2.5rem; }
 
@@ -234,7 +251,7 @@ const THEME_CSS = `
     inset: 0;
     bottom: auto;
     height: 3px;
-    background: #1D4ED8;
+    background: var(--acc);
     transform: scaleX(0);
     transform-origin: right;
     transition: transform 0.3s ease;
@@ -291,10 +308,10 @@ const S = {
     borderRadius: 8, fontSize: '0.9rem', color: '#111',
     outline: 'none', transition: 'border-color 0.18s', appearance: 'none'
   } as React.CSSProperties,
-  inputErr: { borderColor: '#1D4ED8' } as React.CSSProperties,
+  inputErr: { borderColor: 'var(--acc)' } as React.CSSProperties,
   btnPrimary: {
     width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-    background: '#1D4ED8', color: '#fff', fontWeight: 700, fontSize: '0.95rem',
+    background: 'var(--acc)', color: '#fff', fontWeight: 700, fontSize: '0.95rem',
     padding: '0.9rem 1.5rem', borderRadius: 10, border: 'none', cursor: 'pointer',
     transition: 'all 0.2s', fontFamily: 'inherit'
   } as React.CSSProperties,
@@ -722,6 +739,7 @@ export default function Main({ store, children, domain }: any) {
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} style={{ minHeight: '100vh', background: '#F8F8F6' }}>
+      <style>{accentVars(store)}</style>
       <style>{THEME_CSS}</style>
       <Navbar store={store} domain={domain} />
       <main>{children}</main>
@@ -781,7 +799,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       <button onClick={() => setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
         <X size={14} />
       </button>
-      {loading ? <div style={{ padding: '1.5rem', textAlign: 'center', color: '#1D4ED8', fontSize: '0.85rem', fontWeight: 600 }}>{t.searching}</div>
+      {loading ? <div style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--acc)', fontSize: '0.85rem', fontWeight: 600 }}>{t.searching}</div>
         : listSearch.length > 0 ? (
           <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
             {listSearch.map((p: any) => (
@@ -790,15 +808,15 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 <img src={p.productImage || p.imagesProduct?.[0]?.imageUrl} style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} alt="" />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#111' }}>{p.name}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#1D4ED8', fontWeight: 700 }}>{p.price} {store?.currency || 'DZD'}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--acc)', fontWeight: 700 }}>{p.price} {store?.currency || 'DZD'}</div>
                 </div>
               </Link>
             ))}
             <button
               onClick={handleSearch}
               style={{
-                width: '100%', padding: '12px', background: 'rgba(29,78,216,0.07)', border: 'none',
-                borderTop: '1px solid rgba(29,78,216,0.2)', color: '#1D4ED8', fontWeight: 800,
+                width: '100%', padding: '12px', background: 'rgba(var(--acc-rgb),0.07)', border: 'none',
+                borderTop: '1px solid rgba(var(--acc-rgb),0.2)', color: 'var(--acc)', fontWeight: 800,
                 fontSize: '0.85rem', cursor: 'pointer', display: 'flex',
                 alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}>
@@ -834,7 +852,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <Link href="/" style={{ flexShrink: 0, textDecoration: 'none' }}>
             {/* إذا كان هناك رابط مخصص للصورة، نعرض الشعار */}
             {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && !imgError ? (
-              <LogoWithName store={store} nameStyle={{ fontSize: '1rem', fontWeight: 800, color: 'rgb(29, 78, 216)', textTransform: 'uppercase', letterSpacing: '0.02em' }}><img
+              <LogoWithName store={store} nameStyle={{ fontSize: '1rem', fontWeight: 800, color: 'var(--acc)', textTransform: 'uppercase', letterSpacing: '0.02em' }}><img
                 src={store.design.logoUrl}
                 style={{ height: 34, objectFit: 'contain', display: 'block' }}
                 alt={store?.design?.showStoreName ? '' : (store?.name || 'Store Logo')}
@@ -846,7 +864,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 <div style={{
                   padding: '0 12px',
                   height: 36,
-                  background: 'rgb(29, 78, 216)',
+                  background: 'var(--acc)',
                   color: '#fff',
                   borderRadius: 8,
                   display: 'flex',
@@ -855,7 +873,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                   fontSize: '0.85rem',
                   fontWeight: 800,
                   flexShrink: 0,
-                  boxShadow: '0 4px 12px rgba(29, 78, 216, 0.3)',
+                  boxShadow: '0 4px 12px rgba(var(--acc-rgb),0.3)',
                   whiteSpace: 'nowrap' // لضمان عدم انقسام الاسم
                 }}>
                   {store?.name?.toUpperCase() || 'SHAMSOU GAME'}
@@ -869,7 +887,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <form onSubmit={handleSearch}>
               <input type="text" placeholder={t.search} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
                 style={{ width: '100%', padding: isRTL ? '0.625rem 1rem 0.625rem 2.75rem' : '0.625rem 2.75rem 0.625rem 1rem', borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', fontSize: '0.875rem', outline: 'none', transition: 'border-color 0.2s' }}
-                onFocus={e => (e.target.style.borderColor = '#1D4ED8')}
+                onFocus={e => (e.target.style.borderColor = 'var(--acc)')}
                 onBlur={e => (e.target.style.borderColor = '#E0E0E0')} />
               <Search size={15} style={{ position: 'absolute', ...(isRTL ? { left: 12 } : { right: 12 }), top: '50%', transform: 'translateY(-50%)', color: '#aaa' }} />
             </form>
@@ -880,15 +898,15 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div className="nav-desktop">
             {[{ h: '/', l: t.home }, { h: '/contact', l: t.contact }].map(i => (
               <Link key={i.h} href={i.h} style={{ fontSize: '0.875rem', fontWeight: 600, color: '#444', transition: 'color 0.15s' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#1D4ED8')}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--acc)')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#444')}>{i.l}</Link>
             ))}
             {store?.cart !== false && (
               <Link href="/cart" aria-label={t.cart} style={{ position: 'relative', background: '#111', color: '#fff', width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}
-                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#1D4ED8')}
+                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'var(--acc)')}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#111')}>
                 <ShoppingCart size={17} />
-                {count > 0 && <span style={{ position: 'absolute', top: -5, right: -5, background: '#1D4ED8', color: '#fff', fontSize: 10, fontWeight: 700, width: 17, height: 17, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #F8F8F6' }}>{count}</span>}
+                {count > 0 && <span style={{ position: 'absolute', top: -5, right: -5, background: 'var(--acc)', color: '#fff', fontSize: 10, fontWeight: 700, width: 17, height: 17, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #F8F8F6' }}>{count}</span>}
               </Link>
             )}
 
@@ -902,7 +920,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             {store?.cart !== false && (
               <Link href="/cart" aria-label={t.cart} style={{ position: 'relative', width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#333' }}>
                 <ShoppingCart size={16} />
-                {count > 0 && <span style={{ position: 'absolute', top: -4, right: -4, background: '#1D4ED8', color: '#fff', fontSize: 9, fontWeight: 800, width: 15, height: 15, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
+                {count > 0 && <span style={{ position: 'absolute', top: -4, right: -4, background: 'var(--acc)', color: '#fff', fontSize: 9, fontWeight: 800, width: 15, height: 15, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
               </Link>
             )}
 
@@ -917,8 +935,8 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div style={{ padding: '0.625rem 1.25rem', background: '#fff', borderTop: '1px solid #E8E8E8', position: 'relative' }} className="anim-slide-down">
             <form onSubmit={handleSearch} style={{ position: 'relative' }}>
               <input autoFocus type="text" placeholder={t.search} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                style={{ width: '100%', padding: isRTL ? '0.75rem 1rem 0.75rem 2.75rem' : '0.75rem 2.75rem 0.75rem 1rem', border: '1.5px solid #1D4ED8', borderRadius: 8, background: '#F8F8F6', fontSize: '0.9rem', outline: 'none' }} />
-              <Search size={15} style={{ position: 'absolute', ...(isRTL ? { left: 12 } : { right: 12 }), top: '50%', transform: 'translateY(-50%)', color: '#1D4ED8' }} />
+                style={{ width: '100%', padding: isRTL ? '0.75rem 1rem 0.75rem 2.75rem' : '0.75rem 2.75rem 0.75rem 1rem', border: '1.5px solid var(--acc)', borderRadius: 8, background: '#F8F8F6', fontSize: '0.9rem', outline: 'none' }} />
+              <Search size={15} style={{ position: 'absolute', ...(isRTL ? { left: 12 } : { right: 12 }), top: '50%', transform: 'translateY(-50%)', color: 'var(--acc)' }} />
             </form>
             {searchQuery.length >= 2 && <DropResults />}
           </div>
@@ -929,7 +947,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div style={{ padding: '0.375rem 1.25rem 0.875rem' }}>
             {[{ h: '/', l: t.home }, { h: '/contact', l: t.contact }].map(i => (
               <Link key={i.h} href={i.h} onClick={() => setOpen(false)} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid #F0F0F0', fontSize: '0.9rem', fontWeight: 600, color: '#111' }}>
-                {i.l} {isRTL ? <ArrowLeft size={14} style={{ color: '#1D4ED8' }} /> : <ChevronRight size={14} style={{ color: '#1D4ED8' }} />}
+                {i.l} {isRTL ? <ArrowLeft size={14} style={{ color: 'var(--acc)' }} /> : <ChevronRight size={14} style={{ color: 'var(--acc)' }} />}
               </Link>
             ))}
             
@@ -955,7 +973,7 @@ export function Footer({ store }: any) {
           {/* قسم 1 — العلامة */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '1rem' }}>
-              <div style={{ width: 32, height: 32, background: '#1D4ED8', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 32, height: 32, background: 'var(--acc)', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Zap size={18} color="#fff" fill="#fff" />
               </div>
               <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>{store?.name}</span>
@@ -973,7 +991,7 @@ export function Footer({ store }: any) {
             <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1.25rem' }}>{t.quickLinks}</h4>
             {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
               <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: '#999', marginBottom: '0.625rem', transition: 'color 0.15s' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#1D4ED8')}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--acc)')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#999')}>
                 {lnk.l}
               </Link>
@@ -985,7 +1003,7 @@ export function Footer({ store }: any) {
             <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1.25rem' }}>{t.legalNav}</h4>
             {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
               <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: '#999', marginBottom: '0.625rem', transition: 'color 0.15s' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#1D4ED8')}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--acc)')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#999')}>
                 {lnk.l}
               </Link>
@@ -1002,7 +1020,7 @@ export function Footer({ store }: any) {
               { icon: <MapPin size={14} />, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
             ].filter(r => r.val).map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem', color: '#999', fontSize: '0.875rem' }}>
-                <span style={{ color: '#1D4ED8' }}>{r.icon}</span>{r.val}
+                <span style={{ color: 'var(--acc)' }}>{r.icon}</span>{r.val}
               </div>
             ))}
             <div style={{ marginTop: '1.25rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#1A1A1A', padding: '0.5rem 0.875rem', borderRadius: 6 }}>
@@ -1028,7 +1046,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 
   return (
     <div className="card-wrap" style={{ background: '#fff', border: '1.5px solid #EBEBEB', borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', transition: 'all 0.28s ease' }}
-      onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.borderColor = '#1D4ED8'; el.style.boxShadow = '0 8px 32px rgba(29,78,216,0.1)'; el.style.transform = 'translateY(-4px)'; }}
+      onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.borderColor = 'var(--acc)'; el.style.boxShadow = '0 8px 32px rgba(var(--acc-rgb),0.1)'; el.style.transform = 'translateY(-4px)'; }}
       onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.borderColor = '#EBEBEB'; el.style.boxShadow = 'none'; el.style.transform = ''; }}>
 
       <div className="card-stripe" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2 }} />
@@ -1042,12 +1060,12 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
           : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ShoppingBag size={36} color="#ddd" /></div>
         }
         {discount > 0 && (
-          <div style={{ position: 'absolute', top: 10, right: 10, background: '#1D4ED8', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 9px', borderRadius: 4 }}>
+          <div style={{ position: 'absolute', top: 10, right: 10, background: 'var(--acc)', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 9px', borderRadius: 4 }}>
             -{discount}%
           </div>
         )}
         {product.isDigital ? (
-          <div style={{ position: 'absolute', top: 10, left: 10, background: '#1D4ED8', color: '#fff', fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 4, display: 'flex', alignItems: 'center' }}>
+          <div style={{ position: 'absolute', top: 10, left: 10, background: 'var(--acc)', color: '#fff', fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 4, display: 'flex', alignItems: 'center' }}>
             <Download size={12} />
           </div>
         ) : product.shippingFree && (
@@ -1082,23 +1100,23 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
               padding: '0.625rem',
               borderRadius: 8,
               background: 'transparent',
-              border: '1.5px solid #1D4ED8',
-              color: '#1D4ED8',
+              border: '1.5px solid var(--acc)',
+              color: 'var(--acc)',
               fontSize: '0.825rem',
               fontWeight: 700,
               transition: 'background 0.2s, border-color 0.2s, color 0.2s'
             }}
             onMouseEnter={e => {
               const el = e.currentTarget as HTMLAnchorElement;
-              el.style.background = '#1D4ED8';
-              el.style.borderColor = '#1D4ED8';
+              el.style.background = 'var(--acc)';
+              el.style.borderColor = 'var(--acc)';
               el.style.color = '#fff';
             }}
             onMouseLeave={e => {
               const el = e.currentTarget as HTMLAnchorElement;
               el.style.background = 'transparent';
-              el.style.borderColor = '#1D4ED8';
-              el.style.color = '#1D4ED8';
+              el.style.borderColor = 'var(--acc)';
+              el.style.color = 'var(--acc)';
             }}
           >
             {viewDetails} {cardRTL ? <ArrowLeft size={13} /> : <ArrowRight size={13} />}
@@ -1135,15 +1153,15 @@ export function Home({ store, page }: any) {
           </div>
         )}
         {/* Geometric accent */}
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '40%', height: '100%', background: 'linear-gradient(135deg, #1D4ED8 0%, transparent 60%)', opacity: 0.12, pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: -60, right: -60, width: 300, height: 300, border: '60px solid rgba(29,78,216,0.07)', borderRadius: '50%', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '40%', height: '100%', background: 'linear-gradient(135deg, var(--acc) 0%, transparent 60%)', opacity: 0.12, pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: -60, right: -60, width: 300, height: 300, border: '60px solid rgba(var(--acc-rgb),0.07)', borderRadius: '50%', pointerEvents: 'none' }} />
 
         <div className="hero-inner" style={{ maxWidth: 1280, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           {/* Text */}
           <div style={heroTextClear(store)}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(29,78,216,0.15)', border: '1px solid rgba(29,78,216,0.3)', borderRadius: 6, padding: '0.375rem 0.875rem', marginBottom: '1.5rem' }}>
-              <Zap size={13} color="#60A5FA" fill="#60A5FA" />
-              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#60A5FA', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{store.name}</span>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(var(--acc-rgb),0.15)', border: '1px solid rgba(var(--acc-rgb),0.3)', borderRadius: 6, padding: '0.375rem 0.875rem', marginBottom: '1.5rem' }}>
+              <Zap size={13} color={accentOf(store)} fill={accentOf(store)} />
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--acc-light)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{store.name}</span>
             </div>
             <h1 style={{ fontSize: 'clamp(2.25rem,6vw,4.5rem)', fontWeight: 800, color: '#fff', lineHeight: 1.1, letterSpacing: '-0.03em', marginBottom: '1.25rem' }}
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || t.heroTitle) }} />
@@ -1151,9 +1169,9 @@ export function Home({ store, page }: any) {
               {store.hero?.subtitle || t.heroSubtitle}
             </p>
             <div className="hero-actions">
-              <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#1D4ED8', color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, transition: 'all 0.2s', boxShadow: '0 4px 20px rgba(29,78,216,0.35)' }}
-                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#1E40AF')}
-                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = '#1D4ED8')}>
+              <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--acc)', color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.75rem', borderRadius: 10, transition: 'all 0.2s', boxShadow: '0 4px 20px rgba(var(--acc-rgb),0.35)' }}
+                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'var(--acc-dark)')}
+                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'var(--acc)')}>
                 {t.shopNow} {isRTL ? <ArrowLeft size={16} /> : <ChevronRight size={16} />}
               </a>
               {store?.cart !== false && (
@@ -1176,7 +1194,7 @@ export function Home({ store, page }: any) {
             const item = t.trust[i];
             return (
             <div key={i} style={{ padding: '1.125rem 1rem', textAlign: 'center', borderLeft: i < 3 ? '1px solid #EBEBEB' : 'none' }}>
-              <div style={{ color: '#1D4ED8', marginBottom: '0.375rem', display: 'flex', justifyContent: 'center' }}>{icon}</div>
+              <div style={{ color: 'var(--acc)', marginBottom: '0.375rem', display: 'flex', justifyContent: 'center' }}>{icon}</div>
               <p style={{ fontSize: '0.8rem', fontWeight: 700, color: '#111', marginBottom: '0.2rem' }}>{item.t}</p>
               <p style={{ fontSize: '0.72rem', color: '#6B6B6B' }}>{item.d}</p>
             </div>
@@ -1189,23 +1207,23 @@ export function Home({ store, page }: any) {
       {cats.length > 0 && (
         <section style={{ padding: '4rem 1.5rem', maxWidth: 1280, margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.75rem' }}>
-            <div style={{ width: 4, height: 28, background: '#1D4ED8', borderRadius: 2 }} />
+            <div style={{ width: 4, height: 28, background: 'var(--acc)', borderRadius: 2 }} />
             <h2 style={{ fontSize: 'clamp(1.375rem,3.5vw,2rem)', fontWeight: 800, color: '#111' }}>{t.categories}</h2>
           </div>
           <div className="cats-grid">
-            <Link href="?" style={{ display:'inline-flex', alignItems:'center', padding:'0.5rem 1.25rem', borderRadius:999, border:`1.5px solid ${!activeCategory ? '#1D4ED8' : '#ccc'}`, background: !activeCategory ? '#1D4ED8' : 'transparent', color: !activeCategory ? '#fff' : 'inherit', fontSize:'0.82rem', fontWeight:600, cursor:'pointer' }}>
+            <Link href="?" style={{ display:'inline-flex', alignItems:'center', padding:'0.5rem 1.25rem', borderRadius:999, border:`1.5px solid ${!activeCategory ? 'var(--acc)' : '#ccc'}`, background: !activeCategory ? 'var(--acc)' : 'transparent', color: !activeCategory ? '#fff' : 'inherit', fontSize:'0.82rem', fontWeight:600, cursor:'pointer' }}>
                 {t.all}
               </Link>
               {cats.map((cat: any) => {
               const isActive = activeCategory === String(cat.id);
               return (
               <Link key={cat.id} href={`?category=${cat.id}`} style={{
-                padding: '0.75rem 0.875rem', border: `1.5px solid ${isActive ? '#1D4ED8' : '#EBEBEB'}`, borderRadius: 8,
+                padding: '0.75rem 0.875rem', border: `1.5px solid ${isActive ? 'var(--acc)' : '#EBEBEB'}`, borderRadius: 8,
                 textAlign: 'center', fontSize: '0.875rem', fontWeight: 600, color: isActive ? '#fff' : '#333',
-                background: isActive ? '#1D4ED8' : '#fff', transition: 'all 0.18s'
+                background: isActive ? 'var(--acc)' : '#fff', transition: 'all 0.18s'
               }}
-                onMouseEnter={e => { const el = e.currentTarget; el.style.borderColor = '#1D4ED8'; el.style.color = '#1D4ED8'; el.style.background = 'rgba(29,78,216,0.04)'; }}
-                onMouseLeave={e => { const el = e.currentTarget; el.style.borderColor = isActive ? '#1D4ED8' : '#EBEBEB'; el.style.color = isActive ? '#fff' : '#333'; el.style.background = isActive ? '#1D4ED8' : '#fff'; }}>
+                onMouseEnter={e => { const el = e.currentTarget; el.style.borderColor = 'var(--acc)'; el.style.color = 'var(--acc)'; el.style.background = 'rgba(var(--acc-rgb),0.04)'; }}
+                onMouseLeave={e => { const el = e.currentTarget; el.style.borderColor = isActive ? 'var(--acc)' : '#EBEBEB'; el.style.color = isActive ? '#fff' : '#333'; el.style.background = isActive ? 'var(--acc)' : '#fff'; }}>
                 {cat.name}
               </Link>
               );
@@ -1217,7 +1235,7 @@ export function Home({ store, page }: any) {
       {/* ── PRODUCTS ── */}
       <section id="products" style={{ padding: '1rem 1.5rem 5rem', maxWidth: 1280, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-          <div style={{ width: 4, height: 28, background: '#1D4ED8', borderRadius: 2 }} />
+          <div style={{ width: 4, height: 28, background: 'var(--acc)', borderRadius: 2 }} />
           <h2 style={{ fontSize: 'clamp(1.375rem,3.5vw,2rem)', fontWeight: 800, color: '#111' }}>{t.products}</h2>
         </div>
 
@@ -1242,7 +1260,7 @@ export function Home({ store, page }: any) {
             {Array.from({ length: countPage }).map((_, i) => {
               const pn = i + 1; const isA = Number(page) === pn;
               return (
-                <Link key={pn} href={{ query: { page: pn } }} scroll={false} style={{ width: 36, height: 36, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.875rem', fontWeight: 700, border: `1.5px solid ${isA ? '#1D4ED8' : '#EBEBEB'}`, background: isA ? '#1D4ED8' : '#fff', color: isA ? '#fff' : '#111' }}>
+                <Link key={pn} href={{ query: { page: pn } }} scroll={false} style={{ width: 36, height: 36, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.875rem', fontWeight: 700, border: `1.5px solid ${isA ? 'var(--acc)' : '#EBEBEB'}`, background: isA ? 'var(--acc)' : '#fff', color: isA ? '#fff' : '#111' }}>
                   {pn}
                 </Link>
               );
@@ -1287,7 +1305,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ShoppingBag size={48} color="#ccc" /></div>}
 
             {discount > 0 && (
-              <div style={{ position: 'absolute', top: 12, right: 12, background: '#1D4ED8', color: '#fff', padding: '3px 12px', borderRadius: 5, fontSize: 12, fontWeight: 800 }}>
+              <div style={{ position: 'absolute', top: 12, right: 12, background: 'var(--acc)', color: '#fff', padding: '3px 12px', borderRadius: 5, fontSize: 12, fontWeight: 800 }}>
                 {discount}% {t.discountLabel}
               </div>
             )}
@@ -1304,7 +1322,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           {allImages.length > 1 && (
             <div className="thumb-row">
               {allImages.map((img: string, idx: number) => (
-                <button key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 8, overflow: 'hidden', border: `2px solid ${sel === idx ? '#1D4ED8' : '#E8E8E8'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.18s' }}>
+                <button key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 8, overflow: 'hidden', border: `2px solid ${sel === idx ? 'var(--acc)' : '#E8E8E8'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.18s' }}>
                   <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
               ))}
@@ -1325,16 +1343,16 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 
             {/* Price box - Power Red Version */}
             <div style={{
-              background: '#EFF6FF', // خلفية حمراء باهتة جداً لراحة العين
-              border: '1.5px solid #1D4ED8', // إطار أحمر صريح
+              background: 'var(--acc-soft)', // خلفية حمراء باهتة جداً لراحة العين
+              border: '1.5px solid var(--acc)', // إطار أحمر صريح
               borderRadius: 12,
               padding: '1rem 1.25rem',
               marginBottom: '1.5rem',
-              boxShadow: '0 4px 15px rgba(29, 78, 216, 0.1)'
+              boxShadow: '0 4px 15px rgba(var(--acc-rgb),0.1)'
             }}>
               <p style={{
                 fontSize: '0.75rem',
-                color: '#1D4ED8',
+                color: 'var(--acc)',
                 fontWeight: 700,
                 marginBottom: '0.25rem',
                 textTransform: 'uppercase',
@@ -1352,7 +1370,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                 <span style={{
                   fontSize: '1.1rem',
                   fontWeight: 700,
-                  color: '#1D4ED8' // العملة بالأحمر
+                  color: 'var(--acc)' // العملة بالأحمر
                 }}>
                   { 'DZD'}
                 </span>
@@ -1360,7 +1378,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             </div>
 
             {(product.shippingFree || ((store || product?.store)?.supportFreeShipping && (store || product?.store)?.freeShippingMinAmount != null)) && (
-              <p style={{ fontSize: '0.8rem', fontWeight: 700, color: '#1D4ED8', marginBottom: '1.25rem' }}>
+              <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--acc)', marginBottom: '1.25rem' }}>
                 {product.shippingFree ? t.freeShippingBadge : t.freeShippingThreshold.replace('{{amount}}', String((store || product?.store).freeShippingMinAmount))}
               </p>
             )}
@@ -1369,20 +1387,20 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             {false && product.offers?.length > 0 && (
               <div style={{ marginBottom: '1.25rem' }}>
                 {product.offers.map((o: any) => (
-                  <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1rem', border: `1.5px solid ${selectedOffer === o.id ? '#1D4ED8' : '#E8E8E8'}`, borderRadius: 10, cursor: 'pointer', marginBottom: '0.5rem', background: selectedOffer === o.id ? 'rgba(29, 78, 216, 0.04)' : 'transparent', transition: 'all 0.18s' }}>
+                  <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1rem', border: `1.5px solid ${selectedOffer === o.id ? 'var(--acc)' : '#E8E8E8'}`, borderRadius: 10, cursor: 'pointer', marginBottom: '0.5rem', background: selectedOffer === o.id ? 'rgba(var(--acc-rgb),0.04)' : 'transparent', transition: 'all 0.18s' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                      <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${selectedOffer === o.id ? '#1D4ED8' : '#ccc'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {selectedOffer === o.id && <div style={{ width: 9, height: 9, borderRadius: '50%', background: '#1D4ED8' }} />}
+                      <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${selectedOffer === o.id ? 'var(--acc)' : '#ccc'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {selectedOffer === o.id && <div style={{ width: 9, height: 9, borderRadius: '50%', background: 'var(--acc)' }} />}
                       </div>
                       <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
                       <div>
                         <p style={{ fontWeight: 600, color: '#111', fontSize: '0.875rem' }}>{o.name}</p>
                         {o.subTitle && <p style={{ fontSize: '0.75rem', color: '#999', marginTop: 2 }}>{o.subTitle}</p>}
                         <p style={{ fontSize: '0.72rem', color: '#999' }}>{t.qty}: {o.quantity}</p>
-                        {o.shippingFree && <p style={{ fontSize: '0.7rem', fontWeight: 700, color: '#1D4ED8', marginTop: 2 }}>{t.freeShippingBadge}</p>}
+                        {o.shippingFree && <p style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--acc)', marginTop: 2 }}>{t.freeShippingBadge}</p>}
                       </div>
                     </div>
-                    <span className="price-mono" style={{ fontWeight: 800, color: '#1D4ED8', fontSize: '1.1rem' }}>{o.price.toLocaleString()} { 'DZD'}</span>
+                    <span className="price-mono" style={{ fontWeight: 800, color: 'var(--acc)', fontSize: '1.1rem' }}>{o.price.toLocaleString()} { 'DZD'}</span>
                   </label>
                 ))}
               </div>
@@ -1396,7 +1414,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                   {(() => {
                     const chosen = attr.variants.find((v: any) => v.value === selectedVariants?.[attr.name]);
                     return (attr.displayMode === 'color' || attr.displayMode === 'image') && chosen?.name && chosen.name !== chosen.value
-                      ? <span style={{ fontWeight: 600, color: '#1D4ED8', textTransform: 'none' }}> : {chosen.name}</span> : null;
+                      ? <span style={{ fontWeight: 600, color: 'var(--acc)', textTransform: 'none' }}> : {chosen.name}</span> : null;
                   })()}
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -1418,15 +1436,15 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                         style={
                           attr.displayMode === 'color' ? {
                             width: 32, height: 32, borderRadius: '50%', background: isImgUrl ? `url(${v.value}) center/cover` : v.value, border: '1px solid #eee', cursor: available ? 'pointer' : 'not-allowed', overflow: 'hidden',
-                            outline: `2.5px solid ${isSelected ? '#1D4ED8' : 'transparent'}`, outlineOffset: 3, opacity: available ? 1 : 0.35
+                            outline: `2.5px solid ${isSelected ? 'var(--acc)' : 'transparent'}`, outlineOffset: 3, opacity: available ? 1 : 0.35
                           } : attr.displayMode === 'image' ? {
                             width: 64, height: 64, borderRadius: 10, backgroundImage: `url(${v.value})`, backgroundSize: 'cover',
-                            backgroundPosition: 'center', border: `3px solid ${isSelected ? '#1D4ED8' : '#E8E8E8'}`, boxShadow: isSelected ? `0 0 0 2px #fff, 0 0 0 4px ${'#1D4ED8'}` : 'none',
+                            backgroundPosition: 'center', border: `3px solid ${isSelected ? 'var(--acc)' : '#E8E8E8'}`, boxShadow: isSelected ? `0 0 0 2px #fff, 0 0 0 4px ${'var(--acc)'}` : 'none',
                             cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.18s', opacity: available ? 1 : 0.35
                           } : {
-                            padding: '0.45rem 1.1rem', border: `1.5px solid ${isSelected ? '#1D4ED8' : '#E8E8E8'}`, borderRadius: 8,
-                            fontSize: '0.85rem', fontWeight: 600, background: isSelected ? 'rgba(29, 78, 216, 0.05)' : '#fff',
-                            color: isSelected ? '#1D4ED8' : available ? '#555' : '#bbb', cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.18s',
+                            padding: '0.45rem 1.1rem', border: `1.5px solid ${isSelected ? 'var(--acc)' : '#E8E8E8'}`, borderRadius: 8,
+                            fontSize: '0.85rem', fontWeight: 600, background: isSelected ? 'rgba(var(--acc-rgb),0.05)' : '#fff',
+                            color: isSelected ? 'var(--acc)' : available ? '#555' : '#bbb', cursor: available ? 'pointer' : 'not-allowed', transition: 'all 0.18s',
                             textDecoration: available ? 'none' : 'line-through'
                           }
                         }
@@ -1463,7 +1481,7 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
   <div>
     {label && <p style={{ fontSize: '0.775rem', fontWeight: 700, color: '#555', marginBottom: '0.35rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</p>}
     {children}
-    {error && <p style={{ fontSize: '0.75rem', color: '#1D4ED8', marginTop: '0.3rem', display: 'flex', alignItems: 'center', gap: 4 }}><AlertCircle size={11} />{error}</p>}
+    {error && <p style={{ fontSize: '0.75rem', color: 'var(--acc)', marginTop: '0.3rem', display: 'flex', alignItems: 'center', gap: 4 }}><AlertCircle size={11} />{error}</p>}
   </div>
 );
 
@@ -1600,20 +1618,20 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           {product.offers?.map((o: any) => {
             const on = selectedOffer === o.id;
             return (
-              <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1rem', border: `1.5px solid ${on ? '#1D4ED8' : '#E8E8E8'}`, borderRadius: 10, cursor: 'pointer', marginBottom: '0.5rem', background: on ? 'rgba(29, 78, 216, 0.04)' : 'transparent', transition: 'all 0.18s' }}>
+              <label key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1rem', border: `1.5px solid ${on ? 'var(--acc)' : '#E8E8E8'}`, borderRadius: 10, cursor: 'pointer', marginBottom: '0.5rem', background: on ? 'rgba(var(--acc-rgb),0.04)' : 'transparent', transition: 'all 0.18s' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                  <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${on ? '#1D4ED8' : '#ccc'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {on && <div style={{ width: 9, height: 9, borderRadius: '50%', background: '#1D4ED8' }} />}
+                  <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${on ? 'var(--acc)' : '#ccc'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {on && <div style={{ width: 9, height: 9, borderRadius: '50%', background: 'var(--acc)' }} />}
                   </div>
                   <input type="radio" name="offer" checked={on} onChange={() => setSelectedOffer(o.id)} style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }} />
                   <div>
                     <p style={{ fontWeight: 600, color: '#111', fontSize: '0.875rem' }}>{o.name}</p>
                     {o.subTitle && <p style={{ fontSize: '0.75rem', color: '#999', marginTop: 2 }}>{o.subTitle}</p>}
                     <p style={{ fontSize: '0.72rem', color: '#999' }}>{t.qty}: {o.quantity}</p>
-                    {o.shippingFree && <p style={{ fontSize: '0.7rem', fontWeight: 700, color: '#1D4ED8', marginTop: 2 }}>{t.freeShippingBadge}</p>}
+                    {o.shippingFree && <p style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--acc)', marginTop: 2 }}>{t.freeShippingBadge}</p>}
                   </div>
                 </div>
-                <span className="price-mono" style={{ fontWeight: 800, color: '#1D4ED8', fontSize: '1.1rem' }}>{Number(o.price).toLocaleString()} DZD</span>
+                <span className="price-mono" style={{ fontWeight: 800, color: 'var(--acc)', fontSize: '1.1rem' }}>{Number(o.price).toLocaleString()} DZD</span>
               </label>
             );
           })}
@@ -1631,16 +1649,16 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         </div>
       )}
       {/* 3. بطاقة لكل عرض: قطعه وخيارات وإضافات كل قطعة */}
-      <OfferPieces product={product} store={store || product.store} accent="#1D4ED8" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
-      {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#1D4ED8" />}
+      <OfferPieces product={product} store={store || product.store} accent={accentOf(store)} offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
+      {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent={accentOf(store)} />}
         {product.store.cart && !product.isDigital && (
         <div className="cart-add-btns" style={{ marginBottom: '1.25rem' }}>
           <button data-add-to-cart onClick={addToCart} disabled={isAdded} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0.8rem 1rem', border: `1.5px solid ${isAdded ? '#22C55E' : '#E8E8E8'}`, borderRadius: 10, fontSize: '0.875rem', fontWeight: 700, cursor: 'pointer', background: isAdded ? 'rgba(34,197,94,0.07)' : '#fff', color: isAdded ? '#22C55E' : '#111', transition: 'all 0.2s', fontFamily: 'inherit' }}>
             {isAdded ? <><CheckCircle2 size={14} className="anim-check" />{t.addedMsg}</> : <><ShoppingCart size={14} />{t.addToCart}</>}
           </button>
           <button onClick={() => setIsOrderNow(true)} style={{ flex: 1, ...S.btnPrimary, width: 'auto', borderRadius: 10 }}
-            onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = '#1E40AF')}
-            onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#1D4ED8')}>
+            onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = 'var(--acc-dark)')}
+            onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = 'var(--acc)')}>
             {t.orderNow}
           </button>
         </div>
@@ -1699,8 +1717,8 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                   <p style={{ fontSize: '0.775rem', fontWeight: 700, color: '#555', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.delivery}</p>
                   <div className="delivery-grid">
                     {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt, communes, fd.customerCommune)).map(dt => (
-                      <button data-delivery-option key={dt} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: dt }))} style={{ padding: '0.875rem', border: `1.5px solid ${fd.typeLivraison === dt ? '#1D4ED8' : '#E8E8E8'}`, borderRadius: 10, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === dt ? 'rgba(29,78,216,0.05)' : '#fff', transition: 'all 0.18s', fontFamily: 'inherit' }}>
-                        <p style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: 4, color: fd.typeLivraison === dt ? '#1D4ED8' : '#555' }}>{dt === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
+                      <button data-delivery-option key={dt} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: dt }))} style={{ padding: '0.875rem', border: `1.5px solid ${fd.typeLivraison === dt ? 'var(--acc)' : '#E8E8E8'}`, borderRadius: 10, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === dt ? 'rgba(var(--acc-rgb),0.05)' : '#fff', transition: 'all 0.18s', fontFamily: 'inherit' }}>
+                        <p style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: 4, color: fd.typeLivraison === dt ? 'var(--acc)' : '#555' }}>{dt === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
                         {selW && <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 800, color: fd.typeLivraison === dt ? '#111' : '#ccc' }}>{orderFreeShipping ? t.freeShippingBadge : `${(dt === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} DZD`}</p>}
                       </button>
                     ))}
@@ -1724,14 +1742,14 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.375rem' }}>
                 <span style={{ fontWeight: 800, fontSize: '0.875rem', color: '#111' }}>{t.total}</span>
-                <span className="price-mono" style={{ fontSize: '1.625rem', fontWeight: 800, color: '#1D4ED8' }}>{total().toLocaleString()} <span style={{ fontSize: '0.8rem', fontFamily: 'inherit', fontWeight: 700, color: '#1D4ED8' }}>{ 'DZD'}</span></span>
+                <span className="price-mono" style={{ fontSize: '1.625rem', fontWeight: 800, color: 'var(--acc)' }}>{total().toLocaleString()} <span style={{ fontSize: '0.8rem', fontFamily: 'inherit', fontWeight: 700, color: 'var(--acc)' }}>{ 'DZD'}</span></span>
               </div>
             </div>
 
-            {submitError && <p style={{ color: '#1D4ED8', fontSize: '0.85rem', textAlign: 'center', marginTop: 8, fontWeight: 600 }}>{submitError}</p>}
+            {submitError && <p style={{ color: 'var(--acc)', fontSize: '0.85rem', textAlign: 'center', marginTop: 8, fontWeight: 600 }}>{submitError}</p>}
             <button type="submit" disabled={sub} style={{ ...S.btnPrimary, opacity: sub ? 0.7 : 1 }}
-              onMouseEnter={e => !sub && ((e.currentTarget as HTMLButtonElement).style.background = '#1E40AF')}
-              onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#1D4ED8')}>
+              onMouseEnter={e => !sub && ((e.currentTarget as HTMLButtonElement).style.background = 'var(--acc-dark)')}
+              onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = 'var(--acc)')}>
               {sub ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> {t.sending}</> : t.confirmOrder}
             </button>
           </form>
@@ -1841,7 +1859,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         </div>
         <h2 style={{ fontSize: '1.625rem', fontWeight: 800, color: '#111', marginBottom: '0.625rem' }}>{t.successTitle}</h2>
         <p style={{ color: '#888', lineHeight: 1.7, marginBottom: '2rem', fontSize: '0.9375rem' }}>{t.successDesc}</p>
-        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#1D4ED8', color: '#fff', padding: '0.8rem 2rem', borderRadius: 10, fontWeight: 700, fontSize: '0.9rem' }}>{t.backToShop}</Link>
+        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--acc)', color: '#fff', padding: '0.8rem 2rem', borderRadius: 10, fontWeight: 700, fontSize: '0.9rem' }}>{t.backToShop}</Link>
       </div>
     </div>
   );
@@ -1851,7 +1869,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{ textAlign: 'center', padding: '4rem 2rem', border: '2px dashed #E8E8E8', borderRadius: 16, maxWidth: 440, width: '100%', background: '#fff' }}>
         <ShoppingBag size={52} style={{ color: '#E0E0E0', display: 'block', margin: '0 auto 1.25rem' }} />
         <p style={{ color: '#bbb', fontSize: '1rem', marginBottom: '2rem' }}>{t.cartEmpty}</p>
-        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#1D4ED8', color: '#fff', padding: '0.8rem 2rem', borderRadius: 10, fontWeight: 700, fontSize: '0.875rem' }}>{t.shopNow}</Link>
+        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--acc)', color: '#fff', padding: '0.8rem 2rem', borderRadius: 10, fontWeight: 700, fontSize: '0.875rem' }}>{t.shopNow}</Link>
       </div>
     </div>
   );
@@ -1860,7 +1878,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     <div dir={isRTL ? 'rtl' : 'ltr'} style={{ padding: '2.5rem 1.5rem', maxWidth: 1280, margin: '0 auto', minHeight: '100vh' }}>
       <h1 style={{ fontSize: 'clamp(1.75rem,5vw,2.75rem)', fontWeight: 800, color: '#111', letterSpacing: '-0.03em', marginBottom: '2rem' }}>{t.myCart}</h1>
       {freeShippingMin != null && (
-        <div style={{ background: freeShippingReached ? 'rgba(29,78,216,0.06)' : '#F8F8F6', border: `1.5px solid ${freeShippingReached ? '#1D4ED8' : '#E8E8E8'}`, color: freeShippingReached ? '#1D4ED8' : '#555', borderRadius: 10, padding: '0.75rem 1.125rem', marginBottom: '1.5rem', fontWeight: 700, fontSize: '0.85rem', textAlign: 'center' }}>
+        <div style={{ background: freeShippingReached ? 'rgba(var(--acc-rgb),0.06)' : '#F8F8F6', border: `1.5px solid ${freeShippingReached ? 'var(--acc)' : '#E8E8E8'}`, color: freeShippingReached ? 'var(--acc)' : '#555', borderRadius: 10, padding: '0.75rem 1.125rem', marginBottom: '1.5rem', fontWeight: 700, fontSize: '0.85rem', textAlign: 'center' }}>
           {freeShippingReached ? t.freeShippingReached : t.freeShippingRemaining.replace('{{amount}}', String(freeShippingRemainingAmt))}
         </div>
       )}
@@ -1875,8 +1893,8 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   // بطاقة عرض: اسم العرض وسعره، المنتج، وخيارات كل قطعة
                   const offer = item.product?.offers?.find((o: any) => o.id === item.selectedOffer);
                   return (
-                    <div style={{ border: '1.5px solid #1D4ED8', borderRadius: 10, overflow: 'hidden' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0.6rem 0.75rem', background: 'rgba(29,78,216,0.05)' }}>
+                    <div style={{ border: '1.5px solid var(--acc)', borderRadius: 10, overflow: 'hidden' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0.6rem 0.75rem', background: 'rgba(var(--acc-rgb),0.05)' }}>
                         <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: 52, height: 52, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} alt="" />
                         <div style={{ flex: 1, minWidth: 0 }}>
                           {/* العرض: شارة تغيّر عرض هذه البطاقة (one ↔ tow) */}
@@ -1893,7 +1911,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 ) : <p style={{ fontWeight: 800, color: '#111', fontSize: '0.85rem' }}>{offer?.name || item.product?.name}</p>}
                           <p style={{ fontSize: '0.72rem', color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.product?.name}</p>
                         </div>
-                        <span className="price-mono" style={{ fontWeight: 800, color: '#1D4ED8', whiteSpace: 'nowrap' }}>{Number(item.finalPrice).toLocaleString()} {store.currency || 'DZD'}</span>
+                        <span className="price-mono" style={{ fontWeight: 800, color: 'var(--acc)', whiteSpace: 'nowrap' }}>{Number(item.finalPrice).toLocaleString()} {store.currency || 'DZD'}</span>
                         <button aria-label={lang === 'fr' ? 'Dupliquer' : lang === 'en' ? 'Duplicate' : 'نسخ'} title={lang === 'fr' ? 'Dupliquer' : lang === 'en' ? 'Duplicate' : 'نسخ'}
                           onClick={() => update([...items.slice(0, i + 1), JSON.parse(JSON.stringify({ ...item, addedAt: Date.now() })), ...items.slice(i + 1)])}
                           style={{ width: 36, height: 36, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', borderRadius: 8, background: 'none', border: 'none', cursor: 'pointer' }}>
@@ -1906,7 +1924,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                       </div>
                       {/* خيارات كل قطعة قابلة للتعديل من السلة */}
                       <div style={{ padding: '0 0.75rem' }}>
-                        <OfferPieces headless product={item.product} store={store} accent="#1D4ED8" offerId={item.selectedOffer}
+                        <OfferPieces headless product={item.product} store={store} accent={accentOf(store)} offerId={item.selectedOffer}
                           boxes={[cartPieces(item)]} style={{ marginBottom: 0 }}
                           onChange={(b) => update(items.map((x, idx) => (idx === i ? applyCartPieces(x, x.product, b[0], (ids) => addonsTotal(x.product, ids)) : x)))} />
                       </div>
@@ -1926,10 +1944,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     <span aria-hidden="true" style={{ position: 'absolute', insetInlineEnd: 8, fontSize: 9, color: '#b45309', pointerEvents: 'none' }}>▾</span>
                   </span>
                 )}</div>}
-                    <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 800, color: '#1D4ED8' }}>{item.finalPrice?.toLocaleString()} {store.currency || 'DZD'}</p>
+                    <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--acc)' }}>{item.finalPrice?.toLocaleString()} {store.currency || 'DZD'}</p>
                     <p style={{ fontSize: '0.72rem', color: '#aaa', marginTop: '0.25rem' }}>{t.qty}: {item.quantity}</p>
                     {needsPieces(item.product) && (
-                      <OfferPieces headless product={item.product} store={store} accent="#1D4ED8" offerId={null}
+                      <OfferPieces headless product={item.product} store={store} accent={accentOf(store)} offerId={null}
                         boxes={[cartPieces(item)]} style={{ marginBottom: 0, marginTop: '0.5rem' }}
                         onChange={(b) => update(items.map((x, idx) => (idx === i ? applyCartPieces(x, x.product, b[0], (ids) => addonsTotal(x.product, ids)) : x)))} />
                     )}
@@ -1942,7 +1960,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                           <Copy size={16} />
                         </button>}
               {!item.offerBox?.lines?.length && <button aria-label={lang === 'fr' ? 'Supprimer' : lang === 'en' ? 'Remove' : 'حذف'} onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: '#ccc', padding: '0.375rem', borderRadius: 6, background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'center', transition: 'color 0.18s' }}
-                onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = '#1D4ED8')}
+                onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = 'var(--acc)')}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = '#ccc')}>
                 <Trash2 size={17} />
               </button>}
@@ -1992,17 +2010,17 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     onClick={() => setFd(p => ({ ...p, typeLivraison: dt }))}
                     style={{
                       padding: '0.75rem',
-                      border: `2px solid ${fd.typeLivraison === dt ? '#1D4ED8' : '#E8E8E8'}`,
+                      border: `2px solid ${fd.typeLivraison === dt ? 'var(--acc)' : '#E8E8E8'}`,
                       borderRadius: 10,
                       textAlign: 'center',
                       cursor: 'pointer',
-                      background: fd.typeLivraison === dt ? 'rgba(29,78,216,0.04)' : '#fff',
+                      background: fd.typeLivraison === dt ? 'rgba(var(--acc-rgb),0.04)' : '#fff',
                       fontFamily: 'inherit',
                       transition: 'all 0.2s'
                     }}
                   >
                     <span style={{ display: 'block', fontSize: '1.25rem', marginBottom: 3 }}>{dt === 'home' ? '🏠' : '🏢'}</span>
-                    <p style={{ fontWeight: 700, fontSize: '0.78rem', color: fd.typeLivraison === dt ? '#1D4ED8' : '#888' }}>{dt === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
+                    <p style={{ fontWeight: 700, fontSize: '0.78rem', color: fd.typeLivraison === dt ? 'var(--acc)' : '#888' }}>{dt === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
                     {selW && <p style={{ fontWeight: 800, fontSize: '0.875rem', color: '#111', marginTop: 2 }}>{freeShippingReached ? t.freeShippingBadge : `${(dt === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} ${store.currency || 'DZD'}`}</p>}
                   </button>
                 ))}
@@ -2020,13 +2038,13 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <span style={{ fontWeight: 800, color: '#111' }}>{t.total}</span>
-                <span className="price-mono" style={{ fontSize: '1.75rem', fontWeight: 800, color: '#1D4ED8' }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#1D4ED8' }}>{store.currency || 'DZD'}</span></span>
+                <span className="price-mono" style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--acc)' }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--acc)' }}>{store.currency || 'DZD'}</span></span>
               </div>
             </div>
 
             <button type="submit" disabled={submitting} style={{ ...S.btnPrimary, opacity: submitting ? 0.7 : 1 }}
-              onMouseEnter={e => !submitting && ((e.currentTarget as HTMLButtonElement).style.background = '#1E40AF')}
-              onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#1D4ED8')}>
+              onMouseEnter={e => !submitting && ((e.currentTarget as HTMLButtonElement).style.background = 'var(--acc-dark)')}
+              onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = 'var(--acc)')}>
               {submitting ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> {t.sending}</> : t.confirmOrder}
             </button>
           </form>
@@ -2039,7 +2057,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
 export function Success({ store, order }: { store: any; domain: string; order: any }) {
   const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   const currency = store?.currency || 'DZD';
-  const ACCENT = '#1D4ED8';
+  const ACCENT = 'var(--acc)';
   const stepIcons = [CheckCircle2, Phone, Package, Truck];
 
   return (
@@ -2105,8 +2123,8 @@ export function Success({ store, order }: { store: any; domain: string; order: a
 const Shell = ({ children, title, dir }: { children: React.ReactNode; title: string; dir?: string }) => (
   <div dir={dir} style={{ minHeight: '100vh', background: '#F8F8F6' }}>
     <div style={{ background: '#111', paddingTop: 96, paddingBottom: 48, paddingLeft: 24, paddingRight: 24, textAlign: 'center' }}>
-      <div style={{ display: 'inline-block', background: 'rgba(29,78,216,0.15)', border: '1px solid rgba(29,78,216,0.3)', padding: '0.375rem 1rem', borderRadius: 6, marginBottom: '1.25rem' }}>
-        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1D4ED8', letterSpacing: '0.1em', textTransform: 'uppercase' }}>MdStore</span>
+      <div style={{ display: 'inline-block', background: 'rgba(var(--acc-rgb),0.15)', border: '1px solid rgba(var(--acc-rgb),0.3)', padding: '0.375rem 1rem', borderRadius: 6, marginBottom: '1.25rem' }}>
+        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--acc)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>MdStore</span>
       </div>
       <h1 style={{ fontSize: 'clamp(1.75rem,5vw,3rem)', fontWeight: 800, color: '#fff', letterSpacing: '-0.03em' }}>{title}</h1>
     </div>
@@ -2116,7 +2134,7 @@ const Shell = ({ children, title, dir }: { children: React.ReactNode; title: str
 
 const InfoBlock = ({ title, body }: { title: string; body: string }) => (
   <div style={{ padding: '1.375rem 0', borderBottom: '1px solid #EBEBEB', display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-    <div style={{ width: 4, height: 20, background: '#1D4ED8', borderRadius: 2, flexShrink: 0, marginTop: 4 }} />
+    <div style={{ width: 4, height: 20, background: 'var(--acc)', borderRadius: 2, flexShrink: 0, marginTop: 4 }} />
     <div>
       <h3 style={{ fontWeight: 800, fontSize: '1rem', color: '#111', marginBottom: '0.5rem' }}>{title}</h3>
       <p style={{ fontSize: '0.9375rem', lineHeight: 1.75, color: '#666' }}>{body}</p>
@@ -2185,7 +2203,7 @@ export function Categories({ store }: { store?: any }) {
               key={cat.id}
               href={`/?category=${cat.id}`}
               style={{ display: 'block', borderRadius: 14, overflow: 'hidden', border: '1.5px solid #E8E8E8', textDecoration: 'none', background: '#fff', transition: 'border-color 0.2s, transform 0.2s' }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = '#1D4ED8'; el.style.transform = 'translateY(-2px)'; }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = 'var(--acc)'; el.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.borderColor = '#E8E8E8'; el.style.transform = 'none'; }}
             >
               <div style={{ aspectRatio: '1/1', background: '#F5F5F5', overflow: 'hidden' }}>
@@ -2233,13 +2251,13 @@ export function Contact({ store }: { store: any }) {
         {/* Info */}
         <div>
           <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #E8E8E8', padding: '1.75rem', marginBottom: '1rem' }}>
-            <p style={{ fontSize: '0.7rem', fontWeight: 800, color: '#1D4ED8', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1.25rem' }}>{t.contactInfoTitle}</p>
+            <p style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--acc)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '1.25rem' }}>{t.contactInfoTitle}</p>
             {[
               { icon: <Phone size={16} />, label: t.contactPhone, val: store?.contact?.phone || t.contactNA },
               { icon: <MapPin size={16} />, label: t.contactLocation, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') || t.contactDefaultLocation },
             ].map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginBottom: '1.125rem' }}>
-                <div style={{ width: 44, height: 44, borderRadius: 10, background: 'rgba(29,78,216,0.08)', border: '1px solid rgba(29,78,216,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1D4ED8', flexShrink: 0 }}>{r.icon}</div>
+                <div style={{ width: 44, height: 44, borderRadius: 10, background: 'rgba(var(--acc-rgb),0.08)', border: '1px solid rgba(var(--acc-rgb),0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--acc)', flexShrink: 0 }}>{r.icon}</div>
                 <div>
                   <p style={{ fontSize: '0.72rem', color: '#aaa', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.2rem' }}>{r.label}</p>
                   <p style={{ fontWeight: 700, color: '#111', fontSize: '0.875rem' }}>{r.val}</p>
@@ -2262,7 +2280,7 @@ export function Contact({ store }: { store: any }) {
               </div>
               <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#111', marginBottom: '0.5rem' }}>{t.successTitle}</h2>
               <p style={{ color: '#888', lineHeight: 1.7, marginBottom: '2rem', fontSize: '0.9375rem' }}>{t.successDesc}</p>
-              <button onClick={() => setSent(false)} style={{ padding: '0.75rem 1.75rem', borderRadius: 10, border: '1.5px solid #1D4ED8', background: 'transparent', color: '#1D4ED8', fontWeight: 700, cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'inherit' }}>{t.sendAnother}</button>
+              <button onClick={() => setSent(false)} style={{ padding: '0.75rem 1.75rem', borderRadius: 10, border: '1.5px solid var(--acc)', background: 'transparent', color: 'var(--acc)', fontWeight: 700, cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'inherit' }}>{t.sendAnother}</button>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
@@ -2284,10 +2302,10 @@ export function Contact({ store }: { store: any }) {
                 <label style={{ display: 'block', fontSize: '0.775rem', fontWeight: 700, color: '#555', marginBottom: '0.35rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.message}</label>
                 <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={5} placeholder={t.messagePh} style={{ ...S.input, resize: 'none' }} />
               </div>
-              {submitError && <p style={{ color: '#1D4ED8', fontSize: '0.85rem', textAlign: 'center', marginTop: 8, fontWeight: 600 }}>{submitError}</p>}
+              {submitError && <p style={{ color: 'var(--acc)', fontSize: '0.85rem', textAlign: 'center', marginTop: 8, fontWeight: 600 }}>{submitError}</p>}
               <button type="submit" disabled={loading} style={{ ...S.btnPrimary, opacity: loading ? 0.7 : 1 }}
-                onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.background = '#1E40AF')}
-                onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#1D4ED8')}>
+                onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.background = 'var(--acc-dark)')}
+                onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = 'var(--acc)')}>
                 {loading ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> {t.sending}</> : <>{t.sendMsg} {isRTL ? <ArrowLeft size={16} /> : <ChevronRight size={16} />}</>}
               </button>
             </form>
