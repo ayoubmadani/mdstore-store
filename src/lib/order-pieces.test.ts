@@ -87,3 +87,29 @@ test('options as text use the value names the merchant gave', () => {
   assert.equal(variantText(p, { 'اللون': '#f00', 'المقاس': 'M' }), 'أحمر · M');
   assert.equal(variantText(p, {}), '');
 });
+
+// السلة: تغيير خيارات القطع من صفحة السلة
+import { cartPieces, applyCartPieces } from '../components/theme/orderPieces.ts';
+
+test('cart: an offer card turns into its pieces, and back into lines with the offer price split', () => {
+  const entry = { selectedOffer: 'o2', finalPrice: 3500, offerBox: { lines: [{ variantDetailId: 'vM-r', selectedVariants: M.variants, addonIds: [], finalPrice: 1750, quantity: 2 }] } };
+  const pieces = cartPieces(entry);
+  assert.equal(pieces.length, 2);
+  pieces[1] = { ...L };
+  const next = applyCartPieces(entry, product, pieces, addons);
+  assert.deepEqual(next.offerBox.lines.map((l) => [l.variantDetailId, l.quantity, l.finalPrice]), [['vM-r', 1, 1750], ['vL-b', 1, 1750]]);
+  assert.equal(next.finalPrice, 3500);
+  assert.equal(next.totalPrice, 3500);
+});
+
+test('cart: a plain item has one piece for all its quantity; its variant, price and add-ons follow the choice', () => {
+  const entry = { selectedOffer: null, quantity: 3, finalPrice: 1500, selectedVariants: M.variants, variantDetailId: 'vM-r', addonIds: [] };
+  const pieces = cartPieces(entry);
+  assert.equal(pieces.length, 1);
+  const next = applyCartPieces(entry, product, [{ variants: L.variants, addonIds: ['c'] }], addons);
+  assert.equal(next.variantDetailId, 'vL-b');
+  assert.equal(next.finalPrice, 1700 + 100);
+  assert.deepEqual(next.addonIds, ['c']);
+  assert.equal(next.quantity, 3);
+  assert.equal(next.totalPrice, (1700 + 100) * 3);
+});

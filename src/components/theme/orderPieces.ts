@@ -119,3 +119,32 @@ export function variantText(product: { attributes?: AttrWithValues[] | null }, v
     .filter(Boolean)
     .join(' · ');
 }
+
+// ── السلة: تغيير خيارات القطع من صفحة السلة ──
+type CartLine = { variantDetailId?: string; selectedVariants?: Record<string, string>; addonIds?: string[]; finalPrice: number; quantity: number };
+type CartEntry = {
+  selectedOffer?: string | null; quantity?: number; finalPrice?: number; totalPrice?: number;
+  selectedVariants?: Record<string, string>; variantDetailId?: string; addonIds?: string[];
+  offerBox?: { lines: CartLine[] };
+};
+
+/** قطع مدخل السلة: بطاقة عرض = قطعة لكل وحدة من سطورها؛ منتج عادي = قطعة واحدة لكل كميته */
+export function cartPieces(entry: CartEntry): Piece[] {
+  if (entry.offerBox?.lines?.length) {
+    return entry.offerBox.lines.flatMap((l) =>
+      Array.from({ length: Math.max(1, l.quantity || 1) }, () => ({ variants: { ...(l.selectedVariants || {}) }, addonIds: [...(l.addonIds || [])] })));
+  }
+  return [{ variants: { ...(entry.selectedVariants || {}) }, addonIds: [...(entry.addonIds || [])] }];
+}
+
+/** مدخل السلة بعد تغيير القطع: سطور العرض وسعره، أو نسخة المنتج وسعرها وإضافاتها (الكمية كما هي) */
+export function applyCartPieces<T extends CartEntry>(entry: T, product: ProductLike, pieces: Piece[], addonsPrice: (ids: string[]) => number): T {
+  if (entry.offerBox?.lines?.length) {
+    const lines = boxLines(product, entry.selectedOffer, [pieces], addonsPrice);
+    const total = linesTotal(lines);
+    return { ...entry, offerBox: { lines }, finalPrice: total, totalPrice: total };
+  }
+  const [line] = boxLines(product, null, [pieces.slice(0, 1)], addonsPrice);
+  const qty = Math.max(1, entry.quantity || 1);
+  return { ...entry, variantDetailId: line.variantDetailId, selectedVariants: line.selectedVariants, addonIds: line.addonIds, finalPrice: line.finalPrice, totalPrice: line.finalPrice * qty };
+}

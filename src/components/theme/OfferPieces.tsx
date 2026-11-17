@@ -20,7 +20,7 @@ const isUrl = (v: string) => /^https?:\/\/|^\//.test(v);
 /** هل تحتاج الصفحة بطاقات القطع (خيارات أو إضافات)؟ وإلا يكفي العرض والكمية */
 export const needsPieces = (product: any) => !!(product?.attributes?.length || activeAddons(product).length);
 
-export function OfferPieces({ product, store, accent = '#1D4ED8', offerId, boxes, onChange, onVariant, style }: {
+export function OfferPieces({ product, store, accent = '#1D4ED8', offerId, boxes, onChange, onVariant, style, headless = false }: {
   product: any;
   store?: StoreLike;
   accent?: string;
@@ -30,6 +30,8 @@ export function OfferPieces({ product, store, accent = '#1D4ED8', offerId, boxes
   /** آخر خيار تغيّر (لعرض صورة اللون في المعرض) */
   onVariant?: (attrName: string, value: string) => void;
   style?: CSSProperties;
+  /** السلة: سطور القطع فقط، بلا رأس البطاقة ولا إطارها */
+  headless?: boolean;
 }) {
   // البطاقة مطوية: ملخص خيارات كل قطعة + زر «تعديل ▾» يفتح الخيارات تحتها
   // المفتوح: «بطاقة-قطعة» — كل قطعة لها زر تعديل يفتح خياراتها هي فقط
@@ -65,8 +67,9 @@ export function OfferPieces({ product, store, accent = '#1D4ED8', offerId, boxes
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: '1rem', ...style }}>
       {boxes.map((box, b) => (
-        <div key={b} data-offer-box style={{ border: `1.5px solid ${accent}`, borderRadius: 12, background: '#fff', overflow: 'hidden' }}>
-          {/* رأس البطاقة: صورة المنتج، اسم العرض (ورقم البطاقة)، السعر */}
+        <div key={b} data-offer-box style={headless ? {} : { border: `1.5px solid ${accent}`, borderRadius: 12, background: '#fff', overflow: 'hidden' }}>
+          {/* رأس البطاقة: صورة المنتج، اسم العرض (ورقم البطاقة)، السعر — لا يظهر في السلة */}
+          {!headless && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0.7rem 0.9rem', background: `${accent}0D`, borderBottom: `1px solid ${accent}33` }}>
             {thumb && <img src={thumb} alt="" loading="lazy" style={{ width: 44, height: 44, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />}
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -81,6 +84,7 @@ export function OfferPieces({ product, store, accent = '#1D4ED8', offerId, boxes
               </span>
             )}
           </div>
+          )}
 
           {/* كل قطعة: ملخص خياراتها + زر «تعديل ▾» يفتح خياراتها هي تحتها */}
           {box.map((piece, i) => {

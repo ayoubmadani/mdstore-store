@@ -7,7 +7,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 import { OfferPieces, needsPieces } from '@/components/theme/OfferPieces';
-import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, variantText, type Box } from '@/components/theme/orderPieces';
+import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, cartPieces, applyCartPieces, type Box } from '@/components/theme/orderPieces';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
@@ -1884,15 +1884,12 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                         </div>
                         <span className="price-mono" style={{ fontWeight: 800, color: '#1D4ED8', whiteSpace: 'nowrap' }}>{Number(item.finalPrice).toLocaleString()} {store.currency || 'DZD'}</span>
                       </div>
-                      {item.offerBox.lines.map((l: any, k: number) => (
-                        <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 8, padding: '0.45rem 0.75rem', borderTop: '1px dashed #E5E7EB', fontSize: '0.8rem' }}>
-                          <span style={{ color: '#333', fontWeight: 600 }}>
-                            {variantText(item.product, l.selectedVariants) || '—'}
-                            {l.addonIds?.length > 0 && <span style={{ color: '#1D4ED8' }}> + {addonsLabel(item.product, l.addonIds)}</span>}
-                          </span>
-                          {l.quantity > 1 && <span style={{ color: '#888' }}>× {l.quantity}</span>}
-                        </div>
-                      ))}
+                      {/* خيارات كل قطعة قابلة للتعديل من السلة */}
+                      <div style={{ padding: '0 0.75rem' }}>
+                        <OfferPieces headless product={item.product} store={store} accent="#1D4ED8" offerId={item.selectedOffer}
+                          boxes={[cartPieces(item)]} style={{ marginBottom: 0 }}
+                          onChange={(b) => update(items.map((x, idx) => (idx === i ? applyCartPieces(x, x.product, b[0], (ids) => addonsTotal(x.product, ids)) : x)))} />
+                      </div>
                     </div>
                   );
                 })() : (
@@ -1900,6 +1897,11 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                     <h4 style={{ fontWeight: 600, color: '#111', marginBottom: '0.25rem', fontSize: '0.875rem', lineHeight: 1.4 }}>{item.product?.name}</h4>
                     <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 800, color: '#1D4ED8' }}>{item.finalPrice?.toLocaleString()} {store.currency || 'DZD'}</p>
                     <p style={{ fontSize: '0.72rem', color: '#aaa', marginTop: '0.25rem' }}>{t.qty}: {item.quantity}</p>
+                    {needsPieces(item.product) && (
+                      <OfferPieces headless product={item.product} store={store} accent="#1D4ED8" offerId={null}
+                        boxes={[cartPieces(item)]} style={{ marginBottom: 0, marginTop: '0.5rem' }}
+                        onChange={(b) => update(items.map((x, idx) => (idx === i ? applyCartPieces(x, x.product, b[0], (ids) => addonsTotal(x.product, ids)) : x)))} />
+                    )}
                   </>
                 )}
               </div>
