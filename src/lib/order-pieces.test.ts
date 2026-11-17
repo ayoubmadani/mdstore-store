@@ -113,3 +113,26 @@ test('cart: a plain item has one piece for all its quantity; its variant, price 
   assert.equal(next.quantity, 3);
   assert.equal(next.totalPrice, (1700 + 100) * 3);
 });
+
+import { changeCartOffer } from '../components/theme/orderPieces.ts';
+
+test('cart: switching a card\'s offer keeps the first pieces, copies the last for more, and reprices', () => {
+  const two = { selectedOffer: 'o2', quantity: 1, finalPrice: 3500, offerBox: { lines: [
+    { variantDetailId: 'vM-r', selectedVariants: M.variants, addonIds: [], finalPrice: 1750, quantity: 1 },
+    { variantDetailId: 'vL-b', selectedVariants: L.variants, addonIds: [], finalPrice: 1750, quantity: 1 }] } };
+  const three = changeCartOffer(two, product, 'o3', addons);
+  assert.equal(three.selectedOffer, 'o3');
+  assert.deepEqual(three.offerBox.lines.map((l) => [l.variantDetailId, l.quantity]), [['vM-r', 1], ['vL-b', 2]]);
+  assert.equal(three.finalPrice, 1000);
+  // بدون عرض: منتج عادي بكمية = عدد القطع، بخيارات القطعة الأولى
+  const plain = changeCartOffer(two, product, null, addons);
+  assert.equal(plain.selectedOffer, null);
+  assert.equal(plain.offerBox, undefined);
+  assert.equal(plain.quantity, 2);
+  assert.equal(plain.variantDetailId, 'vM-r');
+  assert.equal(plain.finalPrice, 1500);
+  // منتج عادي ← عرض قطعتين
+  const back = changeCartOffer(plain, product, 'o2', addons);
+  assert.equal(back.offerBox.lines.reduce((s, l) => s + l.quantity, 0), 2);
+  assert.equal(back.finalPrice, 3500);
+});

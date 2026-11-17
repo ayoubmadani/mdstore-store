@@ -148,3 +148,22 @@ export function applyCartPieces<T extends CartEntry>(entry: T, product: ProductL
   const qty = Math.max(1, entry.quantity || 1);
   return { ...entry, variantDetailId: line.variantDetailId, selectedVariants: line.selectedVariants, addonIds: line.addonIds, finalPrice: line.finalPrice, totalPrice: line.finalPrice * qty };
 }
+
+/** السلة: تغيير عرض البطاقة (one ↔ tow، أو بدون عرض). القطع الأولى تبقى، والناقص ينسخ آخر قطعة، والسعر يُعاد حسابه */
+export function changeCartOffer<T extends CartEntry>(entry: T, product: ProductLike, offerId: string | null, addonsPrice: (ids: string[]) => number): T {
+  const pieces = entry.offerBox?.lines?.length
+    ? cartPieces(entry)
+    : Array.from({ length: Math.max(1, entry.quantity || 1) }, () => cartPieces(entry)[0]);
+  const offer = offerId ? product.offers?.find((o) => o.id === offerId) : undefined;
+  if (!offer) {
+    const qty = pieces.length;
+    const { offerBox, ...rest } = entry as CartEntry;
+    void offerBox;
+    return applyCartPieces({ ...rest, selectedOffer: null, quantity: qty } as T, product, pieces.slice(0, 1), addonsPrice);
+  }
+  const per = piecesPerBox(product, offer.id);
+  const box = fitBoxes([pieces.slice(0, per)], 1, per, pieces[pieces.length - 1])[0];
+  const lines = boxLines(product, offer.id, [box], addonsPrice);
+  const total = linesTotal(lines);
+  return { ...entry, selectedOffer: offer.id, quantity: 1, offerBox: { lines }, finalPrice: total, totalPrice: total };
+}

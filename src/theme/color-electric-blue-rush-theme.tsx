@@ -7,7 +7,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 import { OfferPieces, needsPieces } from '@/components/theme/OfferPieces';
-import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, cartPieces, applyCartPieces, type Box } from '@/components/theme/orderPieces';
+import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, cartPieces, applyCartPieces, changeCartOffer, type Box } from '@/components/theme/orderPieces';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
@@ -16,7 +16,7 @@ import {
   CheckCircle2, ArrowLeft, ArrowRight, Zap,
   Menu, Search, ShoppingCart, ShoppingBag, Minus, Plus,
   Trash2, Loader2, MapPin, Shield, Truck, Package,
-  Mail, MessageCircle, Download,
+  Mail, MessageCircle, Download, Copy,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, HeroShade, heroTextClear, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
@@ -1879,10 +1879,30 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0.6rem 0.75rem', background: 'rgba(29,78,216,0.05)' }}>
                         <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: 52, height: 52, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} alt="" />
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontWeight: 800, color: '#111', fontSize: '0.85rem' }}>{offer?.name || item.product?.name}</p>
+                          {/* العرض: شارة تغيّر عرض هذه البطاقة (one ↔ tow) */}
+                          {item.product?.offers?.length > 0 ? (
+                  <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+                    <select aria-label={t.offersTitle} value={item.selectedOffer || ''}
+                      onChange={(e) => update(items.map((x, idx) => (idx === i ? changeCartOffer(x, x.product, e.target.value || null, (ids) => addonsTotal(x.product, ids)) : x)))}
+                      style={{ appearance: 'none', WebkitAppearance: 'none', borderRadius: 999, border: '1px solid #f59e0b', background: '#fffbeb', color: '#b45309', padding: '2px 22px 2px 10px', fontSize: '0.75rem', fontWeight: 800, fontFamily: 'inherit', cursor: 'pointer' }}>
+                      <option value="">{lang === 'fr' ? 'Sans offre' : lang === 'en' ? 'No offer' : 'بدون عرض'}</option>
+                      {item.product.offers.map((o: any) => <option key={o.id} value={o.id}>{o.name}</option>)}
+                    </select>
+                    <span aria-hidden="true" style={{ position: 'absolute', insetInlineEnd: 8, fontSize: 9, color: '#b45309', pointerEvents: 'none' }}>▾</span>
+                  </span>
+                ) : <p style={{ fontWeight: 800, color: '#111', fontSize: '0.85rem' }}>{offer?.name || item.product?.name}</p>}
                           <p style={{ fontSize: '0.72rem', color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.product?.name}</p>
                         </div>
                         <span className="price-mono" style={{ fontWeight: 800, color: '#1D4ED8', whiteSpace: 'nowrap' }}>{Number(item.finalPrice).toLocaleString()} {store.currency || 'DZD'}</span>
+                        <button aria-label={lang === 'fr' ? 'Dupliquer' : lang === 'en' ? 'Duplicate' : 'نسخ'} title={lang === 'fr' ? 'Dupliquer' : lang === 'en' ? 'Duplicate' : 'نسخ'}
+                          onClick={() => update([...items.slice(0, i + 1), JSON.parse(JSON.stringify({ ...item, addedAt: Date.now() })), ...items.slice(i + 1)])}
+                          style={{ width: 36, height: 36, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', borderRadius: 8, background: 'none', border: 'none', cursor: 'pointer' }}>
+                          <Copy size={16} />
+                        </button>
+                                                <button aria-label={lang === 'fr' ? 'Supprimer' : lang === 'en' ? 'Remove' : 'حذف'} onClick={() => update(items.filter((_, idx) => idx !== i))}
+                          style={{ width: 36, height: 36, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', borderRadius: 8, background: 'none', border: 'none', cursor: 'pointer' }}>
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                       {/* خيارات كل قطعة قابلة للتعديل من السلة */}
                       <div style={{ padding: '0 0.75rem' }}>
@@ -1895,6 +1915,17 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 })() : (
                   <>
                     <h4 style={{ fontWeight: 600, color: '#111', marginBottom: '0.25rem', fontSize: '0.875rem', lineHeight: 1.4 }}>{item.product?.name}</h4>
+                    {item.product?.offers?.length > 0 && <div style={{ marginBottom: '0.25rem' }}>{(
+                  <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+                    <select aria-label={t.offersTitle} value={item.selectedOffer || ''}
+                      onChange={(e) => update(items.map((x, idx) => (idx === i ? changeCartOffer(x, x.product, e.target.value || null, (ids) => addonsTotal(x.product, ids)) : x)))}
+                      style={{ appearance: 'none', WebkitAppearance: 'none', borderRadius: 999, border: '1px solid #f59e0b', background: '#fffbeb', color: '#b45309', padding: '2px 22px 2px 10px', fontSize: '0.75rem', fontWeight: 800, fontFamily: 'inherit', cursor: 'pointer' }}>
+                      <option value="">{lang === 'fr' ? 'Sans offre' : lang === 'en' ? 'No offer' : 'بدون عرض'}</option>
+                      {item.product.offers.map((o: any) => <option key={o.id} value={o.id}>{o.name}</option>)}
+                    </select>
+                    <span aria-hidden="true" style={{ position: 'absolute', insetInlineEnd: 8, fontSize: 9, color: '#b45309', pointerEvents: 'none' }}>▾</span>
+                  </span>
+                )}</div>}
                     <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 800, color: '#1D4ED8' }}>{item.finalPrice?.toLocaleString()} {store.currency || 'DZD'}</p>
                     <p style={{ fontSize: '0.72rem', color: '#aaa', marginTop: '0.25rem' }}>{t.qty}: {item.quantity}</p>
                     {needsPieces(item.product) && (
@@ -1905,11 +1936,16 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   </>
                 )}
               </div>
-              <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: '#ccc', padding: '0.375rem', borderRadius: 6, background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'center', transition: 'color 0.18s' }}
+              {!item.offerBox?.lines?.length && <button aria-label={lang === 'fr' ? 'Dupliquer' : lang === 'en' ? 'Duplicate' : 'نسخ'} title={lang === 'fr' ? 'Dupliquer' : lang === 'en' ? 'Duplicate' : 'نسخ'}
+                          onClick={() => update([...items.slice(0, i + 1), JSON.parse(JSON.stringify({ ...item, addedAt: Date.now() })), ...items.slice(i + 1)])}
+                          style={{ alignSelf: 'center', width: 36, height: 36, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', borderRadius: 8, background: 'none', border: 'none', cursor: 'pointer' }}>
+                          <Copy size={16} />
+                        </button>}
+              {!item.offerBox?.lines?.length && <button aria-label={lang === 'fr' ? 'Supprimer' : lang === 'en' ? 'Remove' : 'حذف'} onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: '#ccc', padding: '0.375rem', borderRadius: 6, background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'center', transition: 'color 0.18s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = '#1D4ED8')}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = '#ccc')}>
                 <Trash2 size={17} />
-              </button>
+              </button>}
             </div>
           ))}
           <div style={{ padding: '1rem', background: '#F8F8F6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
