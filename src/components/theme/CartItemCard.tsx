@@ -19,7 +19,7 @@ const STRINGS = {
 const lang = (store: StoreLike) => (store?.language === 'fr' ? 'fr' : store?.language === 'en' ? 'en' : 'ar');
 const imageOf = (item: any) => item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage;
 
-export function CartItemCard({ item, index, items, update, store, accent, dark = false }: {
+export function CartItemCard({ item, index, items, update, store, accent, dark = false, noAddons = false }: {
   item: any;
   index: number;
   items: any[];
@@ -27,6 +27,8 @@ export function CartItemCard({ item, index, items, update, store, accent, dark =
   store: StoreLike;
   accent: string;
   dark?: boolean;
+  /** إضافات الطلب كله (addonQty): لا إضافات لكل قطعة */
+  noAddons?: boolean;
 }) {
   const t = STRINGS[lang(store)];
   const C = dark
@@ -76,7 +78,7 @@ export function CartItemCard({ item, index, items, update, store, accent, dark =
             {iconBtn(t.remove, remove, <Trash2 size={16} />)}
           </div>
           <div style={{ padding: '0 0.75rem' }}>
-            <OfferPieces headless dark={dark} product={item.product} store={store} accent={accent} offerId={item.selectedOffer}
+            <OfferPieces headless dark={dark} noAddons={noAddons} product={item.product} store={store} accent={accent} offerId={item.selectedOffer}
               boxes={[cartPieces(item)]} style={{ marginBottom: 0 }}
               onChange={(b) => set(applyCartPieces(item, item.product, b[0], addons))} />
           </div>
@@ -93,8 +95,8 @@ export function CartItemCard({ item, index, items, update, store, accent, dark =
         {offerPill && <div style={{ marginBottom: '0.25rem' }}>{offerPill}</div>}
         <p style={{ margin: 0, fontSize: '1.125rem', fontWeight: 800, color: accent }}><span dir="ltr">{price(item.finalPrice)}</span></p>
         <p style={{ margin: '0.25rem 0 0', fontSize: '0.72rem', color: C.sub }}>{t.qty}: {item.quantity}</p>
-        {needsPieces(item.product) && (
-          <OfferPieces headless dark={dark} product={item.product} store={store} accent={accent} offerId={null}
+        {(noAddons ? item.product?.attributes?.length > 0 : needsPieces(item.product)) && (
+          <OfferPieces headless dark={dark} noAddons={noAddons} product={item.product} store={store} accent={accent} offerId={null}
             boxes={[cartPieces(item)]} style={{ marginBottom: 0, marginTop: '0.5rem' }}
             onChange={(b) => set(applyCartPieces(item, item.product, b[0], addons))} />
         )}

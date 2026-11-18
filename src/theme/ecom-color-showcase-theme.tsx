@@ -14,6 +14,9 @@ import {
 import {
   useCartStore, WhatsAppOrderButton, WhatsAppGlyph, comingSoon,
 } from '@mdstore/theme-kit';
+import { OfferPieces } from '@/components/theme/OfferPieces';
+import { CartItemCard } from '@/components/theme/CartItemCard';
+import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, type Box } from '@/components/theme/orderPieces';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -966,7 +969,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             </div>
           )}
 
-          {allAttrs.map((attr: any) => (
+          {!product.attributes?.length && allAttrs.map((attr: any) => (
             <div key={attr.id} style={{ marginBottom: '1.25rem' }}>
               <p className="cs-attr-name">{attr.name}{__colorName(attr, selectedVariants)}</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
@@ -1031,6 +1034,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const [isAdded, setIsAdded] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [addonQty, setAddonQty] = useState<AddonQty>({});
+  const [boxes, setBoxes] = useState<Box[]>([]);
   const initCount = useCartStore((s) => s.initCount);
   const cur = curOf(store || product.store);
 
@@ -1062,6 +1066,14 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   // سعر المنتج وحده؛ الإضافات بكميتها المستقلة تُضاف مرة واحدة للطلب
   const fp = getFP();
   const qty = supportQty ? fd.quantity : 1;
+  // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها (الإضافات تبقى للطلب كله)
+  const usePieces = !!product.attributes?.length;
+  const per = piecesPerBox(product as any, selectedOffer);
+  useEffect(() => {
+    setBoxes((prev) => fitBoxes(prev, qty, per, { variants: { ...(selectedVariants || {}) }, addonIds: [] }));
+  }, [qty, per]); // eslint-disable-line react-hooks/exhaustive-deps
+  const lines = usePieces && boxes.length ? boxLines(product as any, selectedOffer, boxes, () => 0) : null;
+  const subtotal = lines ? linesTotal(lines) : fp * qty;
   // عدد القطع = الكمية × قطع العرض (عرض «قطعتين» = 2) — حد كل إضافة = maxQty × عدد القطع
   const pieces = qty * (selOfferObj ? Math.max(1, Number(selOfferObj.quantity) || 1) : 1);
   // نقصت القطع ← تنزل كمية الإضافات إلى الحد الجديد
@@ -1075,12 +1087,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const extra = addonExtra(product, addonQty);
   const storeInfo = store || product.store;
   const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
-    (storeInfo?.supportFreeShipping && storeInfo?.freeShippingMinAmount != null && (fp * qty + extra) >= Number(storeInfo.freeShippingMinAmount)));
+    (storeInfo?.supportFreeShipping && storeInfo?.freeShippingMinAmount != null && (subtotal + extra) >= Number(storeInfo.freeShippingMinAmount)));
   const getLiv = useCallback((): number => {
     if (product.isDigital || orderFreeShipping || !selW) return 0;
     return Number(fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice);
   }, [selW, fd.typeLivraison, orderFreeShipping, product.isDigital]);
-  const total = () => fp * qty + extra + +getLiv();
+  const total = () => subtotal + extra + +getLiv();
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = t.errName;
@@ -1102,7 +1114,14 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const addToCart = () => {
     setIsAdded(true);
     const cart = JSON.parse(localStorage.getItem(domain) || '[]');
-    cart.push({ ...fd, quantity: qty, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, addonQty, addonsExtra: extra, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
+    if (lines) {
+      // مدخل لكل بطاقة عرض (بسطور قطعها)؛ إضافات الطلب مع البطاقة الأولى فقط
+      boxEntries(product as any, selectedOffer, boxes, () => 0).forEach((e, k) => {
+        cart.push({ ...fd, quantity: 1, product, productId: product.id, storeId: product.store.id, userId, selectedOffer, platform: platform || 'store', finalPrice: e.total, totalPrice: e.total, priceLivraison: getLiv(), addedAt: Date.now(), offerBox: { lines: e.lines }, ...(k === 0 && Object.keys(addonQty).length ? { addonQty, addonsExtra: extra } : {}) });
+      });
+    } else {
+      cart.push({ ...fd, quantity: qty, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, addonQty, addonsExtra: extra, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
+    }
     localStorage.setItem(domain, JSON.stringify(cart));
     initCount(cart.length);
     setTimeout(() => setIsAdded(false), 2000);
@@ -1117,7 +1136,11 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       const payload = product.isDigital
         ? { ...rest, ...({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) }) }
         : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
-      await axios.post(`${API_URL}/orders/create`, { ...payload, ...(Object.keys(addonQty).length ? { addonQty } : {}), quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+      const aq = Object.keys(addonQty).length ? { addonQty } : {};
+      const common = { ...payload, productId: product.id, storeId: product.store.id, userId, selectedOffer, platform: platform || 'store', priceLivraison: getLiv() };
+      // البطاقات: سطر لكل مجموعة قطع متطابقة، وإضافات الطلب مع السطر الأول؛ وإلا الطلب الواحد كما كان
+      if (lines) await axios.post(`${API_URL}/orders/create`, lines.map((l, k) => ({ ...common, ...(k === 0 ? aq : {}), quantity: l.quantity, variantDetailId: l.variantDetailId, selectedVariants: l.selectedVariants, finalPrice: l.finalPrice, totalPrice: l.finalPrice * l.quantity })));
+      else await axios.post(`${API_URL}/orders/create`, { ...payload, ...(Object.keys(addonQty).length ? { addonQty } : {}), quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
       router.push(`${window.location.origin}/successfully?productId=${product.id}`);
     } catch { setSubmitError(t.errSubmit); } finally { setSub(false); }
@@ -1127,6 +1150,19 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   return (
     <div style={{ marginTop: '1.25rem' }}>
+      {/* الكمية خارج نموذج الطلب، وتحتها بطاقة لكل عرض (خيارات كل قطعة) */}
+      {supportQty && !product.isDigital && (
+        <div style={{ marginBottom: '.5rem' }}>
+          <label className="cs-label">{t.qty}</label>
+          <div className="cs-qty">
+            <button type="button" aria-label="-" onClick={() => setFd((p) => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}><Minus size={16} /></button>
+            <span>{fd.quantity}</span>
+            <button type="button" aria-label="+" onClick={() => setFd((p) => ({ ...p, quantity: p.quantity + 1 }))}><Plus size={16} /></button>
+            <small style={{ color: 'var(--muted)' }}>{t.piece}</small>
+          </div>
+        </div>
+      )}
+      <OfferPieces noAddons product={product} store={store || product.store} accent={normHex((store || product.store)?.design?.primaryColor, DEFAULT_P)} offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
       <AddonsPicker product={product} store={store || product.store} value={addonQty} onChange={setAddonQty} pieces={pieces} />
       {product.store.cart && !product.isDigital && !isOrderNow && (
         <div className="cs-two">
@@ -1205,17 +1241,6 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               </>
             )}
 
-            {supportQty && !product.isDigital && (
-              <div style={{ marginBottom: '.5rem' }}>
-                <label className="cs-label">{t.qty}</label>
-                <div className="cs-qty">
-                  <button type="button" aria-label="-" onClick={() => setFd((p) => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}><Minus size={16} /></button>
-                  <span>{fd.quantity}</span>
-                  <button type="button" aria-label="+" onClick={() => setFd((p) => ({ ...p, quantity: p.quantity + 1 }))}><Plus size={16} /></button>
-                  <small style={{ color: 'var(--muted)' }}>{t.piece}</small>
-                </div>
-              </div>
-            )}
 
             <div className="cs-sum">
               <div><span><Package size={14} />{t.product}</span><b title={product.name}>{clip(product.name, 32)}</b></div>
@@ -1289,7 +1314,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     if (Object.keys(er).length) { setErrors(er); return; }
     setErrors({}); setSubmitting(true); setSubmitError(null);
     try {
-      await axios.post(`${API_URL}/orders/create`, items.map((i) => ({
+      const flat = items.flatMap((it) => (it.offerBox?.lines?.length
+        ? it.offerBox.lines.map((l: any, k: number) => ({ ...it, addonIds: [], addonQty: k === 0 ? it.addonQty : undefined, variantDetailId: l.variantDetailId, selectedVariants: l.selectedVariants, finalPrice: l.finalPrice, quantity: l.quantity }))
+        : [it]));
+      await axios.post(`${API_URL}/orders/create`, flat.map((i) => ({
         ...fd, productId: i.productId, storeId: i.storeId, userId: i.userId, selectedOffer: i.selectedOffer,
         variantDetailId: i.variantDetailId, selectedVariants: i.selectedVariants, ...(i.addonQty ? { addonQty: i.addonQty } : { addonIds: i.addonIds }),
         platform: i.platform || 'store', finalPrice: i.finalPrice, totalPrice: finalTotal, priceLivraison: +getLiv(),
@@ -1324,7 +1352,9 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       )}
       <div className="cs-cart">
         <div className="cs-box">
-          {items.map((item, i) => (
+          {items.map((item, i) => item.offerBox?.lines?.length ? (
+            <CartItemCard key={i} noAddons item={item} index={i} items={items} update={update} store={store} accent={normHex(store?.design?.primaryColor, DEFAULT_P)} />
+          ) : (
             <div key={i} style={{ display: 'flex', gap: '1rem', padding: '1rem', borderBottom: '1px solid var(--line)', alignItems: 'center' }}>
               <img loading="lazy" decoding="async" src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} alt="" style={{ width: 76, height: 76, borderRadius: 14, objectFit: 'contain', background: 'var(--soft)', flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>

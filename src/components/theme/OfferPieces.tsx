@@ -20,7 +20,7 @@ const isUrl = (v: string) => /^https?:\/\/|^\//.test(v);
 /** هل تحتاج الصفحة بطاقات القطع (خيارات أو إضافات)؟ وإلا يكفي العرض والكمية */
 export const needsPieces = (product: any) => !!(product?.attributes?.length || activeAddons(product).length);
 
-export function OfferPieces({ product, store, accent = '#1D4ED8', offerId, boxes, onChange, onVariant, style, headless = false, dark = false }: {
+export function OfferPieces({ product, store, accent = '#1D4ED8', offerId, boxes, onChange, onVariant, style, headless = false, dark = false, noAddons = false }: {
   product: any;
   store?: StoreLike;
   accent?: string;
@@ -34,6 +34,8 @@ export function OfferPieces({ product, store, accent = '#1D4ED8', offerId, boxes
   headless?: boolean;
   /** ثيم داكن: خلفيات ونصوص فاتحة على داكن */
   dark?: boolean;
+  /** ثيم إضافاته للطلب كله (addonQty): القطع بخياراتها فقط، بلا إضافات لكل قطعة */
+  noAddons?: boolean;
 }) {
   const C = dark
     ? { card: '#1C1C1C', text: '#F0F0F0', sub: '#AAAAAA', chip: '#2A2A2A', chipText: '#E5E5E5', line: '#2E2E2E', ring: '#444', optText: '#DDDDDD' }
@@ -41,11 +43,11 @@ export function OfferPieces({ product, store, accent = '#1D4ED8', offerId, boxes
   // البطاقة مطوية: ملخص خيارات كل قطعة + زر «تعديل ▾» يفتح الخيارات تحتها
   // المفتوح: «بطاقة-قطعة» — كل قطعة لها زر تعديل يفتح خياراتها هي فقط
   const [open, setOpen] = useState<string[]>([]);
-  if (!needsPieces(product)) return null;
+  if (!(noAddons ? product?.attributes?.length : needsPieces(product))) return null;
   const t = STRINGS[lang(store)];
   const keyOf = (b: number, i: number) => `${b}-${i}`;
   const toggle = (k: string) => setOpen((o) => (o.includes(k) ? o.filter((x) => x !== k) : [...o, k]));
-  const addons = activeAddons(product);
+  const addons = noAddons ? [] : activeAddons(product);
   // ملخص القطعة: «L · أزرق · test ×2» (اللون باسمه وبنقطة لونه)
   const summary = (piece: Piece) => (
     <span style={{ display: 'inline-flex', flexWrap: 'wrap', alignItems: 'center', gap: 6 }}>
@@ -152,8 +154,8 @@ export function OfferPieces({ product, store, accent = '#1D4ED8', offerId, boxes
                         </div>
                       );
                     })}
-                    <ProductAddons product={product} store={store} accent={accent} style={{ marginBottom: 0 }}
-                      selected={piece.addonIds} onChange={(ids) => setPiece(b, i, { ...piece, addonIds: ids })} />
+                    {!noAddons && <ProductAddons product={product} store={store} accent={accent} style={{ marginBottom: 0 }}
+                      selected={piece.addonIds} onChange={(ids) => setPiece(b, i, { ...piece, addonIds: ids })} />}
                   </div>
                 )}
               </div>
