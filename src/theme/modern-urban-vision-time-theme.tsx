@@ -2,6 +2,9 @@
 // دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
 import * as __kit from '@mdstore/theme-kit';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
+import { OfferPieces, needsPieces } from '@/components/theme/OfferPieces';
+import { CartItemCard, cartOrderItems } from '@/components/theme/CartItemCard';
+import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, type Box } from '@/components/theme/orderPieces';
 
 /* ============================================================================
  *  MdStore Storefront Theme — Urban Vision & Time
@@ -1510,6 +1513,8 @@ export function ProductForm({
   selectedOffer, setSelectedOffer, selectedVariants, platform,
 }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
+  // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
+  const [boxes, setBoxes] = useState<Box[]>([]);
   const store = storeprop || product?.store;
   const t = withLocationLabels(T)[getLang(store)];
   const router = useRouter();
@@ -1575,12 +1580,20 @@ export function ProductForm({
     return Number(product?.price || 0);
   };
 
-  const fp = getFP() + addonsTotal(product, addonIds);
   const supportQty = (store?.supportQty ?? product?.store?.supportQty) !== false;
   const qty = supportQty ? fd.quantity : 1;
+  const usePieces = needsPieces(product);
+  const per = piecesPerBox(product as any, selectedOffer);
+  useEffect(() => {
+    setBoxes((prev) => fitBoxes(prev, qty, per, { variants: { ...(selectedVariants || {}) }, addonIds: [] }));
+  }, [qty, per]); // eslint-disable-line react-hooks/exhaustive-deps
+  const lines = usePieces && boxes.length ? boxLines(product as any, selectedOffer, boxes, (ids) => addonsTotal(product, ids)) : null;
+  // بلا بطاقات: السعر × الكمية كما كان؛ مع البطاقات: مجموع سطورها
+  const fp = getFP() + addonsTotal(product, addonIds);
+  const subtotal = lines ? linesTotal(lines) : fp * qty;
   const selOfferObj = product?.offers?.find((x: Offer) => x.id === selectedOffer);
   const orderFreeShipping = !!(product?.shippingFree || selOfferObj?.shippingFree ||
-    (store?.supportFreeShipping && store?.freeShippingMinAmount != null && (fp * qty) >= Number(store.freeShippingMinAmount)));
+    (store?.supportFreeShipping && store?.freeShippingMinAmount != null && subtotal >= Number(store.freeShippingMinAmount)));
 
   const getLiv = useCallback((): number => {
     if (product?.isDigital) return 0;
@@ -1589,7 +1602,7 @@ export function ProductForm({
     return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
   }, [selW, fd.typeLivraison, orderFreeShipping, product?.isDigital]);
 
-  const total = (): number => fp * qty + getLiv();
+  const total = (): number => subtotal + getLiv();
 
   const set = (k: string, v: any) => {
     setFd((p) => ({ ...p, [k]: v }));
@@ -1644,7 +1657,12 @@ export function ProductForm({
       const raw = localStorage.getItem(domain);
       const arr = raw ? JSON.parse(raw) : [];
       const list = Array.isArray(arr) ? arr : [];
-      list.push({ ...basePayload(), addedAt: Date.now() });
+if (lines) {
+        // مدخل لكل بطاقة عرض (بسطور قطعها) — تظهر في السلة كبطاقة، وتتحول لسطور عند إرسال الطلب
+        for (const e of boxEntries(product as any, selectedOffer, boxes, (ids) => addonsTotal(product, ids))) {
+          list.push({ ...basePayload(), addedAt: Date.now(), quantity: 1, variantDetailId: undefined, selectedVariants: undefined, addonIds: [], finalPrice: e.total, totalPrice: e.total, offerBox: { lines: e.lines } });
+        }
+      } else list.push({ ...basePayload(), addedAt: Date.now() });
       localStorage.setItem(domain, JSON.stringify(list));
       initCount(list.length);
       setAdded(true);
@@ -1660,7 +1678,8 @@ export function ProductForm({
       const r = await fetch(`${API_URL}/orders/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...basePayload(), addonIds }),
+        // البطاقات: سطر لكل مجموعة قطع متطابقة (كطلب السلة)، وإلا الطلب الواحد كما كان
+        body: JSON.stringify(lines ? lines.map((l) => ({ ...basePayload(), addonIds: l.addonIds, quantity: l.quantity, variantDetailId: l.variantDetailId, selectedVariants: l.selectedVariants, finalPrice: l.finalPrice, totalPrice: l.finalPrice * l.quantity })) : { ...basePayload(), addonIds }),
       });
       if (!r.ok) throw new Error('failed');
       const d = await r.json().catch(() => ({}));
@@ -1675,19 +1694,21 @@ export function ProductForm({
 
   return (
     <div className="uvt-formcard">
-  <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#B06A2C" />
+  {/* الكمية خارج نموذج الطلب، فوق بطاقات العرض */}
+  {supportQty && !product?.isDigital && (
+    <div>
+      <span className="uvt-label" style={{ marginBottom: 6 }}>{t.qty}</span>
+      <QtyCounter
+        value={fd.quantity}
+        onDec={() => set('quantity', Math.max(1, fd.quantity - 1))}
+        onInc={() => set('quantity', fd.quantity + 1)}
+      />
+    </div>
+  )}
+  <OfferPieces product={product} store={store || product.store} accent="#B06A2C" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#B06A2C" />}
       {/* quantity + unit price — always visible */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-        {supportQty && !product?.isDigital && (
-          <div>
-            <span className="uvt-label" style={{ marginBottom: 6 }}>{t.qty}</span>
-            <QtyCounter
-              value={fd.quantity}
-              onDec={() => set('quantity', Math.max(1, fd.quantity - 1))}
-              onInc={() => set('quantity', fd.quantity + 1)}
-            />
-          </div>
-        )}
         <div style={{ textAlign: 'end' }}>
           <span className="uvt-label" style={{ marginBottom: 6 }}>{t.price}</span>
           <p className="uvt-num" style={{ margin: 0, fontSize: '1.3rem', fontWeight: 800, color: INK, whiteSpace: 'nowrap' }}>
@@ -2000,7 +2021,7 @@ export function Details({
             </div>
           )}
 
-          {attrs.map((attr) => (
+          {!needsPieces(product) && attrs.map((attr) => (
             <div key={attr.id} style={{ marginBottom: '1.2rem' }}>
               <p className="uvt-label">{attr.name}{__colorName(attr, selectedVariants)}</p>
               <div className="uvt-attrs">
@@ -2134,6 +2155,7 @@ export function Cart({ domain, store }: any) {
     setErrors((p) => ({ ...p, [k]: '' }));
   };
 
+  const update = (n: any[]) => { setItems(n); localStorage.setItem(domain, JSON.stringify(n)); initCount(n.length); };
   const removeItem = (i: number) => {
     const next = items.filter((_, idx) => idx !== i);
     setItems(next);
@@ -2156,7 +2178,7 @@ export function Cart({ domain, store }: any) {
     if (!validate() || items.length === 0) return;
     setSubmitting(true);
     try {
-      const payload = items.map((it) => ({
+      const payload = cartOrderItems(items).map((it) => ({
         ...fd,
         quantity: Number(it.quantity || 1),
         product: it.product,
@@ -2236,6 +2258,7 @@ export function Cart({ domain, store }: any) {
         {/* ---- items ---- */}
         <div>
           {items.map((it, i) => {
+            if (it.offerBox?.lines?.length) return <CartItemCard key={i} item={it} index={i} items={items} update={update} store={store} accent="#B06A2C" />;
             const img = it.product?.productImage || it.product?.imagesProduct?.[0]?.imageUrl;
             const unit = Number(it.finalPrice || it.product?.price || 0);
             return (
