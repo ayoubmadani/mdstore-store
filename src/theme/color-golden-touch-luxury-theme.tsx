@@ -1569,6 +1569,17 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   return (
     <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1.5px solid #2E2E2E' }}>
+      {/* الكمية خارج نموذج الطلب، فوق بطاقات العرض */}
+      {supportQty && !product.isDigital && (
+        <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <p style={{ fontSize: '0.775rem', fontWeight: 700, color: '#AAAAAA', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.qty}</p>
+          <div style={{ display: 'inline-flex', alignItems: 'center', border: '1.5px solid #2E2E2E', borderRadius: 8, overflow: 'hidden', background: '#1C1C1C' }}>
+            <button aria-label="-" type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#F0F0F0' }}><Minus size={14} /></button>
+            <span style={{ width: 40, textAlign: 'center', fontWeight: 800, fontSize: '0.9rem', color: '#F0F0F0' }}>{fd.quantity}</span>
+            <button aria-label="+" type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#F0F0F0' }}><Plus size={14} /></button>
+          </div>
+        </div>
+      )}
       <OfferPieces dark product={product} store={store || product.store} accent="#D4AF37" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
       {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#D4AF37" />}
         {product.store.cart && !product.isDigital && (
@@ -1647,16 +1658,6 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               </>
             )}
 
-            {supportQty && !product.isDigital && (
-              <div style={{ marginBottom: '0.875rem' }}>
-                <p style={{ fontSize: '0.775rem', fontWeight: 700, color: '#AAAAAA', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.qty}</p>
-                <div style={{ display: 'inline-flex', alignItems: 'center', border: '1.5px solid #2E2E2E', borderRadius: 8, overflow: 'hidden', background: '#1C1C1C' }}>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#F0F0F0' }}><Minus size={14} /></button>
-                  <span style={{ width: 40, textAlign: 'center', fontWeight: 800, fontSize: '0.9rem' }}>{fd.quantity}</span>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#F0F0F0' }}><Plus size={14} /></button>
-                </div>
-              </div>
-            )}
 
             {/* Summary */}
             <div style={{ background: '#1C1C1C', border: '1.5px solid #2E2E2E', borderRadius: 10, padding: '1rem 1.125rem', marginBottom: '1rem' }}>

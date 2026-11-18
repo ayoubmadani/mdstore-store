@@ -47,7 +47,7 @@ export function ProductAddons({ product, store, selected, onChange, accent = '#E
               aria-pressed={on}
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.55rem 0.9rem', borderRadius: 999,
-                border: `2px solid ${on ? accent : '#E5DCCB'}`, background: on ? accent : '#fff', color: on ? '#fff' : 'inherit',
+                border: `2px solid ${on ? accent : '#E5DCCB'}`, background: on ? accent : 'transparent', color: on ? '#fff' : 'inherit',
                 fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s',
               }}
             >
