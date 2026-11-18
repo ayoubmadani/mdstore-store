@@ -136,3 +136,17 @@ test('cart: switching a card\'s offer keeps the first pieces, copies the last fo
   assert.equal(back.offerBox.lines.reduce((s, l) => s + l.quantity, 0), 2);
   assert.equal(back.finalPrice, 3500);
 });
+
+test('cartOrderItems: an offer card becomes its piece lines, a plain item stays as it is', async () => {
+  const { cartOrderItems } = await import('../components/theme/orderPieces.ts');
+  const card = { productId: 'p', selectedOffer: 'o2', quantity: 1, finalPrice: 4500, offerBox: { lines: [
+    { variantDetailId: 'vM', selectedVariants: { size: 'M' }, addonIds: [], finalPrice: 2250, quantity: 1 },
+    { variantDetailId: 'vL', selectedVariants: { size: 'L' }, addonIds: ['a'], finalPrice: 2250, quantity: 1 },
+  ] } };
+  const plain = { productId: 'q', quantity: 2, finalPrice: 1000, addonIds: [] };
+  const out = cartOrderItems([card, plain]);
+  assert.equal(out.length, 3);
+  assert.deepEqual(out.map((l: any) => [l.productId, l.variantDetailId, l.finalPrice, l.quantity, l.selectedOffer]),
+    [['p', 'vM', 2250, 1, 'o2'], ['p', 'vL', 2250, 1, 'o2'], ['q', undefined, 1000, 2, undefined]]);
+  assert.deepEqual(out[1].addonIds, ['a']);
+});

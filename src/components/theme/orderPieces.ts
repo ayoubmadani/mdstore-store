@@ -167,3 +167,8 @@ export function changeCartOffer<T extends CartEntry>(entry: T, product: ProductL
   const total = linesTotal(lines);
   return { ...entry, selectedOffer: offer.id, quantity: 1, offerBox: { lines }, finalPrice: total, totalPrice: total };
 }
+
+/** سطور الطلب من السلة: بطاقة العرض تتحول لسطور قطعها، والباقي كما هو */
+export const cartOrderItems = <T extends { offerBox?: { lines?: any[] } }>(items: T[]): any[] => items.flatMap((i) => (i.offerBox?.lines?.length
+  ? i.offerBox.lines.map((l: any) => ({ ...i, addonIds: l.addonIds, variantDetailId: l.variantDetailId, selectedVariants: l.selectedVariants, finalPrice: l.finalPrice, quantity: l.quantity }))
+  : [i]));
