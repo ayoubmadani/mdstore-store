@@ -8,7 +8,9 @@ export { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, what
 export { ProductAddons, activeAddons, addonsTotal, addonsLabel } from './ProductAddons';
 // بطاقات العرض: بطاقة لكل وحدة من الكمية، وفيها قطع العرض بخياراتها وإضافاتها؛ الطلب يُرسل سطوراً (boxLines)
 export { OfferPieces, needsPieces } from './OfferPieces';
-export { boxLines, linesTotal, fitBoxes, piecesPerBox, pieceVariantId } from './orderPieces';
+export { boxLines, linesTotal, fitBoxes, piecesPerBox, pieceVariantId, boxEntries, cartOrderItems, cartPieces, applyCartPieces, changeCartOffer } from './orderPieces';
+// سطر السلة: بطاقة العرض (تغيير العرض، تعديل خيارات كل قطعة، نسخ، حذف) بلون الثيم
+export { CartItemCard } from './CartItemCard';
 export type { Box, Piece, PieceLine } from './orderPieces';
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';

@@ -87,6 +87,11 @@ import {
 5. **السلة:** إذا `store.cart === false` يظهر النموذج مباشرة بدون أزرار السلة. وإلا يظهر «أضف للسلة» و«اطلب الآن». ضع `data-add-to-cart` على زر «أضف للسلة» (صفحة المنتج خارج المتجر تخفيه به).
 6. **منتج رقمي** (`product.isDigital`): لا ولاية ولا توصيل. حقلا **البريد والواتساب معاً، كلاهما اختياري** (لا سؤال «بريد أو واتساب» ولا أزرار اختيار): يُفحص المكتوب فقط (`if (fd.customerEmail.trim() && !emailOk) …`)، ويُرسل غير الفارغ فقط.
 7. **العروض والمتغيرات:** `product.offers` (سعر لكمية)، و`allAttrs` بأنماط `displayMode` (color وimage وtext)، والمتغير غير المتوفر معطّل.
+   **بطاقات العروض (إلزامية، انسخها من القالب كما هي):** كل منتج له خيارات أو إضافات (`needsPieces(product)`) يُطلب بالقطع، لا بخيار واحد للكمية كلها:
+   - الكمية **خارج نموذج الطلب**، فوق البطاقات، وتحتها `<OfferPieces product store accent={…} offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />` (بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض، ولكل قطعة زر «تعديل» لخياراتها وإضافاتها). في ثيم داكن أضف `dark`.
+   - `boxes` تُحدَّث بـ `fitBoxes(prev, qty, piecesPerBox(product, selectedOffer), …)`، و`lines = boxLines(…)`، والمجموع `linesTotal(lines)`. خيارات `allAttrs` العامة وإضافات `ProductAddons` العامة تُخفى حين `needsPieces(product)`.
+   - «أضف للسلة»: مدخل لكل بطاقة من `boxEntries(…)` مع `offerBox: { lines }`. «اطلب الآن»: يُرسل `lines` سطوراً (مصفوفة). السلة: بطاقة العرض بـ `<CartItemCard item index items update store accent />`، وعند الإرسال `cartOrderItems(items)`.
+   - اختيار لون في بطاقة يغيّر صورة المنتج: Details يمرّر `onVariant={handleVariantSelection}` إلى ProductForm، وهذا يمرّره إلى `OfferPieces`.
 8. **التوصيل المجاني:** `product.shippingFree`، و`offer.shippingFree`، و`store.supportFreeShipping` مع `freeShippingMinAmount`.
 9. **Footer:** الهاتف + واتساب + البريد **دائماً**، والناقص منها يُعرض بـ `comingSoon(store)`. الأرقام داخل `<span dir="ltr">`.
 10. **الغلاف `default` (Main):** المحتوى داخل `<main>`، والـ Navbar والـ Footer **أخوة** لـ `<main>` في نفس العنصر الأب (لا داخله). صفحة المنتج خارج المتجر (دومين منتج، قسم «المنتج بثيم المتجر» في المحرر) تخفي كل ما بجانب `<main>` وتلغي `padding-top` عليه.
@@ -124,7 +129,7 @@ import {
 - [ ] `default` و`Home` و`Details` و`Cart` و`StaticPage` مُصدَّرة.
 - [ ] ثلاث ترجمات كاملة بنفس المفاتيح، وكل نص ظاهر يأتي من الترجمة.
 - [ ] الشحن بـ `storeId`، والإضافات في الطلب والسلة، وزر واتساب، وFooter التواصل.
-- [ ] منتج رقمي (بريد وواتساب اختياريان معاً)، و`data-add-to-cart` على زر السلة، و`<main>` في الغلاف، وعروض، ومتغيرات، وتوصيل مجاني، و`store.cart === false`، وولاية واحدة تُختار وتُقفل، ونوع التوصيل حسب الولاية.
+- [ ] منتج رقمي (بريد وواتساب اختياريان معاً)، و`data-add-to-cart` على زر السلة، و`<main>` في الغلاف، وعروض، ومتغيرات، وبطاقات العروض (الكمية فوقها، `onVariant`، `CartItemCard` و`cartOrderItems` في السلة)، وتوصيل مجاني، و`store.cart === false`، وولاية واحدة تُختار وتُقفل، ونوع التوصيل حسب الولاية.
 - [ ] لا يوجد `localStorage` أو `window` خارج `useEffect` أو معالجات الأحداث (الصفحة تُعرض على الخادم أيضاً).
 - [ ] لا تعليق JSX داخل `&& (…)`، ولا `pt` في CSS.
 - [ ] الغلاف: لا صندوق خلف العنوان والوصف، `<HeroShade>` فوق الصورة و`heroTextClear` على النص، والغلاف `<section>` بلا ارتفاع ثابت على الهاتف.
