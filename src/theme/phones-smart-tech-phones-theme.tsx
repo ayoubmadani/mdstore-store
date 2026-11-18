@@ -2,6 +2,9 @@
 // دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
 import * as __kit from '@mdstore/theme-kit';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
+import { OfferPieces, needsPieces } from '@/components/theme/OfferPieces';
+import { CartItemCard, cartOrderItems } from '@/components/theme/CartItemCard';
+import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, type Box } from '@/components/theme/orderPieces';
 
 /* =====================================================================
    MdStore Storefront Theme — phones-smart-tech-phones-theme
@@ -1125,7 +1128,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           )}
 
           {/* Attributes */}
-          {attrs.map((attr: any) => (
+          {!needsPieces(product) && attrs.map((attr: any) => (
             <div key={attr.id} style={{ marginBottom: 18 }}>
               <h3 style={{ fontSize: '0.9rem', fontWeight: 800, marginBottom: 10 }}>{attr.name}{__colorName(attr, selectedVariants)}</h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
@@ -1184,6 +1187,8 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 /* ============================ ProductForm ========================== */
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store: storeprop }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
+  // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
+  const [boxes, setBoxes] = useState<Box[]>([]);
   const store = storeprop || product?.store;
   const t = withLocationLabels(T)[getLang(store)];
   const fmt = useFmt(store);
@@ -1234,12 +1239,20 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     return d ? d.id : null;
   };
 
-  const fp = getFP() + addonsTotal(product, addonIds);
   const supportQty = (store?.supportQty ?? product?.store?.supportQty) !== false;
   const qty = supportQty ? fd.quantity : 1;
+  const usePieces = needsPieces(product);
+  const per = piecesPerBox(product as any, selectedOffer);
+  useEffect(() => {
+    setBoxes((prev) => fitBoxes(prev, qty, per, { variants: { ...(selectedVariants || {}) }, addonIds: [] }));
+  }, [qty, per]); // eslint-disable-line react-hooks/exhaustive-deps
+  const lines = usePieces && boxes.length ? boxLines(product as any, selectedOffer, boxes, (ids) => addonsTotal(product, ids)) : null;
+  // بلا بطاقات: السعر × الكمية كما كان؛ مع البطاقات: مجموع سطورها
+  const fp = getFP() + addonsTotal(product, addonIds);
+  const subtotal = lines ? linesTotal(lines) : fp * qty;
   const selOfferObj = (product?.offers || []).find((o: Offer) => o.id === selectedOffer);
   const orderFreeShipping = !!(product?.shippingFree || selOfferObj?.shippingFree ||
-    (store?.supportFreeShipping && store?.freeShippingMinAmount != null && (fp * qty) >= Number(store.freeShippingMinAmount)));
+    (store?.supportFreeShipping && store?.freeShippingMinAmount != null && subtotal >= Number(store.freeShippingMinAmount)));
 
   const getLiv = useCallback((): number => {
     if (product?.isDigital) return 0;
@@ -1248,7 +1261,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
   }, [selW, fd.typeLivraison, orderFreeShipping, product?.isDigital]);
 
-  const total = () => fp * qty + getLiv();
+  const total = () => subtotal + +getLiv();
 
   const set = (k: string, v: any) => setFd((p) => ({ ...p, [k]: v }));
 
@@ -1279,7 +1292,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const addToCart = () => {
     try {
       const arr = JSON.parse(localStorage.getItem(domain) || '[]');
-      arr.push(buildPayload());
+      if (lines) {
+        // مدخل لكل بطاقة عرض (بسطور قطعها) — تظهر في السلة كبطاقة، وتتحول لسطور عند إرسال الطلب
+        for (const e of boxEntries(product as any, selectedOffer, boxes, (ids) => addonsTotal(product, ids))) {
+          arr.push({ ...buildPayload(), quantity: 1, variantDetailId: undefined, selectedVariants: undefined, addonIds: [], finalPrice: e.total, totalPrice: e.total, offerBox: { lines: e.lines } });
+        }
+      } else arr.push(buildPayload());
       localStorage.setItem(domain, JSON.stringify(arr));
       initCount(arr.length);
     } catch { /* ignore */ }
@@ -1310,7 +1328,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       const r = await fetch(`${API_URL}/orders/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...buildPayload(), addonIds }),
+        body: JSON.stringify(lines ? lines.map((l) => ({ ...buildPayload(), addonIds: l.addonIds, quantity: l.quantity, variantDetailId: l.variantDetailId, selectedVariants: l.selectedVariants, finalPrice: l.finalPrice, totalPrice: l.finalPrice * l.quantity })) : { ...buildPayload(), addonIds }),
       });
       if (!r.ok) throw new Error('order failed');
       try { localStorage.setItem('customerId', fd.customerName); } catch { /* ignore */ }
@@ -1333,20 +1351,22 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   return (
     <div style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 18, padding: '1.5rem', marginTop: 8 }}>
-  <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#2F5BFF" />
+  {/* الكمية خارج نموذج الطلب، فوق بطاقات العرض */}
+  {supportQty && !product?.isDigital && (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+      <span style={{ fontWeight: 800, fontSize: '0.95rem' }}>{t.qty}</span>
+      <div style={{ display: 'inline-flex', alignItems: 'center', border: `1.5px solid ${BD}`, borderRadius: 12, overflow: 'hidden' }}>
+        <button onClick={() => set('quantity', Math.max(1, fd.quantity - 1))}
+          style={{ width: 40, height: 40, border: 'none', background: BG, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: TXT }}><Minus size={16} /></button>
+        <span className="pt-mono" style={{ width: 48, textAlign: 'center', fontWeight: 800 }}>{fd.quantity}</span>
+        <button onClick={() => set('quantity', fd.quantity + 1)}
+          style={{ width: 40, height: 40, border: 'none', background: BG, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: TXT }}><Plus size={16} /></button>
+      </div>
+    </div>
+  )}
+  <OfferPieces product={product} store={store || product.store} accent="#2F5BFF" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#2F5BFF" />}
       {/* Quantity */}
-      {supportQty && !product?.isDigital && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-          <span style={{ fontWeight: 800, fontSize: '0.95rem' }}>{t.qty}</span>
-          <div style={{ display: 'inline-flex', alignItems: 'center', border: `1.5px solid ${BD}`, borderRadius: 12, overflow: 'hidden' }}>
-            <button onClick={() => set('quantity', Math.max(1, fd.quantity - 1))}
-              style={{ width: 40, height: 40, border: 'none', background: BG, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: TXT }}><Minus size={16} /></button>
-            <span className="pt-mono" style={{ width: 48, textAlign: 'center', fontWeight: 800 }}>{fd.quantity}</span>
-            <button onClick={() => set('quantity', fd.quantity + 1)}
-              style={{ width: 40, height: 40, border: 'none', background: BG, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: TXT }}><Plus size={16} /></button>
-          </div>
-        </div>
-      )}
 
       {/* Action buttons */}
       {!isOrderNow && !product?.isDigital && (
@@ -1533,6 +1553,7 @@ export function Cart({ domain, store }: any) {
   const finalTotal = cartTotal + getLiv();
   const set = (k: string, v: any) => setFd((p) => ({ ...p, [k]: v }));
 
+  const update = (n: any[]) => { setItems(n); localStorage.setItem(domain, JSON.stringify(n)); initCount(n.length); };
   const removeItem = (idx: number) => {
     const next = items.filter((_, i) => i !== idx);
     setItems(next);
@@ -1554,7 +1575,7 @@ export function Cart({ domain, store }: any) {
     if (!validate()) return;
     setSubmitting(true);
     try {
-      const orders = items.map((it) => ({
+      const orders = cartOrderItems(items).map((it) => ({
         ...it, ...fd,
         totalPrice: Number(it.finalPrice || 0) * Number(it.quantity || 1) + getLiv(),
         priceLivraison: getLiv(),
@@ -1620,6 +1641,7 @@ export function Cart({ domain, store }: any) {
         {/* Items */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {items.map((it, idx) => {
+            if (it.offerBox?.lines?.length) return <CartItemCard key={idx} item={it} index={idx} items={items} update={update} store={store} accent="#2F5BFF" />;
             const img = it.product?.productImage || it.product?.imagesProduct?.[0]?.imageUrl;
             return (
               <div key={idx} style={{ display: 'flex', gap: 14, background: CARD, border: `1px solid ${BD}`, borderRadius: 14, padding: '0.9rem' }}>

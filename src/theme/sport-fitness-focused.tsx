@@ -7,6 +7,9 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
+import { OfferPieces, needsPieces } from '@/components/theme/OfferPieces';
+import { CartItemCard, cartOrderItems } from '@/components/theme/CartItemCard';
+import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, type Box } from '@/components/theme/orderPieces';
 import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import {
@@ -1449,7 +1452,7 @@ export function Details({ product, store: storeprop, toggleWishlist, isWishliste
             )}
 
             {/* Attributes */}
-            {allAttrs.map((attr:any)=>(
+            {!needsPieces(product) && allAttrs.map((attr: any) => (
               <div key={attr.id} style={{marginBottom:'18px',paddingBottom:'18px',borderBottom:'1px solid var(--line)'}}>
                 <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.18em',textTransform:'uppercase',color:'var(--fire)',marginBottom:'10px'}}>{attr.name}{__colorName(attr, selectedVariants)}</p>
                 {attr.displayMode==='color' ? (
@@ -1501,6 +1504,8 @@ export function Details({ product, store: storeprop, toggleWishlist, isWishliste
 ══════════════════════════════════════════════════════════════ */
 export function ProductForm({ product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss=0 }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
+  // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
+  const [boxes, setBoxes] = useState<Box[]>([]);
   const t = withLocationLabels(T)[getLang(storeprop || product?.store)];
   const isRTL = t.dir === 'rtl';
   const router = useRouter();
@@ -1535,14 +1540,22 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
     }
     return base;
   },[product,selectedOffer,selectedVariants]);
-  const fp    = getFP() + addonsTotal(product, addonIds);
   const supportQty = (storeprop?.supportQty ?? product?.store?.supportQty) !== false;
   const qty = supportQty ? fd.quantity : 1;
+  const usePieces = needsPieces(product);
+  const per = piecesPerBox(product as any, selectedOffer);
+  useEffect(() => {
+    setBoxes((prev) => fitBoxes(prev, qty, per, { variants: { ...(selectedVariants || {}) }, addonIds: [] }));
+  }, [qty, per]); // eslint-disable-line react-hooks/exhaustive-deps
+  const lines = usePieces && boxes.length ? boxLines(product as any, selectedOffer, boxes, (ids) => addonsTotal(product, ids)) : null;
+  // بلا بطاقات: السعر × الكمية كما كان؛ مع البطاقات: مجموع سطورها
+  const fp = getFP() + addonsTotal(product, addonIds);
+  const subtotal = lines ? linesTotal(lines) : fp * qty;
   const selOfferObj = product.offers?.find((o:any)=>o.id===selectedOffer);
   const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
-    (storeprop?.supportFreeShipping && storeprop?.freeShippingMinAmount != null && (fp*qty) >= Number(storeprop.freeShippingMinAmount)));
+    (storeprop?.supportFreeShipping && storeprop?.freeShippingMinAmount != null && subtotal >= Number(storeprop.freeShippingMinAmount)));
   const getLiv = useCallback(():number=>{ if(product.isDigital) return 0; if(orderFreeShipping) return 0; if(!selW) return 0; return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice; },[selW,fd.typeLivraison,orderFreeShipping,product.isDigital]);
-  const total = ()=> fp*qty + +getLiv();
+  const total = () => subtotal + +getLiv();
   const validate = ()=>{
     const e:Record<string,string>={};
     if(!fd.customerName.trim())  e.customerName=t.errName;
@@ -1567,7 +1580,14 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
   const addToCart = ()=>{
     setIsAdded(true);
     const cart=JSON.parse(localStorage.getItem(domain)||'[]');
-    cart.push({ addonIds,...fd,quantity:qty,product,variantDetailId:getVarId(),productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv(),addedAt:Date.now()});
+    if (lines) {
+      // مدخل لكل بطاقة عرض (بسطور قطعها) — تظهر في السلة كبطاقة، وتتحول لسطور عند إرسال الطلب
+      for (const e of boxEntries(product as any, selectedOffer, boxes, (ids) => addonsTotal(product, ids))) {
+        cart.push({ ...fd, quantity: 1, product, productId: product.id, storeId: product.store.id, userId, selectedOffer, platform: platform || 'store', finalPrice: e.total, totalPrice: e.total, priceLivraison: getLiv(), addedAt: Date.now(), offerBox: { lines: e.lines } });
+      }
+    } else {
+      cart.push({ addonIds,...fd,quantity:qty,product,variantDetailId:getVarId(),productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv(),addedAt:Date.now()});
+    }
     localStorage.setItem(domain,JSON.stringify(cart));
     initCount(cart.length);
     setTimeout(()=>setIsAdded(false),2000);
@@ -1582,7 +1602,11 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
       const payload = product.isDigital
         ? { ...rest, ...({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) }) }
         : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
-      await axios.post(`${API_URL}/orders/create`,{ addonIds,...payload,quantity:qty,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});
+      const common = { ...payload, productId: product.id, storeId: product.store.id, userId, selectedOffer, platform: platform || 'store', priceLivraison: getLiv() };
+      // البطاقات: سطر لكل مجموعة قطع متطابقة (كطلب السلة)، وإلا الطلب الواحد كما كان
+      await axios.post(`${API_URL}/orders/create`, lines
+        ? lines.map((l) => ({ ...common, addonIds: l.addonIds, quantity: l.quantity, variantDetailId: l.variantDetailId, selectedVariants: l.selectedVariants, finalPrice: l.finalPrice, totalPrice: l.finalPrice * l.quantity }))
+        : { addonIds, ...common, quantity: qty, variantDetailId: getVarId(), finalPrice: fp, totalPrice: total() });
       if(fd.customerId) localStorage.setItem('customerId',fd.customerId);
       router.push(`/successfully?productId=${product?.id}`);
     }catch{}finally{setSub(false);}
@@ -1590,7 +1614,18 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} style={{marginTop:'22px',paddingTop:'20px',borderTop:'1px solid var(--line)'}}>
-  <ProductAddons product={product} store={product.store as any} selected={addonIds} onChange={setAddonIds} accent="#FF4500" />
+  {/* الكمية خارج نموذج الطلب، فوق بطاقات العرض */}
+  {supportQty && !product.isDigital && (
+    <FR label={t.qty}>
+      <div style={{display:'inline-flex',alignItems:'center',border:'1.5px solid var(--dim)',overflow:'hidden',backgroundColor:'var(--panel)'}}>
+        <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderRight:'1px solid var(--dim)',background:'transparent',cursor:'pointer',color:'var(--fire)',fontSize:'18px',fontWeight:700}}>-</button>
+        <span className="bb" style={{width:'44px',textAlign:'center',fontSize:'1.2rem',color:'var(--white)'}}>{fd.quantity}</span>
+        <button type="button" onClick={()=>setFd(p=>({...p,quantity:p.quantity+1}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderLeft:'1px solid var(--dim)',background:'transparent',cursor:'pointer',color:'var(--fire)',fontSize:'18px',fontWeight:700}}>+</button>
+      </div>
+    </FR>
+  )}
+  <OfferPieces dark product={product} store={(storeprop as any) || product.store} accent="#FF4500" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  {!usePieces && <ProductAddons product={product} store={product.store as any} selected={addonIds} onChange={setAddonIds} accent="#FF4500" />}
       {/* Cart + Order buttons */}
         {product.store?.cart && !product.isDigital && (
         <div style={{display:'flex',gap:'8px',marginBottom:'16px'}}>
@@ -1682,15 +1717,6 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
               </>
             )}
 
-            {supportQty && !product.isDigital && (
-              <FR label={t.qty}>
-                <div style={{display:'inline-flex',alignItems:'center',border:'1.5px solid var(--dim)',overflow:'hidden',backgroundColor:'var(--panel)'}}>
-                  <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderRight:'1px solid var(--dim)',background:'transparent',cursor:'pointer',color:'var(--fire)',fontSize:'18px',fontWeight:700}}>-</button>
-                  <span className="bb" style={{width:'44px',textAlign:'center',fontSize:'1.2rem',color:'var(--white)'}}>{fd.quantity}</span>
-                  <button type="button" onClick={()=>setFd(p=>({...p,quantity:p.quantity+1}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderLeft:'1px solid var(--dim)',background:'transparent',cursor:'pointer',color:'var(--fire)',fontSize:'18px',fontWeight:700}}>+</button>
-                </div>
-              </FR>
-            )}
 
             {/* Summary */}
             <div style={{border:'1px solid var(--line)',borderRight:'3px solid var(--fire)',borderLeft:'none',marginBottom:'14px',overflow:'hidden',backgroundColor:'var(--panel)'}}>
@@ -1773,7 +1799,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     if(Object.keys(er).length){setErrors(er);return;}
     setErrors({}); setSubmitting(true);
     try{
-      await axios.post(`${API_URL}/orders/create`,items.map(i=>({ addonIds: i.addonIds,...fd,productId:i.productId,storeId:i.storeId,userId:i.userId,selectedOffer:i.selectedOffer,variantDetailId:i.variantDetailId,selectedVariants:i.selectedVariants,platform:i.platform||'store',finalPrice:i.finalPrice,totalPrice:finalTotal,priceLivraison:+getLiv(),quantity:i.quantity,customerId:i.customerId||'',priceLoss:selW?.livraisonReturn??0})));
+      await axios.post(`${API_URL}/orders/create`,cartOrderItems(items).map(i => ({ addonIds: i.addonIds,...fd,productId:i.productId,storeId:i.storeId,userId:i.userId,selectedOffer:i.selectedOffer,variantDetailId:i.variantDetailId,selectedVariants:i.selectedVariants,platform:i.platform||'store',finalPrice:i.finalPrice,totalPrice:finalTotal,priceLivraison:+getLiv(),quantity:i.quantity,customerId:i.customerId||'',priceLoss:selW?.livraisonReturn??0})));
       setSuccess(true); localStorage.removeItem(domain); setItems([]); initCount(0);
     }catch{}finally{setSubmitting(false);}
   };
@@ -1823,7 +1849,9 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         <div className="cart-layout">
           {/* Items */}
           <div style={{background:'var(--panel)',border:'1px solid var(--line)',borderTop:'2px solid var(--fire)',alignSelf:'start'}}>
-            {items.map((item,i)=>(
+            {items.map((item, i) => item.offerBox?.lines?.length ? (
+            <CartItemCard key={i} dark item={item} index={i} items={items} update={update} store={store} accent="#FF4500" />
+          ) : (
               <div key={i} style={{display:'flex',gap:'1rem',padding:'14px',borderBottom:'1px solid var(--line)'}}>
                 <div style={{width:80,height:80,flexShrink:0,overflow:'hidden',border:'1px solid var(--line)',background:'var(--panel-2)'}}>
                   <img src={item.product?.imagesProduct?.[0]?.imageUrl||item.product?.productImage} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}} alt=""/>
