@@ -65,7 +65,8 @@ export function CartItemCard({ item, index, items, update, store, accent, dark =
   if (isBox) {
     const offer = item.product?.offers?.find((o: any) => o.id === item.selectedOffer);
     return (
-      <div data-cart-item style={{ padding: '0.75rem', borderBottom: `1px solid ${C.line}` }}>
+      // contain: inline-size ← اسم المنتج الطويل (سطر واحد) لا يوسّع عمود السلة فيدخل تحت نموذج الطلب
+      <div data-cart-item style={{ padding: '0.75rem', borderBottom: `1px solid ${C.line}`, minWidth: 0, contain: 'inline-size' }}>
         <div style={{ border: `1.5px solid ${accent}`, borderRadius: 10, overflow: 'hidden' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0.6rem 0.75rem', background: C.head }}>
             <img src={imageOf(item)} alt="" style={{ width: 52, height: 52, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
@@ -88,7 +89,7 @@ export function CartItemCard({ item, index, items, update, store, accent, dark =
   }
 
   return (
-    <div data-cart-item style={{ display: 'flex', gap: '1rem', padding: '1rem', borderBottom: `1px solid ${C.line}` }}>
+    <div data-cart-item style={{ display: 'flex', gap: '1rem', padding: '1rem', borderBottom: `1px solid ${C.line}`, minWidth: 0, contain: 'inline-size' }}>
       <img src={imageOf(item)} alt="" style={{ width: 76, height: 76, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <h4 style={{ margin: '0 0 0.25rem', fontWeight: 600, color: C.text, fontSize: '0.875rem', lineHeight: 1.4 }}>{item.product?.name}</h4>
