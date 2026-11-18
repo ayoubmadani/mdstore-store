@@ -22,7 +22,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -775,10 +775,10 @@ export function Home({ store, page }: any) {
             <span style={{ fontSize: '0.65rem', fontWeight: 700, color: R, textTransform: 'uppercase', letterSpacing: '0.12em' }}>{t.heroBadge}</span>
           </div>
           <h1 style={{ fontSize: 'clamp(3rem,8vw,7rem)', fontWeight: 800, color: '#fff', lineHeight: 0.95, letterSpacing: '-0.01em', marginBottom: '1.25rem', fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase' }}
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || t.heroTitle) }} />
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || heroFallback(store, t.heroTitle)) }} />
           <div style={{ width: 80, height: 4, background: R, margin: '0 auto 1.5rem' }} />
           <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, marginBottom: '2.5rem', maxWidth: 480, margin: '0 auto 2.5rem' }}>
-            {store.hero?.subtitle || t.heroSubtitle}
+            {store.hero?.subtitle || heroFallback(store, t.heroSubtitle)}
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '0.875rem', flexWrap: 'wrap' as const }}>
             <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: R, color: '#fff', fontWeight: 700, fontSize: '0.875rem', padding: '0.875rem 2rem', textTransform: 'uppercase', letterSpacing: '0.06em', transition: 'background 0.18s' }}

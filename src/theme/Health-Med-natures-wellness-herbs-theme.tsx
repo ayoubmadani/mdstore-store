@@ -22,7 +22,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -986,9 +986,9 @@ export function Home({ store, page }: any) {
                 <span style={{ fontSize: '0.7rem', fontWeight: 600, color: G }}>{t.heroBadge}</span>
               </div>
               <h1 style={{ fontSize: 'clamp(2.25rem,5.5vw,4.5rem)', fontWeight: 700, color: GD, lineHeight: 1.1, letterSpacing: '-0.02em', marginBottom: '1rem' }}
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || t.heroTitleDef) }} />
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || heroFallback(store, t.heroTitleDef)) }} />
               <p style={{ fontSize: '1rem', color: SUB, lineHeight: 1.8, marginBottom: '2rem', maxWidth: 440 }}>
-                {store.hero?.subtitle || t.heroSubtitleDef}
+                {store.hero?.subtitle || heroFallback(store, t.heroSubtitleDef)}
               </p>
               <div className="hero-actions">
                 <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: `linear-gradient(135deg, ${G} 0%, ${GA} 100%)`, color: '#fff', fontWeight: 600, fontSize: '0.9rem', padding: '0.875rem 1.875rem', borderRadius: 12, transition: 'opacity 0.18s' }}

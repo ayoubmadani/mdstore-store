@@ -11,7 +11,7 @@ import { OfferPieces, needsPieces } from '@/components/theme/OfferPieces';
 import { CartItemCard, cartOrderItems } from '@/components/theme/CartItemCard';
 import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, type Box } from '@/components/theme/orderPieces';
 import { useRouter, usePathname } from 'next/navigation';
-import { HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Star, ChevronDown, ChevronLeft, ChevronRight,
@@ -652,7 +652,7 @@ export function Home({ store, page }: any) {
             margin: '0 0 2rem',
             lineHeight: '1.6'
           }}>
-            {store.hero?.subtitle || 'نقدم لك أفضل المنتجات بأعلى جودة وتجربة تسوق بسيطة.'}
+            {store.hero?.subtitle || heroFallback(store, 'نقدم لك أفضل المنتجات بأعلى جودة وتجربة تسوق بسيطة.')}
           </p>
 
           <a href="#products"

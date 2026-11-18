@@ -25,7 +25,7 @@ import {
   ChevronLeft, ChevronRight, Star, Trash2, Plus, Minus, Check, AlertCircle,
   Truck, ShieldCheck, CreditCard, Headphones, Smartphone, Send, Cpu, Package, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -638,7 +638,7 @@ export function Navbar({ store, domain }: any) {
       <div className="pt-topbar">
         <div className="pt-container pt-topbar-inner">
           <span className="pt-mono" style={{ letterSpacing: '0.06em', textTransform: 'uppercase', fontSize: '0.7rem' }}>
-            {store?.hero?.subtitle || t.heroEyebrow}
+            {store?.hero?.subtitle || heroFallback(store, t.heroEyebrow)}
           </span>
           {store?.contact?.phone && (
             <a href={`tel:${store.contact.phone}`} className="pt-mono" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -783,7 +783,7 @@ export function Footer({ store }: any) {
               <Cpu size={24} color={A} />
               <span style={{ color: '#fff', fontWeight: 900, fontSize: '1.25rem' }}>{store?.name}</span>
             </div>
-            <p style={{ maxWidth: 340, fontSize: '0.9rem', lineHeight: 1.7 }}>{store?.hero?.subtitle || t.heroEyebrow}</p>
+            <p style={{ maxWidth: 340, fontSize: '0.9rem', lineHeight: 1.7 }}>{store?.hero?.subtitle || heroFallback(store, t.heroEyebrow)}</p>
             <span className="pt-mono" style={{ display: 'block', marginTop: 18, fontSize: '0.75rem', color: MUT }}>
               © {year} {store?.name} — {t.rightsReserved}
             </span>

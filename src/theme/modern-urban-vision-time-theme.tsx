@@ -30,7 +30,7 @@ import {
   Glasses, Watch, Truck, ShieldCheck, CreditCard, Headphones,
   Star, Plus, Minus, ArrowRight, Send, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -1206,7 +1206,7 @@ export function Footer({ store }: any) {
               {store?.name}
             </p>
             <p style={{ color: 'rgba(237,237,232,.62)', lineHeight: 1.95, fontSize: '.88rem', maxWidth: 380, marginInlineEnd: 'auto' }}>
-              {store?.hero?.subtitle || t.heroSubFallback}
+              {store?.hero?.subtitle || heroFallback(store, t.heroSubFallback)}
             </p>
             <div style={{ display: 'flex', gap: 10, marginTop: 18, color: A }}>
               <Glasses size={18} /><Watch size={18} />
@@ -1346,8 +1346,8 @@ export function Home({ store, page }: any) {
   const countPage = Math.ceil((store?.count || products.length) / 48);
 
   const heroImg = store?.hero?.imageUrl;
-  const heroTitle = store?.hero?.title || t.heroTitleFallback;
-  const heroSub = store?.hero?.subtitle || t.heroSubFallback;
+  const heroTitle = store?.hero?.title || heroFallback(store, t.heroTitleFallback);
+  const heroSub = store?.hero?.subtitle || heroFallback(store, t.heroSubFallback);
 
   const trustIcons = [Truck, ShieldCheck, CreditCard, Headphones];
   const trust = t.trust as readonly { t: string; s: string }[];

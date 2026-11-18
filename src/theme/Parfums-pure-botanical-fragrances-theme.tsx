@@ -23,7 +23,7 @@ import {
   ChevronLeft, ChevronRight, Trash2, Check, Minus, Plus, Leaf, Package, Truck, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -721,7 +721,7 @@ export function Home({ store, page }: any) {
       <section className="pbf-hero">
         <div className="pbf-container">
           <h1 className="pbf-hero-title"
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store?.hero?.title || store?.name || '') }} />
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store?.hero?.title || heroFallback(store, store?.name) || '') }} />
           <p className="pbf-hero-sub">{store?.hero?.subtitle}</p>
           <div className="pbf-hero-cta-row">
             <Link href="#products" className="pbf-btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>

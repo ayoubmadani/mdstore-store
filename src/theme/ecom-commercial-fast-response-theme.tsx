@@ -32,7 +32,7 @@ import {
   ChevronLeft, ChevronRight, Star, Truck, ShieldCheck, Lock, Headphones,
   Trash2, Plus, Minus, CheckCircle, AlertCircle, Package, ArrowLeft, ArrowRight, MessageCircle, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -735,7 +735,7 @@ export function Footer({ store }: any) {
           <div>
             <p className="hn-display" style={{ fontWeight: 900, fontSize: '1.4rem', margin: 0 }}>{store?.name || 'Store'}</p>
             <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', lineHeight: 1.7, margin: '0.75rem 0 0', maxWidth: 360 }}>
-              {store?.hero?.subtitle || t.heroDefaultSub}
+              {store?.hero?.subtitle || heroFallback(store, t.heroDefaultSub)}
             </p>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginTop: 16, background: 'rgba(127,227,192,0.12)', color: '#7FE3C0', padding: '7px 14px', borderRadius: 999, fontSize: '0.82rem', fontWeight: 800 }}>
               <ShieldCheck size={15} /> {t.codBadge}

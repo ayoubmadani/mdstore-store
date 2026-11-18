@@ -22,7 +22,7 @@ import {
   Leaf, Flower2, Droplets, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -1081,7 +1081,7 @@ export function Home({ store, page }: any) {
             fontSize:'clamp(14px, 1.6vw, 16px)', lineHeight:'1.7',
             color:'var(--warm)', maxWidth:'540px', marginBottom:'28px'
           }}>
-            {store.hero?.subtitle || t.heroSubtitle}
+            {store.hero?.subtitle || heroFallback(store, t.heroSubtitle)}
           </p>
 
           <div style={{ display:'flex', gap:'12px', flexWrap:'wrap', justifyContent:'center', marginBottom:'36px' }}>

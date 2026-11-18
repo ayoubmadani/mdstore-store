@@ -22,7 +22,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -661,9 +661,9 @@ export function Home({ store, page }: any) {
             <span style={{ fontSize: '0.72rem', fontWeight: 600, color: A }}>أدوات هندسية متخصصة</span>
           </div>
           <h1 style={{ fontSize: 'clamp(2rem,5.5vw,4rem)', fontWeight: 700, color: '#fff', lineHeight: 1.15, letterSpacing: '-0.025em', marginBottom: '1rem', maxWidth: 640 }}
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'دقة في القياس،<br/>احترافية في <span style="color:#F59E0B">العمل</span>') }} />
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || heroFallback(store, 'دقة في القياس،<br/>احترافية في <span style="color:#F59E0B">العمل</span>')) }} />
           <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.68)', lineHeight: 1.75, marginBottom: '2.25rem', maxWidth: 480 }}>
-            {store.hero?.subtitle || 'أدوات قياس، عدة يدوية وكهربائية، ومعدات حماية شخصية مختارة للمحترفين في قطاع البناء والهندسة.'}
+            {store.hero?.subtitle || heroFallback(store, 'أدوات قياس، عدة يدوية وكهربائية، ومعدات حماية شخصية مختارة للمحترفين في قطاع البناء والهندسة.')}
           </p>
           <div className="hero-actions">
             <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: A, color: SL, fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.875rem', borderRadius: 8, transition: 'all 0.2s', boxShadow: `0 4px 24px rgba(245,158,11,0.4)` }}

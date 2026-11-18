@@ -39,7 +39,7 @@ import {
   Phone, Mail, MessageCircle, MapPin, Star, Trash2, Minus, Plus, Check, AlertCircle, Home as HomeIcon,
   Truck, ShieldCheck, Headphones, Send, Smartphone, ArrowRight, BadgeCheck, CreditCard, Cable, Package, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -840,7 +840,7 @@ export function Navbar({ store, domain }: any) {
               <span className="tk-d"><LogoWithName store={store} nameClass="tk-word"><img src={logo} alt={store?.name || 'logo'}
                 style={{ height: 30, objectFit: 'contain', display: 'block' }} /></LogoWithName></span>
             ) : (
-              <span className="tk-tagline">{store?.hero?.subtitle || t.tagline}</span>
+              <span className="tk-tagline">{store?.hero?.subtitle || heroFallback(store, t.tagline)}</span>
             )}
 
             <form onSubmit={submitSearch} className="tk-searchwrap tk-d" style={{ marginInlineStart: 'auto' }}>
@@ -945,7 +945,7 @@ export function Footer({ store }: any) {
               <span className="tk-disp" style={{ fontSize: '1.12rem', fontWeight: 700 }}>{store?.name || 'ACCESSORIES'}</span>
             </div>
             <p dir="auto" style={{ fontSize: '.87rem', lineHeight: 1.8, color: SUB, maxWidth: 340, margin: 0, marginInlineEnd: 'auto' }}>
-              {store?.hero?.subtitle || t.heroSub}
+              {store?.hero?.subtitle || heroFallback(store, t.heroSub)}
             </p>
           </div>
 
@@ -1059,8 +1059,8 @@ export function Home({ store, page }: any) {
             <div className="tk-tile tk-tile-main">
               <span style={eyebrow}>{t.heroEyebrow}</span>
               <h1 dir="auto" className="tk-hero-title"
-                dangerouslySetInnerHTML={{ __html: clean(store?.hero?.title || t.heroTitle) }} />
-              <p dir="auto" className="tk-hero-sub">{store?.hero?.subtitle || t.heroSub}</p>
+                dangerouslySetInnerHTML={{ __html: clean(store?.hero?.title || heroFallback(store, t.heroTitle)) }} />
+              <p dir="auto" className="tk-hero-sub">{store?.hero?.subtitle || heroFallback(store, t.heroSub)}</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 26 }}>
                 <a href="#grid" className="tk-btnp" style={{ ...btnPrimary, width: 'auto' }}>
                   {t.shopNow} <ArrowRight size={16} style={{ transform: t.dir === 'rtl' ? 'rotate(180deg)' : 'none' }} />

@@ -14,7 +14,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import { Star, ChevronDown, AlertCircle, X, CheckCircle2, Shield, ArrowLeft, Plus, Minus, Search, ShoppingCart, Trash2, Loader2, ChevronLeft, ChevronRight, Phone, Package, Truck, Mail, MessageCircle, Download } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback, heroImageOnly } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -650,10 +650,10 @@ export function Home({store,page}:any){
             {/* الصورة تبقى واضحة: الضبابية خلف النص فقط */}
             <div style={store.hero?.imageUrl?{...heroTextClear(store),maxWidth:'100%'}:undefined}>
               <h1 className="bn" style={{fontSize:'clamp(4rem,12vw,10rem)',color:'var(--tx)',lineHeight:.88,letterSpacing:'0.03em',marginBottom:16}}>
-                {store.hero?.title||<><span>LUXE</span><br/><span style={{color:'var(--cp)'}}>FASHION</span></>}
+                {store.hero?.title||(heroImageOnly(store)?null:<><span>LUXE</span><br/><span style={{color:'var(--cp)'}}>FASHION</span></>)}
               </h1>
               <p style={{fontSize:'13px',color:store.hero?.imageUrl?'rgba(245,241,235,0.85)':'rgba(245,241,235,0.55)',letterSpacing:'0.06em',maxWidth:340,lineHeight:1.8}}>
-                {store.hero?.subtitle||t.heroSubFallback}
+                {store.hero?.subtitle||heroFallback(store, t.heroSubFallback)}
               </p>
             </div>
             <a href="#products" className="btn-dark" style={{textDecoration:'none',flexShrink:0}}>{t.shopNow}</a>

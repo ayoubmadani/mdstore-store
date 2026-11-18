@@ -35,7 +35,7 @@ import {
   Phone, Mail, MapPin, Star, Trash2, Minus, Plus, Check, AlertCircle,
   Truck, ShieldCheck, Award, Headphones, Send, Footprints, ArrowRight, Package, MessageCircle, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -895,7 +895,7 @@ export function Footer({ store }: any) {
             </p>
             <div style={{ width: 46, height: 1, background: A, margin: '16px 0' }} />
             <p dir="auto" style={{ fontSize: '.85rem', lineHeight: 1.8, maxWidth: 340, margin: 0, marginInlineEnd: 'auto' }}>
-              {store?.hero?.subtitle || t.heroSub}
+              {store?.hero?.subtitle || heroFallback(store, t.heroSub)}
             </p>
           </div>
 
@@ -1025,10 +1025,10 @@ export function Home({ store, page }: any) {
             <p style={{ ...eyebrow, color: onImg ? '#D9A97A' : A, animation: 'lxIn .6s ease both' }}>{t.heroEyebrow}</p>
 
             <h1 dir="auto" className="lx-hero-title" style={{ color: TXT }}
-              dangerouslySetInnerHTML={{ __html: clean(store?.hero?.title || t.heroTitle) }} />
+              dangerouslySetInnerHTML={{ __html: clean(store?.hero?.title || heroFallback(store, t.heroTitle)) }} />
 
             <p dir="auto" className="lx-hero-sub" style={{ color: TXT2 }}>
-              {store?.hero?.subtitle || t.heroSub}
+              {store?.hero?.subtitle || heroFallback(store, t.heroSub)}
             </p>
 
             <div className="lx-hero-cta">

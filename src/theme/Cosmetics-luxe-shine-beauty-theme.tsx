@@ -17,7 +17,7 @@ import {
   Package, Clock, Heart, MessageCircle, Download
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 import { ProductAddons, addonsTotal } from '@/components/theme/ProductAddons';
 import { OfferPieces, needsPieces } from '@/components/theme/OfferPieces';
 import { CartItemCard, cartOrderItems } from '@/components/theme/CartItemCard';
@@ -867,7 +867,7 @@ export function Footer({ store }: any) {
       <div className="luxe-container luxe-footer-grid">
         <div>
           <p className="luxe-footer-brand">{store?.name || 'Luxe & Shine'}</p>
-          <p className="luxe-footer-desc">{store?.hero?.subtitle || 'Premium beauty products curated for elegance.'}</p>
+          <p className="luxe-footer-desc">{store?.hero?.subtitle || heroFallback(store, 'Premium beauty products curated for elegance.')}</p>
           <p style={{ color: SUB, fontSize: '0.8rem' }}>© {year} {store?.name}. {t.rightsReserved}</p>
         </div>
         <div>
@@ -948,8 +948,8 @@ export function Home({ store, page }: any) {
   const countPage = Math.ceil((store?.count || products.length) / 48);
   const currentPage = Number(page || 1);
 
-  const heroTitle = store?.hero?.title || 'Luxe & Shine Beauty';
-  const heroSub = store?.hero?.subtitle || 'Discover premium serums, perfumes, and beauty essentials crafted for elegance.';
+  const heroTitle = store?.hero?.title || heroFallback(store, 'Luxe & Shine Beauty');
+  const heroSub = store?.hero?.subtitle || heroFallback(store, 'Discover premium serums, perfumes, and beauty essentials crafted for elegance.');
 
   return (
     <div>

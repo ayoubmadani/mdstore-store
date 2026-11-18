@@ -22,7 +22,7 @@ import {
   Headphones, Volume2, Mail, Sparkles, ShieldCheck, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -866,9 +866,9 @@ export function Home({ store, page }: any) {
             <span className="eyebrow" style={{ fontSize: '0.68rem', fontWeight: 600, color: A, textTransform: 'uppercase' as const }}>نخبة الصوت الفاخر</span>
           </div>
           <h1 className="font-display" style={{ fontSize: 'clamp(2.1rem,6vw,4rem)', fontWeight: 600, color: TXT, lineHeight: 1.25, marginBottom: '1.25rem' }}
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'تجربة صوتية<br/><span style="color:#7C6B5E">استثنائية</span>') }} />
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || heroFallback(store, 'تجربة صوتية<br/><span style="color:#7C6B5E">استثنائية</span>')) }} />
           <p style={{ fontSize: '1rem', color: SUB, lineHeight: 1.8, marginBottom: '2.25rem', maxWidth: 520, margin: '0 auto 2.25rem' }}>
-            {store.hero?.subtitle || 'أنظمة صوت ومسارح منزلية فاخرة، مصممة لعشاق الجودة الصوتية النقية.'}
+            {store.hero?.subtitle || heroFallback(store, 'أنظمة صوت ومسارح منزلية فاخرة، مصممة لعشاق الجودة الصوتية النقية.')}
           </p>
           <div className="hero-actions">
             <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: A, color: '#FFFFFF', fontWeight: 700, fontSize: '0.85rem', padding: '0.875rem 2rem', borderRadius: 0, transition: 'all 0.3s' }}

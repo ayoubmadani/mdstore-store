@@ -12,7 +12,7 @@ import { OfferPieces, needsPieces } from '@/components/theme/OfferPieces';
 import { CartItemCard, cartOrderItems } from '@/components/theme/CartItemCard';
 import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, type Box } from '@/components/theme/orderPieces';
 import { useCartStore } from "@/store/useCartStore";
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 import {
   ShoppingCart, Search, Menu, X, ChevronDown, ChevronLeft, ChevronRight,
   Star, Trash2, Phone, Mail, MapPin, Send, AlertCircle, Minus, Plus,
@@ -747,11 +747,11 @@ export function Home({ store, page }: { store: any; page: number }) {
               {t.heroBadge}
             </div>
             <h1 dir="auto" style={{ fontSize: "clamp(1.6rem,4.5vw,3rem)", fontWeight: 900, color: TXT, lineHeight: 1.2, marginBottom: 16, wordBreak: "break-word" }}>
-              {store?.hero?.title || t.heroTitle}
+              {store?.hero?.title || heroFallback(store, t.heroTitle)}
             </h1>
             <p dir="auto" style={{ fontSize: "clamp(0.9rem,1.8vw,1.1rem)", color: SUB, lineHeight: 1.7, marginBottom: 28, maxWidth: 480,
               display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-              {store?.hero?.subtitle || t.heroSub}
+              {store?.hero?.subtitle || heroFallback(store, t.heroSub)}
             </p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <Link href="/?page=1" style={{ ...btnPrimary, width: "auto", padding: "0.75rem 1.75rem" }}>

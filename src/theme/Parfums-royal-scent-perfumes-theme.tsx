@@ -23,7 +23,7 @@ import {
   ChevronLeft, ChevronRight, Trash2, Check, Minus, Plus, Package, Truck, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -819,7 +819,7 @@ export function Home({ store, page }: any) {
             </span>
           )}
           <h1 className="rsp-hero-title"
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store?.hero?.title || store?.name || '') }} />
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store?.hero?.title || heroFallback(store, store?.name) || '') }} />
           <p className="rsp-hero-sub">{store?.hero?.subtitle}</p>
           <div className="rsp-hero-cta-row">
             <Link href="#products" className="rsp-btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>

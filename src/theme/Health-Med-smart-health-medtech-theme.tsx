@@ -22,7 +22,7 @@ import {
   HeartPulse, Stethoscope, Ambulance, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -1114,7 +1114,7 @@ export function Home({ store, page }: any) {
             color:'var(--ink)', marginBottom:'14px'
           }}
             dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(store.hero?.title || t.heroTitleDefault)
+              __html: DOMPurify.sanitize(store.hero?.title || heroFallback(store, t.heroTitleDefault))
             }}>
           </h1>
 
@@ -1122,7 +1122,7 @@ export function Home({ store, page }: any) {
             fontSize:'clamp(14px, 1.6vw, 16px)', lineHeight:'1.7',
             color:'var(--mid)', maxWidth:'540px', marginBottom:'28px'
           }}>
-            {store.hero?.subtitle || t.heroSubtitleDefault}
+            {store.hero?.subtitle || heroFallback(store, t.heroSubtitleDefault)}
           </p>
 
           <div style={{ display:'flex', gap:'12px', flexWrap:'wrap', justifyContent:'center', marginBottom:'36px' }}>

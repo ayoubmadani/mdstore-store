@@ -16,7 +16,7 @@ import {
   Mail, MessageCircle, Download, Flame, Clock, Bike, Sandwich, ChefHat,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 import { OfferPieces, needsPieces } from '@/components/theme/OfferPieces';
 import { CartItemCard, cartOrderItems } from '@/components/theme/CartItemCard';
@@ -1111,7 +1111,7 @@ export function Home({ store, page }: any) {
   const activeCategory = searchParams.get('category');
   if (!page) page = 1;
   const countPage = Math.ceil((store.count || products.length) / 48);
-  const heroTitle = (store.hero?.title || '').replace(/<[^>]+>/g, '').trim() || t.heroTitle;
+  const heroTitle = (store.hero?.title || '').replace(/<[^>]+>/g, '').trim() || heroFallback(store, t.heroTitle);
 
   const SectionTitle = ({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
@@ -1141,7 +1141,7 @@ export function Home({ store, page }: any) {
               {heroTitle}
             </h1>
             <p style={{ fontSize: '1.0625rem', color: 'rgba(255,248,236,0.72)', lineHeight: 1.8, marginBottom: '2rem', maxWidth: 520, textAlign: align }}>
-              {store.hero?.subtitle || t.heroSubtitle}
+              {store.hero?.subtitle || heroFallback(store, t.heroSubtitle)}
             </p>
             <div className="hero-actions">
               <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#E63228', color: '#fff', fontWeight: 900, fontSize: '1rem', padding: '1rem 2rem', borderRadius: 999, boxShadow: '0 6px 0 #9B1B14', transition: 'transform 0.15s, box-shadow 0.15s' }}

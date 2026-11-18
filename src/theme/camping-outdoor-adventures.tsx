@@ -23,7 +23,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -773,14 +773,14 @@ export function Home({ store, page }: any) {
               <span style={{ fontSize: '0.62rem', fontWeight: 700, color: OR, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: "'Barlow Condensed', sans-serif" }}>{t.heroBadge}</span>
             </div>
             <h1 style={{ fontFamily: "'Barlow Condensed', 'Cairo', sans-serif", fontSize: 'clamp(3.5rem,9vw,7rem)', fontWeight: 800, color: '#FAFAF8', lineHeight: 0.9, letterSpacing: '-0.02em', textTransform: 'uppercase', marginBottom: '1.25rem' }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || t.heroTitle) }} />
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || heroFallback(store, t.heroTitle)) }} />
             <div style={{ display: 'flex', gap: 6, marginBottom: '1.5rem' }}>
               <div style={{ width: 40, height: 3, background: OR }} />
               <div style={{ width: 12, height: 3, background: G }} />
               <div style={{ width: 6, height: 3, background: 'rgba(255,255,255,0.2)' }} />
             </div>
             <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.55)', lineHeight: 1.85, marginBottom: '2rem', maxWidth: 440 }}>
-              {store.hero?.subtitle || t.heroSubtitle}
+              {store.hero?.subtitle || heroFallback(store, t.heroSubtitle)}
             </p>
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
               <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: OR, color: '#fff', fontWeight: 800, fontSize: '0.8rem', padding: '0.875rem 1.875rem', transition: 'background 0.18s', textDecoration: 'none', fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.1em', textTransform: 'uppercase' }}

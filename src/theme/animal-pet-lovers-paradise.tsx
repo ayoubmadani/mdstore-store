@@ -20,7 +20,7 @@ import {
     Shield, Truck, Sparkles, Lock, Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -934,10 +934,10 @@ export function Home({ store, page }: any) {
                         <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--amber-dk)' }}>{store?.name} — {t.heroTag}</span>
                     </div>
                     <h1 className="anim-fade font-serif" style={{ fontSize: 'clamp(2.75rem, 7vw, 5.5rem)', fontWeight: 700, color: 'var(--text)', lineHeight: 1.1, marginBottom: '1.25rem', letterSpacing: '-0.02em' }}
-                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || t.heroDefaultTitle) }} />
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || heroFallback(store, t.heroDefaultTitle)) }} />
                     <div style={{ height: 3, width: 80, borderRadius: 99, background: 'linear-gradient(90deg, var(--amber), var(--green), var(--sky))', marginBottom: '1.5rem' }} />
                     <p className="anim-fade" style={{ fontSize: '1.0625rem', fontWeight: 600, color: 'var(--text-mid)', maxWidth: 480, lineHeight: 1.75, marginBottom: '2.5rem' }}>
-                        {store.hero?.subtitle || t.heroDefaultSubtitle}
+                        {store.hero?.subtitle || heroFallback(store, t.heroDefaultSubtitle)}
                     </p>
                     <div className="hero-actions">
                         <a href="#products" className="btn-warm" style={{ ...BTN_PRI, textDecoration: 'none' }}>

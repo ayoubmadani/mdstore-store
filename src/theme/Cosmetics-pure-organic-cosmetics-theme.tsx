@@ -19,7 +19,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -1048,14 +1048,14 @@ export function Home({ store, page }: any) {
 
               {/* Heading */}
               <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(3rem,7vw,5.5rem)', fontWeight:600, color:'#fff', lineHeight:1.05, letterSpacing:'-0.02em', marginBottom:'1.25rem' }}
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || t.heroTitle) }} />
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || heroFallback(store, t.heroTitle)) }} />
 
               {/* Divider */}
               <div style={{ width:56, height:2, background:`linear-gradient(to left,${RO},transparent)`, marginBottom:'1.5rem' }} />
 
               {/* Subtitle */}
               <p style={{ fontSize:'clamp(0.9rem,2vw,1.05rem)', color:'rgba(255,255,255,0.75)', lineHeight:1.9, marginBottom:'2.5rem', fontWeight:300, maxWidth:380 }}>
-                {store.hero?.subtitle || t.heroSub}
+                {store.hero?.subtitle || heroFallback(store, t.heroSub)}
               </p>
 
               {/* CTAs */}

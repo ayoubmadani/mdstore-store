@@ -36,7 +36,7 @@ import {
   Phone, Mail, MapPin, Star, Trash2, Minus, Plus, Check, AlertCircle, Zap,
   Truck, ShieldCheck, Headphones, Send, Footprints, ArrowRight, Flame, PackageCheck, MessageCircle, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -946,7 +946,7 @@ export function Footer({ store }: any) {
               <span className="vx-disp" style={{ fontSize: '1.4rem', textTransform: 'uppercase' }}>{store?.name || 'VELOCITY'}</span>
             </div>
             <p dir="auto" style={{ fontSize: '.87rem', lineHeight: 1.8, color: SUB, maxWidth: 350, margin: 0, marginInlineEnd: 'auto' }}>
-              {store?.hero?.subtitle || t.heroSub}
+              {store?.hero?.subtitle || heroFallback(store, t.heroSub)}
             </p>
           </div>
 
@@ -1075,9 +1075,9 @@ export function Home({ store, page }: any) {
             </span>
 
             <h1 dir="auto" className="vx-hero-title"
-              dangerouslySetInnerHTML={{ __html: clean(store?.hero?.title || t.heroTitle) }} />
+              dangerouslySetInnerHTML={{ __html: clean(store?.hero?.title || heroFallback(store, t.heroTitle)) }} />
 
-            <p dir="auto" className="vx-hero-sub">{store?.hero?.subtitle || t.heroSub}</p>
+            <p dir="auto" className="vx-hero-sub">{store?.hero?.subtitle || heroFallback(store, t.heroSub)}</p>
 
             <div className="vx-hero-cta">
               <a href="#collection" className="vx-btnp vx-pulse" style={{ ...btnPrimary, width: 'auto' }}>

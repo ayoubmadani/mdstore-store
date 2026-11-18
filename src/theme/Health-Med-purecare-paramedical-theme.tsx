@@ -22,7 +22,7 @@ import {
   Trash2, Loader2, Phone, MapPin, Mail, Activity, Zap, User, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -1055,10 +1055,10 @@ export function Home({ store, page }: any) {
             <div className="fi" style={{ padding: '32px 5vw', zIndex: 2, maxWidth: 460, ...heroTextClear(store) }}>
               {store?.design?.logoUrl && store.design.logoUrl !== '/default-logo.png' && <img src={store.design.logoUrl} alt="" style={{ height: '36px', filter: 'brightness(0) invert(1)', opacity: 0.9, marginBottom: '12px', display: 'block' }} />}
               <h1 className="pjs" style={{ fontSize: 'clamp(1.6rem,5vw,3.2rem)', fontWeight: 800, color: 'white', lineHeight: 1.05, marginBottom: '10px', letterSpacing: '-0.01em' }}>
-                {store.hero?.title || t.heroTitle}
+                {store.hero?.title || heroFallback(store, t.heroTitle)}
               </h1>
               <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.78)', marginBottom: '22px', lineHeight: '1.7' }}>
-                {store.hero?.subtitle || t.heroSubtitle}
+                {store.hero?.subtitle || heroFallback(store, t.heroSubtitle)}
               </p>
               <a href="#products" className="btn-blue" style={{ fontSize: '14px', padding: '11px 26px' }}>{t.shopNowBtn}</a>
             </div>

@@ -4,7 +4,7 @@
 import axios from 'axios';
 
 export { useCartStore } from '@/store/useCartStore';
-export { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, whatsappHref, HeroShade, heroShade, heroTextClear } from './storeContact';
+export { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, whatsappHref, HeroShade, heroShade, heroTextClear, heroImageOnly, heroFallback } from './storeContact';
 export { ProductAddons, activeAddons, addonsTotal, addonsLabel } from './ProductAddons';
 // بطاقات العرض: بطاقة لكل وحدة من الكمية، وفيها قطع العرض بخياراتها وإضافاتها؛ الطلب يُرسل سطوراً (boxLines)
 export { OfferPieces, needsPieces } from './OfferPieces';

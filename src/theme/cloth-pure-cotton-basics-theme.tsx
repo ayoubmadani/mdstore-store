@@ -12,7 +12,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import { ShoppingBag, Search, Menu, X, ChevronLeft, ChevronRight, Trash2, Plus, Minus, Check, MapPin, Phone, Mail, Package, Truck, MessageCircle, Download } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -712,7 +712,7 @@ export function Footer({ store }: any) {
         <div>
           <span className="pc-display" style={{ fontSize: 19, fontWeight: 900 }}>{store?.name}</span>
           <p style={{ marginTop: 10, fontSize: 13.5, color: 'var(--thread-soft)', lineHeight: 1.9, maxWidth: 280 }}>
-            {store?.hero?.subtitle || t.footerDesc}
+            {store?.hero?.subtitle || heroFallback(store, t.footerDesc)}
           </p>
           <p style={{ marginTop: 14, fontSize: 12, color: 'var(--thread-soft)' }}>© {new Date().getFullYear()} {store?.name}. {t.rightsReservedFull}</p>
         </div>
@@ -824,7 +824,7 @@ export function Home({ store, page }: any) {
           <h1
             className="pc-display"
             style={{ fontSize: 'clamp(30px,5vw,52px)', fontWeight: 900, margin: '16px 0', lineHeight: 1.25 }}
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store?.hero?.title || t.heroTitleFallback) }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store?.hero?.title || heroFallback(store, t.heroTitleFallback)) }}
           />
           {store?.hero?.subtitle && (
             <p style={{ fontSize: 16, color: 'var(--thread-soft)', maxWidth: 520, margin: '0 auto 30px', lineHeight: 1.8 }}>{store.hero.subtitle}</p>

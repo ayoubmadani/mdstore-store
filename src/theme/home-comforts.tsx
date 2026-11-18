@@ -22,7 +22,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -787,9 +787,9 @@ export function Home({ store, page }: any) {
               <span style={{ fontSize: '0.68rem', fontWeight: 700, color: WB, letterSpacing: '0.12em', textTransform: 'uppercase' as const }}>{t.heroBadge}</span>
             </div>
             <h1 style={{ fontSize: 'clamp(2.5rem,7vw,5rem)', fontWeight: 700, color: '#FBF8F5', lineHeight: 1.1, letterSpacing: '-0.025em', marginBottom: '1.25rem' }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || t.heroTitleFallback) }} />
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || heroFallback(store, t.heroTitleFallback)) }} />
             <p style={{ fontSize: '1.05rem', color: 'rgba(251,248,245,0.65)', lineHeight: 1.8, marginBottom: '2.5rem', maxWidth: 500 }}>
-              {store.hero?.subtitle || t.heroSubtitleFallback}
+              {store.hero?.subtitle || heroFallback(store, t.heroSubtitleFallback)}
             </p>
             <div className="hero-actions">
               <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: W, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.9rem 2rem', borderRadius: 8, transition: 'background 0.18s', textDecoration: 'none' }}

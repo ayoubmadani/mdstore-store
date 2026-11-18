@@ -20,7 +20,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -1036,7 +1036,7 @@ export function Home({ store, page }: any) {
 
           <div className="rise rise-2" style={{ marginTop: '40px', paddingTop: '24px', borderTop: '1px solid rgba(242,239,232,0.14)', display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: '20px' }}>
             <p className="sm" style={{ fontSize: '11px', lineHeight: '1.9', color: 'rgba(242,239,232,0.5)', maxWidth: '400px', letterSpacing: '0.05em' }}>
-              {store.hero?.subtitle || t.heroSubFallback}
+              {store.hero?.subtitle || heroFallback(store, t.heroSubFallback)}
             </p>
             <div className="rise rise-3" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <a href="#drops" className="btn-z">{t.shopCollection}</a>

@@ -22,7 +22,7 @@ import {
     ArrowLeft, Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -1010,14 +1010,14 @@ export function Home({ store, page }: any) {
 
                             {/* العنوان الرئيسي */}
                             <h1 className="anim-slide-up font-boogaloo" style={{ fontSize: 'clamp(2.5rem, 7vw, 5rem)', color: '#fff', lineHeight: 1.1, marginBottom: '1.5rem', textShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
-                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || 'ألعاب · أزياء<br/><span style="color:#FFE000">تعليم · مغامرة!</span>🚀') }} />
+                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || heroFallback(store, 'ألعاب · أزياء<br/><span style="color:#FFE000">تعليم · مغامرة!</span>🚀')) }} />
 
                             {/* الخط الملون الفاصل */}
                             <div style={{ height: 6, width: 120, borderRadius: 3, background: 'linear-gradient(90deg, var(--yellow), var(--orange))', marginBottom: '2rem' }} />
 
                             {/* الوصف */}
                             <p className="anim-slide-up" style={{ fontSize: '1.15rem', fontWeight: 600, color: 'rgba(255,255,255,0.85)', maxWidth: 520, lineHeight: 1.8, marginBottom: '3rem' }}>
-                                {store.hero?.subtitle || '🎯 كل ما يحتاجه طفلك من ألعاب ذكية، أزياء مريحة، وأدوات تعليمية ممتعة في مكان واحد!'}
+                                {store.hero?.subtitle || heroFallback(store, '🎯 كل ما يحتاجه طفلك من ألعاب ذكية، أزياء مريحة، وأدوات تعليمية ممتعة في مكان واحد!')}
                             </p>
 
                             {/* أزرار العمليات (CTAs) */}

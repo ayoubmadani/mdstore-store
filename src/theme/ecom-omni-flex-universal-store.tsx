@@ -20,7 +20,7 @@ import {
   Search, ShoppingCart, Trash2, Loader2, Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -1116,11 +1116,11 @@ export function Home({ store, page }: any) {
           </p>
 
           <h1 className="fu fu-2 bc" style={{fontSize:'clamp(2.5rem,6vw,4.8rem)',fontWeight:900,color:'var(--white)',lineHeight:1.05,marginBottom:'24px',maxWidth:'800px',letterSpacing:'0.02em'}}
-            dangerouslySetInnerHTML={{__html:DOMPurify.sanitize(store.hero?.title||t.heroTitle)}}>
+            dangerouslySetInnerHTML={{__html:DOMPurify.sanitize(store.hero?.title||heroFallback(store, t.heroTitle))}}>
           </h1>
 
           <p className="fu fu-3" style={{fontSize:'17px',lineHeight:'1.7',color:'rgba(255,255,255,0.7)',marginBottom:'40px',maxWidth:'520px',fontWeight:300}}>
-            {store.hero?.subtitle||t.heroSub}
+            {store.hero?.subtitle||heroFallback(store, t.heroSub)}
           </p>
 
           <div className="fu fu-3" style={{display:'flex',gap:'16px',flexWrap:'wrap'}}>

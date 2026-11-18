@@ -21,7 +21,7 @@ import {
   Trash2, Loader2, Package, Shield, Truck, Lock, RotateCcw, Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -1364,11 +1364,11 @@ export function Home({ store, page }: any) {
             </div>
 
             <h1 className="oswald anim-fade-up d1" style={{ fontSize: 'clamp(2.5rem,6vw,4.5rem)', fontWeight: 700, color: '#fff', lineHeight: 1.1, marginBottom: '1.375rem', textTransform: 'uppercase', letterSpacing: '1px' }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || t.heroTitleDef) }}>
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || heroFallback(store, t.heroTitleDef)) }}>
             </h1>
 
             <p className="anim-fade-up d2" style={{ fontSize: '1.0625rem', color: 'var(--g400)', maxWidth: 480, lineHeight: 1.75, marginBottom: '2.5rem' }}>
-              {store.hero?.subtitle || t.heroSubDef}
+              {store.hero?.subtitle || heroFallback(store, t.heroSubDef)}
             </p>
 
             {/* Stats */}

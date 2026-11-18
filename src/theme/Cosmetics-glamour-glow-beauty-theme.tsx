@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { showError } from '@/lib/showError';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -805,7 +805,7 @@ export function Home({ store, domain, page }: { store: any; domain: string; page
                 {store?.hero?.title?.replace(/<[^>]+>/g, '') || t.heroTitle}
               </h1>
               <p className="gg-hero-sub">
-                {store?.hero?.subtitle || t.heroSub}
+                {store?.hero?.subtitle || heroFallback(store, t.heroSub)}
               </p>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 <a href="#products" className="gg-btn gg-btn-pink">{t.shopNow}</a>

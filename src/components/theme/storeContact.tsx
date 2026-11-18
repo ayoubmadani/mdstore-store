@@ -93,8 +93,19 @@ export function heroTextPanel(store: { hero?: { imageUrl?: string | null } | nul
 }
 
 /** تدرّج أسود فوق صورة الغلاف من جهة النص (بدل اللوحة الضبابية): ضعه داخل حاوية الصورة (position: relative/absolute) */
-export function heroShade(store: { hero?: { imageUrl?: string | null } | null } | null | undefined, isRTL: boolean, tone: 'dark' | 'light' = 'dark', zIndex?: number): CSSProperties {
-  if (!store?.hero?.imageUrl) return { display: 'none' };
+type HeroStore = { hero?: { imageUrl?: string | null; title?: string | null; subtitle?: string | null } | null } | null | undefined;
+
+/** غلاف بصورة فقط (بلا عنوان ولا وصف): الصورة تظهر نظيفة — بلا طبقة تعتيم وبلا النص الافتراضي */
+export const heroImageOnly = (store: HeroStore) =>
+  !!store?.hero?.imageUrl
+  && !String(store?.hero?.title ?? '').replace(/<[^>]+>/g, '').trim()
+  && !String(store?.hero?.subtitle ?? '').replace(/<[^>]+>/g, '').trim();
+
+/** النص الافتراضي للغلاف (عنوان/وصف الثيم) — فارغ إن كان الغلاف صورة فقط */
+export const heroFallback = <T,>(store: HeroStore, fallback: T): T | '' => (heroImageOnly(store) ? '' : fallback);
+
+export function heroShade(store: HeroStore, isRTL: boolean, tone: 'dark' | 'light' = 'dark', zIndex?: number): CSSProperties {
+  if (!store?.hero?.imageUrl || heroImageOnly(store)) return { display: 'none' };
   // dark: أسود خلف نص فاتح — light: أبيض خلف نص داكن (ثيمات النص الداكن)
   const c = tone === 'dark' ? '0,0,0' : '255,255,255';
   // لا يصل للشفافية: النص في الوسط (ثيمات النص المتوسّط) يبقى مقروءاً

@@ -30,7 +30,7 @@ import {
   Send, Home as HomeIcon, Wrench, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -794,7 +794,7 @@ export function Navbar({ store, domain }: any) {
                 </span>
               )}
             </Link>
-            <span className="ae-nb-tagline">{store?.hero?.subtitle || t.brandTagline}</span>
+            <span className="ae-nb-tagline">{store?.hero?.subtitle || heroFallback(store, t.brandTagline)}</span>
             {store?.contact?.phone ? (
               <a href={`tel:${store.contact.phone}`} className="ae-num"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#fff', fontWeight: 600 }}>
@@ -966,7 +966,7 @@ export function Footer({ store }: any) {
             <p className="ae-display" style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700 }}>{store?.name || 'AUTO'}</p>
             <div style={{ width: 44, height: 3, background: A, margin: '12px 0 14px' }} />
             <p style={{ margin: 0, fontSize: '0.86rem', lineHeight: 1.7, color: 'rgba(255,255,255,0.66)', maxWidth: 380 }}>
-              {store?.hero?.subtitle || t.footerDesc}
+              {store?.hero?.subtitle || heroFallback(store, t.footerDesc)}
             </p>
           </div>
 
@@ -1131,7 +1131,7 @@ export function Home({ store, page }: any) {
                 color: '#fff', wordBreak: 'break-word',
                 textAlign: t.dir === 'rtl' ? 'right' : 'left',
               }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store?.hero?.title || t.heroTitle) }} />
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store?.hero?.title || heroFallback(store, t.heroTitle)) }} />
             <p className="ae-hero-sub"
               dir={t.dir}
               style={{
@@ -1139,7 +1139,7 @@ export function Home({ store, page }: any) {
                 margin: '1rem 0 0', maxWidth: 480,
                 textAlign: t.dir === 'rtl' ? 'right' : 'left',
               }}>
-              {store?.hero?.subtitle || t.heroSub}
+              {store?.hero?.subtitle || heroFallback(store, t.heroSub)}
             </p>
             <div className="ae-hero-cta" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: '1.75rem' }}>
               <a href="#products" className="ae-btn ae-btn-accent">
