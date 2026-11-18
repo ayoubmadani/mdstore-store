@@ -1,5 +1,6 @@
 'use client';
 // دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import { useCardLink } from '@/components/theme/cardLink';
 import * as __kit from '@mdstore/theme-kit';
 import { showError } from '@/lib/showError';
 
@@ -1076,13 +1077,14 @@ export function Footer({ store }: any) {
 
 /* ── CARD ───────────────────────────────────────────────────── */
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
+  const __card = useCardLink(`/product/${product?.slug || product?.id}`);
   const [hov, setHov] = useState(false);
   if (!product || !store) return null;
   const price = typeof product.price === 'string' ? parseFloat(product.price) : (product.price as number) || 0;
   const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
   const brandColor = 'var(--cyan)';
   return (
-    <div className="g-card group" onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+    <div {...__card} className="g-card group" onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: 'var(--navy-3)', border: `1px solid ${hov ? brandColor : 'var(--panel)'}`, transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)', position: 'relative', borderRadius: '4px' }}>
       <div className="g-img" style={{ position: 'relative', aspectRatio: '1/1', overflow: 'hidden', backgroundColor: 'var(--navy-2)' }}>
         {displayImage

@@ -1,5 +1,6 @@
 'use client';
 // دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import { useCardLink } from '@/components/theme/cardLink';
 import * as __kit from '@mdstore/theme-kit';
 import { showError } from '@/lib/showError';
 
@@ -881,6 +882,7 @@ const PALETTES = [
 ];
 
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
+  const __card = useCardLink(`/product/${product?.slug || product?.id}`);
     const [hov, setHov] = useState(false);
 
     // 1. تحويل الأسعار مع التأكد من القيم
@@ -900,7 +902,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
     const idValue = product.id ? String(product.id).length : 0; // استخدام الطول أضمن إذا كان الـ ID نصياً
     const pal = palettesList[idValue % palettesList.length];
     return (
-        <div className="adv-card" style={{ background: '#fff', border: `3px solid ${hov ? pal.border : 'var(--border)'}`, borderRadius: 18, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', boxShadow: hov ? `0 16px 48px ${pal.border}22` : '0 2px 10px rgba(0,0,0,0.05)' }}
+        <div {...__card} className="adv-card" style={{ background: '#fff', border: `3px solid ${hov ? pal.border : 'var(--border)'}`, borderRadius: 18, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', boxShadow: hov ? `0 16px 48px ${pal.border}22` : '0 2px 10px rgba(0,0,0,0.05)' }}
             onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}>
 
             {/* Color accent top bar */}

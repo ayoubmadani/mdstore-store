@@ -1,6 +1,7 @@
 'use client';
 
 // دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import { useCardLink } from '@/components/theme/cardLink';
 import * as __kit from '@mdstore/theme-kit';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -650,12 +651,13 @@ export function Footer({ store }: any) {
 /*  CARD  —  ARCHETYPE 5: Framed Label                                         */
 /* ═══════════════════════════════════════════════════════════════════════════ */
 export function Card({ product, displayImage, discount, store: storeProp, viewDetails }: any) {
+  const __card = useCardLink(`/product/${product?.slug || product?.id}`);
   const t = withLocationLabels(T)[getLang(storeProp)];
   const [imgErr, setImgErr] = useState(false);
   const img = displayImage || product?.productImage || product?.imagesProduct?.[0]?.imageUrl;
 
   return (
-    <div className="wc-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', border: `1px solid ${BD}`, borderRadius: 8, overflow: 'hidden', background: CARD, transition: 'transform 0.28s cubic-bezier(.22,.68,0,1.2), box-shadow 0.28s ease' }}
+    <div {...__card} className="wc-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', border: `1px solid ${BD}`, borderRadius: 8, overflow: 'hidden', background: CARD, transition: 'transform 0.28s cubic-bezier(.22,.68,0,1.2), box-shadow 0.28s ease' }}
       onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-6px) scale(1.02)'; e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.12)'; }}
       onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0) scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}>
       {/* Eyebrow */}

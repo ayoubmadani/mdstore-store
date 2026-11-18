@@ -1,5 +1,6 @@
 'use client';
 // دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import { useCardLink } from '@/components/theme/cardLink';
 import * as __kit from '@mdstore/theme-kit';
 import { showError } from '@/lib/showError';
 
@@ -1274,6 +1275,7 @@ const catEmojis: { [key: string]: string } = {
 };
 
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
+  const __card = useCardLink(`/product/${product?.slug || product?.id}`);
   const cardLang = getLang(store); const cardT = T[cardLang];
   const [hov, setHov] = useState(false);
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
@@ -1283,7 +1285,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
   const categoryEmoji = catEmojis[product.category?.name || product.category] || '🏆';
 
   return (
-    <div className="prod-card" onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}>
+    <div {...__card} className="prod-card" onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}>
       {/* Image */}
       <div className="card-img-inner" style={{ position: 'relative', height: 240, overflow: 'hidden', background: 'var(--g100)' }}>
         {displayImage

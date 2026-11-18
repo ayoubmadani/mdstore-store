@@ -1,5 +1,6 @@
 'use client';
 // دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import { useCardLink } from '@/components/theme/cardLink';
 import * as __kit from '@mdstore/theme-kit';
 import { showError } from '@/lib/showError';
 
@@ -695,11 +696,12 @@ export function Footer({ store }: any) {
 }
 
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
+  const __card = useCardLink(`/product/${product?.slug || product?.id}`);
   const lang = getLang(store); const t = withLocationLabels(T)[lang]; const cardRTL = lang === 'ar';
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
   const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
   return (
-    <div className="prd-card">
+    <div {...__card} className="prd-card">
       <div style={{ position: 'relative', aspectRatio: '4/3', background: '#ECEFF1', overflow: 'hidden' }}>
         {displayImage
           ? <img src={displayImage} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.4s ease' }}

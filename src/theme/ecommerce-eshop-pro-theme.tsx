@@ -1,6 +1,7 @@
 'use client';
 
 // دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import { useCardLink } from '@/components/theme/cardLink';
 import * as __kit from '@mdstore/theme-kit';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -1039,13 +1040,14 @@ export function Footer({ store }: any) {
    CARD
 ═══════════════════════════════════════════════════════════ */
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
+  const __card = useCardLink(`/product/${product?.slug || product?.id}`);
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
   const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
   const cardLang = getLang(store);
   const cardRTL = cardLang === 'ar';
 
   return (
-    <div className="card-wrap" style={{ background: '#fff', border: '1.5px solid #EBEBEB', borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', transition: 'all 0.28s ease' }}
+    <div {...__card} className="card-wrap" style={{ background: '#fff', border: '1.5px solid #EBEBEB', borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', transition: 'all 0.28s ease' }}
       onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.borderColor = 'var(--acc)'; el.style.boxShadow = '0 8px 32px rgba(var(--acc-rgb),0.1)'; el.style.transform = 'translateY(-4px)'; }}
       onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.borderColor = '#EBEBEB'; el.style.boxShadow = 'none'; el.style.transform = ''; }}>
 

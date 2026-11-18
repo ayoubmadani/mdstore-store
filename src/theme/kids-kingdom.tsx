@@ -1,6 +1,7 @@
 'use client';
 
 // دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import { useCardLink } from '@/components/theme/cardLink';
 import * as __kit from '@mdstore/theme-kit';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -883,6 +884,7 @@ export function Footer({ store }: any) {
    CARD
 ═══════════════════════════════════════════════════════════ */
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
+  const __card = useCardLink(`/product/${product?.slug || product?.id}`);
   const [hov, setHov] = useState(false);
   const lang = getLang(store);
   const t = withLocationLabels(T)[lang];
@@ -892,7 +894,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
   const label = viewDetails ?? t.view_details;
 
   return (
-    <div className="product-card" style={{ background: '#fff', border: `3px solid ${hov ? 'var(--coral)' : 'var(--border)'}`, borderRadius: 24, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', cursor: 'pointer' }}
+    <div {...__card} className="product-card" style={{ background: '#fff', border: `3px solid ${hov ? 'var(--coral)' : 'var(--border)'}`, borderRadius: 24, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', cursor: 'pointer' }}
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}>
       <div style={{ height: 4, background: 'var(--coral)', width: '100%' }} />
 

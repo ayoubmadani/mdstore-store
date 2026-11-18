@@ -1,5 +1,6 @@
 'use client';
 // دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import { useCardLink } from '@/components/theme/cardLink';
 import * as __kit from '@mdstore/theme-kit';
 import { showError } from '@/lib/showError';
 
@@ -943,12 +944,13 @@ export function Footer({ store }: any) {
    CARD
 ══════════════════════════════════════════════════════════════ */
 export function Card({ product, displayImage, discount, store, viewDetails, isNew }: any) {
+  const __card = useCardLink(`/product/${product?.slug || product?.id}`);
   const cardLang = getLang(store); const cardT = T[cardLang];
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
   const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
 
   return (
-    <div className="p-card" style={{ 
+    <div {...__card} className="p-card" style={{ 
       display: 'flex', 
       flexDirection: 'column', 
       height: '100%', // يضمن أن الكارت يملأ كامل طول الخلية في الشبكة

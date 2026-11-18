@@ -1,5 +1,6 @@
 'use client';
 // دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import { useCardLink } from '@/components/theme/cardLink';
 import * as __kit from '@mdstore/theme-kit';
 import { showError } from '@/lib/showError';
 
@@ -918,6 +919,7 @@ export function Footer({ store }: any) {
    CARD
 ══════════════════════════════════════════════════════════════ */
 export function Card({ product, displayImage, discount, store, viewDetails }: any) {
+  const __card = useCardLink(`/product/${product?.slug || product?.id}`);
     const [hov, setHov] = useState(false);
     const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
     const orig = product.priceOriginal ? parseFloat(String(product.priceOriginal)) : 0;
@@ -932,7 +934,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
     const pal = palettes[idValue % palettes.length] || palettes[0];
 
     return (
-        <div className="soft-card" style={{ background: '#fff', border: `2px solid ${hov ? pal.accent : 'var(--border)'}`, borderRadius: 22, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
+        <div {...__card} className="soft-card" style={{ background: '#fff', border: `2px solid ${hov ? pal.accent : 'var(--border)'}`, borderRadius: 22, overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
             onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}>
             {/* Image */}
             <div style={{ position: 'relative', aspectRatio: '1/1', background: pal.bg, overflow: 'hidden' }}>
