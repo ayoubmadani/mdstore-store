@@ -1548,7 +1548,7 @@ export function Cart({ domain, store }: any) {
           </div>
         </div>
       </div>
-      <style dangerouslySetInnerHTML={{ __html: `@media (min-width:1024px){ .rsp-cart-inner{ grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } }` }} />
+      <style dangerouslySetInnerHTML={{ __html: `@media (min-width:1024px){ .rsp-cart-inner{ grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) !important; } }` }} />
     </div>
   );
 }
