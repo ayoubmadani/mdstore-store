@@ -6,6 +6,9 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
+import { OfferPieces, needsPieces } from '@/components/theme/OfferPieces';
+import { CartItemCard, cartOrderItems } from '@/components/theme/CartItemCard';
+import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, type Box } from '@/components/theme/orderPieces';
 import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import { Star, ChevronDown, AlertCircle, X, CheckCircle2, Shield, ArrowLeft, Plus, Minus, Search, ShoppingCart, Trash2, Loader2, ChevronLeft, ChevronRight, Phone, Package, Truck, Mail, MessageCircle, Download } from 'lucide-react';
@@ -782,7 +785,7 @@ export function Details({product,discount,allImages,allAttrs,finalPrice,inStock,
             </div>
           )}
 
-          {allAttrs.map((attr:any)=>(
+          {!needsPieces(product) && allAttrs.map((attr: any) => (
             <div key={attr.id} style={{marginBottom:20,paddingBottom:20,borderBottom:'1px solid var(--br)'}}>
               <span className="lbl">{attr.name}{__colorName(attr, selectedVariants)}</span>
               {attr.displayMode==='color'?(
@@ -818,6 +821,8 @@ export function Details({product,discount,allImages,allAttrs,finalPrice,inStock,
 /* ══ PRODUCT FORM ══ */
 export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffer,selectedVariants,platform,priceLoss=0,store}:ProductFormProps){
   const [addonIds, setAddonIds] = useState<string[]>([]);
+  // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
+  const [boxes, setBoxes] = useState<Box[]>([]);
   const t = withLocationLabels(T)[getLang(store || product?.store)];
   const cur = (store || product?.store)?.currency || currencyLabel(t.currency);
   const router=useRouter();
@@ -847,33 +852,69 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
     return base;
   },[product,selectedOffer,selectedVariants]);
   const supportQty=((store||product.store)?.supportQty)!==false;
-  const fp=getFP() + addonsTotal(product, addonIds);
-  const qty=supportQty?fd.quantity:1;
+  const qty = supportQty?fd.quantity:1;
+  const usePieces = needsPieces(product);
+  const per = piecesPerBox(product as any, selectedOffer);
+  useEffect(() => {
+    setBoxes((prev) => fitBoxes(prev, qty, per, { variants: { ...(selectedVariants || {}) }, addonIds: [] }));
+  }, [qty, per]); // eslint-disable-line react-hooks/exhaustive-deps
+  const lines = usePieces && boxes.length ? boxLines(product as any, selectedOffer, boxes, (ids) => addonsTotal(product, ids)) : null;
+  // بلا بطاقات: السعر × الكمية كما كان؛ مع البطاقات: مجموع سطورها
+  const fp = getFP() + addonsTotal(product, addonIds);
+  const subtotal = lines ? linesTotal(lines) : fp * qty;
   const selOfferObj=product.offers?.find((o:any)=>o.id===selectedOffer);
   const storeInfo=store||product.store;
-  const orderFreeShipping=!!(product.shippingFree||selOfferObj?.shippingFree||(storeInfo?.supportFreeShipping&&storeInfo?.freeShippingMinAmount!=null&&(fp*qty)>=Number(storeInfo.freeShippingMinAmount)));
+  const orderFreeShipping=!!(product.shippingFree||selOfferObj?.shippingFree||(storeInfo?.supportFreeShipping&&storeInfo?.freeShippingMinAmount!=null&&subtotal >= Number(storeInfo.freeShippingMinAmount)));
   const getLiv=useCallback(():any=>{if(product.isDigital)return 0;if(orderFreeShipping)return 0;if(!selW)return 0;return fd.typeLivraison==='home'?selW.livraisonHome:selW.livraisonOfice},[selW,fd.typeLivraison,orderFreeShipping,product.isDigital]);
-  const total = () => Number(fp) * Number(qty) + Number(getLiv());
+  const total = () => subtotal + Number(getLiv());
   const getVarId=useCallback(()=>{if(!product.variantDetails?.length||!Object.keys(selectedVariants).length)return undefined;return product.variantDetails.find((v:any)=>vm(v,selectedVariants))?.id},[product.variantDetails,selectedVariants]);
   const validate=()=>{const e:Record<string,string>={};if(!fd.customerName.trim())e.name=t.errName;if(!fd.customerPhone.trim()||!isValidDzPhone(fd.customerPhone.trim()))e.phone=t.errPhoneInvalid;if(product.isDigital){if(String(fd.customerEmail??'').trim()){if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.customerEmail.trim()))e.email=t.errEmail}if(String(fd.customerWhatsapp??'').trim()){if(!isValidDzPhone(fd.customerWhatsapp.trim()))e.whatsapp=t.errWhatsapp}}else{if(!fd.customerWelaya)e.w=t.errWilaya;if(!fd.customerCommune)e.c=t.errCommune}return e};
 
   const addCart=()=>{
     setAdded(true);
     const cart=JSON.parse(localStorage.getItem(domain)||'[]');
-    cart.push({ addonIds,...fd,quantity:qty,product,variantDetailId:getVarId(),productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv(),addedAt:Date.now()});
+    if (lines) {
+      // مدخل لكل بطاقة عرض (بسطور قطعها) — تظهر في السلة كبطاقة، وتتحول لسطور عند إرسال الطلب
+      for (const e of boxEntries(product as any, selectedOffer, boxes, (ids) => addonsTotal(product, ids))) {
+        cart.push({ ...fd, quantity: 1, product, productId: product.id, storeId: product.store.id, userId, selectedOffer, platform: platform || 'store', finalPrice: e.total, totalPrice: e.total, priceLivraison: getLiv(), addedAt: Date.now(), offerBox: { lines: e.lines } });
+      }
+    } else {
+      cart.push({ addonIds,...fd,quantity:qty,product,variantDetailId:getVarId(),productId:product.id,storeId:product.store.id,userId,selectedOffer,selectedVariants,platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv(),addedAt:Date.now()});
+    }
     localStorage.setItem(domain,JSON.stringify(cart));initCount(cart.length);
     setTimeout(()=>setAdded(false),2200);
   };
   const submit=async(e:React.FormEvent)=>{
     e.preventDefault();const er=validate();if(Object.keys(er).length){setE(er);return}
     setE({});setSub(true);
-    try{const {customerWelaya,customerCommune,typeLivraison,priceLoss,customerEmail,customerWhatsapp,...rest}=fd;const payload=product.isDigital?{...rest,...(String(customerEmail??'').trim()?{customerEmail}:{}),...(String(customerWhatsapp??'').trim()?{customerWhatsapp}:{})}:{...rest,customerWelaya,customerCommune,typeLivraison,priceLoss};await axios.post(`${API}/orders/create`,{ addonIds,...payload,quantity:qty,productId:product.id,storeId:product.store.id,userId,selectedOffer,variantDetailId:getVarId(),platform:platform||'store',finalPrice:fp,totalPrice:total(),priceLivraison:getLiv()});if(fd.customerId)localStorage.setItem('customerId',fd.customerId);router.push(`/successfully?productId=${product?.id}`)}
+    try{const {customerWelaya,customerCommune,typeLivraison,priceLoss,customerEmail,customerWhatsapp,...rest}=fd;const payload=product.isDigital?{...rest,...(String(customerEmail??'').trim()?{customerEmail}:{}),...(String(customerWhatsapp??'').trim()?{customerWhatsapp}:{})}:{...rest,customerWelaya,customerCommune,typeLivraison,priceLoss};const common={...payload,productId:product.id,storeId:product.store.id,userId,selectedOffer,platform:platform||'store',priceLivraison:getLiv()};
+      // البطاقات: سطر لكل مجموعة قطع متطابقة (كطلب السلة)، وإلا الطلب الواحد كما كان
+      await axios.post(`${API}/orders/create`,lines?lines.map((l)=>({...common,addonIds:l.addonIds,quantity:l.quantity,variantDetailId:l.variantDetailId,selectedVariants:l.selectedVariants,finalPrice:l.finalPrice,totalPrice:l.finalPrice*l.quantity})):{ addonIds,...common,quantity:qty,variantDetailId:getVarId(),finalPrice:fp,totalPrice:total()});if(fd.customerId)localStorage.setItem('customerId',fd.customerId);router.push(`/successfully?productId=${product?.id}`)}
     catch{}finally{setSub(false)}
   };
 
   return(
     <div dir={t.dir} style={{marginTop:20}}>
-      <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#C88B6A" />
+      {/* الكمية خارج نموذج الطلب، فوق بطاقات العرض */}
+      {supportQty&&!product.isDigital&&(
+      <FR label={t.qty}>
+        <div style={{display:'inline-flex',alignItems:'center',border:'1px solid var(--br2)'}}>
+          <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} style={{width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',background:'transparent',border:'none',borderLeft:'1px solid var(--br2)',cursor:'pointer',color:'var(--mu)',transition:'color .15s'}}
+            onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--tx)'}}
+            onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mu)'}}>
+            <Minus style={{width:12,height:12}}/>
+          </button>
+          <span style={{width:40,textAlign:'center',fontWeight:700,fontSize:'1rem',lineHeight:'36px',display:'inline-block',fontFamily:"'Raleway',sans-serif"}}>{fd.quantity}</span>
+          <button type="button" onClick={()=>setFd(p=>({...p,quantity:p.quantity+1}))} style={{width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',background:'transparent',border:'none',borderRight:'1px solid var(--br2)',cursor:'pointer',color:'var(--mu)',transition:'color .15s'}}
+            onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--tx)'}}
+            onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mu)'}}>
+            <Plus style={{width:12,height:12}}/>
+          </button>
+        </div>
+      </FR>
+      )}
+      <OfferPieces dark product={product} store={store || product.store} accent="#C88B6A" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+      {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#C88B6A" />}
       {product.store?.cart!==false&&!product.isDigital&&(
         <div style={{display:'flex',gap:8,marginBottom:14}}>
           <button data-add-to-cart onClick={addCart} disabled={added} className="btn-ghost" style={{flex:1,padding:'12px',opacity:added?1:undefined,borderColor:added?'#22c55e':undefined,color:added?'#22c55e':undefined}}>
@@ -936,23 +977,6 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
               </div>
             </FR>
             </>
-            )}
-            {supportQty&&!product.isDigital&&(
-            <FR label={t.qty}>
-              <div style={{display:'inline-flex',alignItems:'center',border:'1px solid var(--br2)'}}>
-                <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} style={{width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',background:'transparent',border:'none',borderLeft:'1px solid var(--br2)',cursor:'pointer',color:'var(--mu)',transition:'color .15s'}}
-                  onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--tx)'}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mu)'}}>
-                  <Minus style={{width:12,height:12}}/>
-                </button>
-                <span style={{width:40,textAlign:'center',fontWeight:700,fontSize:'1rem',lineHeight:'36px',display:'inline-block',fontFamily:"'Raleway',sans-serif"}}>{fd.quantity}</span>
-                <button type="button" onClick={()=>setFd(p=>({...p,quantity:p.quantity+1}))} style={{width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',background:'transparent',border:'none',borderRight:'1px solid var(--br2)',cursor:'pointer',color:'var(--mu)',transition:'color .15s'}}
-                  onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--tx)'}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mu)'}}>
-                  <Plus style={{width:12,height:12}}/>
-                </button>
-              </div>
-            </FR>
             )}
 
             <div style={{background:'var(--s1)',padding:'14px',marginBottom:14}}>
@@ -1023,7 +1047,7 @@ export function Cart({domain,store}:{domain:string;store:any}){
     if(!fd.customerCommune)er.c=t.errCommune;
     if(Object.keys(er).length){setE(er);return}
     setE({});setSub(true);
-    try{await axios.post(`${API}/orders/create`,items.map(i=>({ addonIds: i.addonIds,...fd,productId:i.productId,storeId:i.storeId,userId:i.userId,selectedOffer:i.selectedOffer,variantDetailId:i.variantDetailId,selectedVariants:i.selectedVariants,platform:i.platform||'store',finalPrice:i.finalPrice,totalPrice:grand,priceLivraison:getLiv(),quantity:i.quantity,customerId:i.customerId||'',priceLoss:selW?.livraisonReturn??0})));
+    try{await axios.post(`${API}/orders/create`,cartOrderItems(items).map(i=>({ addonIds: i.addonIds,...fd,productId:i.productId,storeId:i.storeId,userId:i.userId,selectedOffer:i.selectedOffer,variantDetailId:i.variantDetailId,selectedVariants:i.selectedVariants,platform:i.platform||'store',finalPrice:i.finalPrice,totalPrice:grand,priceLivraison:getLiv(),quantity:i.quantity,customerId:i.customerId||'',priceLoss:selW?.livraisonReturn??0})));
     setDone(true);localStorage.removeItem(domain);setItems([]);initCount(0)}catch{}finally{setSub(false)}
   };
 
@@ -1047,7 +1071,9 @@ export function Cart({domain,store}:{domain:string;store:any}){
       <div className="cart-grid">
         {/* Items */}
         <div>
-          {items.map((item,i)=>(
+          {items.map((item, i) => item.offerBox?.lines?.length ? (
+            <CartItemCard key={i} dark item={item} index={i} items={items} update={upd} store={store} accent="#C88B6A" />
+          ) : (
             <div key={i} style={{display:'flex',gap:14,padding:'14px 0',borderBottom:'1px solid var(--br)'}}>
               <div style={{width:72,height:96,flexShrink:0,overflow:'hidden',background:'var(--s2)'}}>
                 <img src={item.product?.productImage||item.product?.imagesProduct?.[0]?.imageUrl} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}} alt=""/>
