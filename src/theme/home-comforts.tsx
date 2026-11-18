@@ -162,6 +162,7 @@ export interface Product {
   isDigital?: boolean;
 }
 export interface ProductFormProps {
+  onVariant?: (n: string, v: string) => void;
   product: Product; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
   selectedVariants: Record<string, string>; platform?: string; priceLoss?: number;
@@ -997,7 +998,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                 </div>
               </div>
             ))}
-            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store || product?.store} />
+            <ProductForm onVariant={handleVariantSelection} product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store || product?.store} />
             {product.desc && (
               <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: `1px solid ${BD}` }}>
                 <p style={{ fontSize: '0.68rem', fontWeight: 600, color: SUB, marginBottom: '0.75rem', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>{t.descTitle}</p>
@@ -1019,7 +1020,7 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
   </div>
 );
 
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: ProductFormProps) {
+export function ProductForm({ onVariant, product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -1152,7 +1153,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       </div>
     </div>
   )}
-  <OfferPieces product={product} store={store || product.store} accent="#C49A6C" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  <OfferPieces product={product} store={store || product.store} accent="#C49A6C" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
   {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#C49A6C" />}
         {product.store?.cart !== false && !product.isDigital && (
         <div className="cart-add-btns" style={{ marginBottom: '1.25rem' }}>

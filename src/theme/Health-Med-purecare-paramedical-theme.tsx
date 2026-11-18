@@ -207,6 +207,7 @@ export interface Product {
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 export interface ProductFormProps {
+  onVariant?: (n: string, v: string) => void;
   product: Product; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
   selectedVariants: Record<string, string>; platform?: string; priceLoss?: number;
@@ -1344,7 +1345,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
               </div>
             ))}
 
-            <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store} />
+            <ProductForm onVariant={handleVariantSelection} product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store} />
 
             {product.desc && (
               <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid var(--line)' }}>
@@ -1363,7 +1364,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
 /* ══════════════════════════════════════════════════════════════
    PRODUCT FORM
 ══════════════════════════════════════════════════════════════ */
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0, store }: ProductFormProps) {
+export function ProductForm({ onVariant, product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0, store }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -1488,7 +1489,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       </div>
     </FR>
   )}
-  <OfferPieces product={product} store={store || product.store} accent="#1A6ED4" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  <OfferPieces product={product} store={store || product.store} accent="#1A6ED4" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
   {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#1A6ED4" />}
       {/* Cart + Order buttons */}
         {product.store?.cart && !product.isDigital && (

@@ -53,6 +53,7 @@ interface Product {
 }
 
 interface ProductFormProps {
+  onVariant?: (n: string, v: string) => void;
   product: Product; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
   selectedVariants: Record<string, string>; platform?: string; priceLoss?: number; store?: any;
@@ -1000,7 +1001,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             )}
 
             {/* ProductForm */}
-            <ProductForm product={product} userId={product?.store?.userId} domain={domain} store={storeprop}
+            <ProductForm onVariant={handleVariantSelection} product={product} userId={product?.store?.userId} domain={domain} store={storeprop}
               selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
 
             {/* Description */}
@@ -1020,7 +1021,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 /* ═══════════════════════════════════════════════════════════════════════════ */
 /*  PRODUCT FORM                                                               */
 /* ═══════════════════════════════════════════════════════════════════════════ */
-export function ProductForm({ product, userId, domain, store: storeprop, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
+export function ProductForm({ onVariant, product, userId, domain, store: storeprop, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -1229,7 +1230,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
           </div>
         </div>
       )}
-      <OfferPieces product={product} store={store || product.store} accent="#1E5A8E" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+      <OfferPieces product={product} store={store || product.store} accent="#1E5A8E" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
       {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#1E5A8E" />}
 
       {/* Buttons */}

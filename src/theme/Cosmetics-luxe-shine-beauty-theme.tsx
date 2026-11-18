@@ -53,6 +53,7 @@ interface Product {
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 interface ProductFormProps {
+  onVariant?: (n: string, v: string) => void;
   product: Product; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
   selectedVariants: Record<string, string>; platform?: string; priceLoss?: number;
@@ -1155,7 +1156,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           ))}
 
           <div style={{ marginTop: '1.5rem' }}>
-            <ProductForm
+            <ProductForm onVariant={handleVariantSelection}
               product={product}
               userId={product.store?.userId}
               domain={domain}
@@ -1180,7 +1181,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 }
 
 /* ─────────── ProductForm ─────────── */
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, store: storeprop }: ProductFormProps & { store?: any }) {
+export function ProductForm({ onVariant, product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, store: storeprop }: ProductFormProps & { store?: any }) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -1340,7 +1341,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           <button type="button" aria-label="+" className="luxe-qty-btn" onClick={() => setFd(p => ({...p, quantity: p.quantity + 1}))}><Plus size={16} /></button>
         </div>
       )}
-      <OfferPieces product={product} store={storeprop || product.store} accent={A} offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+      <OfferPieces product={product} store={storeprop || product.store} accent={A} offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
       {!usePieces && <ProductAddons product={product} store={storeprop || product.store} selected={addonIds} onChange={setAddonIds} accent={A} />}
       {!isOrderNow && !product.isDigital ? (
         <div className="luxe-btn-grid">

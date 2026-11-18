@@ -1508,7 +1508,7 @@ export function Home({ store, page }: any) {
  *  cancel button, summary rendered AFTER fields and BEFORE buttons (§15.24).
  * =========================================================================*/
 
-export function ProductForm({
+export function ProductForm({ onVariant,
   product, store: storeprop, userId, domain,
   selectedOffer, setSelectedOffer, selectedVariants, platform,
 }: any) {
@@ -1705,7 +1705,7 @@ if (lines) {
       />
     </div>
   )}
-  <OfferPieces product={product} store={store || product.store} accent="#B06A2C" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  <OfferPieces product={product} store={store || product.store} accent="#B06A2C" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
   {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#B06A2C" />}
       {/* quantity + unit price — always visible */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
@@ -2056,7 +2056,7 @@ export function Details({
             </div>
           ))}
 
-          <ProductForm
+          <ProductForm onVariant={handleVariantSelection}
             product={product}
             store={store}
             userId={store?.userId || store?.user?.id || product?.store?.userId}

@@ -109,7 +109,8 @@ interface VariantDetail{id:string|number;name:VariantAttributeEntry[];price:numb
 interface Wilaya{id:string;name:string;ar_name:string;livraisonHome:number;livraisonOfice:number;livraisonReturn:number}
 interface Commune{id:string;name:string;ar_name:string;wilayaId:string}
 export interface Product{id:string;name:string;price:string|number;priceOriginal?:string|number;desc?:string;productImage?:string;imagesProduct?:ProductImage[];offers?:Offer[];attributes?:Attribute[];variantDetails?:VariantDetail[];stock?:number;isActive?:boolean;shippingFree?:boolean;isDigital?:boolean;store:{id:string;name:string;subdomain:string;userId:string;cart?:boolean;supportQty?:boolean;supportFreeShipping?:boolean;freeShippingMinAmount?:number|null}}
-export interface ProductFormProps{product:Product;userId:string;domain:string;selectedOffer:string|null;setSelectedOffer:(id:string|null)=>void;selectedVariants:Record<string,string>;platform?:string;priceLoss?:number;store?:any}
+export interface ProductFormProps{
+  onVariant?: (n: string, v: string) => void;product:Product;userId:string;domain:string;selectedOffer:string|null;setSelectedOffer:(id:string|null)=>void;selectedVariants:Record<string,string>;platform?:string;priceLoss?:number;store?:any}
 
 const vm=(d:VariantDetail,s:Record<string,string>)=>Object.entries(s).every(([n,v])=>d.name.some(e=>e.attrName===n&&e.value===v));
 const fw=async(uid:string,sid?:string):Promise<Wilaya[]>=>{try{const{data}=await axios.get(`${API}/shipping/public/get-shipping/${uid}${sid ? `?storeId=${sid}` : ''}`);return data||[]}catch{return[]}};
@@ -803,7 +804,7 @@ export function Details({product,discount,allImages,allAttrs,finalPrice,inStock,
             </div>
           ))}
 
-          <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store || product?.store}/>
+          <ProductForm onVariant={handleVariantSelection} product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store || product?.store}/>
 
           {product.desc&&(
             <div style={{marginTop:32,paddingTop:24,borderTop:'1px solid var(--br)'}}>
@@ -819,7 +820,7 @@ export function Details({product,discount,allImages,allAttrs,finalPrice,inStock,
 }
 
 /* ══ PRODUCT FORM ══ */
-export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffer,selectedVariants,platform,priceLoss=0,store}:ProductFormProps){
+export function ProductForm({ onVariant,product,userId,domain,selectedOffer,setSelectedOffer,selectedVariants,platform,priceLoss=0,store}:ProductFormProps){
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -913,7 +914,7 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
         </div>
       </FR>
       )}
-      <OfferPieces dark product={product} store={store || product.store} accent="#C88B6A" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+      <OfferPieces dark product={product} store={store || product.store} accent="#C88B6A" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
       {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#C88B6A" />}
       {product.store?.cart!==false&&!product.isDigital&&(
         <div style={{display:'flex',gap:8,marginBottom:14}}>

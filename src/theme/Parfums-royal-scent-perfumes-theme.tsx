@@ -1022,7 +1022,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             </div>
           ))}
 
-          <ProductForm
+          <ProductForm onVariant={handleVariantSelection}
             product={product}
             userId={product?.store?.userId}
             domain={domain}
@@ -1047,7 +1047,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 
 /* ============================== PRODUCT FORM ============================== */
 
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store: storeProp }: any) {
+export function ProductForm({ onVariant, product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store: storeProp }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -1214,7 +1214,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       </div>
     </div>
   )}
-  <OfferPieces dark product={product} store={store || product.store} accent={GOLD} offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  <OfferPieces dark product={product} store={store || product.store} accent={GOLD} offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
   {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#E0645A" />}
       {(!isOrderNow && !product?.isDigital) ? (
         <>

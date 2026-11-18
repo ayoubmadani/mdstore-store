@@ -56,6 +56,7 @@ interface Product {
 }
 
 interface ProductFormProps {
+  onVariant?: (n: string, v: string) => void;
   product: Product; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
   selectedVariants: Record<string, string>; platform?: string; priceLoss?: number; store?: any;
@@ -1013,7 +1014,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           </div>
         ))}
 
-        <ProductForm
+        <ProductForm onVariant={handleVariantSelection}
           product={product}
           userId={product?.store?.userId}
           domain={domain}
@@ -1036,7 +1037,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 /* ============================================================
    PRODUCT FORM
    ============================================================ */
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: ProductFormProps) {
+export function ProductForm({ onVariant, product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -1220,7 +1221,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       </div>
     </div>
   )}
-  <OfferPieces product={product} store={store || product.store} accent="#B8693F" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  <OfferPieces product={product} store={store || product.store} accent="#B8693F" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
   {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#B8693F" />}
       {!isOrderNow && !product.isDigital ? (
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>

@@ -1186,7 +1186,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
               <p className="hn-display" style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 900, fontSize: '1rem', margin: '0 0 12px', color: AD }}>
                 <Truck size={18} /> {t.orderHere}
               </p>
-              <ProductForm
+              <ProductForm onVariant={handleVariantSelection}
                 product={product}
                 store={store}
                 userId={store?.user?.id || product?.store?.userId}
@@ -1226,7 +1226,7 @@ function navArrow(side: 'start' | 'end'): React.CSSProperties {
 /* ============================================================
  * 10. ProductForm — order + add-to-cart
  * ========================================================== */
-export function ProductForm({ product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
+export function ProductForm({ onVariant, product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -1416,7 +1416,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
           </div>
         </>
       )}
-      <OfferPieces product={product} store={store || product.store} accent="#1F7A5E" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+      <OfferPieces product={product} store={store || product.store} accent="#1F7A5E" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
       {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#1F7A5E" />}
       {/* qty */}
 

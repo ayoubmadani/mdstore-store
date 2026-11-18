@@ -309,6 +309,7 @@ export interface Product {
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 export interface ProductFormProps {
+  onVariant?: (n: string, v: string) => void;
   product: Product; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
   selectedVariants: Record<string, string>; platform?: string; priceLoss?: number;
@@ -993,7 +994,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             </div>
           ))}
 
-          <ProductForm product={product} userId={product.store.userId} domain={domain} store={store}
+          <ProductForm onVariant={handleVariantSelection} product={product} userId={product.store.userId} domain={domain} store={store}
             selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
           {!product.isDigital && <div className="cs-trust cs-show-m">{trust}</div>}
 
@@ -1018,7 +1019,7 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
   </div>
 );
 
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: ProductFormProps) {
+export function ProductForm({ onVariant, product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: ProductFormProps) {
   const lang = getLang(store || product?.store);
   const t = T[lang];
   const router = useRouter();
@@ -1162,7 +1163,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           </div>
         </div>
       )}
-      <OfferPieces noAddons product={product} store={store || product.store} accent={normHex((store || product.store)?.design?.primaryColor, DEFAULT_P)} offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+      <OfferPieces noAddons product={product} store={store || product.store} accent={normHex((store || product.store)?.design?.primaryColor, DEFAULT_P)} offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
       <AddonsPicker product={product} store={store || product.store} value={addonQty} onChange={setAddonQty} pieces={pieces} />
       {product.store.cart && !product.isDigital && !isOrderNow && (
         <div className="cs-two">

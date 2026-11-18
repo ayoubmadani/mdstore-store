@@ -1328,7 +1328,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
           ))}
 
           {/* Order form — domain forwarded as real prop (§15.26), store passed (§15.25) */}
-          <ProductForm
+          <ProductForm onVariant={handleVariantSelection}
             product={product}
             store={store}
             userId={product?.store?.userId}
@@ -1356,7 +1356,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
 
 /* ========================= ProductForm (§10) ========================= */
 
-export function ProductForm({ product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
+export function ProductForm({ onVariant, product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -1548,7 +1548,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
       </div>
     </div>
   )}
-  <OfferPieces dark product={product} store={store || product.store} accent="#00E5FF" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  <OfferPieces dark product={product} store={store || product.store} accent="#00E5FF" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
   {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#00E5FF" />}
       {/* Quantity */}
 

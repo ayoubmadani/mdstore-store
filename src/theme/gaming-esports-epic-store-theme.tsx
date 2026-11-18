@@ -47,6 +47,7 @@ interface Product {
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 interface ProductFormProps {
+  onVariant?: (n: string, v: string) => void;
   product: Product; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
   selectedVariants: Record<string, string>; platform?: string; priceLoss?: number; store?: any;
@@ -977,7 +978,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               </div>
             )}
 
-            <ProductForm product={product} userId={product.store?.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store} />
+            <ProductForm onVariant={handleVariantSelection} product={product} userId={product.store?.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store} />
 
             {product.desc && (
               <div>
@@ -995,7 +996,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 }
 
 // ─── ProductForm ──────────────────────────────────────────────────
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss: propPriceLoss, store }: ProductFormProps) {
+export function ProductForm({ onVariant, product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss: propPriceLoss, store }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -1140,7 +1141,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       </div>
     </div>
   )}
-  <OfferPieces dark product={product} store={store || product.store} accent="#FF2A6D" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  <OfferPieces dark product={product} store={store || product.store} accent="#FF2A6D" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
   {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#FF2A6D" />}
       {added && (
         <div style={{ background: "rgba(0,245,212,.1)", border: `1px solid ${SUCCESS}`, color: SUCCESS, padding: "10px 14px", borderRadius: 8, marginBottom: 14, display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem", fontWeight: 700 }}>

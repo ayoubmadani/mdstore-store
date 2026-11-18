@@ -1036,7 +1036,7 @@ function catChip(active: boolean): React.CSSProperties {
 /* ============================================================================
    PRODUCT FORM  (§10) — delivery contract, buttons, validation
    ========================================================================== */
-export function ProductForm({ product, userId, domain, store: storeprop, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
+export function ProductForm({ onVariant, product, userId, domain, store: storeprop, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -1216,7 +1216,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
       </div>
     </>
   )}
-  <OfferPieces product={product} store={store || product.store} accent="#D9822B" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  <OfferPieces product={product} store={store || product.store} accent="#D9822B" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
   {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#D9822B" />}
       {/* Quantity */}
 
@@ -1518,7 +1518,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
           ))}
 
           {/* Order form — §26 forward real domain */}
-          <ProductForm
+          <ProductForm onVariant={handleVariantSelection}
             product={product} store={store} userId={store?.user?.id || product?.store?.userId}
             domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer}
             selectedVariants={selectedVariants} platform="web" />

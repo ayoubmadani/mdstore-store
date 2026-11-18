@@ -1322,7 +1322,7 @@ export function Details({
           )}
           <div className="lx-buy" style={{ marginTop: 32 }}>
             <div style={{ background: CARD, border: `1px solid ${BD}`, padding: '24px 20px' }}>
-              <ProductForm
+              <ProductForm onVariant={handleVariantSelection}
                 product={product}
                 store={store}
                 userId={userId || product?.store?.userId}
@@ -1347,7 +1347,7 @@ export function Details({
 }
 
 /* ============================ PRODUCT FORM ============================ */
-export function ProductForm({
+export function ProductForm({ onVariant,
   product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store: storeprop,
 }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
@@ -1530,7 +1530,7 @@ export function ProductForm({
       </span>
     </div>
   )}
-  <OfferPieces product={product} store={store || product.store} accent="#7C441C" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  <OfferPieces product={product} store={store || product.store} accent="#7C441C" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
   {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#7C441C" />}
 
       {!isOrderNow && !product?.isDigital && (

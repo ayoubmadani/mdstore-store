@@ -246,6 +246,7 @@ export interface Product {
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 export interface ProductFormProps {
+  onVariant?: (n: string, v: string) => void;
   product: Product; store?: any; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string|null; setSelectedOffer: (id: string|null) => void;
   selectedVariants: Record<string,string>; platform?: string; priceLoss?: number;
@@ -1483,7 +1484,7 @@ export function Details({ product, store: storeprop, toggleWishlist, isWishliste
               </div>
             ))}
 
-            <ProductForm product={product} store={storeprop} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants}/>
+            <ProductForm onVariant={handleVariantSelection} product={product} store={storeprop} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants}/>
 
             {product.desc && (
               <div style={{marginTop:'28px',paddingTop:'22px',borderTop:'1px solid var(--line)'}}>
@@ -1502,7 +1503,7 @@ export function Details({ product, store: storeprop, toggleWishlist, isWishliste
 /* ══════════════════════════════════════════════════════════════
    PRODUCT FORM
 ══════════════════════════════════════════════════════════════ */
-export function ProductForm({ product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss=0 }: ProductFormProps) {
+export function ProductForm({ onVariant, product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss=0 }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -1624,7 +1625,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
       </div>
     </FR>
   )}
-  <OfferPieces dark product={product} store={(storeprop as any) || product.store} accent="#FF4500" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  <OfferPieces dark product={product} store={(storeprop as any) || product.store} accent="#FF4500" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
   {!usePieces && <ProductAddons product={product} store={product.store as any} selected={addonIds} onChange={setAddonIds} accent="#FF4500" />}
       {/* Cart + Order buttons */}
         {product.store?.cart && !product.isDigital && (

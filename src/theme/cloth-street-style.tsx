@@ -202,6 +202,7 @@ export interface Product {
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 export interface ProductFormProps {
+  onVariant?: (n: string, v: string) => void;
   product: Product; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
   selectedVariants: Record<string, string>; platform?: string; priceLoss?: number;
@@ -1264,7 +1265,7 @@ export function Details({ product, store, toggleWishlist, isWishlisted, discount
             </div>
           ))}
 
-          <ProductForm product={product} store={store} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
+          <ProductForm onVariant={handleVariantSelection} product={product} store={store} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
 
           {product.desc && (
             <div style={{ marginTop: '28px', paddingTop: '22px', borderTop: '1px solid var(--ink)' }}>
@@ -1282,7 +1283,7 @@ export function Details({ product, store, toggleWishlist, isWishlisted, discount
 /* ══════════════════════════════════════════════════════════════
    PRODUCT FORM
 ══════════════════════════════════════════════════════════════ */
-export function ProductForm({ product, store, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0 }: ProductFormProps) {
+export function ProductForm({ onVariant, product, store, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0 }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -1414,7 +1415,7 @@ export function ProductForm({ product, store, userId, domain, selectedOffer, set
       </div>
     </FR>
   )}
-  <OfferPieces product={product} store={store || product.store} accent="#FF2D00" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  <OfferPieces product={product} store={store || product.store} accent="#FF2D00" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
   {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#FF2D00" />}
         {product.store?.cart !== false && !product.isDigital && (
         <div className="cart-add-btns" style={{ marginBottom: '14px' }}>

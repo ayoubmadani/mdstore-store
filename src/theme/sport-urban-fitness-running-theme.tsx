@@ -1006,7 +1006,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
             </div>
           ))}
 
-          <ProductForm
+          <ProductForm onVariant={handleVariantSelection}
             product={product}
             store={storeprop}
             userId={product?.store?.userId}
@@ -1031,7 +1031,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
 /* ==================================================================
    PRODUCT FORM
    ================================================================== */
-export function ProductForm({ product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
+export function ProductForm({ onVariant, product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -1186,7 +1186,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
       <button onClick={() => setFd((s) => ({ ...s, quantity: s.quantity + 1 }))} style={{ width: 36, height: 36, border: 'none', background: 'none' }}><Plus size={14} /></button>
     </div>
   )}
-  <OfferPieces product={product} store={store || product.store} accent="#C6FF33" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  <OfferPieces product={product} store={store || product.store} accent="#C6FF33" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
   {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#C6FF33" />}
       {(isOrderNow || product?.isDigital) && (
         <div style={{ border: `1px solid ${BD}`, borderRadius: 4, padding: '1rem', marginBottom: 16 }}>

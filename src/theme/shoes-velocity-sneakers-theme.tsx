@@ -1397,7 +1397,7 @@ export function Details({
           )}
 
           <div style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 20, padding: '20px 18px' }}>
-            <ProductForm
+            <ProductForm onVariant={handleVariantSelection}
               product={product}
               store={store}
               userId={userId || product?.store?.userId}
@@ -1431,7 +1431,7 @@ export function Details({
 }
 
 /* ============================ PRODUCT FORM ============================ */
-export function ProductForm({
+export function ProductForm({ onVariant,
   product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store: storeprop,
 }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
@@ -1614,7 +1614,7 @@ export function ProductForm({
       </span>
     </div>
   )}
-  <OfferPieces dark product={product} store={store || product.store} accent="#D9FF39" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  <OfferPieces dark product={product} store={store || product.store} accent="#D9FF39" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
   {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#D9FF39" />}
 
       {!isOrderNow && !product?.isDigital && (

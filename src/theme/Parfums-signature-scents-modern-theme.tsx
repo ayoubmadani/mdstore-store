@@ -1093,7 +1093,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             </div>
           ))}
 
-          <ProductForm product={product} userId={product.store?.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store} />
+          <ProductForm onVariant={handleVariantSelection} product={product} userId={product.store?.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store} />
 
           {product.desc && (
             <div style={{ marginTop: 30, paddingTop: 26, borderTop: `1px solid ${BD}` }}>
@@ -1110,7 +1110,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 /* ============================================================
    ProductForm
    ============================================================ */
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: any) {
+export function ProductForm({ onVariant, product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -1269,7 +1269,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       </div>
     </div>
   )}
-  <OfferPieces product={product} store={store || product.store} accent="#FF4D6D" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  <OfferPieces product={product} store={store || product.store} accent="#FF4D6D" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
   {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#FF4D6D" />}
 
       {!product.isDigital && (

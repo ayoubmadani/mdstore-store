@@ -1483,7 +1483,7 @@ export function Details({
             </div>
           ) : null}
 
-          <ProductForm
+          <ProductForm onVariant={handleVariantSelection}
             product={product}
             store={store}
             userId={store?.user?.id || store?.userId || product?.store?.userId}
@@ -1510,7 +1510,7 @@ export function Details({
 
 /* --------------------------------------------------------- ProductForm --- */
 
-export function ProductForm({
+export function ProductForm({ onVariant,
   product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform,
 }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
@@ -1705,7 +1705,7 @@ export function ProductForm({
         </div>
       ) : null}
       {/* بطاقة لكل عرض تحت الكمية */}
-      <OfferPieces product={product} store={store || product.store} accent="#FF7A00" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+      <OfferPieces product={product} store={store || product.store} accent="#FF7A00" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
       {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#FF7A00" />}
 
       {orderFreeShipping ? (

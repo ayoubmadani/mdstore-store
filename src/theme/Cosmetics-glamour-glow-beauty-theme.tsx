@@ -48,6 +48,7 @@ interface Product {
   store: any;
 }
 export interface ProductFormProps {
+  onVariant?: (n: string, v: string) => void;
   product: Product; userId: string; domain: string;
   selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
   selectedVariants: Record<string, string>; platform?: string; priceLoss?: number;
@@ -1046,7 +1047,7 @@ export function Details({ product, discount, allImages, domain, allAttrs, finalP
             </div>
           )}
 
-          <ProductForm product={product} userId={product.store?.userId || product.store?.user?.id} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants || {}} store={store || product?.store} />
+          <ProductForm onVariant={handleVariantSelection} product={product} userId={product.store?.userId || product.store?.user?.id} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants || {}} store={store || product?.store} />
 
           {product.desc && (
             <div style={{ marginTop: 28, paddingTop: 22, borderTop: '1px solid var(--line)' }}>
@@ -1062,7 +1063,7 @@ export function Details({ product, discount, allImages, domain, allAttrs, finalP
 /* ══════════════════════════════════════════════════════════════
    PRODUCT FORM
 ══════════════════════════════════════════════════════════════ */
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0, store }: ProductFormProps) {
+export function ProductForm({ onVariant, product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, priceLoss = 0, store }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -1198,7 +1199,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       </div>
     </FR>
   )}
-  <OfferPieces product={product} store={store || product.store} accent="#FF1F8E" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  <OfferPieces product={product} store={store || product.store} accent="#FF1F8E" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
   {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#FF1F8E" />}
       {/* Cart + Order buttons */}
         {product.store?.cart && !product.isDigital && (

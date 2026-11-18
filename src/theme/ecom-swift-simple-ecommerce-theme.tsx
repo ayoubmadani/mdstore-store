@@ -165,6 +165,7 @@ export interface Product {
   store: { id: string; name: string; subdomain: string; userId: string; cart?: boolean; supportQty?: boolean; supportFreeShipping?: boolean; freeShippingMinAmount?: number | null; };
 }
 export interface ProductFormProps {
+  onVariant?: (n: string, v: string) => void;
   product: Product; userId: string; domain: string; redirectPath?: string;
   selectedOffer: string | null; setSelectedOffer: (id: string | null) => void;
   selectedVariants: Record<string, string>; platform?: string; priceLoss?: number; store?: any;
@@ -873,7 +874,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 
           <SimpleDivider />
 
-          <ProductForm product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store} />
+          <ProductForm onVariant={handleVariantSelection} product={product} userId={product.store.userId} domain={domain} selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} store={store} />
 
           {product.desc && (
             <div style={{ marginTop: '3rem' }}>
@@ -898,7 +899,7 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
   </div>
 );
 
-export function ProductForm({ product, userId, domain, selectedOffer, selectedVariants, platform, store }: ProductFormProps) {
+export function ProductForm({ onVariant, product, userId, domain, selectedOffer, selectedVariants, platform, store }: ProductFormProps) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
   // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -1015,7 +1016,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, selectedVa
       </div>
     </FR>
   )}
-  <OfferPieces product={product} store={store || product.store} accent="#DC2626" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  <OfferPieces product={product} store={store || product.store} accent="#DC2626" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} onVariant={onVariant} />
   {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#DC2626" />}
       <form onSubmit={handleSubmit}>
         <div style={{ background: 'var(--bg-alt)', padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
