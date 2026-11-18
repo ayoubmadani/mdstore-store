@@ -2,6 +2,9 @@
 // دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
 import * as __kit from '@mdstore/theme-kit';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
+import { OfferPieces, needsPieces } from '@/components/theme/OfferPieces';
+import { CartItemCard, cartOrderItems } from '@/components/theme/CartItemCard';
+import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, type Box } from '@/components/theme/orderPieces';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
@@ -1067,7 +1070,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             </div>
           )}
 
-          {allAttrs?.map((attr: Attribute) => (
+          {!needsPieces(product) && allAttrs?.map((attr: Attribute) => (
             <div key={attr.id} style={{ marginBottom: 20 }}>
               <div style={{ fontWeight: 700, marginBottom: 10, fontSize: 14 }}>{attr.name}{__colorName(attr, selectedVariants)}</div>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
@@ -1109,6 +1112,8 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
    ============================================================ */
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
+  // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
+  const [boxes, setBoxes] = useState<Box[]>([]);
   const t = withLocationLabels(T)[getLang(store || product?.store)];
   const router = useRouter();
   const initCount = useCartStore((s: any) => s.initCount);
@@ -1155,12 +1160,20 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     return Number(product.price);
   }, [selectedOffer, product, selectedVariants]);
 
-  const fp = getFP() + addonsTotal(product, addonIds);
   const supportQty = (store?.supportQty ?? product?.store?.supportQty) !== false;
   const qty = supportQty ? fd.quantity : 1;
+  const usePieces = needsPieces(product);
+  const per = piecesPerBox(product as any, selectedOffer);
+  useEffect(() => {
+    setBoxes((prev) => fitBoxes(prev, qty, per, { variants: { ...(selectedVariants || {}) }, addonIds: [] }));
+  }, [qty, per]); // eslint-disable-line react-hooks/exhaustive-deps
+  const lines = usePieces && boxes.length ? boxLines(product as any, selectedOffer, boxes, (ids) => addonsTotal(product, ids)) : null;
+  // بلا بطاقات: السعر × الكمية كما كان؛ مع البطاقات: مجموع سطورها
+  const fp = getFP() + addonsTotal(product, addonIds);
+  const subtotal = lines ? linesTotal(lines) : fp * qty;
   const selOfferObj = product.offers?.find((x: Offer) => x.id === selectedOffer);
   const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
-    (store?.supportFreeShipping && store?.freeShippingMinAmount != null && (fp * qty) >= Number(store.freeShippingMinAmount)));
+    (store?.supportFreeShipping && store?.freeShippingMinAmount != null && subtotal >= Number(store.freeShippingMinAmount)));
 
   const getLiv = useCallback((): number => {
     if (product.isDigital) return 0;
@@ -1169,7 +1182,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
   }, [selW, fd.typeLivraison, orderFreeShipping, product.isDigital]);
 
-  const total = () => fp * qty + getLiv();
+  const total = () => subtotal + +getLiv();
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -1204,7 +1217,12 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const addToCart = () => {
     try {
       const arr = JSON.parse(localStorage.getItem(domain) || '[]');
-      arr.push(buildPayload());
+      if (lines) {
+        // مدخل لكل بطاقة عرض (بسطور قطعها) — تظهر في السلة كبطاقة، وتتحول لسطور عند إرسال الطلب
+        for (const e of boxEntries(product as any, selectedOffer, boxes, (ids) => addonsTotal(product, ids))) {
+          arr.push({ ...buildPayload(), quantity: 1, variantDetailId: undefined, selectedVariants: undefined, addonIds: [], finalPrice: e.total, totalPrice: e.total, offerBox: { lines: e.lines } });
+        }
+      } else arr.push(buildPayload());
       localStorage.setItem(domain, JSON.stringify(arr));
       initCount(arr.length);
       setAdded(true);
@@ -1217,7 +1235,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     setSubmitting(true);
     try {
       const r = await fetch(`${API_URL}/orders/create`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...buildPayload(), addonIds }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lines ? lines.map((l) => ({ ...buildPayload(), addonIds: l.addonIds, quantity: l.quantity, variantDetailId: l.variantDetailId, selectedVariants: l.selectedVariants, finalPrice: l.finalPrice, totalPrice: l.finalPrice * l.quantity })) : { ...buildPayload(), addonIds }),
       });
       const d = await r.json();
       if (fd.customerId || d?.customerId) localStorage.setItem('customerId', d?.customerId || fd.customerId);
@@ -1241,16 +1259,18 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   return (
     <div style={{ marginTop: 18 }}>
-  <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#FF4D6D" />
-      {supportQty && !product.isDigital && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', border: `1.5px solid ${BD}`, borderRadius: 12, overflow: 'hidden' }}>
-            <button onClick={() => setFd((s) => ({ ...s, quantity: Math.max(1, s.quantity - 1) }))} style={{ width: 40, height: 40, border: 'none', background: CARD, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={15} /></button>
-            <span style={{ width: 44, textAlign: 'center', fontWeight: 700 }}>{fd.quantity}</span>
-            <button onClick={() => setFd((s) => ({ ...s, quantity: s.quantity + 1 }))} style={{ width: 40, height: 40, border: 'none', background: CARD, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={15} /></button>
-          </div>
-        </div>
-      )}
+  {/* الكمية خارج نموذج الطلب، فوق بطاقات العرض */}
+  {supportQty && !product.isDigital && (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
+      <div style={{ display: 'inline-flex', alignItems: 'center', border: `1.5px solid ${BD}`, borderRadius: 12, overflow: 'hidden' }}>
+        <button onClick={() => setFd((s) => ({ ...s, quantity: Math.max(1, s.quantity - 1) }))} style={{ width: 40, height: 40, border: 'none', background: CARD, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={15} /></button>
+        <span style={{ width: 44, textAlign: 'center', fontWeight: 700 }}>{fd.quantity}</span>
+        <button onClick={() => setFd((s) => ({ ...s, quantity: s.quantity + 1 }))} style={{ width: 40, height: 40, border: 'none', background: CARD, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={15} /></button>
+      </div>
+    </div>
+  )}
+  <OfferPieces product={product} store={store || product.store} accent="#FF4D6D" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+  {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#FF4D6D" />}
 
       {!product.isDigital && (
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -1399,6 +1419,7 @@ export function Cart({ domain, store }: any) {
 
   const finalTotal = cartTotal + getLiv();
 
+  const update = (n: any[]) => { setItems(n); localStorage.setItem(domain, JSON.stringify(n)); initCount(n.length); };
   const removeItem = (idx: number) => {
     const arr = [...items];
     arr.splice(idx, 1);
@@ -1421,7 +1442,7 @@ export function Cart({ domain, store }: any) {
     if (!validate() || items.length === 0) return;
     setSubmitting(true);
     try {
-      const payload = items.map((it) => ({
+      const payload = cartOrderItems(items).map((it) => ({
         ...fd, product: it.product, addonIds: it.addonIds, productId: it.productId, storeId: it.storeId, userId: it.userId,
         variantDetailId: it.variantDetailId, selectedOffer: it.selectedOffer, selectedVariants: it.selectedVariants,
         quantity: it.quantity, finalPrice: it.finalPrice, totalPrice: it.finalPrice * it.quantity + getLiv(), priceLivraison: getLiv(),
@@ -1479,6 +1500,7 @@ export function Cart({ domain, store }: any) {
       <div className="cart-inner">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {items.map((it, idx) => {
+            if (it.offerBox?.lines?.length) return <CartItemCard key={idx} item={it} index={idx} items={items} update={update} store={store} accent="#FF4D6D" />;
             const img = it.product?.productImage || it.product?.imagesProduct?.[0]?.imageUrl;
             return (
               <div key={idx} style={{ display: 'flex', gap: 14, background: CARD, borderRadius: 16, padding: 14, border: `1px solid ${BD}` }}>

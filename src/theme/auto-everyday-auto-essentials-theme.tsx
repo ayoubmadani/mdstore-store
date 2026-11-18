@@ -19,6 +19,9 @@ import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
+import { OfferPieces, needsPieces } from '@/components/theme/OfferPieces';
+import { CartItemCard, cartOrderItems } from '@/components/theme/CartItemCard';
+import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, type Box } from '@/components/theme/orderPieces';
 import DOMPurify from 'isomorphic-dompurify';
 import {
   Search, X, Menu, ShoppingCart, Trash2, Plus, Minus, Phone, Mail, MapPin,
@@ -1407,7 +1410,7 @@ export function Details({
 
           {attrs.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem', marginBottom: '1.5rem' }}>
-              {attrs.map((attr) => (
+              {!needsPieces(product) && attrs.map((attr) => (
                 <div key={attr.id}>
                   <p style={{ margin: '0 0 9px', fontSize: '0.8rem', fontWeight: 700 }}>{attr.name}{__colorName(attr, selectedVariants)}</p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -1511,6 +1514,8 @@ export function ProductForm({
   product, store: storeprop, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform,
 }: any) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
+  // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
+  const [boxes, setBoxes] = useState<Box[]>([]);
   const store = storeprop || product?.store;
   const t = withLocationLabels(T)[getLang(store)];
   const currency = store?.currency || 'DZD';
@@ -1565,11 +1570,19 @@ export function ProductForm({
     if (d && Number(d.price) !== -1) return Number(d.price);
     return Number(product?.price || 0);
   };
+  const usePieces = needsPieces(product);
+  const per = piecesPerBox(product as any, selectedOffer);
+  useEffect(() => {
+    setBoxes((prev) => fitBoxes(prev, qty, per, { variants: { ...(selectedVariants || {}) }, addonIds: [] }));
+  }, [qty, per]); // eslint-disable-line react-hooks/exhaustive-deps
+  const lines = usePieces && boxes.length ? boxLines(product as any, selectedOffer, boxes, (ids) => addonsTotal(product, ids)) : null;
+  // بلا بطاقات: السعر × الكمية كما كان؛ مع البطاقات: مجموع سطورها
   const fp = getFP() + addonsTotal(product, addonIds);
+  const subtotal = lines ? linesTotal(lines) : fp * qty;
 
   const selW = wilayas.find((w) => String(w.id) === String(fd.customerWelaya));
 
-  const orderFreeShipping = isFreeShipping({ store, product, offer: selOffer, amount: fp * qty });
+  const orderFreeShipping = isFreeShipping({ store, product, offer: selOffer, amount: subtotal });
 
   const getLiv = useCallback((): number => {
     if (product?.isDigital) return 0;
@@ -1578,7 +1591,7 @@ export function ProductForm({
     return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
   }, [selW, fd.typeLivraison, orderFreeShipping, product?.isDigital]);
 
-  const total = () => Number(fp) * Number(qty) + Number(getLiv());
+  const total = () => subtotal + Number(getLiv());
 
   const getVarId = () => {
     const d = product?.variantDetails?.find((x: VariantDetail) => variantMatches(x, selectedVariants || {}));
@@ -1632,7 +1645,12 @@ export function ProductForm({
     try {
       const arr = JSON.parse(localStorage.getItem(domain) || '[]');
       const next = Array.isArray(arr) ? arr : [];
-      next.push(buildPayload());
+      if (lines) {
+        // مدخل لكل بطاقة عرض (بسطور قطعها) — تظهر في السلة كبطاقة، وتتحول لسطور عند إرسال الطلب
+        for (const e of boxEntries(product as any, selectedOffer, boxes, (ids) => addonsTotal(product, ids))) {
+          next.push({ ...buildPayload(), quantity: 1, variantDetailId: undefined, selectedVariants: undefined, addonIds: [], finalPrice: e.total, totalPrice: e.total, offerBox: { lines: e.lines } });
+        }
+      } else next.push(buildPayload());
       localStorage.setItem(domain, JSON.stringify(next));
       initCount(next.length);
       setToast(t.addedMsg);
@@ -1643,7 +1661,10 @@ export function ProductForm({
     if (!validate()) return;
     setSubmitting(true);
     try {
-      const r = await axios.post(`${API_URL}/orders/create`, buildPayload());
+      // البطاقات: سطر لكل مجموعة قطع متطابقة (كطلب السلة)، وإلا الطلب الواحد كما كان
+      const r = await axios.post(`${API_URL}/orders/create`, lines
+        ? lines.map((l) => ({ ...buildPayload(), addonIds: l.addonIds, quantity: l.quantity, variantDetailId: l.variantDetailId, selectedVariants: l.selectedVariants, finalPrice: l.finalPrice, totalPrice: l.finalPrice * l.quantity }))
+        : buildPayload());
       const cid = r.data?.customerId || r.data?.data?.customerId;
       if (cid) { try { localStorage.setItem('customerId', cid); } catch { /* ignore */ } }
       router.push(`/successfully?productId=${product?.id}`);
@@ -1654,7 +1675,7 @@ export function ProductForm({
 
   const livLabel = selW ? (orderFreeShipping ? t.freeShippingBadge : fmt(getLiv(), currency)) : '—';
   const remaining = (store?.supportFreeShipping && store?.freeShippingMinAmount != null && !orderFreeShipping)
-    ? Number(store.freeShippingMinAmount) - fp * qty : 0;
+    ? Number(store.freeShippingMinAmount) - subtotal : 0;
 
   const label = (txt: string) => (
     <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, marginBottom: 6, color: TXT }}>{txt}</label>
@@ -1667,7 +1688,6 @@ export function ProductForm({
 
   return (
     <div style={{ border: `1px solid ${BD}`, borderTop: `3px solid ${INK}`, padding: '1.25rem', background: '#fff' }}>
-  <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#FF7A00" />
       <Styles />
 
       {supportQty && !product?.isDigital ? (
@@ -1684,6 +1704,9 @@ export function ProductForm({
           </div>
         </div>
       ) : null}
+      {/* بطاقة لكل عرض تحت الكمية */}
+      <OfferPieces product={product} store={store || product.store} accent="#FF7A00" offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+      {!usePieces && <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#FF7A00" />}
 
       {orderFreeShipping ? (
         <p className="ae-badge-free" style={{ marginTop: 0, marginBottom: '1rem' }}>
@@ -1922,6 +1945,7 @@ export function Cart({ domain, store }: any) {
 
   const set = (k: string, v: any) => setFd((s) => ({ ...s, [k]: v }));
 
+  const update = (n: any[]) => { setItems(n); localStorage.setItem(domain, JSON.stringify(n)); initCount(n.length); };
   const removeItem = (i: number) => {
     const next = items.filter((_, idx) => idx !== i);
     setItems(next);
@@ -1962,7 +1986,7 @@ export function Cart({ domain, store }: any) {
     if (!validate() || items.length === 0) return;
     setSubmitting(true);
     try {
-      const orders = items.map((it) => ({
+      const orders = cartOrderItems(items).map((it) => ({
         ...it,
         ...fd,
         quantity: Number(it.quantity || 1),
@@ -2032,6 +2056,7 @@ export function Cart({ domain, store }: any) {
       <div className="ae-cart-grid">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {items.map((it, i) => {
+            if (it.offerBox?.lines?.length) return <CartItemCard key={i} item={it} index={i} items={items} update={update} store={store} accent="#FF7A00" />;
             const img = productImg(it.product);
             const line = Number(it.finalPrice || it.product?.price || 0) * Number(it.quantity || 1);
             return (
