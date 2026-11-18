@@ -19,6 +19,9 @@ import {
 import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 import { ProductAddons, addonsTotal } from '@/components/theme/ProductAddons';
+import { OfferPieces, needsPieces } from '@/components/theme/OfferPieces';
+import { CartItemCard, cartOrderItems } from '@/components/theme/CartItemCard';
+import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, type Box } from '@/components/theme/orderPieces';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -1122,7 +1125,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           )}
 
           {/* Attributes */}
-          {allAttrs?.map((attr: Attribute) => (
+          {!needsPieces(product) && allAttrs?.map((attr: Attribute) => (
             <div key={attr.id} className="luxe-details-attr">
               <p className="luxe-details-attr-label">{attr.name}{__colorName(attr, selectedVariants)}</p>
               <div className="luxe-details-attr-vals">
@@ -1179,6 +1182,8 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 /* ─────────── ProductForm ─────────── */
 export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, store: storeprop }: ProductFormProps & { store?: any }) {
   const [addonIds, setAddonIds] = useState<string[]>([]);
+  // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها وإضافاتها
+  const [boxes, setBoxes] = useState<Box[]>([]);
   const store = storeprop || product?.store;
   const t = withLocationLabels(T)[getLang(store)];
   const [orderNowState, setIsOrderNow] = useState(false);
@@ -1226,9 +1231,17 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   const supportQty = (store?.supportQty ?? product.store?.supportQty) !== false;
   const qty = supportQty ? fd.quantity : 1;
+  const usePieces = needsPieces(product);
+  const per = piecesPerBox(product as any, selectedOffer);
+  useEffect(() => {
+    setBoxes((prev) => fitBoxes(prev, qty, per, { variants: { ...(selectedVariants || {}) }, addonIds: [] }));
+  }, [qty, per]); // eslint-disable-line react-hooks/exhaustive-deps
+  const lines = usePieces && boxes.length ? boxLines(product as any, selectedOffer, boxes, (ids) => addonsTotal(product, ids)) : null;
+  // بلا بطاقات: السعر × الكمية كما كان؛ مع البطاقات: مجموع سطورها
+  const subtotal = lines ? linesTotal(lines) : unitFP() * qty;
   const selOfferObj = product.offers?.find((o: any) => o.id === selectedOffer);
   const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
-    (store?.supportFreeShipping && store?.freeShippingMinAmount != null && (unitFP() * qty) >= Number(store.freeShippingMinAmount)));
+    (store?.supportFreeShipping && store?.freeShippingMinAmount != null && subtotal >= Number(store.freeShippingMinAmount)));
   const getLiv = useCallback((): number => {
     if (product.isDigital) return 0;
     if (orderFreeShipping) return 0;
@@ -1236,7 +1249,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     return fd.typeLivraison === 'home' ? Number(selW.livraisonHome) : Number(selW.livraisonOfice);
   }, [selW, fd.typeLivraison, orderFreeShipping, product.isDigital]);
 
-  const total = useCallback(() => unitFP() * qty + getLiv(), [unitFP, qty, getLiv]);
+  const total = useCallback(() => subtotal + getLiv(), [subtotal, getLiv]);
 
   const getVarId = useCallback(() => {
     if (!Object.keys(selectedVariants).length || !product.variantDetails) return null;
@@ -1270,11 +1283,16 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       addedAt: new Date().toISOString(),
     };
     const arr = JSON.parse(localStorage.getItem(domain) || '[]');
-    arr.push(payload);
+    if (lines) {
+      // مدخل لكل بطاقة عرض (بسطور قطعها) — تظهر في السلة كبطاقة، وتتحول لسطور عند إرسال الطلب
+      for (const e of boxEntries(product as any, selectedOffer, boxes, (ids) => addonsTotal(product, ids))) {
+        arr.push({ ...payload, quantity: 1, variantDetailId: undefined, selectedVariants: undefined, addonIds: [], finalPrice: e.total, totalPrice: e.total, offerBox: { lines: e.lines } });
+      }
+    } else arr.push(payload);
     localStorage.setItem(domain, JSON.stringify(arr));
     const cs = useCartStore.getState();
     cs.initCount(arr.length);
-  }, [fd, qty, product, userId, domain, getVarId, selectedOffer, selectedVariants, unitFP, total, getLiv]);
+  }, [fd, qty, product, userId, domain, getVarId, selectedOffer, selectedVariants, unitFP, total, getLiv, lines, boxes]);
 
   const submitOrder = useCallback(async () => {
     if (!validate()) return;
@@ -1284,13 +1302,13 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       const payload = product.isDigital
         ? { ...rest, ...({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) }) }
         : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
+      const common = { ...payload, product, productId: product.id, storeId: product.store?.id, userId, selectedOffer, priceLivraison: getLiv() };
+      // البطاقات: سطر لكل مجموعة قطع متطابقة (كطلب السلة)، وإلا الطلب الواحد كما كان
       const r = await fetch(`${API_URL}/orders/create`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...payload, quantity: qty, product, productId: product.id, storeId: product.store?.id, userId,
-          variantDetailId: getVarId(), selectedOffer, selectedVariants,
-          addonIds, finalPrice: unitFP(), totalPrice: total(), priceLivraison: getLiv(),
-        }),
+        body: JSON.stringify(lines
+          ? lines.map((l) => ({ ...common, addonIds: l.addonIds, quantity: l.quantity, variantDetailId: l.variantDetailId, selectedVariants: l.selectedVariants, finalPrice: l.finalPrice, totalPrice: l.finalPrice * l.quantity }))
+          : { ...common, quantity: qty, variantDetailId: getVarId(), selectedVariants, addonIds, finalPrice: unitFP(), totalPrice: total() }),
       });
       if (r.ok) {
         const d = await r.json();
@@ -1299,7 +1317,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       } else { setErrors({ submit: t.errSubmit }); }
     } catch { setErrors({ submit: t.errSubmit }); }
     setSubmitting(false);
-  }, [fd, qty, product, userId, getVarId, selectedOffer, selectedVariants, unitFP, total, getLiv, validate, t]);
+  }, [fd, qty, product, userId, getVarId, selectedOffer, selectedVariants, unitFP, total, getLiv, validate, t, lines]);
 
   if (success) {
     return (
@@ -1314,7 +1332,16 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   return (
     <div className="luxe-form">
-      <ProductAddons product={product} store={storeprop || product.store} selected={addonIds} onChange={setAddonIds} accent={A} />
+      {/* الكمية خارج نموذج الطلب، فوق بطاقات العرض */}
+      {supportQty && !product.isDigital && (
+        <div className="luxe-qty-row" style={{ marginBottom: '1rem' }}>
+          <button type="button" aria-label="-" className="luxe-qty-btn" onClick={() => setFd(p => ({...p, quantity: Math.max(1, p.quantity - 1)}))}><Minus size={16} /></button>
+          <span className="luxe-qty-val">{fd.quantity}</span>
+          <button type="button" aria-label="+" className="luxe-qty-btn" onClick={() => setFd(p => ({...p, quantity: p.quantity + 1}))}><Plus size={16} /></button>
+        </div>
+      )}
+      <OfferPieces product={product} store={storeprop || product.store} accent={A} offerId={selectedOffer} boxes={boxes} onChange={setBoxes} />
+      {!usePieces && <ProductAddons product={product} store={storeprop || product.store} selected={addonIds} onChange={setAddonIds} accent={A} />}
       {!isOrderNow && !product.isDigital ? (
         <div className="luxe-btn-grid">
           <button className="luxe-btn-primary" onClick={() => setIsOrderNow(true)}>
@@ -1393,14 +1420,6 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 </button>)}
               </div>
             </>
-          )}
-
-          {supportQty && !product.isDigital && (
-            <div className="luxe-qty-row">
-              <button className="luxe-qty-btn" onClick={() => setFd(p => ({...p, quantity: Math.max(1, p.quantity - 1)}))}><Minus size={16} /></button>
-              <span className="luxe-qty-val">{fd.quantity}</span>
-              <button className="luxe-qty-btn" onClick={() => setFd(p => ({...p, quantity: p.quantity + 1}))}><Plus size={16} /></button>
-            </div>
           )}
 
           {/* Summary */}
@@ -1485,6 +1504,7 @@ export function Cart({ domain, store }: any) {
     return Object.keys(e).length === 0;
   }, [fd, t]);
 
+  const update = (n: any[]) => { setItems(n); localStorage.setItem(domain, JSON.stringify(n)); initCount(n.length); };
   const removeItem = useCallback((idx: number) => {
     const arr = [...items]; arr.splice(idx, 1);
     setItems(arr);
@@ -1496,7 +1516,7 @@ export function Cart({ domain, store }: any) {
     if (!validate()) return;
     setSubmitting(true);
     try {
-      const results = await Promise.all(items.map(it =>
+      const results = await Promise.all(cartOrderItems(items).map(it =>
         fetch(`${API_URL}/orders/create`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1563,6 +1583,7 @@ export function Cart({ domain, store }: any) {
       <div className="luxe-cart-grid">
         <div>
           {items.map((it, idx) => {
+            if (it.offerBox?.lines?.length) return <CartItemCard key={idx} item={it} index={idx} items={items} update={update} store={store} accent={A} />;
             const img = it.product?.productImage || it.product?.imagesProduct?.[0]?.imageUrl;
             return (
               <div key={idx} className="luxe-cart-item">
