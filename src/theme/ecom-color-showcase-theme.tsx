@@ -173,6 +173,7 @@ const THEME_CSS = `
   .cs-det { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.75rem; padding-top: 1.5rem; padding-bottom: 4rem; }
   @media (min-width: 900px) { .cs-det { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3rem; padding-top: 2.5rem; } .cs-gal { position: sticky; top: 92px; align-self: start; } }
   .cs-gal-main { position: relative; aspect-ratio: 1; background: #fff; border-radius: 20px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .cs-gal-main { touch-action: pan-y; } .cs-gal-main img { -webkit-user-drag: none; user-select: none; }
   .cs-gal-main img { width: 100%; height: 100%; object-fit: contain; }
   .cs-thumbs { display: flex; gap: .7rem; margin-top: 1rem; flex-wrap: wrap; justify-content: center; }
   .cs-thumbs button { width: 72px; height: 72px; border-radius: 14px; overflow: hidden; border: 2px solid transparent; background: #fff; cursor: pointer; padding: 4px; }
@@ -887,6 +888,20 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
   const tracked = product.variantDetails?.length ? product.variantDetails.some((v: any) => typeof v.stock === 'number') : typeof product.stock === 'number';
   const inStock = product.variantDetails?.length ? product.variantDetails.some((v: any) => v.autoGenerate || Number(v.stock) > 0) : Number(product.stock) > 0;
   const step = (d: number) => setSel((s) => (s + d + images.length) % images.length);
+  // Swipe the main picture with a finger (phones): the next / previous picture, as with the arrows.
+  // RTL: the next picture comes from the left, so a swipe to the right shows it.
+  const touch = React.useRef<{ x: number; y: number } | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => { const t0 = e.touches[0]; touch.current = { x: t0.clientX, y: t0.clientY }; };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const start = touch.current;
+    touch.current = null;
+    if (!start || images.length < 2) return;
+    const t1 = e.changedTouches[0];
+    const dx = t1.clientX - start.x;
+    const dy = t1.clientY - start.y;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return; // a tap or a vertical scroll
+    step((dx > 0) === isRTL ? 1 : -1);
+  };
   const share = async () => {
     const url = window.location.href;
     try {
@@ -915,7 +930,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 
       <div className="cs-wrap cs-det">
         <div className="cs-gal">
-          <div className="cs-gal-main">
+          <div className="cs-gal-main" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             {images[sel]
               ? <img fetchPriority="high" decoding="async" src={images[sel]} alt={product.name} />
               : <ShoppingBag size={56} color="#D1D5DB" />}
