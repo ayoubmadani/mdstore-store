@@ -10,6 +10,7 @@ import ThemeRunner from '@/components/ThemeRunner'
 import CustomerTracker from '@/components/CustomerTracker'
 import MobilePaddingClamp from '@/components/theme/MobilePaddingClamp'
 import { useStore } from '@/Hook/store-provider'
+import { withOptionImages } from '@/lib/variant-image'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000'
 
@@ -255,9 +256,10 @@ export default function ProductClient({
 
   // imagesProduct[0] هي الصورة الرئيسية دائماً (نفس القاعدة المعتمدة في الداشبورد)،
   // و productImage مجرد حقل احتياطي قديم — لا نجمعه مع imagesProduct لتفادي تكرار نفس الصورة
-  const allImages  = product.imagesProduct?.length
+  // + صور خيارات «صورة» غير المربوطة (بعد صور المنتج): اختيار الخيار يعرض صورته دون ربط يدوي
+  const allImages  = withOptionImages(product.imagesProduct?.length
     ? product.imagesProduct.map((i: any) => i.imageUrl)
-    : [product.productImage].filter(Boolean) as string[]
+    : [product.productImage].filter(Boolean) as string[], product.attributes)
   const discount   = (() => {
     if (!product.priceOriginal) return 0
     const o = parseFloat(product.priceOriginal.toString())
