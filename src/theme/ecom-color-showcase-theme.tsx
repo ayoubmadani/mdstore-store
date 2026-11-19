@@ -571,13 +571,19 @@ const getLang = (store?: any): Lang => (store?.language === 'fr' ? 'fr' : store?
 const curOf = (store: any) => store?.currency || 'DZD';
 
 /* ═══════════ MAIN ═══════════ */
+// Store pictures are not saved the easy way: no right-click "Save image", no dragging a picture out,
+// no long-press "Save image" on phones. (A screenshot still works — this stops casual copying only.)
+const noImageSave = (e: React.SyntheticEvent) => { if ((e.target as HTMLElement)?.tagName === 'IMG') e.preventDefault(); };
+const NO_IMAGE_SAVE_CSS = `.cs-root img { -webkit-touch-callout: none; -webkit-user-drag: none; user-select: none; -webkit-user-select: none; }`;
+
 export default function Main({ store, children, domain }: any) {
   const pathname = usePathname();
   const isRTL = getLang(store) === 'ar';
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return (
-    <div dir={isRTL ? 'rtl' : 'ltr'} className="cs-root" style={brandVars(store)}>
+    <div dir={isRTL ? 'rtl' : 'ltr'} className="cs-root" style={brandVars(store)} onContextMenu={noImageSave} onDragStart={noImageSave}>
       <style>{THEME_CSS}</style>
+      <style>{NO_IMAGE_SAVE_CSS}</style>
       <Navbar store={store} domain={domain} />
       <main>{children}</main>
       <Footer store={store} />
