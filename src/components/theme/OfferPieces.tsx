@@ -47,8 +47,13 @@ export function OfferPieces({ product, store, accent = '#1D4ED8', offerId, boxes
       {attrs.map((attr) => {
         const v = attr.variants.find((x) => x.value === piece.variants[attr.name]);
         if (!v) return null;
-        const dot = attr.displayMode === 'color' ? <span style={{ width: 12, height: 12, borderRadius: '50%', display: 'inline-block', border: '1px solid #ddd', background: isUrl(v.value) ? `url(${v.value}) center/cover` : v.value }} /> : null;
-        return <span key={attr.name} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', borderRadius: 999, background: '#F3F4F6', fontSize: '0.78rem', fontWeight: 700, color: '#333' }}>{dot}{v.name && v.name !== v.value ? v.name : attr.displayMode === 'color' ? '' : v.value}</span>;
+        // a picture option shows its picture (never its link), a colour its dot, text stays text
+        const picture = attr.displayMode === 'image' || (attr.displayMode !== 'color' && isUrl(v.value));
+        const dot = attr.displayMode === 'color'
+          ? <span style={{ width: 12, height: 12, borderRadius: '50%', display: 'inline-block', border: '1px solid #ddd', background: isUrl(v.value) ? `url(${v.value}) center/cover` : v.value }} />
+          : picture ? <span aria-hidden style={{ width: 22, height: 22, borderRadius: 5, display: 'inline-block', border: '1px solid #ddd', background: `url(${v.value}) center/cover` }} /> : null;
+        const named = v.name && v.name !== v.value ? v.name : '';
+        return <span key={attr.name} title={named || attr.name} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: picture ? '2px 6px 2px 2px' : '2px 8px', borderRadius: 999, background: '#F3F4F6', fontSize: '0.78rem', fontWeight: 700, color: '#333' }}>{dot}{named || (attr.displayMode === 'color' || picture ? '' : v.value)}</span>;
       })}
       {addons.filter((a) => piece.addonIds.includes(a.id)).map((a) => {
         const n = piece.addonIds.filter((x) => x === a.id).length;
