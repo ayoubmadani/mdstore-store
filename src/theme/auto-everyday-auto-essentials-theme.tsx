@@ -33,6 +33,22 @@ import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
+
+// Swipe the product picture with a finger (phones): next / previous picture, as with the arrows or thumbnails.
+// The page direction decides: in RTL the next picture comes from the left (swipe right). Taps and vertical scrolls are left alone.
+const __swipe = (count: number, set: (f: (i: number) => number) => void) => ({
+  onTouchStart: (e: any) => { const t = e.touches[0]; e.currentTarget.__sw = { x: t.clientX, y: t.clientY }; },
+  onTouchEnd: (e: any) => {
+    const el = e.currentTarget; const s = el.__sw; el.__sw = null;
+    if (!s || count < 2) return;
+    const t = e.changedTouches[0]; const dx = t.clientX - s.x; const dy = t.clientY - s.y;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    const rtl = getComputedStyle(el).direction === 'rtl';
+    const d = (dx > 0) === rtl ? 1 : -1;
+    set((i) => (i + d + count) % count);
+  },
+});
+
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
 const __colorName = (attr: any, sel: any) => {
   const v = attr?.variants?.find((x: any) => x.value === sel?.[attr?.name]);
@@ -1309,7 +1325,7 @@ export function Details({
           <div style={{ position: 'relative', border: `1px solid ${BD}`, background: SURF, aspectRatio: '1 / 1', overflow: 'hidden' }}>
             {discount > 0 ? <span className="ae-badge-sale ae-num">-{discount}%</span> : null}
             {gallery[sel] && !imgErr ? (
-              <img src={gallery[sel]} alt={product?.name || ''} onError={() => setImgErr(true)} style={imgStyle} />
+              <img {...__swipe(gallery.length, setSel)} src={gallery[sel]} alt={product?.name || ''} onError={() => setImgErr(true)} style={imgStyle} />
             ) : (
               <Placeholder size={60} />
             )}

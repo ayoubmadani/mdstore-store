@@ -24,6 +24,22 @@ import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
+
+// Swipe the product picture with a finger (phones): next / previous picture, as with the arrows or thumbnails.
+// The page direction decides: in RTL the next picture comes from the left (swipe right). Taps and vertical scrolls are left alone.
+const __swipe = (count: number, set: (f: (i: number) => number) => void) => ({
+  onTouchStart: (e: any) => { const t = e.touches[0]; e.currentTarget.__sw = { x: t.clientX, y: t.clientY }; },
+  onTouchEnd: (e: any) => {
+    const el = e.currentTarget; const s = el.__sw; el.__sw = null;
+    if (!s || count < 2) return;
+    const t = e.changedTouches[0]; const dx = t.clientX - s.x; const dy = t.clientY - s.y;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    const rtl = getComputedStyle(el).direction === 'rtl';
+    const d = (dx > 0) === rtl ? 1 : -1;
+    set((i) => (i + d + count) % count);
+  },
+});
+
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
 const __colorName = (attr: any, sel: any) => {
   const v = attr?.variants?.find((x: any) => x.value === sel?.[attr?.name]);
@@ -1537,7 +1553,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
           <div style={{top: 88 }}>
             <div style={{ position: 'relative', height: 420, overflow: 'hidden', background: 'var(--g100)', borderRadius: 'var(--radius)', border: '1px solid var(--g200)' }}>
               {allImages[sel]
-                ? <img src={allImages[sel]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ? <img {...__swipe(allImages.length, setSel)} src={allImages[sel]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem' }}>🏆</div>}
               {discount > 0 && <span className="badge-sale" style={{ position: 'absolute', top: 14, right: 14, padding: '6px 14px', borderRadius: 50, fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase' }}>-{discount}%</span>}
               

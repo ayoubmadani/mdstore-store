@@ -31,6 +31,22 @@ import {
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
 
 
+
+// Swipe the product picture with a finger (phones): next / previous picture, as with the arrows or thumbnails.
+// The page direction decides: in RTL the next picture comes from the left (swipe right). Taps and vertical scrolls are left alone.
+const __swipe = (count: number, set: (f: (i: number) => number) => void) => ({
+  onTouchStart: (e: any) => { const t = e.touches[0]; e.currentTarget.__sw = { x: t.clientX, y: t.clientY }; },
+  onTouchEnd: (e: any) => {
+    const el = e.currentTarget; const s = el.__sw; el.__sw = null;
+    if (!s || count < 2) return;
+    const t = e.changedTouches[0]; const dx = t.clientX - s.x; const dy = t.clientY - s.y;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    const rtl = getComputedStyle(el).direction === 'rtl';
+    const d = (dx > 0) === rtl ? 1 : -1;
+    set((i) => (i + d + count) % count);
+  },
+});
+
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
 const __colorName = (attr: any, sel: any) => {
   const v = attr?.variants?.find((x: any) => x.value === sel?.[attr?.name]);
@@ -1180,7 +1196,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
       <div className="ti-details-inner">
         {/* Gallery */}
         <div>
-          <div style={{ position: 'relative', border: `1px solid ${BD}`, borderRadius: 6, overflow: 'hidden', aspectRatio: '1/1', background: CARD, animation: 'scaleIn 0.4s ease both' }}>
+          <div {...__swipe(images.length, setSel)} style={{ position: 'relative', border: `1px solid ${BD}`, borderRadius: 6, overflow: 'hidden', aspectRatio: '1/1', background: CARD, animation: 'scaleIn 0.4s ease both' }}>
             <ProductImg src={images[sel]} alt={product?.name} />
             {discount > 0 && (
               <span className="ti-mono" style={{ position: 'absolute', top: 12, insetInlineStart: 12, background: HOT, color: '#fff', fontSize: '0.72rem', fontWeight: 700, padding: '4px 10px', borderRadius: 3 }}>

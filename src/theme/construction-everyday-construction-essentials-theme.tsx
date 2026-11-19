@@ -25,6 +25,22 @@ import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, heroFallback } from '@/components/theme/storeContact';
 
 
+
+// Swipe the product picture with a finger (phones): next / previous picture, as with the arrows or thumbnails.
+// The page direction decides: in RTL the next picture comes from the left (swipe right). Taps and vertical scrolls are left alone.
+const __swipe = (count: number, set: (f: (i: number) => number) => void) => ({
+  onTouchStart: (e: any) => { const t = e.touches[0]; e.currentTarget.__sw = { x: t.clientX, y: t.clientY }; },
+  onTouchEnd: (e: any) => {
+    const el = e.currentTarget; const s = el.__sw; el.__sw = null;
+    if (!s || count < 2) return;
+    const t = e.changedTouches[0]; const dx = t.clientX - s.x; const dy = t.clientY - s.y;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    const rtl = getComputedStyle(el).direction === 'rtl';
+    const d = (dx > 0) === rtl ? 1 : -1;
+    set((i) => (i + d + count) % count);
+  },
+});
+
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
 const __colorName = (attr: any, sel: any) => {
   const v = attr?.variants?.find((x: any) => x.value === sel?.[attr?.name]);
@@ -870,7 +886,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
       <div className="details-inner" style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div className="gallery-container">
           <div style={{ position: 'relative', aspectRatio: '1/1', overflow: 'hidden', background: '#F3F4F6', border: `1px solid ${BD}` }}>
-            {allImages[sel] ? <img src={allImages[sel]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Package size={48} color={BD} /></div>}
+            {allImages[sel] ? <img {...__swipe(allImages.length, setSel)} src={allImages[sel]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Package size={48} color={BD} /></div>}
             {discount > 0 && <div style={{ position: 'absolute', top: 10, right: 10, background: E, color: '#fff', padding: '2px 8px', fontSize: 11, fontWeight: 800 }}>-{discount}%</div>}
             {allImages.length > 1 && (
               <>

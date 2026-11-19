@@ -26,6 +26,22 @@ import { useCartStore } from '@/store/useCartStore';
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
 
 
+
+// Swipe the product picture with a finger (phones): next / previous picture, as with the arrows or thumbnails.
+// The page direction decides: in RTL the next picture comes from the left (swipe right). Taps and vertical scrolls are left alone.
+const __swipe = (count: number, set: (f: (i: number) => number) => void) => ({
+  onTouchStart: (e: any) => { const t = e.touches[0]; e.currentTarget.__sw = { x: t.clientX, y: t.clientY }; },
+  onTouchEnd: (e: any) => {
+    const el = e.currentTarget; const s = el.__sw; el.__sw = null;
+    if (!s || count < 2) return;
+    const t = e.changedTouches[0]; const dx = t.clientX - s.x; const dy = t.clientY - s.y;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    const rtl = getComputedStyle(el).direction === 'rtl';
+    const d = (dx > 0) === rtl ? 1 : -1;
+    set((i) => (i + d + count) % count);
+  },
+});
+
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
 const __colorName = (attr: any, sel: any) => {
   const v = attr?.variants?.find((x: any) => x.value === sel?.[attr?.name]);
@@ -1421,7 +1437,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
         <div className="details-L">
           <div style={{ position: 'relative', aspectRatio: '1/1', overflow: 'hidden', backgroundColor: 'var(--panel)', border: '1px solid var(--line)', borderRadius: '8px' }}>
             {allImages.length > 0
-              ? <img src={allImages[sel]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              ? <img {...__swipe(allImages.length, setSel)} src={allImages[sel]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
               : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Gamepad2 style={{ width: '64px', height: '64px', color: 'var(--dim)' }} /></div>
             }
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(5,11,26,0.7) 0%, transparent 50%)', pointerEvents: 'none' }} />

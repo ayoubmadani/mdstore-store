@@ -13,6 +13,22 @@ import { CartItemCard, cartOrderItems } from '@/components/theme/CartItemCard';
 import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, type Box } from '@/components/theme/orderPieces';
 import { useCartStore } from "@/store/useCartStore";
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, heroFallback } from '@/components/theme/storeContact';
+
+// Swipe the product picture with a finger (phones): next / previous picture, as with the arrows or thumbnails.
+// The page direction decides: in RTL the next picture comes from the left (swipe right). Taps and vertical scrolls are left alone.
+const __swipe = (count: number, set: (f: (i: number) => number) => void) => ({
+  onTouchStart: (e: any) => { const t = e.touches[0]; e.currentTarget.__sw = { x: t.clientX, y: t.clientY }; },
+  onTouchEnd: (e: any) => {
+    const el = e.currentTarget; const s = el.__sw; el.__sw = null;
+    if (!s || count < 2) return;
+    const t = e.changedTouches[0]; const dx = t.clientX - s.x; const dy = t.clientY - s.y;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    const rtl = getComputedStyle(el).direction === 'rtl';
+    const d = (dx > 0) === rtl ? 1 : -1;
+    set((i) => (i + d + count) % count);
+  },
+});
+
 import {
   ShoppingCart, Search, Menu, X, ChevronDown, ChevronLeft, ChevronRight,
   Star, Trash2, Phone, Mail, MapPin, Send, AlertCircle, Minus, Plus,
@@ -878,7 +894,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           <div>
             <div style={{ position: "relative", aspectRatio: "1/1", background: C2, borderRadius: 10, overflow: "hidden", border: `1px solid ${BD}`, marginBottom: 10 }}>
               {mainSrc && !imgErr ? (
-                <img src={mainSrc} alt={product.name} onError={() => setImgErr(true)} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                <img {...__swipe(imgs.length, setSel)} src={mainSrc} alt={product.name} onError={() => setImgErr(true)} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               ) : (
                 <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><Gamepad2 size={52} color={BD} /></div>
               )}
