@@ -42,6 +42,21 @@ import {
 import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, heroFallback } from '@/components/theme/storeContact';
 
 
+
+// Store pictures are not saved the easy way: no right-click "Save image", no dragging a picture out,
+// no long-press "Save image" on phones. (A screenshot still works — this stops casual copying only.)
+function useNoImageSave() {
+  React.useEffect(() => {
+    const stop = (e: Event) => { if ((e.target as HTMLElement)?.tagName === 'IMG') e.preventDefault(); };
+    document.addEventListener('contextmenu', stop);
+    document.addEventListener('dragstart', stop);
+    const css = document.createElement('style');
+    css.textContent = 'img { -webkit-touch-callout: none; -webkit-user-drag: none; user-select: none; -webkit-user-select: none; }';
+    document.head.appendChild(css);
+    return () => { document.removeEventListener('contextmenu', stop); document.removeEventListener('dragstart', stop); css.remove(); };
+  }, []);
+}
+
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
 const __colorName = (attr: any, sel: any) => {
   const v = attr?.variants?.find((x: any) => x.value === sel?.[attr?.name]);
@@ -659,6 +674,7 @@ function ErrLine({ msg }: { msg?: string }) {
 
 /* ============================ MAIN ============================ */
 export default function Main({ store, children, domain }: any) {
+  useNoImageSave();
   const t = withLocationLabels(T)[getLang(store)];
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);

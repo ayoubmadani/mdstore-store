@@ -24,6 +24,21 @@ import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, Logo
 
 
 
+
+// Store pictures are not saved the easy way: no right-click "Save image", no dragging a picture out,
+// no long-press "Save image" on phones. (A screenshot still works — this stops casual copying only.)
+function useNoImageSave() {
+  React.useEffect(() => {
+    const stop = (e: Event) => { if ((e.target as HTMLElement)?.tagName === 'IMG') e.preventDefault(); };
+    document.addEventListener('contextmenu', stop);
+    document.addEventListener('dragstart', stop);
+    const css = document.createElement('style');
+    css.textContent = 'img { -webkit-touch-callout: none; -webkit-user-drag: none; user-select: none; -webkit-user-select: none; }';
+    document.head.appendChild(css);
+    return () => { document.removeEventListener('contextmenu', stop); document.removeEventListener('dragstart', stop); css.remove(); };
+  }, []);
+}
+
 // Swipe the product picture with a finger (phones): next / previous picture, as with the arrows or thumbnails.
 // The page direction decides: in RTL the next picture comes from the left (swipe right). Taps and vertical scrolls are left alone.
 const __swipe = (count: number, set: (f: (i: number) => number) => void) => ({
@@ -631,6 +646,7 @@ const getLang = (store?: any): Lang => {
 const T: Record<Lang, typeof jsonAr> = { ar: jsonAr, fr: jsonFr as any, en: jsonFr as any };
 
 export default function Main({ store, children, domain }: any) {
+  useNoImageSave();
   const pathname = usePathname();
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   const [menuOpen, setMenuOpen] = useState(false);

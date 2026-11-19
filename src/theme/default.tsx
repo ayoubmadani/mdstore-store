@@ -8,6 +8,21 @@
 
 import React from 'react';
 
+
+// Store pictures are not saved the easy way: no right-click "Save image", no dragging a picture out,
+// no long-press "Save image" on phones. (A screenshot still works — this stops casual copying only.)
+function useNoImageSave() {
+  React.useEffect(() => {
+    const stop = (e: Event) => { if ((e.target as HTMLElement)?.tagName === 'IMG') e.preventDefault(); };
+    document.addEventListener('contextmenu', stop);
+    document.addEventListener('dragstart', stop);
+    const css = document.createElement('style');
+    css.textContent = 'img { -webkit-touch-callout: none; -webkit-user-drag: none; user-select: none; -webkit-user-select: none; }';
+    document.head.appendChild(css);
+    return () => { document.removeEventListener('contextmenu', stop); document.removeEventListener('dragstart', stop); css.remove(); };
+  }, []);
+}
+
 function Placeholder({ store }: { store?: any }) {
   const isRTL = (store?.language || 'ar') === 'ar';
   return (
@@ -33,6 +48,7 @@ function Placeholder({ store }: { store?: any }) {
 }
 
 export default function Main({ store }: any) {
+  useNoImageSave();
   return <Placeholder store={store} />;
 }
 
