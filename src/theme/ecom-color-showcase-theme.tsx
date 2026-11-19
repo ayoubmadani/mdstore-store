@@ -14,6 +14,7 @@ import {
 import {
   useCartStore, WhatsAppOrderButton, WhatsAppGlyph, comingSoon,
 } from '@mdstore/theme-kit';
+import { imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
 import { OfferPieces } from '@/components/theme/OfferPieces';
 import { CartItemCard } from '@/components/theme/CartItemCard';
 import { boxLines, linesTotal, fitBoxes, piecesPerBox, boxEntries, type Box } from '@/components/theme/orderPieces';
@@ -893,7 +894,17 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
   // المخزون: يظهر «متوفر/غير متوفر» فقط إن كان المنتج يتتبع الكمية
   const tracked = product.variantDetails?.length ? product.variantDetails.some((v: any) => typeof v.stock === 'number') : typeof product.stock === 'number';
   const inStock = product.variantDetails?.length ? product.variantDetails.some((v: any) => v.autoGenerate || Number(v.stock) > 0) : Number(product.stock) > 0;
-  const step = (d: number) => setSel((s) => (s + d + images.length) % images.length);
+  // an option linked to a picture (or a picture option): choosing it shows that picture; showing a picture (thumbnail, arrows, swipe) chooses its option
+  useEffect(() => {
+    const idx = imageIndexForSelection(product?.attributes, selectedVariants || {}, images);
+    if (idx >= 0) setSel(idx);
+  }, [selectedVariants]); // eslint-disable-line react-hooks/exhaustive-deps
+  const showImage = (idx: number) => {
+    setSel(idx);
+    const v = variantForImage(product?.attributes, images[idx]);
+    if (v && selectedVariants?.[v.name] !== v.value) handleVariantSelection(v.name, v.value);
+  };
+  const step = (d: number) => showImage((sel + d + images.length) % images.length);
   // Swipe the main picture with a finger (phones): the next / previous picture, as with the arrows.
   // RTL: the next picture comes from the left, so a swipe to the right shows it.
   const touch = React.useRef<{ x: number; y: number } | null>(null);
@@ -950,7 +961,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           {images.length > 1 && (
             <div className="cs-thumbs">
               {images.map((img, i) => (
-                <button key={i} className={i === sel ? 'on' : ''} onClick={() => setSel(i)} aria-label={`${i + 1}`}><img loading="lazy" decoding="async" src={img} alt="" /></button>
+                <button key={i} className={i === sel ? 'on' : ''} onClick={() => showImage(i)} aria-label={`${i + 1}`}><img loading="lazy" decoding="async" src={img} alt="" /></button>
               ))}
             </div>
           )}
