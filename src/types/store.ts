@@ -1,3 +1,5 @@
+import type { BundleCard } from '@/lib/bundles';
+
 export interface Store {
   id: string;
   name: string;
@@ -23,6 +25,8 @@ export interface Store {
     secondaryColor: string;
     logoUrl?: string | null;
     faviconUrl?: string | null;
+    // عنوان سلايدر الأطقم: null = الافتراضي، '' = بلا عنوان
+    bundlesTitle?: string | null;
   };
   topBar: {
     enabled: boolean;
@@ -43,6 +47,10 @@ export interface Store {
   };
   products?: Product[];
   categories?: Category[];
+  // أطقم سلايدر الرئيسية (الصفحة الأولى فقط)
+  bundles?: BundleCard[];
+  // مالك المتجر (رقمه فقط) — لأسعار التوصيل
+  user?: { id: string } | null;
 }
 
 export interface Pixel {
