@@ -13,11 +13,23 @@ interface Props {
   language?: string;
   /** عنوان التاجر: undefined/null = الافتراضي بلغة المتجر، '' = بلا عنوان */
   title?: string | null;
-  /** بادئة الروابط محلياً (/<domain>) — فارغة في الإنتاج */
-  base: string;
+  /** بادئة الروابط محلياً (/<domain>) — فارغة في الإنتاج؛ غير معروفة داخل الثيم فتُصحَّح عند الضغط */
+  base?: string;
+  /** يرسمه الثيم نفسه تحت غلافه (StoreBundles) — فيختفي سلايدر المنصة الاحتياطي فوق الغلاف */
+  inTheme?: boolean;
 }
 
-export default function BundleSlider({ bundles, accent, language = 'ar', title, base }: Props) {
+/** داخل الثيم لا نعرف البادئة وقت الرسم: محلياً (الدومين الرئيسي) نضيف /<domain> من المسار الحالي */
+function fixLocalLink(e: React.MouseEvent<HTMLAnchorElement>) {
+  const root = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'mdstore.top').toLowerCase();
+  if (window.location.host.toLowerCase() !== root) return;
+  const seg = window.location.pathname.split('/').filter(Boolean)[0];
+  if (!seg) return;
+  e.preventDefault();
+  window.location.href = `/${seg}${e.currentTarget.getAttribute('href')}`;
+}
+
+export default function BundleSlider({ bundles, accent, language = 'ar', title, base, inTheme }: Props) {
   const t = bundleStrings(language);
   const track = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
@@ -34,7 +46,7 @@ export default function BundleSlider({ bundles, accent, language = 'ar', title, 
   };
 
   return (
-    <section className="w-full py-5" dir={language === 'ar' ? 'rtl' : 'ltr'} aria-label={heading || t.title}>
+    <section className="w-full py-5" dir={language === 'ar' ? 'rtl' : 'ltr'} aria-label={heading || t.title} data-mds-bundles={inTheme ? '' : undefined}>
       <div className="mx-auto max-w-6xl">
         {(heading || !single) && (
           <div className="flex items-center justify-between gap-3 px-4 pb-3">
@@ -55,7 +67,7 @@ export default function BundleSlider({ bundles, accent, language = 'ar', title, 
               <article key={b.id}
                 className={`snap-start shrink-0 flex flex-col overflow-hidden rounded-[22px] border-2 bg-white text-gray-900 ${single ? 'w-full sm:max-w-xl' : 'w-[82%] sm:w-[360px]'}`}
                 style={{ borderColor: accent, backgroundColor: `color-mix(in srgb, ${accent} 8%, #ffffff)` }}>
-                <a href={`${base}/bundle/${b.slug}`} className="relative block aspect-[16/8] bg-gray-100" aria-label={b.name}>
+                <a href={`${base ?? ''}/bundle/${b.slug}`} onClick={base === undefined ? fixLocalLink : undefined} className="relative block aspect-[16/8] bg-gray-100" aria-label={b.name}>
                   {img
                     ? (
                       <picture>
@@ -95,7 +107,7 @@ export default function BundleSlider({ bundles, accent, language = 'ar', title, 
                 </div>
 
                 <div className="mt-auto px-3.5 pb-3.5">
-                  <a href={`${base}/bundle/${b.slug}`}
+                  <a href={`${base ?? ''}/bundle/${b.slug}`} onClick={base === undefined ? fixLocalLink : undefined}
                     className="flex h-12 items-center justify-center rounded-2xl text-[15px] font-bold text-white"
                     style={{ backgroundColor: accent }}>{t.order}</a>
                 </div>

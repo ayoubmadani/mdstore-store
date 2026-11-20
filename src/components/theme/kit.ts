@@ -8,6 +8,7 @@ export { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, what
 export { ProductAddons, activeAddons, addonsTotal, addonsLabel } from './ProductAddons';
 // بطاقات العرض: بطاقة لكل وحدة من الكمية، وفيها قطع العرض بخياراتها وإضافاتها؛ الطلب يُرسل سطوراً (boxLines)
 export { OfferPieces, needsPieces } from './OfferPieces';
+export { StoreBundles } from './StoreBundles';
 export { boxLines, linesTotal, fitBoxes, piecesPerBox, pieceVariantId } from './orderPieces';
 export type { Box, Piece, PieceLine } from './orderPieces';
 

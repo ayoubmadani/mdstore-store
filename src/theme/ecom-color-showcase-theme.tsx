@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 // كل ما يحتاجه الثيم من المتجر يأتي من @mdstore/theme-kit — الثيم ملف واحد مستقل يُبنى ويُرفع من الـ API
 import {
-  useCartStore, WhatsAppOrderButton, WhatsAppGlyph, comingSoon,
+  useCartStore, WhatsAppOrderButton, WhatsAppGlyph, comingSoon, StoreBundles,
 } from '@mdstore/theme-kit';
 
 
@@ -813,6 +813,9 @@ export function Home({ store, page }: any) {
           <a href="#products" className="cs-btn" style={{ width: 'auto', marginTop: '1.5rem', background: '#fff', color: 'var(--p-ink)' }}><ShoppingBag size={17} /> {t.shopNow}</a>
         </section>
       ))}
+
+      {/* عروض الأطقم تحت الغلاف (من المنصة) */}
+      {showHero && <StoreBundles store={store} />}
 
       {cats.length > 0 && !search && (
         <section id="categories" style={{ padding: '4rem 0 3.5rem', scrollMarginTop: 80 }}>

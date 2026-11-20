@@ -54,8 +54,10 @@ export default async function StorePage(props: {
 
   return (
     <>
-      {/* سلايدر «عروض الأطقم» — مشترك لكل الثيمات؛ فوق محتوى الثيم حتى تضعه الثيمات تحت غلافها */}
+      {/* سلايدر «عروض الأطقم» الاحتياطي فوق محتوى الثيم — يختفي حين يرسمه الثيم تحت غلافه (StoreBundles) */}
       {bundles.length > 0 && (
+        <div className="mds-bundles-fallback">
+        <style>{'body:has([data-mds-bundles]) .mds-bundles-fallback{display:none}'}</style>
         <BundleSlider
           bundles={bundles}
           accent={store.design?.primaryColor || '#111827'}
@@ -63,6 +65,7 @@ export default async function StorePage(props: {
           title={store.design?.bundlesTitle}
           base={base}
         />
+        </div>
       )}
       <ThemeRunner
         bundleUrl={bundleUrl}
