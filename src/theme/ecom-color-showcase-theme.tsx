@@ -223,7 +223,6 @@ const THEME_CSS = `
   .cs-bnds { padding: 3rem 0 1rem; }
   .cs-bnd-track { display: flex; gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: .5rem; scrollbar-width: none; }
   .cs-bnd-track::-webkit-scrollbar { display: none; }
-  .cs-bnd-track.one { justify-content: center; }
   .cs-bnd { scroll-snap-align: start; flex: 0 0 min(86%, 380px); background: #fff; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(17,24,39,.06); }
   .cs-bnd-track.one .cs-bnd { flex-basis: min(100%, 560px); }
   .cs-bnd-img { position: relative; display: block; aspect-ratio: 16 / 8; background: var(--soft); overflow: hidden; }
@@ -240,7 +239,10 @@ const THEME_CSS = `
   .cs-bnd-price { display: flex; align-items: baseline; flex-wrap: wrap; gap: .5rem; }
   .cs-bnd-price em { font-style: normal; font-size: .8rem; font-weight: 800; color: #047857; margin-inline-start: auto; }
   .cs-bnd-body .cs-btn { margin-top: auto; }
+  .cs-bnd-top { padding: 0; }
+  @media (max-width: 899px) { .cs-wrap.cs-bnd-top { padding: 0; } }
   .cs-bnd-hero { position: relative; background: var(--soft); overflow: hidden; }
+  @media (min-width: 900px) { .cs-bnd-top { padding-top: 1.75rem; } .cs-bnd-hero { border-radius: 22px; } }
   .cs-bnd-hero img { display: block; width: 100%; height: clamp(200px, 40vw, 460px); object-fit: cover; }
   .cs-bnd-hero .cs-chip { top: 14px; inset-inline-start: 14px; font-size: .9rem; padding: 5px 12px; }
   .cs-bnd-list { display: flex; flex-direction: column; gap: .9rem; }
@@ -865,6 +867,7 @@ export function Bundle({ store, bundle, domain }: any) {
   return (
     <div className="cs-fade">
       {banner && (
+        <div className="cs-wrap cs-bnd-top">
         <section className="cs-bnd-hero" aria-label={bundle.name}>
           <picture>
             {bundle.mobileImageUrl && <source media="(max-width: 640px)" srcSet={bundle.mobileImageUrl} />}
@@ -872,6 +875,7 @@ export function Bundle({ store, bundle, domain }: any) {
           </picture>
           <span className="cs-chip"><bdi dir="ltr">-{bundle.discountPercent}%</bdi></span>
         </section>
+        </div>
       )}
 
       <div className="cs-wrap cs-det">
