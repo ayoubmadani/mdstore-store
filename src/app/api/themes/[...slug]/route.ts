@@ -34,6 +34,16 @@ export async function GET(
   // Last segment is the theme name — used as flat fallback (strips lang prefix)
   const flatSlug = slug[slug.length - 1]
 
+  // تطوير فقط: ثيم مبني محلياً (node scripts/bundle-themes.mjs --out=<dir>) بدل R2 — لتجربة ثيم قبل رفعه
+  const localDir = process.env.NODE_ENV !== 'production' ? process.env.LOCAL_THEMES_DIR : undefined
+  if (localDir) {
+    try {
+      const { readFile } = await import('node:fs/promises')
+      const code = await readFile(`${localDir}/${flatSlug}.js`, 'utf8')
+      return new NextResponse(code, { headers: { 'Content-Type': 'text/javascript; charset=utf-8', 'Cache-Control': 'no-store' } })
+    } catch { /* غير موجود محلياً ← R2 */ }
+  }
+
   try {
     let obj
     try {

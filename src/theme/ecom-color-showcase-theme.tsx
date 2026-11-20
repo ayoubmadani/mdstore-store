@@ -12,7 +12,8 @@ import {
 } from 'lucide-react';
 // كل ما يحتاجه الثيم من المتجر يأتي من @mdstore/theme-kit — الثيم ملف واحد مستقل يُبنى ويُرفع من الـ API
 import {
-  useCartStore, WhatsAppOrderButton, WhatsAppGlyph, comingSoon, StoreBundles,
+  useCartStore, WhatsAppOrderButton, WhatsAppGlyph, comingSoon,
+  useBundleOrder, optionKind, optionImage, bundleProductImage, bundleLink, bundleStrings,
 } from '@mdstore/theme-kit';
 
 
@@ -217,6 +218,41 @@ const THEME_CSS = `
   .cs-addon-qty span { min-width: 24px; text-align: center; font-weight: 800; }
   .cs-desc-html { font-size: .95rem; line-height: 1.85; color: #4B5563; }
   .cs-desc-html img { max-width: 100%; height: auto; border-radius: 12px; }
+
+  /* الأطقم */
+  .cs-bnds { padding: 3rem 0 1rem; }
+  .cs-bnd-track { display: flex; gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: .5rem; scrollbar-width: none; }
+  .cs-bnd-track::-webkit-scrollbar { display: none; }
+  .cs-bnd-track.one { justify-content: center; }
+  .cs-bnd { scroll-snap-align: start; flex: 0 0 min(86%, 380px); background: #fff; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(17,24,39,.06); }
+  .cs-bnd-track.one .cs-bnd { flex-basis: min(100%, 560px); }
+  .cs-bnd-img { position: relative; display: block; aspect-ratio: 16 / 8; background: var(--soft); overflow: hidden; }
+  .cs-bnd-img picture, .cs-bnd-img img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .cs-bnd-body { padding: 1rem 1.1rem 1.15rem; display: flex; flex-direction: column; gap: .7rem; flex: 1; }
+  .cs-bnd-body h3 { font-size: 1.1rem; font-weight: 800; color: var(--ink); }
+  .cs-bnd-body > p { font-size: .84rem; color: var(--muted); margin-top: -.45rem; }
+  .cs-bnd-items { list-style: none; display: flex; align-items: flex-start; justify-content: space-between; gap: .25rem; background: var(--soft); border-radius: 16px; padding: .7rem .5rem; }
+  .cs-bnd-items li { display: contents; }
+  .cs-bnd-it { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: .3rem; text-align: center; }
+  .cs-bnd-it img, .cs-bnd-it i { width: 54px; height: 54px; border-radius: 12px; object-fit: contain; background: #fff; border: 1px solid var(--line); display: block; }
+  .cs-bnd-it small { font-size: .7rem; font-weight: 700; color: #374151; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .cs-bnd-plus { color: var(--p-ink); font-weight: 800; font-size: 1.1rem; padding-top: 1rem; }
+  .cs-bnd-price { display: flex; align-items: baseline; flex-wrap: wrap; gap: .5rem; }
+  .cs-bnd-price em { font-style: normal; font-size: .8rem; font-weight: 800; color: #047857; margin-inline-start: auto; }
+  .cs-bnd-body .cs-btn { margin-top: auto; }
+  .cs-bnd-hero { position: relative; background: var(--soft); overflow: hidden; }
+  .cs-bnd-hero img { display: block; width: 100%; height: clamp(200px, 40vw, 460px); object-fit: cover; }
+  .cs-bnd-hero .cs-chip { top: 14px; inset-inline-start: 14px; font-size: .9rem; padding: 5px 12px; }
+  .cs-bnd-list { display: flex; flex-direction: column; gap: .9rem; }
+  .cs-bnd-p { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 1rem; background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 1rem; }
+  .cs-bnd-p > img, .cs-bnd-p > i { width: 84px; height: 84px; border-radius: 14px; object-fit: contain; background: var(--soft); display: block; }
+  .cs-bnd-p h3 { font-size: .95rem; font-weight: 800; color: var(--ink); line-height: 1.45; }
+  .cs-bnd-p .cs-price { font-size: 1.05rem; }
+  .cs-bnd-opts { display: flex; flex-direction: column; gap: .7rem; margin-top: .7rem; }
+  .cs-bnd-opts > div > div { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .cs-bnd-opts .cs-var-img { width: 56px; height: 56px; }
+  .cs-bnd-side { min-width: 0; }
+  @media (min-width: 900px) { .cs-bnd-side { position: sticky; top: 92px; align-self: start; } }
 
   /* نموذج الطلب */
   .cs-order { border: 1px solid var(--line); border-radius: 20px; background: #fff; overflow: hidden; margin-top: .5rem; }
@@ -763,6 +799,202 @@ const SectionTitle = ({ children }: { children: React.ReactNode }) => (
   <div className="cs-title"><h2>{children}</h2><i /></div>
 );
 
+/* ── الأطقم: سلايدر «عروض الأطقم» تحت الغلاف (data-mds-bundles يخفي سلايدر المنصة الاحتياطي) ── */
+function BundlesStrip({ store }: any) {
+  const list: any[] = store?.bundles || [];
+  if (!list.length) return null;
+  const lang = getLang(store);
+  const bt = bundleStrings(lang);
+  const cur = curOf(store);
+  const title = store?.design?.bundlesTitle;
+  const heading = title === null || title === undefined ? bt.title : String(title).trim();
+  return (
+    <section className="cs-bnds" data-mds-bundles="" aria-label={heading || bt.title}>
+      <div className="cs-wrap">
+        {heading && <SectionTitle>{heading}</SectionTitle>}
+        <div className={`cs-bnd-track ${list.length === 1 ? 'one' : ''}`}>
+          {list.map((b) => (
+            <article key={b.id} className="cs-bnd">
+              <a {...bundleLink(b.slug)} className="cs-bnd-img" aria-label={b.name}>
+                {(b.imageUrl || b.mobileImageUrl) ? (
+                  <picture>
+                    {b.mobileImageUrl && <source media="(max-width: 640px)" srcSet={b.mobileImageUrl} />}
+                    <img loading="lazy" decoding="async" src={b.imageUrl || b.mobileImageUrl} alt="" />
+                  </picture>
+                ) : null}
+                <span className="cs-chip"><bdi dir="ltr">-{b.discountPercent}%</bdi></span>
+              </a>
+              <div className="cs-bnd-body">
+                <h3>{b.name}</h3>
+                {b.subtitle && <p>{b.subtitle}</p>}
+                <ul className="cs-bnd-items">
+                  {b.items.map((it: any, i: number) => (
+                    <li key={it.productId}>
+                      {i > 0 && <span className="cs-bnd-plus" aria-hidden="true">+</span>}
+                      <span className="cs-bnd-it">
+                        {it.imageUrl ? <img loading="lazy" decoding="async" src={it.imageUrl} alt="" /> : <i />}
+                        <small>{it.name}</small>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="cs-bnd-price">
+                  <span className="cs-price"><small>{cur}</small>{money(b.price)}</span>
+                  <span className="cs-old">{money(b.original)} {cur}</span>
+                  <em>{bt.save} {money(b.saving)} {cur}</em>
+                </div>
+                <a {...bundleLink(b.slug)} className="cs-btn">{bt.order}</a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── صفحة طلب الطقم بأسلوب الثيم (المنطق من useBundleOrder في theme-kit) ── */
+export function Bundle({ store, bundle, domain }: any) {
+  const lang = getLang(store);
+  const t = T[lang];
+  const cur = curOf(store);
+  const o = useBundleOrder({ bundle, store, domain });
+  const bt = o.t;
+  const cls = (err?: string) => `cs-input ${err ? 'err' : ''}`;
+  const banner = bundle.imageUrl || bundle.mobileImageUrl;
+  return (
+    <div className="cs-fade">
+      {banner && (
+        <section className="cs-bnd-hero" aria-label={bundle.name}>
+          <picture>
+            {bundle.mobileImageUrl && <source media="(max-width: 640px)" srcSet={bundle.mobileImageUrl} />}
+            <img fetchPriority="high" decoding="async" src={banner} alt={bundle.name} />
+          </picture>
+          <span className="cs-chip"><bdi dir="ltr">-{bundle.discountPercent}%</bdi></span>
+        </section>
+      )}
+
+      <div className="cs-wrap cs-det">
+        <div style={{ minWidth: 0 }}>
+          <h1 className="cs-ptitle">{bundle.name}</h1>
+          {bundle.subtitle && <p style={{ color: 'var(--muted)', marginTop: '-.5rem', marginBottom: '1rem' }}>{bundle.subtitle}</p>}
+          <div className="cs-pricebox" style={{ marginBottom: '1.4rem' }}>
+            <span className="cs-price">{money(o.price)} <small>{cur}</small></span>
+            <span className="cs-old">{money(o.original)} {cur}</span>
+            <span className="cs-off"><bdi dir="ltr">-{bundle.discountPercent}%</bdi></span>
+          </div>
+
+          <p className="cs-attr-name">{bt.inBundle}</p>
+          <div id="bundle-items" className="cs-bnd-list">
+            {o.products.map((p: any) => {
+              const img = bundleProductImage(p);
+              return (
+                <div key={p.id} className="cs-bnd-p">
+                  {img ? <img loading="lazy" decoding="async" src={img} alt="" /> : <i />}
+                  <div style={{ minWidth: 0 }}>
+                    <h3>{p.name}</h3>
+                    <div className="cs-price"><small>{cur}</small>{money(o.priceOf(p))}</div>
+                    {o.attrsOf(p).length > 0 && (
+                      <div className="cs-bnd-opts">
+                        {o.attrsOf(p).map((a: any) => (
+                          <div key={a.id}>
+                            <p className="cs-attr-name">{a.name}</p>
+                            <div role="group" aria-label={`${a.name} — ${p.name}`}>
+                              {a.variants.map((v: any, i: number) => {
+                                const on = o.chosen(p, a.name) === v.value;
+                                const kind = optionKind(a, v.value);
+                                if (kind === 'image') return <button key={v.id} type="button" aria-pressed={on} aria-label={`${a.name} ${i + 1}`} className={`cs-var-img ${on ? 'on' : ''}`} style={{ backgroundImage: `url("${optionImage(v)}")` }} onClick={() => o.pick(p.id, a.name, v.value)} />;
+                                if (kind === 'color') return <button key={v.id} type="button" aria-pressed={on} aria-label={v.name || v.value} className={`cs-var-color ${on ? 'on' : ''}`} style={{ background: v.value }} onClick={() => o.pick(p.id, a.name, v.value)} />;
+                                return <button key={v.id} type="button" aria-pressed={on} className={`cs-var-text ${on ? 'on' : ''}`} onClick={() => o.pick(p.id, a.name, v.value)}>{v.name || v.value}</button>;
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {o.errors.options && <p className="cs-err" style={{ marginTop: '.6rem' }}><AlertCircle size={12} />{o.errors.options}</p>}
+        </div>
+
+        <div className="cs-bnd-side">
+          <div className="cs-order">
+            <div className="cs-order-head">
+              <ShoppingCart size={20} />
+              <div style={{ flex: 1, minWidth: 0 }}><b>{t.orderCardTitle}</b><small>{t.orderCardSub}</small></div>
+            </div>
+            <form id="bundle-form" onSubmit={o.submit} className="cs-order-body" noValidate>
+              <div className="cs-row2">
+                <FR error={o.errors.name} label={t.fullName}>
+                  <div className="cs-field"><User size={16} /><input className={cls(o.errors.name)} value={o.form.name} onChange={(e) => o.setName(e.target.value)} placeholder={t.fullNamePh} autoComplete="name" /></div>
+                </FR>
+                <FR error={o.errors.phone} label={t.phone}>
+                  <div className="cs-field"><Phone size={16} /><input type="tel" dir="ltr" className={cls(o.errors.phone)} value={o.form.phone} onChange={(e) => o.setPhone(e.target.value)} placeholder={t.phonePh} autoComplete="tel" /></div>
+                </FR>
+              </div>
+
+              {!o.digital && (
+                <>
+                  <div className="cs-row2">
+                    <FR error={o.errors.wilaya} label={t.wilaya}>
+                      <div className="cs-field">
+                        <MapPin size={16} /><ChevronDown size={15} className="cs-chev" />
+                        <select className={cls(o.errors.wilaya)} value={o.form.wilaya} onChange={(e) => o.chooseWilaya(e.target.value)}>
+                          <option value="">{o.wilayas.length ? t.wilayaPh : t.wilayaNA}</option>
+                          {o.wilayas.map((w: any) => <option key={w.id} value={w.id}>{w.code ?? w.id} - {o.placeName(w)}</option>)}
+                        </select>
+                      </div>
+                    </FR>
+                    <FR error={o.errors.commune} label={t.commune}>
+                      <div className="cs-field">
+                        <MapPin size={16} /><ChevronDown size={15} className="cs-chev" />
+                        <select className={cls(o.errors.commune)} value={o.form.commune} disabled={!o.form.wilaya || o.loadingCommunes} onChange={(e) => o.setCommune(e.target.value)}>
+                          <option value="">{!o.form.wilaya ? t.communeFirst : o.loadingCommunes ? t.communeLoading : t.communePh}</option>
+                          {o.communes.map((c: any) => <option key={c.id} value={c.id}>{o.placeName(c)}</option>)}
+                        </select>
+                      </div>
+                    </FR>
+                  </div>
+
+                  <div style={{ marginBottom: '.85rem' }}>
+                    <label className="cs-label">{t.deliveryType}</label>
+                    {o.form.wilaya ? (
+                      <div className="cs-deliv">
+                        {(['home', 'office'] as const).map((dt) => (
+                          <button data-delivery-option key={dt} type="button" className={o.form.ship === dt ? 'on' : ''} onClick={() => o.setShip(dt)}>
+                            {dt === 'home' ? <HomeIcon size={22} /> : <Building2 size={22} />}
+                            <b>{dt === 'home' ? t.deliveryHome : t.deliveryOffice}</b>
+                            {o.shipCost(dt) !== null && <small>{money(o.shipCost(dt))} {cur}</small>}
+                          </button>
+                        ))}
+                      </div>
+                    ) : <p style={{ fontSize: '.82rem', color: 'var(--muted)', textAlign: 'center', padding: '.6rem', background: 'var(--soft)', borderRadius: 12 }}>{t.pickWilayaForPrice}</p>}
+                  </div>
+                </>
+              )}
+
+              <div className="cs-sum">
+                <div><span><Package size={14} />{bt.original}</span><b className="cs-old" style={{ fontSize: '.88rem' }}>{money(o.original)} {cur}</b></div>
+                <div><span><Tag size={14} />{bt.bundlePrice}</span><b>{money(o.price)} {cur}</b></div>
+                <div><span>{bt.saved}</span><b style={{ color: '#047857' }}>{money(o.saving)} {cur}</b></div>
+                {!o.digital && <div><span>{t.delivery}</span><b>{o.wilaya ? `${money(o.ship)} ${cur}` : '—'}</b></div>}
+                <div className="cs-total"><span style={{ color: 'var(--ink)', fontWeight: 800 }}>{t.total}</span><b>{money(o.total)} {cur}</b></div>
+              </div>
+
+              <button type="submit" disabled={o.submitting} className="cs-btn" style={{ padding: '1rem', fontSize: '1.02rem' }}>
+                {o.submitting ? <><Loader2 size={17} className="cs-spin" /> {t.sending}</> : bt.order}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function Home({ store, page }: any) {
   const lang = getLang(store);
   const t = T[lang];
@@ -815,7 +1047,7 @@ export function Home({ store, page }: any) {
       ))}
 
       {/* عروض الأطقم تحت الغلاف (من المنصة) */}
-      {showHero && <StoreBundles store={store} />}
+      {showHero && <BundlesStrip store={store} />}
 
       {cats.length > 0 && !search && (
         <section id="categories" style={{ padding: '4rem 0 3.5rem', scrollMarginTop: 80 }}>

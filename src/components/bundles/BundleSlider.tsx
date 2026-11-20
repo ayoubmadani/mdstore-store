@@ -20,7 +20,7 @@ interface Props {
 }
 
 /** داخل الثيم لا نعرف البادئة وقت الرسم: محلياً (الدومين الرئيسي) نضيف /<domain> من المسار الحالي */
-function fixLocalLink(e: React.MouseEvent<HTMLAnchorElement>) {
+export function fixLocalLink(e: React.MouseEvent<HTMLAnchorElement>) {
   const root = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'mdstore.top').toLowerCase();
   if (window.location.host.toLowerCase() !== root) return;
   const seg = window.location.pathname.split('/').filter(Boolean)[0];
@@ -134,3 +134,6 @@ export default function BundleSlider({ bundles, accent, language = 'ar', title, 
     </section>
   );
 }
+
+/** للثيمات: رابط صفحة طقم داخل المتجر — <a {...bundleLink(b.slug)}> (البادئة المحلية تُصحَّح عند الضغط) */
+export const bundleLink = (slug: string) => ({ href: `/bundle/${slug}`, onClick: fixLocalLink });

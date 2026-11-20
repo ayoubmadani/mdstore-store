@@ -1,22 +1,11 @@
 'use client';
 
-// صفحة طلب الطقم: البانر ← المنتجات (اختيار الخيارات لكل منتج) ← الملخص ← الاستمارة ← الإجمالي ← الطلب.
-// الطلب يُرسل منتجات الطقم مع bundleId، والخادم يحسب الأسعار بخصم الطقم (لا يعتمد على ما نعرضه هنا).
+// صفحة طلب الطقم الاحتياطية (للثيمات التي لا تصدّر Bundle): البانر ← المنتجات ← الملخص ← الاستمارة ← الطلب.
+// المنطق كله في useBundleOrder (نفسه الذي تستعمله الثيمات من @mdstore/theme-kit).
 
-import { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
 import { AlertCircle, Building2, Home, ImageIcon, Loader2 } from 'lucide-react';
-import { isValidDzPhone } from '@/components/theme/kit';
-import { getProductFormStrings } from '@/components/productForm/translations';
-import {
-  BundlePage, BundleProduct, bundleStrings, discounted, formatDA, matchVariant, unitPrice,
-} from '@/lib/bundles';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
-
-interface Wilaya { id: string; ar_name: string; name?: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number }
-interface Commune { id: string; ar_name: string; name?: string }
+import { BundlePage, formatDA, unitPrice } from '@/lib/bundles';
+import { firstImage, useBundleOrder } from './useBundleOrder';
 
 interface Props {
   bundle: BundlePage;
@@ -27,86 +16,18 @@ interface Props {
   language?: string;
 }
 
-const firstImage = (p: BundleProduct) => [...(p.imagesProduct || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))[0]?.imageUrl;
-
 export default function BundleOrder({ bundle, domain, storeId, userId, accent, language = 'ar' }: Props) {
-  const t = bundleStrings(language);
-  const f = getProductFormStrings(language);
-  const router = useRouter();
-  const ar = language === 'ar';
-  const digital = bundle.products.every((p) => p.isDigital);
-
-  /* ── الخيارات: لكل منتج { اسم الخاصية: القيمة } ── */
-  const [sel, setSel] = useState<Record<string, Record<string, string>>>({});
-  const pick = (pid: string, attr: string, value: string) => setSel((s) => ({ ...s, [pid]: { ...s[pid], [attr]: value } }));
-  const needsChoice = (p: BundleProduct) => (p.attributes ?? []).some((a) => a.variants?.length) && !!p.variantDetails?.length;
-  const variantOf = (p: BundleProduct) => (needsChoice(p) ? matchVariant(p, sel[p.id] ?? {}) : undefined);
-
-  const bases = bundle.products.map((p) => unitPrice(p, variantOf(p)?.id));
-  const original = bases.reduce((a, b) => a + b, 0);
-  const price = discounted(original, bundle.discountPercent);
-
-  /* ── التوصيل ── */
-  const [wilayas, setWilayas] = useState<Wilaya[]>([]);
-  const [communes, setCommunes] = useState<Commune[]>([]);
-  const [loadingCommunes, setLoadingCommunes] = useState(false);
-  const [form, setForm] = useState({ name: '', phone: '', wilaya: '', commune: '', ship: 'home' as 'home' | 'office' });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (digital || !userId) return;
-    axios.get(`${API_URL}/shipping/public/get-shipping/${userId}?storeId=${storeId}`).then((r) => setWilayas(r.data || [])).catch(() => setWilayas([]));
-  }, [userId, storeId, digital]);
-  // البلديات تُجلب عند اختيار الولاية
-  const chooseWilaya = (id: string) => {
-    setForm((p) => ({ ...p, wilaya: id, commune: '' }));
-    setCommunes([]);
-    if (!id) return;
-    setLoadingCommunes(true);
-    axios.get(`${API_URL}/shipping/get-communes/${id}`).then((r) => setCommunes(r.data || [])).catch(() => setCommunes([])).finally(() => setLoadingCommunes(false));
-  };
-
-  const wilaya = useMemo(() => wilayas.find((w) => String(w.id) === String(form.wilaya)), [wilayas, form.wilaya]);
-  const ship = digital || !wilaya ? 0 : Number(form.ship === 'home' ? wilaya.livraisonHome : wilaya.livraisonOfice);
-  const placeName = (x: { ar_name: string; name?: string }) => (ar ? x.ar_name : x.name || x.ar_name);
-
-  /* ── الطلب ── */
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const err: Record<string, string> = {};
-    if (bundle.products.some((p) => needsChoice(p) && !variantOf(p))) err.options = t.pickOptions;
-    if (form.name.trim().length < 3) err.name = f.errorName;
-    if (!isValidDzPhone(form.phone.replace(/\s/g, ''))) err.phone = f.errorPhone;
-    if (!digital && !form.wilaya) err.wilaya = f.errorWilaya;
-    if (!digital && !form.commune) err.commune = f.errorCommune;
-    setErrors(err);
-    if (Object.keys(err).length) {
-      document.getElementById(err.options ? 'bundle-items' : 'bundle-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
-    }
-
-    let customerId = '';
-    try { customerId = localStorage.getItem('customerId') || ''; } catch { /* وضع خاص */ }
-    const customer = {
-      domain, bundleId: bundle.id, customerId, customerName: form.name.trim(), customerPhone: form.phone,
-      ...(digital ? {} : {
-        typeShip: form.ship, priceShip: ship, priceLoss: wilaya?.livraisonReturn ?? 0,
-        customerWilayaId: form.wilaya, customerCommuneId: form.commune,
-      }),
-    };
-    const payload = bundle.products.map((p) => ({ ...customer, productId: p.id, variantDetailId: variantOf(p)?.id, quantity: 1 }));
-
-    setSubmitting(true);
-    try {
-      const res = await axios.post(`${API_URL}/orders`, payload);
-      try { if (res.data?.customerId) localStorage.setItem('customerId', res.data.customerId); } catch { /* وضع خاص */ }
-      router.push(`${window.location.pathname.replace(/\/bundle\/[^/]+\/?$/, '')}/successfully`);
-    } catch (ex) {
-      const msg = axios.isAxiosError(ex) ? (ex.response?.data as { message?: string | string[] } | undefined)?.message : undefined;
-      alert(Array.isArray(msg) ? msg[0] : msg || f.connectionError);
-      setSubmitting(false);
-    }
+  const o = useBundleOrder({ bundle, domain, store: { id: storeId, language, user: { id: userId } } });
+  const { t, f, ar, digital, needsChoice, variantOf, pick, errors, original, price, form, chooseWilaya,
+    wilayas, communes, loadingCommunes, wilaya, ship, placeName, submit, submitting } = o;
+  const sel: Record<string, Record<string, string>> = Object.fromEntries(
+    bundle.products.map((p) => [p.id, Object.fromEntries(o.attrsOf(p).map((a) => [a.name, o.chosen(p, a.name) ?? '']))]),
+  );
+  const setForm = (next: typeof form) => {
+    if (next.name !== form.name) o.setName(next.name);
+    if (next.phone !== form.phone) o.setPhone(next.phone);
+    if (next.commune !== form.commune) o.setCommune(next.commune);
+    if (next.ship !== form.ship) o.setShip(next.ship);
   };
 
   const banner = bundle.imageUrl || bundle.mobileImageUrl;

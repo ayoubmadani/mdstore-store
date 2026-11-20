@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { headers } from 'next/headers'
 import BundleOrder from '@/components/bundles/BundleOrder'
+import ThemeRunner from '@/components/ThemeRunner'
 import { bundleStrings, getBundlePage } from '@/lib/bundles'
 import { getStoreForRequest } from '@/lib/store-request'
 
@@ -36,7 +37,8 @@ export default async function BundlePageRoute(props: Props) {
     )
   }
 
-  return (
+  // صفحة الثيم (export Bundle) بأسلوبه — وإلا الصفحة المشتركة
+  const shared = (
     <BundleOrder
       bundle={bundle}
       domain={domain}
@@ -44,6 +46,15 @@ export default async function BundlePageRoute(props: Props) {
       userId={store.user?.id ?? ''}
       accent={store.design?.primaryColor || '#111827'}
       language={language}
+    />
+  )
+  return (
+    <ThemeRunner
+      bundleUrl={`/api/themes/${store.theme?.slug || 'default'}`}
+      exportName="Bundle"
+      strict
+      missing={shared}
+      themeProps={{ store, bundle, domain }}
     />
   )
 }

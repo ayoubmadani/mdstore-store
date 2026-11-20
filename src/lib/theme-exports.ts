@@ -12,6 +12,7 @@ export function createThemeRegistry() {
   const loaded = new Map<string, ThemeExports>();
   return {
     remember(bundleUrl: string, exports: ThemeExports) { loaded.set(bundleUrl, exports); },
+    get(bundleUrl: string) { return loaded.get(bundleUrl); },
     component(bundleUrl: string, exportName: string) { return pickComponent(loaded.get(bundleUrl), exportName); },
   };
 }

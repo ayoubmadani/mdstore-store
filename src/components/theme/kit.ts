@@ -9,6 +9,11 @@ export { ProductAddons, activeAddons, addonsTotal, addonsLabel } from './Product
 // بطاقات العرض: بطاقة لكل وحدة من الكمية، وفيها قطع العرض بخياراتها وإضافاتها؛ الطلب يُرسل سطوراً (boxLines)
 export { OfferPieces, needsPieces } from './OfferPieces';
 export { StoreBundles } from './StoreBundles';
+// الأطقم: الثيم يرسم سلايدره (store.bundles) وصفحة Bundle بأسلوبه — المنطق والنصوص من هنا
+export { useBundleOrder, optionKind, optionImage, firstImage as bundleProductImage } from '@/components/bundles/useBundleOrder';
+export { bundleLink } from '@/components/bundles/BundleSlider';
+export { bundleStrings, formatDA as formatBundlePrice } from '@/lib/bundles';
+export type { BundleCard, BundlePage, BundleProduct } from '@/lib/bundles';
 export { boxLines, linesTotal, fitBoxes, piecesPerBox, pieceVariantId } from './orderPieces';
 export type { Box, Piece, PieceLine } from './orderPieces';
 

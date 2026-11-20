@@ -106,6 +106,10 @@ interface ThemeRunnerProps {
   themeProps: Record<string, any>;
   children?: React.ReactNode;
   fallback?: React.ReactNode;
+  /** exportName فقط (بلا الرجوع إلى default/Main) — لصفحة اختيارية في الثيم مثل Bundle */
+  strict?: boolean;
+  /** يُعرض إن لم يصدّر الثيم exportName (مع strict) */
+  missing?: React.ReactNode;
 }
 
 export default function ThemeRunner({
@@ -114,15 +118,19 @@ export default function ThemeRunner({
   themeProps,
   children,
   fallback = null,
+  strict = false,
+  missing,
 }: ThemeRunnerProps) {
-  const [Component, setComponent] = useState<React.ComponentType<any> | null>(
-    () => readyComponent(bundleUrl, exportName)
-  );
+  const pick = (exports: Record<string, any> | undefined) =>
+    strict ? (typeof exports?.[exportName] === 'function' ? exports[exportName] : null) : pickComponent(exports, exportName);
+  const ready0 = () => (strict ? pick(loadedThemes.get(bundleUrl)) : readyComponent(bundleUrl, exportName));
+  const [Component, setComponent] = useState<React.ComponentType<any> | null>(ready0);
+  const [isMissing, setMissing] = useState(() => strict && !!loadedThemes.get(bundleUrl) && !ready0());
   const [error, setError] = useState<string | null>(null);
   ReactDOM.preload(bundleUrl, { as: 'fetch', crossOrigin: 'anonymous' });
 
   useEffect(() => {
-    const ready = readyComponent(bundleUrl, exportName);
+    const ready = ready0();
     if (ready) {
       setComponent(() => ready);
       return;
@@ -130,7 +138,8 @@ export default function ThemeRunner({
 
     loadThemeModule(bundleUrl)
       .then((exports) => {
-        const comp = pickComponent(exports, exportName) as React.ComponentType<any> | null;
+        const comp = pick(exports) as React.ComponentType<any> | null;
+        if (!comp && strict) { setMissing(true); return; }
         if (!comp) throw new Error(`export "${exportName}" not found`);
         setComponent(() => comp);
       })
@@ -138,8 +147,9 @@ export default function ThemeRunner({
         console.error('[ThemeRunner]', bundleUrl, err.message);
         setError(err.message);
       });
-  }, [bundleUrl, exportName]);
+  }, [bundleUrl, exportName]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  if (isMissing && missing !== undefined) return <>{missing}</>;
   if (error) return <>{children ?? fallback}</>;
   if (!Component) return <>{children ?? fallback}</>;
 
