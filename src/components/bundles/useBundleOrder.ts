@@ -32,7 +32,8 @@ export const optionImage = (v: { name: string; value: string }) => (/^https?:\/\
 export const firstImage = (p: BundleProduct) =>
   [...(p.imagesProduct || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))[0]?.imageUrl;
 
-export function useBundleOrder({ bundle, store, domain }: { bundle: BundlePage; store: BundleStoreLike; domain: string }) {
+// domain: يبقى في التوقيع (الثيمات تمرّره) — الطلب يُرسل برقم المتجر
+export function useBundleOrder({ bundle, store }: { bundle: BundlePage; store: BundleStoreLike; domain?: string }) {
   const language = store?.language || 'ar';
   const t = bundleStrings(language);
   const f = getProductFormStrings(language);
@@ -104,7 +105,8 @@ export function useBundleOrder({ bundle, store, domain }: { bundle: BundlePage; 
     let customerId = '';
     try { customerId = localStorage.getItem('customerId') || ''; } catch { /* وضع خاص */ }
     const customer = {
-      domain, bundleId: bundle.id, customerId, customerName: form.name.trim(), customerPhone: form.phone,
+      // المتجر برقمه لا بالدومين: الدومين هنا قد يكون الاسم الكامل (x.mdstore.top أو دومين خاص) والخادم يبحث بالـ subdomain
+      storeId, bundleId: bundle.id, customerId, customerName: form.name.trim(), customerPhone: form.phone,
       ...(digital ? {} : {
         typeShip: form.ship, priceShip: ship, priceLoss: wilaya?.livraisonReturn ?? 0,
         customerWilayaId: form.wilaya, customerCommuneId: form.commune,
