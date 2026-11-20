@@ -118,9 +118,9 @@ export default function BundleOrder({ bundle, domain, storeId, userId, accent, l
   const tint = `color-mix(in srgb, ${accent} 8%, #ffffff)`;
 
   return (
-    <div className="w-full min-w-0 overflow-x-clip text-gray-900" dir={ar ? 'rtl' : 'ltr'} style={{ maxWidth: 576, marginInline: 'auto', paddingBottom: 40 }}>
+    <div className="w-full min-w-0 overflow-x-clip" dir={ar ? 'rtl' : 'ltr'} style={{ maxWidth: 1120, marginInline: 'auto', paddingBottom: 40 }}>
       {/* البانر */}
-      <div className="relative w-full overflow-hidden bg-gray-100 sm:rounded-3xl" style={{ aspectRatio: '16 / 9', marginTop: 16 }}>
+      <div className="relative w-full overflow-hidden bg-gray-100 aspect-[16/9] lg:aspect-[21/8] sm:rounded-3xl" style={{ marginTop: 16 }}>
         {banner
           ? (
             <picture className="block h-full w-full">
@@ -131,6 +131,9 @@ export default function BundleOrder({ bundle, domain, storeId, userId, accent, l
           : <span className="flex h-full w-full items-center justify-center text-gray-300"><ImageIcon className="h-12 w-12" aria-hidden /></span>}
         <span className="absolute top-3 start-3 rounded-full bg-red-700 text-sm font-bold text-white" style={{ padding: '4px 12px' }}>-{bundle.discountPercent}%</span>
       </div>
+      {/* الهاتف: عمود واحد — الكمبيوتر: المنتجات | الملخص والاستمارة */}
+      <div className="lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-start" style={{ columnGap: 24 }}>
+      <div className="min-w-0">
       <div style={{ padding: '16px 16px 0', ...col(4) }}>
         <h1 className="text-2xl font-bold leading-snug">{bundle.name}</h1>
         {bundle.subtitle && <p className="text-sm text-gray-600">{bundle.subtitle}</p>}
@@ -143,7 +146,7 @@ export default function BundleOrder({ bundle, domain, storeId, userId, accent, l
           const img = firstImage(p);
           const chosen = sel[p.id] ?? {};
           return (
-            <div key={p.id} className="flex gap-3 rounded-2xl border border-gray-200 bg-white" style={{ padding: 12 }}>
+            <div key={p.id} className="flex gap-3 rounded-2xl border border-gray-200 bg-white text-gray-900" style={{ padding: 12 }}>
               {img ? <img src={img} alt="" className="h-20 w-20 shrink-0 rounded-xl object-cover bg-gray-100" /> : <span className="h-20 w-20 shrink-0 rounded-xl bg-gray-100" />}
               <div className="min-w-0 flex-1" style={col(8)}>
                 <div className="flex items-start justify-between gap-2">
@@ -192,8 +195,11 @@ export default function BundleOrder({ bundle, domain, storeId, userId, accent, l
         {errors.options && <p className="flex items-center gap-1 text-sm font-medium text-red-600"><AlertCircle className="h-4 w-4" />{errors.options}</p>}
       </section>
 
+      </div>
+
+      <div className="min-w-0 lg:sticky lg:top-4" style={{ paddingTop: 4 }}>
       {/* الملخص */}
-      <section className="rounded-2xl text-sm" style={{ margin: '16px 16px 0', padding: 16, backgroundColor: tint, ...col(6) }}>
+      <section className="rounded-2xl text-sm text-gray-900" style={{ margin: '16px 16px 0', padding: 16, backgroundColor: tint, ...col(6) }}>
         <div className="flex justify-between"><span>{t.original}</span><s className="text-gray-500">{formatDA(original, language)}</s></div>
         <div className="flex justify-between font-bold"><span>{t.bundlePrice}</span><span style={{ color: accent }}>{formatDA(price, language)}</span></div>
         <div className="flex justify-between font-semibold text-green-700"><span>{t.saved}</span><span>{formatDA(original - price, language)}</span></div>
@@ -239,7 +245,7 @@ export default function BundleOrder({ bundle, domain, storeId, userId, accent, l
                 const cost = wilaya ? (type === 'home' ? wilaya.livraisonHome : wilaya.livraisonOfice) : null;
                 return (
                   <button key={type} type="button" onClick={() => setForm({ ...form, ship: type })} aria-pressed={on}
-                    className="flex min-h-14 items-center justify-center gap-2 rounded-xl border-2 text-sm font-semibold"
+                    className="flex min-h-14 items-center justify-center gap-2 rounded-xl border-2 text-sm font-semibold text-gray-900"
                     style={{ paddingInline: 8, ...(on ? { borderColor: accent, backgroundColor: tint } : { borderColor: '#e5e7eb', backgroundColor: '#fff' }) }}>
                     {type === 'home' ? <Home className="h-4 w-4" aria-hidden /> : <Building2 className="h-4 w-4" aria-hidden />}
                     <span>{type === 'home' ? f.home : f.office}{cost !== null && ` · ${formatDA(Number(cost), language)}`}</span>
@@ -267,6 +273,8 @@ export default function BundleOrder({ bundle, domain, storeId, userId, accent, l
           <p className="text-center text-xs text-gray-500">{t.cod}</p>
         </div>
       </form>
+      </div>
+      </div>
     </div>
   );
 }
