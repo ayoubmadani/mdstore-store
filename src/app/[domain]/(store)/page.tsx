@@ -2,7 +2,7 @@ import { headers } from 'next/headers'
 import { heroForDevice } from '@/lib/hero-device'
 import { getStoreForRequest as getStoreCached } from '@/lib/store-request'
 import ThemeRunner from '@/components/ThemeRunner'
-import BundleSlider from '@/components/bundles/BundleSlider'
+import BundleSliderFallback from '@/components/bundles/BundleSliderFallback'
 
 export const dynamic = 'force-dynamic'
 
@@ -54,18 +54,16 @@ export default async function StorePage(props: {
 
   return (
     <>
-      {/* سلايدر «عروض الأطقم» الاحتياطي فوق محتوى الثيم — يختفي حين يرسمه الثيم تحت غلافه (StoreBundles) */}
+      {/* سلايدر «عروض الأطقم» المشترك — فقط للثيمات التي لا ترسم الأطقم بنفسها، وبعد تحميل الثيم (لا يسبقه) */}
       {bundles.length > 0 && (
-        <div className="mds-bundles-fallback">
-        <style>{'body:has([data-mds-bundles]) .mds-bundles-fallback{display:none}'}</style>
-        <BundleSlider
+        <BundleSliderFallback
+          themeUrl={bundleUrl}
           bundles={bundles}
           accent={store.design?.primaryColor || '#111827'}
           language={store.language || 'ar'}
           title={store.design?.bundlesTitle}
           base={base}
         />
-        </div>
       )}
       <ThemeRunner
         bundleUrl={bundleUrl}
