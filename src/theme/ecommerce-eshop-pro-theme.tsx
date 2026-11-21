@@ -25,6 +25,9 @@ const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isVa
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
+const __k: any = __kit;
+const bundleLink = (slug: string) => (__k.bundleLink ? __k.bundleLink(slug) : { href: `/bundle/${slug}` });
+const bundleImg = (v: any) => (__k.optionImage ? __k.optionImage(v) : v.value);
 
 /* ── ألوان المتجر: الثيم كله يتبع «اللون الأساسي» من إعدادات المتجر (design.primaryColor) ──
    كل لون صالح يُطبَّق كما هو (الأسود أيضاً)؛ بلا لون صالح → الأزرق.
@@ -229,6 +232,25 @@ const THEME_CSS = `
   @media (min-width: 500px) { .cart-add-btns { flex-direction: row; } }
 
   .delivery-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.75rem; }
+  /* الأطقم */
+  .bnd-track { display: flex; gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 1.5rem; padding: 0 1.5rem 0.5rem; scrollbar-width: none; }
+  .bnd-track::-webkit-scrollbar { display: none; }
+  .bnd-card { scroll-snap-align: start; flex: 0 0 min(86%, 380px); background: #fff; border: 1.5px solid #EBEBEB; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: border-color .2s, box-shadow .2s; }
+  .bnd-card:hover { border-color: var(--acc); box-shadow: 0 8px 32px rgba(var(--acc-rgb),0.1); }
+  .bnd-track.one .bnd-card { flex-basis: min(100%, 560px); }
+  .bnd-img { position: relative; display: block; aspect-ratio: 16/8; background: #F4F4F2; overflow: hidden; }
+  .bnd-img img, .bnd-img picture { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .bnd-items { list-style: none; display: flex; align-items: flex-start; gap: 0.25rem; background: #F8F8F6; border: 1.5px solid #EBEBEB; border-radius: 10px; padding: 0.625rem 0.5rem; }
+  .bnd-items li { display: contents; }
+  .bnd-top { max-width: 1280px; margin: 0 auto; padding: 0; }
+  .bnd-hero { position: relative; overflow: hidden; background: #111; }
+  .bnd-split { max-width: 1280px; margin: 0 auto; padding: 1.5rem 1rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.75rem; }
+  @media (min-width: 900px) {
+    .bnd-top { padding: 1.5rem 1.5rem 0; }
+    .bnd-hero { border-radius: 16px; }
+    .bnd-split { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 2.5rem; padding: 2rem 1.5rem 5rem; }
+    .bnd-side { position: sticky; top: 88px; align-self: start; }
+  }
 
   .thumb-row { display: flex; gap: 0.625rem; margin-top: 0.875rem; flex-wrap: wrap; padding-bottom: 4px; }
 
@@ -1130,6 +1152,227 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 /* ═══════════════════════════════════════════════════════════
    HOME
 ═══════════════════════════════════════════════════════════ */
+/* ── الأطقم: «عروض الأطقم» تحت الغلاف (data-mds-bundles) + صفحة الطقم ── */
+const SecHead = ({ children }: { children: React.ReactNode }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.75rem' }}>
+    <div style={{ width: 4, height: 28, background: 'var(--acc)', borderRadius: 2 }} />
+    <h2 style={{ fontSize: 'clamp(1.375rem,3.5vw,2rem)', fontWeight: 800, color: '#111' }}>{children}</h2>
+  </div>
+);
+
+function BundlesStrip({ store }: any) {
+  const list: any[] = store?.bundles || [];
+  if (!list.length || !__k.bundleStrings) return null;
+  const bt = __k.bundleStrings(getLang(store));
+  const cur = store?.currency || 'DZD';
+  const title = store?.design?.bundlesTitle;
+  const heading = title === null || title === undefined ? bt.title : String(title).trim();
+  return (
+    <section data-mds-bundles="" aria-label={heading || bt.title} style={{ padding: '4rem 0 1rem', maxWidth: 1280, margin: '0 auto' }}>
+      {heading && <div style={{ padding: '0 1.5rem' }}><SecHead>{heading}</SecHead></div>}
+      <div className={`bnd-track ${list.length === 1 ? 'one' : ''}`}>
+        {list.map((b) => (
+          <article key={b.id} className="bnd-card">
+            <a {...bundleLink(b.slug)} className="bnd-img" aria-label={b.name}>
+              {(b.imageUrl || b.mobileImageUrl) && (
+                <picture>
+                  {b.mobileImageUrl && <source media="(max-width: 640px)" srcSet={b.mobileImageUrl} />}
+                  <img loading="lazy" decoding="async" src={b.imageUrl || b.mobileImageUrl} alt="" />
+                </picture>
+              )}
+              <span style={{ position: 'absolute', top: 10, insetInlineEnd: 10, background: 'var(--acc)', color: '#fff', fontSize: 11, fontWeight: 800, padding: '2px 9px', borderRadius: 4 }}><bdi dir="ltr">-{b.discountPercent}%</bdi></span>
+            </a>
+            <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1 }}>
+              <div>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#111', lineHeight: 1.35 }}>{b.name}</h3>
+                {b.subtitle && <p style={{ fontSize: '0.8rem', color: '#6B6B6B', marginTop: 2 }}>{b.subtitle}</p>}
+              </div>
+              <ul className="bnd-items">
+                {b.items.map((it: any, i: number) => (
+                  <li key={it.productId}>
+                    {i > 0 && <span aria-hidden="true" style={{ color: 'var(--acc)', fontWeight: 800, fontSize: '1.1rem', paddingTop: 14 }}>+</span>}
+                    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
+                      {it.imageUrl ? <img loading="lazy" decoding="async" src={it.imageUrl} alt="" style={{ width: 52, height: 52, objectFit: 'cover', borderRadius: 8, background: '#fff', border: '1px solid #EBEBEB', display: 'block' }} /> : <span style={{ width: 52, height: 52, borderRadius: 8, background: '#fff', display: 'block' }} />}
+                      <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#555', lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{it.name}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', flexWrap: 'wrap' }}>
+                <span className="price-mono" style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--acc)' }}>{Number(b.price).toLocaleString()}</span>
+                <span style={{ fontSize: '0.75rem', color: '#6B6B6B', fontWeight: 500 }}>{cur}</span>
+                <span style={{ fontSize: '0.8rem', color: '#737373', textDecoration: 'line-through' }}>{Number(b.original).toLocaleString()}</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#16A34A', marginInlineStart: 'auto' }}>{bt.save} {Number(b.saving).toLocaleString()} {cur}</span>
+              </div>
+              <a {...bundleLink(b.slug)} style={{ ...S.btnPrimary, marginTop: 'auto', textDecoration: 'none' }}
+                onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'var(--acc-dark)')}
+                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = 'var(--acc)')}>{bt.order}</a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function BundlePage({ store, bundle, domain }: any) {
+  const lang = getLang(store);
+  const t = withLocationLabels(T)[lang];
+  const isRTL = lang === 'ar';
+  const cur = store?.currency || 'DZD';
+  const o = __k.useBundleOrder({ bundle, store, domain });
+  const bt = o.t;
+  const inp = (err?: boolean) => ({ ...S.input, ...(err ? S.inputErr : {}) });
+  const banner = bundle.imageUrl || bundle.mobileImageUrl;
+  const num = (n: number) => Number(n || 0).toLocaleString();
+  return (
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background: '#fff' }}>
+      {banner && (
+        <div className="bnd-top">
+          <div className="bnd-hero">
+            <picture>
+              {bundle.mobileImageUrl && <source media="(max-width: 640px)" srcSet={bundle.mobileImageUrl} />}
+              <img fetchPriority="high" decoding="async" src={banner} alt={bundle.name} style={{ display: 'block', width: '100%', height: 'clamp(200px, 40vw, 460px)', objectFit: 'cover' }} />
+            </picture>
+            <span style={{ position: 'absolute', top: 14, insetInlineEnd: 14, background: 'var(--acc)', color: '#fff', fontSize: 13, fontWeight: 800, padding: '4px 12px', borderRadius: 6 }}><bdi dir="ltr">-{bundle.discountPercent}%</bdi></span>
+          </div>
+        </div>
+      )}
+
+      <div className="bnd-split">
+        {/* المنتجات */}
+        <div style={{ minWidth: 0 }}>
+          <h1 style={{ fontSize: 'clamp(1.6rem,3.5vw,2.4rem)', fontWeight: 800, color: '#111', lineHeight: 1.2, letterSpacing: '-0.02em', marginBottom: '0.5rem' }}>{bundle.name}</h1>
+          {bundle.subtitle && <p style={{ fontSize: '0.95rem', color: '#6B6B6B', marginBottom: '1rem' }}>{bundle.subtitle}</p>}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.625rem', flexWrap: 'wrap', background: '#F8F8F6', border: '1.5px solid #EBEBEB', borderRadius: 12, padding: '1rem 1.25rem', marginBottom: '1.75rem' }}>
+            <span className="price-mono" style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--acc)' }}>{num(o.price)}</span>
+            <span style={{ fontSize: '0.9rem', color: '#6B6B6B', fontWeight: 600 }}>{cur}</span>
+            <span style={{ fontSize: '0.95rem', color: '#737373', textDecoration: 'line-through' }}>{num(o.original)}</span>
+            <span style={{ background: 'var(--acc)', color: '#fff', fontSize: 12, fontWeight: 800, padding: '2px 9px', borderRadius: 4 }}><bdi dir="ltr">-{bundle.discountPercent}%</bdi></span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#16A34A', marginInlineStart: 'auto' }}>{bt.saved} {num(o.saving)} {cur}</span>
+          </div>
+
+          <p style={{ fontSize: '0.775rem', fontWeight: 700, color: '#555', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{bt.inBundle}</p>
+          <div id="bundle-items" style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+            {o.products.map((p: any) => {
+              const img = __k.bundleProductImage ? __k.bundleProductImage(p) : p.imagesProduct?.[0]?.imageUrl;
+              return (
+                <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '84px minmax(0, 1fr)', gap: '1rem', background: '#fff', border: '1.5px solid #EBEBEB', borderRadius: 12, padding: '1rem' }}>
+                  {img ? <img loading="lazy" decoding="async" src={img} alt="" style={{ width: 84, height: 84, objectFit: 'cover', borderRadius: 10, background: '#F4F4F2', display: 'block' }} /> : <span style={{ width: 84, height: 84, borderRadius: 10, background: '#F4F4F2', display: 'block' }} />}
+                  <div style={{ minWidth: 0 }}>
+                    <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#111', lineHeight: 1.45 }}>{p.name}</h3>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', marginTop: 4 }}>
+                      <span className="price-mono" style={{ fontSize: '1.1rem', fontWeight: 800, color: '#111' }}>{num(o.priceOf(p))}</span>
+                      <span style={{ fontSize: '0.75rem', color: '#6B6B6B', fontWeight: 500 }}>{cur}</span>
+                    </div>
+                    {o.attrsOf(p).map((a: any) => (
+                      <div key={a.id} style={{ marginTop: '0.75rem' }}>
+                        <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#555', marginBottom: '0.45rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{a.name}</p>
+                        <div role="group" aria-label={`${a.name} — ${p.name}`} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                          {a.variants.map((v: any, i: number) => {
+                            const sel = o.chosen(p, a.name) === v.value;
+                            const kind = __k.optionKind ? __k.optionKind(a, v.value) : (a.displayMode || 'text');
+                            if (kind === 'image') return <button key={v.id} type="button" aria-pressed={sel} aria-label={`${a.name} ${i + 1}`} onClick={() => o.pick(p.id, a.name, v.value)} style={{ width: 56, height: 56, borderRadius: 10, backgroundImage: `url("${bundleImg(v)}")`, backgroundSize: 'cover', backgroundPosition: 'center', border: `3px solid ${sel ? 'var(--acc)' : '#E8E8E8'}`, boxShadow: sel ? '0 0 0 2px #fff, 0 0 0 4px var(--acc)' : 'none', cursor: 'pointer', transition: 'all 0.18s' }} />;
+                            if (kind === 'color') return <button key={v.id} type="button" aria-pressed={sel} aria-label={v.name || v.value} title={v.name} onClick={() => o.pick(p.id, a.name, v.value)} style={{ width: 32, height: 32, borderRadius: '50%', background: v.value, border: '1px solid #eee', cursor: 'pointer', outline: `2.5px solid ${sel ? 'var(--acc)' : 'transparent'}`, outlineOffset: 3 }} />;
+                            return <button key={v.id} type="button" aria-pressed={sel} onClick={() => o.pick(p.id, a.name, v.value)} style={{ padding: '0.45rem 1.1rem', border: `1.5px solid ${sel ? 'var(--acc)' : '#E8E8E8'}`, borderRadius: 8, fontSize: '0.85rem', fontWeight: 600, background: sel ? 'rgba(var(--acc-rgb),0.05)' : '#fff', color: sel ? 'var(--acc)' : '#555', cursor: 'pointer', transition: 'all 0.18s', fontFamily: 'inherit' }}>{v.name || v.value}</button>;
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {o.errors.options && <p style={{ fontSize: '0.8rem', color: 'var(--acc)', marginTop: '0.6rem', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}><AlertCircle size={12} />{o.errors.options}</p>}
+        </div>
+
+        {/* الطلب */}
+        <div className="bnd-side" style={{ minWidth: 0 }}>
+          <div style={{ background: '#fff', border: '1.5px solid #EBEBEB', borderRadius: 12, padding: '1.25rem' }}>
+            <p style={{ fontWeight: 700, fontSize: '0.875rem', color: '#111', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '1rem' }}>{t.orderInfo}</p>
+            <form id="bundle-form" onSubmit={o.submit} noValidate>
+              <div className="form-row-2">
+                <FR error={o.errors.name} label={t.fullName}>
+                  <input type="text" value={o.form.name} onChange={e => o.setName(e.target.value)} placeholder={t.fullNamePh} style={inp(!!o.errors.name)} autoComplete="name" />
+                </FR>
+                <FR error={o.errors.phone} label={t.phone}>
+                  <input type="tel" value={o.form.phone} onChange={e => o.setPhone(e.target.value)} placeholder={t.phonePh} style={inp(!!o.errors.phone)} autoComplete="tel" />
+                </FR>
+              </div>
+              {!o.digital && (
+                <>
+                  <div className="form-row-2">
+                    <FR error={o.errors.wilaya} label={t.wilaya}>
+                      <div style={{ position: 'relative' }}>
+                        <ChevronDown size={12} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#aaa', pointerEvents: 'none' }} />
+                        <select value={o.form.wilaya} onChange={e => o.chooseWilaya(e.target.value)} style={{ ...inp(!!o.errors.wilaya), paddingRight: 36, fontFamily: 'inherit' }}>
+                          <option value="">{t.wilayaPh}</option>{o.wilayas.map((w: any) => <option key={w.id} value={w.id}>{w.code ?? w.id} - {o.placeName(w)}</option>)}
+                        </select>
+                      </div>
+                    </FR>
+                    <FR error={o.errors.commune} label={t.commune}>
+                      <div style={{ position: 'relative' }}>
+                        <ChevronDown size={12} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#aaa', pointerEvents: 'none' }} />
+                        <select value={o.form.commune} disabled={!o.form.wilaya || o.loadingCommunes} onChange={e => o.setCommune(e.target.value)} style={{ ...inp(!!o.errors.commune), paddingRight: 36, opacity: (!o.form.wilaya || o.loadingCommunes) ? 0.5 : 1, fontFamily: 'inherit' }}>
+                          <option value="">{o.loadingCommunes ? t.communeLoading : t.communePh}</option>{o.communes.map((c: any) => <option key={c.id} value={c.id}>{o.placeName(c)}</option>)}
+                        </select>
+                      </div>
+                    </FR>
+                  </div>
+                  {o.form.wilaya && (
+                    <div style={{ marginBottom: '0.875rem' }}>
+                      <p style={{ fontSize: '0.775rem', fontWeight: 700, color: '#555', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.delivery}</p>
+                      <div className="delivery-grid">
+                        {(['home', 'office'] as const).map(dt => {
+                          const on = o.form.ship === dt;
+                          const cost = o.shipCost(dt);
+                          return (
+                            <button data-delivery-option key={dt} type="button" onClick={() => o.setShip(dt)} style={{ padding: '0.875rem', border: `1.5px solid ${on ? 'var(--acc)' : '#E8E8E8'}`, borderRadius: 10, textAlign: 'center', cursor: 'pointer', background: on ? 'rgba(var(--acc-rgb),0.05)' : '#fff', fontFamily: 'inherit' }}>
+                              <p style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: 4, color: on ? 'var(--acc)' : '#555' }}>{dt === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
+                              {cost !== null && <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 800, color: on ? '#111' : '#ccc' }}>{num(cost)} {cur}</p>}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
+              <div style={{ background: '#F8F8F6', border: '1.5px solid #EBEBEB', borderRadius: 10, padding: '1rem 1.125rem', marginBottom: '1rem' }}>
+                {[
+                  { l: bt.original, v: <s style={{ color: '#888' }}>{num(o.original)} {cur}</s> },
+                  { l: bt.bundlePrice, v: `${num(o.price)} ${cur}` },
+                  { l: bt.saved, v: <span style={{ color: '#16A34A' }}>{num(o.saving)} {cur}</span> },
+                  ...(o.digital ? [] : [{ l: t.delivery, v: o.wilaya ? `${num(o.ship)} ${cur}` : '—' }]),
+                ].map((r, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px solid #E8E8E8' }}>
+                    <span style={{ fontSize: '0.85rem', color: '#888' }}>{r.l}</span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#111' }}>{r.v}</span>
+                  </div>
+                ))}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.375rem' }}>
+                  <span style={{ fontWeight: 800, fontSize: '0.875rem', color: '#111' }}>{t.total}</span>
+                  <span className="price-mono" style={{ fontSize: '1.625rem', fontWeight: 800, color: 'var(--acc)' }}>{num(o.total)} <span style={{ fontSize: '0.8rem', fontFamily: 'inherit', fontWeight: 700 }}>{cur}</span></span>
+                </div>
+              </div>
+
+              <button type="submit" disabled={o.submitting} style={{ ...S.btnPrimary, opacity: o.submitting ? 0.7 : 1 }}
+                onMouseEnter={e => !o.submitting && ((e.currentTarget as HTMLButtonElement).style.background = 'var(--acc-dark)')}
+                onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = 'var(--acc)')}>
+                {o.submitting ? <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> {t.sending}</> : bt.order}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+// صفحة الطقم للمتجر: فقط إن كان المتجر المنشور يوفّر useBundleOrder (وإلا تظهر الصفحة المشتركة)
+export const Bundle = __k.useBundleOrder ? BundlePage : undefined;
+
 export function Home({ store, page }: any) {
   const lang = getLang(store);
   const t = withLocationLabels(T)[lang];
@@ -1202,6 +1445,9 @@ export function Home({ store, page }: any) {
           })}
         </div>
       </div>
+
+      {/* ── BUNDLES (عروض الأطقم) ── */}
+      <BundlesStrip store={store} />
 
       {/* ── CATEGORIES ── */}
       {cats.length > 0 && (
