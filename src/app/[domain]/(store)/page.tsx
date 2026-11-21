@@ -2,7 +2,6 @@ import { headers } from 'next/headers'
 import { heroForDevice } from '@/lib/hero-device'
 import { getStoreForRequest as getStoreCached } from '@/lib/store-request'
 import ThemeRunner from '@/components/ThemeRunner'
-import BundleSliderFallback from '@/components/bundles/BundleSliderFallback'
 
 export const dynamic = 'force-dynamic'
 
@@ -47,24 +46,10 @@ export default async function StorePage(props: {
   const bundleUrl = `/api/themes/${slug}`
 
   const h = await headers()
-  // روابط المتجر محلياً تحمل /<domain> (الـ middleware لا يعيد الكتابة على الدومين الرئيسي)
-  const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'mdstore.top').toLowerCase()
-  const base = (h.get('host') || '').toLowerCase() === rootDomain ? `/${domain}` : ''
-  const bundles = store.bundles ?? []
 
   return (
     <>
-      {/* سلايدر «عروض الأطقم» المشترك — فقط للثيمات التي لا ترسم الأطقم بنفسها، وبعد تحميل الثيم (لا يسبقه) */}
-      {bundles.length > 0 && (
-        <BundleSliderFallback
-          themeUrl={bundleUrl}
-          bundles={bundles}
-          accent={store.design?.primaryColor || '#111827'}
-          language={store.language || 'ar'}
-          title={store.design?.bundlesTitle}
-          base={base}
-        />
-      )}
+      {/* الأطقم في الرئيسية يرسمها الثيم نفسه (export Bundle + سلايدر تحت غلافه) — ثيم لا يدعمها لا يعرض شيئاً */}
       <ThemeRunner
         bundleUrl={bundleUrl}
         exportName="Home"
