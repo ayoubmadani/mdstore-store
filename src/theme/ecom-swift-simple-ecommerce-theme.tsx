@@ -53,6 +53,9 @@ const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isVa
 const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currencyLabel(dzLabel) : dzLabel);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
+const __k: any = __kit;
+const bundleLink = (slug: string) => (__k.bundleLink ? __k.bundleLink(slug) : { href: `/bundle/${slug}` });
+const bundleImg = (v: any) => (__k.optionImage ? __k.optionImage(v) : v.value);
 
 /* ─── MINIMALIST THEME CSS ─── */
 const THEME_CSS = `
@@ -89,6 +92,23 @@ const THEME_CSS = `
 
   /* ── Common Layouts ── */
   .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+  /* الأطقم */
+  .sw-track { display: flex; gap: 1.5rem; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 1.5rem; padding: 0 1.5rem 0.5rem; scrollbar-width: none; }
+  .sw-track::-webkit-scrollbar { display: none; }
+  .sw-card { scroll-snap-align: start; flex: 0 0 min(86%, 360px); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: var(--bg-main); display: flex; flex-direction: column; }
+  .sw-track.one .sw-card { flex-basis: min(100%, 540px); }
+  .sw-img { position: relative; display: block; aspect-ratio: 16/8; background: var(--bg-alt); overflow: hidden; }
+  .sw-img img, .sw-img picture { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .sw-items { list-style: none; display: flex; align-items: flex-start; gap: 0.25rem; background: var(--bg-alt); border-radius: 8px; padding: 0.6rem 0.4rem; margin: 0; }
+  .sw-items li { display: contents; }
+  .sw-top { max-width: 1200px; margin: 0 auto; }
+  .sw-split { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  @media (min-width: 900px) {
+    .sw-top { padding: 1.5rem 1.5rem 0; }
+    .sw-top .sw-hero { border-radius: 8px; }
+    .sw-split { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 2.5rem; padding: 2rem 1.5rem 5rem; }
+    .sw-side { position: sticky; top: 90px; align-self: start; }
+  }
   
   .grid-2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
   @media (min-width: 640px) { .grid-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
@@ -599,6 +619,187 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 }
 
 /* ═══════════════════════════════════════════════════════════
+   BUNDLES — عروض الأطقم (data-mds-bundles) + صفحة الطقم
+═══════════════════════════════════════════════════════════ */
+function BundlesStrip({ store }: any) {
+  const list: any[] = store?.bundles || [];
+  if (!list.length || !__k.bundleStrings) return null;
+  const bt = __k.bundleStrings(store?.language || 'ar');
+  const cur = store?.currency || 'دج';
+  const title = store?.design?.bundlesTitle;
+  const heading = title === null || title === undefined ? bt.title : String(title).trim();
+  return (
+    <section data-mds-bundles="" aria-label={heading || bt.title} style={{ padding: '3rem 0 1rem', maxWidth: 1200, margin: '0 auto' }}>
+      {heading && <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', padding: '0 1.5rem' }}>{heading}</h2>}
+      <div className={`sw-track ${list.length === 1 ? 'one' : ''}`}>
+        {list.map((b) => (
+          <article key={b.id} className="sw-card">
+            <a {...bundleLink(b.slug)} className="sw-img" aria-label={b.name}>
+              {(b.imageUrl || b.mobileImageUrl) && (
+                <picture>
+                  {b.mobileImageUrl && <source media="(max-width: 640px)" srcSet={b.mobileImageUrl} />}
+                  <img loading="lazy" decoding="async" src={b.imageUrl || b.mobileImageUrl} alt="" />
+                </picture>
+              )}
+              <span style={{ position: 'absolute', top: 10, insetInlineEnd: 10, background: 'var(--primary)', color: '#fff', fontSize: '11px', padding: '4px 8px', borderRadius: '4px' }}><bdi dir="ltr">-{b.discountPercent}%</bdi></span>
+            </a>
+            <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1 }}>
+              <div>
+                <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>{b.name}</h3>
+                {b.subtitle && <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 2 }}>{b.subtitle}</p>}
+              </div>
+              <ul className="sw-items">
+                {b.items.map((it: any, i: number) => (
+                  <li key={it.productId}>
+                    {i > 0 && <span aria-hidden="true" style={{ color: 'var(--primary)', fontWeight: 700, paddingTop: 14 }}>+</span>}
+                    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
+                      {it.imageUrl ? <img loading="lazy" decoding="async" src={it.imageUrl} alt="" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 6, background: 'var(--bg-main)', display: 'block' }} /> : <span style={{ width: 50, height: 50, borderRadius: 6, background: 'var(--bg-main)', display: 'block' }} />}
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{it.name}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <span style={{ color: store.design?.primaryColor || 'var(--primary)', fontWeight: 700, fontSize: '1.15rem' }}>{Number(b.price).toLocaleString()} {cur}</span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>{Number(b.original).toLocaleString()}</span>
+                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#16A34A', marginInlineStart: 'auto' }}>{bt.save} {Number(b.saving).toLocaleString()} {cur}</span>
+              </div>
+              <a {...bundleLink(b.slug)} className="btn-primary" style={{ textAlign: 'center', textDecoration: 'none', marginTop: 'auto' }}>{bt.order}</a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function BundlePage({ store, bundle, domain }: any) {
+  const o = __k.useBundleOrder({ bundle, store, domain });
+  const bt = o.t;
+  const f = o.f;
+  const cur = store?.currency || 'دج';
+  const banner = bundle.imageUrl || bundle.mobileImageUrl;
+  const num = (n: number) => Number(n || 0).toLocaleString();
+  return (
+    <div dir={o.ar ? 'rtl' : 'ltr'}>
+      {banner && (
+        <div className="sw-top">
+          <div className="sw-hero" style={{ position: 'relative', overflow: 'hidden', background: 'var(--bg-alt)' }}>
+            <picture>
+              {bundle.mobileImageUrl && <source media="(max-width: 640px)" srcSet={bundle.mobileImageUrl} />}
+              <img fetchPriority="high" decoding="async" src={banner} alt={bundle.name} style={{ display: 'block', width: '100%', height: 'clamp(200px, 40vw, 440px)', objectFit: 'cover' }} />
+            </picture>
+            <span style={{ position: 'absolute', top: 12, insetInlineEnd: 12, background: 'var(--primary)', color: '#fff', fontSize: '12px', padding: '4px 10px', borderRadius: '4px' }}><bdi dir="ltr">-{bundle.discountPercent}%</bdi></span>
+          </div>
+        </div>
+      )}
+
+      <div className="sw-split">
+        {/* المنتجات */}
+        <div style={{ minWidth: 0 }}>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.5rem' }}>{bundle.name}</h1>
+          {bundle.subtitle && <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>{bundle.subtitle}</p>}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', flexWrap: 'wrap', background: 'var(--bg-alt)', borderRadius: 8, padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
+            <span style={{ color: store.design?.primaryColor || 'var(--primary)', fontWeight: 700, fontSize: '1.75rem' }}>{num(o.price)} {cur}</span>
+            <span style={{ color: 'var(--text-muted)', textDecoration: 'line-through' }}>{num(o.original)}</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#16A34A', marginInlineStart: 'auto' }}>{bt.saved} {num(o.saving)} {cur}</span>
+          </div>
+
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 600, marginBottom: '0.75rem' }}>{bt.inBundle}</h3>
+          <div id="bundle-items" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {o.products.map((p: any) => {
+              const img = __k.bundleProductImage ? __k.bundleProductImage(p) : p.imagesProduct?.[0]?.imageUrl;
+              return (
+                <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '80px minmax(0, 1fr)', gap: '1rem', border: '1px solid var(--border-color)', borderRadius: 8, padding: '0.85rem', background: 'var(--bg-main)' }}>
+                  {img ? <img loading="lazy" decoding="async" src={img} alt="" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6, background: 'var(--bg-alt)', display: 'block' }} /> : <span style={{ width: 80, height: 80, borderRadius: 6, background: 'var(--bg-alt)', display: 'block' }} />}
+                  <div style={{ minWidth: 0 }}>
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: 500, lineHeight: 1.45 }}>{p.name}</h4>
+                    <span style={{ color: store.design?.primaryColor || 'var(--primary)', fontWeight: 700, display: 'inline-block', marginTop: 4 }}>{num(o.priceOf(p))} {cur}</span>
+                    {o.attrsOf(p).map((a: any) => (
+                      <div key={a.id} style={{ marginTop: '0.75rem' }}>
+                        <span style={{ display: 'block', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.4rem' }}>{a.name}</span>
+                        <div role="group" aria-label={`${a.name} — ${p.name}`} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                          {a.variants.map((v: any, i: number) => {
+                            const sel = o.chosen(p, a.name) === v.value;
+                            const kind = __k.optionKind ? __k.optionKind(a, v.value) : (a.displayMode || 'text');
+                            const ring = { border: `2px solid ${sel ? 'var(--primary)' : 'var(--border-color)'}`, cursor: 'pointer' };
+                            if (kind === 'image') return <button key={v.id} type="button" aria-pressed={sel} aria-label={`${a.name} ${i + 1}`} onClick={() => o.pick(p.id, a.name, v.value)} style={{ ...ring, width: 52, height: 52, padding: 0, borderRadius: 6, overflow: 'hidden', background: 'var(--bg-main)' }}><img src={bundleImg(v)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>;
+                            if (kind === 'color') return <button key={v.id} type="button" aria-pressed={sel} aria-label={v.name || v.value} title={v.name} onClick={() => o.pick(p.id, a.name, v.value)} style={{ ...ring, width: 32, height: 32, borderRadius: '50%', background: v.value }} />;
+                            return <button key={v.id} type="button" aria-pressed={sel} onClick={() => o.pick(p.id, a.name, v.value)} className="btn-outline" style={{ padding: '0.45rem 0.9rem', borderColor: sel ? 'var(--primary)' : 'var(--border-color)', background: sel ? 'var(--primary)' : 'var(--bg-main)', color: sel ? '#fff' : 'inherit' }}>{v.name || v.value}</button>;
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {o.errors.options && <p style={{ fontSize: '0.8rem', color: '#dc2626', marginTop: '0.5rem' }}>{o.errors.options}</p>}
+        </div>
+
+        {/* الطلب */}
+        <div className="sw-side" style={{ minWidth: 0 }}>
+          <form id="bundle-form" onSubmit={o.submit} noValidate>
+            <div style={{ background: 'var(--bg-alt)', padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem' }}>{bt.order}</h3>
+              <div className="grid-2">
+                <FR error={o.errors.name} label={f.fullName}><input className="input-base" type="text" value={o.form.name} onChange={e => o.setName(e.target.value)} autoComplete="name" /></FR>
+                <FR error={o.errors.phone} label={f.phone}><input className="input-base" type="tel" value={o.form.phone} onChange={e => o.setPhone(e.target.value)} autoComplete="tel" /></FR>
+              </div>
+              {!o.digital && (
+                <>
+                  <div className="grid-2">
+                    <FR error={o.errors.wilaya} label={f.wilaya}>
+                      <select className="input-base" value={o.form.wilaya} onChange={e => o.chooseWilaya(e.target.value)}>
+                        <option value="">{f.selectWilaya}</option>{o.wilayas.map((w: any) => <option key={w.id} value={w.id}>{o.placeName(w)}</option>)}
+                      </select>
+                    </FR>
+                    <FR error={o.errors.commune} label={f.commune}>
+                      <select className="input-base" value={o.form.commune} onChange={e => o.setCommune(e.target.value)} disabled={!o.form.wilaya || o.loadingCommunes}>
+                        <option value="">{o.loadingCommunes ? f.loadingCommunes : f.selectCommune}</option>{o.communes.map((c: any) => <option key={c.id} value={c.id}>{o.placeName(c)}</option>)}
+                      </select>
+                    </FR>
+                  </div>
+                  {o.form.wilaya && (
+                    <FR label={f.deliveryType}>
+                      <div className="grid-2">
+                        {(['home', 'office'] as const).map(dt => {
+                          const on = o.form.ship === dt;
+                          const cost = o.shipCost(dt);
+                          return (
+                            <button data-delivery-option key={dt} type="button" onClick={() => o.setShip(dt)} className="btn-outline" style={{ borderColor: on ? 'var(--primary)' : 'var(--border-color)', background: on ? 'var(--bg-main)' : 'transparent', fontWeight: on ? 600 : 400 }}>
+                              {dt === 'home' ? f.home : f.office}{cost !== null && ` - ${num(cost)} ${cur}`}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </FR>
+                  )}
+                </>
+              )}
+              <div style={{ borderTop: '1px solid var(--border-color)', marginTop: '0.5rem', paddingTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.9rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>{bt.original}</span><s style={{ color: 'var(--text-muted)' }}>{num(o.original)} {cur}</s></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>{bt.bundlePrice}</span><span style={{ fontWeight: 600 }}>{num(o.price)} {cur}</span></div>
+                {!o.digital && <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>{bt.delivery}</span><span>{o.wilaya ? `${num(o.ship)} ${cur}` : '—'}</span></div>}
+              </div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', fontSize: '1.25rem', fontWeight: 700 }}>
+              <span>{bt.total}:</span>
+              <span>{num(o.total)} {cur}</span>
+            </div>
+            <button type="submit" className="btn-primary" disabled={o.submitting} style={{ width: '100%' }}>{o.submitting ? <Loader2 className="anim-pulse" size={18} /> : bt.order}</button>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '0.75rem' }}>{bt.cod}</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+// صفحة الطقم للمتجر: فقط إن كان المتجر المنشور يوفّر useBundleOrder (وإلا تظهر الصفحة المشتركة)
+export const Bundle = __k.useBundleOrder ? BundlePage : undefined;
+
+/* ═══════════════════════════════════════════════════════════
    HOME
 ═══════════════════════════════════════════════════════════ */
 export function Home({ store, page }: any) {
@@ -666,6 +867,9 @@ export function Home({ store, page }: any) {
           </a>
         </div>
       </section>
+
+      {/* ── BUNDLES (عروض الأطقم) ── */}
+      <BundlesStrip store={store} />
 
       {/* ── CATEGORIES ── */}
       {cats.length > 0 && (
