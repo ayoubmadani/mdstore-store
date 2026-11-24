@@ -33,6 +33,9 @@ const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currency
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
+const __k: any = __kit;
+const bundleLink = (slug: string) => (__k.bundleLink ? __k.bundleLink(slug) : { href: `/bundle/${slug}` });
+const bundleImg = (v: any) => (__k.optionImage ? __k.optionImage(v) : v.value);
 
 const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
@@ -67,6 +70,23 @@ const CSS = `
   ::-webkit-scrollbar-thumb { background:var(--gold); border-radius:2px; }
 
   .pd { font-family:'Playfair Display',serif; }
+  /* الأطقم */
+  .hb-track { display:flex; gap:20px; overflow-x:auto; scroll-snap-type:x mandatory; scroll-padding-inline:20px; padding:0 20px 8px; scrollbar-width:none; }
+  .hb-track::-webkit-scrollbar { display:none; }
+  .hb-track .p-card { scroll-snap-align:start; flex:0 0 min(86%, 380px); display:flex; flex-direction:column; }
+  .hb-track.one .p-card { flex-basis:min(100%, 560px); }
+  .hb-img { position:relative; display:block; aspect-ratio:16/8; overflow:hidden; background:var(--beige); }
+  .hb-img img, .hb-img picture { display:block; width:100%; height:100%; object-fit:cover; }
+  .hb-items { list-style:none; display:flex; align-items:flex-start; gap:4px; background:var(--cream); border:1px solid var(--tan); border-radius:10px; padding:10px 6px; margin:0; }
+  .hb-items li { display:contents; }
+  .hb-top { max-width:1280px; margin:0 auto; }
+  .hb-split { max-width:1280px; margin:0 auto; padding:24px 16px 64px; display:grid; grid-template-columns:minmax(0, 1fr); gap:28px; }
+  @media (min-width: 900px) {
+    .hb-top { padding:24px 20px 0; }
+    .hb-top .hb-hero { border-radius:16px; }
+    .hb-split { grid-template-columns:minmax(0, 1.1fr) minmax(0, 1fr); gap:40px; padding:36px 20px 80px; }
+    .hb-side { position:sticky; top:90px; align-self:start; }
+  }
 
   @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
   .fi { animation:fadeIn 0.5s ease both; }
@@ -1009,6 +1029,217 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
   );
 }
 
+/* ── الأطقم: «عروض الأطقم» تحت الغلاف (data-mds-bundles) + صفحة الطقم ── */
+function BundlesStrip({ store }: any) {
+  const list: any[] = store?.bundles || [];
+  if (!list.length || !__k.bundleStrings) return null;
+  const lang = getLang(store);
+  const bt = __k.bundleStrings(lang);
+  const cur = store?.currency || 'DZD';
+  const isRTL = lang === 'ar';
+  const title = store?.design?.bundlesTitle;
+  const heading = title === null || title === undefined ? bt.title : String(title).trim();
+  return (
+    <section data-mds-bundles="" aria-label={heading || bt.title} style={{ padding:'56px 0 24px', background:'var(--cream)' }}>
+      <div style={{ maxWidth:'1280px', margin:'0 auto' }}>
+        {heading && (
+          <div style={{ padding:'0 20px', marginBottom:'24px' }}>
+            <h2 className="pd" style={{ fontSize:'clamp(1.8rem, 4vw, 3rem)', color:'var(--brown)', lineHeight:1.1, display:'flex', alignItems:'center', gap:10 }}><Leaf size={26} style={{ color:'var(--green)' }} />{heading}</h2>
+          </div>
+        )}
+        <div className={`hb-track ${list.length === 1 ? 'one' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
+          {list.map((b) => (
+            <article key={b.id} className="p-card">
+              <a {...bundleLink(b.slug)} className="hb-img" aria-label={b.name}>
+                {(b.imageUrl || b.mobileImageUrl) && (
+                  <picture>
+                    {b.mobileImageUrl && <source media="(max-width: 640px)" srcSet={b.mobileImageUrl} />}
+                    <img loading="lazy" decoding="async" src={b.imageUrl || b.mobileImageUrl} alt="" />
+                  </picture>
+                )}
+                <span className="pd" style={{ position:'absolute', top:10, insetInlineEnd:10, background:'var(--red)', color:'white', fontSize:'11px', fontWeight:700, padding:'2px 10px', borderRadius:'6px' }}><bdi dir="ltr">-{b.discountPercent}%</bdi></span>
+                <span style={{ position:'absolute', bottom:0, left:0, right:0, height:'3px', background:'linear-gradient(90deg, var(--green), var(--gold))' }} />
+              </a>
+              <div style={{ padding:'14px', display:'flex', flexDirection:'column', gap:'10px', flex:1 }}>
+                <div>
+                  <h3 className="pd" style={{ fontSize:'17px', fontWeight:700, color:'var(--brown)', lineHeight:1.3 }}>{b.name}</h3>
+                  {b.subtitle && <p style={{ fontSize:'12px', color:'var(--warm)', marginTop:2 }}>{b.subtitle}</p>}
+                </div>
+                <ul className="hb-items">
+                  {b.items.map((it: any, i: number) => (
+                    <li key={it.productId}>
+                      {i > 0 && <span aria-hidden="true" className="pd" style={{ color:'var(--gold)', fontWeight:700, fontSize:'1.2rem', paddingTop:14 }}>+</span>}
+                      <span style={{ flex:1, minWidth:0, display:'flex', flexDirection:'column', alignItems:'center', gap:4, textAlign:'center' }}>
+                        {it.imageUrl ? <img loading="lazy" decoding="async" src={it.imageUrl} alt="" style={{ width:52, height:52, objectFit:'cover', borderRadius:8, background:'var(--white)', display:'block' }} /> : <span style={{ width:52, height:52, borderRadius:8, background:'var(--beige)', display:'block' }} />}
+                        <span style={{ fontSize:'11px', color:'var(--warm)', lineHeight:1.3, overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical' }}>{it.name}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <div style={{ display:'flex', alignItems:'baseline', gap:6, flexWrap:'wrap' }}>
+                  <span className="pd" style={{ fontSize:'1.4rem', fontWeight:700, color:'var(--gold)' }}>{Number(b.price).toLocaleString()}</span>
+                  <span style={{ fontSize:'11px', color:'var(--dim)' }}>{cur}</span>
+                  <span style={{ fontSize:'12px', color:'var(--dim)', textDecoration:'line-through' }}>{Number(b.original).toLocaleString()}</span>
+                  <span className="pd" style={{ fontSize:'12px', fontWeight:600, color:'var(--green)', marginInlineStart:'auto' }}>{bt.save} {Number(b.saving).toLocaleString()} {cur}</span>
+                </div>
+                <a {...bundleLink(b.slug)} className="btn-primary" style={{ width:'100%', marginTop:'auto', textDecoration:'none' }}><Leaf size={14} /> {bt.order}</a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BundlePage({ store, bundle, domain }: any) {
+  const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
+  const cur = store?.currency || 'DZD';
+  const o = __k.useBundleOrder({ bundle, store, domain });
+  const bt = o.t;
+  const banner = bundle.imageUrl || bundle.mobileImageUrl;
+  const num = (n: number) => Number(n || 0).toLocaleString();
+  return (
+    <div dir={isRTL ? 'rtl' : 'ltr'} style={{ background:'var(--cream)' }}>
+      {banner && (
+        <div className="hb-top">
+          <div className="hb-hero" style={{ position:'relative', overflow:'hidden', background:'var(--beige)' }}>
+            <picture>
+              {bundle.mobileImageUrl && <source media="(max-width: 640px)" srcSet={bundle.mobileImageUrl} />}
+              <img fetchPriority="high" decoding="async" src={banner} alt={bundle.name} style={{ display:'block', width:'100%', height:'clamp(200px, 40vw, 460px)', objectFit:'cover' }} />
+            </picture>
+            <span className="pd" style={{ position:'absolute', top:14, insetInlineEnd:14, background:'var(--red)', color:'white', fontSize:'13px', fontWeight:700, padding:'3px 12px', borderRadius:'6px' }}><bdi dir="ltr">-{bundle.discountPercent}%</bdi></span>
+            <span style={{ position:'absolute', bottom:0, left:0, right:0, height:'4px', background:'linear-gradient(90deg, var(--green), var(--gold))' }} />
+          </div>
+        </div>
+      )}
+
+      <div className="hb-split">
+        {/* المنتجات */}
+        <div style={{ minWidth:0 }}>
+          <h1 className="pd" style={{ fontSize:'clamp(1.9rem, 4vw, 2.8rem)', color:'var(--brown)', lineHeight:1.15, marginBottom:'6px' }}>{bundle.name}</h1>
+          {bundle.subtitle && <p style={{ fontSize:'14px', color:'var(--warm)', marginBottom:'14px' }}>{bundle.subtitle}</p>}
+          <div style={{ display:'flex', alignItems:'baseline', gap:10, flexWrap:'wrap', background:'var(--white)', border:'1px solid var(--tan)', borderRadius:12, padding:'14px 18px', marginBottom:'22px' }}>
+            <span className="pd" style={{ fontSize:'2.2rem', fontWeight:700, color:'var(--gold)' }}>{num(o.price)}</span>
+            <span style={{ fontSize:'13px', color:'var(--dim)' }}>{cur}</span>
+            <span style={{ fontSize:'14px', color:'var(--dim)', textDecoration:'line-through' }}>{num(o.original)}</span>
+            <span className="pd" style={{ background:'var(--red)', color:'white', fontSize:'11px', fontWeight:700, padding:'2px 10px', borderRadius:'6px' }}><bdi dir="ltr">-{bundle.discountPercent}%</bdi></span>
+            <span className="pd" style={{ fontSize:'13px', fontWeight:600, color:'var(--green)', marginInlineStart:'auto' }}>{bt.saved} {num(o.saving)} {cur}</span>
+          </div>
+
+          <p className="pd" style={{ fontSize:'13px', fontWeight:600, color:'var(--gold)', marginBottom:'10px' }}>{bt.inBundle}</p>
+          <div id="bundle-items" style={{ display:'flex', flexDirection:'column', gap:12 }}>
+            {o.products.map((p: any) => {
+              const img = __k.bundleProductImage ? __k.bundleProductImage(p) : p.imagesProduct?.[0]?.imageUrl;
+              return (
+                <div key={p.id} style={{ display:'grid', gridTemplateColumns:'84px minmax(0, 1fr)', gap:14, background:'var(--white)', border:'1px solid var(--tan)', borderRadius:12, padding:14 }}>
+                  {img ? <img loading="lazy" decoding="async" src={img} alt="" style={{ width:84, height:84, objectFit:'cover', borderRadius:10, background:'var(--beige)', display:'block' }} /> : <span style={{ width:84, height:84, borderRadius:10, background:'var(--beige)', display:'block' }} />}
+                  <div style={{ minWidth:0 }}>
+                    <h3 style={{ fontSize:'14px', fontWeight:600, color:'var(--brown)', lineHeight:1.4 }}>{p.name}</h3>
+                    <span className="pd" style={{ fontSize:'1.1rem', fontWeight:700, color:'var(--gold)', display:'inline-block', marginTop:4 }}>{num(o.priceOf(p))} <span style={{ fontFamily:"'Inter',sans-serif", fontSize:'11px', fontWeight:400, color:'var(--dim)' }}>{cur}</span></span>
+                    {o.attrsOf(p).map((a: any) => (
+                      <div key={a.id} style={{ marginTop:12 }}>
+                        <p className="pd" style={{ fontSize:'12px', fontWeight:600, color:'var(--warm)', marginBottom:6 }}>{a.name}</p>
+                        <div role="group" aria-label={`${a.name} — ${p.name}`} style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+                          {a.variants.map((v: any, i: number) => {
+                            const sel = o.chosen(p, a.name) === v.value;
+                            const kind = __k.optionKind ? __k.optionKind(a, v.value) : (a.displayMode || 'text');
+                            if (kind === 'image') return <button key={v.id} type="button" aria-pressed={sel} aria-label={`${a.name} ${i + 1}`} onClick={() => o.pick(p.id, a.name, v.value)} style={{ width:52, height:52, padding:0, overflow:'hidden', borderRadius:10, border:`2px solid ${sel ? 'var(--gold)' : 'var(--tan)'}`, background:'var(--white)', cursor:'pointer' }}><img src={bundleImg(v)} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }} /></button>;
+                            if (kind === 'color') return <button key={v.id} type="button" aria-pressed={sel} aria-label={v.name || v.value} title={v.name} onClick={() => o.pick(p.id, a.name, v.value)} style={{ width:30, height:30, borderRadius:'50%', background:v.value, border:'2px solid var(--white)', boxShadow:`0 0 0 2px ${sel ? 'var(--gold)' : 'var(--tan)'}`, cursor:'pointer' }} />;
+                            return <button key={v.id} type="button" aria-pressed={sel} onClick={() => o.pick(p.id, a.name, v.value)} style={{ padding:'7px 14px', borderRadius:10, border:`1.5px solid ${sel ? 'var(--gold)' : 'var(--tan)'}`, background:sel ? 'var(--gold-lt)' : 'var(--white)', color:sel ? 'var(--gold)' : 'var(--warm)', fontSize:'13px', fontWeight:600, cursor:'pointer', fontFamily:'inherit' }}>{v.name || v.value}</button>;
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {o.errors.options && <p style={{ fontSize:'12px', color:'#ef4444', marginTop:8, display:'flex', alignItems:'center', gap:4 }}><AlertCircle style={{ width:12, height:12 }} />{o.errors.options}</p>}
+        </div>
+
+        {/* الطلب */}
+        <div className="hb-side" style={{ minWidth:0 }}>
+          <form id="bundle-form" onSubmit={o.submit} noValidate style={{ background:'var(--white)', border:'1px solid var(--tan)', borderRadius:16, padding:18 }}>
+            <div className="form-2c">
+              <FR error={o.errors.name} label={t.fullName}><input type="text" value={o.form.name} onChange={e => o.setName(e.target.value)} placeholder={t.namePh} style={INP_S(!!o.errors.name)} autoComplete="name" /></FR>
+              <FR error={o.errors.phone} label={t.phone}><input type="tel" value={o.form.phone} onChange={e => o.setPhone(e.target.value)} placeholder={t.phonePh} style={INP_S(!!o.errors.phone)} autoComplete="tel" /></FR>
+            </div>
+            {!o.digital && (
+              <>
+                <div className="form-2c">
+                  <FR error={o.errors.wilaya} label={t.wilaya}>
+                    <div style={{ position:'relative' }}>
+                      <ChevronDown style={{ position:'absolute', left:'11px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }} />
+                      <select value={o.form.wilaya} onChange={e => o.chooseWilaya(e.target.value)} className="inp" style={{ paddingLeft:'32px' }}>
+                        <option value="">{t.wilayaPh}</option>{o.wilayas.map((w: any) => <option key={w.id} value={w.id}>{w.code ?? w.id} - {o.placeName(w)}</option>)}
+                      </select>
+                    </div>
+                  </FR>
+                  <FR error={o.errors.commune} label={t.commune}>
+                    <div style={{ position:'relative' }}>
+                      <ChevronDown style={{ position:'absolute', left:'11px', top:'50%', transform:'translateY(-50%)', width:'13px', height:'13px', color:'var(--dim)', pointerEvents:'none' }} />
+                      <select value={o.form.commune} disabled={!o.form.wilaya || o.loadingCommunes} onChange={e => o.setCommune(e.target.value)} className="inp" style={{ paddingLeft:'32px', opacity:!o.form.wilaya ? 0.4 : 1 }}>
+                        <option value="">{o.loadingCommunes ? t.communeLoading : t.communePh}</option>{o.communes.map((c: any) => <option key={c.id} value={c.id}>{o.placeName(c)}</option>)}
+                      </select>
+                    </div>
+                  </FR>
+                </div>
+                {o.form.wilaya && (
+                  <FR label={t.deliveryType}>
+                    <div className="dlv-2c">
+                      {(['home', 'office'] as const).map(type => {
+                        const on = o.form.ship === type;
+                        const cost = o.shipCost(type);
+                        return (
+                          <button data-delivery-option key={type} type="button" onClick={() => o.setShip(type)} style={{ padding:'12px 10px', borderRadius:'10px', border:`1.5px solid ${on ? 'var(--gold)' : 'var(--tan)'}`, backgroundColor:on ? 'var(--gold-lt)' : 'transparent', cursor:'pointer', textAlign:isRTL ? 'right' : 'left', transition:'all 0.2s', fontFamily:'inherit' }}>
+                            <p className="pd" style={{ fontSize:'12px', fontWeight:600, color:on ? 'var(--gold)' : 'var(--warm)', margin:'0 0 4px' }}>{type === 'home' ? t.homeLabel : t.officeLabel}</p>
+                            {cost !== null && <p className="pd" style={{ fontSize:'1rem', color:on ? 'var(--gold)' : 'var(--warm)', margin:0 }}>{num(cost)} {cur}</p>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </FR>
+                )}
+              </>
+            )}
+
+            <div style={{ border:'1px solid var(--tan)', borderRadius:'12px', marginBottom:'14px', overflow:'hidden', background:'var(--white)' }}>
+              <div style={{ padding:'10px 14px', borderBottom:'1px solid var(--tan)', display:'flex', alignItems:'center', gap:'8px', background:'var(--green-lt)' }}>
+                <Package size={13} style={{ color:'var(--green)' }} />
+                <span className="pd" style={{ fontSize:'11px', fontWeight:600, color:'var(--green)' }}>{t.orderSummary}</span>
+              </div>
+              {[
+                { l: bt.original, v: <s>{num(o.original)} {cur}</s> },
+                { l: bt.bundlePrice, v: `${num(o.price)} ${cur}` },
+                { l: bt.saved, v: <span style={{ color:'var(--green)' }}>{num(o.saving)} {cur}</span> },
+                ...(o.digital ? [] : [{ l: t.delivery, v: o.wilaya ? `${num(o.ship)} ${cur}` : '—' }]),
+              ].map((row, i) => (
+                <div key={i} style={{ display:'flex', justifyContent:'space-between', padding:'7px 14px', borderBottom:'1px solid var(--tan)' }}>
+                  <span className="pd" style={{ fontSize:'12px', color:'var(--dim)' }}>{row.l}</span>
+                  <span style={{ fontSize:'13px', fontWeight:600, color:'var(--warm)' }}>{row.v}</span>
+                </div>
+              ))}
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', padding:'12px 14px' }}>
+                <span className="pd" style={{ fontSize:'12px', fontWeight:600, color:'var(--dim)' }}>{t.total}</span>
+                <span className="pd" style={{ fontSize:'1.8rem', fontWeight:700, color:'var(--gold)' }}>{num(o.total)} <span style={{ fontFamily:"'Inter',sans-serif", fontWeight:400, fontSize:'12px', color:'var(--dim)' }}>{cur}</span></span>
+              </div>
+            </div>
+
+            <button type="submit" disabled={o.submitting} className="btn-primary" style={{ width:'100%', fontSize:'15px', padding:'14px', cursor:o.submitting ? 'not-allowed' : 'pointer', opacity:o.submitting ? 0.7 : 1 }}>
+              {o.submitting ? <><Loader2 style={{ width:'15px', height:'15px', animation:'spin 1s linear infinite' }} /> {t.processingOrder}</> : <><Zap size={15} /> {bt.order}</>}
+            </button>
+            <p style={{ display:'flex', justifyContent:'center', alignItems:'center', gap:6, marginTop:10, fontSize:'11px', color:'var(--dim)' }}><Lock size={11} /> {t.securePay}</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+// صفحة الطقم للمتجر: فقط إن كان المتجر المنشور يوفّر useBundleOrder (وإلا تظهر الصفحة المشتركة)
+export const Bundle = __k.useBundleOrder ? BundlePage : undefined;
+
 export function Home({ store, page }: any) {
   const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   const products: any[] = store.products || [];
@@ -1139,6 +1370,9 @@ export function Home({ store, page }: any) {
           </div>
         </div>
       </div>
+
+      {/* BUNDLES (عروض الأطقم) */}
+      <BundlesStrip store={store} />
 
       {cats.length > 0 && (
         <section id="categories" style={{ padding:'64px 0', background:'var(--cream)' }}>
