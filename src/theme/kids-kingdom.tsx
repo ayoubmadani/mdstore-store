@@ -33,6 +33,9 @@ const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currency
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
+const __k: any = __kit;
+const bundleLink = (slug: string) => (__k.bundleLink ? __k.bundleLink(slug) : { href: `/bundle/${slug}` });
+const bundleImg = (v: any) => (__k.optionImage ? __k.optionImage(v) : v.value);
 
 /* ═══════════════════════════════════════════════════════════
    I18N — يقرأ store.language من الداتابيز (ar افتراضي)
@@ -356,6 +359,24 @@ const THEME_CSS = `
 
   /* ── Buttons ── */
   .btn-bouncy { transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease; }
+  /* الأطقم */
+  .kk-track { display: flex; gap: 1.25rem; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 1.5rem; padding: 0.5rem 1.5rem 1rem; scrollbar-width: none; }
+  .kk-track::-webkit-scrollbar { display: none; }
+  .kk-card { scroll-snap-align: start; flex: 0 0 min(86%, 380px); background: #fff; border: 3px solid var(--border); border-radius: 24px; overflow: hidden; display: flex; flex-direction: column; transition: border-color .2s, transform .2s; }
+  .kk-card:hover { border-color: var(--coral); transform: translateY(-4px); }
+  .kk-track.one .kk-card { flex-basis: min(100%, 560px); }
+  .kk-img { position: relative; display: block; aspect-ratio: 16/8; overflow: hidden; background: rgba(255,107,107,0.07); }
+  .kk-img img, .kk-img picture { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .kk-items { list-style: none; display: flex; align-items: flex-start; gap: 0.25rem; background: rgba(78,205,196,0.08); border: 2px dashed var(--border); border-radius: 18px; padding: 0.75rem 0.5rem; margin: 0; }
+  .kk-items li { display: contents; }
+  .kk-top { max-width: 1280px; margin: 0 auto; }
+  .kk-split { max-width: 1280px; margin: 0 auto; padding: 1.5rem 1rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  @media (min-width: 900px) {
+    .kk-top { padding: 1.5rem 1.5rem 0; }
+    .kk-top .kk-hero { border-radius: 28px; border: 3px solid var(--border); }
+    .kk-split { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 2.5rem; padding: 2rem 1.5rem 5rem; }
+    .kk-side { position: sticky; top: 90px; align-self: start; }
+  }
   .btn-bouncy:hover  { transform: translateY(-3px) scale(1.04); }
   .btn-bouncy:active { transform: translateY(1px)  scale(0.97); }
 
@@ -943,6 +964,215 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 }
 
 /* ═══════════════════════════════════════════════════════════
+   BUNDLES — عروض الأطقم (data-mds-bundles) + صفحة الطقم
+═══════════════════════════════════════════════════════════ */
+function BundlesStrip({ store }: any) {
+  const list: any[] = store?.bundles || [];
+  if (!list.length || !__k.bundleStrings) return null;
+  const lang = getLang(store);
+  const t = withLocationLabels(T)[lang];
+  const bt = __k.bundleStrings(lang);
+  const cur = store?.currency || currencyLabel(t.currency);
+  const title = store?.design?.bundlesTitle;
+  const heading = title === null || title === undefined ? bt.title : String(title).trim();
+  return (
+    <section data-mds-bundles="" aria-label={heading || bt.title} style={{ padding: '3rem 0 1.5rem', maxWidth: 1280, margin: '0 auto' }}>
+      {heading && (
+        <h2 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', textAlign: 'center', color: 'var(--text)', marginBottom: '1.5rem', padding: '0 1.5rem' }}>🎁 {heading}</h2>
+      )}
+      <div className={`kk-track ${list.length === 1 ? 'one' : ''}`}>
+        {list.map((b) => (
+          <article key={b.id} className="kk-card">
+            <div style={{ height: 4, background: 'var(--coral)', width: '100%' }} />
+            <a {...bundleLink(b.slug)} className="kk-img" aria-label={b.name}>
+              {(b.imageUrl || b.mobileImageUrl) && (
+                <picture>
+                  {b.mobileImageUrl && <source media="(max-width: 640px)" srcSet={b.mobileImageUrl} />}
+                  <img loading="lazy" decoding="async" src={b.imageUrl || b.mobileImageUrl} alt="" />
+                </picture>
+              )}
+              <span style={{ position: 'absolute', top: 10, insetInlineEnd: 10, width: 52, height: 52, borderRadius: '50%', background: 'var(--coral-d)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '0.95rem', boxShadow: '0 6px 16px rgba(255,107,107,0.4)' }}><bdi dir="ltr">-{b.discountPercent}%</bdi></span>
+            </a>
+            <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1 }}>
+              <div>
+                <h3 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.2rem', color: 'var(--text)', lineHeight: 1.25 }}>{b.name}</h3>
+                {b.subtitle && <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-soft)', marginTop: 2 }}>{b.subtitle}</p>}
+              </div>
+              <ul className="kk-items">
+                {b.items.map((it: any, i: number) => (
+                  <li key={it.productId}>
+                    {i > 0 && <span aria-hidden="true" style={{ fontFamily: "'Fredoka One', cursive", color: 'var(--grape)', fontSize: '1.4rem', paddingTop: 12 }}>+</span>}
+                    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
+                      {it.imageUrl ? <img loading="lazy" decoding="async" src={it.imageUrl} alt="" style={{ width: 54, height: 54, objectFit: 'cover', borderRadius: 14, background: '#fff', border: '2px solid var(--border)', display: 'block' }} /> : <span style={{ width: 54, height: 54, borderRadius: 14, background: '#fff', display: 'block' }} />}
+                      <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-mid)', lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{it.name}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', flexWrap: 'wrap' }}>
+                <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.5rem', color: 'var(--coral-d)' }}>{Number(b.price).toLocaleString()}</span>
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-soft)' }}>{cur}</span>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-soft)', textDecoration: 'line-through' }}>{Number(b.original).toLocaleString()}</span>
+                <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#16A34A', marginInlineStart: 'auto' }}>🎉 {bt.save} {Number(b.saving).toLocaleString()} {cur}</span>
+              </div>
+              <a {...bundleLink(b.slug)} className="btn-bouncy" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '0.8rem', borderRadius: 16, background: 'linear-gradient(135deg, var(--coral), var(--grape))', color: '#fff', fontWeight: 900, fontSize: '0.9rem', marginTop: 'auto', boxShadow: '0 8px 20px rgba(255,107,107,0.3)' }}>{bt.order} 🚀</a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function BundlePage({ store, bundle, domain }: any) {
+  const lang = getLang(store);
+  const t = withLocationLabels(T)[lang];
+  const isRTL = lang === 'ar';
+  const cur = store?.currency || currencyLabel(t.currency);
+  const o = __k.useBundleOrder({ bundle, store, domain });
+  const bt = o.t;
+  const banner = bundle.imageUrl || bundle.mobileImageUrl;
+  const num = (n: number) => Number(n || 0).toLocaleString();
+  return (
+    <div dir={isRTL ? 'rtl' : 'ltr'}>
+      {banner && (
+        <div className="kk-top">
+          <div className="kk-hero" style={{ position: 'relative', overflow: 'hidden', background: 'rgba(255,107,107,0.07)' }}>
+            <picture>
+              {bundle.mobileImageUrl && <source media="(max-width: 640px)" srcSet={bundle.mobileImageUrl} />}
+              <img fetchPriority="high" decoding="async" src={banner} alt={bundle.name} style={{ display: 'block', width: '100%', height: 'clamp(200px, 40vw, 440px)', objectFit: 'cover' }} />
+            </picture>
+            <span style={{ position: 'absolute', top: 14, insetInlineEnd: 14, width: 62, height: 62, borderRadius: '50%', background: 'var(--coral-d)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', boxShadow: '0 6px 16px rgba(255,107,107,0.4)' }}><bdi dir="ltr">-{bundle.discountPercent}%</bdi></span>
+          </div>
+        </div>
+      )}
+
+      <div className="kk-split">
+        {/* المنتجات */}
+        <div style={{ minWidth: 0 }}>
+          <h1 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', color: 'var(--text)', lineHeight: 1.2, marginBottom: '0.4rem' }}>🎁 {bundle.name}</h1>
+          {bundle.subtitle && <p style={{ fontWeight: 600, color: 'var(--text-soft)', marginBottom: '1rem' }}>{bundle.subtitle}</p>}
+          <div className="polka-dots" style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem', flexWrap: 'wrap', background: '#fff', border: '3px solid var(--border)', borderRadius: 22, padding: '1rem 1.25rem', marginBottom: '1.5rem' }}>
+            <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2.2rem', color: 'var(--coral-d)' }}>{num(o.price)}</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-soft)' }}>{cur}</span>
+            <span style={{ color: 'var(--text-soft)', textDecoration: 'line-through' }}>{num(o.original)}</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 900, color: '#16A34A', marginInlineStart: 'auto' }}>🎉 {bt.saved} {num(o.saving)} {cur}</span>
+          </div>
+
+          <p style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--text-mid)', textTransform: 'uppercase', marginBottom: '0.6rem' }}>{bt.inBundle}</p>
+          <div id="bundle-items" style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+            {o.products.map((p: any) => {
+              const img = __k.bundleProductImage ? __k.bundleProductImage(p) : p.imagesProduct?.[0]?.imageUrl;
+              return (
+                <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '84px minmax(0, 1fr)', gap: '1rem', background: '#fff', border: '3px solid var(--border)', borderRadius: 22, padding: '1rem' }}>
+                  {img ? <img loading="lazy" decoding="async" src={img} alt="" style={{ width: 84, height: 84, objectFit: 'cover', borderRadius: 16, background: 'rgba(255,107,107,0.07)', display: 'block' }} /> : <span style={{ width: 84, height: 84, borderRadius: 16, background: 'rgba(255,107,107,0.07)', display: 'block' }} />}
+                  <div style={{ minWidth: 0 }}>
+                    <h3 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--text)', lineHeight: 1.35 }}>{p.name}</h3>
+                    <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.15rem', color: 'var(--coral-d)', display: 'inline-block', marginTop: 2 }}>{num(o.priceOf(p))} <span style={{ fontSize: '0.75rem', fontFamily: 'inherit', color: 'var(--text-soft)' }}>{cur}</span></span>
+                    {o.attrsOf(p).map((a: any) => (
+                      <div key={a.id} style={{ marginTop: '0.75rem' }}>
+                        <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--text-mid)', textTransform: 'uppercase', marginBottom: '0.4rem' }}>{a.name}</p>
+                        <div role="group" aria-label={`${a.name} — ${p.name}`} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                          {a.variants.map((v: any, i: number) => {
+                            const sel = o.chosen(p, a.name) === v.value;
+                            const kind = __k.optionKind ? __k.optionKind(a, v.value) : (a.displayMode || 'text');
+                            if (kind === 'image') return <button key={v.id} type="button" aria-pressed={sel} aria-label={`${a.name} ${i + 1}`} onClick={() => o.pick(p.id, a.name, v.value)} style={{ width: 56, height: 56, padding: 0, borderRadius: 16, overflow: 'hidden', border: `3px solid ${sel ? 'var(--sky)' : 'var(--border)'}`, background: '#fff', cursor: 'pointer', transform: sel ? 'scale(1.06)' : 'none', transition: 'all .2s' }}><img src={bundleImg(v)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>;
+                            if (kind === 'color') return <button key={v.id} type="button" aria-pressed={sel} aria-label={v.name || v.value} title={v.name} onClick={() => o.pick(p.id, a.name, v.value)} style={{ width: 34, height: 34, borderRadius: '50%', background: v.value, border: '3px solid #fff', boxShadow: `0 0 0 3px ${sel ? 'var(--sky)' : 'var(--border)'}`, cursor: 'pointer' }} />;
+                            return <button key={v.id} type="button" aria-pressed={sel} onClick={() => o.pick(p.id, a.name, v.value)} style={{ padding: '0.45rem 1rem', borderRadius: 14, border: `3px solid ${sel ? 'var(--sky)' : 'var(--border)'}`, background: sel ? 'rgba(78,205,196,0.1)' : '#fff', color: sel ? 'var(--sky-dk)' : 'var(--text-mid)', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit' }}>{v.name || v.value}</button>;
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {o.errors.options && <p style={{ fontSize: '0.78rem', color: 'var(--coral-d)', marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700 }}><AlertCircle size={12} />{o.errors.options}</p>}
+        </div>
+
+        {/* الطلب */}
+        <div className="kk-side" style={{ minWidth: 0 }}>
+          <form id="bundle-form" onSubmit={o.submit} noValidate style={{ background: '#fff', border: '3px solid var(--border)', borderRadius: 26, padding: '1.25rem' }}>
+            <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
+              <FR error={o.errors.name} label={t.name_label}><input type="text" value={o.form.name} onChange={e => o.setName(e.target.value)} placeholder={t.contact_name_ph} style={inp(!!o.errors.name)} autoComplete="name" /></FR>
+              <FR error={o.errors.phone} label={t.phone_label}><input type="tel" value={o.form.phone} onChange={e => o.setPhone(e.target.value)} placeholder="05XXXXXXXX" style={inp(!!o.errors.phone)} autoComplete="tel" /></FR>
+            </div>
+            {!o.digital && (
+              <>
+                <div className="form-row-2" style={{ marginBottom: '0.875rem' }}>
+                  <FR error={o.errors.wilaya} label={t.wilaya_label}>
+                    <div style={{ position: 'relative' }}>
+                      <ChevronDown size={14} style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', [isRTL ? 'left' : 'right']: 12, color: 'var(--text-soft)', pointerEvents: 'none' }} />
+                      <select value={o.form.wilaya} onChange={e => o.chooseWilaya(e.target.value)} style={{ ...inp(!!o.errors.wilaya), [isRTL ? 'paddingLeft' : 'paddingRight']: 32 }}>
+                        <option value="">{t.choose_wilaya}</option>{o.wilayas.map((w: any) => <option key={w.id} value={w.id}>{w.code ?? w.id} - {o.placeName(w)}</option>)}
+                      </select>
+                    </div>
+                  </FR>
+                  <FR error={o.errors.commune} label={t.commune_label}>
+                    <div style={{ position: 'relative' }}>
+                      <ChevronDown size={14} style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', [isRTL ? 'left' : 'right']: 12, color: 'var(--text-soft)', pointerEvents: 'none' }} />
+                      <select value={o.form.commune} disabled={!o.form.wilaya || o.loadingCommunes} onChange={e => o.setCommune(e.target.value)} style={{ ...inp(!!o.errors.commune), [isRTL ? 'paddingLeft' : 'paddingRight']: 32, opacity: !o.form.wilaya ? 0.5 : 1 }}>
+                        <option value="">{o.loadingCommunes ? t.loading_dots : t.choose_commune}</option>{o.communes.map((c: any) => <option key={c.id} value={c.id}>{o.placeName(c)}</option>)}
+                      </select>
+                    </div>
+                  </FR>
+                </div>
+                {o.form.wilaya && (
+                  <div style={{ marginBottom: '0.875rem' }}>
+                    <p style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--text-mid)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>{t.delivery_type}</p>
+                    <div className="delivery-grid">
+                      {(['home', 'office'] as const).map(ty => {
+                        const on = o.form.ship === ty;
+                        const cost = o.shipCost(ty);
+                        return (
+                          <button data-delivery-option key={ty} type="button" onClick={() => o.setShip(ty)} style={{ padding: '0.875rem', border: `3px solid ${on ? 'var(--sky)' : 'var(--border)'}`, borderRadius: 16, textAlign: 'center', cursor: 'pointer', background: on ? 'rgba(78,205,196,0.1)' : '#fff', fontFamily: 'inherit', transition: 'all 0.2s' }}>
+                            <span style={{ display: 'block', fontSize: '1.5rem', marginBottom: 4 }}>{ty === 'home' ? '🏠' : '🏢'}</span>
+                            <p style={{ fontWeight: 800, fontSize: '0.8rem', color: on ? 'var(--sky-dk)' : 'var(--text-soft)' }}>{ty === 'home' ? t.home_delivery : t.office_delivery}</p>
+                            {cost !== null && <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: on ? 'var(--text)' : 'var(--text-soft)' }}>{num(cost)} {cur}</p>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            <div className="polka-dots" style={{ background: '#fff', border: '2.5px solid var(--border)', borderRadius: 20, padding: '1.125rem', marginBottom: '1.25rem' }}>
+              <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--coral-d)', textTransform: 'uppercase', marginBottom: '0.875rem' }}>{t.order_summary}</p>
+              {[
+                { l: bt.original, v: <s>{num(o.original)} {cur}</s> },
+                { l: bt.bundlePrice, v: `${num(o.price)} ${cur}` },
+                { l: bt.saved, v: <span style={{ color: '#16A34A' }}>{num(o.saving)} {cur}</span> },
+                ...(o.digital ? [] : [{ l: t.sum_delivery, v: o.wilaya ? `${num(o.ship)} ${cur}` : '---' }]),
+              ].map((r, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: '1px dashed var(--border)' }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-soft)', textTransform: 'uppercase' }}>{r.l}</span>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)' }}>{r.v}</span>
+                </div>
+              ))}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', paddingTop: '0.5rem' }}>
+                <span style={{ fontWeight: 900, fontSize: '0.875rem', color: 'var(--coral-d)' }}>{t.sum_total}</span>
+                <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2rem', color: 'var(--coral-d)' }}>{num(o.total)} <span style={{ fontSize: '0.9rem', fontFamily: 'inherit' }}>{cur}</span></span>
+              </div>
+            </div>
+            <button type="submit" disabled={o.submitting} className="btn-bouncy" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '1rem', borderRadius: 18, border: 'none', cursor: o.submitting ? 'not-allowed' : 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 900, fontSize: '1rem', color: '#fff', background: o.submitting ? 'var(--text-soft)' : 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: '0 10px 24px rgba(255,107,107,0.3)' }}>
+              {o.submitting ? <><Loader2 size={18} style={{ animation: 'spin-slow 1s linear infinite' }} /> {t.processing}</> : <>{bt.order} 🚀</>}
+            </button>
+            <p style={{ textAlign: 'center', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-soft)', marginTop: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              <Lock size={11} style={{ color: 'var(--sky)' }} /> {t.secure_pay}
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+// صفحة الطقم للمتجر: فقط إن كان المتجر المنشور يوفّر useBundleOrder (وإلا تظهر الصفحة المشتركة)
+export const Bundle = __k.useBundleOrder ? BundlePage : undefined;
+
+/* ═══════════════════════════════════════════════════════════
    HOME
 ═══════════════════════════════════════════════════════════ */
 export function Home({ store, page }: any) {
@@ -1027,6 +1257,9 @@ export function Home({ store, page }: any) {
       </section>
 
       <WavyDivider top="white" bottom="var(--bg)" />
+
+      {/* ── BUNDLES (عروض الأطقم) ── */}
+      <BundlesStrip store={store} />
 
       {/* ── CATEGORIES ── */}
       {cats.length > 0 && (
