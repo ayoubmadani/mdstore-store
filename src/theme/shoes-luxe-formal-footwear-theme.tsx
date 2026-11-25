@@ -27,6 +27,7 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import { useCartStore } from '@/store/useCartStore';
+import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
 import {
   Search, ShoppingBag, Menu, X, ChevronLeft, ChevronRight, ChevronDown,
   Phone, Mail, MapPin, Star, Trash2, Minus, Plus, Check, AlertCircle,
@@ -43,6 +44,7 @@ const __colorName = (attr: any, sel: any) => {
 };
 
 const isValidDzPhone = (v?: string | null) => (__kit.isValidDzPhone ? __kit.isValidDzPhone(v as string) : /^(0|\+213)[5-7]\d{8}$/.test(String(v ?? '').trim()));
+const __k: any = __bk;
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 /* ============================ TOKENS ============================ */
@@ -989,6 +991,244 @@ export function Card({ product, displayImage, discount, store, viewDetails, inde
 }
 
 /* ============================ HOME ============================ */
+const __BCSS = `
+.mdb-track { max-width: 1280px; margin: 0 auto; display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 1.5rem; padding: 0 1.5rem 0.5rem; scrollbar-width: none; }
+.mdb-track::-webkit-scrollbar { display: none; }
+.mdb-track > article { scroll-snap-align: start; flex: 0 0 min(88%, 380px); }
+.mdb-track.one > article { flex-basis: min(100%, 560px); }
+.mdb-items { list-style: none; display: flex; align-items: flex-start; gap: 4px; margin: 0; padding: 10px 6px; background: #F6F2EC; border: 1.5px solid #DED6CB; border-radius: 2px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
+.mdb-items::-webkit-scrollbar { display: none; }
+.mdb-items li { display: contents; }
+.mdb-split { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.75rem; padding: 1.5rem 1.5rem 4rem; }
+.mdb-row2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.85rem; }
+.mdb-ship { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+@media (min-width: 560px) { .mdb-row2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+@media (min-width: 900px) {
+  .mdb-split { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 2.5rem; padding-top: 2rem; padding-bottom: 5rem; }
+  .mdb-side { position: sticky; top: 84px; align-self: start; }
+}
+`;
+
+/* ------------------------------------------------ Bundles — عروض الأطقم --- */
+const __bfmt = (n: number, c: string) => `${Number(n || 0).toLocaleString()} ${c}`;
+
+function BundlesStrip({ store }: any) {
+  const sc = __k.useBundleScroll ? __k.useBundleScroll() : null; // أسهم التمرير
+  const list: any[] = store?.bundles || [];
+  if (!list.length) return null;
+  const currency = store?.currency || 'DZD';
+  const bt = __k.bundleStrings(getLang(store));
+  const title = store?.design?.bundlesTitle;
+  const heading = title === null || title === undefined ? bt.title : String(title).trim();
+  const arrow = (d: boolean): React.CSSProperties => ({ width: 38, height: 38, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, border: `1.5px solid ${d ? '#DED6CB' : '#7C441C'}`, background: d ? '#FFFDFA' : '#7C441C', color: d ? '#6A625B' : '#fff', cursor: d ? 'default' : 'pointer', padding: 0, opacity: d ? 0.5 : 1, transition: 'all 0.18s' });
+  return (
+    <section data-mds-bundles="" aria-label={heading || bt.title} style={{ padding: '3rem 0 0' }}>
+      <style>{__BCSS}</style>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+        <div style={{ width: 4, height: 28, background: '#7C441C', borderRadius: 2 }} />
+        {heading && <h2 style={{ fontSize: 'clamp(1.375rem,3.5vw,2rem)', fontWeight: 800, color: '#1C1917', margin: 0 }}>{heading}</h2>}
+        <div style={{ flex: 1 }} />
+        {sc?.show && (
+          <div style={{ display: 'flex', gap: 6 }}>
+            {[{ d: sc.atStart, on: sc.prev, label: sc.labels.prev, left: sc.prevLeft }, { d: sc.atEnd, on: sc.next, label: sc.labels.next, left: !sc.prevLeft }].map((a, i) => (
+              <button key={i} type="button" aria-label={a.label} disabled={a.d} onClick={a.on} style={arrow(a.d)}>
+                {a.left ? <ChevronLeft size={18} aria-hidden="true" /> : <ChevronRight size={18} aria-hidden="true" />}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <div ref={sc?.ref} data-bundle-track="" className={`mdb-track ${list.length === 1 ? 'one' : ''}`}>
+        {list.map((b) => (
+          <article key={b.id} style={{ display: 'flex', flexDirection: 'column', background: '#FFFDFA', border: '1.5px solid #DED6CB', borderRadius: 2, overflow: 'hidden' }}>
+            <a {...__k.bundleLink(b.slug)} aria-label={b.name} style={{ position: 'relative', display: 'block', aspectRatio: '16 / 8', overflow: 'hidden', background: '#F6F2EC' }}>
+              {(b.imageUrl || b.mobileImageUrl) && (
+                <picture>
+                  {b.mobileImageUrl && <source media="(max-width: 640px)" srcSet={b.mobileImageUrl} />}
+                  <img loading="lazy" decoding="async" src={b.imageUrl || b.mobileImageUrl} alt="" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }} />
+                </picture>
+              )}
+              <span style={{ position: 'absolute', top: 10, insetInlineStart: 10, background: '#7C441C', color: '#fff', fontWeight: 800, fontSize: '0.78rem', padding: '3px 9px', borderRadius: 6 }}><bdi dir="ltr">-{b.discountPercent}%</bdi></span>
+              <span style={{ position: 'absolute', top: 10, insetInlineEnd: 10, background: 'rgba(0,0,0,0.65)', color: '#fff', fontWeight: 700, fontSize: '0.74rem', padding: '3px 9px', borderRadius: 6, display: 'inline-flex', alignItems: 'center', gap: 4 }}><Package size={12} aria-hidden="true" /><bdi dir="ltr">×{b.items.length}</bdi></span>
+            </a>
+            <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
+              <div>
+                <p style={{ margin: 0, fontSize: '0.98rem', fontWeight: 700, lineHeight: 1.45, color: '#1C1917' }}>{b.name}</p>
+                {b.subtitle && <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: '#6A625B' }}>{b.subtitle}</p>}
+              </div>
+              <ul className="mdb-items">
+                {b.items.map((it: any, i: number) => (
+                  <li key={it.productId}>
+                    {i > 0 && <span aria-hidden="true" style={{ color: '#7C441C', fontWeight: 900, paddingTop: 14 }}>+</span>}
+                    <span style={{ flex: '1 0 76px', minWidth: 76, scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
+                      {it.imageUrl ? <img loading="lazy" decoding="async" src={it.imageUrl} alt="" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 8, background: '#FFFDFA', border: '1.5px solid #DED6CB', display: 'block' }} /> : <span style={{ width: 50, height: 50, borderRadius: 8, background: '#FFFDFA', border: '1.5px solid #DED6CB', display: 'block' }} />}
+                      <span style={{ fontSize: '0.68rem', color: '#6A625B', lineHeight: 1.35, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{it.name}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+                <span  style={{ fontSize: '1.15rem', fontWeight: 800, color: '#1C1917', whiteSpace: 'nowrap' }}>{__bfmt(b.price, currency)}</span>
+                <span  style={{ fontSize: '0.78rem', color: '#6A625B', textDecoration: 'line-through', whiteSpace: 'nowrap' }}>{__bfmt(b.original, currency)}</span>
+                <span style={{ marginInlineStart: 'auto', fontSize: '0.74rem', fontWeight: 700, color: '#7C441C' }}>{bt.save} {__bfmt(b.saving, currency)}</span>
+              </div>
+              <a {...__k.bundleLink(b.slug)} style={{ marginTop: 'auto', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: '#7C441C', color: '#fff', fontWeight: 700, fontSize: '0.92rem', padding: '0.8rem 1.25rem', borderRadius: 2, textDecoration: 'none' }}>{bt.order}</a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function BundlePage({ store, bundle, domain }: any) {
+  const t = withLocationLabels(T)[getLang(store)];
+  const currency = store?.currency || 'DZD';
+  const o = __k.useBundleOrder({ bundle, store, domain, validPhone: isValidDzPhone });
+  const bt = o.t;
+  const L = (...ks: string[]) => { for (const k of ks) if ((t as any)[k]) return (t as any)[k] as string; return ''; };
+  const banner = bundle.imageUrl || bundle.mobileImageUrl;
+  const inp = (err?: boolean): React.CSSProperties => ({ width: '100%', padding: '0.8rem 1rem', background: '#FFFDFA', border: `1.5px solid ${err ? '#DC2626' : '#DED6CB'}`, borderRadius: 2, fontSize: '0.9rem', color: '#1C1917', outline: 'none', appearance: 'none' as any, fontFamily: 'inherit' });
+  const label = (txt: string, id: string) => <label htmlFor={id} style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, marginBottom: 6, color: '#6A625B' }}>{txt}</label>;
+  const errLine = (msg?: string) => (msg ? <p style={{ display: 'flex', alignItems: 'center', gap: 5, margin: '6px 0 0', fontSize: '0.74rem', color: '#E63946' }}><AlertCircle size={12} aria-hidden="true" /> {msg}</p> : null);
+  const cap: React.CSSProperties = { margin: '0 0 12px', fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#1C1917' };
+  const row = (l: string, v: React.ReactNode, strong?: boolean) => <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '0.35rem 0', fontSize: strong ? '1rem' : '0.85rem', fontWeight: strong ? 800 : 500, color: strong ? '#1C1917' : '#6A625B' }}><span>{l}</span><span >{v}</span></div>;
+  return (
+    <div dir={t.dir}>
+      <style>{__BCSS}</style>
+      {banner && (
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '1.5rem 1.5rem 0' }}>
+          <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 2, background: '#F6F2EC' }}>
+            <picture>
+              {bundle.mobileImageUrl && <source media="(max-width: 640px)" srcSet={bundle.mobileImageUrl} />}
+              <img fetchPriority="high" decoding="async" src={banner} alt={bundle.name} style={{ display: 'block', width: '100%', height: 'clamp(200px, 40vw, 460px)', objectFit: 'cover' }} />
+            </picture>
+            <span style={{ position: 'absolute', top: 14, insetInlineStart: 14, background: '#7C441C', color: '#fff', fontWeight: 800, fontSize: '0.85rem', padding: '5px 11px', borderRadius: 8 }}><bdi dir="ltr">-{bundle.discountPercent}%</bdi></span>
+          </div>
+        </div>
+      )}
+
+      <div className="mdb-split">
+        <div style={{ minWidth: 0 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 10, fontSize: '0.78rem', fontWeight: 700, color: '#7C441C' }}><Package size={13} aria-hidden="true" /> {bt.inBundle} · <bdi dir="ltr">×{o.products.length}</bdi></span>
+          <h1 style={{ margin: '0 0 6px', fontSize: 'clamp(1.5rem, 4vw, 2.3rem)', fontWeight: 800, lineHeight: 1.3, color: '#1C1917' }}>{bundle.name}</h1>
+          {bundle.subtitle && <p style={{ margin: '0 0 14px', color: '#6A625B' }}>{bundle.subtitle}</p>}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap', background: '#F6F2EC', border: '1.5px solid #DED6CB', borderRadius: 2, padding: '0.9rem 1rem', margin: '0 0 1.5rem' }}>
+            <span  style={{ fontSize: '1.8rem', fontWeight: 800, color: '#7C441C' }}>{__bfmt(o.price, currency)}</span>
+            <span  style={{ color: '#6A625B', textDecoration: 'line-through' }}>{__bfmt(o.original, currency)}</span>
+            <span style={{ marginInlineStart: 'auto', fontSize: '0.82rem', fontWeight: 700, color: '#7C441C' }}>{bt.saved} {__bfmt(o.saving, currency)}</span>
+          </div>
+
+          <p style={cap}>{bt.inBundle}</p>
+          <div id="bundle-items" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {o.products.map((p: any) => {
+              const img = __k.bundleProductImage(p);
+              return (
+                <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '84px minmax(0, 1fr)', gap: 14, background: '#FFFDFA', border: '1.5px solid #DED6CB', borderRadius: 2, padding: 14 }}>
+                  {img ? <img loading="lazy" decoding="async" src={img} alt="" style={{ width: 84, height: 84, objectFit: 'cover', borderRadius: 8, background: '#F6F2EC', display: 'block' }} /> : <span style={{ width: 84, height: 84, borderRadius: 8, background: '#F6F2EC', display: 'block' }} />}
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600, lineHeight: 1.5, color: '#1C1917' }}>{p.name}</p>
+                    <span  style={{ display: 'inline-block', marginTop: 4, fontWeight: 800, color: '#7C441C' }}>{__bfmt(o.priceOf(p), currency)}</span>
+                    {o.attrsOf(p).map((a: any) => (
+                      <div key={a.id} style={{ marginTop: 12 }}>
+                        <p style={{ margin: '0 0 6px', fontSize: '0.74rem', fontWeight: 700, color: '#6A625B' }}>{a.name}</p>
+                        <div role="group" aria-label={`${a.name} — ${p.name}`} style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                          {a.variants.map((v: any, i: number) => {
+                            const sel = o.chosen(p, a.name) === v.value;
+                            const kind = __k.optionKind(a, v.value);
+                            if (kind === 'image') return <button key={v.id} type="button" aria-pressed={sel} aria-label={`${a.name} ${i + 1}`} onClick={() => o.pick(p.id, a.name, v.value)} style={{ width: 52, height: 52, padding: 0, overflow: 'hidden', borderRadius: 8, border: `2px solid ${sel ? '#7C441C' : '#DED6CB'}`, background: '#F6F2EC', cursor: 'pointer' }}><img src={__k.optionImage(v)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>;
+                            if (kind === 'color') return <button key={v.id} type="button" aria-pressed={sel} aria-label={v.name || v.value} title={v.name} onClick={() => o.pick(p.id, a.name, v.value)} style={{ width: 32, height: 32, borderRadius: '50%', background: v.value, border: `2px solid ${sel ? '#7C441C' : '#DED6CB'}`, outline: sel ? '2px solid #7C441C' : 'none', outlineOffset: 1, cursor: 'pointer' }} />;
+                            return <button key={v.id} type="button" aria-pressed={sel} onClick={() => o.pick(p.id, a.name, v.value)} style={{ minHeight: 40, padding: '0.45rem 0.9rem', borderRadius: 8, fontFamily: 'inherit', border: `1.5px solid ${sel ? '#7C441C' : '#DED6CB'}`, background: sel ? '#7C441C' : '#FFFDFA', color: sel ? '#fff' : '#1C1917', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', transition: 'all 0.18s' }}>{v.name || v.value}</button>;
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {o.errors.options && errLine(o.errors.options)}
+        </div>
+
+        <div className="mdb-side" style={{ minWidth: 0 }}>
+          <form id="bundle-form" onSubmit={o.submit} noValidate style={{ background: '#FFFDFA', border: '1.5px solid #DED6CB', borderTop: '3px solid #7C441C', borderRadius: 2, padding: '1.1rem' }}>
+            <p style={cap}>{L('checkoutTitle')}</p>
+            <div className="mdb-row2" style={{ marginBottom: '0.85rem' }}>
+              <div>
+                {label(L('fullName'), 'crb-name')}
+                <input id="crb-name" type="text" value={o.form.name} onChange={(e) => o.setName(e.target.value)} placeholder={L('fullNamePh','fullNamePlaceholder')} autoComplete="name" style={inp(!!o.errors.name)} />
+                {errLine(o.errors.name)}
+              </div>
+              <div>
+                {label(L('phone'), 'crb-phone')}
+                <input id="crb-phone" type="tel" inputMode="tel" dir="ltr" value={o.form.phone} onChange={(e) => o.setPhone(e.target.value)} placeholder={L('phonePh','phonePlaceholder')} autoComplete="tel" style={inp(!!o.errors.phone)} />
+                {errLine(o.errors.phone)}
+              </div>
+            </div>
+            {!o.digital && (
+              <>
+                <div className="mdb-row2" style={{ marginBottom: '0.85rem' }}>
+                  <div>
+                    {label(L('wilaya'), 'crb-wilaya')}
+                    <div style={{ position: 'relative' }}>
+                      <ChevronDown size={12} aria-hidden="true" style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', color: '#6A625B', pointerEvents: 'none' }} />
+                      <select id="crb-wilaya" value={o.form.wilaya} onChange={(e) => o.chooseWilaya(e.target.value)} style={{ ...inp(!!o.errors.wilaya), paddingInlineEnd: 36, fontFamily: 'inherit' }}>
+                        <option value="">{L('wilayaPh','wilayaPlaceholder')}</option>
+                        {o.wilayas.map((w: any) => <option key={w.id} value={w.id}>{w.code ?? w.id} - {o.placeName(w)}</option>)}
+                      </select>
+                    </div>
+                    {errLine(o.errors.wilaya)}
+                  </div>
+                  <div>
+                    {label(L('commune'), 'crb-commune')}
+                    <div style={{ position: 'relative' }}>
+                      <ChevronDown size={12} aria-hidden="true" style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', color: '#6A625B', pointerEvents: 'none' }} />
+                      <select id="crb-commune" disabled={!o.form.wilaya || o.loadingCommunes} value={o.form.commune} onChange={(e) => o.setCommune(e.target.value)} style={{ ...inp(!!o.errors.commune), paddingInlineEnd: 36, fontFamily: 'inherit', opacity: (!o.form.wilaya || o.loadingCommunes) ? 0.55 : 1 }}>
+                        <option value="">{o.loadingCommunes ? t.communeLoading : t.communePh}</option>
+                        {o.communes.map((c: any) => <option key={c.id} value={c.id}>{o.placeName(c)}</option>)}
+                      </select>
+                    </div>
+                    {errLine(o.errors.commune)}
+                  </div>
+                </div>
+                {o.form.wilaya && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <p style={{ ...cap, margin: '0 0 6px', fontSize: '0.75rem' }}>{L('delivery')}</p>
+                    <div className="mdb-ship">
+                      {(['home', 'office'] as const).map((type) => {
+                        const active = o.form.ship === type;
+                        const cost = o.shipCost(type);
+                        return (
+                          <button data-delivery-option key={type} type="button" onClick={() => o.setShip(type)} style={{ padding: '0.8rem', border: `1.5px solid ${active ? '#7C441C' : '#DED6CB'}`, borderRadius: 2, background: active ? '#F6F2EC' : '#FFFDFA', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center', transition: 'all 0.18s' }}>
+                            <p style={{ margin: 0, fontWeight: 700, fontSize: '0.85rem', color: active ? '#7C441C' : '#6A625B' }}>{type === 'home' ? t.deliveryHome : t.deliveryOffice}</p>
+                            {cost !== null && <p  style={{ margin: '4px 0 0', fontSize: '0.95rem', fontWeight: 800, color: active ? '#1C1917' : '#6A625B' }}>{__bfmt(cost, currency)}</p>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+            <div style={{ background: '#F6F2EC', border: '1.5px solid #DED6CB', borderRadius: 2, padding: '0.9rem 1rem', marginBottom: '1rem' }}>
+              <p style={{ ...cap, margin: '0 0 6px' }}>{L('orderInfo','orderSummary')}</p>
+              {row(bt.original, __bfmt(o.original, currency))}
+              {row(bt.bundlePrice, __bfmt(o.price, currency))}
+              {row(bt.saved, __bfmt(o.saving, currency))}
+              {!o.digital && row(t.delivery, o.wilaya ? __bfmt(o.ship, currency) : '—')}
+              {row(t.total, __bfmt(o.total, currency), true)}
+            </div>
+            <button type="submit" disabled={o.submitting} style={{ width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: '#7C441C', color: '#fff', fontWeight: 700, fontSize: '0.95rem', padding: '0.9rem 1.5rem', borderRadius: 2, border: 'none', cursor: 'pointer', fontFamily: 'inherit', opacity: o.submitting ? 0.7 : 1 }}>{o.submitting ? L('sending') : bt.order}</button>
+            <p style={{ margin: '10px 0 0', textAlign: 'center', fontSize: '0.74rem', color: '#6A625B' }}>{bt.cod}</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+// صفحة الطقم للمتجر
+export const Bundle = BundlePage;
 export function Home({ store, page }: any) {
   const t = withLocationLabels(T)[getLang(store)];
   const searchParams = useSearchParams();
@@ -1072,6 +1312,8 @@ export function Home({ store, page }: any) {
           </div>
         </div>
       </section>
+
+      <BundlesStrip store={store} />
 
       <section id="collection" style={{ padding: '60px 0 80px' }}>
         <div className="lx-wrap">
