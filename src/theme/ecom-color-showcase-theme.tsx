@@ -16,6 +16,7 @@ import {
   useCartStore, WhatsAppOrderButton, WhatsAppGlyph, comingSoon,
 } from '@mdstore/theme-kit';
 import { useBundleOrder, optionKind, optionImage, bundleProductImage, bundleLink, bundleStrings } from '@/components/bundles/useBundleOrder';
+import { boxLines, linesTotal, fitBoxes, piecesPerBox, valueAvailable, type Box } from '@/components/theme/orderPieces'; // منطق القطع مدمج داخل الثيم
 const __k: any = __bk;
 
 
@@ -197,6 +198,17 @@ const THEME_CSS = `
   .cs-offer.on { border-color: var(--s); }
   .cs-radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #CBD5E1; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .cs-offer.on .cs-radio { border-color: var(--ink); } .cs-offer.on .cs-radio::after { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--ink); }
+  .cs-pc { background: #fff; border: 2px solid var(--line); border-radius: 16px; padding: .9rem 1rem; margin-bottom: .75rem; }
+  .cs-pc-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .7rem; font-size: .95rem; color: var(--ink); }
+  .cs-pc-row + .cs-pc-row { border-top: 1px dashed var(--line); margin-top: .75rem; padding-top: .75rem; }
+  .cs-pc-sum { display: flex; align-items: center; gap: .45rem; flex-wrap: wrap; }
+  .cs-pc-n { width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: #fff; font-size: .75rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .cs-pc-chip { display: inline-flex; align-items: center; gap: 6px; padding: .25rem .65rem; border-radius: 999px; background: var(--soft); font-size: .8rem; font-weight: 700; color: #374151; }
+  .cs-pc-chip i { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--line); background: center/cover no-repeat; display: inline-block; }
+  .cs-pc-chip.miss { background: #FEF2F2; color: #B91C1C; }
+  .cs-pc-edit { margin-inline-start: auto; display: inline-flex; align-items: center; gap: 4px; border: 1.5px solid var(--line); background: #fff; border-radius: 10px; padding: .4rem .85rem; min-height: 36px; font-weight: 800; font-size: .8rem; cursor: pointer; color: var(--ink); font-family: inherit; }
+  .cs-pc-edit[aria-expanded="true"] { border-color: var(--ink); }
+  .cs-pc-opts { margin-top: .85rem; }
   .cs-attr-name { font-size: .8rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: .6rem; }
   .cs-var-img { width: 72px; height: 72px; border-radius: 14px; border: 2px solid var(--line); background: #fff center/contain no-repeat; cursor: pointer; }
   .cs-var-img.on { border-color: var(--ink); }
@@ -1218,7 +1230,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             </div>
           )}
 
-          {allAttrs.map((attr: any) => (
+          {!usesPieces(product) && allAttrs.map((attr: any) => (
             <div key={attr.id} style={{ marginBottom: '1.25rem' }}>
               <p className="cs-attr-name">{attr.name}{__colorName(attr, selectedVariants)}</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
@@ -1243,7 +1255,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           ))}
 
           <ProductForm product={product} userId={product.store.userId} domain={domain} store={store}
-            selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} />
+            selectedOffer={selectedOffer} setSelectedOffer={setSelectedOffer} selectedVariants={selectedVariants} onVariant={handleVariantSelection} />
           {!product.isDigital && <div className="cs-trust cs-show-m">{trust}</div>}
 
           {product.desc && (
@@ -1258,6 +1270,92 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
   );
 }
 
+/* ═══════════ PIECES — خيارات كل قطعة ═══════════ */
+const PC_T = {
+  ar: { order: 'الطلب', edit: 'تعديل', done: 'تم', missing: 'اختر كل الخيارات لكل قطعة' },
+  fr: { order: 'Commande', edit: 'Modifier', done: 'OK', missing: 'Choisissez toutes les options de chaque pièce' },
+  en: { order: 'Order', edit: 'Edit', done: 'Done', missing: 'Choose all options for each piece' },
+};
+/** المنتج بخيارات (مقاس، لون…) ← الخيارات تُختار لكل قطعة داخل بطاقات الطلب */
+const usesPieces = (product: any) => !!product?.attributes?.length;
+const pieceMissing = (product: any, boxes: Box[]) => boxes.some((b) => b.some((pc) => (product?.attributes || []).some((a: any) => !pc.variants[a.name])));
+
+function PiecesPicker({ product, store, offer, boxes, onChange, onVariant, missing }: { product: any; store: any; offer?: any; boxes: Box[]; onChange: (b: Box[]) => void; onVariant?: (n: string, v: string) => void; missing?: boolean }) {
+  const s = (PC_T as any)[getLang(store)] || PC_T.ar;
+  const attrs: any[] = product?.attributes || [];
+  const count = boxes.reduce((n, b) => n + b.length, 0);
+  const [open, setOpen] = useState('0-0');
+  if (!attrs.length || !boxes.length) return null;
+  const pick = (bi: number, pi: number, name: string, value: string) => {
+    onChange(boxes.map((b, i) => (i !== bi ? b : b.map((pc, j) => (j !== pi ? pc : { ...pc, variants: { ...pc.variants, [name]: value } })))));
+    onVariant?.(name, value);
+  };
+  return (
+    <div style={{ marginBottom: '1rem' }}>
+      {boxes.map((box, bi) => (
+        <div key={bi} className="cs-pc">
+          {(boxes.length > 1 || offer) && (
+            <div className="cs-pc-head">
+              <b>{s.order}{boxes.length > 1 ? ` ${bi + 1}` : ''}</b>
+              {offer && <span className="cs-offer-tag">{offer.name}</span>}
+            </div>
+          )}
+          {box.map((pc, pi) => {
+            const k = `${bi}-${pi}`;
+            const isOpen = count === 1 || open === k;
+            return (
+              <div key={pi} className="cs-pc-row">
+                {count > 1 && (
+                  <div className="cs-pc-sum">
+                    {box.length > 1 && <span className="cs-pc-n">{pi + 1}</span>}
+                    {attrs.map((a: any) => {
+                      const v = a.variants.find((x: any) => x.value === pc.variants[a.name]);
+                      if (!v) return <span key={a.id} className={`cs-pc-chip ${missing ? 'miss' : ''}`}>{a.name}: —</span>;
+                      const isImg = /^https?:\/\/|^\//.test(v.value);
+                      if (a.displayMode === 'color' || a.displayMode === 'image') return <span key={a.id} className="cs-pc-chip"><i style={{ background: isImg ? `url(${v.value}) center/cover` : v.value }} />{v.name && v.name !== v.value ? v.name : ''}</span>;
+                      return <span key={a.id} className="cs-pc-chip">{v.name || v.value}</span>;
+                    })}
+                    <button type="button" className="cs-pc-edit" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? '' : k)}>
+                      {isOpen ? s.done : s.edit}<ChevronDown size={14} aria-hidden="true" style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
+                    </button>
+                  </div>
+                )}
+                {isOpen && (
+                  <div className={count > 1 ? 'cs-pc-opts' : ''}>
+                    {attrs.map((attr: any) => (
+                      <div key={attr.id} style={{ marginBottom: '1rem' }}>
+                        <p className="cs-attr-name">{attr.name}{__colorName(attr, pc.variants)}</p>
+                        <div role="group" aria-label={attr.name} style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                          {attr.variants.map((v: any) => {
+                            const on = pc.variants[attr.name] === v.value;
+                            const isImgUrl = /^https?:\/\/|^\//.test(v.value);
+                            const available = valueAvailable(product, pc.variants, attr.name, v.value);
+                            const cls = attr.displayMode === 'color' ? 'cs-var-color' : attr.displayMode === 'image' ? 'cs-var-img' : 'cs-var-text';
+                            const style = attr.displayMode === 'color' ? { background: isImgUrl ? `url(${v.value}) center/cover` : v.value }
+                              : attr.displayMode === 'image' ? { backgroundImage: `url(${v.value})` } : undefined;
+                            return (
+                              <button key={v.id} type="button" title={v.name} aria-label={v.name || v.value} aria-pressed={on}
+                                className={`${cls} ${on ? 'on' : ''} ${available ? '' : 'cs-var-off'}`} style={style}
+                                onClick={() => available && pick(bi, pi, attr.name, v.value)}>
+                                {attr.displayMode !== 'color' && attr.displayMode !== 'image' && v.name}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ))}
+      {missing && <p className="cs-err"><AlertCircle size={13} />{s.missing}</p>}
+    </div>
+  );
+}
+
 /* ═══════════ PRODUCT FORM ═══════════ */
 const FR = ({ error, label, children }: { error?: string; label?: string; children: React.ReactNode }) => (
   <div>
@@ -1267,7 +1365,10 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
   </div>
 );
 
-export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store }: ProductFormProps) {
+export function ProductForm({ product, userId, domain, selectedOffer, setSelectedOffer, selectedVariants, platform, store, onVariant }: ProductFormProps & { onVariant?: (n: string, v: string) => void }) {
+  // بطاقة لكل وحدة من الكمية، وفي كل بطاقة قطع العرض بخياراتها
+  const [boxes, setBoxes] = useState<Box[]>([]);
+  const [pcMissing, setPcMissing] = useState(false);
   const lang = getLang(store || product?.store);
   const t = T[lang];
   const router = useRouter();
@@ -1324,15 +1425,33 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       return changed ? next : q;
     });
   }, [pieces, product]);
+  const usePieces = usesPieces(product) && !product.isDigital;
+  const per = piecesPerBox(product as any, selectedOffer);
+  useEffect(() => {
+    setBoxes((prev) => fitBoxes(prev, qty, per, { variants: { ...(selectedVariants || {}) }, addonIds: [] }));
+  }, [qty, per]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (pcMissing && !pieceMissing(product, boxes)) setPcMissing(false); }, [boxes]); // eslint-disable-line react-hooks/exhaustive-deps
+  // سطور الطلب: القطع المتطابقة في سطر واحد بكميتها
+  const lines = usePieces && boxes.length ? boxLines(product as any, selectedOffer, boxes, () => 0) : null;
+  const itemsSub = lines ? linesTotal(lines) : fp * qty;
+  // الإضافات (كمية مستقلة) تُوزّع على السطور حسب حد كل سطر
+  const spreadAddons = (ls: { quantity: number }[]) => {
+    const out: AddonQty[] = ls.map(() => ({}));
+    for (const a of addonList(product)) {
+      let n = addonQty[a.id] || 0;
+      ls.forEach((l, i) => { const take = Math.min(n, addonMax(a, l.quantity)); if (take > 0) { out[i][a.id] = take; n -= take; } });
+    }
+    return out;
+  };
   const extra = addonExtra(product, addonQty);
   const storeInfo = store || product.store;
   const orderFreeShipping = !!(product.shippingFree || selOfferObj?.shippingFree ||
-    (storeInfo?.supportFreeShipping && storeInfo?.freeShippingMinAmount != null && (fp * qty + extra) >= Number(storeInfo.freeShippingMinAmount)));
+    (storeInfo?.supportFreeShipping && storeInfo?.freeShippingMinAmount != null && (itemsSub + extra) >= Number(storeInfo.freeShippingMinAmount)));
   const getLiv = useCallback((): number => {
     if (product.isDigital || orderFreeShipping || !selW) return 0;
     return Number(fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice);
   }, [selW, fd.typeLivraison, orderFreeShipping, product.isDigital]);
-  const total = () => fp * qty + extra + +getLiv();
+  const total = () => itemsSub + extra + +getLiv();
   const validate = () => {
     const e: Record<string, string> = {};
     if (!fd.customerName.trim()) e.customerName = t.errName;
@@ -1352,8 +1471,20 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   }, [product.variantDetails, selectedVariants]);
 
   const addToCart = () => {
+    if (lines && pieceMissing(product, boxes)) { setPcMissing(true); return; }
     setIsAdded(true);
     const cart = JSON.parse(localStorage.getItem(domain) || '[]');
+    if (lines) {
+      const aq = spreadAddons(lines);
+      lines.forEach((l, i) => {
+        const has = Object.keys(aq[i]).length > 0;
+        cart.push({ ...fd, quantity: l.quantity, product, variantDetailId: l.variantDetailId, productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants: l.selectedVariants, ...(has ? { addonQty: aq[i], addonsExtra: addonExtra(product, aq[i]) } : {}), platform: platform || 'store', finalPrice: l.finalPrice, totalPrice: l.finalPrice * l.quantity, priceLivraison: getLiv(), addedAt: Date.now() });
+      });
+      localStorage.setItem(domain, JSON.stringify(cart));
+      initCount(cart.length);
+      setTimeout(() => setIsAdded(false), 2000);
+      return;
+    }
     cart.push({ ...fd, quantity: qty, product, variantDetailId: getVarId(), productId: product.id, storeId: product.store.id, userId, selectedOffer, selectedVariants, addonQty, addonsExtra: extra, platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv(), addedAt: Date.now() });
     localStorage.setItem(domain, JSON.stringify(cart));
     initCount(cart.length);
@@ -1363,13 +1494,17 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const er = validate(); if (Object.keys(er).length) { setErrors(er); return; }
+    if (lines && pieceMissing(product, boxes)) { setPcMissing(true); return; }
     setErrors({}); setSub(true); setSubmitError(null);
     try {
       const { customerWelaya, customerCommune, typeLivraison, priceLoss, customerEmail, customerWhatsapp, ...rest } = fd;
       const payload = product.isDigital
         ? { ...rest, ...({ ...(String(customerEmail ?? '').trim() ? { customerEmail } : {}), ...(String(customerWhatsapp ?? '').trim() ? { customerWhatsapp } : {}) }) }
         : { ...rest, customerWelaya, customerCommune, typeLivraison, priceLoss };
-      await axios.post(`${API_URL}/orders/create`, { ...payload, ...(Object.keys(addonQty).length ? { addonQty } : {}), quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
+      const aq = lines ? spreadAddons(lines) : [];
+      // القطع: سطر لكل مجموعة متطابقة (كطلب السلة)، وإلا الطلب الواحد كما كان
+      if (lines) await axios.post(`${API_URL}/orders/create`, lines.map((l, i) => ({ ...payload, ...(Object.keys(aq[i]).length ? { addonQty: aq[i] } : {}), quantity: l.quantity, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: l.variantDetailId, selectedVariants: l.selectedVariants, platform: platform || 'store', finalPrice: l.finalPrice, totalPrice: l.finalPrice * l.quantity, priceLivraison: getLiv() })));
+      else await axios.post(`${API_URL}/orders/create`, { ...payload, ...(Object.keys(addonQty).length ? { addonQty } : {}), quantity: qty, productId: product.id, storeId: product.store.id, userId, selectedOffer, variantDetailId: getVarId(), platform: platform || 'store', finalPrice: fp, totalPrice: total(), priceLivraison: getLiv() });
       if (fd.customerId) localStorage.setItem('customerId', fd.customerId);
       router.push(`${window.location.origin}/successfully?productId=${product.id}`);
     } catch { setSubmitError(t.errSubmit); } finally { setSub(false); }
@@ -1379,6 +1514,17 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
   return (
     <div style={{ marginTop: '1.25rem' }}>
+      {usePieces && supportQty && (
+        <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <label className="cs-label" style={{ margin: 0 }}>{t.qty}</label>
+          <div className="cs-qty">
+            <button type="button" aria-label="-" onClick={() => setFd((p) => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}><Minus size={16} /></button>
+            <span>{fd.quantity}</span>
+            <button type="button" aria-label="+" onClick={() => setFd((p) => ({ ...p, quantity: p.quantity + 1 }))}><Plus size={16} /></button>
+          </div>
+        </div>
+      )}
+      {usePieces && <PiecesPicker product={product} store={store || product.store} offer={selOfferObj} boxes={boxes} onChange={setBoxes} onVariant={onVariant} missing={pcMissing} />}
       <AddonsPicker product={product} store={store || product.store} value={addonQty} onChange={setAddonQty} pieces={pieces} />
       {product.store.cart && !product.isDigital && !isOrderNow && (
         <div className="cs-two">
@@ -1457,7 +1603,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               </>
             )}
 
-            {supportQty && !product.isDigital && (
+            {supportQty && !product.isDigital && !usePieces && (
               <div style={{ marginBottom: '.5rem' }}>
                 <label className="cs-label">{t.qty}</label>
                 <div className="cs-qty">
@@ -1472,7 +1618,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <div className="cs-sum">
               <div><span><Package size={14} />{t.product}</span><b title={product.name}>{clip(product.name, 32)}</b></div>
               {selOfferObj && <div><span><Tag size={14} />{t.selectedOffer}</span><span className="cs-offer-tag">{selOfferObj.name}</span></div>}
-              <div><span>{t.price}</span><b>{money(fp)} {cur}{qty > 1 ? ` × ${qty}` : ''}</b></div>
+              <div><span>{t.price}</span><b>{lines ? `${money(itemsSub)} ${cur}` : <>{money(fp)} {cur}{qty > 1 ? ` × ${qty}` : ''}</>}</b></div>
               {addonLines(product, addonQty).map(({ a, n }) => (
                 <div key={a.id}><span><Plus size={13} />{a.name}{n > 1 ? ` ×${n}` : ''}</span><b>{Number(a.price) ? `${money(Number(a.price) * n)} ${cur}` : t.free}</b></div>
               ))}
