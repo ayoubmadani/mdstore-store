@@ -14,6 +14,7 @@
 
 // دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
 import * as __kit from '@mdstore/theme-kit';
+import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -43,6 +44,7 @@ const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.wi
 /* ------------------------------------------------------------------ config */
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
+const __k: any = __bk;
 
 const INK = '#12171C';
 const A = '#FF7A00';
@@ -605,6 +607,27 @@ const THEME_CSS = `
 .ae-qty button:hover:not(:disabled) { background: ${BD}; }
 .ae-qty span { min-width: 54px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
 
+/* ---------- bundles (الأطقم) ---------- */
+.ae-bnd-track { max-width: 1280px; margin: 0 auto; display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 1.25rem; padding: 0 1.25rem 0.5rem; scrollbar-width: none; }
+.ae-bnd-track::-webkit-scrollbar { display: none; }
+@media (min-width: 768px) { .ae-bnd-track { padding: 0 1.5rem 0.5rem; scroll-padding-inline: 1.5rem; } }
+.ae-bnd-track .ae-card { scroll-snap-align: start; flex: 0 0 min(86%, 380px); height: auto; animation: none; }
+.ae-bnd-track.one .ae-card { flex-basis: min(100%, 560px); }
+.ae-bnd-img { position: relative; display: block; aspect-ratio: 16 / 8; overflow: hidden; background: ${SURF}; }
+.ae-bnd-img img, .ae-bnd-img picture { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ae-bnd-items { list-style: none; display: flex; align-items: flex-start; gap: 4px; margin: 0; padding: 10px 6px; background: ${SURF}; border: 1px solid ${BD}; border-radius: 2px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
+.ae-bnd-items::-webkit-scrollbar { display: none; }
+.ae-bnd-items li { display: contents; }
+.ae-hazard { height: 6px; background: repeating-linear-gradient(-45deg, ${A} 0 10px, ${INK} 10px 20px); }
+.ae-bnd-split { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.75rem; padding-top: 1.5rem; padding-bottom: 4rem; }
+@media (min-width: 900px) {
+  .ae-bnd-top { padding-top: 1.5rem; }
+  .ae-bnd-hero { border: 1px solid ${BD}; border-radius: 2px; }
+  .ae-bnd-split { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 2.5rem; padding-top: 2rem; padding-bottom: 5rem; }
+  .ae-bnd-side { position: sticky; top: 84px; align-self: start; }
+}
+@media (max-width: 899px) { .ae-container.ae-bnd-top { padding: 0; } }
+
 /* ---------- misc ---------- */
 .ae-badge-sale {
   position: absolute; top: 8px; inset-inline-start: 8px; z-index: 2;
@@ -1085,6 +1108,227 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
   );
 }
 
+/* ------------------------------------------------ Bundles — عروض الأطقم --- */
+
+function BundlesStrip({ store }: any) {
+  const sc = __k.useBundleScroll ? __k.useBundleScroll() : null; // أسهم التمرير
+  const list: any[] = store?.bundles || [];
+  if (!list.length) return null;
+  const currency = store?.currency || 'DZD';
+  const bt = __k.bundleStrings(getLang(store));
+  const title = store?.design?.bundlesTitle;
+  const heading = title === null || title === undefined ? bt.title : String(title).trim();
+  const arrow = (d: boolean): React.CSSProperties => ({ width: 40, height: 40, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 2, border: `1px solid ${d ? BD : INK}`, background: d ? '#fff' : INK, color: d ? BD : A, cursor: d ? 'default' : 'pointer', padding: 0, transition: 'all 0.18s ease' });
+  return (
+    <section data-mds-bundles="" aria-label={heading || bt.title} style={{ padding: '2.25rem 0 0' }}>
+      <div className="ae-container" style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: '1.1rem' }}>
+        {heading && <h2 style={{ margin: 0, fontSize: 'clamp(1.15rem, 3vw, 1.55rem)' }}>{heading}</h2>}
+        <div style={{ flex: 1, height: 1, background: BD }} />
+        {sc?.show && (
+          <div style={{ display: 'flex', gap: 6 }}>
+            {[{ d: sc.atStart, on: sc.prev, label: sc.labels.prev, left: sc.prevLeft }, { d: sc.atEnd, on: sc.next, label: sc.labels.next, left: !sc.prevLeft }].map((a, i) => (
+              <button key={i} type="button" aria-label={a.label} disabled={a.d} onClick={a.on} style={arrow(a.d)}>
+                {a.left ? <ChevronLeft size={18} strokeWidth={2.4} aria-hidden="true" /> : <ChevronRight size={18} strokeWidth={2.4} aria-hidden="true" />}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <div ref={sc?.ref} data-bundle-track="" className={`ae-bnd-track ${list.length === 1 ? 'one' : ''}`}>
+        {list.map((b) => (
+          <article key={b.id} className="ae-card">
+            <div className="ae-card-eyebrow">
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><Wrench size={12} color={A} aria-hidden="true" /> {bt.inBundle}</span>
+              <span className="ae-num" style={{ color: INK }}><bdi dir="ltr">×{b.items.length}</bdi></span>
+            </div>
+            <a {...__k.bundleLink(b.slug)} className="ae-bnd-img" aria-label={b.name}>
+              {(b.imageUrl || b.mobileImageUrl) && (
+                <picture>
+                  {b.mobileImageUrl && <source media="(max-width: 640px)" srcSet={b.mobileImageUrl} />}
+                  <img loading="lazy" decoding="async" src={b.imageUrl || b.mobileImageUrl} alt="" />
+                </picture>
+              )}
+              <span className="ae-badge-sale ae-num"><bdi dir="ltr">-{b.discountPercent}%</bdi></span>
+            </a>
+            <div className="ae-hazard" aria-hidden="true" />
+            <div className="ae-card-body">
+              <div>
+                <p style={{ margin: 0, fontSize: '0.98rem', fontWeight: 700, lineHeight: 1.45 }}>{b.name}</p>
+                {b.subtitle && <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: SUB }}>{b.subtitle}</p>}
+              </div>
+              <ul className="ae-bnd-items">
+                {b.items.map((it: any, i: number) => (
+                  <li key={it.productId}>
+                    {i > 0 && <span aria-hidden="true" style={{ color: A, fontWeight: 900, paddingTop: 14 }}>+</span>}
+                    <span style={{ flex: '1 0 76px', minWidth: 76, scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
+                      {it.imageUrl ? <img loading="lazy" decoding="async" src={it.imageUrl} alt="" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 2, background: '#fff', border: `1px solid ${BD}`, display: 'block' }} /> : <span style={{ width: 50, height: 50, borderRadius: 2, background: '#fff', border: `1px solid ${BD}`, display: 'block' }} />}
+                      <span style={{ fontSize: '0.68rem', color: SUB, lineHeight: 1.35, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{it.name}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+                <span className="ae-num" style={{ fontSize: '1.1rem', fontWeight: 800, color: INK, whiteSpace: 'nowrap' }}>{fmt(b.price, currency)}</span>
+                <span className="ae-num" style={{ fontSize: '0.78rem', color: SUB, textDecoration: 'line-through', whiteSpace: 'nowrap' }}>{fmt(b.original, currency)}</span>
+                <span className="ae-badge-free" style={{ marginInlineStart: 'auto' }}>{bt.save} <span className="ae-num">{fmt(b.saving, currency)}</span></span>
+              </div>
+              <a {...__k.bundleLink(b.slug)} className="ae-btn ae-btn-accent" style={{ width: '100%', marginTop: 'auto' }}>{bt.order}</a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function BundlePage({ store, bundle, domain }: any) {
+  const t = withLocationLabels(T)[getLang(store)];
+  const currency = store?.currency || 'DZD';
+  const o = __k.useBundleOrder({ bundle, store, domain, validPhone: isValidDzPhone });
+  const bt = o.t;
+  const banner = bundle.imageUrl || bundle.mobileImageUrl;
+  const label = (txt: string, id: string) => <label htmlFor={id} style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, marginBottom: 6, color: TXT }}>{txt}</label>;
+  const errLine = (msg?: string) => (msg ? <p style={{ display: 'flex', alignItems: 'center', gap: 5, margin: '6px 0 0', fontSize: '0.74rem', color: ERR }}><AlertCircle size={12} aria-hidden="true" /> {msg}</p> : null);
+  const cap: React.CSSProperties = { margin: '0 0 12px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: SUB };
+  return (
+    <div dir={t.dir}>
+      {banner && (
+        <div className="ae-container ae-bnd-top">
+          <div className="ae-bnd-hero" style={{ position: 'relative', overflow: 'hidden', background: SURF }}>
+            <picture>
+              {bundle.mobileImageUrl && <source media="(max-width: 640px)" srcSet={bundle.mobileImageUrl} />}
+              <img fetchPriority="high" decoding="async" src={banner} alt={bundle.name} style={{ display: 'block', width: '100%', height: 'clamp(200px, 40vw, 460px)', objectFit: 'cover' }} />
+            </picture>
+            <span className="ae-badge-sale ae-num" style={{ top: 14, insetInlineStart: 14, fontSize: '0.82rem', padding: '5px 10px' }}><bdi dir="ltr">-{bundle.discountPercent}%</bdi></span>
+            <div className="ae-hazard" aria-hidden="true" style={{ position: 'absolute', insetInline: 0, bottom: 0 }} />
+          </div>
+        </div>
+      )}
+
+      <div className="ae-container ae-bnd-split">
+        {/* المنتجات */}
+        <div style={{ minWidth: 0 }}>
+          <span className="ae-badge-free" style={{ marginBottom: 10 }}><Wrench size={12} aria-hidden="true" /> {bt.inBundle} · <span className="ae-num"><bdi dir="ltr">×{o.products.length}</bdi></span></span>
+          <h1 style={{ margin: '0 0 6px', fontSize: 'clamp(1.5rem, 4vw, 2.3rem)', lineHeight: 1.3 }}>{bundle.name}</h1>
+          {bundle.subtitle && <p style={{ margin: '0 0 14px', color: SUB }}>{bundle.subtitle}</p>}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap', background: SURF, border: `1px solid ${BD}`, borderInlineStart: `4px solid ${A}`, padding: '0.9rem 1rem', margin: '0 0 1.5rem' }}>
+            <span className="ae-num" style={{ fontSize: '1.8rem', fontWeight: 800, color: INK }}>{fmt(o.price, currency)}</span>
+            <span className="ae-num" style={{ color: SUB, textDecoration: 'line-through' }}>{fmt(o.original, currency)}</span>
+            <span style={{ marginInlineStart: 'auto', fontSize: '0.82rem', fontWeight: 700, color: AD }}>{bt.saved} <span className="ae-num">{fmt(o.saving, currency)}</span></span>
+          </div>
+
+          <p style={cap}>{bt.inBundle}</p>
+          <div id="bundle-items" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {o.products.map((p: any) => {
+              const img = __k.bundleProductImage(p);
+              return (
+                <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '84px minmax(0, 1fr)', gap: 14, background: '#fff', border: `1px solid ${BD}`, borderRadius: 2, padding: 14 }}>
+                  {img ? <img loading="lazy" decoding="async" src={img} alt="" style={{ width: 84, height: 84, objectFit: 'cover', borderRadius: 2, background: SURF, display: 'block' }} /> : <span style={{ width: 84, height: 84, borderRadius: 2, background: SURF, display: 'block' }} />}
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600, lineHeight: 1.5 }}>{p.name}</p>
+                    <span className="ae-num" style={{ display: 'inline-block', marginTop: 4, fontWeight: 800, color: INK }}>{fmt(o.priceOf(p), currency)}</span>
+                    {o.attrsOf(p).map((a: any) => (
+                      <div key={a.id} style={{ marginTop: 12 }}>
+                        <p style={{ margin: '0 0 6px', fontSize: '0.74rem', fontWeight: 700, color: SUB }}>{a.name}</p>
+                        <div role="group" aria-label={`${a.name} — ${p.name}`} style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                          {a.variants.map((v: any, i: number) => {
+                            const sel = o.chosen(p, a.name) === v.value;
+                            const kind = __k.optionKind(a, v.value);
+                            if (kind === 'image') return <button key={v.id} type="button" aria-pressed={sel} aria-label={`${a.name} ${i + 1}`} onClick={() => o.pick(p.id, a.name, v.value)} style={{ width: 52, height: 52, padding: 0, overflow: 'hidden', borderRadius: 2, border: `2px solid ${sel ? A : BD}`, background: SURF, cursor: 'pointer' }}><img src={__k.optionImage(v)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>;
+                            if (kind === 'color') return <button key={v.id} type="button" aria-pressed={sel} aria-label={v.name || v.value} title={v.name} onClick={() => o.pick(p.id, a.name, v.value)} style={{ width: 32, height: 32, borderRadius: 2, background: v.value, border: `2px solid ${sel ? A : BD}`, outline: sel ? `2px solid ${INK}` : 'none', outlineOffset: 1, cursor: 'pointer' }} />;
+                            return <button key={v.id} type="button" aria-pressed={sel} onClick={() => o.pick(p.id, a.name, v.value)} style={{ minHeight: 40, padding: '0.45rem 0.9rem', borderRadius: 2, fontFamily: 'inherit', border: `1px solid ${sel ? INK : BD}`, background: sel ? INK : '#fff', color: sel ? '#fff' : TXT, fontWeight: 700, fontSize: '0.82rem', letterSpacing: sel ? '0.04em' : 0, cursor: 'pointer', transition: 'all 0.18s ease' }}>{v.name || v.value}</button>;
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {o.errors.options && errLine(o.errors.options)}
+        </div>
+
+        {/* الطلب */}
+        <div className="ae-bnd-side" style={{ minWidth: 0 }}>
+          <form id="bundle-form" onSubmit={o.submit} noValidate style={{ background: '#fff', border: `1px solid ${BD}`, borderTop: `3px solid ${INK}`, borderRadius: 2, padding: '1.1rem' }}>
+            <p style={cap}>{t.checkoutTitle}</p>
+            <div className="ae-form-2" style={{ marginBottom: '0.85rem' }}>
+              <div>
+                {label(t.fullName, 'aeb-name')}
+                <input id="aeb-name" className={`ae-input${o.errors.name ? ' ae-err' : ''}`} value={o.form.name} onChange={(e) => o.setName(e.target.value)} placeholder={t.fullNamePlaceholder} autoComplete="name" dir={t.dir} />
+                {errLine(o.errors.name)}
+              </div>
+              <div>
+                {label(t.phone, 'aeb-phone')}
+                <input id="aeb-phone" className={`ae-input ae-num${o.errors.phone ? ' ae-err' : ''}`} value={o.form.phone} onChange={(e) => o.setPhone(e.target.value)} placeholder={t.phonePlaceholder} type="tel" inputMode="tel" autoComplete="tel" dir="ltr" />
+                {errLine(o.errors.phone)}
+              </div>
+            </div>
+            {!o.digital && (
+              <>
+                <div className="ae-form-2" style={{ marginBottom: '0.85rem' }}>
+                  <div>
+                    {label(t.wilaya, 'aeb-wilaya')}
+                    <div style={{ position: 'relative' }}>
+                      <ChevronDown size={14} color={SUB} aria-hidden="true" style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                      <select id="aeb-wilaya" className={`ae-select${o.errors.wilaya ? ' ae-err' : ''}`} value={o.form.wilaya} onChange={(e) => o.chooseWilaya(e.target.value)} style={{ paddingInlineEnd: 36 }}>
+                        <option value="">{o.wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
+                        {o.wilayas.map((w: any) => <option key={w.id} value={w.id}>{w.code ?? w.id} - {o.placeName(w)}</option>)}
+                      </select>
+                    </div>
+                    {errLine(o.errors.wilaya)}
+                  </div>
+                  <div>
+                    {label(t.commune, 'aeb-commune')}
+                    <div style={{ position: 'relative' }}>
+                      <ChevronDown size={14} color={SUB} aria-hidden="true" style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                      <select id="aeb-commune" className={`ae-select${o.errors.commune ? ' ae-err' : ''}`} disabled={!o.form.wilaya || o.loadingCommunes} value={o.form.commune} onChange={(e) => o.setCommune(e.target.value)} style={{ paddingInlineEnd: 36 }}>
+                        <option value="">{o.loadingCommunes ? t.communeLoading : t.communePlaceholder}</option>
+                        {o.communes.map((c: any) => <option key={c.id} value={c.id}>{o.placeName(c)}</option>)}
+                      </select>
+                    </div>
+                    {errLine(o.errors.commune)}
+                  </div>
+                </div>
+                {o.form.wilaya && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <p style={{ margin: '0 0 6px', fontSize: '0.78rem', fontWeight: 700, color: TXT }}>{t.deliveryType}</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 8 }}>
+                      {(['home', 'office'] as const).map((type) => {
+                        const active = o.form.ship === type;
+                        const cost = o.shipCost(type);
+                        return (
+                          <button data-delivery-option key={type} type="button" onClick={() => o.setShip(type)} style={{ minHeight: 52, padding: '0.6rem', cursor: 'pointer', borderRadius: 2, fontFamily: 'inherit', border: `2px solid ${active ? A : BD}`, background: active ? AL : '#fff', color: active ? AD : SUB, fontWeight: 700, fontSize: '0.82rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, transition: 'all 0.18s ease' }}>
+                            <span>{type === 'home' ? t.deliveryHome : t.deliveryOffice}</span>
+                            {cost !== null && <span className="ae-num" style={{ fontSize: '0.72rem', fontWeight: 600 }}>{fmt(cost, currency)}</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+            <div style={{ background: SURF, border: `1px solid ${BD}`, padding: '0.9rem 1rem', marginBottom: '1rem' }}>
+              <p style={{ ...cap, margin: '0 0 4px', letterSpacing: '0.12em' }}>{t.orderSummary}</p>
+              <div className="ae-summary-row"><span>{bt.original}</span><span className="ae-num">{fmt(o.original, currency)}</span></div>
+              <div className="ae-summary-row"><span>{bt.bundlePrice}</span><span className="ae-num">{fmt(o.price, currency)}</span></div>
+              <div className="ae-summary-row"><span>{bt.saved}</span><span className="ae-num" style={{ color: AD }}>{fmt(o.saving, currency)}</span></div>
+              {!o.digital && <div className="ae-summary-row" style={{ borderBottom: `1px solid ${BD}` }}><span>{t.delivery}</span><span className="ae-num">{o.wilaya ? fmt(o.ship, currency) : '—'}</span></div>}
+              <div className="ae-summary-row" style={{ fontSize: '1rem' }}><span style={{ color: TXT, fontWeight: 700 }}>{t.total}</span><span className="ae-num" style={{ fontWeight: 800, color: INK }}>{fmt(o.total, currency)}</span></div>
+            </div>
+            <button type="submit" className="ae-btn ae-btn-accent" disabled={o.submitting} style={{ width: '100%' }}>{o.submitting ? t.sending : bt.order}</button>
+            <p style={{ margin: '10px 0 0', textAlign: 'center', fontSize: '0.74rem', color: SUB }}>{bt.cod}</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+// صفحة الطقم للمتجر
+export const Bundle = BundlePage;
+
 /* ---------------------------------------------------------------- Home --- */
 
 export function Home({ store, page }: any) {
@@ -1176,6 +1420,9 @@ export function Home({ store, page }: any) {
           })}
         </div>
       </section>
+
+      {/* BUNDLES (عروض الأطقم) */}
+      <BundlesStrip store={store} />
 
       {cats.length > 0 ? (
         <section className="ae-container" style={{ padding: '2.25rem 1.25rem 0' }}>
