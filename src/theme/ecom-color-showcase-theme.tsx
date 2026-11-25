@@ -16,7 +16,7 @@ import {
   useCartStore, WhatsAppOrderButton, WhatsAppGlyph, comingSoon,
 } from '@mdstore/theme-kit';
 import { useBundleOrder, optionKind, optionImage, bundleProductImage, bundleLink, bundleStrings } from '@/components/bundles/useBundleOrder';
-import { boxLines, linesTotal, fitBoxes, piecesPerBox, valueAvailable, type Box } from '@/components/theme/orderPieces'; // منطق القطع مدمج داخل الثيم
+import { boxLines, linesTotal, fitBoxes, piecesPerBox, valueAvailable, pieceVariantId, type Box } from '@/components/theme/orderPieces'; // منطق القطع مدمج داخل الثيم
 const __k: any = __bk;
 
 
@@ -1272,13 +1272,49 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 
 /* ═══════════ PIECES — خيارات كل قطعة ═══════════ */
 const PC_T = {
-  ar: { order: 'الطلب', edit: 'تعديل', done: 'تم', missing: 'اختر كل الخيارات لكل قطعة' },
-  fr: { order: 'Commande', edit: 'Modifier', done: 'OK', missing: 'Choisissez toutes les options de chaque pièce' },
-  en: { order: 'Order', edit: 'Edit', done: 'Done', missing: 'Choose all options for each piece' },
+  ar: { order: 'الطلب', edit: 'تعديل', done: 'تم', missing: 'اختر كل الخيارات لكل قطعة', copy: 'نسخة بخيارات أخرى' },
+  fr: { order: 'Commande', edit: 'Modifier', done: 'OK', missing: 'Choisissez toutes les options de chaque pièce', copy: 'Dupliquer (autres options)' },
+  en: { order: 'Order', edit: 'Edit', done: 'Done', missing: 'Choose all options for each piece', copy: 'Duplicate (other options)' },
 };
 /** المنتج بخيارات (مقاس، لون…) ← الخيارات تُختار لكل قطعة داخل بطاقات الطلب */
 const usesPieces = (product: any) => !!product?.attributes?.length;
 const pieceMissing = (product: any, boxes: Box[]) => boxes.some((b) => b.some((pc) => (product?.attributes || []).some((a: any) => !pc.variants[a.name])));
+
+/** ملخص خيارات قطعة: لون/صورة كنقطة، والنص كما هو */
+function PieceChips({ product, variants, missing }: { product: any; variants: Record<string, string>; missing?: boolean }) {
+  return <>{(product?.attributes || []).map((a: any) => {
+    const v = a.variants.find((x: any) => x.value === variants?.[a.name]);
+    if (!v) return <span key={a.id} className={`cs-pc-chip ${missing ? 'miss' : ''}`}>{a.name}: —</span>;
+    const isImg = /^https?:\/\/|^\//.test(v.value);
+    if (a.displayMode === 'color' || a.displayMode === 'image') return <span key={a.id} className="cs-pc-chip"><i style={{ background: isImg ? `url(${v.value}) center/cover` : v.value }} />{v.name && v.name !== v.value ? v.name : ''}</span>;
+    return <span key={a.id} className="cs-pc-chip">{v.name || v.value}</span>;
+  })}</>;
+}
+/** أزرار خيارات قطعة واحدة بأسلوب الثيم */
+function PieceOptions({ product, variants, onPick }: { product: any; variants: Record<string, string>; onPick: (name: string, value: string) => void }) {
+  return <>{(product?.attributes || []).map((attr: any) => (
+    <div key={attr.id} style={{ marginBottom: '1rem' }}>
+      <p className="cs-attr-name">{attr.name}{__colorName(attr, variants)}</p>
+      <div role="group" aria-label={attr.name} style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+        {attr.variants.map((v: any) => {
+          const on = variants?.[attr.name] === v.value;
+          const isImgUrl = /^https?:\/\/|^\//.test(v.value);
+          const available = valueAvailable(product, variants || {}, attr.name, v.value);
+          const cls = attr.displayMode === 'color' ? 'cs-var-color' : attr.displayMode === 'image' ? 'cs-var-img' : 'cs-var-text';
+          const style = attr.displayMode === 'color' ? { background: isImgUrl ? `url(${v.value}) center/cover` : v.value }
+            : attr.displayMode === 'image' ? { backgroundImage: `url(${v.value})` } : undefined;
+          return (
+            <button key={v.id} type="button" title={v.name} aria-label={v.name || v.value} aria-pressed={on}
+              className={`${cls} ${on ? 'on' : ''} ${available ? '' : 'cs-var-off'}`} style={style}
+              onClick={() => available && onPick(attr.name, v.value)}>
+              {attr.displayMode !== 'color' && attr.displayMode !== 'image' && v.name}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  ))}</>;
+}
 
 function PiecesPicker({ product, store, offer, boxes, onChange, onVariant, missing }: { product: any; store: any; offer?: any; boxes: Box[]; onChange: (b: Box[]) => void; onVariant?: (n: string, v: string) => void; missing?: boolean }) {
   const s = (PC_T as any)[getLang(store)] || PC_T.ar;
@@ -1308,13 +1344,7 @@ function PiecesPicker({ product, store, offer, boxes, onChange, onVariant, missi
                 {count > 1 && (
                   <div className="cs-pc-sum">
                     {box.length > 1 && <span className="cs-pc-n">{pi + 1}</span>}
-                    {attrs.map((a: any) => {
-                      const v = a.variants.find((x: any) => x.value === pc.variants[a.name]);
-                      if (!v) return <span key={a.id} className={`cs-pc-chip ${missing ? 'miss' : ''}`}>{a.name}: —</span>;
-                      const isImg = /^https?:\/\/|^\//.test(v.value);
-                      if (a.displayMode === 'color' || a.displayMode === 'image') return <span key={a.id} className="cs-pc-chip"><i style={{ background: isImg ? `url(${v.value}) center/cover` : v.value }} />{v.name && v.name !== v.value ? v.name : ''}</span>;
-                      return <span key={a.id} className="cs-pc-chip">{v.name || v.value}</span>;
-                    })}
+                    <PieceChips product={product} variants={pc.variants} missing={missing} />
                     <button type="button" className="cs-pc-edit" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? '' : k)}>
                       {isOpen ? s.done : s.edit}<ChevronDown size={14} aria-hidden="true" style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
                     </button>
@@ -1322,28 +1352,7 @@ function PiecesPicker({ product, store, offer, boxes, onChange, onVariant, missi
                 )}
                 {isOpen && (
                   <div className={count > 1 ? 'cs-pc-opts' : ''}>
-                    {attrs.map((attr: any) => (
-                      <div key={attr.id} style={{ marginBottom: '1rem' }}>
-                        <p className="cs-attr-name">{attr.name}{__colorName(attr, pc.variants)}</p>
-                        <div role="group" aria-label={attr.name} style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-                          {attr.variants.map((v: any) => {
-                            const on = pc.variants[attr.name] === v.value;
-                            const isImgUrl = /^https?:\/\/|^\//.test(v.value);
-                            const available = valueAvailable(product, pc.variants, attr.name, v.value);
-                            const cls = attr.displayMode === 'color' ? 'cs-var-color' : attr.displayMode === 'image' ? 'cs-var-img' : 'cs-var-text';
-                            const style = attr.displayMode === 'color' ? { background: isImgUrl ? `url(${v.value}) center/cover` : v.value }
-                              : attr.displayMode === 'image' ? { backgroundImage: `url(${v.value})` } : undefined;
-                            return (
-                              <button key={v.id} type="button" title={v.name} aria-label={v.name || v.value} aria-pressed={on}
-                                className={`${cls} ${on ? 'on' : ''} ${available ? '' : 'cs-var-off'}`} style={style}
-                                onClick={() => available && pick(bi, pi, attr.name, v.value)}>
-                                {attr.displayMode !== 'color' && attr.displayMode !== 'image' && v.name}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
+                    <PieceOptions product={product} variants={pc.variants} onPick={(n, v) => pick(bi, pi, n, v)} />
                   </div>
                 )}
               </div>
@@ -1676,6 +1685,34 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   const getLiv = () => (freeShippingReached || !selW ? 0 : Number(fd.typeLivraison === 'home' ? selW.livraisonHome : selW.livraisonOfice));
   const finalTotal = cartTotal + +getLiv();
   const update = (n: any[]) => { setItems(n); localStorage.setItem(domain, JSON.stringify(n)); initCount(n.length); };
+  const pcT = (PC_T as any)[lang] || PC_T.ar;
+  const [editing, setEditing] = useState(-1);
+  // سعر قطعة بلا عرض: سعر النسخة المختارة إن وُجد، وإلا سعر المنتج
+  const unitPrice = (product: any, variants: Record<string, string>) => {
+    const id = pieceVariantId(product, variants);
+    const v = id ? product?.variantDetails?.find((d: any) => d.id === id) : undefined;
+    return v && Number(v.price) > 0 ? Number(v.price) : Number(product?.price) || 0;
+  };
+  // الإضافات لا تتجاوز حدها مع الكمية الجديدة
+  const clampAddons = (item: any, q: number) => {
+    if (!item.addonQty) return item;
+    const aq: AddonQty = {};
+    for (const a of addonList(item.product)) { const n = Math.min(item.addonQty[a.id] || 0, addonMax(a, q)); if (n > 0) aq[a.id] = n; }
+    return { ...item, addonQty: aq, addonsExtra: addonExtra(item.product, aq) };
+  };
+  const pickOpt = (i: number, name: string, value: string) => update(items.map((x, idx) => {
+    if (idx !== i) return x;
+    const variants = { ...(x.selectedVariants || {}), [name]: value };
+    const finalPrice = x.selectedOffer ? x.finalPrice : unitPrice(x.product, variants);
+    return { ...x, selectedVariants: variants, variantDetailId: pieceVariantId(x.product, variants), finalPrice, totalPrice: finalPrice * x.quantity };
+  }));
+  const setQty = (i: number, q: number) => update(items.map((x, idx) => (idx !== i ? x : clampAddons({ ...x, quantity: Math.max(1, q), totalPrice: x.finalPrice * Math.max(1, q) }, Math.max(1, q)))));
+  const duplicate = (i: number) => {
+    const x = items[i];
+    const copy = clampAddons({ ...x, quantity: 1, totalPrice: x.finalPrice, addedAt: Date.now() }, 1);
+    const next = [...items.slice(0, i + 1), copy, ...items.slice(i + 1)];
+    update(next); setEditing(i + 1);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1723,15 +1760,45 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div className="cs-cart">
         <div className="cs-box">
           {items.map((item, i) => (
-            <div key={i} style={{ display: 'flex', gap: '1rem', padding: '1rem', borderBottom: '1px solid var(--line)', alignItems: 'center' }}>
-              <img loading="lazy" decoding="async" src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} alt="" style={{ width: 76, height: 76, borderRadius: 14, objectFit: 'contain', background: 'var(--soft)', flexShrink: 0 }} />
+            <div key={item.addedAt ? `${item.addedAt}-${i}` : i} style={{ borderBottom: '1px solid var(--line)' }}>
+            <div style={{ display: 'flex', gap: '1rem', padding: '1rem', alignItems: 'center' }}>
+              <img loading="lazy" decoding="async" src={(() => { const a = (item.product?.attributes || []).find((x: any) => x.displayMode === 'image' && /^https?:\/\/|^\//.test(item.selectedVariants?.[x.name] || '')); return a ? item.selectedVariants[a.name] : item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage; })()} alt="" style={{ width: 76, height: 76, borderRadius: 14, objectFit: 'contain', background: 'var(--soft)', flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <b style={{ display: 'block', fontSize: '.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.product?.name}</b>
                 {(item.addonQty ? Object.keys(item.addonQty).length > 0 : item.addonIds?.length > 0) && <small style={{ display: 'block', color: 'var(--p-ink)', fontWeight: 700 }}>+ {addonNames(item.product, item.addonQty, item.addonIds)}</small>}
                 <span className="cs-price" style={{ fontSize: '1.05rem' }}>{money(item.finalPrice)} <small>{cur}</small></span>
-                <small style={{ display: 'block', color: 'var(--muted)' }}>{t.qty}: {item.quantity}</small>
+                {item.product?.attributes?.length > 0 && <div className="cs-pc-sum" style={{ margin: '.35rem 0' }}><PieceChips product={item.product} variants={item.selectedVariants || {}} /></div>}
+                {item.selectedOffer ? (
+                  <small style={{ display: 'block', color: 'var(--muted)' }}>{t.qty}: {item.quantity}</small>
+                ) : (
+                  <div className="cs-qty" style={{ marginTop: '.4rem', transform: 'scale(.9)', transformOrigin: lang === 'ar' ? 'right' : 'left' }}>
+                    <button type="button" aria-label="-" disabled={item.quantity <= 1} onClick={() => setQty(i, item.quantity - 1)}><Minus size={15} /></button>
+                    <span>{item.quantity}</span>
+                    <button type="button" aria-label="+" onClick={() => setQty(i, item.quantity + 1)}><Plus size={15} /></button>
+                  </div>
+                )}
               </div>
-              <button aria-label="delete" onClick={() => update(items.filter((_, idx) => idx !== i))} className="cs-icon-btn" style={{ color: '#DC2626' }}><Trash2 size={16} /></button>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end', flexShrink: 0 }}>
+                <button aria-label="delete" onClick={() => { update(items.filter((_, idx) => idx !== i)); setEditing(-1); }} className="cs-icon-btn" style={{ color: '#DC2626' }}><Trash2 size={16} /></button>
+                {item.product?.attributes?.length > 0 && (
+                  <button type="button" className="cs-pc-edit" aria-expanded={editing === i} onClick={() => setEditing(editing === i ? -1 : i)}>
+                    {editing === i ? pcT.done : pcT.edit}<ChevronDown size={14} aria-hidden="true" style={{ transform: editing === i ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
+                  </button>
+                )}
+              </div>
+            </div>
+            {editing === i && item.product?.attributes?.length > 0 && (
+              <div className="cs-fade" style={{ padding: '0 1rem 1rem' }}>
+                <div className="cs-pc" style={{ marginBottom: 0 }}>
+                  <PieceOptions product={item.product} variants={item.selectedVariants || {}} onPick={(n, v) => pickOpt(i, n, v)} />
+                  {!item.selectedOffer && (
+                    <button type="button" className="cs-btn ghost" style={{ width: '100%', padding: '.65rem' }} onClick={() => duplicate(i)}>
+                      <Plus size={15} />{pcT.copy}
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
             </div>
           ))}
           <div style={{ padding: '1rem', background: 'var(--soft)', display: 'flex', justifyContent: 'space-between', fontWeight: 800 }}>
