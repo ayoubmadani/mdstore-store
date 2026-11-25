@@ -232,9 +232,10 @@ const THEME_CSS = `
   .cs-bnd-body { padding: 1rem 1.1rem 1.15rem; display: flex; flex-direction: column; gap: .7rem; flex: 1; }
   .cs-bnd-body h3 { font-size: 1.1rem; font-weight: 800; color: var(--ink); }
   .cs-bnd-body > p { font-size: .84rem; color: var(--muted); margin-top: -.45rem; }
-  .cs-bnd-items { list-style: none; display: flex; align-items: flex-start; justify-content: space-between; gap: .25rem; background: var(--soft); border-radius: 16px; padding: .7rem .5rem; }
+  .cs-bnd-items { list-style: none; display: flex; align-items: flex-start; justify-content: space-between; gap: .25rem; background: var(--soft); border-radius: 16px; padding: .7rem .5rem; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+  .cs-bnd-items::-webkit-scrollbar { display: none; }
   .cs-bnd-items li { display: contents; }
-  .cs-bnd-it { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: .3rem; text-align: center; }
+  .cs-bnd-it { flex: 1 0 76px; min-width: 76px; scroll-snap-align: start; display: flex; flex-direction: column; align-items: center; gap: .3rem; text-align: center; }
   .cs-bnd-it img, .cs-bnd-it i { width: 54px; height: 54px; border-radius: 12px; object-fit: contain; background: #fff; border: 1px solid var(--line); display: block; }
   .cs-bnd-it small { font-size: .7rem; font-weight: 700; color: #374151; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .cs-bnd-plus { color: var(--p-ink); font-weight: 800; font-size: 1.1rem; padding-top: 1rem; }
@@ -842,7 +843,7 @@ function BundlesStrip({ store }: any) {
                 <h3>{b.name}</h3>
                 {b.subtitle && <p>{b.subtitle}</p>}
                 <ul className="cs-bnd-items">
-                  {b.items.slice(0, 3).map((it: any, i: number) => (
+                  {b.items.map((it: any, i: number) => (
                     <li key={it.productId}>
                       {i > 0 && <span className="cs-bnd-plus" aria-hidden="true">+</span>}
                       <span className="cs-bnd-it">
@@ -851,15 +852,7 @@ function BundlesStrip({ store }: any) {
                       </span>
                     </li>
                   ))}
-                {b.items.length > 3 && (
-  <li style={{ display: 'contents' }}>
-    <span aria-hidden="true" style={{ fontWeight: 800, fontSize: '1.1rem', paddingTop: 14, opacity: 0.7 }}>+</span>
-    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
-      <span style={{ width: 52, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px dashed currentColor', borderRadius: 10, fontWeight: 800, fontSize: '1rem', opacity: 0.75 }}><bdi dir="ltr">+{b.items.length - 3}</bdi></span>
-    </span>
-  </li>
-)}
-</ul>
+                </ul>
                 <div className="cs-bnd-price">
                   <span className="cs-price"><small>{cur}</small>{money(b.price)}</span>
                   <span className="cs-old">{money(b.original)} {cur}</span>

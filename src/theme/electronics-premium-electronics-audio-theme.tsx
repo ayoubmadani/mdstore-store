@@ -146,7 +146,8 @@ const THEME_CSS = `
   .ep-img { position: relative; display: block; aspect-ratio: 16/8; overflow: hidden; background: #FAFAF8; }
   .ep-img img, .ep-img picture { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
   .ep-card:hover .ep-img img { transform: scale(1.04); }
-  .ep-items { list-style: none; display: flex; align-items: flex-start; gap: 0.25rem; border-top: 1px solid rgba(28,26,24,0.10); border-bottom: 1px solid rgba(28,26,24,0.10); padding: 0.75rem 0; margin: 0; }
+  .ep-items { list-style: none; display: flex; align-items: flex-start; gap: 0.25rem; border-top: 1px solid rgba(28,26,24,0.10); border-bottom: 1px solid rgba(28,26,24,0.10); padding: 0.75rem 0; margin: 0; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+  .ep-items::-webkit-scrollbar { display: none; }
   .ep-items li { display: contents; }
   .ep-top { max-width: 1280px; margin: 0 auto; }
   .ep-split { max-width: 1280px; margin: 0 auto; padding: 1.5rem 1rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
@@ -897,24 +898,16 @@ function BundlesStrip({ store }: any) {
                 {b.subtitle && <p style={{ fontSize: '0.8rem', color: SUB, marginTop: 2 }}>{b.subtitle}</p>}
               </div>
               <ul className="ep-items">
-                {b.items.slice(0, 3).map((it: any, i: number) => (
+                {b.items.map((it: any, i: number) => (
                   <li key={it.productId}>
                     {i > 0 && <span aria-hidden="true" style={{ color: A, fontWeight: 700, fontSize: '1.1rem', paddingTop: 14 }}>+</span>}
-                    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
+                    <span style={{ flex: '1 0 76px', minWidth: 76, scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
                       {it.imageUrl ? <img loading="lazy" decoding="async" src={it.imageUrl} alt="" style={{ width: 52, height: 52, objectFit: 'cover', background: '#FAFAF8', display: 'block' }} /> : <span style={{ width: 52, height: 52, background: '#FAFAF8', display: 'block' }} />}
                       <span style={{ fontSize: '0.7rem', color: SUB, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{it.name}</span>
                     </span>
                   </li>
                 ))}
-              {b.items.length > 3 && (
-  <li style={{ display: 'contents' }}>
-    <span aria-hidden="true" style={{ fontWeight: 800, fontSize: '1.1rem', paddingTop: 14, opacity: 0.7 }}>+</span>
-    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
-      <span style={{ width: 52, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px dashed currentColor', borderRadius: 10, fontWeight: 800, fontSize: '1rem', opacity: 0.75 }}><bdi dir="ltr">+{b.items.length - 3}</bdi></span>
-    </span>
-  </li>
-)}
-</ul>
+              </ul>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', flexWrap: 'wrap' }}>
                 <span className="price-mono" style={{ fontSize: '1.3rem', fontWeight: 700, color: A }}>{Number(b.price).toLocaleString()}</span>
                 <span style={{ fontSize: '0.72rem', color: SUB }}>{currency}</span>

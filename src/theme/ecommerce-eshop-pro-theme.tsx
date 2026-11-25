@@ -241,7 +241,8 @@ const THEME_CSS = `
   .bnd-track.one .bnd-card { flex-basis: min(100%, 560px); }
   .bnd-img { position: relative; display: block; aspect-ratio: 16/8; background: #F4F4F2; overflow: hidden; }
   .bnd-img img, .bnd-img picture { display: block; width: 100%; height: 100%; object-fit: cover; }
-  .bnd-items { list-style: none; display: flex; align-items: flex-start; gap: 0.25rem; background: #F8F8F6; border: 1.5px solid #EBEBEB; border-radius: 10px; padding: 0.625rem 0.5rem; }
+  .bnd-items { list-style: none; display: flex; align-items: flex-start; gap: 0.25rem; background: #F8F8F6; border: 1.5px solid #EBEBEB; border-radius: 10px; padding: 0.625rem 0.5rem; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+  .bnd-items::-webkit-scrollbar { display: none; }
   .bnd-items li { display: contents; }
   .bnd-top { max-width: 1280px; margin: 0 auto; padding: 0; }
   .bnd-hero { position: relative; overflow: hidden; background: #111; }
@@ -1199,24 +1200,16 @@ function BundlesStrip({ store }: any) {
                 {b.subtitle && <p style={{ fontSize: '0.8rem', color: '#6B6B6B', marginTop: 2 }}>{b.subtitle}</p>}
               </div>
               <ul className="bnd-items">
-                {b.items.slice(0, 3).map((it: any, i: number) => (
+                {b.items.map((it: any, i: number) => (
                   <li key={it.productId}>
                     {i > 0 && <span aria-hidden="true" style={{ color: 'var(--acc)', fontWeight: 800, fontSize: '1.1rem', paddingTop: 14 }}>+</span>}
-                    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
+                    <span style={{ flex: '1 0 76px', minWidth: 76, scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
                       {it.imageUrl ? <img loading="lazy" decoding="async" src={it.imageUrl} alt="" style={{ width: 52, height: 52, objectFit: 'cover', borderRadius: 8, background: '#fff', border: '1px solid #EBEBEB', display: 'block' }} /> : <span style={{ width: 52, height: 52, borderRadius: 8, background: '#fff', display: 'block' }} />}
                       <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#555', lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{it.name}</span>
                     </span>
                   </li>
                 ))}
-              {b.items.length > 3 && (
-  <li style={{ display: 'contents' }}>
-    <span aria-hidden="true" style={{ fontWeight: 800, fontSize: '1.1rem', paddingTop: 14, opacity: 0.7 }}>+</span>
-    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
-      <span style={{ width: 52, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px dashed currentColor', borderRadius: 10, fontWeight: 800, fontSize: '1rem', opacity: 0.75 }}><bdi dir="ltr">+{b.items.length - 3}</bdi></span>
-    </span>
-  </li>
-)}
-</ul>
+              </ul>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', flexWrap: 'wrap' }}>
                 <span className="price-mono" style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--acc)' }}>{Number(b.price).toLocaleString()}</span>
                 <span style={{ fontSize: '0.75rem', color: '#6B6B6B', fontWeight: 500 }}>{cur}</span>

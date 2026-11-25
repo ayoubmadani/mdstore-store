@@ -368,7 +368,8 @@ const THEME_CSS = `
   .kk-track.one .kk-card { flex-basis: min(100%, 560px); }
   .kk-img { position: relative; display: block; aspect-ratio: 16/8; overflow: hidden; background: rgba(255,107,107,0.07); }
   .kk-img img, .kk-img picture { display: block; width: 100%; height: 100%; object-fit: cover; }
-  .kk-items { list-style: none; display: flex; align-items: flex-start; gap: 0.25rem; background: rgba(78,205,196,0.08); border: 2px dashed var(--border); border-radius: 18px; padding: 0.75rem 0.5rem; margin: 0; }
+  .kk-items { list-style: none; display: flex; align-items: flex-start; gap: 0.25rem; background: rgba(78,205,196,0.08); border: 2px dashed var(--border); border-radius: 18px; padding: 0.75rem 0.5rem; margin: 0; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+  .kk-items::-webkit-scrollbar { display: none; }
   .kk-items li { display: contents; }
   .kk-top { max-width: 1280px; margin: 0 auto; }
   .kk-split { max-width: 1280px; margin: 0 auto; padding: 1.5rem 1rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
@@ -1010,24 +1011,16 @@ function BundlesStrip({ store }: any) {
                 {b.subtitle && <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-soft)', marginTop: 2 }}>{b.subtitle}</p>}
               </div>
               <ul className="kk-items">
-                {b.items.slice(0, 3).map((it: any, i: number) => (
+                {b.items.map((it: any, i: number) => (
                   <li key={it.productId}>
                     {i > 0 && <span aria-hidden="true" style={{ fontFamily: "'Fredoka One', cursive", color: 'var(--grape)', fontSize: '1.4rem', paddingTop: 12 }}>+</span>}
-                    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
+                    <span style={{ flex: '1 0 76px', minWidth: 76, scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
                       {it.imageUrl ? <img loading="lazy" decoding="async" src={it.imageUrl} alt="" style={{ width: 54, height: 54, objectFit: 'cover', borderRadius: 14, background: '#fff', border: '2px solid var(--border)', display: 'block' }} /> : <span style={{ width: 54, height: 54, borderRadius: 14, background: '#fff', display: 'block' }} />}
                       <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-mid)', lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{it.name}</span>
                     </span>
                   </li>
                 ))}
-              {b.items.length > 3 && (
-  <li style={{ display: 'contents' }}>
-    <span aria-hidden="true" style={{ fontWeight: 800, fontSize: '1.1rem', paddingTop: 14, opacity: 0.7 }}>+</span>
-    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
-      <span style={{ width: 54, height: 54, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px dashed currentColor', borderRadius: 10, fontWeight: 800, fontSize: '1rem', opacity: 0.75 }}><bdi dir="ltr">+{b.items.length - 3}</bdi></span>
-    </span>
-  </li>
-)}
-</ul>
+              </ul>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', flexWrap: 'wrap' }}>
                 <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.5rem', color: 'var(--coral-d)' }}>{Number(b.price).toLocaleString()}</span>
                 <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-soft)' }}>{cur}</span>

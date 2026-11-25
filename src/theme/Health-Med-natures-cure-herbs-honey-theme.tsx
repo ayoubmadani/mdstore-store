@@ -78,7 +78,8 @@ const CSS = `
   .hb-track.one .p-card { flex-basis:min(100%, 560px); }
   .hb-img { position:relative; display:block; aspect-ratio:16/8; overflow:hidden; background:var(--beige); }
   .hb-img img, .hb-img picture { display:block; width:100%; height:100%; object-fit:cover; }
-  .hb-items { list-style:none; display:flex; align-items:flex-start; gap:4px; background:var(--cream); border:1px solid var(--tan); border-radius:10px; padding:10px 6px; margin:0; }
+  .hb-items { list-style:none; display:flex; align-items:flex-start; gap:4px; background:var(--cream); border:1px solid var(--tan); border-radius:10px; padding:10px 6px; margin:0; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+  .hb-items::-webkit-scrollbar { display: none; }
   .hb-items li { display:contents; }
   .hb-top { max-width:1280px; margin:0 auto; }
   .hb-split { max-width:1280px; margin:0 auto; padding:24px 16px 64px; display:grid; grid-template-columns:minmax(0, 1fr); gap:28px; }
@@ -1077,7 +1078,7 @@ function BundlesStrip({ store }: any) {
                   {b.subtitle && <p style={{ fontSize:'12px', color:'var(--warm)', marginTop:2 }}>{b.subtitle}</p>}
                 </div>
                 <ul className="hb-items">
-                  {b.items.slice(0, 3).map((it: any, i: number) => (
+                  {b.items.map((it: any, i: number) => (
                     <li key={it.productId}>
                       {i > 0 && <span aria-hidden="true" className="pd" style={{ color:'var(--gold)', fontWeight:700, fontSize:'1.2rem', paddingTop:14 }}>+</span>}
                       <span style={{ flex:1, minWidth:0, display:'flex', flexDirection:'column', alignItems:'center', gap:4, textAlign:'center' }}>
@@ -1086,15 +1087,7 @@ function BundlesStrip({ store }: any) {
                       </span>
                     </li>
                   ))}
-                {b.items.length > 3 && (
-  <li style={{ display: 'contents' }}>
-    <span aria-hidden="true" style={{ fontWeight: 800, fontSize: '1.1rem', paddingTop: 14, opacity: 0.7 }}>+</span>
-    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
-      <span style={{ width: 52, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px dashed currentColor', borderRadius: 10, fontWeight: 800, fontSize: '1rem', opacity: 0.75 }}><bdi dir="ltr">+{b.items.length - 3}</bdi></span>
-    </span>
-  </li>
-)}
-</ul>
+                </ul>
                 <div style={{ display:'flex', alignItems:'baseline', gap:6, flexWrap:'wrap' }}>
                   <span className="pd" style={{ fontSize:'1.4rem', fontWeight:700, color:'var(--gold)' }}>{Number(b.price).toLocaleString()}</span>
                   <span style={{ fontSize:'11px', color:'var(--dim)' }}>{cur}</span>
