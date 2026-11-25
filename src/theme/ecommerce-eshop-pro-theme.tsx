@@ -1170,7 +1170,8 @@ function BundlesStrip({ store }: any) {
   return (
     <section data-mds-bundles="" aria-label={heading || bt.title} style={{ padding: '4rem 0 1rem', maxWidth: 1280, margin: '0 auto' }}>
       {heading && <div style={{ padding: '0 1.5rem' }}><SecHead>{heading}</SecHead></div>}
-      <div className={`bnd-track ${list.length === 1 ? 'one' : ''}`}>
+      {__k.BundleArrows && <__k.BundleArrows />}
+      <div data-bundle-track="" className={`bnd-track ${list.length === 1 ? 'one' : ''}`}>
         {list.map((b) => (
           <article key={b.id} className="bnd-card">
             <a {...bundleLink(b.slug)} className="bnd-img" aria-label={b.name}>

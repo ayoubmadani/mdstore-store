@@ -868,7 +868,8 @@ function BundlesStrip({ store }: any) {
           <h2 className="font-display" style={{ fontSize: 'clamp(1.4rem,3vw,1.9rem)', fontWeight: 600, color: TXT }}>{heading}</h2>
         </div>
       )}
-      <div className={`ep-track ${list.length === 1 ? 'one' : ''}`}>
+      {__k.BundleArrows && <__k.BundleArrows />}
+      <div data-bundle-track="" className={`ep-track ${list.length === 1 ? 'one' : ''}`}>
         {list.map((b) => (
           <article key={b.id} className="ep-card">
             <a {...bundleLink(b.slug)} className="ep-img" aria-label={b.name}>

@@ -655,7 +655,8 @@ function BundlesStrip({ store }: any) {
           <span style={{ fontSize: '11px', color: 'var(--mu)', letterSpacing: '0.06em' }}>{list.length}</span>
         </div>
       )}
-      <div className={`lb-track ${list.length === 1 ? 'one' : ''}`}>
+      {__k.BundleArrows && <__k.BundleArrows />}
+      <div data-bundle-track="" className={`lb-track ${list.length === 1 ? 'one' : ''}`}>
         {list.map((b) => (
           <article key={b.id} className="lb-card">
             <a {...bundleLink(b.slug)} className="lb-img" aria-label={b.name}>

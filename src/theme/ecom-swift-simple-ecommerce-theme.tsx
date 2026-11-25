@@ -631,7 +631,8 @@ function BundlesStrip({ store }: any) {
   return (
     <section data-mds-bundles="" aria-label={heading || bt.title} style={{ padding: '3rem 0 1rem', maxWidth: 1200, margin: '0 auto' }}>
       {heading && <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', padding: '0 1.5rem' }}>{heading}</h2>}
-      <div className={`sw-track ${list.length === 1 ? 'one' : ''}`}>
+      {__k.BundleArrows && <__k.BundleArrows />}
+      <div data-bundle-track="" className={`sw-track ${list.length === 1 ? 'one' : ''}`}>
         {list.map((b) => (
           <article key={b.id} className="sw-card">
             <a {...bundleLink(b.slug)} className="sw-img" aria-label={b.name}>

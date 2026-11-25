@@ -980,7 +980,8 @@ function BundlesStrip({ store }: any) {
       {heading && (
         <h2 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', textAlign: 'center', color: 'var(--text)', marginBottom: '1.5rem', padding: '0 1.5rem' }}>🎁 {heading}</h2>
       )}
-      <div className={`kk-track ${list.length === 1 ? 'one' : ''}`}>
+      {__k.BundleArrows && <__k.BundleArrows />}
+      <div data-bundle-track="" className={`kk-track ${list.length === 1 ? 'one' : ''}`}>
         {list.map((b) => (
           <article key={b.id} className="kk-card">
             <div style={{ height: 4, background: 'var(--coral)', width: '100%' }} />

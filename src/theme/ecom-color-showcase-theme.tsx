@@ -15,6 +15,8 @@ import {
   useCartStore, WhatsAppOrderButton, WhatsAppGlyph, comingSoon,
   useBundleOrder, optionKind, optionImage, bundleProductImage, bundleLink, bundleStrings,
 } from '@mdstore/theme-kit';
+import * as __kns from '@mdstore/theme-kit';
+const __k: any = __kns;
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -814,7 +816,8 @@ function BundlesStrip({ store }: any) {
     <section className="cs-bnds" data-mds-bundles="" aria-label={heading || bt.title}>
       <div className="cs-wrap">
         {heading && <SectionTitle>{heading}</SectionTitle>}
-        <div className={`cs-bnd-track ${list.length === 1 ? 'one' : ''}`}>
+        {__k.BundleArrows && <__k.BundleArrows />}
+        <div data-bundle-track="" className={`cs-bnd-track ${list.length === 1 ? 'one' : ''}`}>
           {list.map((b) => (
             <article key={b.id} className="cs-bnd">
               <a {...bundleLink(b.slug)} className="cs-bnd-img" aria-label={b.name}>

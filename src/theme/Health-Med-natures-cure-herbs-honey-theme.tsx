@@ -1047,7 +1047,8 @@ function BundlesStrip({ store }: any) {
             <h2 className="pd" style={{ fontSize:'clamp(1.8rem, 4vw, 3rem)', color:'var(--brown)', lineHeight:1.1, display:'flex', alignItems:'center', gap:10 }}><Leaf size={26} style={{ color:'var(--green)' }} />{heading}</h2>
           </div>
         )}
-        <div className={`hb-track ${list.length === 1 ? 'one' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
+        {__k.BundleArrows && <__k.BundleArrows />}
+        <div data-bundle-track="" className={`hb-track ${list.length === 1 ? 'one' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
           {list.map((b) => (
             <article key={b.id} className="p-card">
               <a {...bundleLink(b.slug)} className="hb-img" aria-label={b.name}>
