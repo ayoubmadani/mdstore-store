@@ -830,7 +830,7 @@ function BundlesStrip({ store }: any) {
                 <h3>{b.name}</h3>
                 {b.subtitle && <p>{b.subtitle}</p>}
                 <ul className="cs-bnd-items">
-                  {b.items.map((it: any, i: number) => (
+                  {b.items.slice(0, 3).map((it: any, i: number) => (
                     <li key={it.productId}>
                       {i > 0 && <span className="cs-bnd-plus" aria-hidden="true">+</span>}
                       <span className="cs-bnd-it">
@@ -839,7 +839,15 @@ function BundlesStrip({ store }: any) {
                       </span>
                     </li>
                   ))}
-                </ul>
+                {b.items.length > 3 && (
+  <li style={{ display: 'contents' }}>
+    <span aria-hidden="true" style={{ fontWeight: 800, fontSize: '1.1rem', paddingTop: 14, opacity: 0.7 }}>+</span>
+    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
+      <span style={{ width: 52, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px dashed currentColor', borderRadius: 10, fontWeight: 800, fontSize: '1rem', opacity: 0.75 }}><bdi dir="ltr">+{b.items.length - 3}</bdi></span>
+    </span>
+  </li>
+)}
+</ul>
                 <div className="cs-bnd-price">
                   <span className="cs-price"><small>{cur}</small>{money(b.price)}</span>
                   <span className="cs-old">{money(b.original)} {cur}</span>

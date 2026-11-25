@@ -999,7 +999,7 @@ function BundlesStrip({ store }: any) {
                 {b.subtitle && <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-soft)', marginTop: 2 }}>{b.subtitle}</p>}
               </div>
               <ul className="kk-items">
-                {b.items.map((it: any, i: number) => (
+                {b.items.slice(0, 3).map((it: any, i: number) => (
                   <li key={it.productId}>
                     {i > 0 && <span aria-hidden="true" style={{ fontFamily: "'Fredoka One', cursive", color: 'var(--grape)', fontSize: '1.4rem', paddingTop: 12 }}>+</span>}
                     <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
@@ -1008,7 +1008,15 @@ function BundlesStrip({ store }: any) {
                     </span>
                   </li>
                 ))}
-              </ul>
+              {b.items.length > 3 && (
+  <li style={{ display: 'contents' }}>
+    <span aria-hidden="true" style={{ fontWeight: 800, fontSize: '1.1rem', paddingTop: 14, opacity: 0.7 }}>+</span>
+    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
+      <span style={{ width: 54, height: 54, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px dashed currentColor', borderRadius: 10, fontWeight: 800, fontSize: '1rem', opacity: 0.75 }}><bdi dir="ltr">+{b.items.length - 3}</bdi></span>
+    </span>
+  </li>
+)}
+</ul>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', flexWrap: 'wrap' }}>
                 <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.5rem', color: 'var(--coral-d)' }}>{Number(b.price).toLocaleString()}</span>
                 <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-soft)' }}>{cur}</span>

@@ -1053,7 +1053,7 @@ function BundlesStrip({ store }: any) {
                 {b.subtitle && <p className="sm" style={{ fontSize: '9px', letterSpacing: '0.12em', color: 'var(--ash)', marginTop: 4 }}>{b.subtitle}</p>}
               </div>
               <ul className="bz-items">
-                {b.items.map((it: any, i: number) => (
+                {b.items.slice(0, 3).map((it: any, i: number) => (
                   <li key={it.productId}>
                     {i > 0 && <span className="ub" aria-hidden="true" style={{ color: 'var(--punch)', fontWeight: 900, paddingTop: 16 }}>+</span>}
                     <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
@@ -1062,7 +1062,15 @@ function BundlesStrip({ store }: any) {
                     </span>
                   </li>
                 ))}
-              </ul>
+              {b.items.length > 3 && (
+  <li style={{ display: 'contents' }}>
+    <span aria-hidden="true" style={{ fontWeight: 800, fontSize: '1.1rem', paddingTop: 14, opacity: 0.7 }}>+</span>
+    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
+      <span style={{ width: 50, height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px dashed currentColor', borderRadius: 10, fontWeight: 800, fontSize: '1rem', opacity: 0.75 }}><bdi dir="ltr">+{b.items.length - 3}</bdi></span>
+    </span>
+  </li>
+)}
+</ul>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
                 <span className="ub" style={{ fontWeight: 900, fontSize: '1.5rem', color: 'var(--punch)', letterSpacing: '-0.03em', lineHeight: 1 }}>{Number(b.price).toLocaleString()}<span className="sm" style={{ fontWeight: 400, fontSize: '10px', marginInlineStart: 4 }}>{cur}</span></span>
                 <span className="sm" style={{ fontSize: '11px', textDecoration: 'line-through', color: 'var(--mist)' }}>{Number(b.original).toLocaleString()}</span>

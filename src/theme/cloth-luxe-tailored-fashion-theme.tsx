@@ -673,7 +673,7 @@ function BundlesStrip({ store }: any) {
                 {b.subtitle && <p style={{ fontSize: '11px', color: 'var(--mu)', letterSpacing: '0.06em', marginTop: 4 }}>{b.subtitle}</p>}
               </div>
               <ul className="lb-items">
-                {b.items.map((it: any, i: number) => (
+                {b.items.slice(0, 3).map((it: any, i: number) => (
                   <li key={it.productId}>
                     {i > 0 && <span aria-hidden="true" className="bn" style={{ color: 'var(--cp)', fontSize: '1.3rem', paddingTop: 16 }}>+</span>}
                     <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, textAlign: 'center' }}>
@@ -682,7 +682,15 @@ function BundlesStrip({ store }: any) {
                     </span>
                   </li>
                 ))}
-              </ul>
+              {b.items.length > 3 && (
+  <li style={{ display: 'contents' }}>
+    <span aria-hidden="true" style={{ fontWeight: 800, fontSize: '1.1rem', paddingTop: 14, opacity: 0.7 }}>+</span>
+    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
+      <span style={{ width: 52, height: 68, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px dashed currentColor', borderRadius: 10, fontWeight: 800, fontSize: '1rem', opacity: 0.75 }}><bdi dir="ltr">+{b.items.length - 3}</bdi></span>
+    </span>
+  </li>
+)}
+</ul>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
                 <span style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--cp)' }}>{Number(b.price).toLocaleString()} {cur}</span>
                 <span style={{ fontSize: '11px', textDecoration: 'line-through', color: 'var(--mu)' }}>{Number(b.original).toLocaleString()}</span>

@@ -91,7 +91,7 @@ export default function BundleSlider({ bundles, accent, language = 'ar', title, 
                 </div>
 
                 <ul className="flex items-start justify-between gap-1 rounded-2xl bg-white" style={{ margin: '10px 12px 0', padding: '10px 6px', listStyle: 'none' }}>
-                  {b.items.map((it, i) => (
+                  {b.items.slice(0, 3).map((it, i) => (
                     <li key={it.productId} className="contents">
                       {i > 0 && <span aria-hidden className="text-lg font-bold" style={{ color: accent, paddingTop: 14 }}>+</span>}
                       <span className="flex min-w-0 flex-1 flex-col items-center gap-1 text-center">
@@ -102,7 +102,15 @@ export default function BundleSlider({ bundles, accent, language = 'ar', title, 
                       </span>
                     </li>
                   ))}
-                </ul>
+                {b.items.length > 3 && (
+  <li style={{ display: 'contents' }}>
+    <span aria-hidden="true" style={{ fontWeight: 800, fontSize: '1.1rem', paddingTop: 14, opacity: 0.7 }}>+</span>
+    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
+      <span style={{ width: 52, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px dashed currentColor', borderRadius: 10, fontWeight: 800, fontSize: '1rem', opacity: 0.75 }}><bdi dir="ltr">+{b.items.length - 3}</bdi></span>
+    </span>
+  </li>
+)}
+</ul>
 
                 <div className="flex items-baseline justify-between gap-2" style={{ padding: '10px 14px' }}>
                   <span className="text-xs font-semibold text-green-700">{t.save} {formatDA(b.saving, language)}</span>
