@@ -16,7 +16,7 @@ import {
   useCartStore, WhatsAppOrderButton, WhatsAppGlyph, comingSoon,
 } from '@mdstore/theme-kit';
 import { useBundleOrder, optionKind, optionImage, bundleProductImage, bundleLink, bundleStrings } from '@/components/bundles/useBundleOrder';
-import { boxLines, linesTotal, fitBoxes, piecesPerBox, valueAvailable, pieceVariantId, type Box } from '@/components/theme/orderPieces'; // منطق القطع مدمج داخل الثيم
+import { boxLines, linesTotal, fitBoxes, piecesPerBox, valueAvailable, pieceVariantId, boxEntries, cartPieces, applyCartPieces, type Box } from '@/components/theme/orderPieces'; // منطق القطع مدمج داخل الثيم
 const __k: any = __bk;
 
 
@@ -1272,9 +1272,9 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 
 /* ═══════════ PIECES — خيارات كل قطعة ═══════════ */
 const PC_T = {
-  ar: { order: 'الطلب', edit: 'تعديل', done: 'تم', missing: 'اختر كل الخيارات لكل قطعة', copy: 'نسخة بخيارات أخرى' },
-  fr: { order: 'Commande', edit: 'Modifier', done: 'OK', missing: 'Choisissez toutes les options de chaque pièce', copy: 'Dupliquer (autres options)' },
-  en: { order: 'Order', edit: 'Edit', done: 'Done', missing: 'Choose all options for each piece', copy: 'Duplicate (other options)' },
+  ar: { order: 'الطلب', edit: 'تعديل', done: 'تم', missing: 'اختر كل الخيارات لكل قطعة', copy: 'نسخة بخيارات أخرى', piece: 'القطعة' },
+  fr: { order: 'Commande', edit: 'Modifier', done: 'OK', missing: 'Choisissez toutes les options de chaque pièce', copy: 'Dupliquer (autres options)', piece: 'Pièce' },
+  en: { order: 'Order', edit: 'Edit', done: 'Done', missing: 'Choose all options for each piece', copy: 'Duplicate (other options)', piece: 'Piece' },
 };
 /** المنتج بخيارات (مقاس، لون…) ← الخيارات تُختار لكل قطعة داخل بطاقات الطلب */
 const usesPieces = (product: any) => !!product?.attributes?.length;
@@ -1346,7 +1346,7 @@ function PiecesPicker({ product, store, offer, boxes, onChange, onVariant, missi
                     {box.length > 1 && <span className="cs-pc-n">{pi + 1}</span>}
                     <PieceChips product={product} variants={pc.variants} missing={missing} />
                     <button type="button" className="cs-pc-edit" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? '' : k)}>
-                      {isOpen ? s.done : s.edit}<ChevronDown size={14} aria-hidden="true" style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
+                      {s.edit}<ChevronDown size={14} aria-hidden="true" style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
                     </button>
                   </div>
                 )}
@@ -1483,6 +1483,18 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
     if (lines && pieceMissing(product, boxes)) { setPcMissing(true); return; }
     setIsAdded(true);
     const cart = JSON.parse(localStorage.getItem(domain) || '[]');
+    if (lines && selOfferObj) {
+      const entries = boxEntries(product as any, selectedOffer, boxes, () => 0);
+      const aq = spreadAddons(entries.map(() => ({ quantity: per })));
+      entries.forEach((e, i) => {
+        const has = Object.keys(aq[i]).length > 0;
+        cart.push({ ...fd, quantity: 1, product, productId: product.id, storeId: product.store.id, userId, selectedOffer, ...(has ? { addonQty: aq[i], addonsExtra: addonExtra(product, aq[i]) } : {}), platform: platform || 'store', finalPrice: e.total, totalPrice: e.total, priceLivraison: getLiv(), addedAt: Date.now() + i, offerBox: { lines: e.lines } });
+      });
+      localStorage.setItem(domain, JSON.stringify(cart));
+      initCount(cart.length);
+      setTimeout(() => setIsAdded(false), 2000);
+      return;
+    }
     if (lines) {
       const aq = spreadAddons(lines);
       lines.forEach((l, i) => {
@@ -1706,6 +1718,13 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     const finalPrice = x.selectedOffer ? x.finalPrice : unitPrice(x.product, variants);
     return { ...x, selectedVariants: variants, variantDetailId: pieceVariantId(x.product, variants), finalPrice, totalPrice: finalPrice * x.quantity };
   }));
+  const [editPc, setEditPc] = useState('');
+  const pickPiece = (i: number, k: number, name: string, value: string) => update(items.map((x, idx) => {
+    if (idx !== i) return x;
+    const pcs = cartPieces(x);
+    pcs[k] = { ...pcs[k], variants: { ...pcs[k].variants, [name]: value } };
+    return applyCartPieces(x, x.product, pcs, () => 0);
+  }));
   const setQty = (i: number, q: number) => update(items.map((x, idx) => (idx !== i ? x : clampAddons({ ...x, quantity: Math.max(1, q), totalPrice: x.finalPrice * Math.max(1, q) }, Math.max(1, q)))));
   const duplicate = (i: number) => {
     const x = items[i];
@@ -1724,9 +1743,12 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     if (Object.keys(er).length) { setErrors(er); return; }
     setErrors({}); setSubmitting(true); setSubmitError(null);
     try {
-      await axios.post(`${API_URL}/orders/create`, items.map((i) => ({
+      const flat = items.flatMap((i) => (i.offerBox?.lines?.length
+        ? i.offerBox.lines.map((l: any, k: number) => ({ ...i, addonQty: k === 0 ? i.addonQty : undefined, addonIds: undefined, variantDetailId: l.variantDetailId, selectedVariants: l.selectedVariants, finalPrice: l.finalPrice, quantity: l.quantity }))
+        : [i]));
+      await axios.post(`${API_URL}/orders/create`, flat.map((i) => ({
         ...fd, productId: i.productId, storeId: i.storeId, userId: i.userId, selectedOffer: i.selectedOffer,
-        variantDetailId: i.variantDetailId, selectedVariants: i.selectedVariants, ...(i.addonQty ? { addonQty: i.addonQty } : { addonIds: i.addonIds }),
+        variantDetailId: i.variantDetailId, selectedVariants: i.selectedVariants, ...(i.addonQty ? { addonQty: i.addonQty } : i.addonIds ? { addonIds: i.addonIds } : {}),
         platform: i.platform || 'store', finalPrice: i.finalPrice, totalPrice: finalTotal, priceLivraison: +getLiv(),
         quantity: i.quantity, customerId: i.customerId || '', priceLoss: selW?.livraisonReturn ?? 0,
       })));
@@ -1767,8 +1789,10 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <b style={{ display: 'block', fontSize: '.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.product?.name}</b>
                 {(item.addonQty ? Object.keys(item.addonQty).length > 0 : item.addonIds?.length > 0) && <small style={{ display: 'block', color: 'var(--p-ink)', fontWeight: 700 }}>+ {addonNames(item.product, item.addonQty, item.addonIds)}</small>}
                 <span className="cs-price" style={{ fontSize: '1.05rem' }}>{money(item.finalPrice)} <small>{cur}</small></span>
-                {item.product?.attributes?.length > 0 && <div className="cs-pc-sum" style={{ margin: '.35rem 0' }}><PieceChips product={item.product} variants={item.selectedVariants || {}} /></div>}
-                {item.selectedOffer ? (
+                {item.offerBox?.lines?.length ? (
+                  item.product?.offers?.find((o: any) => o.id === item.selectedOffer) && <span className="cs-offer-tag" style={{ display: 'inline-block', margin: '.35rem 0' }}>{item.product.offers.find((o: any) => o.id === item.selectedOffer).name}</span>
+                ) : item.product?.attributes?.length > 0 && <div className="cs-pc-sum" style={{ margin: '.35rem 0' }}><PieceChips product={item.product} variants={item.selectedVariants || {}} /></div>}
+                {item.offerBox?.lines?.length ? null : item.selectedOffer ? (
                   <small style={{ display: 'block', color: 'var(--muted)' }}>{t.qty}: {item.quantity}</small>
                 ) : (
                   <div className="cs-qty" style={{ marginTop: '.4rem', transform: 'scale(.9)', transformOrigin: lang === 'ar' ? 'right' : 'left' }}>
@@ -1780,14 +1804,35 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end', flexShrink: 0 }}>
                 <button aria-label="delete" onClick={() => { update(items.filter((_, idx) => idx !== i)); setEditing(-1); }} className="cs-icon-btn" style={{ color: '#DC2626' }}><Trash2 size={16} /></button>
-                {item.product?.attributes?.length > 0 && (
+                {!item.offerBox?.lines?.length && item.product?.attributes?.length > 0 && (
                   <button type="button" className="cs-pc-edit" aria-expanded={editing === i} onClick={() => setEditing(editing === i ? -1 : i)}>
-                    {editing === i ? pcT.done : pcT.edit}<ChevronDown size={14} aria-hidden="true" style={{ transform: editing === i ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
+                    {pcT.edit}<ChevronDown size={14} aria-hidden="true" style={{ transform: editing === i ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
                   </button>
                 )}
               </div>
             </div>
-            {editing === i && item.product?.attributes?.length > 0 && (
+            {item.offerBox?.lines?.length > 0 && item.product?.attributes?.length > 0 && (
+              <div style={{ padding: '0 1rem 1rem' }}>
+                <div className="cs-pc" style={{ marginBottom: 0 }}>
+                  {cartPieces(item).map((pc, k) => {
+                    const key = `${i}-${k}`; const open = editPc === key;
+                    return (
+                      <div key={k} className="cs-pc-row">
+                        <div className="cs-pc-sum">
+                          <span className="cs-pc-n">{k + 1}</span>
+                          <PieceChips product={item.product} variants={pc.variants} />
+                          <button type="button" className="cs-pc-edit" aria-expanded={open} onClick={() => setEditPc(open ? '' : key)}>
+                            {pcT.edit}<ChevronDown size={14} aria-hidden="true" style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
+                          </button>
+                        </div>
+                        {open && <div className="cs-pc-opts cs-fade"><PieceOptions product={item.product} variants={pc.variants} onPick={(n, v) => pickPiece(i, k, n, v)} /></div>}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            {!item.offerBox?.lines?.length && editing === i && item.product?.attributes?.length > 0 && (
               <div className="cs-fade" style={{ padding: '0 1rem 1rem' }}>
                 <div className="cs-pc" style={{ marginBottom: 0 }}>
                   <PieceOptions product={item.product} variants={item.selectedVariants || {}} onPick={(n, v) => pickOpt(i, n, v)} />
