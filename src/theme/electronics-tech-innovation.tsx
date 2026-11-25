@@ -1,6 +1,7 @@
 'use client';
 // دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
 import * as __kit from '@mdstore/theme-kit';
+import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 /* ============================================================================
@@ -60,6 +61,7 @@ interface Product {
 /* ========================= Constants / Tokens ========================= */
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
+const __k: any = __bk;
 
 const BG = '#060A12';        // page background — deep space navy
 const BG2 = '#0B1220';       // section alt
@@ -348,6 +350,24 @@ const THEME_CSS = `
 .ti-root a { text-decoration: none; color: inherit; }
 .ti-root img { max-width: 100%; }
 .ti-container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+/* الأطقم */
+.ti-bnd-track { max-width: 1280px; margin: 0 auto; display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 1.5rem; padding: 0 1.5rem 0.5rem; scrollbar-width: none; }
+.ti-bnd-track::-webkit-scrollbar { display: none; }
+.ti-bnd-track .ti-card { scroll-snap-align: start; flex: 0 0 min(86%, 380px); }
+.ti-bnd-track.one .ti-card { flex-basis: min(100%, 560px); }
+.ti-bnd-img { position: relative; display: block; aspect-ratio: 16/8; overflow: hidden; background: ${BG2}; }
+.ti-bnd-img img, .ti-bnd-img picture { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ti-bnd-items { list-style: none; display: flex; align-items: flex-start; gap: 4px; margin: 0; padding: 10px 6px; background: ${SRF}; border: 1px solid ${BD}; border-radius: 4px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
+.ti-bnd-items::-webkit-scrollbar { display: none; }
+.ti-bnd-items li { display: contents; }
+.ti-bnd-split { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.75rem; padding: 1.5rem 1rem 4rem; }
+@media (min-width: 900px) {
+  .ti-bnd-top { padding-top: 1.5rem; }
+  .ti-bnd-hero { border: 1px solid ${BD}; border-radius: 6px; }
+  .ti-bnd-split { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 2.5rem; padding: 2rem 1.5rem 5rem; }
+  .ti-bnd-side { position: sticky; top: 90px; align-self: start; }
+}
+@media (max-width: 899px) { .ti-container.ti-bnd-top { padding: 0; } }
 .ti-mono { font-family: ${FONT_MONO}; }
 
 /* ---------- Keyframes (§20.1) ---------- */
@@ -977,6 +997,210 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
   );
 }
 
+/* ========================= Bundles — عروض الأطقم (data-mds-bundles) + صفحة الطقم ========================= */
+function BundlesStrip({ store }: any) {
+  const sc = __k.useBundleScroll ? __k.useBundleScroll() : null; // أسهم التمرير
+  const list: any[] = store?.bundles || [];
+  if (!list.length) return null;
+  const t = withLocationLabels(T)[getLang(store)];
+  const bt = __k.bundleStrings(getLang(store));
+  const title = store?.design?.bundlesTitle;
+  const heading = title === null || title === undefined ? bt.title : String(title).trim();
+  const arrow = (d: boolean): React.CSSProperties => ({ width: 36, height: 36, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 4, border: `1px solid ${d ? BD : A}`, background: d ? 'transparent' : AL, color: d ? SUB : A, cursor: d ? 'default' : 'pointer', padding: 0 });
+  return (
+    <section data-mds-bundles="" aria-label={heading || bt.title} style={{ padding: '2.5rem 0 0' }}>
+      <div className="ti-container" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: '1rem' }}>
+        {heading && <h2 className="ti-mono" style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: SUB, margin: 0, display: 'inline-flex', gap: 8 }}><span aria-hidden="true" style={{ color: A }}>//</span><span>{heading}</span></h2>}
+        <span style={{ flex: 1, height: 1, background: BD }} aria-hidden="true" />
+        {sc?.show && [{ d: sc.atStart, on: sc.prev, label: sc.labels.prev, left: sc.prevLeft }, { d: sc.atEnd, on: sc.next, label: sc.labels.next, left: !sc.prevLeft }].map((a, i) => (
+          <button key={i} type="button" aria-label={a.label} disabled={a.d} onClick={a.on} style={arrow(a.d)}>
+            <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d={a.left ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6'} /></svg>
+          </button>
+        ))}
+      </div>
+      <div ref={sc?.ref} data-bundle-track="" className={`ti-bnd-track ${list.length === 1 ? 'one' : ''}`}>
+        {list.map((b) => (
+          <article key={b.id} className="ti-card">
+            <div className="ti-mono" style={{ background: BG2, padding: '4px 12px', fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: SUB, borderBottom: `1px solid ${BD}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+              <span>BUNDLE · {String(b.items.length).padStart(2, '0')}</span>
+              <Zap size={10} color={A} aria-hidden="true" />
+            </div>
+            <a {...__k.bundleLink(b.slug)} className="ti-bnd-img" aria-label={b.name}>
+              {(b.imageUrl || b.mobileImageUrl) && (
+                <picture>
+                  {b.mobileImageUrl && <source media="(max-width: 640px)" srcSet={b.mobileImageUrl} />}
+                  <img loading="lazy" decoding="async" src={b.imageUrl || b.mobileImageUrl} alt="" />
+                </picture>
+              )}
+              <span className="ti-mono" style={{ position: 'absolute', top: 10, insetInlineStart: 10, background: '#DB2777', color: '#fff', fontSize: '0.68rem', fontWeight: 700, padding: '3px 8px', borderRadius: 3 }}><bdi dir="ltr">-{b.discountPercent}%</bdi></span>
+            </a>
+            <div style={{ padding: '0.9rem', display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
+              <div>
+                <p style={{ fontSize: '0.98rem', fontWeight: 800, color: TXT, margin: 0, lineHeight: 1.4 }}>{b.name}</p>
+                {b.subtitle && <p style={{ fontSize: '0.78rem', color: SUB, margin: '2px 0 0' }}>{b.subtitle}</p>}
+              </div>
+              <ul className="ti-bnd-items">
+                {b.items.map((it: any, i: number) => (
+                  <li key={it.productId}>
+                    {i > 0 && <span aria-hidden="true" className="ti-mono" style={{ color: A, fontWeight: 800, paddingTop: 14 }}>+</span>}
+                    <span style={{ flex: '1 0 76px', minWidth: 76, scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, textAlign: 'center' }}>
+                      {it.imageUrl ? <img loading="lazy" decoding="async" src={it.imageUrl} alt="" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 3, background: CARD, border: `1px solid ${BD}`, display: 'block' }} /> : <span style={{ width: 50, height: 50, borderRadius: 3, background: CARD, display: 'block' }} />}
+                      <span style={{ fontSize: '0.68rem', color: SUB, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{it.name}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+                <span className="ti-mono" style={{ fontWeight: 800, color: A, fontSize: '1.15rem', whiteSpace: 'nowrap' }}>{fmt(b.price)} {cur(store)}</span>
+                <span className="ti-mono" style={{ color: SUB, fontSize: '0.78rem', textDecoration: 'line-through' }}>{fmt(b.original)}</span>
+                <span className="ti-mono" style={{ color: OK, fontSize: '0.74rem', fontWeight: 700, marginInlineStart: 'auto' }}>{bt.save} {fmt(b.saving)}</span>
+              </div>
+              <a {...__k.bundleLink(b.slug)} className="ti-btn" style={{ marginTop: 'auto', textAlign: 'center' }}>{bt.order}</a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function BundlePage({ store, bundle, domain }: any) {
+  const t = withLocationLabels(T)[getLang(store)];
+  const o = __k.useBundleOrder({ bundle, store, domain, validPhone: isValidDzPhone });
+  const bt = o.t;
+  const banner = bundle.imageUrl || bundle.mobileImageUrl;
+  const Err = ({ k }: { k: string }) => (o.errors[k] ? <p style={{ fontSize: '0.75rem', color: HOT, marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}><AlertCircle size={12} aria-hidden="true" />{o.errors[k]}</p> : null);
+  return (
+    <div dir={t.dir} style={{ background: BG, color: TXT }}>
+      {banner && (
+        <div className="ti-container ti-bnd-top">
+          <div className="ti-bnd-hero" style={{ position: 'relative', overflow: 'hidden', background: BG2 }}>
+            <picture>
+              {bundle.mobileImageUrl && <source media="(max-width: 640px)" srcSet={bundle.mobileImageUrl} />}
+              <img fetchPriority="high" decoding="async" src={banner} alt={bundle.name} style={{ display: 'block', width: '100%', height: 'clamp(200px, 40vw, 460px)', objectFit: 'cover' }} />
+            </picture>
+            <span className="ti-mono" style={{ position: 'absolute', top: 14, insetInlineStart: 14, background: '#DB2777', color: '#fff', fontSize: '0.8rem', fontWeight: 700, padding: '4px 10px', borderRadius: 3 }}><bdi dir="ltr">-{bundle.discountPercent}%</bdi></span>
+          </div>
+        </div>
+      )}
+
+      <div className="ti-container ti-bnd-split">
+        {/* المنتجات */}
+        <div style={{ minWidth: 0 }}>
+          <p className="ti-mono" style={{ fontSize: '0.72rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: A, margin: '0 0 6px' }}><bdi dir="ltr">// BUNDLE · {String(o.products.length).padStart(2, '0')}</bdi></p>
+          <h1 style={{ fontSize: 'clamp(1.6rem, 4vw, 2.4rem)', fontWeight: 900, margin: '0 0 6px', color: TXT, lineHeight: 1.2 }}>{bundle.name}</h1>
+          {bundle.subtitle && <p style={{ color: SUB, margin: '0 0 14px' }}>{bundle.subtitle}</p>}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap', border: `1px solid ${BD}`, borderRadius: 4, background: SRF, padding: '0.9rem 1rem', marginBottom: '1.5rem' }}>
+            <span className="ti-mono" style={{ fontWeight: 800, color: A, fontSize: '2rem' }}>{fmt(o.price)} {cur(store)}</span>
+            <span className="ti-mono" style={{ color: SUB, textDecoration: 'line-through' }}>{fmt(o.original)}</span>
+            <span className="ti-mono" style={{ color: OK, fontWeight: 700, fontSize: '0.85rem', marginInlineStart: 'auto' }}>{bt.saved} {fmt(o.saving)}</span>
+          </div>
+
+          <h2 className="ti-mono" style={{ fontSize: '0.85rem', textTransform: 'uppercase', color: SUB, margin: '0 0 0.75rem', display: 'flex', gap: 8 }}><span aria-hidden="true" style={{ color: A }}>//</span><span>{bt.inBundle}</span></h2>
+          <div id="bundle-items" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {o.products.map((p: any) => {
+              const img = __k.bundleProductImage(p);
+              return (
+                <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '84px minmax(0, 1fr)', gap: 14, background: CARD, border: `1px solid ${BD}`, borderRadius: 4, padding: 14 }}>
+                  {img ? <img loading="lazy" decoding="async" src={img} alt="" style={{ width: 84, height: 84, objectFit: 'cover', borderRadius: 3, background: BG2, display: 'block' }} /> : <span style={{ width: 84, height: 84, borderRadius: 3, background: BG2, display: 'block' }} />}
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontSize: '0.9rem', fontWeight: 700, color: TXT, margin: 0, lineHeight: 1.45 }}>{p.name}</p>
+                    <span className="ti-mono" style={{ fontWeight: 800, color: A, fontSize: '1rem', display: 'inline-block', marginTop: 4 }}>{fmt(o.priceOf(p))} {cur(store)}</span>
+                    {o.attrsOf(p).map((a: any) => (
+                      <div key={a.id} style={{ marginTop: 12 }}>
+                        <span className="ti-label">{a.name}</span>
+                        <div role="group" aria-label={`${a.name} — ${p.name}`} style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                          {a.variants.map((v: any, i: number) => {
+                            const sel = o.chosen(p, a.name) === v.value;
+                            const kind = __k.optionKind(a, v.value);
+                            if (kind === 'image') return <button key={v.id} type="button" aria-pressed={sel} aria-label={`${a.name} ${i + 1}`} onClick={() => o.pick(p.id, a.name, v.value)} style={{ width: 52, height: 52, padding: 0, overflow: 'hidden', borderRadius: 4, border: sel ? `2px solid ${A}` : `1px solid ${BD}`, background: SRF, cursor: 'pointer', boxShadow: sel ? '0 0 12px rgba(0,229,255,0.35)' : 'none' }}><img src={__k.optionImage(v)} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></button>;
+                            if (kind === 'color') return <button key={v.id} type="button" aria-pressed={sel} aria-label={v.name || v.value} title={v.name} onClick={() => o.pick(p.id, a.name, v.value)} style={{ width: 30, height: 30, borderRadius: '50%', background: v.value, border: `2px solid ${sel ? A : BD}`, cursor: 'pointer', boxShadow: sel ? '0 0 10px rgba(0,229,255,0.45)' : 'none' }} />;
+                            return <button key={v.id} type="button" aria-pressed={sel} onClick={() => o.pick(p.id, a.name, v.value)} className="ti-mono" style={{ padding: '0.45rem 0.9rem', minHeight: 40, borderRadius: 4, border: sel ? `2px solid ${A}` : `1px solid ${BD}`, background: sel ? AL : 'transparent', color: sel ? A : SUB, fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}>{v.name || v.value}</button>;
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {o.errors.options && <p style={{ fontSize: '0.8rem', color: HOT, marginTop: 8, display: 'flex', alignItems: 'center', gap: 5 }}><AlertCircle size={13} aria-hidden="true" />{o.errors.options}</p>}
+        </div>
+
+        {/* الطلب */}
+        <div className="ti-bnd-side" style={{ minWidth: 0 }}>
+          <form id="bundle-form" onSubmit={o.submit} noValidate style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 4, padding: '1.1rem' }}>
+            <div style={{ marginBottom: '0.875rem' }}>
+              <label className="ti-label" htmlFor="tib-name">{t.fullName}</label>
+              <input id="tib-name" className={`ti-input ${o.errors.name ? 'err' : ''}`} value={o.form.name} onChange={(e) => o.setName(e.target.value)} placeholder={t.fullNamePlaceholder} autoComplete="name" />
+              <Err k="name" />
+            </div>
+            <div style={{ marginBottom: '0.875rem' }}>
+              <label className="ti-label" htmlFor="tib-phone">{t.phone}</label>
+              <input id="tib-phone" className={`ti-input ti-mono ${o.errors.phone ? 'err' : ''}`} dir="ltr" inputMode="tel" value={o.form.phone} onChange={(e) => o.setPhone(e.target.value)} placeholder={t.phonePlaceholder} autoComplete="tel" />
+              <Err k="phone" />
+            </div>
+            {!o.digital && (
+              <>
+                <div className="ti-form-row-2">
+                  <div>
+                    <label className="ti-label" htmlFor="tib-wilaya">{t.wilaya}</label>
+                    <div style={{ position: 'relative' }}>
+                      <ChevronDown size={13} aria-hidden="true" style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
+                      <select id="tib-wilaya" className={`ti-input ${o.errors.wilaya ? 'err' : ''}`} value={o.form.wilaya} onChange={(e) => o.chooseWilaya(e.target.value)} style={{ paddingInlineEnd: 36 }}>
+                        <option value="">{o.wilayas.length === 0 ? t.wilayaUnavailable : t.wilayaPlaceholder}</option>
+                        {o.wilayas.map((w: any) => <option key={w.id} value={w.id}>{w.code ?? w.id} - {o.placeName(w)}</option>)}
+                      </select>
+                    </div>
+                    <Err k="wilaya" />
+                  </div>
+                  <div>
+                    <label className="ti-label" htmlFor="tib-commune">{t.commune}</label>
+                    <div style={{ position: 'relative' }}>
+                      <ChevronDown size={13} aria-hidden="true" style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: SUB }} />
+                      <select id="tib-commune" className={`ti-input ${o.errors.commune ? 'err' : ''}`} disabled={!o.form.wilaya || o.loadingCommunes} value={o.form.commune} onChange={(e) => o.setCommune(e.target.value)} style={{ paddingInlineEnd: 36 }}>
+                        <option value="">{o.loadingCommunes ? t.communeLoading : t.communePlaceholder}</option>
+                        {o.communes.map((c: any) => <option key={c.id} value={c.id}>{o.placeName(c)}</option>)}
+                      </select>
+                    </div>
+                    <Err k="commune" />
+                  </div>
+                </div>
+                {o.form.wilaya && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10, marginBottom: '1rem' }}>
+                    {(['home', 'office'] as const).map((type) => {
+                      const active = o.form.ship === type;
+                      const cost = o.shipCost(type);
+                      return (
+                        <button data-delivery-option key={type} type="button" onClick={() => o.setShip(type)} style={{ padding: '0.7rem', minHeight: 44, cursor: 'pointer', fontFamily: 'inherit', border: active ? `2px solid ${A}` : `1px solid ${BD}`, borderRadius: 4, background: active ? AL : 'transparent', color: active ? A : SUB, fontWeight: 700, fontSize: '0.85rem' }}>
+                          {type === 'home' ? t.deliveryHome : t.deliveryOffice}{cost !== null && <span className="ti-mono" style={{ display: 'block', fontSize: '0.8rem', marginTop: 2 }}>{fmt(cost)} {cur(store)}</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            )}
+            <div style={{ border: `1px solid ${BD}`, borderRadius: 4, background: SRF, padding: '0.75rem 1rem', marginBottom: '1rem' }}>
+              <SummaryRow l={bt.original} v={`${fmt(o.original)} ${cur(store)}`} />
+              <SummaryRow l={bt.bundlePrice} v={`${fmt(o.price)} ${cur(store)}`} />
+              <SummaryRow l={bt.saved} v={`${fmt(o.saving)} ${cur(store)}`} />
+              {!o.digital && <SummaryRow l={t.delivery} v={o.wilaya ? `${fmt(o.ship)} ${cur(store)}` : '—'} />}
+              <div style={{ height: 1, background: BD, margin: '0.25rem 0' }} />
+              <SummaryRow l={t.total} v={`${fmt(o.total)} ${cur(store)}`} big />
+            </div>
+            <button type="submit" className="ti-btn" disabled={o.submitting} style={{ width: '100%' }}>{o.submitting ? t.sending : bt.order}</button>
+            <p className="ti-mono" style={{ fontSize: '0.72rem', color: SUB, textAlign: 'center', marginTop: 10 }}>{bt.cod}</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+// صفحة الطقم للمتجر
+export const Bundle = BundlePage;
+
 /* ========================= Home (§8) ========================= */
 
 export function Home({ store, page }: any) {
@@ -1078,6 +1302,9 @@ export function Home({ store, page }: any) {
           })}
         </div>
       </section>
+
+      {/* BUNDLES (عروض الأطقم) */}
+      <BundlesStrip store={store} />
 
       {/* CATEGORIES — server-side filtering via URL only (§8) */}
       {cats.length > 0 && (
