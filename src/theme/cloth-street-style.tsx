@@ -1019,6 +1019,7 @@ const CLASSES = ['zs-half', 'zs-third', 'zs-wide', 'zs-half', 'zs-third', 'zs-wi
    BUNDLES — عروض الأطقم (data-mds-bundles) + صفحة الطقم
 ══════════════════════════════════════════════════════════════ */
 function BundlesStrip({ store }: any) {
+  const sc = __k.useBundleScroll ? __k.useBundleScroll() : null; // أسهم التمرير (المنطق من theme-kit)
   const list: any[] = store?.bundles || [];
   if (!list.length || !__k.bundleStrings) return null;
   const lang = getLang(store);
@@ -1035,8 +1036,16 @@ function BundlesStrip({ store }: any) {
           <span className="sm" style={{ fontSize: '8px', letterSpacing: '0.2em', color: 'rgba(242,239,232,0.55)' }}>{list.length} / PACK</span>
         </div>
       )}
-      {__k.BundleArrows && <__k.BundleArrows />}
-      <div data-bundle-track="" className={`bz-track ${list.length === 1 ? 'one' : ''}`}>
+      {sc?.show && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 0, padding: '12px 20px 0' }}>
+          {[{ d: sc.atStart, on: sc.prev, label: sc.labels.prev, left: sc.prevLeft }, { d: sc.atEnd, on: sc.next, label: sc.labels.next, left: !sc.prevLeft }].map((a, i) => (
+            <button key={i} type="button" aria-label={a.label} disabled={a.d} onClick={a.on} style={((d: boolean) => ({ width: 38, height: 38, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--ink)', marginInlineStart: -1, background: d ? 'transparent' : 'var(--ink)', color: d ? 'var(--mist)' : 'var(--punch)', cursor: d ? 'default' : 'pointer', padding: 0 }))(a.d)}>
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d={a.left ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6'} /></svg>
+            </button>
+          ))}
+        </div>
+      )}
+      <div ref={sc?.ref} data-bundle-track="" className={`bz-track ${list.length === 1 ? 'one' : ''}`}>
         {list.map((b) => (
           <article key={b.id} className="bz-card">
             <a {...bundleLink(b.slug)} className="bz-img" aria-label={b.name}>

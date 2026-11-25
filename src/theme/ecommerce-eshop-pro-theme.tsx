@@ -1161,6 +1161,7 @@ const SecHead = ({ children }: { children: React.ReactNode }) => (
 );
 
 function BundlesStrip({ store }: any) {
+  const sc = __k.useBundleScroll ? __k.useBundleScroll() : null; // أسهم التمرير (المنطق من theme-kit)
   const list: any[] = store?.bundles || [];
   if (!list.length || !__k.bundleStrings) return null;
   const bt = __k.bundleStrings(getLang(store));
@@ -1170,8 +1171,16 @@ function BundlesStrip({ store }: any) {
   return (
     <section data-mds-bundles="" aria-label={heading || bt.title} style={{ padding: '4rem 0 1rem', maxWidth: 1280, margin: '0 auto' }}>
       {heading && <div style={{ padding: '0 1.5rem' }}><SecHead>{heading}</SecHead></div>}
-      {__k.BundleArrows && <__k.BundleArrows />}
-      <div data-bundle-track="" className={`bnd-track ${list.length === 1 ? 'one' : ''}`}>
+      {sc?.show && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '0 1.5rem 0.875rem' }}>
+          {[{ d: sc.atStart, on: sc.prev, label: sc.labels.prev, left: sc.prevLeft }, { d: sc.atEnd, on: sc.next, label: sc.labels.next, left: !sc.prevLeft }].map((a, i) => (
+            <button key={i} type="button" aria-label={a.label} disabled={a.d} onClick={a.on} style={((d: boolean) => ({ width: 38, height: 38, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, border: `1.5px solid ${d ? '#EBEBEB' : 'var(--acc)'}`, background: '#fff', color: d ? '#C8C8C8' : 'var(--acc)', cursor: d ? 'default' : 'pointer', padding: 0 }))(a.d)}>
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d={a.left ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6'} /></svg>
+            </button>
+          ))}
+        </div>
+      )}
+      <div ref={sc?.ref} data-bundle-track="" className={`bnd-track ${list.length === 1 ? 'one' : ''}`}>
         {list.map((b) => (
           <article key={b.id} className="bnd-card">
             <a {...bundleLink(b.slug)} className="bnd-img" aria-label={b.name}>

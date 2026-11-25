@@ -855,6 +855,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 
 // ─── الأطقم: «عروض الأطقم» تحت الغلاف (data-mds-bundles) + صفحة الطقم ─────────
 function BundlesStrip({ store }: any) {
+  const sc = __k.useBundleScroll ? __k.useBundleScroll() : null; // أسهم التمرير (المنطق من theme-kit)
   const list: any[] = store?.bundles || [];
   if (!list.length || !__k.bundleStrings) return null;
   const bt = __k.bundleStrings(getLang(store));
@@ -868,8 +869,16 @@ function BundlesStrip({ store }: any) {
           <h2 className="font-display" style={{ fontSize: 'clamp(1.4rem,3vw,1.9rem)', fontWeight: 600, color: TXT }}>{heading}</h2>
         </div>
       )}
-      {__k.BundleArrows && <__k.BundleArrows />}
-      <div data-bundle-track="" className={`ep-track ${list.length === 1 ? 'one' : ''}`}>
+      {sc?.show && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, padding: '0 1.5rem 1rem' }}>
+          {[{ d: sc.atStart, on: sc.prev, label: sc.labels.prev, left: sc.prevLeft }, { d: sc.atEnd, on: sc.next, label: sc.labels.next, left: !sc.prevLeft }].map((a, i) => (
+            <button key={i} type="button" aria-label={a.label} disabled={a.d} onClick={a.on} style={((d: boolean) => ({ width: 38, height: 38, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${d ? BD : A}`, background: d ? 'transparent' : A, color: d ? SUB : '#FFFFFF', cursor: d ? 'default' : 'pointer', padding: 0, transition: 'all 0.3s' }))(a.d)}>
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={a.left ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6'} /></svg>
+            </button>
+          ))}
+        </div>
+      )}
+      <div ref={sc?.ref} data-bundle-track="" className={`ep-track ${list.length === 1 ? 'one' : ''}`}>
         {list.map((b) => (
           <article key={b.id} className="ep-card">
             <a {...bundleLink(b.slug)} className="ep-img" aria-label={b.name}>

@@ -640,6 +640,7 @@ export function Card({product,displayImage,discount,store}:any){
 
 /* ══ BUNDLES — عروض الأطقم (data-mds-bundles) + صفحة الطقم ══ */
 function BundlesStrip({ store }: any) {
+  const sc = __k.useBundleScroll ? __k.useBundleScroll() : null; // أسهم التمرير (المنطق من theme-kit)
   const list: any[] = store?.bundles || [];
   if (!list.length || !__k.bundleStrings) return null;
   const t = withLocationLabels(T)[getLang(store)];
@@ -655,8 +656,16 @@ function BundlesStrip({ store }: any) {
           <span style={{ fontSize: '11px', color: 'var(--mu)', letterSpacing: '0.06em' }}>{list.length}</span>
         </div>
       )}
-      {__k.BundleArrows && <__k.BundleArrows />}
-      <div data-bundle-track="" className={`lb-track ${list.length === 1 ? 'one' : ''}`}>
+      {sc?.show && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, padding: '0 32px 14px' }}>
+          {[{ d: sc.atStart, on: sc.prev, label: sc.labels.prev, left: sc.prevLeft }, { d: sc.atEnd, on: sc.next, label: sc.labels.next, left: !sc.prevLeft }].map((a, i) => (
+            <button key={i} type="button" aria-label={a.label} disabled={a.d} onClick={a.on} style={((d: boolean) => ({ width: 40, height: 40, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${d ? 'var(--br)' : 'var(--cp)'}`, background: 'transparent', color: d ? 'var(--mu)' : 'var(--cp)', cursor: d ? 'default' : 'pointer', padding: 0 }))(a.d)}>
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={a.left ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6'} /></svg>
+            </button>
+          ))}
+        </div>
+      )}
+      <div ref={sc?.ref} data-bundle-track="" className={`lb-track ${list.length === 1 ? 'one' : ''}`}>
         {list.map((b) => (
           <article key={b.id} className="lb-card">
             <a {...bundleLink(b.slug)} className="lb-img" aria-label={b.name}>

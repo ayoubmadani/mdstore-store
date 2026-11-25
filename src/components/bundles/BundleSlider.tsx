@@ -6,7 +6,7 @@
 import { useRef, useState } from 'react';
 import { Gift, ImageIcon } from 'lucide-react';
 import { BundleCard, bundleStrings, formatDA } from '@/lib/bundles';
-import { BundleArrows } from '@/components/theme/BundleArrows';
+import { BundleArrows, useBundleScroll } from '@/components/theme/BundleArrows';
 
 interface Props {
   bundles: BundleCard[];
@@ -34,6 +34,7 @@ export default function BundleSlider({ bundles, accent, language = 'ar', title, 
   const t = bundleStrings(language);
   const track = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
+  const sc = useBundleScroll();
 
   if (!bundles?.length) return null;
   const single = bundles.length === 1;
@@ -65,8 +66,8 @@ export default function BundleSlider({ bundles, accent, language = 'ar', title, 
           </div>
         )}
 
-        <BundleArrows />
-        <div ref={track} onScroll={onScroll} data-bundle-track=""
+        <BundleArrows sc={sc} />
+        <div ref={(n) => { track.current = n; sc.ref(n); }} onScroll={onScroll} data-bundle-track=""
           className={`flex gap-3 overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${single ? 'justify-center' : ''}`}
           style={{ padding: '0 16px 4px' }}>
           {bundles.map((b) => {

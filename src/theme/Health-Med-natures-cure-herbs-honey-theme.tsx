@@ -1031,6 +1031,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
 
 /* ── الأطقم: «عروض الأطقم» تحت الغلاف (data-mds-bundles) + صفحة الطقم ── */
 function BundlesStrip({ store }: any) {
+  const sc = __k.useBundleScroll ? __k.useBundleScroll() : null; // أسهم التمرير (المنطق من theme-kit)
   const list: any[] = store?.bundles || [];
   if (!list.length || !__k.bundleStrings) return null;
   const lang = getLang(store);
@@ -1047,8 +1048,16 @@ function BundlesStrip({ store }: any) {
             <h2 className="pd" style={{ fontSize:'clamp(1.8rem, 4vw, 3rem)', color:'var(--brown)', lineHeight:1.1, display:'flex', alignItems:'center', gap:10 }}><Leaf size={26} style={{ color:'var(--green)' }} />{heading}</h2>
           </div>
         )}
-        {__k.BundleArrows && <__k.BundleArrows />}
-        <div data-bundle-track="" className={`hb-track ${list.length === 1 ? 'one' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
+        {sc?.show && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '0 20px 14px' }}>
+            {[{ d: sc.atStart, on: sc.prev, label: sc.labels.prev, left: sc.prevLeft }, { d: sc.atEnd, on: sc.next, label: sc.labels.next, left: !sc.prevLeft }].map((a, i) => (
+              <button key={i} type="button" aria-label={a.label} disabled={a.d} onClick={a.on} style={((d: boolean) => ({ width: 40, height: 40, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', border: `1.5px solid ${d ? 'var(--tan)' : 'var(--gold)'}`, background: d ? 'var(--white)' : 'var(--green)', color: d ? 'var(--dim)' : 'var(--white)', cursor: d ? 'default' : 'pointer', padding: 0 }))(a.d)}>
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={a.left ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6'} /></svg>
+              </button>
+            ))}
+          </div>
+        )}
+        <div ref={sc?.ref} data-bundle-track="" className={`hb-track ${list.length === 1 ? 'one' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
           {list.map((b) => (
             <article key={b.id} className="p-card">
               <a {...bundleLink(b.slug)} className="hb-img" aria-label={b.name}>

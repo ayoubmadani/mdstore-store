@@ -967,6 +967,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
    BUNDLES — عروض الأطقم (data-mds-bundles) + صفحة الطقم
 ═══════════════════════════════════════════════════════════ */
 function BundlesStrip({ store }: any) {
+  const sc = __k.useBundleScroll ? __k.useBundleScroll() : null; // أسهم التمرير (المنطق من theme-kit)
   const list: any[] = store?.bundles || [];
   if (!list.length || !__k.bundleStrings) return null;
   const lang = getLang(store);
@@ -980,8 +981,16 @@ function BundlesStrip({ store }: any) {
       {heading && (
         <h2 style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', textAlign: 'center', color: 'var(--text)', marginBottom: '1.5rem', padding: '0 1.5rem' }}>🎁 {heading}</h2>
       )}
-      {__k.BundleArrows && <__k.BundleArrows />}
-      <div data-bundle-track="" className={`kk-track ${list.length === 1 ? 'one' : ''}`}>
+      {sc?.show && (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 12, padding: '0 1.5rem 1rem' }}>
+          {[{ d: sc.atStart, on: sc.prev, label: sc.labels.prev, left: sc.prevLeft }, { d: sc.atEnd, on: sc.next, label: sc.labels.next, left: !sc.prevLeft }].map((a, i) => (
+            <button key={i} type="button" aria-label={a.label} disabled={a.d} onClick={a.on} style={((d: boolean) => ({ width: 46, height: 46, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', border: 'none', background: d ? 'var(--border)' : 'linear-gradient(135deg, var(--coral), var(--grape))', color: '#fff', boxShadow: d ? 'none' : '0 8px 18px rgba(255,107,107,0.35)', cursor: d ? 'default' : 'pointer', padding: 0 }))(a.d)}>
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d={a.left ? 'M15 18l-6-6 6-6' : 'M9 18l6-6-6-6'} /></svg>
+            </button>
+          ))}
+        </div>
+      )}
+      <div ref={sc?.ref} data-bundle-track="" className={`kk-track ${list.length === 1 ? 'one' : ''}`}>
         {list.map((b) => (
           <article key={b.id} className="kk-card">
             <div style={{ height: 4, background: 'var(--coral)', width: '100%' }} />
