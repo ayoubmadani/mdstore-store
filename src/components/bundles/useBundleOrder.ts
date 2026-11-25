@@ -4,10 +4,9 @@
 // خيارات كل منتج، الأسعار قبل/بعد الخصم، الولايات والبلديات والتوصيل، التحقق، والإرسال.
 // الثيم يرسم الشكل فقط. الخادم يعيد حساب الأسعار بخصم الطقم ولا يعتمد على ما يُعرض هنا.
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { isValidDzPhone } from '@/components/theme/kit';
 import { getProductFormStrings } from '@/components/productForm/translations';
 import {
   BundleAttribute, BundlePage, BundleProduct, bundleStrings, discounted, formatDA, matchVariant, unitPrice,
@@ -17,7 +16,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
 export interface BundleWilaya { id: string; ar_name: string; name?: string; livraisonHome: number; livraisonOfice: number; livraisonReturn: number }
 export interface BundleCommune { id: string; ar_name: string; name?: string }
-type BundleStoreLike = { id?: string; language?: string | null; user?: { id?: string } | null };
+type BundleStoreLike = { id?: string; language?: string | null; country?: string | null; user?: { id?: string } | null };
+
+// هذا الملف يُدمج داخل كل ثيم عند بنائه (الثيم مستقل) — لا يستورد شيئاً من المتجر وقت التشغيل.
+// الهاتف: الجزائر 05/06/07 (أو +213)، وغيرها 8–15 رقماً — الثيم يمرّر مدقّقه إن كان له واحد (validPhone)
+const defaultPhone = (country?: string | null) => (v: string) =>
+  !country || country === 'DZ' ? /^(0|\+213)[5-7]\d{8}$/.test(v) : /^\+?\d{8,15}$/.test(v);
 
 /** نوع عرض قيمة خاصية: صورة (رابط) / لون (كود) / نص */
 export function optionKind(a: Pick<BundleAttribute, 'displayMode' | 'type'>, value: string): 'image' | 'color' | 'text' {
@@ -33,7 +37,8 @@ export const firstImage = (p: BundleProduct) =>
   [...(p.imagesProduct || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))[0]?.imageUrl;
 
 // domain: يبقى في التوقيع (الثيمات تمرّره) — الطلب يُرسل برقم المتجر
-export function useBundleOrder({ bundle, store }: { bundle: BundlePage; store: BundleStoreLike; domain?: string }) {
+export function useBundleOrder({ bundle, store, validPhone }: { bundle: BundlePage; store: BundleStoreLike; domain?: string; validPhone?: (v: string) => boolean }) {
+  const phoneOk = validPhone || defaultPhone(store?.country);
   const language = store?.language || 'ar';
   const t = bundleStrings(language);
   const f = getProductFormStrings(language);
@@ -93,7 +98,7 @@ export function useBundleOrder({ bundle, store }: { bundle: BundlePage; store: B
     const err: Record<string, string> = {};
     if (bundle.products.some((p) => needsChoice(p) && !variantOf(p))) err.options = t.pickOptions;
     if (form.name.trim().length < 3) err.name = f.errorName;
-    if (!isValidDzPhone(form.phone.replace(/\s/g, ''))) err.phone = f.errorPhone;
+    if (!phoneOk(form.phone.replace(/\s/g, ''))) err.phone = f.errorPhone;
     if (!digital && !form.wilaya) err.wilaya = f.errorWilaya;
     if (!digital && !form.commune) err.commune = f.errorCommune;
     setErrors(err);
@@ -136,3 +141,55 @@ export function useBundleOrder({ bundle, store }: { bundle: BundlePage; store: B
     errors, submitting, submit,
   };
 }
+
+/* ── رابط صفحة طقم: <a {...bundleLink(slug)}> — محلياً (الدومين الرئيسي) تُضاف بادئة /<domain> عند الضغط ── */
+function fixLocalLink(e: { currentTarget: HTMLAnchorElement; preventDefault: () => void }) {
+  const root = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'mdstore.top').toLowerCase();
+  if (window.location.host.toLowerCase() !== root) return;
+  const seg = window.location.pathname.split('/').filter(Boolean)[0];
+  if (!seg) return;
+  e.preventDefault();
+  window.location.href = `/${seg}${e.currentTarget.getAttribute('href')}`;
+}
+export const bundleLink = (slug: string) => ({ href: `/bundle/${slug}`, onClick: fixLocalLink });
+
+/* ── تمرير سلايدر الأطقم يميناً/يساراً — المنطق فقط، والثيم يرسم أزراره بأسلوبه ── */
+export function useBundleScroll() {
+  const [el, setEl] = useState<HTMLElement | null>(null);
+  const [state, setState] = useState({ show: false, atStart: true, atEnd: false, rtl: true });
+
+  const update = useCallback(() => {
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    const pos = Math.abs(el.scrollLeft); // RTL: scrollLeft سالب
+    setState({ show: max > 4, atStart: pos <= 4, atEnd: pos >= max - 4, rtl: getComputedStyle(el).direction === 'rtl' });
+  }, [el]);
+
+  useEffect(() => {
+    if (!el) return undefined;
+    const raf = requestAnimationFrame(update);
+    el.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => { cancelAnimationFrame(raf); el.removeEventListener('scroll', update); window.removeEventListener('resize', update); };
+  }, [el, update]);
+
+  // dir = 1 التالي (نحو نهاية السطر)، -1 السابق — بطاقة واحدة
+  const go = (dir: 1 | -1) => {
+    if (!el) return;
+    const card = el.firstElementChild as HTMLElement | null;
+    const step = (card?.offsetWidth || el.clientWidth * 0.8) + 16;
+    el.scrollBy({ left: dir * step * (state.rtl ? -1 : 1), behavior: 'smooth' });
+  };
+
+  return {
+    ref: setEl as (node: HTMLElement | null) => void,
+    ...state,
+    prev: () => go(-1),
+    next: () => go(1),
+    prevLeft: !state.rtl,
+    labels: state.rtl ? { prev: 'السابق', next: 'التالي' } : { prev: 'Previous', next: 'Next' },
+  };
+}
+
+export { bundleStrings };
+export { firstImage as bundleProductImage };

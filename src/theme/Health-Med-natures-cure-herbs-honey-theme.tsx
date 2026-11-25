@@ -1,5 +1,6 @@
 'use client';
 // دوال المتجر وقت التشغيل (@mdstore/theme-kit) — مع بديل إن كان المتجر المنشور أقدم
+import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
 import * as __kit from '@mdstore/theme-kit';
 import { showError } from '@/lib/showError';
 
@@ -33,7 +34,7 @@ const currencyLabel = (dzLabel: string) => (__kit.currencyLabel ? __kit.currency
 const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.withLocationLabels ? __kit.withLocationLabels(d) : d);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
-const __k: any = __kit;
+const __k: any = __bk;
 const bundleLink = (slug: string) => (__k.bundleLink ? __k.bundleLink(slug) : { href: `/bundle/${slug}` });
 const bundleImg = (v: any) => (__k.optionImage ? __k.optionImage(v) : v.value);
 
@@ -1113,7 +1114,7 @@ function BundlesStrip({ store }: any) {
 function BundlePage({ store, bundle, domain }: any) {
   const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   const cur = store?.currency || 'DZD';
-  const o = __k.useBundleOrder({ bundle, store, domain });
+  const o = __k.useBundleOrder({ bundle, store, domain, validPhone: isValidDzPhone });
   const bt = o.t;
   const banner = bundle.imageUrl || bundle.mobileImageUrl;
   const num = (n: number) => Number(n || 0).toLocaleString();

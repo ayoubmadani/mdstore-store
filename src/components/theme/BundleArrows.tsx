@@ -7,44 +7,9 @@
 // prevLeft: سهم «السابق» يشير لليسار (LTR) أو لليمين (RTL).
 // BundleArrows: أزرار بسيطة للصفحة المشتركة فقط (ليست تصميماً للثيمات).
 
-import { useCallback, useEffect, useState } from 'react';
+import { useBundleScroll } from '@/components/bundles/useBundleOrder';
 
-export function useBundleScroll() {
-  const [el, setEl] = useState<HTMLElement | null>(null);
-  const [state, setState] = useState({ show: false, atStart: true, atEnd: false, rtl: true });
-
-  const update = useCallback(() => {
-    if (!el) return;
-    const max = el.scrollWidth - el.clientWidth;
-    const pos = Math.abs(el.scrollLeft); // RTL: scrollLeft سالب
-    setState({ show: max > 4, atStart: pos <= 4, atEnd: pos >= max - 4, rtl: getComputedStyle(el).direction === 'rtl' });
-  }, [el]);
-
-  useEffect(() => {
-    if (!el) return undefined;
-    const raf = requestAnimationFrame(update);
-    el.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
-    return () => { cancelAnimationFrame(raf); el.removeEventListener('scroll', update); window.removeEventListener('resize', update); };
-  }, [el, update]);
-
-  // dir = 1 التالي (نحو نهاية السطر)، -1 السابق — بطاقة واحدة
-  const go = (dir: 1 | -1) => {
-    if (!el) return;
-    const card = el.firstElementChild as HTMLElement | null;
-    const step = (card?.offsetWidth || el.clientWidth * 0.8) + 16;
-    el.scrollBy({ left: dir * step * (state.rtl ? -1 : 1), behavior: 'smooth' });
-  };
-
-  return {
-    ref: setEl as (node: HTMLElement | null) => void,
-    ...state,
-    prev: () => go(-1),
-    next: () => go(1),
-    prevLeft: !state.rtl,
-    labels: state.rtl ? { prev: 'السابق', next: 'التالي' } : { prev: 'Previous', next: 'Next' },
-  };
-}
+export { useBundleScroll };
 
 /** للصفحة المشتركة: يعطي الـ ref للمسار عبر track */
 export function BundleArrows({ sc, size = 40 }: { sc: ReturnType<typeof useBundleScroll>; size?: number }) {

@@ -1,5 +1,6 @@
 'use client';
 
+import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
@@ -13,10 +14,9 @@ import {
 // كل ما يحتاجه الثيم من المتجر يأتي من @mdstore/theme-kit — الثيم ملف واحد مستقل يُبنى ويُرفع من الـ API
 import {
   useCartStore, WhatsAppOrderButton, WhatsAppGlyph, comingSoon,
-  useBundleOrder, optionKind, optionImage, bundleProductImage, bundleLink, bundleStrings,
 } from '@mdstore/theme-kit';
-import * as __kns from '@mdstore/theme-kit';
-const __k: any = __kns;
+import { useBundleOrder, optionKind, optionImage, bundleProductImage, bundleLink, bundleStrings } from '@/components/bundles/useBundleOrder';
+const __k: any = __bk;
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
