@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -175,7 +175,7 @@ const fetchCommunes = async (wid: string): Promise<Commune[]> => { try { const {
 const S = {
   input: { width: '100%', padding: '0.7rem 0.875rem', background: '#fff', border: `1px solid ${BD}`, borderRadius: 4, fontSize: '0.9rem', color: INK, outline: 'none', transition: 'border-color 0.15s', appearance: 'none' } as React.CSSProperties,
   inputErr: { borderColor: '#EF4444' } as React.CSSProperties,
-  btnPrimary: { width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: E, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.5rem', borderRadius: 4, border: 'none', cursor: 'pointer', transition: 'background 0.2s', fontFamily: "'Tajawal', sans-serif" } as React.CSSProperties,
+  btnPrimary: { width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: E, color: '#111827', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.5rem', borderRadius: 4, border: 'none', cursor: 'pointer', transition: 'background 0.2s', fontFamily: "'Tajawal', sans-serif" } as React.CSSProperties,
 };
 
 
@@ -491,7 +491,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   return (
     <>
       {store?.topBar?.enabled && store?.topBar?.text && (
-        <div style={{ background: E, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+        <div style={{ background: E, color: '#111827', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
           {store.topBar.text}
         </div>
       )}
@@ -513,7 +513,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               onBlur={e => (e.currentTarget.style.borderColor = BD)}>
               <Search size={13} color={SUB} style={{ flexShrink: 0 }} />
               <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder={t.search} style={{ flex: 1, border: 'none', background: 'transparent', fontSize: '0.82rem', color: INK, outline: 'none', fontFamily: "'Tajawal', sans-serif", direction: isRTL ? 'rtl' as const : 'ltr' as const }} />
-              {searchQuery && <button type="button" onClick={() => setSearchQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: SUB, padding: 0, display: 'flex', alignItems: 'center' }}><X size={11} /></button>}
+              {searchQuery && <button aria-label={a11y(store).clear} type="button" onClick={() => setSearchQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: SUB, padding: 0, display: 'flex', alignItems: 'center' }}><X size={11} /></button>}
             </form>
           </div>
           <div className="nav-desktop" style={{ flexShrink: 0, gap: '1.25rem' }}>
@@ -523,7 +523,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 onMouseLeave={e => (e.currentTarget.style.color = SUB)}>{i.l}</Link>
             ))}
             {store?.cart !== false && (
-              <Link href="/cart" style={{ position: 'relative', background: E, color: '#fff', height: 36, padding: '0 0.875rem', borderRadius: 4, display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.82rem', fontWeight: 700, transition: 'background 0.18s' }}
+              <Link href="/cart" style={{ position: 'relative', background: E, color: '#111827', height: 36, padding: '0 0.875rem', borderRadius: 4, display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.82rem', fontWeight: 700, transition: 'background 0.18s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = ED)}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = E)}>
                 <ShoppingCart size={14} /> {t.cart}
@@ -532,14 +532,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             )}
           </div>
           <div className="nav-mobile">
-            <button onClick={() => setShowSearch(true)} style={{ width: 36, height: 36, borderRadius: 4, border: `1px solid ${BD}`, background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: SUB }}><Search size={14} /></button>
+            <button aria-label={a11y(store).search} onClick={() => setShowSearch(true)} style={{ width: 36, height: 36, borderRadius: 4, border: `1px solid ${BD}`, background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: SUB }}><Search size={14} /></button>
             {store?.cart !== false && (
-              <Link href="/cart" style={{ position: 'relative', background: E, color: '#fff', width: 36, height: 36, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Link href="/cart" style={{ position: 'relative', background: E, color: '#111827', width: 36, height: 36, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <ShoppingCart size={15} />
                 {count > 0 && <span style={{ position: 'absolute', top: -4, right: -4, background: '#fff', color: E, fontSize: 9, fontWeight: 800, width: 15, height: 15, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
               </Link>
             )}
-            <button onClick={() => setOpen(!open)} style={{ width: 36, height: 36, borderRadius: 4, border: `1px solid ${BD}`, background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: SUB }}>
+            <button aria-label={a11y(store).menu} onClick={() => setOpen(!open)} style={{ width: 36, height: 36, borderRadius: 4, border: `1px solid ${BD}`, background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: SUB }}>
               {open ? <X size={15} /> : <Menu size={15} />}
             </button>
           </div>
@@ -561,7 +561,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div className="glb-search-panel">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
               <span style={{ fontSize: '0.8rem', fontWeight: 700, color: SUB }}>{t.search}</span>
-              <button onClick={() => setShowSearch(false)} style={{ width: 32, height: 32, borderRadius: 4, border: `1px solid ${BD}`, background: CARD, color: SUB, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><X size={14} /></button>
+              <button aria-label={a11y(store).close} onClick={() => setShowSearch(false)} style={{ width: 32, height: 32, borderRadius: 4, border: `1px solid ${BD}`, background: CARD, color: SUB, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><X size={14} /></button>
             </div>
             <form className="glb-search-form" onSubmit={handleSearch}>
               <Search size={18} style={{ color: E, flexShrink: 0, marginLeft: 10 }} />
@@ -603,7 +603,7 @@ export function Footer({ store }: any) {
   const t = withLocationLabels(T)[lang];
   const isRTL = lang === 'ar';
   return (
-    <footer dir={isRTL ? 'rtl' : 'ltr'} style={{ background: INK, color: 'rgba(255,255,255,0.4)', marginTop: 80, padding: '3.5rem 1.5rem 1.25rem' }}>
+    <footer dir={isRTL ? 'rtl' : 'ltr'} style={{ background: INK, color: 'rgba(255,255,255,0.5)', marginTop: 80, padding: '3.5rem 1.5rem 1.25rem' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div className="footer-inner">
           <div>
@@ -614,14 +614,14 @@ export function Footer({ store }: any) {
             <p style={{ fontSize: '0.875rem', lineHeight: 1.8, maxWidth: 280 }}>
               {store?.hero?.subtitle?.substring(0, 90) || ''}
             </p>
-            <p style={{ marginTop: '2rem', fontSize: '0.7rem', color: 'rgba(255,255,255,0.2)' }}>© {new Date().getFullYear()} {store?.name}</p>
+            <p style={{ marginTop: '2rem', fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)' }}>© {new Date().getFullYear()} {store?.name}</p>
           </div>
           <div>
             <h4 style={{ fontSize: '0.72rem', fontWeight: 700, color: E, textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: '1rem' }}>{t.quickLinks}</h4>
             {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
-              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'rgba(255,255,255,0.4)', marginBottom: '0.5rem', transition: 'color 0.15s' }}
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.5rem', transition: 'color 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = E)}
-                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}>
                 {lnk.l}
               </Link>
             ))}
@@ -631,9 +631,9 @@ export function Footer({ store }: any) {
           <div>
             <p style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '1rem' }}>{t.legalNav}</p>
             {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
-              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', opacity: 0.6, transition: 'opacity 0.15s' }}
-              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
-              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.6')}>
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', transition: 'opacity 0.15s' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '0.8')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}>
               {lnk.l}
             </Link>
             ))}
@@ -648,7 +648,7 @@ export function Footer({ store }: any) {
             ].filter(r => r.val).map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.625rem', fontSize: '0.875rem' }}>
                 <span style={{ color: E, flexShrink: 0 }}>{r.icon}</span>
-                <span style={{ color: 'rgba(255,255,255,0.45)' }}>{r.val}</span>
+                <span style={{ color: 'rgba(255,255,255,0.52)' }}>{r.val}</span>
               </div>
             ))}
           </div>
@@ -673,10 +673,10 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
           : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Package size={36} color={BD} /></div>
         }
         {discount > 0 && (
-          <div style={{ position: 'absolute', top: 8, right: 8, background: E, color: '#fff', fontSize: 10, fontWeight: 800, padding: '2px 7px', borderRadius: 2 }}>-{discount}%</div>
+          <div style={{ position: 'absolute', top: 8, right: 8, background: E, color: '#111827', fontSize: 10, fontWeight: 800, padding: '2px 7px', borderRadius: 2 }}>-{discount}%</div>
         )}
         {product.isDigital ? (
-          <div style={{ position: 'absolute', top: 8, left: 8, background: E, color: '#fff', fontSize: 10, fontWeight: 800, padding: '3px 7px', borderRadius: 2, display: 'flex', alignItems: 'center' }}>
+          <div style={{ position: 'absolute', top: 8, left: 8, background: E, color: '#111827', fontSize: 10, fontWeight: 800, padding: '3px 7px', borderRadius: 2, display: 'flex', alignItems: 'center' }}>
             <Download size={12} />
           </div>
         ) : product.shippingFree && (
@@ -689,10 +689,10 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div style={{ marginBottom: '0.625rem' }}>
           <span className="price-mono" style={{ fontSize: '1.25rem', fontWeight: 800, color: ED }}>{price.toLocaleString()}</span>
           <span style={{ fontSize: '0.7rem', color: SUB, marginRight: 4 }}>{store?.currency || 'DZD'}</span>
-          {orig > price && <span style={{ fontSize: '0.7rem', color: '#D1D5DB', textDecoration: 'line-through', marginRight: 6 }}>{orig.toLocaleString()}</span>}
+          {orig > price && <span style={{ fontSize: '0.7rem', color: '#6B7280', textDecoration: 'line-through', marginRight: 6 }}>{orig.toLocaleString()}</span>}
         </div>
       </div>
-      <Link href={`/product/${product.slug || product.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: E, color: '#fff', fontWeight: 700, fontSize: '0.82rem', padding: '0.7rem', transition: 'background 0.18s' }}
+      <Link href={`/product/${product.slug || product.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: E, color: '#111827', fontWeight: 700, fontSize: '0.82rem', padding: '0.7rem', transition: 'background 0.18s' }}
         onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = ED)}
         onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = E)}>
         {t.shopNow} <ArrowLeft size={12} />
@@ -973,7 +973,7 @@ export function Home({ store, page }: any) {
               {store.hero?.subtitle || 'مثبتات، مواد بناء، وأدوات يومية موثوقة للمقاولين والمحترفين.'}
             </p>
             <div className="hero-actions">
-              <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: E, color: '#fff', fontWeight: 700, fontSize: '0.875rem', padding: '0.8rem 1.75rem', borderRadius: 4, transition: 'background 0.18s' }}
+              <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: E, color: '#111827', fontWeight: 700, fontSize: '0.875rem', padding: '0.8rem 1.75rem', borderRadius: 4, transition: 'background 0.18s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = ED)}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = E)}>
                 {t.shopNow} <ArrowLeft size={15} />
@@ -1000,7 +1000,7 @@ export function Home({ store, page }: any) {
 
       {/* TRUST STRIP */}
       <div style={{ background: EL, borderBottom: `1px solid rgba(16,185,129,0.15)` }}>
-        <div className="trust-strip" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
+        <div className="trust-strip" tabIndex={0} style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
           {[
             { icon: <Truck size={13} />, t: 'توصيل لـ 58 ولاية' },
             { icon: <Shield size={13} />, t: 'دفع عند الاستلام' },
@@ -1107,18 +1107,18 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
         <div className="gallery-container">
           <div style={{ position: 'relative', aspectRatio: '1/1', overflow: 'hidden', background: '#F3F4F6', border: `1px solid ${BD}` }}>
             {allImages[sel] ? <img src={allImages[sel]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Package size={48} color={BD} /></div>}
-            {discount > 0 && <div style={{ position: 'absolute', top: 10, right: 10, background: E, color: '#fff', padding: '2px 8px', fontSize: 11, fontWeight: 800 }}>-{discount}%</div>}
+            {discount > 0 && <div style={{ position: 'absolute', top: 10, right: 10, background: E, color: '#111827', padding: '2px 8px', fontSize: 11, fontWeight: 800 }}>-{discount}%</div>}
             {allImages.length > 1 && (
               <>
-                <button onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: INK }}><ChevronRight size={15} /></button>
-                <button onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: INK }}><ChevronLeft size={15} /></button>
+                <button aria-label={a11y(store).prev} onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: INK }}><ChevronRight size={15} /></button>
+                <button aria-label={a11y(store).next} onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: INK }}><ChevronLeft size={15} /></button>
               </>
             )}
           </div>
           {allImages.length > 1 && (
             <div className="thumb-row">
               {allImages.map((img: string, idx: number) => (
-                <button key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 54, height: 54, border: `1.5px solid ${sel === idx ? E : BD}`, overflow: 'hidden', cursor: 'pointer', padding: 0, background: 'none', opacity: sel === idx ? 1 : 0.5, transition: 'all 0.15s' }}>
+                <button aria-label={`${a11y(store).image} ${idx + 1}`} key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 54, height: 54, border: `1.5px solid ${sel === idx ? E : BD}`, overflow: 'hidden', cursor: 'pointer', padding: 0, background: 'none', opacity: sel === idx ? 1 : 0.5, transition: 'all 0.15s' }}>
                   <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
               ))}
@@ -1382,9 +1382,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <div style={{ marginBottom: '0.875rem' }}>
                 <p style={{ fontSize: '0.7rem', fontWeight: 700, color: SUB, marginBottom: '0.5rem', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>{t.qty}</p>
                 <div style={{ display: 'inline-flex', alignItems: 'center', border: `1px solid ${BD}`, overflow: 'hidden', background: CARD }}>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: SUB, borderLeft: `1px solid ${BD}` }}><Minus size={12} /></button>
+                  <button aria-label={a11y(store).decrease} type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: SUB, borderLeft: `1px solid ${BD}` }}><Minus size={12} /></button>
                   <span style={{ width: 38, textAlign: 'center', fontWeight: 700, fontSize: '0.9rem', color: INK }}>{fd.quantity}</span>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: E, borderRight: `1px solid ${BD}` }}><Plus size={12} /></button>
+                  <button aria-label={a11y(store).increase} type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: E, borderRight: `1px solid ${BD}` }}><Plus size={12} /></button>
                 </div>
               </div>
             )}
@@ -1477,7 +1477,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         <CheckCircle2 size={40} style={{ color: E, display: 'block', margin: '0 auto 1.25rem' }} />
         <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: INK, marginBottom: '0.5rem' }}>{t.successTitle}</h2>
         <p style={{ color: SUB, lineHeight: 1.7, marginBottom: '2rem', fontSize: '0.9rem' }}>{t.successDesc}</p>
-        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: E, color: '#fff', padding: '0.75rem 2rem', fontWeight: 700, fontSize: '0.875rem', borderRadius: 4 }}>{t.backToShop}</Link>
+        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: E, color: '#111827', padding: '0.75rem 2rem', fontWeight: 700, fontSize: '0.875rem', borderRadius: 4 }}>{t.backToShop}</Link>
       </div>
     </div>
   );
@@ -1487,7 +1487,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{ textAlign: 'center', padding: '4rem 2rem', border: `1px solid ${BD}`, maxWidth: 400, width: '100%', background: CARD }}>
         <ShoppingBag size={40} style={{ color: BD, display: 'block', margin: '0 auto 1.25rem' }} />
         <p style={{ color: '#9CA3AF', fontSize: '0.9rem', marginBottom: '2rem' }}>{t.cartEmpty}</p>
-        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: E, color: '#fff', padding: '0.7rem 1.75rem', fontWeight: 700, fontSize: '0.875rem', borderRadius: 4 }}>{t.shopNow}</Link>
+        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: E, color: '#111827', padding: '0.7rem 1.75rem', fontWeight: 700, fontSize: '0.875rem', borderRadius: 4 }}>{t.shopNow}</Link>
       </div>
     </div>
   );
@@ -1513,7 +1513,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <p className="price-mono" style={{ fontSize: '1rem', fontWeight: 800, color: ED }}>{item.finalPrice?.toLocaleString()} {store?.currency || 'DZD'}</p>
                 <p style={{ fontSize: '0.7rem', color: SUB, marginTop: '0.15rem' }}>{t.qty}: {item.quantity}</p>
               </div>
-              <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: '#D1D5DB', padding: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'flex-start', transition: 'color 0.15s' }}
+              <button aria-label={a11y(store).remove} onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: '#D1D5DB', padding: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'flex-start', transition: 'color 0.15s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = '#EF4444')}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = '#D1D5DB')}>
                 <Trash2 size={15} />
@@ -1635,7 +1635,7 @@ export function Success({ store, order }: { store: any; domain: string; order: a
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, background: E, color: '#fff', padding: '0.875rem 2rem', borderRadius: 4, fontWeight: 700, fontSize: '0.875rem', textDecoration: 'none' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, background: E, color: '#111827', padding: '0.875rem 2rem', borderRadius: 4, fontWeight: 700, fontSize: '0.875rem', textDecoration: 'none' }}>
             <ShoppingBag size={17} /> {t.shopNow}
           </Link>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.8rem', borderRadius: 4, border: `1px solid ${BD}`, color: SUB, fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none' }}>

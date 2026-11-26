@@ -2,7 +2,8 @@
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
 
-export interface BundleCardItem { productId: string; name: string; imageUrl: string | null; price: number }
+/** price: سعر المنتج العادي — bundlePrice: سعره داخل الطقم (كتبه التاجر) */
+export interface BundleCardItem { productId: string; name: string; imageUrl: string | null; price: number; bundlePrice?: number }
 
 /** طقم في سلايدر الرئيسية (يأتي مع بيانات المتجر) */
 export interface BundleCard {
@@ -13,10 +14,13 @@ export interface BundleCard {
 }
 
 export interface BundleVariantEntry { attrId: string; attrName: string; displayMode: 'color' | 'image' | 'text'; value: string }
-export interface BundleVariantDetail { id: string; name: BundleVariantEntry[]; price: number; stock: number; isActive?: boolean }
+/** bundlePrice: سعر هذا الخيار داخل الطقم (الخيارات الموقوفة في الطقم لا تصل) */
+export interface BundleVariantDetail { id: string; name: BundleVariantEntry[]; price: number; stock: number; isActive?: boolean; bundlePrice?: number }
 export interface BundleAttribute { id: string; name: string; type: string; displayMode?: 'color' | 'image' | null; variants: { id: string; name: string; value: string }[] }
 export interface BundleProduct {
   id: string; name: string; price: number | string; isDigital?: boolean;
+  /** سعر المنتج داخل الطقم (نفسه لكل نسخه) */
+  bundlePrice?: number;
   imagesProduct?: { id: string; imageUrl: string; order?: number }[];
   attributes?: BundleAttribute[]; variantDetails?: BundleVariantDetail[];
 }
@@ -38,12 +42,17 @@ export async function getBundlePage(domain: string, slug: string): Promise<Bundl
   }
 }
 
-/** نفس قاعدة الطلب: سعر النسخة إن كان > 0 وإلا سعر المنتج — ثم خصم الطقم (الخادم يعيد الحساب ويُعتمد حسابه) */
+/** السعر العادي (خارج الطقم): سعر النسخة إن كان > 0 وإلا سعر المنتج */
 export const unitPrice = (p: BundleProduct, variantId?: string) => {
   const v = variantId ? p.variantDetails?.find((x) => x.id === variantId) : undefined;
   return v && Number(v.price) > 0 ? Number(v.price) : Number(p.price);
 };
 export const discounted = (total: number, percent: number) => Math.round((total * (100 - percent)) / 100);
+/** سعر المنتج داخل الطقم كما كتبه التاجر (الخادم يعيد الحساب ويُعتمد حسابه) — أطقم قديمة بلا bundlePrice: بالنسبة */
+export const bundleItemPrice = (p: BundleProduct, percent: number, variant?: BundleVariantDetail) => {
+  if (variant && variant.bundlePrice !== undefined && variant.bundlePrice !== null) return Number(variant.bundlePrice);
+  return p.bundlePrice !== undefined && p.bundlePrice !== null ? Number(p.bundlePrice) : discounted(Number(p.price), percent);
+};
 
 /** النسخة المطابقة لاختيارات الزبون (كل خاصية لها قيمة) */
 export function matchVariant(p: BundleProduct, sel: Record<string, string>): BundleVariantDetail | undefined {

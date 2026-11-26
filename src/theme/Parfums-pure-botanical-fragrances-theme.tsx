@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -269,7 +269,7 @@ const BG_ALT = '#f1ece1';
 const INK = '#2e2a22';
 const SAGE = '#7c8a63';
 const SAGE_DARK = '#5f6b4a';
-const MUTED = 'rgba(46,42,34,0.6)';
+const MUTED = 'rgba(46,42,34,0.72)';
 const BORDER = 'rgba(46,42,34,0.14)';
 
 const THEME_CSS = `
@@ -526,7 +526,7 @@ export function Navbar({ store, domain }: any) {
       {open && (
         <div className="pbf-mobile-overlay" onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end', padding: 18 }}>
-            <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: INK, cursor: 'pointer' }}>
+            <button aria-label={a11y(store).close} onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: INK, cursor: 'pointer' }}>
               <X size={26} />
             </button>
           </div>
@@ -550,7 +550,7 @@ export function Navbar({ store, domain }: any) {
             <input autoFocus value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t.search}
               style={{ flex: 1, border: 'none', outline: 'none', fontSize: '1rem', background: 'transparent', color: INK }} />
-            <button onClick={() => { setShowSearch(false); setSearchQuery(''); setListSearch([]); }}
+            <button aria-label={a11y(store).close} onClick={() => { setShowSearch(false); setSearchQuery(''); setListSearch([]); }}
               style={{ background: 'none', border: 'none', color: INK, cursor: 'pointer' }}>
               <X size={22} />
             </button>
@@ -609,9 +609,9 @@ export function Footer({ store }: any) {
           <div>
             <p style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '1rem' }}>{t.legalNav}</p>
             {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
-              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', opacity: 0.6, transition: 'opacity 0.15s' }}
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', opacity: 0.75, transition: 'opacity 0.15s' }}
               onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
-              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.6')}>
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.75')}>
               {lnk.l}
             </Link>
             ))}
@@ -1066,11 +1066,11 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             {images?.[sel] && <img src={images[sel]} alt={product?.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}
             {images?.length > 1 && (
               <>
-                <button onClick={() => showImage((s) => (s - 1 + images.length) % images.length)}
+                <button aria-label={a11y(store).prev} onClick={() => showImage((s) => (s - 1 + images.length) % images.length)}
                   style={{ position: 'absolute', top: '50%', insetInlineStart: 10, transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.85)', border: 'none', color: INK, borderRadius: '50%', width: 38, height: 38, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {t.dir === 'rtl' ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
                 </button>
-                <button onClick={() => showImage((s) => (s + 1) % images.length)}
+                <button aria-label={a11y(store).next} onClick={() => showImage((s) => (s + 1) % images.length)}
                   style={{ position: 'absolute', top: '50%', insetInlineEnd: 10, transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.85)', border: 'none', color: INK, borderRadius: '50%', width: 38, height: 38, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {t.dir === 'rtl' ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
                 </button>
@@ -1080,7 +1080,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           {images?.length > 1 && (
             <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
               {images.map((img: string, i: number) => (
-                <button key={i} onClick={() => showImage(i)}
+                <button aria-label={`${a11y(store).image} ${i + 1}`} key={i} onClick={() => showImage(i)}
                   style={{ width: 64, height: 64, flexShrink: 0, borderRadius: 4, overflow: 'hidden', border: sel === i ? `2px solid ${SAGE_DARK}` : `1px solid ${BORDER}`, padding: 0, cursor: 'pointer', background: 'none' }}>
                   <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
@@ -1335,10 +1335,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
               <span className="pbf-label" style={{ margin: 0 }}>{t.qty}</span>
               <div style={{ display: 'flex', alignItems: 'center', border: `1px solid ${BORDER}`, borderRadius: 4 }}>
-                <button onClick={() => setFd((f) => ({ ...f, quantity: Math.max(1, f.quantity - 1) }))}
+                <button aria-label={a11y(store).decrease} onClick={() => setFd((f) => ({ ...f, quantity: Math.max(1, f.quantity - 1) }))}
                   style={{ width: 40, height: 40, background: 'none', border: 'none', color: INK, cursor: 'pointer' }}><Minus size={14} /></button>
                 <span style={{ width: 36, textAlign: 'center', color: INK }}>{fd.quantity}</span>
-                <button onClick={() => setFd((f) => ({ ...f, quantity: f.quantity + 1 }))}
+                <button aria-label={a11y(store).increase} onClick={() => setFd((f) => ({ ...f, quantity: f.quantity + 1 }))}
                   style={{ width: 40, height: 40, background: 'none', border: 'none', color: INK, cursor: 'pointer' }}><Plus size={14} /></button>
               </div>
             </div>
@@ -1592,7 +1592,7 @@ export function Cart({ domain, store }: any) {
                 <p style={{ color: INK, fontWeight: 600, margin: '0 0 4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{it.product?.name}</p>
                 <p style={{ color: SAGE_DARK, fontWeight: 700, margin: 0 }}>{Number(it.finalPrice).toLocaleString()} {store?.currency} × {it.quantity}</p>
               </div>
-              <button onClick={() => removeItem(idx)} style={{ background: 'none', border: 'none', color: MUTED, cursor: 'pointer' }}>
+              <button aria-label={a11y(store).remove} onClick={() => removeItem(idx)} style={{ background: 'none', border: 'none', color: MUTED, cursor: 'pointer' }}>
                 <Trash2 size={18} />
               </button>
             </div>

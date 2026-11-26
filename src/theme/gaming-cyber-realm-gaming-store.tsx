@@ -20,7 +20,7 @@ import {
 import { Store } from '@/types/store';
 import { useCartStore } from '@/store/useCartStore';
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -56,7 +56,7 @@ const CSS = `
     --red:     #FF4444;
     --white:   #F0F8FF;
     --mid:     #7A9BB5;
-    --dim:     #3D5A78;
+    --dim:     #7389A0;
     --line:    rgba(0,212,255,0.15);
     --line-pk: rgba(255,45,138,0.2);
     --glow-c:  0 0 20px rgba(0,212,255,0.4);
@@ -876,7 +876,7 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
     <div style={{ position: 'absolute', top: '100%', right: 0, left: 0, maxWidth: '400px', background: 'rgba(10,22,40,0.98)', border: '1px solid var(--line)', borderRadius: '0 0 8px 8px', zIndex: 100, boxShadow: '0 10px 30px rgba(0,0,0,0.5)', marginTop: '4px', maxHeight: '340px', overflowY: 'auto' }}>
       <div style={{ position: 'sticky', top: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(0,212,255,0.06)', borderBottom: '1px solid var(--line)', backdropFilter: 'blur(8px)' }}>
         <span style={{ fontFamily: "'Orbitron',monospace", fontSize: '9px', letterSpacing: '0.18em', color: 'var(--cyan)', textTransform: 'uppercase' }}>// SEARCH</span>
-        <button onClick={() => setSearchQuery('')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '22px', height: '22px', background: 'rgba(255,255,255,0.06)', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--mid)', cursor: 'pointer', transition: 'all 0.15s' }}
+        <button aria-label={a11y(store).clear} onClick={() => setSearchQuery('')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '22px', height: '22px', background: 'rgba(255,255,255,0.06)', border: '1px solid var(--line)', borderRadius: '4px', color: 'var(--mid)', cursor: 'pointer', transition: 'all 0.15s' }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,42,109,0.15)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--pink)'; (e.currentTarget as HTMLElement).style.color = 'var(--pink)'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--line)'; (e.currentTarget as HTMLElement).style.color = 'var(--mid)'; }}>
           <X size={12} />
@@ -962,8 +962,8 @@ export function Navbar({ store, domain }: { store: any, domain: string }) {
             {itemsCartCount > 0 && <span className="cart-badge">{itemsCartCount}</span>}
           </Link>
           )}
-          <button onClick={() => setShowSearch(!showSearch)} style={{ background: 'none', border: 'none', color: 'var(--cyan)', cursor: 'pointer' }}><Search size={22} /></button>
-          <button onClick={() => setOpen(!open)} style={{ background: 'none', border: 'none', color: 'var(--cyan)', cursor: 'pointer' }}>{open ? <X size={24} /> : <Menu size={24} />}</button>
+          <button aria-label={a11y(store).search} onClick={() => setShowSearch(!showSearch)} style={{ background: 'none', border: 'none', color: 'var(--cyan)', cursor: 'pointer' }}><Search size={22} /></button>
+          <button aria-label={a11y(store).menu} onClick={() => setOpen(!open)} style={{ background: 'none', border: 'none', color: 'var(--cyan)', cursor: 'pointer' }}>{open ? <X size={24} /> : <Menu size={24} />}</button>
         </div>
       </div>
 
@@ -1552,7 +1552,7 @@ export function Home({ store, page }: any) {
             <div className="flex items-center justify-center gap-2 mt-12 font-tajawal" dir="rtl">
 
               {/* 1. زر السابق (يقلل الصفحة) */}
-              <Link
+              <Link aria-label={a11y(store).prev}
                 href={{ query: { ...Object.fromEntries(new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')), page: Math.max(1, page - 1) } }}
                 className={`flex items-center justify-center w-10 h-10 transition-colors duration-300 rounded-lg text-dim hover:text-cyan-400 bg-panel/50 
       ${Number(page) === 1 ? 'pointer-events-none opacity-20' : ''}`}
@@ -1587,7 +1587,7 @@ export function Home({ store, page }: any) {
               })}
 
               {/* 3. زر التالي (يزيد الصفحة) */}
-              <Link
+              <Link aria-label={a11y(store).next}
                 href={{ query: { ...Object.fromEntries(new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')), page: Math.min(Math.ceil(countPage), Number(page) + 1) } }}
                 className={`flex items-center justify-center w-10 h-10 transition-colors duration-300 rounded-lg text-dim hover:text-cyan-400 bg-panel/50 
       ${Number(page) >= Math.ceil(countPage) ? 'pointer-events-none opacity-20' : ''}`}
@@ -1666,10 +1666,10 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             <span style={{ position: 'absolute', bottom: '8px', right: '8px', width: '14px', height: '14px', borderBottom: '2px solid var(--pink)', borderRight: '2px solid var(--pink)' }} />
             {allImages.length > 1 && (
               <>
-                <button onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', width: '34px', height: '34px', border: '1px solid var(--cyan)', borderRadius: '4px', backgroundColor: 'rgba(5,11,26,0.85)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--cyan)' }}>
+                <button aria-label={a11y(store).prev} onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', width: '34px', height: '34px', border: '1px solid var(--cyan)', borderRadius: '4px', backgroundColor: 'rgba(5,11,26,0.85)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--cyan)' }}>
                   <ChevronRight style={{ width: '14px', height: '14px' }} />
                 </button>
-                <button onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '34px', height: '34px', border: '1px solid var(--cyan)', borderRadius: '4px', backgroundColor: 'rgba(5,11,26,0.85)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--cyan)' }}>
+                <button aria-label={a11y(store).next} onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '34px', height: '34px', border: '1px solid var(--cyan)', borderRadius: '4px', backgroundColor: 'rgba(5,11,26,0.85)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--cyan)' }}>
                   <ChevronLeft style={{ width: '14px', height: '14px' }} />
                 </button>
               </>
@@ -1679,7 +1679,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
           {allImages.length > 1 && (
             <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
               {allImages.slice(0, 5).map((img: string, idx: number) => (
-                <button key={idx} onClick={() => showImage(idx)} style={{ width: '52px', height: '52px', overflow: 'hidden', border: `2px solid ${sel === idx ? 'var(--cyan)' : 'var(--line)'}`, cursor: 'pointer', padding: 0, background: 'none', borderRadius: '4px', opacity: sel === idx ? 1 : 0.55, boxShadow: sel === idx ? 'var(--glow-c)' : 'none' }}>
+                <button aria-label={`${a11y(store).image} ${idx + 1}`} key={idx} onClick={() => showImage(idx)} style={{ width: '52px', height: '52px', overflow: 'hidden', border: `2px solid ${sel === idx ? 'var(--cyan)' : 'var(--line)'}`, cursor: 'pointer', padding: 0, background: 'none', borderRadius: '4px', opacity: sel === idx ? 1 : 0.55, boxShadow: sel === idx ? 'var(--glow-c)' : 'none' }}>
                   <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 </button>
               ))}
@@ -2050,14 +2050,14 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             {supportQty && !product.isDigital && (
               <FR label={t.qty}>
                 <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid var(--line)', borderRadius: '6px', overflow: 'hidden', backgroundColor: 'var(--navy-3)' }}>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
+                  <button aria-label={a11y(store).decrease} type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))}
                     style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderInlineEnd: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.18s' }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
                     <Minus style={{ width: '12px', height: '12px' }} />
                   </button>
                   <span className="orb" style={{ width: '44px', textAlign: 'center', fontSize: '1.1rem', fontWeight: 900, color: 'var(--white)' }}>{fd.quantity}</span>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))}
+                  <button aria-label={a11y(store).increase} type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))}
                     style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', borderInlineStart: '1px solid var(--line)', background: 'transparent', cursor: 'pointer', color: 'var(--cyan)', transition: 'background 0.18s' }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.1)'; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>

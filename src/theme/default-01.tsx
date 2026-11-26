@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { Store } from '@/types/store';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -330,7 +330,7 @@ export function Navbar({ store }: { store: Store }) {
             </Link>
           )}
 
-          <button onClick={() => setOpen(!open)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#111' }} className="mob-btn">
+          <button aria-label={a11y(store).menu} onClick={() => setOpen(!open)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#111' }} className="mob-btn">
             {open ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
@@ -414,8 +414,8 @@ export function Footer({ store }: any) {
         )}
       </div>
       <div style={{ ...S.container, marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid #e5e5e5', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-        <p style={{ fontSize: '0.75rem', color: '#999' }}>© {new Date().getFullYear()} {store?.name}</p>
-        <a href="https://mdstore.app" target="_blank" rel="noreferrer" style={{ fontSize: '0.72rem', color: '#bbb', textDecoration: 'none' }}>
+        <p style={{ fontSize: '0.75rem', color: '#6E6E6E' }}>© {new Date().getFullYear()} {store?.name}</p>
+        <a href="https://mdstore.app" target="_blank" rel="noreferrer" style={{ fontSize: '0.72rem', color: '#6E6E6E', textDecoration: 'none' }}>
           Powered by MdStore
         </a>
       </div>
@@ -458,7 +458,7 @@ export function Card({ product, displayImage, discount, isRTL, store, viewDetail
         </p>
         <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{price.toLocaleString()} <span style={{ fontWeight: 400, fontSize: '0.8rem', color: '#666' }}>{store?.currency || 'دج'}</span></span>
-          {orig > price && <span style={{ fontSize: '0.78rem', color: '#aaa', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
+          {orig > price && <span style={{ fontSize: '0.78rem', color: '#737373', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
         </div>
         <div style={{ ...S.btnBlack, justifyContent: 'center', padding: '0.5rem', fontSize: '0.78rem', borderRadius: 3 }}>
           {viewDetails || 'عرض'}
@@ -587,7 +587,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
             {allImages.length > 1 && (
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
                 {allImages.map((img: string, i: number) => (
-                  <button key={i} onClick={() => showImage(i)} style={{ width: 56, height: 56, flexShrink: 0, border: `2px solid ${selImg === i ? '#111' : '#e5e5e5'}`, borderRadius: 3, padding: 0, cursor: 'pointer', overflow: 'hidden', background: 'none' }}>
+                  <button aria-label={`${a11y(store).image} ${i + 1}`} key={i} onClick={() => showImage(i)} style={{ width: 56, height: 56, flexShrink: 0, border: `2px solid ${selImg === i ? '#111' : '#e5e5e5'}`, borderRadius: 3, padding: 0, cursor: 'pointer', overflow: 'hidden', background: 'none' }}>
                     <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
                   </button>
                 ))}
@@ -870,9 +870,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         {supportQty && !product.isDigital && (
           <FR label="الكمية">
             <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: 4, width: 'fit-content', background: '#fff', overflow: 'hidden' }}>
-              <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={14} /></button>
+              <button aria-label={a11y(store).decrease} type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={14} /></button>
               <span style={{ width: 36, textAlign: 'center', fontWeight: 700 }}>{fd.quantity}</span>
-              <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 36, height: 36, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={14} /></button>
+              <button aria-label={a11y(store).increase} type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 36, height: 36, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={14} /></button>
             </div>
           </FR>
         )}
@@ -900,7 +900,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             {submitting ? <><Loader2 size={14} /> جاري الإرسال...</> : <><ShoppingCart size={14} /> تأكيد الطلب</>}
           </button>
         {product.store.cart && !product.isDigital && (
-            <button data-add-to-cart type="button" onClick={addToCart} disabled={isAdded} style={{ ...S.btnOutline, padding: '0.65rem 0.9rem' }}>
+            <button aria-label={a11y(store).addToCart} data-add-to-cart type="button" onClick={addToCart} disabled={isAdded} style={{ ...S.btnOutline, padding: '0.65rem 0.9rem' }}>
               {isAdded ? <Check size={16} color="green" /> : <ShoppingCart size={16} />}
             </button>
           )}
@@ -964,7 +964,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <p style={{ fontSize: '0.85rem', fontWeight: 500, marginBottom: 4 }}>{item.product?.name}</p>
                 <p style={{ fontSize: '0.9rem', fontWeight: 700 }}>{item.finalPrice} دج <span style={{ fontWeight: 400, color: '#888', fontSize: '0.8rem' }}>× {item.quantity}</span></p>
               </div>
-              <button onClick={() => remove(i)} style={{ background: 'none', border: 'none', color: '#c00', cursor: 'pointer', padding: 4 }}><Trash2 size={16} /></button>
+              <button aria-label={a11y(store).remove} onClick={() => remove(i)} style={{ background: 'none', border: 'none', color: '#c00', cursor: 'pointer', padding: 4 }}><Trash2 size={16} /></button>
             </div>
           ))}
         </div>

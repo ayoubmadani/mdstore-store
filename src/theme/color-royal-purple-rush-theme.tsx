@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, HeroShade, heroTextClear, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, HeroShade, heroTextClear, imageIndexForSelection, variantForImage, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -775,7 +775,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
   const DropResults = () => (
     <div style={{ paddingTop: 25, position: 'absolute', top: 'calc(100% + 6px)', right: 0, left: 0, background: '#fff', border: '1.5px solid #E0E0E0', borderRadius: 10, boxShadow: '0 12px 40px rgba(0,0,0,0.12)', zIndex: 60, maxHeight: '300px', overflowY: 'auto' }} className="anim-slide-down">
-      <button onClick={() => setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
+      <button aria-label={a11y(store).clear} onClick={() => setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
         <X size={14} />
       </button>
       {loading ? <div style={{ padding: '1.5rem', textAlign: 'center', color: '#7C3AED', fontSize: '0.85rem', fontWeight: 600 }}>{t.searching}</div>
@@ -895,7 +895,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
           {/* Mobile */}
           <div className="nav-mobile">
-            <button onClick={() => setShowSearch(!showSearch)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <button aria-label={a11y(store).search} onClick={() => setShowSearch(!showSearch)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
               <Search size={16} />
             </button>
             {store?.cart !== false && (
@@ -905,7 +905,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               </Link>
             )}
 
-            <button onClick={() => setOpen(!open)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <button aria-label={a11y(store).menu} onClick={() => setOpen(!open)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
               {open ? <X size={16} /> : <Menu size={16} />}
             </button>
           </div>
@@ -959,10 +959,10 @@ export function Footer({ store }: any) {
               </div>
               <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>{store?.name}</span>
             </div>
-            <p style={{ fontSize: '0.875rem', lineHeight: 1.8, color: '#666', maxWidth: 320 }}>
+            <p style={{ fontSize: '0.875rem', lineHeight: 1.8, color: '#999', maxWidth: 320 }}>
               {store?.hero?.subtitle?.substring(0, 100) || t.footerDesc}
             </p>
-            <p style={{ marginTop: '2rem', fontSize: '0.75rem', color: '#333' }}>
+            <p style={{ marginTop: '2rem', fontSize: '0.75rem', color: '#888' }}>
               © {new Date().getFullYear()} {store?.name}. {t.rightsReserved}
             </p>
           </div>
@@ -971,9 +971,9 @@ export function Footer({ store }: any) {
           <div>
             <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1.25rem' }}>{t.quickLinks}</h4>
             {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
-              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: '#666', marginBottom: '0.625rem', transition: 'color 0.15s' }}
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: '#999', marginBottom: '0.625rem', transition: 'color 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#7C3AED')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#666')}>
+                onMouseLeave={e => (e.currentTarget.style.color = '#999')}>
                 {lnk.l}
               </Link>
             ))}
@@ -983,9 +983,9 @@ export function Footer({ store }: any) {
           <div>
             <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1.25rem' }}>{t.legalNav}</h4>
             {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
-              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: '#666', marginBottom: '0.625rem', transition: 'color 0.15s' }}
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: '#999', marginBottom: '0.625rem', transition: 'color 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#7C3AED')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#666')}>
+                onMouseLeave={e => (e.currentTarget.style.color = '#999')}>
                 {lnk.l}
               </Link>
             ))}
@@ -1000,7 +1000,7 @@ export function Footer({ store }: any) {
               { icon: <Mail size={14} />, val: store?.contact?.email || comingSoon(store) },
               { icon: <MapPin size={14} />, val: [store?.contact?.wilaya, store?.contact?.address].filter(Boolean).join(' / ') },
             ].filter(r => r.val).map((r, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem', color: '#666', fontSize: '0.875rem' }}>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem', color: '#999', fontSize: '0.875rem' }}>
                 <span style={{ color: '#7C3AED' }}>{r.icon}</span>{r.val}
               </div>
             ))}
@@ -1067,8 +1067,8 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div style={{ marginTop: 'auto' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', marginBottom: '0.75rem' }}>
             <span className="price-mono" style={{ fontSize: '1.375rem', fontWeight: 800, color: '#111' }}>{price.toLocaleString()}</span>
-            <span style={{ fontSize: '0.75rem', color: '#999', fontWeight: 500 }}>{store.currency || 'DZD'}</span>
-            {orig > price && <span style={{ fontSize: '0.75rem', color: '#ccc', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
+            <span style={{ fontSize: '0.75rem', color: '#6B6B6B', fontWeight: 500 }}>{store.currency || 'DZD'}</span>
+            {orig > price && <span style={{ fontSize: '0.75rem', color: '#737373', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
           </div>
           <Link
             href={`/product/${product.slug || product.id}`}
@@ -1360,8 +1360,8 @@ export function Home({ store, page }: any) {
           {/* Text */}
           <div style={heroTextClear(store)}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: 6, padding: '0.375rem 0.875rem', marginBottom: '1.5rem' }}>
-              <Zap size={13} color="#7C3AED" fill="#7C3AED" />
-              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#7C3AED', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{store.name}</span>
+              <Zap size={13} color="#A78BFA" fill="#A78BFA" />
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#A78BFA', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{store.name}</span>
             </div>
             <h1 style={{ fontSize: 'clamp(2.25rem,6vw,4.5rem)', fontWeight: 800, color: '#fff', lineHeight: 1.1, letterSpacing: '-0.03em', marginBottom: '1.25rem' }}
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || t.heroTitle) }} />
@@ -1396,7 +1396,7 @@ export function Home({ store, page }: any) {
             <div key={i} style={{ padding: '1.125rem 1rem', textAlign: 'center', borderLeft: i < 3 ? '1px solid #EBEBEB' : 'none' }}>
               <div style={{ color: '#7C3AED', marginBottom: '0.375rem', display: 'flex', justifyContent: 'center' }}>{icon}</div>
               <p style={{ fontSize: '0.8rem', fontWeight: 700, color: '#111', marginBottom: '0.2rem' }}>{item.t}</p>
-              <p style={{ fontSize: '0.72rem', color: '#999' }}>{item.d}</p>
+              <p style={{ fontSize: '0.72rem', color: '#6B6B6B' }}>{item.d}</p>
             </div>
             );
           })}
@@ -1514,8 +1514,8 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 
             {allImages.length > 1 && (
               <>
-                <button onClick={() => showImage(sel === 0 ? allImages.length - 1 : sel - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 8, background: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.12)' }}><ChevronRight size={18} /></button>
-                <button onClick={() => showImage(sel === allImages.length - 1 ? 0 : sel + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 8, background: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.12)' }}><ChevronLeft size={18} /></button>
+                <button aria-label={a11y(store).prev} onClick={() => showImage(sel === 0 ? allImages.length - 1 : sel - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 8, background: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.12)' }}><ChevronRight size={18} /></button>
+                <button aria-label={a11y(store).next} onClick={() => showImage(sel === allImages.length - 1 ? 0 : sel + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 8, background: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.12)' }}><ChevronLeft size={18} /></button>
               </>
             )}
           </div>
@@ -1524,7 +1524,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           {allImages.length > 1 && (
             <div className="thumb-row">
               {allImages.map((img: string, idx: number) => (
-                <button key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 8, overflow: 'hidden', border: `2px solid ${sel === idx ? '#7C3AED' : '#E8E8E8'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.18s' }}>
+                <button aria-label={`${a11y(store).image} ${idx + 1}`} key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 8, overflow: 'hidden', border: `2px solid ${sel === idx ? '#7C3AED' : '#E8E8E8'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.18s' }}>
                   <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
               ))}
@@ -1863,9 +1863,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <div style={{ marginBottom: '0.875rem' }}>
                 <p style={{ fontSize: '0.775rem', fontWeight: 700, color: '#555', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.qty}</p>
                 <div style={{ display: 'inline-flex', alignItems: 'center', border: '1.5px solid #E8E8E8', borderRadius: 8, overflow: 'hidden', background: '#fff' }}>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#111' }}><Minus size={14} /></button>
+                  <button aria-label={a11y(store).decrease} type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#111' }}><Minus size={14} /></button>
                   <span style={{ width: 40, textAlign: 'center', fontWeight: 800, fontSize: '0.9rem' }}>{fd.quantity}</span>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#111' }}><Plus size={14} /></button>
+                  <button aria-label={a11y(store).increase} type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#111' }}><Plus size={14} /></button>
                 </div>
               </div>
             )}
@@ -2032,7 +2032,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 800, color: '#7C3AED' }}>{item.finalPrice?.toLocaleString()} {store.currency || 'DZD'}</p>
                 <p style={{ fontSize: '0.72rem', color: '#aaa', marginTop: '0.25rem' }}>{t.qty}: {item.quantity}</p>
               </div>
-              <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: '#ccc', padding: '0.375rem', borderRadius: 6, background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'center', transition: 'color 0.18s' }}
+              <button aria-label={a11y(store).remove} onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: '#ccc', padding: '0.375rem', borderRadius: 6, background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'center', transition: 'color 0.18s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = '#7C3AED')}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = '#ccc')}>
                 <Trash2 size={17} />

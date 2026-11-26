@@ -347,7 +347,8 @@ const THEME_CSS = `
 
 .ti-root { background: ${BG}; color: ${TXT}; font-family: ${FONT_BODY}; min-height: 100vh; }
 .ti-root * { box-sizing: border-box; }
-.ti-root a { text-decoration: none; color: inherit; }
+.ti-root a { text-decoration: none; }
+.ti-root a:not(.ti-btn) { color: inherit; }
 .ti-root img { max-width: 100%; }
 .ti-container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
 /* الأطقم */
@@ -949,7 +950,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         {discount > 0 && (
           <span className="ti-mono" style={{
             position: 'absolute', top: 10, insetInlineStart: 10, zIndex: 2,
-            background: HOT, color: '#fff', fontSize: '0.68rem', fontWeight: 700,
+            background: '#DB2777', color: '#fff', fontSize: '0.68rem', fontWeight: 700,
             padding: '3px 8px', borderRadius: 3, letterSpacing: '0.04em',
           }}>
             -{discount}%

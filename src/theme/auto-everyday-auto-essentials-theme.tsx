@@ -487,7 +487,7 @@ const THEME_CSS = `
 
 /* ---------- hero (full-bleed background image) ---------- */
 .ae-hero-badge {
-  display: inline-flex; align-items: center; gap: 8px; background: ${AL}; color: ${AD};
+  display: inline-flex; align-items: center; gap: 8px; background: ${AL}; color: #A54C00;
   border: 1px solid ${A}; padding: 6px 12px; font-size: 0.72rem; font-weight: 700;
   letter-spacing: 0.1em; text-transform: uppercase; border-radius: 2px;
   animation: aeScaleIn 0.5s ease 0.05s both;

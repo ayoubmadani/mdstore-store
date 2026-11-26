@@ -49,7 +49,7 @@ const onColor = (hex: string) => {
   const n = parseInt(hex.slice(1), 16);
   const lin = (c: number) => { const x = c / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; };
   const L = 0.2126 * lin((n >> 16) & 255) + 0.7152 * lin((n >> 8) & 255) + 0.0722 * lin(n & 255);
-  return L > 0.45 ? '#111827' : '#FFFFFF';
+  return L > 0.3 ? '#111827' : '#FFFFFF'; // 0.3: تحته يبقى الأبيض بتباين ≥ 3، وفوقه الأسود أوضح
 };
 const brandVars = (store: any): React.CSSProperties => {
   const p = normHex(store?.design?.primaryColor, DEFAULT_P);
@@ -146,7 +146,7 @@ const THEME_CSS = `
   .cs-card h3 { font-size: 1rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .cs-price { color: var(--p-ink); font-weight: 800; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
   .cs-price small { font-size: .72rem; font-weight: 700; color: var(--muted); margin-inline-end: 4px; }
-  .cs-old { color: #9CA3AF; text-decoration: line-through; font-size: .8rem; font-weight: 600; }
+  .cs-old { color: #6B7280; text-decoration: line-through; font-size: .8rem; font-weight: 600; }
   .cs-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--p); color: var(--on-p); font-weight: 800; border: none; border-radius: 12px; padding: .85rem 1.25rem; cursor: pointer; transition: background .15s, transform .1s; font-size: .95rem; width: 100%; }
   .cs-btn:hover { background: var(--p-dark); }
   .cs-btn:active { transform: scale(.98); }
@@ -777,7 +777,7 @@ export function Footer({ store }: any) {
             ))}
           </div>
         </div>
-        <p style={{ textAlign: 'center', fontSize: '.8rem', color: '#6B7280', marginTop: '1.25rem', marginBottom: 0 }}>© {new Date().getFullYear()} {store?.name}. {t.rightsReserved}</p>
+        <p style={{ textAlign: 'center', fontSize: '.8rem', color: '#9CA3AF', marginTop: '1.25rem', marginBottom: 0 }}>© {new Date().getFullYear()} {store?.name}. {t.rightsReserved}</p>
       </div>
     </footer>
   );

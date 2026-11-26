@@ -30,7 +30,7 @@ import {
   ChevronLeft, ChevronRight, Star, Truck, ShieldCheck, Lock, Headphones,
   Trash2, Plus, Minus, CheckCircle, AlertCircle, Package, ArrowLeft, ArrowRight, MessageCircle, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -55,7 +55,7 @@ const SUB  = '#68786F';   // muted
 const BD   = '#DCE6E0';   // border
 const BG   = '#F6F9F7';   // page bg
 const CARD = '#FFFFFF';   // surface
-const SALE = '#E4572E';   // discount / urgency
+const SALE = '#C8491F';   // discount / urgency
 const INK  = '#0F1A15';   // dark chrome
 
 /* ============================================================
@@ -597,7 +597,7 @@ export function Navbar({ store, domain }: any) {
               style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, color: INK, alignItems: 'center' }}>
               <Menu size={24} />
             </button>
-            <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}><Logo /></Link>
+            <Link aria-label={a11y(store).home} href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}><Logo /></Link>
           </div>
 
           {/* desktop links */}
@@ -691,7 +691,7 @@ export function Navbar({ store, domain }: any) {
               onKeyDown={(e) => { if (e.key === 'Enter') goSearch(); }}
               placeholder={t.search}
               style={{ flex: 1, border: 'none', outline: 'none', fontSize: '1rem', fontFamily: 'inherit', color: TXT, background: 'transparent' }} />
-            <button onClick={() => { setShowSearch(false); setSearchQuery(''); setListSearch([]); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: INK }}><X size={22} /></button>
+            <button aria-label={a11y(store).close} onClick={() => { setShowSearch(false); setSearchQuery(''); setListSearch([]); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: INK }}><X size={22} /></button>
           </div>
           <div style={{ flex: 1, overflowY: 'auto', background: '#fff', marginTop: 1 }}>
             {loading && <p style={{ padding: '1rem', textAlign: 'center', color: SUB }}>{t.searching}</p>}
@@ -1294,9 +1294,9 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
               )}
               {uniqueImages.length > 1 && (
                 <>
-                  <button onClick={() => { showImage((s) => (s - 1 + uniqueImages.length) % uniqueImages.length); setMainErr(false); }}
+                  <button aria-label={a11y(store).prev} onClick={() => { showImage((s) => (s - 1 + uniqueImages.length) % uniqueImages.length); setMainErr(false); }}
                     style={navArrow('start')}>{t.dir === 'rtl' ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}</button>
-                  <button onClick={() => { showImage((s) => (s + 1) % uniqueImages.length); setMainErr(false); }}
+                  <button aria-label={a11y(store).next} onClick={() => { showImage((s) => (s + 1) % uniqueImages.length); setMainErr(false); }}
                     style={navArrow('end')}>{t.dir === 'rtl' ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}</button>
                 </>
               )}
@@ -1307,7 +1307,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
           {uniqueImages.length > 1 && (
             <div className="hn-thumbs">
               {uniqueImages.map((im, i) => (
-                <button key={i} onClick={() => { showImage(i); setMainErr(false); }}
+                <button aria-label={`${a11y(store).image} ${i + 1}`} key={i} onClick={() => { showImage(i); setMainErr(false); }}
                   style={{ width: 72, height: 72, borderRadius: 10, overflow: 'hidden', flexShrink: 0, cursor: 'pointer', padding: 0, background: BG, border: `2px solid ${i === sel ? A : BD}` }}>
                   <img src={im} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 </button>
@@ -1635,9 +1635,9 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
         <>
           <label style={fieldLabel}>{t.qty}</label>
           <div style={{ display: 'inline-flex', alignItems: 'center', border: `1px solid ${BD}`, borderRadius: 8, overflow: 'hidden', background: '#fff', marginBottom: 12 }}>
-            <button onClick={() => set('quantity', Math.max(1, fd.quantity - 1))} style={qtyBtn}><Minus size={16} /></button>
+            <button aria-label={a11y(store).decrease} onClick={() => set('quantity', Math.max(1, fd.quantity - 1))} style={qtyBtn}><Minus size={16} /></button>
             <span style={{ width: 46, textAlign: 'center', fontWeight: 800 }}>{fd.quantity}</span>
-            <button onClick={() => set('quantity', fd.quantity + 1)} style={qtyBtn}><Plus size={16} /></button>
+            <button aria-label={a11y(store).increase} onClick={() => set('quantity', fd.quantity + 1)} style={qtyBtn}><Plus size={16} /></button>
           </div>
         </>
       )}

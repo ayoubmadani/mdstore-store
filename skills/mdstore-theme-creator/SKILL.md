@@ -107,6 +107,12 @@ import {
     - `HeroShade` و`heroTextClear` من `@mdstore/theme-kit`. لا يظهر شيء منهما إن لم توجد صورة غلاف.
     - **غلاف الهاتف:** المتجر يعطي زائر الهاتف `hero.mobileImageUrl` مكان `imageUrl` (نسبة 4:5). `HeroShade` يجعل قسم الغلاف (`<section>`) على الهاتف بارتفاع `125vw` فتظهر الصورة كاملة. لذلك اجعل الغلاف `<section>`، ولا تعطِ الصورة أو حاويتها ارتفاعاً ثابتاً أو `maxHeight` أو `aspect-ratio` على الهاتف.
 
+### الأطقم (Bundles) — إلزامي في كل ثيم جديد
+
+- في `Home` تحت الغلاف: سلايدر «عروض الأطقم» من `store.bundles` بأسلوب الثيم، على `<section data-mds-bundles="">`، والروابط بـ `bundleLink(slug)`.
+- `export function Bundle({ store, bundle, domain })`: صفحة طلب الطقم بـ `useBundleOrder` من `@mdstore/theme-kit` وclasses استمارة الثيم نفسها.
+- التفاصيل والقواعد: مهارة `theme-dev` (الفقرة 13-ج)، والمرجع `src/theme/ecom-color-showcase-theme.tsx`.
+
 ## 3. سير العمل
 
 1. افهم النشاط، ثم `admin_list_niches` واختر المجال الأساسي الذي صُمم له الثيم والمجالات الثانوية التي يناسبها.

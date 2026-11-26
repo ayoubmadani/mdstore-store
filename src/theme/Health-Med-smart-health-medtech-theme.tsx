@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -52,7 +52,7 @@ const CSS = `
     --slate:   #F1F5F9;
     --ink:     #0F172A;
     --mid:     #475569;
-    --dim:     #94A3B8;
+    --dim:     #64748B;
     --line:    #E2E8F0;
     --green:   #16A34A;
     --red:     #DC2626;
@@ -92,7 +92,7 @@ const CSS = `
 
   .btn-primary {
     display:inline-flex; align-items:center; justify-content:center; gap:8px;
-    background:var(--sky); color:white;
+    background:var(--sky); color:#0F172A;
     font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; font-weight:700;
     padding:12px 28px; border:none; cursor:pointer; border-radius:8px;
     transition:all 0.2s;
@@ -738,7 +738,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       zIndex:200, overflow:'hidden', boxShadow:'0 12px 40px rgba(14,165,233,0.15)'
     }} className="fi">
       <div style={{ display:'flex', justifyContent:'flex-end', padding:'8px 12px 2px' }}>
-        <button onClick={() => setSq('')} style={{
+        <button aria-label={a11y(store).close} onClick={() => setSq('')} style={{
           background:'var(--sky-lt)', border:'none', borderRadius:'50%',
           width:24, height:24, display:'flex', alignItems:'center',
           justifyContent:'center', cursor:'pointer', color:'var(--sky)'
@@ -834,7 +834,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               ))}
             </div>
 
-            <button onClick={() => setShowSearch(!showSearch)} className="lg:hidden"
+            <button aria-label={a11y(store).search} onClick={() => setShowSearch(!showSearch)} className="lg:hidden"
               style={{ background:'none', border:'none', color:'var(--mid)', cursor:'pointer' }}>
               <Search size={20} />
             </button>
@@ -855,7 +855,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               </Link>
             )}
 
-            <button onClick={() => setOpen(!open)} className="lg:hidden"
+            <button aria-label={a11y(store).menu} onClick={() => setOpen(!open)} className="lg:hidden"
               style={{
                 background:'var(--sky)', border:'none', color:'white', padding:'6px',
                 borderRadius:'6px', cursor:'pointer'
@@ -911,7 +911,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 export function Footer({ store }: any) {
   const lang = getLang(store); const t = withLocationLabels(T)[lang]; const isRTL = lang === 'ar';
   return (
-    <footer dir={isRTL ? 'rtl' : 'ltr'} style={{ backgroundColor:'var(--ink)', color:'var(--off)', fontFamily:"'Inter',sans-serif" }}>
+    <footer dir={isRTL ? 'rtl' : 'ltr'} style={{ ['--dim' as any]:'#94A3B8', backgroundColor:'var(--ink)', color:'var(--off)', fontFamily:"'Inter',sans-serif" }}>
       <div style={{
         background:'linear-gradient(90deg, var(--sky), var(--teal))',
         padding:'10px 0', textAlign:'center'
@@ -937,7 +937,7 @@ export function Footer({ store }: any) {
               <Truck size={14} style={{ color:'var(--teal)' }} />
               <span style={{ fontSize:'12px', fontWeight:600, color:'var(--teal)' }}>{t.footerDelivery}</span>
             </div>
-            <p style={{ fontSize:'11px', color:'var(--dim)', marginTop:'24px', opacity:0.6 }}>
+            <p style={{ fontSize:'11px', color:'var(--dim)', marginTop:'24px' }}>
               &copy; {new Date().getFullYear()} {store?.name}. {t.rightsReserved}
             </p>
           </div>
@@ -1015,7 +1015,7 @@ export function Card({ product, displayImage, discount, store }: any) {
         }
         {discount > 0 && (
           <span className="pjs" style={{
-            position:'absolute', top:10, right:10, background:'var(--rose)', color:'white',
+            position:'absolute', top:10, right:10, background:'#E11D48', color:'white',
             fontSize:'11px', fontWeight:700, padding:'2px 10px', borderRadius:'6px'
           }}>-{discount}%</span>
         )}
@@ -1045,7 +1045,7 @@ export function Card({ product, displayImage, discount, store }: any) {
           ))}
         </div>
         <div style={{ display:'flex', alignItems:'baseline', gap:'6px', marginTop:'auto' }}>
-          <span className="pjs" style={{ fontSize:'1.3rem', fontWeight:700, color:'var(--sky)' }}>{price.toLocaleString()}</span>
+          <span className="pjs" style={{ fontSize:'1.3rem', fontWeight:700, color:'#0284C7' }}>{price.toLocaleString()}</span>
           <span style={{ fontSize:'11px', color:'var(--dim)' }}>{store?.currency || 'DZD'}</span>
           {orig > price && (
             <span style={{ fontSize:'11px', color:'var(--dim)', textDecoration:'line-through' }}>{orig.toLocaleString()}</span>
@@ -1618,13 +1618,13 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
               )}
               {allImages.length > 1 && (
                 <>
-                  <button onClick={() => showImage(p => p===0?allImages.length-1:p-1)} style={{
+                  <button aria-label={a11y(store).prev} onClick={() => showImage(p => p===0?allImages.length-1:p-1)} style={{
                     position:'absolute', right:10, top:'50%', transform:'translateY(-50%)',
                     width:'34px', height:'34px', border:'1px solid var(--line)', borderRadius:'50%',
                     background:'rgba(255,255,255,0.9)', cursor:'pointer', display:'flex',
                     alignItems:'center', justifyContent:'center', color:'var(--sky)'
                   }}><ChevronRight size={14} /></button>
-                  <button onClick={() => showImage(p => p===allImages.length-1?0:p+1)} style={{
+                  <button aria-label={a11y(store).next} onClick={() => showImage(p => p===allImages.length-1?0:p+1)} style={{
                     position:'absolute', left:10, top:'50%', transform:'translateY(-50%)',
                     width:'34px', height:'34px', border:'1px solid var(--line)', borderRadius:'50%',
                     background:'rgba(255,255,255,0.9)', cursor:'pointer', display:'flex',
@@ -1636,7 +1636,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             {allImages.length > 1 && (
               <div className="thumb-row">
                 {allImages.slice(0,5).map((img:string, idx:number) => (
-                  <button key={idx} onClick={() => showImage(idx)} style={{
+                  <button aria-label={`${a11y(store).image} ${idx + 1}`} key={idx} onClick={() => showImage(idx)} style={{
                     width:'54px', height:'54px', overflow:'hidden', borderRadius:'8px',
                     border:`2px solid ${sel===idx?'var(--sky)':'var(--line)'}`,
                     cursor:'pointer', padding:0, background:'none', opacity:sel===idx?1:0.6

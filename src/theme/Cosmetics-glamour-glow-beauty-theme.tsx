@@ -15,7 +15,7 @@ import {
 import { useCartStore } from '@/store/useCartStore';
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
 import { showError } from '@/lib/showError';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -117,7 +117,7 @@ const GLOBAL_CSS = `
 
   /* Ticker */
   @keyframes gg-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-  .gg-ticker-wrap { overflow: hidden; white-space: nowrap; background: var(--pink); color: #fff; height: 36px; display: flex; align-items: center; }
+  .gg-ticker-wrap { overflow: hidden; white-space: nowrap; background: #DB1B7A; color: #fff; height: 36px; display: flex; align-items: center; }
   .gg-ticker-track { display: inline-flex; animation: gg-scroll 30s linear infinite; }
   .gg-ticker-item  { padding: 0 48px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
 
@@ -194,10 +194,10 @@ const GLOBAL_CSS = `
   .gg-card-img { aspect-ratio: 3/4; overflow: hidden; position: relative; background: var(--blush); }
   .gg-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s; }
   .gg-card:hover .gg-card-img img { transform: scale(1.06); }
-  .gg-card-badge { position: absolute; top: 10px; right: 10px; background: var(--pink); color: #fff; font-family: 'Nunito Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; }
+  .gg-card-badge { position: absolute; top: 10px; right: 10px; background: #DB1B7A; color: #fff; font-family: 'Nunito Sans', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; }
   .gg-card-body { padding: 14px; flex: 1; display: flex; flex-direction: column; }
   .gg-card-name { font-family: 'Nunito Sans', sans-serif; font-size: 13.5px; font-weight: 600; color: var(--ink); margin-bottom: 6px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .gg-card-price { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 600; color: var(--pink); }
+  .gg-card-price { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 600; color: #DB1B7A; }
   .gg-card-old { font-family: 'Nunito Sans', sans-serif; font-size: 12px; color: var(--dim); text-decoration: line-through; margin-right: 6px; }
   .gg-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
 
@@ -546,7 +546,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       <nav className="gg-nav">
         <div className="gg-nav-inner">
           {/* Mobile menu btn */}
-          <button className="gg-icon-btn" style={{ display: 'none' }} id="gg-menu-btn"
+          <button aria-label={a11y(store).menu} className="gg-icon-btn" style={{ display: 'none' }} id="gg-menu-btn"
             onClick={() => setMenuOpen(true)}
             onMouseEnter={() => { const b = document.getElementById('gg-menu-btn'); if (b) b.style.display = 'flex'; }}
           >
@@ -565,10 +565,10 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
           {/* Actions */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <button className="gg-icon-btn" onClick={openSearch}><Search size={18} /></button>
+            <button aria-label={a11y(store).search} className="gg-icon-btn" onClick={openSearch}><Search size={18} /></button>
             {store?.cart !== false && (
             <Link href="/cart" style={{ position: 'relative', display: 'inline-flex' }}>
-              <button className="gg-icon-btn"><ShoppingBag size={18} /></button>
+              <button aria-label={a11y(store).cart} className="gg-icon-btn"><ShoppingBag size={18} /></button>
               {count > 0 && <span className="gg-cart-badge">{count}</span>}
             </Link>
             )}
@@ -593,7 +593,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                   timer.current = setTimeout(() => doSearch(e.target.value), 350);
                 }}
               />
-              <button onClick={closeSearch} style={{ position: 'absolute', ...(isRTL ? { left: '16px' } : { right: '16px' }), top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--dim)' }}><X size={18} /></button>
+              <button aria-label={a11y(store).close} onClick={closeSearch} style={{ position: 'absolute', ...(isRTL ? { left: '16px' } : { right: '16px' }), top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--dim)' }}><X size={18} /></button>
             </div>
             {results.length > 0 && (
               <div className="gg-srch-results">
@@ -626,7 +626,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div className="gg-drawer-panel">
             <div className="gg-drawer-hd">
               <span className="gg-logo" style={{ fontSize: '1.35rem' }}>{store?.name || 'Glamour & Glow'}</span>
-              <button className="gg-icon-btn" onClick={() => setMenuOpen(false)}><X size={20} /></button>
+              <button aria-label={a11y(store).close} className="gg-icon-btn" onClick={() => setMenuOpen(false)}><X size={20} /></button>
             </div>
             <div style={{ padding: '24px' }}>
               {[['/', t.home], ['/contact', t.contact]].map(([href, label]) => (
@@ -1163,10 +1163,10 @@ export function Details({ product, discount, allImages, domain, allAttrs, finalP
             
             {allImages?.length > 1 && (
               <>
-                <button onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, border: '1px solid var(--line)', background: 'rgba(255,255,255,0.9)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+                <button aria-label={a11y(store).prev} onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, border: '1px solid var(--line)', background: 'rgba(255,255,255,0.9)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
                   <ChevronRight size={14} style={{ color: 'var(--ink)' }} />
                 </button>
-                <button onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, border: '1px solid var(--line)', background: 'rgba(255,255,255,0.9)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+                <button aria-label={a11y(store).next} onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, border: '1px solid var(--line)', background: 'rgba(255,255,255,0.9)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
                   <ChevronLeft size={14} style={{ color: 'var(--ink)' }} />
                 </button>
               </>

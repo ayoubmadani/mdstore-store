@@ -1,15 +1,15 @@
 'use client';
 
 // منطق طلب الطقم (مشترك بين صفحة المنصة وصفحات الثيمات — @mdstore/theme-kit):
-// خيارات كل منتج، الأسعار قبل/بعد الخصم، الولايات والبلديات والتوصيل، التحقق، والإرسال.
-// الثيم يرسم الشكل فقط. الخادم يعيد حساب الأسعار بخصم الطقم ولا يعتمد على ما يُعرض هنا.
+// خيارات كل منتج، الأسعار (العادية وداخل الطقم)، الولايات والبلديات والتوصيل، التحقق، والإرسال.
+// الثيم يرسم الشكل فقط. الخادم يعيد حساب الأسعار من أسعار الطقم ولا يعتمد على ما يُعرض هنا.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { getProductFormStrings } from '@/components/productForm/translations';
 import {
-  BundleAttribute, BundlePage, BundleProduct, bundleStrings, discounted, formatDA, matchVariant, unitPrice,
+  BundleAttribute, BundlePage, BundleProduct, bundleItemPrice, bundleStrings, formatDA, matchVariant, unitPrice,
 } from '@/lib/bundles';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7000';
@@ -55,10 +55,13 @@ export function useBundleOrder({ bundle, store, validPhone }: { bundle: BundlePa
   const variantOf = (p: BundleProduct) => (needsChoice(p) ? matchVariant(p, sel[p.id] ?? {}) : undefined);
   const attrsOf = (p: BundleProduct) => (needsChoice(p) ? (p.attributes ?? []).filter((a) => a.variants?.length) : []);
   const chosen = (p: BundleProduct, attr: string) => sel[p.id]?.[attr];
-  const priceOf = (p: BundleProduct) => unitPrice(p, variantOf(p)?.id);
+  // priceOf: سعر المنتج داخل الطقم (ما تعرضه الثيمات لكل منتج) — regularPriceOf: سعره العادي حسب النسخة المختارة
+  // الخيار المختار قد يكون له سعر خاص داخل الطقم
+  const priceOf = (p: BundleProduct) => bundleItemPrice(p, bundle.discountPercent, variantOf(p));
+  const regularPriceOf = (p: BundleProduct) => unitPrice(p, variantOf(p)?.id);
 
-  const original = bundle.products.reduce((s, p) => s + priceOf(p), 0);
-  const price = discounted(original, bundle.discountPercent);
+  const original = bundle.products.reduce((s, p) => s + regularPriceOf(p), 0);
+  const price = bundle.products.reduce((s, p) => s + priceOf(p), 0);
 
   /* ── التوصيل ── */
   const [wilayas, setWilayas] = useState<BundleWilaya[]>([]);
@@ -134,8 +137,8 @@ export function useBundleOrder({ bundle, store, validPhone }: { bundle: BundlePa
   return {
     /** نصوص الطقم (t) ونصوص الاستمارة (f) بلغة المتجر */
     t, f, ar, language, digital, money,
-    products: bundle.products, attrsOf, chosen, pick, variantOf, priceOf, needsChoice,
-    original, price, saving: original - price, total: price + ship,
+    products: bundle.products, attrsOf, chosen, pick, variantOf, priceOf, regularPriceOf, needsChoice,
+    original, price, saving: Math.max(0, original - price), total: price + ship,
     wilayas, communes, loadingCommunes, wilaya, placeName,
     form, setName, setPhone, chooseWilaya, setCommune, setShip, ship, shipCost,
     errors, submitting, submit,

@@ -19,7 +19,7 @@ import {
   Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -291,6 +291,7 @@ const THEME_CSS = `
 
   :root {
     --coral:    #FF6B6B;
+    --coral-d:  #C93636;
     --coral-dk: #E85555;
     --sun:      #FFD93D;
     --sun-dk:   #F4B942;
@@ -306,7 +307,7 @@ const THEME_CSS = `
     --bg-card:  #FFFFFF;
     --text:     #2D2D2D;
     --text-mid: #666;
-    --text-soft:#999;
+    --text-soft:#707070;
     --border:   #FFE4B5;
     --shadow:   rgba(255,107,107,0.18);
   }
@@ -574,7 +575,7 @@ const FR = ({ error, label, children }: { error?: string; label?: string; childr
   <div>
     {label && <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-mid)', marginBottom: '0.375rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</label>}
     {children}
-    {error && <p style={{ fontSize: '0.72rem', color: 'var(--coral)', marginTop: '0.3rem', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700 }}><AlertCircle size={11} />{error}</p>}
+    {error && <p style={{ fontSize: '0.72rem', color: 'var(--coral-d)', marginTop: '0.3rem', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700 }}><AlertCircle size={11} />{error}</p>}
   </div>
 );
 
@@ -662,7 +663,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     <div style={{ maxHeight: "300px", overflow: 'auto', paddingTop: "25px", position: 'absolute', top: 'calc(100% + 8px)', right: 0, left: 0, background: '#fff', border: '3px solid var(--border)', borderRadius: 20, boxShadow: '0 16px 48px rgba(0,0,0,0.1)', zIndex: 200, }}>
 
       {/* زر إغلاق البحث */}
-      <button
+      <button aria-label={a11y(store).clear}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={() => setSearchQuery('')}
@@ -676,7 +677,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       </button>
 
       {loading ? (
-        <div style={{ padding: '1.25rem', textAlign: 'center', color: 'var(--coral)', fontWeight: 800, fontSize: '0.875rem' }}>{t.searching}</div>
+        <div style={{ padding: '1.25rem', textAlign: 'center', color: 'var(--coral-d)', fontWeight: 800, fontSize: '0.875rem' }}>{t.searching}</div>
       ) : listSearch.length > 0 ? (
         <>
           {listSearch.map((p: any, i: number) => (
@@ -693,7 +694,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               />
               <div>
                 <div className='line-clamp-1' style={{ fontSize: '0.85rem', fontWeight: 700 }}>{p.name}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--coral)', fontWeight: 900 }}>{p.price} {currencyLabel(t.currency)}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--coral-d)', fontWeight: 900 }}>{p.price} {currencyLabel(t.currency)}</div>
               </div>
             </Link>
           ))}
@@ -759,7 +760,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           ))}
           {/* شرط إخفاء السلة في نسخة الكمبيوتر */}
           {store?.cart !== false && (
-            <Link href="/cart" className="btn-bouncy" style={{ position: 'relative', width: 44, height: 44, borderRadius: 14, border: '2.5px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral)', flexShrink: 0 }}>
+            <Link href="/cart" className="btn-bouncy" style={{ position: 'relative', width: 44, height: 44, borderRadius: 14, border: '2.5px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral-d)', flexShrink: 0 }}>
               <ShoppingCart size={19} />
               {count > 0 && <span className="cart-badge">{count}</span>}
             </Link>
@@ -768,19 +769,19 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
         {/* Mobile */}
         <div className="nav-mobile-btns">
-          <button onClick={() => setShowSearch(!showSearch)} style={{ width: 40, height: 40, borderRadius: 12, border: '2px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral)' }}>
+          <button aria-label={a11y(store).search} onClick={() => setShowSearch(!showSearch)} style={{ width: 40, height: 40, borderRadius: 12, border: '2px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral-d)' }}>
             <Search size={18} />
           </button>
 
           {/* شرط إخفاء السلة في نسخة الهاتف */}
           {store?.cart !== false && (
-            <Link href="/cart" style={{ position: 'relative', width: 40, height: 40, borderRadius: 12, border: '2px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral)' }}>
+            <Link href="/cart" style={{ position: 'relative', width: 40, height: 40, borderRadius: 12, border: '2px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral-d)' }}>
               <ShoppingCart size={18} />
               {count > 0 && <span className="cart-badge">{count}</span>}
             </Link>
           )}
 
-          <button onClick={() => setOpen(!open)} style={{ width: 40, height: 40, borderRadius: 12, border: '2px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral)' }}>
+          <button aria-label={a11y(store).menu} onClick={() => setOpen(!open)} style={{ width: 40, height: 40, borderRadius: 12, border: '2px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--coral-d)' }}>
             {open ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
@@ -792,7 +793,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <form onSubmit={doSearch} style={{ position: 'relative' }}>
             <input autoFocus type="text" placeholder={t.search_ph_mobile} value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
               style={{ width: '100%', padding: isRTL ? '0.75rem 1rem 0.75rem 2.75rem' : '0.75rem 2.75rem 0.75rem 1rem', borderRadius: 50, border: '2.5px solid var(--border)', outline: 'none' }} />
-            <Search size={16} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--coral)' }} />
+            <Search size={16} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--coral-d)' }} />
           </form>
           {searchQuery.length >= 2 && <SearchDrop />}
         </div>
@@ -921,12 +922,12 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
           ? <img src={displayImage} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s', transform: hov ? 'scale(1.1)' : 'scale(1)' }} />
           : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>🧸</div>}
         {discount > 0 && (
-          <div style={{ position: 'absolute', top: 10, [isRTL ? 'right' : 'left']: 10, width: 48, height: 48, borderRadius: '50%', background: 'var(--coral)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '0.8rem', boxShadow: '0 4px 12px rgba(255,107,107,0.5)', transform: 'rotate(12deg)' }}>
+          <div style={{ position: 'absolute', top: 10, [isRTL ? 'right' : 'left']: 10, width: 48, height: 48, borderRadius: '50%', background: 'var(--coral-d)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '0.8rem', boxShadow: '0 4px 12px rgba(255,107,107,0.5)', transform: 'rotate(12deg)' }}>
             -{discount}%
           </div>
         )}
         {product.isDigital ? (
-          <div style={{ position: 'absolute', top: 10, [isRTL ? 'left' : 'right']: 10, background: 'var(--coral)', color: '#fff', fontSize: '0.68rem', fontWeight: 800, padding: '3px 9px', borderRadius: 20, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', display: 'flex', alignItems: 'center' }}>
+          <div style={{ position: 'absolute', top: 10, [isRTL ? 'left' : 'right']: 10, background: 'var(--coral-d)', color: '#fff', fontSize: '0.68rem', fontWeight: 800, padding: '3px 9px', borderRadius: 20, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', display: 'flex', alignItems: 'center' }}>
             <Download size={12} />
           </div>
         ) : product.shippingFree && (
@@ -946,7 +947,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         </h3>
         <div style={{ marginTop: 'auto' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', marginBottom: '0.75rem' }}>
-            <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.4rem', color: 'var(--coral)' }}>{price.toLocaleString()}</span>
+            <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.4rem', color: 'var(--coral-d)' }}>{price.toLocaleString()}</span>
             <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-soft)' }}>{store?.currency || currencyLabel(t.currency)}</span>
             {orig > price && <span style={{ fontSize: '0.75rem', color: 'var(--text-soft)', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
           </div>
@@ -1224,7 +1225,7 @@ export function Home({ store, page }: any) {
 
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '7rem 1.5rem 4rem', position: 'relative', zIndex: 1, width: '100%', ...(store.hero?.imageUrl ? { ...heroTextClear(store, 'light'), marginBlock: '5rem 3rem' } : {}) }}>
           <div className="anim-pop-in" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '0.5rem 1.25rem', borderRadius: 50, background: 'rgba(255,107,107,0.12)', border: '2px solid rgba(255,107,107,0.25)', marginBottom: '1.5rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--coral)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.hero_badge}</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--coral-d)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.hero_badge}</span>
           </div>
           <h1 className="anim-pop-in" style={{ fontFamily: "'Fredoka One', cursive", fontSize: 'clamp(3rem, 8vw, 6rem)', color: 'var(--text)', lineHeight: 1.1, marginBottom: '1.25rem' }}
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(store.hero?.title || t.hero_title_fallback) }} />
@@ -1323,7 +1324,7 @@ export function Home({ store, page }: any) {
         {countPage > 1 && (
           <div className="pagination" dir={isRTL ? 'rtl' : 'ltr'}>
             <Link href={{ query: { page: Math.max(1, page - 1) } }} scroll={false}
-              style={{ width: 40, height: 40, borderRadius: 14, border: '2.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', color: 'var(--coral)', fontWeight: 900, opacity: page <= 1 ? 0.3 : 1 }}>{isRTL ? '❮' : '❰'}</Link>
+              style={{ width: 40, height: 40, borderRadius: 14, border: '2.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', color: 'var(--coral-d)', fontWeight: 900, opacity: page <= 1 ? 0.3 : 1 }}>{isRTL ? '❮' : '❰'}</Link>
             {Array.from({ length: countPage }).map((_, i) => {
               const pn = i + 1; const isA = Number(page) === pn;
               return (
@@ -1333,7 +1334,7 @@ export function Home({ store, page }: any) {
               );
             })}
             <Link href={{ query: { page: Math.min(countPage, Number(page) + 1) } }} scroll={false}
-              style={{ width: 40, height: 40, borderRadius: 14, border: '2.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', color: 'var(--coral)', fontWeight: 900, opacity: page >= countPage ? 0.3 : 1 }}>{isRTL ? '❯' : '❱'}</Link>
+              style={{ width: 40, height: 40, borderRadius: 14, border: '2.5px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', color: 'var(--coral-d)', fontWeight: 900, opacity: page >= countPage ? 0.3 : 1 }}>{isRTL ? '❯' : '❱'}</Link>
           </div>
         )}
       </section>
@@ -1391,14 +1392,14 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
           ? <img src={allImages[sel]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'clamp(4rem, 14vw, 7rem)' }}>🧸</div>}
         {discount > 0 && (
-          <div style={{ position: 'absolute', top: 14, [isRTL ? 'right' : 'left']: 14, width: 54, height: 54, borderRadius: '50%', background: 'var(--coral)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '0.9rem', transform: 'rotate(-12deg)', boxShadow: '0 4px 16px rgba(255,107,107,0.5)', zIndex: 2 }}>-{discount}%</div>
+          <div style={{ position: 'absolute', top: 14, [isRTL ? 'right' : 'left']: 14, width: 54, height: 54, borderRadius: '50%', background: 'var(--coral-d)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '0.9rem', transform: 'rotate(-12deg)', boxShadow: '0 4px 16px rgba(255,107,107,0.5)', zIndex: 2 }}>-{discount}%</div>
         )}
         {allImages.length > 1 && (
           <>
-            <button onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', [isRTL ? 'right' : 'left']: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.92)', border: '2px solid rgba(0,0,0,0.06)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
+            <button aria-label={a11y(store).prev} onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', [isRTL ? 'right' : 'left']: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.92)', border: '2px solid rgba(0,0,0,0.06)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
               {isRTL ? <ChevronRight size={17} /> : <ChevronLeft size={17} />}
             </button>
-            <button onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.92)', border: '2px solid rgba(0,0,0,0.06)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
+            <button aria-label={a11y(store).next} onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', [isRTL ? 'left' : 'right']: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.92)', border: '2px solid rgba(0,0,0,0.06)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
               {isRTL ? <ChevronLeft size={17} /> : <ChevronRight size={17} />}
             </button>
             <div style={{ position: 'absolute', bottom: 10, left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 5, pointerEvents: 'none', zIndex: 2 }}>
@@ -1412,7 +1413,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
       {allImages.length > 1 && (
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', paddingBottom: 4, marginTop: 10 }}>
           {allImages.map((img: string, idx: number) => (
-            <button key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 12, overflow: 'hidden', border: `3px solid ${sel === idx ? accent : 'var(--border)'}`, opacity: sel === idx ? 1 : 0.5, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.2s' }}>
+            <button aria-label={`${a11y(store).image} ${idx + 1}`} key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 12, overflow: 'hidden', border: `3px solid ${sel === idx ? accent : 'var(--border)'}`, opacity: sel === idx ? 1 : 0.5, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.2s' }}>
               <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </button>
           ))}
@@ -1698,7 +1699,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         <div style={{ animation: 'pop-in 0.3s ease' }}>
           {store?.cart !== false && !product.isDigital && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <p style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--coral)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.delivery_info}</p>
+              <p style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--coral-d)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.delivery_info}</p>
               {orderNowState && (<button onClick={() => setIsOrderNow(false)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0.375rem 0.75rem', borderRadius: 10, border: '2px solid var(--border)', background: '#fff', color: 'var(--text-soft)', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
                 <X size={12} /> {t.cancel}
               </button>)}
@@ -1767,16 +1768,16 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <div style={{ marginBottom: '0.875rem' }}>
                 <p style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--text-mid)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>{t.quantity_label}</p>
                 <div style={{ display: 'inline-flex', alignItems: 'center', border: '2.5px solid var(--border)', borderRadius: 16, overflow: 'hidden', background: '#fff' }}>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--coral)' }}><Minus size={16} /></button>
+                  <button aria-label={a11y(store).decrease} type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--coral-d)' }}><Minus size={16} /></button>
                   <span style={{ width: 46, textAlign: 'center', fontFamily: "'Fredoka One', cursive", fontSize: '1.25rem', color: 'var(--text)' }}>{fd.quantity}</span>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--coral)' }}><Plus size={16} /></button>
+                  <button aria-label={a11y(store).increase} type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--coral-d)' }}><Plus size={16} /></button>
                 </div>
               </div>
             )}
 
             {/* Summary */}
             <div className="polka-dots" style={{ background: '#fff', border: '2.5px solid var(--border)', borderRadius: 20, padding: '1.125rem', marginBottom: '1.25rem' }}>
-              <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--coral)', textTransform: 'uppercase', marginBottom: '0.875rem' }}>{t.order_summary}</p>
+              <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--coral-d)', textTransform: 'uppercase', marginBottom: '0.875rem' }}>{t.order_summary}</p>
               {[
                 { l: t.sum_product, v: product.name.slice(0, 24) + (product.name.length > 24 ? '...' : '') },
                 { l: t.sum_price, v: `${fp.toLocaleString()} ${currencyLabel(t.currency)}` },
@@ -1789,8 +1790,8 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 </div>
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', paddingTop: '0.5rem' }}>
-                <span style={{ fontWeight: 900, fontSize: '0.875rem', color: 'var(--coral)' }}>{t.sum_total}</span>
-                <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2rem', color: 'var(--coral)' }}>{total().toLocaleString()} <span style={{ fontSize: '0.9rem', fontFamily: 'inherit' }}>{currencyLabel(t.currency)}</span></span>
+                <span style={{ fontWeight: 900, fontSize: '0.875rem', color: 'var(--coral-d)' }}>{t.sum_total}</span>
+                <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2rem', color: 'var(--coral-d)' }}>{total().toLocaleString()} <span style={{ fontSize: '0.9rem', fontFamily: 'inherit' }}>{currencyLabel(t.currency)}</span></span>
               </div>
             </div>
 
@@ -1908,18 +1909,18 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
           {/* Items */}
           <div style={{ background: '#fff', borderRadius: 24, border: '3px solid var(--border)', overflow: 'hidden', alignSelf: 'start' }}>
             <div style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '3px dashed var(--border)', background: 'rgba(255,107,107,0.04)' }}>
-              <Package size={18} style={{ color: 'var(--coral)' }} />
-              <span style={{ fontFamily: "'Fredoka One', cursive", color: 'var(--coral)', fontSize: '0.95rem' }}>{t.cart_items(items.length)}</span>
+              <Package size={18} style={{ color: 'var(--coral-d)' }} />
+              <span style={{ fontFamily: "'Fredoka One', cursive", color: 'var(--coral-d)', fontSize: '0.95rem' }}>{t.cart_items(items.length)}</span>
             </div>
             {items.map((item, i) => (
               <div key={i} style={{ display: 'flex', gap: '1rem', padding: '1rem', borderBottom: '2px dashed var(--border)' }}>
                 <img src={item.product?.imagesProduct?.[0]?.imageUrl || item.product?.productImage} style={{ width: 78, height: 78, borderRadius: 16, objectFit: 'cover', border: '2px solid var(--border)', flexShrink: 0 }} alt="" />
                 <div style={{ flex: 1 }}>
                   <h4 style={{ fontFamily: "'Fredoka One', cursive", fontSize: '0.95rem', color: 'var(--text)', marginBottom: '0.25rem' }}>{item.product?.name}</h4>
-                  <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: 'var(--coral)', marginBottom: '0.5rem' }}>{item.finalPrice?.toLocaleString()} {currencyLabel(t.currency)}</p>
+                  <p style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.1rem', color: 'var(--coral-d)', marginBottom: '0.5rem' }}>{item.finalPrice?.toLocaleString()} {currencyLabel(t.currency)}</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
                     <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1rem', color: 'var(--text)' }}>× {item.quantity}</span>
-                    <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0.375rem 0.75rem', borderRadius: 10, border: '2px solid rgba(255,107,107,0.3)', background: 'transparent', color: 'var(--coral)', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0.375rem 0.75rem', borderRadius: 10, border: '2px solid rgba(255,107,107,0.3)', background: 'transparent', color: 'var(--coral-d)', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
                       <Trash2 size={12} /> {t.delete}
                     </button>
                   </div>
@@ -1928,7 +1929,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             ))}
             <div style={{ padding: '1rem', background: 'rgba(255,107,107,0.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontWeight: 800, fontSize: '0.875rem', color: 'var(--text-soft)' }}>{t.subtotal}</span>
-              <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.5rem', color: 'var(--coral)' }}>{cartTotal.toLocaleString()} {currencyLabel(t.currency)}</span>
+              <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '1.5rem', color: 'var(--coral-d)' }}>{cartTotal.toLocaleString()} {currencyLabel(t.currency)}</span>
             </div>
           </div>
 
@@ -1976,7 +1977,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               </div>
 
               <div className="polka-dots" style={{ background: '#fff', border: '2.5px solid var(--border)', borderRadius: 18, padding: '1rem', marginBottom: '1rem' }}>
-                <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--coral)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>{t.summary}</p>
+                <p style={{ fontSize: '0.72rem', fontWeight: 900, color: 'var(--coral-d)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>{t.summary}</p>
                 {[
                   { l: t.subtotal, v: `${cartTotal.toLocaleString()} ${currencyLabel(t.currency)}` },
                   { l: t.sum_delivery, v: !selW ? '---' : freeShippingReached ? t.free_shipping_badge : `${getLiv().toLocaleString()} ${currencyLabel(t.currency)}` },
@@ -1987,8 +1988,8 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   </div>
                 ))}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', paddingTop: '0.375rem' }}>
-                  <span style={{ fontWeight: 900, fontSize: '0.875rem', color: 'var(--coral)' }}>{t.total_label}</span>
-                  <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2rem', color: 'var(--coral)' }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.85rem', fontFamily: 'inherit' }}>{currencyLabel(t.currency)}</span></span>
+                  <span style={{ fontWeight: 900, fontSize: '0.875rem', color: 'var(--coral-d)' }}>{t.total_label}</span>
+                  <span style={{ fontFamily: "'Fredoka One', cursive", fontSize: '2rem', color: 'var(--coral-d)' }}>{finalTotal.toLocaleString()} <span style={{ fontSize: '0.85rem', fontFamily: 'inherit' }}>{currencyLabel(t.currency)}</span></span>
                 </div>
               </div>
 
@@ -2032,7 +2033,7 @@ export function Success({ store, order }: { store: any; domain: string; order: a
             {order.total != null && (
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-mid)' }}>{currency}</span>
-                <span style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--coral)' }}>{Number(order.total).toLocaleString()} {currency}</span>
+                <span style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--coral-d)' }}>{Number(order.total).toLocaleString()} {currency}</span>
               </div>
             )}
           </div>
@@ -2213,7 +2214,7 @@ export function Contact({ store }: { store: any }) {
                 <button type="submit" disabled={loading} className="btn-bouncy" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '1rem', borderRadius: 18, border: 'none', cursor: loading ? 'not-allowed' : 'pointer', fontFamily: "'Nunito', sans-serif", fontWeight: 900, fontSize: '1rem', color: '#fff', background: 'linear-gradient(135deg, var(--coral), var(--grape))', boxShadow: '0 8px 28px rgba(255,107,107,0.4)', opacity: loading ? 0.7 : 1 }}>
                   {loading ? <><Loader2 size={18} style={{ animation: 'spin-slow 1s linear infinite' }} /> {t.contact_sending}</> : <>{t.contact_send}</>}
                 </button>
-                {contactError && <p style={{ color: 'var(--coral)', fontWeight: 700, fontSize: '0.875rem', textAlign: 'center', marginTop: '0.25rem' }}>{contactError}</p>}
+                {contactError && <p style={{ color: 'var(--coral-d)', fontWeight: 700, fontSize: '0.875rem', textAlign: 'center', marginTop: '0.25rem' }}>{contactError}</p>}
               </form>
             )}
           </div>

@@ -899,7 +899,7 @@ export function Footer({ store }: any) {
           </div>
 
           <div>
-            <p style={{ ...eyebrow, color: '#8C8073', marginBottom: 14 }}>{t.quickLinks}</p>
+            <p style={{ ...eyebrow, color: '#958A7E', marginBottom: 14 }}>{t.quickLinks}</p>
             {links.map((l) => <Link key={l.h} href={l.h} className="lx-footlink">{l.l}</Link>)}
           </div>
 
@@ -916,7 +916,7 @@ export function Footer({ store }: any) {
             ))}
           </div>
 <div>
-            <p style={{ ...eyebrow, color: '#8C8073', marginBottom: 14 }}>{t.contactUs}</p>
+            <p style={{ ...eyebrow, color: '#958A7E', marginBottom: 14 }}>{t.contactUs}</p>
             <a href={c.phone ? `tel:${c.phone}` : undefined} className="lx-footlink" style={{ display: 'flex', alignItems: 'center', gap: 9 }} dir="ltr">
               <Phone size={14} strokeWidth={1.6} /> {c.phone || comingSoon(store)}
             </a>
@@ -935,7 +935,7 @@ export function Footer({ store }: any) {
           </div>
         </div>
 
-        <div style={{ borderTop: '1px solid rgba(255,248,241,.14)', padding: '20px 0 26px', fontSize: '.72rem', letterSpacing: '.1em', color: '#8C8073' }}>
+        <div style={{ borderTop: '1px solid rgba(255,248,241,.14)', padding: '20px 0 26px', fontSize: '.72rem', letterSpacing: '.1em', color: '#958A7E' }}>
           © {year} {store?.name || 'MAISON'} — {t.rightsReserved}
         </div>
       </div>

@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -43,6 +43,7 @@ const SUB = '#8A7A85';
 const BD = '#F3E1E6';
 const A = '#FF4D6D';
 const AD = '#E63958';
+const AT = '#CE3B57'; // درجة أغمق للنص وللأزرار ذات النص الأبيض (تباين ≥ 4.5)
 const AL = '#FFE6EC';
 const GOLD = '#D4A542';
 const GOLD_L = '#FBF0DC';
@@ -670,7 +671,7 @@ export function Navbar({ store, domain }: any) {
                   className="input-field"
                   style={{ flex: 1, padding: '10px 14px', border: `1px solid ${BD}`, borderRadius: 10, fontFamily: 'inherit', fontSize: 14, background: BG, color: TXT }}
                 />
-                <button type="submit" className="btn-primary" style={{ background: A, color: '#fff', border: 'none', borderRadius: 10, padding: '0 16px', cursor: 'pointer' }}>
+                <button aria-label={a11y(store).search} type="submit" className="btn-primary" style={{ background: AT, color: '#fff', border: 'none', borderRadius: 10, padding: '0 16px', cursor: 'pointer' }}>
                   <Search size={16} />
                 </button>
               </form>
@@ -687,7 +688,7 @@ export function Navbar({ store, domain }: any) {
                       <span style={{ fontSize: 13, fontWeight: 600 }}>{p.name}</span>
                     </Link>
                   ))}
-                  <Link href={`/?search=${encodeURIComponent(searchQuery)}`} onClick={() => setShowSearch(false)} style={{ display: 'block', textAlign: 'center', padding: 10, color: A, fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>
+                  <Link href={`/?search=${encodeURIComponent(searchQuery)}`} onClick={() => setShowSearch(false)} style={{ display: 'block', textAlign: 'center', padding: 10, color: AT, fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>
                     {t.showAll}
                   </Link>
                 </div>
@@ -699,7 +700,7 @@ export function Navbar({ store, domain }: any) {
             <Link href="/cart" aria-label={t.cart} style={{ position: 'relative', color: TXT, display: 'flex', minHeight: 44, minWidth: 44, alignItems: 'center', justifyContent: 'center' }}>
               <ShoppingBag size={20} />
               {count > 0 && (
-                <span className="cart-badge-animate" style={{ position: 'absolute', top: 2, right: 2, background: A, color: '#fff', fontSize: 10, fontWeight: 700, borderRadius: 999, minWidth: 17, height: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>
+                <span className="cart-badge-animate" style={{ position: 'absolute', top: 2, right: 2, background: AT, color: '#fff', fontSize: 10, fontWeight: 700, borderRadius: 999, minWidth: 17, height: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>
                   {count}
                 </span>
               )}
@@ -718,7 +719,7 @@ export function Navbar({ store, domain }: any) {
         <div onClick={(e) => e.stopPropagation()} style={{ position: 'absolute', top: 0, [isRTL ? 'right' : 'left']: 0, height: '100%', width: 280, background: CARD, padding: 24, boxShadow: isRTL ? '-10px 0 40px rgba(0,0,0,0.2)' : '10px 0 40px rgba(0,0,0,0.2)', animation: 'fadeIn 0.25s ease', zIndex: 10000 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
             <StoreLogo store={store} size={36} />
-            <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: TXT }}><X size={22} /></button>
+            <button aria-label={a11y(store).close} onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: TXT }}><X size={22} /></button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {mobileLinks.map((l) => (
@@ -761,7 +762,7 @@ export function Footer({ store }: any) {
               {!store?.design?.logoUrl && <span style={{ fontFamily: FONT_HEAD, fontWeight: 700, fontSize: 19 }}>{store?.name}</span>}
             </div>
             <p style={{ color: '#C9B8C4', fontSize: 14, lineHeight: 1.8, maxWidth: 280 }}>{store?.hero?.subtitle}</p>
-            <p style={{ color: '#8A7A85', fontSize: 12, marginTop: 18 }}>© {year} {store?.name}. {t.rightsReserved}</p>
+            <p style={{ color: '#9D8E98', fontSize: 12, marginTop: 18 }}>© {year} {store?.name}. {t.rightsReserved}</p>
           </div>
           <div>
             <h4 style={{ fontFamily: FONT_HEAD, fontSize: 16, marginBottom: 16, color: GOLD }}>{t.quickLinks}</h4>
@@ -812,16 +813,16 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
       <div style={{ background: CARD, borderRadius: 22, overflow: 'hidden', boxShadow: '0 6px 20px rgba(36,18,32,0.06)', border: `1px solid ${BD}` }}>
         <div className="card-img" style={{ position: 'relative', aspectRatio: '1/1', background: AL }}>
           {discount > 0 && (
-            <span style={{ position: 'absolute', top: 12, right: 12, zIndex: 2, background: A, color: '#fff', fontSize: 11, fontWeight: 800, padding: '5px 10px', borderRadius: 999 }}>
+            <span style={{ position: 'absolute', top: 12, right: 12, zIndex: 2, background: AT, color: '#fff', fontSize: 11, fontWeight: 800, padding: '5px 10px', borderRadius: 999 }}>
               -{discount}%
             </span>
           )}
           {product.isDigital ? (
-            <span style={{ position: 'absolute', top: 12, left: 12, zIndex: 2, background: A, color: '#fff', fontSize: 11, fontWeight: 800, padding: '5px 10px', borderRadius: 999, display: 'flex', alignItems: 'center' }}>
+            <span style={{ position: 'absolute', top: 12, left: 12, zIndex: 2, background: AT, color: '#fff', fontSize: 11, fontWeight: 800, padding: '5px 10px', borderRadius: 999, display: 'flex', alignItems: 'center' }}>
               <Download size={12} />
             </span>
           ) : product.shippingFree && (
-            <span style={{ position: 'absolute', top: 12, left: 12, zIndex: 2, background: A, color: '#fff', fontSize: 11, fontWeight: 800, padding: '5px 10px', borderRadius: 999 }}>
+            <span style={{ position: 'absolute', top: 12, left: 12, zIndex: 2, background: AT, color: '#fff', fontSize: 11, fontWeight: 800, padding: '5px 10px', borderRadius: 999 }}>
               🚚
             </span>
           )}
@@ -844,9 +845,9 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
             {product.name}
           </h3>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={{ fontWeight: 800, fontSize: 17, color: A }}>{fmt(price)} {store?.currency || 'DZD'}</span>
+            <span style={{ fontWeight: 800, fontSize: 17, color: AT }}>{fmt(price)} {store?.currency || 'DZD'}</span>
             {priceOriginal && priceOriginal > price && (
-              <span style={{ fontSize: 13, color: SUB, textDecoration: 'line-through' }}>{fmt(priceOriginal)}</span>
+              <span style={{ fontSize: 13, color: '#7B6C76', textDecoration: 'line-through' }}>{fmt(priceOriginal)}</span>
             )}
           </div>
         </div>
@@ -1137,7 +1138,7 @@ export function Home({ store, page }: any) {
                 {store?.hero?.subtitle || t.heroSub}
               </p>
               <div className="hero-cta" style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: isRTL ? 'flex-start' : 'flex-start' }}>
-                <a href="#products" className="btn-primary" style={{ background: A, color: '#fff', fontWeight: 700, padding: '15px 30px', borderRadius: 999, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 44 }}>
+                <a href="#products" className="btn-primary" style={{ background: AT, color: '#fff', fontWeight: 700, padding: '15px 30px', borderRadius: 999, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 44 }}>
                   {t.shopNow} {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
                 </a>
                 {store?.cart !== false && (
@@ -1258,19 +1259,19 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Sparkles size={60} color={GOLD} /></div>
             )}
             {discount > 0 && (
-              <span style={{ position: 'absolute', top: 14, right: 14, background: A, color: '#fff', fontSize: 12, fontWeight: 800, padding: '6px 12px', borderRadius: 999 }}>{t.discountPre} {discount}%</span>
+              <span style={{ position: 'absolute', top: 14, right: 14, background: AT, color: '#fff', fontSize: 12, fontWeight: 800, padding: '6px 12px', borderRadius: 999 }}>{t.discountPre} {discount}%</span>
             )}
             {images.length > 1 && (
               <>
-                <button onClick={() => showImage((s) => (s === 0 ? images.length - 1 : s - 1))} style={{ position: 'absolute', top: '50%', right: 12, transform: 'translateY(-50%)', background: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}><ChevronRight size={18} /></button>
-                <button onClick={() => showImage((s) => (s === images.length - 1 ? 0 : s + 1))} style={{ position: 'absolute', top: '50%', left: 12, transform: 'translateY(-50%)', background: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}><ChevronLeft size={18} /></button>
+                <button aria-label={a11y(store).prev} onClick={() => showImage((s) => (s === 0 ? images.length - 1 : s - 1))} style={{ position: 'absolute', top: '50%', right: 12, transform: 'translateY(-50%)', background: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}><ChevronRight size={18} /></button>
+                <button aria-label={a11y(store).next} onClick={() => showImage((s) => (s === images.length - 1 ? 0 : s + 1))} style={{ position: 'absolute', top: '50%', left: 12, transform: 'translateY(-50%)', background: '#fff', border: 'none', borderRadius: '50%', width: 40, height: 40, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}><ChevronLeft size={18} /></button>
               </>
             )}
           </div>
           {images.length > 1 && (
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               {images.map((im, i) => (
-                <button key={i} onClick={() => showImage(i)} style={{ width: 66, height: 66, borderRadius: 12, overflow: 'hidden', border: `2px solid ${sel === i ? A : BD}`, padding: 0, cursor: 'pointer', flexShrink: 0 }}>
+                <button aria-label={`${a11y(store).image} ${i + 1}`} key={i} onClick={() => showImage(i)} style={{ width: 66, height: 66, borderRadius: 12, overflow: 'hidden', border: `2px solid ${sel === i ? A : BD}`, padding: 0, cursor: 'pointer', flexShrink: 0 }}>
                   <img src={im} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
               ))}
@@ -1282,10 +1283,10 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
         <div>
           <div style={{ display: 'flex', gap: 3, marginBottom: 10 }}>{[...Array(5)].map((_, i) => <Star key={i} size={15} fill={GOLD} color={GOLD} />)}</div>
           <h1 style={{ fontFamily: FONT_HEAD, fontSize: 'clamp(1.5rem,3vw,2.1rem)', fontWeight: 700, margin: '0 0 14px' }}>{product.name}</h1>
-          <div style={{ fontSize: 26, fontWeight: 800, color: A, marginBottom: 20 }}>{fmt(finalPrice)} {store?.currency || product?.store?.currency || 'DZD'}</div>
+          <div style={{ fontSize: 26, fontWeight: 800, color: AT, marginBottom: 20 }}>{fmt(finalPrice)} {store?.currency || product?.store?.currency || 'DZD'}</div>
 
           {(product.shippingFree || (store?.supportFreeShipping && store?.freeShippingMinAmount != null)) && (
-            <div style={{ marginBottom: 22, padding: '10px 14px', border: `1.5px solid ${A}`, borderRadius: 14, background: AL, fontSize: 13, fontWeight: 700, color: A }}>
+            <div style={{ marginBottom: 22, padding: '10px 14px', border: `1.5px solid ${A}`, borderRadius: 14, background: AL, fontSize: 13, fontWeight: 700, color: AT }}>
               🚚 {product.shippingFree ? t.freeShippingBadge : t.freeShippingThreshold.replace('{{amount}}', `${fmt(Number(store.freeShippingMinAmount))} ${store?.currency || 'DZD'}`)}
             </div>
           )}
@@ -1300,9 +1301,9 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                     <span style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                       <span style={{ fontWeight: 600, fontSize: 14 }}>{o.name} ({o.quantity})</span>
                       {o.subTitle && <span style={{ fontWeight: 400, fontSize: 12, color: SUB }}>{o.subTitle}</span>}
-                      {o.shippingFree && <span style={{ fontWeight: 700, fontSize: 12, color: A }}>🚚 {t.freeShippingBadge}</span>}
+                      {o.shippingFree && <span style={{ fontWeight: 700, fontSize: 12, color: AT }}>🚚 {t.freeShippingBadge}</span>}
                     </span>
-                    <span style={{ fontWeight: 800, color: A }}>{fmt(o.price)} {store?.currency || 'DZD'}</span>
+                    <span style={{ fontWeight: 800, color: AT }}>{fmt(o.price)} {store?.currency || 'DZD'}</span>
                   </label>
                 ))}
               </div>
@@ -1474,7 +1475,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
   };
   const btnPrimary: React.CSSProperties = {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-    padding: '0.9rem 1.5rem', minHeight: 44, background: A, color: '#fff', fontWeight: 700,
+    padding: '0.9rem 1.5rem', minHeight: 44, background: AT, color: '#fff', fontWeight: 700,
     fontSize: '0.92rem', border: 'none', borderRadius: 14, cursor: 'pointer', transition: 'all 0.2s',
     fontFamily: 'inherit', width: '100%',
   };
@@ -1487,9 +1488,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       {supportQty && !product.isDigital && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', border: `1.5px solid ${BD}`, borderRadius: 12, overflow: 'hidden' }}>
-            <button onClick={() => setFd((s) => ({ ...s, quantity: Math.max(1, s.quantity - 1) }))} style={{ width: 40, height: 40, border: 'none', background: CARD, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={15} /></button>
+            <button aria-label={a11y(store).decrease} onClick={() => setFd((s) => ({ ...s, quantity: Math.max(1, s.quantity - 1) }))} style={{ width: 40, height: 40, border: 'none', background: CARD, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={15} /></button>
             <span style={{ width: 44, textAlign: 'center', fontWeight: 700 }}>{fd.quantity}</span>
-            <button onClick={() => setFd((s) => ({ ...s, quantity: s.quantity + 1 }))} style={{ width: 40, height: 40, border: 'none', background: CARD, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={15} /></button>
+            <button aria-label={a11y(store).increase} onClick={() => setFd((s) => ({ ...s, quantity: s.quantity + 1 }))} style={{ width: 40, height: 40, border: 'none', background: CARD, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={15} /></button>
           </div>
         </div>
       )}
@@ -1497,7 +1498,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
       {!product.isDigital && (
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           {canCart && (
-            <button data-add-to-cart onClick={addToCart} className="btn-primary" style={{ ...btnPrimary, background: 'transparent', color: A, border: `1.5px solid ${A}`, flex: 1 }}>
+            <button data-add-to-cart onClick={addToCart} className="btn-primary" style={{ ...btnPrimary, background: 'transparent', color: AT, border: `1.5px solid ${A}`, flex: 1 }}>
               {added ? <><Check size={17} /> {t.addedBtn}</> : <><ShoppingBag size={17} /> {t.addBtn}</>}
             </button>
           )}
@@ -1690,7 +1691,7 @@ export function Cart({ domain, store }: any) {
         </div>
         <h2 style={{ fontFamily: FONT_HEAD, fontSize: 24, marginBottom: 10 }}>{t.successTitle}</h2>
         <p style={{ color: SUB, marginBottom: 26 }}>{t.successDesc}</p>
-        <Link href="/" style={{ background: A, color: '#fff', padding: '14px 30px', borderRadius: 999, textDecoration: 'none', fontWeight: 700 }}>{t.continueShop}</Link>
+        <Link href="/" style={{ background: AT, color: '#fff', padding: '14px 30px', borderRadius: 999, textDecoration: 'none', fontWeight: 700 }}>{t.continueShop}</Link>
       </div>
     );
   }
@@ -1701,7 +1702,7 @@ export function Cart({ domain, store }: any) {
         <ShoppingBag size={48} color={BD} style={{ marginBottom: 16 }} />
         <h2 style={{ fontFamily: FONT_HEAD, fontSize: 22, marginBottom: 10 }}>{t.cartEmpty}</h2>
         <p style={{ color: SUB, marginBottom: 26 }}>{t.cartEmptyDesc}</p>
-        <Link href="/" style={{ background: A, color: '#fff', padding: '14px 30px', borderRadius: 999, textDecoration: 'none', fontWeight: 700 }}>{t.shopNow}</Link>
+        <Link href="/" style={{ background: AT, color: '#fff', padding: '14px 30px', borderRadius: 999, textDecoration: 'none', fontWeight: 700 }}>{t.shopNow}</Link>
       </div>
     );
   }
@@ -1730,9 +1731,9 @@ export function Cart({ domain, store }: any) {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 700, fontSize: 14.5, marginBottom: 4 }}>{it.product?.name}</div>
                   <div style={{ fontSize: 13, color: SUB }}>{t.qtyShort}: {it.quantity}</div>
-                  <div style={{ fontWeight: 800, color: A, marginTop: 4 }}>{fmt(Number(it.finalPrice) * Number(it.quantity))} {store?.currency || 'DZD'}</div>
+                  <div style={{ fontWeight: 800, color: AT, marginTop: 4 }}>{fmt(Number(it.finalPrice) * Number(it.quantity))} {store?.currency || 'DZD'}</div>
                 </div>
-                <button onClick={() => removeItem(idx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', alignSelf: 'flex-start', minHeight: 44, minWidth: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Trash2 size={18} /></button>
+                <button aria-label={a11y(store).remove} onClick={() => removeItem(idx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', alignSelf: 'flex-start', minHeight: 44, minWidth: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Trash2 size={18} /></button>
               </div>
             );
           })}
@@ -1780,11 +1781,11 @@ export function Cart({ domain, store }: any) {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '10px 0 0', borderTop: `1px solid ${BD}`, marginTop: 6 }}>
                 <span style={{ flexShrink: 0, fontSize: 15, fontWeight: 800 }}>{t.total}</span>
-                <span style={{ whiteSpace: 'nowrap', fontWeight: 800, fontSize: 16, color: A }}>{fmt(finalTotal)} {store?.currency || 'DZD'}</span>
+                <span style={{ whiteSpace: 'nowrap', fontWeight: 800, fontSize: 16, color: AT }}>{fmt(finalTotal)} {store?.currency || 'DZD'}</span>
               </div>
             </div>
 
-            <button onClick={submit} disabled={submitting} style={{ width: '100%', minHeight: 44, background: A, color: '#fff', fontWeight: 700, border: 'none', borderRadius: 14, padding: '14px', cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.65 : 1, fontFamily: 'inherit' }}>
+            <button onClick={submit} disabled={submitting} style={{ width: '100%', minHeight: 44, background: AT, color: '#fff', fontWeight: 700, border: 'none', borderRadius: 14, padding: '14px', cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.65 : 1, fontFamily: 'inherit' }}>
               {submitting ? t.sending : t.confirmOrder}
             </button>
           </div>
@@ -1807,7 +1808,7 @@ export function Success({ store, order }: { store: any; domain: string; order: a
       <div style={{ maxWidth: 480, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', background: CARD, padding: '3rem 2rem', borderRadius: 16, border: `1px solid ${BD}`, marginBottom: '1.5rem' }}>
           <div style={{ width: 60, height: 60, borderRadius: '50%', background: AL, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem' }}>
-            <Check size={28} style={{ color: A }} />
+            <Check size={28} style={{ color: AT }} />
           </div>
           <h2 style={{ fontFamily: FONT_HEAD, fontSize: 24, color: TXT, marginBottom: 10 }}>{t.successTitle}</h2>
           <p style={{ color: SUB }}>{t.successDesc}</p>
@@ -1822,7 +1823,7 @@ export function Success({ store, order }: { store: any; domain: string; order: a
             {order.total != null && (
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: 13, color: SUB }}>{t.total}</span>
-                <span style={{ fontFamily: FONT_HEAD, fontSize: '1.2rem', color: A }}>{Number(order.total).toLocaleString()} {currency}</span>
+                <span style={{ fontFamily: FONT_HEAD, fontSize: '1.2rem', color: AT }}>{Number(order.total).toLocaleString()} {currency}</span>
               </div>
             )}
           </div>
@@ -1847,7 +1848,7 @@ export function Success({ store, order }: { store: any; domain: string; order: a
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: A, color: '#fff', padding: '0.875rem 2rem', borderRadius: 12, fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: AT, color: '#fff', padding: '0.875rem 2rem', borderRadius: 12, fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none' }}>
             <ShoppingBag size={17} /> {t.shopNow}
           </Link>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.8rem', borderRadius: 12, border: `1px solid ${BD}`, color: SUB, fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none' }}>
@@ -1876,7 +1877,7 @@ function Shell({ title, children, store }: any) {
 function InfoBlock({ title, body }: any) {
   return (
     <div>
-      <h3 style={{ fontFamily: FONT_HEAD, fontSize: 18, marginBottom: 10, color: A }}>{title}</h3>
+      <h3 style={{ fontFamily: FONT_HEAD, fontSize: 18, marginBottom: 10, color: AT }}>{title}</h3>
       <p style={{ color: SUB, lineHeight: 1.9, fontSize: 14.5 }}>{body}</p>
     </div>
   );
@@ -1945,7 +1946,7 @@ export function Contact({ store }: any) {
           <div style={{ background: CARD, borderRadius: 18, padding: 30, border: `1px solid ${BD}`, textAlign: 'center' }}>
             <Check size={36} color={A} style={{ marginBottom: 12 }} />
             <p style={{ marginBottom: 18 }}>{t.sentMsg}</p>
-            <button onClick={() => { setSent(false); setForm({ name: '', email: '', phone: '', message: '' }); }} style={{ background: A, color: '#fff', border: 'none', borderRadius: 12, padding: '12px 22px', fontWeight: 700, cursor: 'pointer' }}>{t.sendAnother}</button>
+            <button onClick={() => { setSent(false); setForm({ name: '', email: '', phone: '', message: '' }); }} style={{ background: AT, color: '#fff', border: 'none', borderRadius: 12, padding: '12px 22px', fontWeight: 700, cursor: 'pointer' }}>{t.sendAnother}</button>
           </div>
         ) : (
           <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 14, background: CARD, borderRadius: 18, padding: 24, border: `1px solid ${BD}` }}>
@@ -1953,7 +1954,7 @@ export function Contact({ store }: any) {
             <input required type="email" placeholder={t.emailPh} value={form.email} onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))} className="input-field" style={inputBase} />
             <input placeholder={t.phone} value={form.phone} onChange={(e) => setForm((s) => ({ ...s, phone: e.target.value }))} className="input-field" style={inputBase} />
             <textarea required rows={5} placeholder={t.messagePh} value={form.message} onChange={(e) => setForm((s) => ({ ...s, message: e.target.value }))} className="input-field" style={{ ...inputBase, resize: 'none' }} />
-            <button type="submit" disabled={sending} style={{ background: A, color: '#fff', border: 'none', borderRadius: 12, padding: '13px', fontWeight: 700, cursor: sending ? 'default' : 'pointer', opacity: sending ? 0.65 : 1, minHeight: 44 }}>
+            <button type="submit" disabled={sending} style={{ background: AT, color: '#fff', border: 'none', borderRadius: 12, padding: '13px', fontWeight: 700, cursor: sending ? 'default' : 'pointer', opacity: sending ? 0.65 : 1, minHeight: 44 }}>
               {sending ? t.sending : t.sendBtn}
             </button>
           </form>

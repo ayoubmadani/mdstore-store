@@ -19,7 +19,7 @@ import {
   Headphones, Volume2, Mail, Sparkles, ShieldCheck, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -672,7 +672,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           </div>
 
           <div className="nav-mobile">
-            <button onClick={() => setShowSearch(true)} style={{ width: 38, height: 38, borderRadius: 0, border: `1px solid ${BD}`, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: SUB }}>
+            <button aria-label={a11y(store).search} onClick={() => setShowSearch(true)} style={{ width: 38, height: 38, borderRadius: 0, border: `1px solid ${BD}`, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: SUB }}>
               <Search size={15} />
             </button>
             {store?.cart !== false && (
@@ -681,7 +681,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 {count > 0 && <span style={{ position: 'absolute', top: -5, right: -5, background: A, color: '#FFFFFF', fontSize: 10, fontWeight: 800, width: 17, height: 17, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
               </Link>
             )}
-            <button onClick={() => setOpen(!open)} style={{ width: 38, height: 38, borderRadius: 0, border: `1px solid ${BD}`, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: SUB }}>
+            <button aria-label={a11y(store).menu} onClick={() => setOpen(!open)} style={{ width: 38, height: 38, borderRadius: 0, border: `1px solid ${BD}`, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: SUB }}>
               {open ? <X size={16} /> : <Menu size={16} />}
             </button>
           </div>
@@ -708,14 +708,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 </div>
                 <span style={{ fontSize: '0.75rem', fontWeight: 600, color: SUB }}>{t.search}</span>
               </div>
-              <button onClick={() => setShowSearch(false)} style={{ width: 34, height: 34, borderRadius: 0, border: `1px solid ${BD}`, background: CARD, color: SUB, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <button aria-label={a11y(store).close} onClick={() => setShowSearch(false)} style={{ width: 34, height: 34, borderRadius: 0, border: `1px solid ${BD}`, background: CARD, color: SUB, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
                 <X size={15} />
               </button>
             </div>
             <form className="glb-search-form" onSubmit={handleSearch}>
               <Search size={20} style={{ color: A, flexShrink: 0, ...(isRTL ? { marginLeft: 12 } : { marginRight: 12 }) }} />
               <input ref={searchInputRef} className="glb-search-input" type="text" placeholder={t.searchPh} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
-              {searchQuery && <button type="button" onClick={() => setSearchQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: SUB, padding: 0, display: 'flex', alignItems: 'center', flexShrink: 0 }}><X size={14} /></button>}
+              {searchQuery && <button aria-label={a11y(store).clear} type="button" onClick={() => setSearchQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: SUB, padding: 0, display: 'flex', alignItems: 'center', flexShrink: 0 }}><X size={14} /></button>}
             </form>
             {loading && <p style={{ textAlign: 'center', color: A, fontSize: '0.85rem', fontWeight: 600, padding: '2rem' }}>{t.searching}</p>}
             {!loading && listSearch.length > 0 && (
@@ -764,12 +764,12 @@ export function Footer({ store }: any) {
             <p style={{ fontSize: '0.875rem', lineHeight: 1.8, maxWidth: 300 }}>
               {store?.hero?.subtitle?.substring(0, 100) || t.footerDesc}
             </p>
-            <p style={{ marginTop: '2rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.22)' }}>
+            <p style={{ marginTop: '2rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)' }}>
               © {new Date().getFullYear()} {store?.name}. {t.rightsReserved}
             </p>
           </div>
           <div>
-            <h4 className="eyebrow" style={{ fontSize: '0.68rem', fontWeight: 700, color: A, textTransform: 'uppercase' as const, marginBottom: '1.25rem' }}>{t.quickLinks}</h4>
+            <h4 className="eyebrow" style={{ fontSize: '0.68rem', fontWeight: 700, color: '#9C8D81', textTransform: 'uppercase' as const, marginBottom: '1.25rem' }}>{t.quickLinks}</h4>
             {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
               <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'rgba(255,255,255,0.45)', marginBottom: '0.625rem', transition: 'color 0.3s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = A)}
@@ -779,7 +779,7 @@ export function Footer({ store }: any) {
             ))}
           </div>
           <div>
-            <h4 className="eyebrow" style={{ fontSize: '0.68rem', fontWeight: 700, color: A, textTransform: 'uppercase' as const, marginBottom: '1.25rem' }}>{t.legalNav}</h4>
+            <h4 className="eyebrow" style={{ fontSize: '0.68rem', fontWeight: 700, color: '#9C8D81', textTransform: 'uppercase' as const, marginBottom: '1.25rem' }}>{t.legalNav}</h4>
             {[{ h: '/privacy', l: t.privacy }, { h: '/terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
               <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'rgba(255,255,255,0.45)', marginBottom: '0.625rem', transition: 'color 0.3s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = A)}
@@ -789,7 +789,7 @@ export function Footer({ store }: any) {
             ))}
           </div>
           <div>
-            <h4 className="eyebrow" style={{ fontSize: '0.68rem', fontWeight: 700, color: A, textTransform: 'uppercase' as const, marginBottom: '1.25rem' }}>{t.contactSect}</h4>
+            <h4 className="eyebrow" style={{ fontSize: '0.68rem', fontWeight: 700, color: '#9C8D81', textTransform: 'uppercase' as const, marginBottom: '1.25rem' }}>{t.contactSect}</h4>
             {[
               { icon: <Phone size={14} />, val: store?.contact?.phone || comingSoon(store) },
               { icon: <WhatsAppGlyph size={14} />, val: store?.contact?.whatsapp || comingSoon(store) },
@@ -848,7 +848,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem' }}>
           <span className="price-mono" style={{ fontSize: '1.1rem', fontWeight: 700, color: A }}>{price.toLocaleString()}</span>
           <span style={{ fontSize: '0.72rem', color: SUB }}>{store.currency || 'دج'}</span>
-          {orig > price && <span className="price-mono" style={{ fontSize: '0.72rem', color: '#B0AAA4', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
+          {orig > price && <span className="price-mono" style={{ fontSize: '0.72rem', color: '#6E6A66', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
         </div>
       </div>
     </div>
@@ -1241,15 +1241,15 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             )}
             {allImages.length > 1 && (
               <>
-                <button onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: 0, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: TXT }}><ChevronRight size={16} /></button>
-                <button onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: 0, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: TXT }}><ChevronLeft size={16} /></button>
+                <button aria-label={a11y(store).prev} onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: 0, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: TXT }}><ChevronRight size={16} /></button>
+                <button aria-label={a11y(store).next} onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: 0, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: TXT }}><ChevronLeft size={16} /></button>
               </>
             )}
           </div>
           {allImages.length > 1 && (
             <div className="thumb-row">
               {allImages.map((img: string, idx: number) => (
-                <button key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 58, height: 58, overflow: 'hidden', border: `1.5px solid ${sel === idx ? A : BD}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.3s' }}>
+                <button aria-label={`${a11y(store).image} ${idx + 1}`} key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 58, height: 58, overflow: 'hidden', border: `1.5px solid ${sel === idx ? A : BD}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.3s' }}>
                   <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
               ))}
@@ -1522,9 +1522,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <div style={{ marginBottom: '0.875rem' }}>
                 <p className="eyebrow" style={{ fontSize: '0.72rem', fontWeight: 600, color: SUB, marginBottom: '0.5rem', textTransform: 'uppercase' as const }}>الكمية</p>
                 <div style={{ display: 'inline-flex', alignItems: 'center', border: `1px solid ${BD}`, overflow: 'hidden' }}>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: SUB }}><Minus size={13} /></button>
+                  <button aria-label={a11y(store).decrease} type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: SUB }}><Minus size={13} /></button>
                   <span style={{ width: 40, textAlign: 'center', fontWeight: 700, fontSize: '0.9rem', color: TXT }}>{fd.quantity}</span>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: A }}><Plus size={13} /></button>
+                  <button aria-label={a11y(store).increase} type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: A }}><Plus size={13} /></button>
                 </div>
               </div>
             )}
@@ -1663,7 +1663,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <p className="price-mono" style={{ fontSize: '1.05rem', fontWeight: 700, color: A }}>{item.finalPrice?.toLocaleString()} {currency}</p>
                 <p style={{ fontSize: '0.72rem', color: SUB, marginTop: '0.2rem' }}>{t.qty}: {item.quantity}</p>
               </div>
-              <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: '#B0AAA4', padding: '0.375rem', borderRadius: 0, background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'center', transition: 'color 0.3s' }}
+              <button aria-label={a11y(store).remove} onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: '#B0AAA4', padding: '0.375rem', borderRadius: 0, background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'center', transition: 'color 0.3s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = '#EF4444')}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = '#B0AAA4')}>
                 <Trash2 size={16} />

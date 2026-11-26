@@ -11,7 +11,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import DOMPurify from 'isomorphic-dompurify';
 import { Star, ChevronDown, AlertCircle, X, CheckCircle2, Shield, ArrowLeft, Plus, Minus, Search, ShoppingCart, Trash2, Loader2, ChevronLeft, ChevronRight, Phone, Package, Truck, Mail, MessageCircle, Download } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -36,7 +36,7 @@ const CSS = `
 html{scroll-behavior:smooth}
 :root{
   --bg:#0E0C0A; --s1:#161310; --s2:#1E1A16;
-  --tx:#F5F1EB; --mu:#7A7068;
+  --tx:#F5F1EB; --mu:#91877F;
   --br:rgba(245,241,235,0.08); --br2:rgba(245,241,235,0.15);
   --cp:#C88B6A; --cl:rgba(200,139,106,0.1);
 }
@@ -488,7 +488,7 @@ export function Navbar({store,domain}:{store:any;domain:string}){
         <div style={{display:'flex',alignItems:'center',gap:'4px'}}>
           {/* Search */}
           <div style={{position:'relative'}}>
-            <button onClick={()=>setShowS(p=>!p)} style={{width:40,height:40,display:'flex',alignItems:'center',justifyContent:'center',background:'none',border:'none',cursor:'pointer',color:showS?'var(--cp)':'var(--mu)',transition:'color .18s'}}
+            <button aria-label={a11y(store).search} onClick={()=>setShowS(p=>!p)} style={{width:40,height:40,display:'flex',alignItems:'center',justifyContent:'center',background:'none',border:'none',cursor:'pointer',color:showS?'var(--cp)':'var(--mu)',transition:'color .18s'}}
               onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--tx)'}}
               onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color=showS?'var(--cp)':'var(--mu)'}}>
               <Search style={{width:16,height:16}}/>
@@ -497,7 +497,7 @@ export function Navbar({store,domain}:{store:any;domain:string}){
               <div style={{position:'absolute',top:'calc(100% + 4px)',right:0,width:'300px',zIndex:200,background:'var(--s1)',border:'1px solid var(--br2)'}} className="sd srch-drop">
                 <form onSubmit={go} style={{display:'flex',alignItems:'center',borderBottom:'1px solid var(--br)'}}>
                   <input autoFocus type="text" value={sq} onChange={e=>setSq(e.target.value)} placeholder={t.search} style={{flex:1,padding:'11px 14px',background:'transparent',border:'none',color:'var(--tx)',fontSize:'13px',fontFamily:"'Raleway',sans-serif",outline:'none'}}/>
-                  {sq&&<button type="button" onClick={()=>setSq('')} style={{background:'none',border:'none',cursor:'pointer',color:'var(--mu)',padding:'0 10px',display:'flex',alignItems:'center'}}><X size={13}/></button>}
+                  {sq&&<button aria-label={a11y(store).close} type="button" onClick={()=>setSq('')} style={{background:'none',border:'none',cursor:'pointer',color:'var(--mu)',padding:'0 10px',display:'flex',alignItems:'center'}}><X size={13}/></button>}
                 </form>
                 {sq.length>=2&&(
                   <div style={{maxHeight:'55vh',overflowY:'auto'}} className="fi">
@@ -552,7 +552,7 @@ export function Navbar({store,domain}:{store:any;domain:string}){
       {/* Mobile menu */}
       {mOpen&&(
         <div dir={t.dir} style={{position:'fixed',inset:0,zIndex:200,background:'var(--bg)',paddingTop:'60px',display:'flex',flexDirection:'column'}} className="fi">
-          <button onClick={()=>setMOpen(false)} style={{position:'absolute',top:12,left:20,width:40,height:40,display:'flex',alignItems:'center',justifyContent:'center',background:'none',border:'none',cursor:'pointer',color:'var(--mu)'}}>
+          <button aria-label={a11y(store).close} onClick={()=>setMOpen(false)} style={{position:'absolute',top:12,left:20,width:40,height:40,display:'flex',alignItems:'center',justifyContent:'center',background:'none',border:'none',cursor:'pointer',color:'var(--mu)'}}>
             <X style={{width:20,height:20}}/>
           </button>
           <div style={{flex:1,display:'flex',flexDirection:'column',justifyContent:'center',padding:'0 32px'}}>
@@ -607,7 +607,7 @@ export function Footer({store}:any){
           ))}
         </div>
       </div>
-      <p style={{fontSize:'10px',color:'rgba(245,241,235,0.15)',textAlign:'center',paddingTop:20,letterSpacing:'0.12em'}}>© {new Date().getFullYear()} {store?.name}</p>
+      <p style={{fontSize:'10px',color:'rgba(245,241,235,0.5)',textAlign:'center',paddingTop:20,letterSpacing:'0.12em'}}>© {new Date().getFullYear()} {store?.name}</p>
     </footer>
   );
 }
@@ -929,11 +929,11 @@ export function Home({store,page}:any){
 
         {total>1&&(
           <div className="pag">
-            <Link href={{query:{page:Math.max(1,page-1)}}} scroll={false} style={{width:36,height:36,border:'1px solid var(--br2)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--mu)',opacity:page<=1?0.3:1,transition:'all .18s'}}><ChevronRight size={13}/></Link>
+            <Link aria-label={a11y(store).prev} href={{query:{page:Math.max(1,page-1)}}} scroll={false} style={{width:36,height:36,border:'1px solid var(--br2)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--mu)',opacity:page<=1?0.3:1,transition:'all .18s'}}><ChevronRight size={13}/></Link>
             {Array.from({length:total}).map((_,i)=>{const pn=i+1;const isA=Number(page)===pn;return(
               <Link key={pn} href={{query:{page:pn}}} scroll={false} style={{width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',background:isA?'var(--cp)':'transparent',border:`1px solid ${isA?'var(--cp)':'var(--br2)'}`,color:isA?'var(--bg)':'var(--mu)',fontWeight:700,transition:'all .2s',fontFamily:"'Raleway',sans-serif"}}>{pn}</Link>
             )})}
-            <Link href={{query:{page:Math.min(total,Number(page)+1)}}} scroll={false} style={{width:36,height:36,border:'1px solid var(--br2)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--mu)',opacity:page>=total?0.3:1,transition:'all .18s'}}><ChevronLeft size={13}/></Link>
+            <Link aria-label={a11y(store).next} href={{query:{page:Math.min(total,Number(page)+1)}}} scroll={false} style={{width:36,height:36,border:'1px solid var(--br2)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--mu)',opacity:page>=total?0.3:1,transition:'all .18s'}}><ChevronLeft size={13}/></Link>
           </div>
         )}
       </section>
@@ -971,8 +971,8 @@ export function Details({product,discount,allImages,allAttrs,finalPrice,inStock,
             
             {allImages.length>1&&(
               <>
-                <button onClick={()=>showImage(p=>p===0?allImages.length-1:p-1)} style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',width:34,height:34,background:'rgba(14,12,10,.6)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--tx)'}}><ChevronRight size={14}/></button>
-                <button onClick={()=>showImage(p=>p===allImages.length-1?0:p+1)} style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',width:34,height:34,background:'rgba(14,12,10,.6)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--tx)'}}><ChevronLeft size={14}/></button>
+                <button aria-label={a11y(store).prev} onClick={()=>showImage(p=>p===0?allImages.length-1:p-1)} style={{position:'absolute',right:12,top:'50%',transform:'translateY(-50%)',width:34,height:34,background:'rgba(14,12,10,.6)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--tx)'}}><ChevronRight size={14}/></button>
+                <button aria-label={a11y(store).next} onClick={()=>showImage(p=>p===allImages.length-1?0:p+1)} style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',width:34,height:34,background:'rgba(14,12,10,.6)',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--tx)'}}><ChevronLeft size={14}/></button>
                 <div style={{position:'absolute',bottom:12,left:0,right:0,display:'flex',justifyContent:'center',gap:4}}>
                   {allImages.map((_:string,i:number)=><button key={i} onClick={()=>showImage(i)} style={{width:i===sel?20:6,height:6,background:i===sel?'var(--cp)':'rgba(245,241,235,0.3)',border:'none',cursor:'pointer',borderRadius:3,transition:'all .25s'}}/>)}
                 </div>
@@ -1177,13 +1177,13 @@ export function ProductForm({product,userId,domain,selectedOffer,setSelectedOffe
             {supportQty&&!product.isDigital&&(
             <FR label={t.qty}>
               <div style={{display:'inline-flex',alignItems:'center',border:'1px solid var(--br2)'}}>
-                <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} style={{width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',background:'transparent',border:'none',borderLeft:'1px solid var(--br2)',cursor:'pointer',color:'var(--mu)',transition:'color .15s'}}
+                <button aria-label={a11y(store).decrease} type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} style={{width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',background:'transparent',border:'none',borderLeft:'1px solid var(--br2)',cursor:'pointer',color:'var(--mu)',transition:'color .15s'}}
                   onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--tx)'}}
                   onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mu)'}}>
                   <Minus style={{width:12,height:12}}/>
                 </button>
                 <span style={{width:40,textAlign:'center',fontWeight:700,fontSize:'1rem',lineHeight:'36px',display:'inline-block',fontFamily:"'Raleway',sans-serif"}}>{fd.quantity}</span>
-                <button type="button" onClick={()=>setFd(p=>({...p,quantity:p.quantity+1}))} style={{width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',background:'transparent',border:'none',borderRight:'1px solid var(--br2)',cursor:'pointer',color:'var(--mu)',transition:'color .15s'}}
+                <button aria-label={a11y(store).increase} type="button" onClick={()=>setFd(p=>({...p,quantity:p.quantity+1}))} style={{width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',background:'transparent',border:'none',borderRight:'1px solid var(--br2)',cursor:'pointer',color:'var(--mu)',transition:'color .15s'}}
                   onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.color='var(--tx)'}}
                   onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.color='var(--mu)'}}>
                   <Plus style={{width:12,height:12}}/>

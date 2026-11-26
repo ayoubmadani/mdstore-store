@@ -28,7 +28,7 @@ import {
   Glasses, Watch, Truck, ShieldCheck, CreditCard, Headphones,
   Star, Plus, Minus, ArrowRight, Send, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -44,7 +44,7 @@ const withLocationLabels = <D extends Record<string, any>>(d: D): D => (__kit.wi
 
 /* ---------------------------------------------------------------- tokens */
 
-const A    = '#B06A2C';                     /* tortoiseshell acetate amber   */
+const A    = '#9E5F27';                     /* tortoiseshell acetate amber   */
 const AD   = '#8C5220';                     /* amber, pressed                */
 const AL   = 'rgba(176,106,44,0.10)';       /* amber wash                    */
 const INK  = '#14161A';                     /* obsidian frame                */
@@ -1713,7 +1713,7 @@ export function Home({ store, page }: any) {
           {countPage > 1 && (
             <nav className="uvt-pager" aria-label="pagination">
               {current > 1 && (
-                <Link href={{ query: buildQuery(current - 1) }} scroll={false}>
+                <Link aria-label={a11y(store).prev} href={{ query: buildQuery(current - 1) }} scroll={false}>
                   <ChevronLeft size={16} style={{ transform: t.dir === 'rtl' ? 'scaleX(-1)' : 'none' }} />
                 </Link>
               )}
@@ -1728,7 +1728,7 @@ export function Home({ store, page }: any) {
                 </Link>
               ))}
               {current < countPage && (
-                <Link href={{ query: buildQuery(current + 1) }} scroll={false}>
+                <Link aria-label={a11y(store).next} href={{ query: buildQuery(current + 1) }} scroll={false}>
                   <ChevronRight size={16} style={{ transform: t.dir === 'rtl' ? 'scaleX(-1)' : 'none' }} />
                 </Link>
               )}
@@ -1917,7 +1917,7 @@ export function ProductForm({
 
   return (
     <div className="uvt-formcard">
-  <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#B06A2C" />
+  <ProductAddons product={product} store={store || product.store} selected={addonIds} onChange={setAddonIds} accent="#9E5F27" />
       {/* quantity + unit price — always visible */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
         {supportQty && !product?.isDigital && (

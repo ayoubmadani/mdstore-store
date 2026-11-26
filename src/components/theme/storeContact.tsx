@@ -2,6 +2,7 @@
 // «سيتوفر لاحقاً» لجهات التواصل الناقصة في Footer، أيقونة واتساب، وزر «استفسر عبر واتساب» في صفحة المنتج.
 import type { CSSProperties, ReactNode, SVGProps } from 'react';
 import { whatsappHref } from '@/components/builderPages/buttonLinks';
+import { decorativeImages } from '@/lib/decorative-logo';
 
 export { whatsappHref };
 
@@ -9,6 +10,16 @@ type StoreLike = { language?: string | null; contact?: { whatsapp?: string | nul
 type ProductLike = { name?: string; whatsappEnabled?: boolean; whatsappNumber?: string | null };
 
 const lang = (store: StoreLike) => (store?.language === 'fr' ? 'fr' : store?.language === 'en' ? 'en' : 'ar');
+
+// أسماء الأزرار التي ليس فيها نص (أيقونة فقط) — يقرؤها قارئ الشاشة ويطلبها فحص Accessibility.
+// left/right: سهم المعرض حسب اتجاه اللغة (في العربية السهم الأيسر = التالي).
+const A11Y = {
+  ar: { menu: 'القائمة', close: 'إغلاق', search: 'بحث', cart: 'السلة', addToCart: 'أضف إلى السلة', favorite: 'المفضلة', increase: 'زيادة الكمية', decrease: 'إنقاص الكمية', remove: 'حذف', prev: 'السابق', next: 'التالي', clear: 'مسح', back: 'رجوع', image: 'صورة المنتج', view: 'عرض المنتج', home: 'الرئيسية' },
+  fr: { menu: 'Menu', close: 'Fermer', search: 'Rechercher', cart: 'Panier', addToCart: 'Ajouter au panier', favorite: 'Favoris', increase: 'Augmenter la quantité', decrease: 'Diminuer la quantité', remove: 'Supprimer', prev: 'Précédent', next: 'Suivant', clear: 'Effacer', back: 'Retour', image: 'Image du produit', view: 'Voir le produit', home: 'Accueil' },
+  en: { menu: 'Menu', close: 'Close', search: 'Search', cart: 'Cart', addToCart: 'Add to cart', favorite: 'Favorites', increase: 'Increase quantity', decrease: 'Decrease quantity', remove: 'Remove', prev: 'Previous', next: 'Next', clear: 'Clear', back: 'Back', image: 'Product image', view: 'View product', home: 'Home' },
+};
+/** aria-label لزر الأيقونة بلغة المتجر: `aria-label={a11y(store).menu}` */
+export const a11y = (store?: StoreLike) => A11Y[lang(store)];
 
 const STRINGS = {
   ar: { comingSoon: 'سيتوفر لاحقاً', orderViaWhatsapp: 'استفسر عبر واتساب', waOrderMsg: 'مرحباً، لدي استفسار حول:' },
@@ -65,6 +76,7 @@ type LogoStore = { name?: string | null; design?: { logoUrl?: string | null; sho
 
 /** الشعار + اسم المتجر بجانبه إذا فعّله التاجر (design.showStoreName) — وإلا يُعاد الشعار كما هو.
  *  nameBeforeLogo: قلب الترتيب (الاسم ثم الشعار).
+ *  الشعار هنا زخرفي (alt فارغ): الاسم مكتوب بجانبه فلا يُقرأ مرتين.
  *  nameClass/nameStyle: نفس تنسيق اسم المتجر في الثيم (حين لا يوجد شعار) حتى يبقى الاسم بهوية الثيم */
 export function LogoWithName({ store, children, color, style, nameClass, nameStyle }: { store: LogoStore; children: ReactNode; color?: string; style?: CSSProperties; nameClass?: string; nameStyle?: CSSProperties }) {
   if (!store?.design?.showStoreName || !store?.name) return <>{children}</>;
@@ -73,7 +85,7 @@ export function LogoWithName({ store, children, color, style, nameClass, nameSty
     : { fontWeight: 800, fontSize: '1.05rem', lineHeight: 1.2, color: color || 'inherit' };
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, minWidth: 0, flexDirection: store.design?.nameBeforeLogo ? 'row-reverse' : 'row' }}>
-      {children}
+      {decorativeImages(children)}
       <span className={nameClass} style={{ ...look, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200, ...style }}>{store.name}</span>
     </span>
   );

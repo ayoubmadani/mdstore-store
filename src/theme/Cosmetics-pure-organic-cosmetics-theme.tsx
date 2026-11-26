@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -773,7 +773,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 </div>
                 <div>
                   <span style={{ fontSize:'1rem', fontWeight:700, color: INK, display:'block', lineHeight:1.1, letterSpacing:'-0.01em', fontFamily:"'Cormorant Garamond',serif" }}>{store?.name||'Pure Organics'}</span>
-                  <span style={{ fontSize:'0.5rem', color: RO, letterSpacing:'0.16em', textTransform:'uppercase', fontWeight:500 }}>Organic Beauty</span>
+                  <span style={{ fontSize:'0.5rem', color: '#97606F', letterSpacing:'0.16em', textTransform:'uppercase', fontWeight:500 }}>Organic Beauty</span>
                 </div>
               </>
             )}
@@ -792,7 +792,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
           {/* Desktop actions */}
           <div className="nav-desktop" style={{ flexShrink:0, gap:'0.625rem' }}>
-            <button onClick={() => setShowSearch(true)} style={{ width:38, height:38, borderRadius:'50%', border:`1px solid ${BD}`, background:'transparent', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color: SUB, transition:'all 0.18s' }}
+            <button aria-label={a11y(store).search} onClick={() => setShowSearch(true)} style={{ width:38, height:38, borderRadius:'50%', border:`1px solid ${BD}`, background:'transparent', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color: SUB, transition:'all 0.18s' }}
               onMouseEnter={e => { const el=e.currentTarget as HTMLButtonElement; el.style.borderColor=RO; el.style.color=RO; el.style.background=ROL; }}
               onMouseLeave={e => { const el=e.currentTarget as HTMLButtonElement; el.style.borderColor=BD; el.style.color=SUB; el.style.background='transparent'; }}>
               <Search size={14} />
@@ -809,14 +809,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
           {/* Mobile */}
           <div className="nav-mobile">
-            <button onClick={() => setShowSearch(true)} style={{ width:36, height:36, borderRadius:'50%', border:`1px solid ${BD}`, background:'transparent', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color: SUB }}><Search size={14} /></button>
+            <button aria-label={a11y(store).search} onClick={() => setShowSearch(true)} style={{ width:36, height:36, borderRadius:'50%', border:`1px solid ${BD}`, background:'transparent', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color: SUB }}><Search size={14} /></button>
             {store?.cart !== false && (
               <Link href="/cart" style={{ position:'relative', background:`linear-gradient(135deg,${RO},${ROD})`, color:'#fff', width:36, height:36, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center' }}>
                 <ShoppingCart size={14} />
                 {count > 0 && <span style={{ position:'absolute', top:-3, right:-3, background: INK, color:'#fff', fontSize:8, fontWeight:800, width:14, height:14, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center' }}>{count}</span>}
               </Link>
             )}
-            <button onClick={() => setOpen(!open)} style={{ width:36, height:36, borderRadius:'50%', border:`1px solid ${BD}`, background:'transparent', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color: SUB }}>
+            <button aria-label={a11y(store).menu} onClick={() => setOpen(!open)} style={{ width:36, height:36, borderRadius:'50%', border:`1px solid ${BD}`, background:'transparent', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color: SUB }}>
               {open ? <X size={14} /> : <Menu size={14} />}
             </button>
           </div>
@@ -843,7 +843,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 <Flower2 size={14} color={RO} />
                 <span style={{ fontSize:'0.65rem', fontWeight:600, color: SUB, letterSpacing:'0.12em', textTransform:'uppercase' }}>{t.search}</span>
               </div>
-              <button onClick={() => setShowSearch(false)} style={{ width:32, height:32, borderRadius:'50%', border:`1px solid ${BD}`, background: CARD, color: SUB, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}><X size={13}/></button>
+              <button aria-label={a11y(store).close} onClick={() => setShowSearch(false)} style={{ width:32, height:32, borderRadius:'50%', border:`1px solid ${BD}`, background: CARD, color: SUB, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}><X size={13}/></button>
             </div>
             <form className="glb-search-form" onSubmit={handleSearch}>
               <Search size={16} style={{ color: RO, flexShrink:0, ...(isRTL ? { marginLeft:10 } : { marginRight:10 }) }} />
@@ -887,7 +887,7 @@ export function Footer({ store }: any) {
   const t = withLocationLabels(T)[getLang(store)];
   const isRTL = t.dir === 'rtl';
   return (
-    <footer dir={isRTL ? 'rtl' : 'ltr'} style={{ background: INK, color:'rgba(255,255,255,0.38)', marginTop:80 }}>
+    <footer dir={isRTL ? 'rtl' : 'ltr'} style={{ background: INK, color:'rgba(255,255,255,0.5)', marginTop:80 }}>
       <div style={{ maxWidth:1320, margin:'0 auto', padding:'4.5rem 2rem 2rem' }}>
         <div className="footer-cols" style={{ paddingBottom:'3rem', marginBottom:'2rem', borderBottom:'1px solid rgba(255,255,255,0.06)' }}>
           <div>
@@ -900,17 +900,17 @@ export function Footer({ store }: any) {
             </p>
             <div style={{ display:'flex', gap:6, marginTop:'1.75rem', flexWrap:'wrap' }}>
               {['🌿 Organic', '🐇 Cruelty-Free', '🌱 Vegan'].map(b => (
-                <span key={b} style={{ fontSize:'0.58rem', fontWeight:600, color:'rgba(255,255,255,0.3)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:6, padding:'3px 9px', letterSpacing:'0.08em' }}>{b}</span>
+                <span key={b} style={{ fontSize:'0.58rem', fontWeight:600, color:'rgba(255,255,255,0.5)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:6, padding:'3px 9px', letterSpacing:'0.08em' }}>{b}</span>
               ))}
             </div>
-            <p style={{ marginTop:'2.5rem', fontSize:'0.6rem', color:'rgba(255,255,255,0.14)' }}>© {new Date().getFullYear()} {store?.name} — {t.rightsReserved}</p>
+            <p style={{ marginTop:'2.5rem', fontSize:'0.6rem', color:'rgba(255,255,255,0.5)' }}>© {new Date().getFullYear()} {store?.name} — {t.rightsReserved}</p>
           </div>
           <div>
             <h4 style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.16em', marginBottom:'1.5rem' }}>{t.pages}</h4>
             {[['/', t.home], ['/cart', t.cart], ['/contact', t.contactSect]].filter(([h]) => h !== '/cart' || store?.cart !== false).map(([h, l], i) => (
-              <Link key={i} href={h} style={{ display:'block', fontSize:'0.875rem', color:'rgba(255,255,255,0.38)', marginBottom:'0.65rem', fontWeight:300, transition:'color 0.15s' }}
+              <Link key={i} href={h} style={{ display:'block', fontSize:'0.875rem', color:'rgba(255,255,255,0.5)', marginBottom:'0.65rem', fontWeight:300, transition:'color 0.15s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = RO)}
-                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.38)')}>
+                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.5)')}>
                 {l}
               </Link>
             ))}
@@ -918,9 +918,9 @@ export function Footer({ store }: any) {
           <div>
             <h4 style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.16em', marginBottom:'1.5rem' }}>{t.legalNav}</h4>
             {[['/privacy', t.privacy], ['/terms', t.terms], ['/cookies', t.cookies]].map(([h, l], i) => (
-              <Link key={i} href={h} style={{ display:'block', fontSize:'0.875rem', color:'rgba(255,255,255,0.38)', marginBottom:'0.65rem', fontWeight:300, transition:'color 0.15s' }}
+              <Link key={i} href={h} style={{ display:'block', fontSize:'0.875rem', color:'rgba(255,255,255,0.5)', marginBottom:'0.65rem', fontWeight:300, transition:'color 0.15s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = RO)}
-                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.38)')}>
+                onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.5)')}>
                 {l}
               </Link>
             ))}
@@ -973,7 +973,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
           </div>
         )}
         {/* Heart */}
-        <button style={{ position:'absolute', top:12, left:12, width:32, height:32, borderRadius:'50%', background:'rgba(255,255,255,0.9)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', backdropFilter:'blur(4px)', transition:'all 0.2s' }}
+        <button aria-label={a11y(store).favorite} style={{ position:'absolute', top:12, left:12, width:32, height:32, borderRadius:'50%', background:'rgba(255,255,255,0.9)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', backdropFilter:'blur(4px)', transition:'all 0.2s' }}
           onMouseEnter={e => { const el=e.currentTarget as HTMLButtonElement; el.style.background=`rgba(193,123,142,0.15)`; }}
           onMouseLeave={e => { const el=e.currentTarget as HTMLButtonElement; el.style.background=`rgba(255,255,255,0.9)`; }}>
           <Heart size={13} color={RO} />
@@ -986,7 +986,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div style={{ display:'flex', alignItems:'center', gap:6 }}>
           <span className="price-mono" style={{ fontSize:'1.05rem', fontWeight:700, color: INK }}>{price.toLocaleString()}</span>
           <span style={{ fontSize:'0.62rem', color: SUB }}>{store?.currency || 'DZD'}</span>
-          {orig > price && <span className="price-mono" style={{ fontSize:'0.7rem', color: BD, textDecoration:'line-through' }}>{orig.toLocaleString()}</span>}
+          {orig > price && <span className="price-mono" style={{ fontSize:'0.7rem', color: '#79726E', textDecoration:'line-through' }}>{orig.toLocaleString()}</span>}
         </div>
         {/* Stars */}
         <div style={{ display:'flex', gap:2, marginTop:'0.375rem' }}>
@@ -1370,7 +1370,7 @@ export function Home({ store, page }: any) {
       <section id="products" style={{ padding:'0 1.5rem 6rem', maxWidth:1320, margin:'0 auto' }}>
         <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:'2.25rem', paddingBottom:'1.25rem', borderBottom:`1px solid ${BD}` }}>
           <div>
-            <p style={{ fontSize:'0.58rem', fontWeight:700, color: RO, textTransform:'uppercase', letterSpacing:'0.18em', marginBottom:6 }}>Pure Organics</p>
+            <p style={{ fontSize:'0.58rem', fontWeight:700, color: '#97606F', textTransform:'uppercase', letterSpacing:'0.18em', marginBottom:6 }}>Pure Organics</p>
             <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(1.75rem,4vw,2.5rem)', fontWeight:600, color: INK, lineHeight:1, letterSpacing:'-0.02em' }}>{t.productsTitle}</h2>
             {store.count > 0 && <p style={{ fontSize:'0.68rem', color: SUB, marginTop:5 }}>{store.count} {t.itemUnit}</p>}
           </div>
@@ -1422,7 +1422,7 @@ export function Home({ store, page }: any) {
                   onMouseLeave={e => { const el=e.currentTarget as HTMLDivElement; el.style.background='rgba(255,255,255,0.04)'; el.style.borderColor='rgba(255,255,255,0.08)'; }}>
                   <div style={{ width:44, height:44, borderRadius:12, background: ROL, display:'flex', alignItems:'center', justifyContent:'center', color: RO, marginBottom:'1.25rem' }}>{icons[i]}</div>
                   <h3 style={{ fontSize:'1.05rem', fontWeight:600, color:'#fff', marginBottom:'0.625rem', fontFamily:"'Cormorant Garamond',serif" }}>{f.t}</h3>
-                  <p style={{ fontSize:'0.82rem', color:'rgba(255,255,255,0.42)', lineHeight:1.85, fontWeight:300 }}>{f.d}</p>
+                  <p style={{ fontSize:'0.82rem', color:'rgba(255,255,255,0.5)', lineHeight:1.85, fontWeight:300 }}>{f.d}</p>
                 </div>
               );
             })}
@@ -1464,15 +1464,15 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             {discount > 0 && <div style={{ position:'absolute', top:14, right:14, background:`linear-gradient(135deg,${RO},${ROD})`, color:'#fff', padding:'5px 13px', fontSize:11, fontWeight:700, borderRadius:20 }}>{discount}% خصم</div>}
             {allImages.length > 1 && (
               <>
-                <button onClick={() => showImage(p => p===0 ? allImages.length-1 : p-1)} style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', width:34, height:34, background:'rgba(255,255,255,0.9)', border:`1px solid ${BD}`, borderRadius:10, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color: INK }}><ChevronRight size={14}/></button>
-                <button onClick={() => showImage(p => p===allImages.length-1 ? 0 : p+1)} style={{ position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', width:34, height:34, background:'rgba(255,255,255,0.9)', border:`1px solid ${BD}`, borderRadius:10, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color: INK }}><ChevronLeft size={14}/></button>
+                <button aria-label={a11y(store).prev} onClick={() => showImage(p => p===0 ? allImages.length-1 : p-1)} style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', width:34, height:34, background:'rgba(255,255,255,0.9)', border:`1px solid ${BD}`, borderRadius:10, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color: INK }}><ChevronRight size={14}/></button>
+                <button aria-label={a11y(store).next} onClick={() => showImage(p => p===allImages.length-1 ? 0 : p+1)} style={{ position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', width:34, height:34, background:'rgba(255,255,255,0.9)', border:`1px solid ${BD}`, borderRadius:10, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color: INK }}><ChevronLeft size={14}/></button>
               </>
             )}
           </div>
           {allImages.length > 1 && (
             <div className="thumb-row">
               {allImages.map((img:string, idx:number) => (
-                <button key={idx} onClick={() => showImage(idx)} style={{ flexShrink:0, width:58, height:74, border:`2px solid ${sel===idx ? RO : BD}`, borderRadius:10, overflow:'hidden', cursor:'pointer', padding:0, background:'none', opacity: sel===idx ? 1 : 0.55, transition:'all 0.15s' }}>
+                <button aria-label={`${a11y(store).image} ${idx + 1}`} key={idx} onClick={() => showImage(idx)} style={{ flexShrink:0, width:58, height:74, border:`2px solid ${sel===idx ? RO : BD}`, borderRadius:10, overflow:'hidden', cursor:'pointer', padding:0, background:'none', opacity: sel===idx ? 1 : 0.55, transition:'all 0.15s' }}>
                   <img src={img} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                 </button>
               ))}
@@ -1744,9 +1744,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <div style={{ marginBottom:'0.875rem' }}>
                 <p style={{ fontSize:'0.62rem', fontWeight:700, color: SUB, marginBottom:'0.5rem', textTransform:'uppercase', letterSpacing:'0.1em' }}>{t.qty}</p>
                 <div style={{ display:'inline-flex', alignItems:'center', border:`1px solid ${BD}`, borderRadius:12, overflow:'hidden', background: CR }}>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1,p.quantity-1) }))} style={{ width:38, height:38, display:'flex', alignItems:'center', justifyContent:'center', background:'none', border:'none', cursor:'pointer', color: SUB, borderLeft:`1px solid ${BD}` }}><Minus size={13}/></button>
+                  <button aria-label={a11y(store).decrease} type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1,p.quantity-1) }))} style={{ width:38, height:38, display:'flex', alignItems:'center', justifyContent:'center', background:'none', border:'none', cursor:'pointer', color: SUB, borderLeft:`1px solid ${BD}` }}><Minus size={13}/></button>
                   <span style={{ width:44, textAlign:'center', fontWeight:700, fontSize:'0.95rem', color: INK }}>{fd.quantity}</span>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity+1 }))} style={{ width:38, height:38, display:'flex', alignItems:'center', justifyContent:'center', background:'none', border:'none', cursor:'pointer', color: RO, borderRight:`1px solid ${BD}` }}><Plus size={13}/></button>
+                  <button aria-label={a11y(store).increase} type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity+1 }))} style={{ width:38, height:38, display:'flex', alignItems:'center', justifyContent:'center', background:'none', border:'none', cursor:'pointer', color: RO, borderRight:`1px solid ${BD}` }}><Plus size={13}/></button>
                 </div>
               </div>
             )}
@@ -1886,7 +1886,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <h4 style={{ fontWeight:500, color: INK, marginBottom:'0.4rem', fontSize:'0.875rem', lineHeight:1.45 }}>{item.product?.name}</h4>
                 <p className="price-mono" style={{ fontSize:'1.1rem', fontWeight:700, color: INK }}>{item.finalPrice?.toLocaleString()} {currency}</p>
               </div>
-              <button onClick={() => update(items.filter((_,idx) => idx!==i))} style={{ color: BD, padding:'0.25rem', background:'none', border:'none', cursor:'pointer', alignSelf:'flex-start', transition:'color 0.15s' }}
+              <button aria-label={a11y(store).remove} onClick={() => update(items.filter((_,idx) => idx!==i))} style={{ color: BD, padding:'0.25rem', background:'none', border:'none', cursor:'pointer', alignSelf:'flex-start', transition:'color 0.15s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color='#DC2626')}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color=BD)}>
                 <Trash2 size={14}/>

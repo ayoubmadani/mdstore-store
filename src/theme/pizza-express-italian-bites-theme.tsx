@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 
 
@@ -810,7 +810,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
   const DropResults = () => (
     <div style={{ paddingTop: 25, position: 'absolute', top: 'calc(100% + 6px)', right: 0, left: 0, background: '#fff', border: '1.5px solid #E0E0E0', borderRadius: 10, boxShadow: '0 12px 40px rgba(0,0,0,0.12)', zIndex: 60, maxHeight: '300px', overflowY: 'auto' }} className="anim-slide-down">
-      <button onClick={() => setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
+      <button aria-label={a11y(store).clear} onClick={() => setSearchQuery('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
         <X size={14} />
       </button>
       {loading ? <div style={{ padding: '1.5rem', textAlign: 'center', color: '#C8281E', fontSize: '0.85rem', fontWeight: 600 }}>{t.searching}</div>
@@ -914,7 +914,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
           {/* Mobile */}
           <div className="nav-mobile">
-            <button onClick={() => setShowSearch(!showSearch)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <button aria-label={a11y(store).search} onClick={() => setShowSearch(!showSearch)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
               <Search size={16} />
             </button>
             {store?.cart !== false && (
@@ -924,7 +924,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               </Link>
             )}
 
-            <button onClick={() => setOpen(!open)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <button aria-label={a11y(store).menu} onClick={() => setOpen(!open)} style={{ width: 38, height: 38, borderRadius: 8, border: '1.5px solid #E0E0E0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
               {open ? <X size={16} /> : <Menu size={16} />}
             </button>
           </div>
@@ -981,7 +981,7 @@ export function Footer({ store }: any) {
             <p style={{ fontSize: '0.875rem', lineHeight: 1.8, color: '#A8957F', maxWidth: 320 }}>
               {store?.hero?.subtitle?.substring(0, 100) || t.footerDesc}
             </p>
-            <p style={{ marginTop: '2rem', fontSize: '0.75rem', color: '#7A6754' }}>
+            <p style={{ marginTop: '2rem', fontSize: '0.75rem', color: '#9A8A7A' }}>
               © {new Date().getFullYear()} {store?.name}. {t.rightsReserved}
             </p>
           </div>
@@ -1081,9 +1081,9 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         </h3>
         <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-            {orig > price && <span style={{ fontSize: '0.72rem', color: '#B8A58A', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
+            {orig > price && <span style={{ fontSize: '0.72rem', color: '#7F725F', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
             <span className="price-mono" style={{ fontSize: '1.2rem', fontWeight: 900, color: '#C8281E', lineHeight: 1.1 }}>
-              {price.toLocaleString()} <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#8A7560' }}>{store.currency || 'DZD'}</span>
+              {price.toLocaleString()} <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#7F6B57' }}>{store.currency || 'DZD'}</span>
             </span>
           </div>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#F2A541', color: '#2A1A12', fontSize: '0.78rem', fontWeight: 800, padding: '0.45rem 0.8rem', borderRadius: 999, whiteSpace: 'nowrap' }}>
@@ -1420,7 +1420,7 @@ export function Home({ store, page }: any) {
                 <div style={{ width: 42, height: 42, borderRadius: 12, background: i % 2 ? '#2F7D32' : '#C8281E', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{icon}</div>
                 <div style={{ minWidth: 0, textAlign: align }}>
                   <p style={{ fontSize: '0.85rem', fontWeight: 800, color: '#2A1A12' }}>{item.t}</p>
-                  <p style={{ fontSize: '0.72rem', color: '#8A7560' }}>{item.d}</p>
+                  <p style={{ fontSize: '0.72rem', color: '#7F6B57' }}>{item.d}</p>
                 </div>
               </div>
             );
@@ -1458,7 +1458,7 @@ export function Home({ store, page }: any) {
         {products.length === 0 ? (
           <div style={{ padding: '4rem 1.5rem', textAlign: 'center', border: '3px dashed #EADBC4', borderRadius: 24, background: '#fff' }}>
             <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>🥖</div>
-            <p style={{ color: '#8A7560', fontSize: '1rem', fontWeight: 700 }}>{t.noProducts}</p>
+            <p style={{ color: '#7F6B57', fontSize: '1rem', fontWeight: 700 }}>{t.noProducts}</p>
           </div>
         ) : (
           <div className="products-grid">
@@ -1549,8 +1549,8 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
 
             {allImages.length > 1 && (
               <>
-                <button onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 8, background: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.12)' }}><ChevronRight size={18} /></button>
-                <button onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 8, background: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.12)' }}><ChevronLeft size={18} /></button>
+                <button aria-label={a11y(store).prev} onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 8, background: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.12)' }}><ChevronRight size={18} /></button>
+                <button aria-label={a11y(store).next} onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 8, background: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.12)' }}><ChevronLeft size={18} /></button>
               </>
             )}
           </div>
@@ -1559,7 +1559,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           {allImages.length > 1 && (
             <div className="thumb-row">
               {allImages.map((img: string, idx: number) => (
-                <button key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 8, overflow: 'hidden', border: `2px solid ${sel === idx ? '#C8281E' : '#E8E8E8'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.18s' }}>
+                <button aria-label={`${a11y(store).image} ${idx + 1}`} key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 8, overflow: 'hidden', border: `2px solid ${sel === idx ? '#C8281E' : '#E8E8E8'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.18s' }}>
                   <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
               ))}
@@ -1899,9 +1899,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <div style={{ marginBottom: '0.875rem' }}>
                 <p style={{ fontSize: '0.775rem', fontWeight: 700, color: '#555', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{t.qty}</p>
                 <div style={{ display: 'inline-flex', alignItems: 'center', border: '1.5px solid #E8E8E8', borderRadius: 8, overflow: 'hidden', background: '#fff' }}>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#2A1A12' }}><Minus size={14} /></button>
+                  <button aria-label={a11y(store).decrease} type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#2A1A12' }}><Minus size={14} /></button>
                   <span style={{ width: 40, textAlign: 'center', fontWeight: 800, fontSize: '0.9rem' }}>{fd.quantity}</span>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#2A1A12' }}><Plus size={14} /></button>
+                  <button aria-label={a11y(store).increase} type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#2A1A12' }}><Plus size={14} /></button>
                 </div>
               </div>
             )}
@@ -2070,7 +2070,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 800, color: '#C8281E' }}>{item.finalPrice?.toLocaleString()} {store.currency || 'DZD'}</p>
                 <p style={{ fontSize: '0.72rem', color: '#aaa', marginTop: '0.25rem' }}>{t.qty}: {item.quantity}</p>
               </div>
-              <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: '#ccc', padding: '0.375rem', borderRadius: 6, background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'center', transition: 'color 0.18s' }}
+              <button aria-label={a11y(store).remove} onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: '#ccc', padding: '0.375rem', borderRadius: 6, background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'center', transition: 'color 0.18s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = '#C8281E')}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = '#ccc')}>
                 <Trash2 size={17} />

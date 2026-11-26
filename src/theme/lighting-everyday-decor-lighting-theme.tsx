@@ -34,7 +34,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown, Trash2, Plus, Minus,
   Lightbulb, Star, Check, AlertCircle, Truck, ShieldCheck, CreditCard, Headphones, Package, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -69,8 +69,9 @@ const SURF2 = '#FBF3E7'; // inset / inputs (slightly warmer, "type here")
 const A     = '#D9822B'; // accent — honey/amber lamp glow
 const AL    = '#FBEBD6'; // accent light tint
 const AD    = '#B96A1C'; // accent dark (hover)
+const AT    = '#9E5F1F'; // accent as text on light surfaces (contrast)
 const TXT   = '#3A2E24'; // warm charcoal-brown (cozier than pure black)
-const SUB   = '#8C7B6A'; // muted warm grey
+const SUB   = '#7A6B5C'; // muted warm grey
 const BD    = '#EADDCB'; // warm border
 const DARK  = '#2A2019'; // warm near-black brown (footer / static headers)
 const GLOW  = '240, 168, 74'; // rgb of the bright glow amber
@@ -319,7 +320,7 @@ const inputBase: React.CSSProperties = {
 
 const btnPrimary: React.CSSProperties = {
   display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-  padding: '0.95rem 1.6rem', minHeight: 48, background: A, color: '#fff',
+  padding: '0.95rem 1.6rem', minHeight: 48, background: A, color: '#2A2019',
   fontWeight: 800, fontSize: '0.95rem', border: 'none', borderRadius: 14,
   cursor: 'pointer', transition: 'transform .15s ease, box-shadow .2s, background .2s',
   fontFamily: 'inherit', width: '100%',
@@ -564,7 +565,7 @@ export function Navbar({ store, domain }: any) {
         </div>
         <div style={{ minWidth: 0 }}>
           <p style={{ fontSize: '.88rem', fontWeight: 700, margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</p>
-          <p style={{ fontSize: '.82rem', color: A, margin: 0, fontWeight: 800 }}>{fmt(Number(p.price))} {cur(store)}</p>
+          <p style={{ fontSize: '.82rem', color: AT, margin: 0, fontWeight: 800 }}>{fmt(Number(p.price))} {cur(store)}</p>
         </div>
       </Link>
     );
@@ -612,7 +613,7 @@ export function Navbar({ store, domain }: any) {
                 onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
                 style={{ ...inputBase, paddingInlineStart: 40, paddingInlineEnd: searchQuery ? 40 : 14, borderRadius: 999, height: 46 }} />
               {searchQuery && (
-                <button type="button"
+                <button aria-label={a11y(store).clear} type="button"
                   onMouseDown={(e) => { e.preventDefault(); setSearchQuery(''); setListSearch([]); setSearchFocused(false); }}
                   style={{ position: 'absolute', insetInlineEnd: 12, top: '50%', transform: 'translateY(-50%)', background: BD, border: 'none', borderRadius: '50%', width: 22, height: 22, display: 'grid', placeItems: 'center', cursor: 'pointer', color: TXT, flexShrink: 0 }}>
                   <X size={13} />
@@ -628,7 +629,7 @@ export function Navbar({ store, domain }: any) {
                   {listSearch.map((p) => resultRow(p, () => setSearchFocused(false)))}
                   {listSearch.length > 0 && (
                     <Link href={`/?search=${encodeURIComponent(searchQuery)}`} onMouseDown={(e) => e.preventDefault()}
-                      style={{ display: 'block', padding: '12px 14px', textAlign: 'center', fontSize: '.85rem', fontWeight: 800, color: A, textDecoration: 'none' }}>
+                      style={{ display: 'block', padding: '12px 14px', textAlign: 'center', fontSize: '.85rem', fontWeight: 800, color: AT, textDecoration: 'none' }}>
                       {t.showAll}
                     </Link>
                   )}
@@ -656,7 +657,7 @@ export function Navbar({ store, domain }: any) {
                 {count > 0 && (
                   <span style={{
                     position: 'absolute', top: 4, insetInlineEnd: 2, minWidth: 18, height: 18, padding: '0 4px',
-                    background: A, color: '#fff', fontSize: '.68rem', fontWeight: 800, borderRadius: 999,
+                    background: A, color: '#2A2019', fontSize: '.68rem', fontWeight: 800, borderRadius: 999,
                     display: 'grid', placeItems: 'center', boxShadow: `0 0 10px rgba(${GLOW}, .7)`,
                   }}>{count}</span>
                 )}
@@ -683,7 +684,7 @@ export function Navbar({ store, domain }: any) {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <span className="lm-display" style={{ fontSize: '1.2rem', fontWeight: 700 }}>{store?.name}</span>
-              <button onClick={() => setOpen(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: TXT }}><X size={24} /></button>
+              <button aria-label={a11y(store).close} onClick={() => setOpen(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: TXT }}><X size={24} /></button>
             </div>
             {mobileLinks.map((lnk) => (
               <Link key={lnk.h} href={lnk.h} onClick={() => setOpen(false)}
@@ -703,7 +704,7 @@ export function Navbar({ store, domain }: any) {
             <Search size={20} color={SUB} />
             <input autoFocus value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t.search}
               style={{ flex: 1, border: 'none', outline: 'none', fontSize: '1rem', background: 'transparent', color: TXT, fontFamily: 'inherit' }} />
-            <button type="button" onClick={() => { setShowSearch(false); setSearchQuery(''); setListSearch([]); }}
+            <button aria-label={a11y(store).close} type="button" onClick={() => { setShowSearch(false); setSearchQuery(''); setListSearch([]); }}
               style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: TXT }}><X size={22} /></button>
           </form>
           <div style={{ flex: 1, overflowY: 'auto', background: SURF, marginTop: 1 }}>
@@ -711,7 +712,7 @@ export function Navbar({ store, domain }: any) {
             {listSearch.map((p) => resultRow(p, () => setShowSearch(false)))}
             {listSearch.length > 0 && (
               <Link href={`/?search=${encodeURIComponent(searchQuery)}`} onClick={() => setShowSearch(false)}
-                style={{ display: 'block', padding: '15px', textAlign: 'center', background: SURF2, fontWeight: 800, color: A, textDecoration: 'none' }}>
+                style={{ display: 'block', padding: '15px', textAlign: 'center', background: SURF2, fontWeight: 800, color: AT, textDecoration: 'none' }}>
                 {t.showAll}
               </Link>
             )}
@@ -755,7 +756,7 @@ export function Footer({ store }: any) {
             <p style={{ fontSize: '.9rem', lineHeight: 1.7, color: '#C6B49C', maxWidth: 320, margin: 0 }}>
               {store?.hero?.subtitle || ''}
             </p>
-            <p style={{ fontSize: '.8rem', color: '#8F7C63', marginTop: 18 }}>© {year} {store?.name} — {t.rightsReserved}</p>
+            <p style={{ fontSize: '.8rem', color: '#9C8B74', marginTop: 18 }}>© {year} {store?.name} — {t.rightsReserved}</p>
           </div>
 
           <div>
@@ -802,7 +803,7 @@ export function Footer({ store }: any) {
           </div>
         </div>
       </div>
-      <div style={{ borderTop: '1px solid rgba(255,255,255,.08)', padding: '14px 0', textAlign: 'center', fontSize: '.78rem', color: '#8F7C63' }}>
+      <div style={{ borderTop: '1px solid rgba(255,255,255,.08)', padding: '14px 0', textAlign: 'center', fontSize: '.78rem', color: '#9C8B74' }}>
         {store?.name} • {t.rightsReserved}
       </div>
     </footer>
@@ -827,20 +828,20 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         </div>
         {discount > 0 && (
           <span style={{
-            position: 'absolute', top: 12, insetInlineStart: 12, background: A, color: '#fff',
+            position: 'absolute', top: 12, insetInlineStart: 12, background: A, color: '#2A2019',
             fontSize: '.72rem', fontWeight: 800, padding: '5px 10px', borderRadius: 999,
             boxShadow: `0 4px 12px rgba(${GLOW}, .55)`,
           }}>-{discount}%</span>
         )}
         {product.isDigital ? (
           <span style={{
-            position: 'absolute', top: 12, insetInlineEnd: 12, background: A, color: '#fff',
+            position: 'absolute', top: 12, insetInlineEnd: 12, background: A, color: '#2A2019',
             fontSize: '.72rem', fontWeight: 800, padding: '5px 8px', borderRadius: 999,
             boxShadow: `0 4px 12px rgba(${GLOW}, .55)`, display: 'flex', alignItems: 'center',
           }}><Download size={12} /></span>
         ) : product.shippingFree && (
           <span style={{
-            position: 'absolute', top: 12, insetInlineEnd: 12, background: A, color: '#fff',
+            position: 'absolute', top: 12, insetInlineEnd: 12, background: A, color: '#2A2019',
             fontSize: '.72rem', fontWeight: 800, padding: '5px 10px', borderRadius: 999,
             boxShadow: `0 4px 12px rgba(${GLOW}, .55)`,
           }}>🚚</span>
@@ -853,7 +854,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
           lineHeight: 1.35, minHeight: '2.6em', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
         }}>{product.name}</h3>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '1.15rem', fontWeight: 800, color: A }}>{fmt(price)} {cur(store)}</span>
+          <span style={{ fontSize: '1.15rem', fontWeight: 800, color: AT }}>{fmt(price)} {cur(store)}</span>
           {orig > price && (
             <span style={{ fontSize: '.85rem', color: SUB, textDecoration: 'line-through' }}>{fmt(orig)}</span>
           )}
@@ -1134,7 +1135,7 @@ export function Home({ store, page }: any) {
           <div className="lm-hero-grid" style={{ width: '100%' }}>
             <div style={{ maxWidth: 620, marginInlineEnd: 'auto', ...heroTextClear(store, 'light') }}>
               <span className="hero-badge" style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8, background: SURF, color: AD,
+                display: 'inline-flex', alignItems: 'center', gap: 8, background: SURF, color: AT,
                 border: `1px solid ${BD}`, padding: '7px 15px', borderRadius: 999, fontSize: '.82rem', fontWeight: 800,
                 animation: 'lmScaleIn .5s ease .1s both', boxShadow: `0 4px 16px rgba(${GLOW}, .28)`,
               }}>
@@ -1435,9 +1436,9 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
         <>
           <label style={{ fontSize: '.8rem', fontWeight: 800, color: SUB, textTransform: 'uppercase', letterSpacing: '.04em' }}>{t.qty}</label>
           <div style={{ display: 'flex', alignItems: 'center', border: `1.5px solid ${BD}`, borderRadius: 12, overflow: 'hidden', width: 'fit-content', margin: '8px 0 18px', background: SURF2 }}>
-            <button onClick={() => set('quantity', Math.max(1, fd.quantity - 1))} style={qtyBtn}><Minus size={16} /></button>
+            <button aria-label={a11y(store).decrease} onClick={() => set('quantity', Math.max(1, fd.quantity - 1))} style={qtyBtn}><Minus size={16} /></button>
             <span style={{ minWidth: 46, textAlign: 'center', fontWeight: 800, fontSize: '1rem' }}>{fd.quantity}</span>
-            <button onClick={() => set('quantity', fd.quantity + 1)} style={qtyBtn}><Plus size={16} /></button>
+            <button aria-label={a11y(store).increase} onClick={() => set('quantity', fd.quantity + 1)} style={qtyBtn}><Plus size={16} /></button>
           </div>
         </>
       )}
@@ -1530,7 +1531,7 @@ export function ProductForm({ product, userId, domain, store: storeprop, selecte
         <div style={{ height: 1, background: BD, margin: '10px 0' }} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
           <span style={{ flexShrink: 0, fontWeight: 800, fontSize: '.95rem' }}>{t.total}</span>
-          <span style={{ whiteSpace: 'nowrap', fontWeight: 800, fontSize: '1.25rem', color: A }}>{fmt(total())} {cur(store)}</span>
+          <span style={{ whiteSpace: 'nowrap', fontWeight: 800, fontSize: '1.25rem', color: AT }}>{fmt(total())} {cur(store)}</span>
         </div>
       </div>
 
@@ -1630,7 +1631,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
           <div style={{ position: 'relative', aspectRatio: '1 / 1', borderRadius: 22, overflow: 'hidden', background: SURF, border: `1px solid ${BD}`, boxShadow: `0 20px 50px -22px rgba(${GLOW}, .55)` }}>
             <ProductImg src={mainImg} alt={product?.name} />
             {discount > 0 && (
-              <span style={{ position: 'absolute', top: 16, insetInlineStart: 16, background: A, color: '#fff', fontSize: '.8rem', fontWeight: 800, padding: '6px 12px', borderRadius: 999, boxShadow: `0 4px 14px rgba(${GLOW}, .55)` }}>-{discount}%</span>
+              <span style={{ position: 'absolute', top: 16, insetInlineStart: 16, background: A, color: '#2A2019', fontSize: '.8rem', fontWeight: 800, padding: '6px 12px', borderRadius: 999, boxShadow: `0 4px 14px rgba(${GLOW}, .55)` }}>-{discount}%</span>
             )}
             {gallery.length > 1 && (
               <>
@@ -1642,7 +1643,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
           {gallery.length > 1 && (
             <div style={{ display: 'flex', gap: 10, marginTop: 14, flexWrap: 'wrap' }}>
               {gallery.map((im: string, i: number) => (
-                <button key={i} onClick={() => showImage(i)}
+                <button aria-label={`${a11y(store).image} ${i + 1}`} key={i} onClick={() => showImage(i)}
                   style={{ width: 68, height: 68, borderRadius: 14, overflow: 'hidden', cursor: 'pointer', padding: 0, background: SURF2, border: `2px solid ${i === sel ? A : BD}`, boxShadow: i === sel ? `0 0 14px rgba(${GLOW}, .5)` : 'none' }}>
                   <ProductImg src={im} alt="" />
                 </button>
@@ -1657,7 +1658,7 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
             <Stars n={5} size={16} />
             <h1 className="lm-display" style={{ fontSize: 'clamp(1.6rem, 3.4vw, 2.3rem)', fontWeight: 700, margin: '10px 0 0', lineHeight: 1.2 }}>{product?.name}</h1>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginTop: 14, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '1.9rem', fontWeight: 800, color: A }}>{fmt(price)} {cur(store)}</span>
+              <span style={{ fontSize: '1.9rem', fontWeight: 800, color: AT }}>{fmt(price)} {cur(store)}</span>
               {orig > price && <span style={{ fontSize: '1.05rem', color: SUB, textDecoration: 'line-through' }}>{fmt(orig)} {cur(store)}</span>}
             </div>
           </div>
@@ -1690,10 +1691,10 @@ export function Details({ product, store: storeprop, discount, allImages, allAtt
                         <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                           <span style={{ fontWeight: 700, fontSize: '.92rem' }}>{o.name}</span>
                           {o.subTitle && <span style={{ fontWeight: 500, fontSize: '.76rem', color: SUB }}>{o.subTitle}</span>}
-                          {o.shippingFree && <span style={{ fontWeight: 700, fontSize: '.76rem', color: A }}>🚚 {t.freeShippingBadge}</span>}
+                          {o.shippingFree && <span style={{ fontWeight: 700, fontSize: '.76rem', color: AT }}>🚚 {t.freeShippingBadge}</span>}
                         </span>
                       </span>
-                      <span style={{ fontWeight: 800, color: A, whiteSpace: 'nowrap' }}>{fmt(Number(o.price))} {cur(store)}</span>
+                      <span style={{ fontWeight: 800, color: AT, whiteSpace: 'nowrap' }}>{fmt(Number(o.price))} {cur(store)}</span>
                     </button>
                   );
                 })}
@@ -1924,7 +1925,7 @@ export function Cart({ domain, store }: any) {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ margin: 0, fontWeight: 700, fontSize: '.95rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{it.product?.name}</p>
                   <p style={{ margin: '4px 0 0', color: SUB, fontSize: '.82rem' }}>{t.qty}: {it.quantity}</p>
-                  <p style={{ margin: '6px 0 0', color: A, fontWeight: 800, whiteSpace: 'nowrap' }}>{fmt(line)} {cur(store)}</p>
+                  <p style={{ margin: '6px 0 0', color: AT, fontWeight: 800, whiteSpace: 'nowrap' }}>{fmt(line)} {cur(store)}</p>
                 </div>
                 <button onClick={() => removeItem(i)} aria-label="delete"
                   style={{ width: 40, height: 40, borderRadius: 10, background: SURF2, border: `1px solid ${BD}`, cursor: 'pointer', display: 'grid', placeItems: 'center', color: '#C0392B', flexShrink: 0 }}>
@@ -2000,7 +2001,7 @@ export function Cart({ domain, store }: any) {
             <div style={{ height: 1, background: BD, margin: '10px 0' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
               <span style={{ flexShrink: 0, fontWeight: 800 }}>{t.total}</span>
-              <span style={{ whiteSpace: 'nowrap', fontWeight: 800, fontSize: '1.25rem', color: A }}>{fmt(finalTotal)} {cur(store)}</span>
+              <span style={{ whiteSpace: 'nowrap', fontWeight: 800, fontSize: '1.25rem', color: AT }}>{fmt(finalTotal)} {cur(store)}</span>
             </div>
           </div>
 

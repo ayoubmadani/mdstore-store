@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -188,7 +188,7 @@ const fetchCommunes = async (wid: string): Promise<Commune[]> => { try { const {
 const S = {
   input: { width: '100%', padding: '0.7rem 0.875rem', background: '#fff', border: `1px solid ${BD}`, borderRadius: 10, fontSize: '0.9rem', color: INK, outline: 'none', transition: 'border-color 0.15s', appearance: 'none' } as React.CSSProperties,
   inputErr: { borderColor: '#DC2626' } as React.CSSProperties,
-  btnPrimary: { width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: W, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.5rem', borderRadius: 10, border: 'none', cursor: 'pointer', transition: 'background 0.2s', fontFamily: "'Cairo', sans-serif" } as React.CSSProperties,
+  btnPrimary: { width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: W, color: '#2C1810', fontWeight: 700, fontSize: '0.9rem', padding: '0.875rem 1.5rem', borderRadius: 10, border: 'none', cursor: 'pointer', transition: 'background 0.2s', fontFamily: "'Cairo', sans-serif" } as React.CSSProperties,
 };
 
 
@@ -578,13 +578,13 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           </div>
 
           <div className="nav-desktop" style={{ flexShrink: 0, gap: '0.75rem' }}>
-            <button onClick={() => setShowSearch(true)} style={{ width: 38, height: 38, borderRadius: 10, border: `1px solid ${BD}`, background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: SUB, transition: 'all 0.15s' }}
+            <button aria-label={a11y(store).search} onClick={() => setShowSearch(true)} style={{ width: 38, height: 38, borderRadius: 10, border: `1px solid ${BD}`, background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: SUB, transition: 'all 0.15s' }}
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = W; (e.currentTarget as HTMLButtonElement).style.color = W; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = BD; (e.currentTarget as HTMLButtonElement).style.color = SUB; }}>
               <Search size={15} />
             </button>
             {store?.cart !== false && (
-              <Link href="/cart" style={{ position: 'relative', background: W, color: '#fff', height: 38, padding: '0 1.125rem', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.875rem', fontWeight: 600, transition: 'background 0.18s' }}
+              <Link href="/cart" style={{ position: 'relative', background: W, color: '#2C1810', height: 38, padding: '0 1.125rem', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.875rem', fontWeight: 600, transition: 'background 0.18s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = WD)}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = W)}>
                 <ShoppingCart size={14} /> {t.cart}
@@ -594,14 +594,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           </div>
 
           <div className="nav-mobile">
-            <button onClick={() => setShowSearch(true)} style={{ width: 38, height: 38, borderRadius: 10, border: `1px solid ${BD}`, background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: SUB }}><Search size={15} /></button>
+            <button aria-label={a11y(store).search} onClick={() => setShowSearch(true)} style={{ width: 38, height: 38, borderRadius: 10, border: `1px solid ${BD}`, background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: SUB }}><Search size={15} /></button>
             {store?.cart !== false && (
-              <Link href="/cart" style={{ position: 'relative', background: W, color: '#fff', width: 38, height: 38, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Link href="/cart" style={{ position: 'relative', background: W, color: '#2C1810', width: 38, height: 38, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <ShoppingCart size={15} />
                 {count > 0 && <span style={{ position: 'absolute', top: -4, right: -4, background: '#fff', color: W, fontSize: 9, fontWeight: 800, width: 15, height: 15, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
               </Link>
             )}
-            <button onClick={() => setOpen(!open)} style={{ width: 38, height: 38, borderRadius: 10, border: `1px solid ${BD}`, background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: SUB }}>
+            <button aria-label={a11y(store).menu} onClick={() => setOpen(!open)} style={{ width: 38, height: 38, borderRadius: 10, border: `1px solid ${BD}`, background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: SUB }}>
               {open ? <X size={15} /> : <Menu size={15} />}
             </button>
           </div>
@@ -623,7 +623,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           <div className="glb-search-panel">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
               <span style={{ fontSize: '0.8rem', fontWeight: 600, color: SUB }}>{t.search}</span>
-              <button onClick={() => setShowSearch(false)} style={{ width: 32, height: 32, borderRadius: 8, border: `1px solid ${BD}`, background: CARD, color: SUB, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><X size={14} /></button>
+              <button aria-label={a11y(store).close} onClick={() => setShowSearch(false)} style={{ width: 32, height: 32, borderRadius: 8, border: `1px solid ${BD}`, background: CARD, color: SUB, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}><X size={14} /></button>
             </div>
             <form className="glb-search-form" onSubmit={handleSearch}>
               <Search size={18} style={{ color: W, flexShrink: 0, marginLeft: 10 }} />
@@ -651,7 +651,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               </>
             )}
             {!loading && searchQuery.length >= 2 && listSearch.length === 0 && (
-              <p style={{ textAlign: 'center', color: WB, fontSize: '0.875rem', padding: '3rem' }}>{t.noResults}</p>
+              <p style={{ textAlign: 'center', color: SUB, fontSize: '0.875rem', padding: '3rem' }}>{t.noResults}</p>
             )}
           </div>
         </div>
@@ -663,7 +663,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 export function Footer({ store }: any) {
   const t = withLocationLabels(T)[getLang(store)];
   return (
-    <footer dir={t.dir} style={{ background: '#2C1810', color: 'rgba(255,255,255,0.4)', marginTop: 80, padding: '3.5rem 1.5rem 1.5rem' }}>
+    <footer dir={t.dir} style={{ background: '#2C1810', color: 'rgba(255,255,255,0.55)', marginTop: 80, padding: '3.5rem 1.5rem 1.5rem' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div className="footer-inner">
           <div>
@@ -676,14 +676,14 @@ export function Footer({ store }: any) {
             <p style={{ fontSize: '0.875rem', lineHeight: 1.85, maxWidth: 280, color: 'rgba(255,255,255,0.45)' }}>
               {store?.hero?.subtitle?.substring(0, 90) || t.footerSubtitle}
             </p>
-            <p style={{ marginTop: '2rem', fontSize: '0.68rem', color: 'rgba(255,255,255,0.18)' }}>© {new Date().getFullYear()} {store?.name}</p>
+            <p style={{ marginTop: '2rem', fontSize: '0.68rem', color: 'rgba(255,255,255,0.55)' }}>© {new Date().getFullYear()} {store?.name}</p>
           </div>
           <div>
             <h4 style={{ fontSize: '0.72rem', fontWeight: 700, color: W, textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: '1.125rem' }}>{t.quickLinks}</h4>
             {[{ h: '/', l: t.home }, { h: '/cart', l: t.cart }, { h: '/contact', l: t.contact }].filter(lnk => lnk.h !== '/cart' || store?.cart !== false).map((lnk, i) => (
-              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'rgba(255,255,255,0.4)', marginBottom: '0.6rem', transition: 'color 0.15s' }}
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'rgba(255,255,255,0.55)', marginBottom: '0.6rem', transition: 'color 0.15s' }}
                 onMouseEnter={e => (e.currentTarget.style.color = W)}
-                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.55)')}>
                 {lnk.l}
               </Link>
             ))}
@@ -693,9 +693,9 @@ export function Footer({ store }: any) {
           <div>
             <p style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '1rem' }}>{t.legalNav}</p>
             {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
-              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', opacity: 0.6, transition: 'opacity 0.15s' }}
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', opacity: 0.9, transition: 'opacity 0.15s' }}
               onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
-              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.6')}>
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.9')}>
               {lnk.l}
             </Link>
             ))}
@@ -710,7 +710,7 @@ export function Footer({ store }: any) {
             ].filter(r => r.val).map((r, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', fontSize: '0.875rem' }}>
                 <span style={{ color: W, flexShrink: 0 }}>{r.icon}</span>
-                <span style={{ color: 'rgba(255,255,255,0.4)' }}>{r.val}</span>
+                <span style={{ color: 'rgba(255,255,255,0.55)' }}>{r.val}</span>
               </div>
             ))}
           </div>
@@ -732,14 +732,14 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
           : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Sofa size={40} color={WB} /></div>
         }
         {discount > 0 && (
-          <div style={{ position: 'absolute', top: 10, right: 10, background: '#C4664A', color: '#fff', fontSize: 10, fontWeight: 700, padding: '4px 10px', borderRadius: 6 }}>-{discount}% {t.discount}</div>
+          <div style={{ position: 'absolute', top: 10, right: 10, background: '#B25D43', color: '#fff', fontSize: 10, fontWeight: 700, padding: '4px 10px', borderRadius: 6 }}>-{discount}% {t.discount}</div>
         )}
         {product.isDigital ? (
-          <div style={{ position: 'absolute', top: 10, left: 10, background: '#C4664A', color: '#fff', fontSize: 10, fontWeight: 700, padding: '4px 10px', borderRadius: 6, display: 'flex', alignItems: 'center' }}>
+          <div style={{ position: 'absolute', top: 10, left: 10, background: '#B25D43', color: '#fff', fontSize: 10, fontWeight: 700, padding: '4px 10px', borderRadius: 6, display: 'flex', alignItems: 'center' }}>
             <Download size={12} />
           </div>
         ) : product.shippingFree && (
-          <div style={{ position: 'absolute', top: 10, left: 10, background: W, color: '#fff', fontSize: 10, fontWeight: 700, padding: '4px 10px', borderRadius: 6 }}>🚚</div>
+          <div style={{ position: 'absolute', top: 10, left: 10, background: W, color: '#2C1810', fontSize: 10, fontWeight: 700, padding: '4px 10px', borderRadius: 6 }}>🚚</div>
         )}
         <div style={{ position: 'absolute', bottom: 0, inset: 'auto 0 0 0', height: 80, background: 'linear-gradient(to top, rgba(44,24,16,0.55) 0%, transparent 100%)' }} />
       </div>
@@ -749,7 +749,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: '0.875rem' }}>
           <span className="price-mono" style={{ fontSize: '1.375rem', fontWeight: 700, color: WD }}>{price.toLocaleString()}</span>
           <span style={{ fontSize: '0.68rem', color: SUB }}>{store.currency || currencyLabel(t.currency)}</span>
-          {orig > price && <span className="price-mono" style={{ fontSize: '0.72rem', color: WB, textDecoration: 'line-through', marginRight: 2 }}>{orig.toLocaleString()}</span>}
+          {orig > price && <span className="price-mono" style={{ fontSize: '0.72rem', color: '#736E68', textDecoration: 'line-through', marginRight: 2 }}>{orig.toLocaleString()}</span>}
         </div>
       </div>
       <Link href={`/product/${product.slug || product.id}`} className="hc-btn">
@@ -1026,7 +1026,7 @@ export function Home({ store, page }: any) {
               {store.hero?.subtitle || t.heroSubtitleFallback}
             </p>
             <div className="hero-actions">
-              <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: W, color: '#fff', fontWeight: 700, fontSize: '0.9rem', padding: '0.9rem 2rem', borderRadius: 8, transition: 'background 0.18s', textDecoration: 'none' }}
+              <a href="#products" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: W, color: '#2C1810', fontWeight: 700, fontSize: '0.9rem', padding: '0.9rem 2rem', borderRadius: 8, transition: 'background 0.18s', textDecoration: 'none' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = WD)}
                 onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = W)}>
                 {t.heroCTA} <ArrowLeft size={15} />
@@ -1155,18 +1155,18 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
         <div className="gallery-container">
           <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden', background: WL, borderRadius: 20, border: `1px solid ${BD}` }}>
             {allImages[sel] ? <img src={allImages[sel]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 20 }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Sofa size={48} color={WB} /></div>}
-            {discount > 0 && <div style={{ position: 'absolute', top: 12, right: 12, background: W, color: '#fff', padding: '3px 10px', fontSize: 11, fontWeight: 700, borderRadius: 20 }}>{discount}% {t.discount}</div>}
+            {discount > 0 && <div style={{ position: 'absolute', top: 12, right: 12, background: W, color: '#2C1810', padding: '3px 10px', fontSize: 11, fontWeight: 700, borderRadius: 20 }}>{discount}% {t.discount}</div>}
             {allImages.length > 1 && (
               <>
-                <button onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 34, height: 34, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: INK }}><ChevronRight size={15} /></button>
-                <button onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 34, height: 34, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: INK }}><ChevronLeft size={15} /></button>
+                <button aria-label={a11y(store).prev} onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 34, height: 34, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: INK }}><ChevronRight size={15} /></button>
+                <button aria-label={a11y(store).next} onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 34, height: 34, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: INK }}><ChevronLeft size={15} /></button>
               </>
             )}
           </div>
           {allImages.length > 1 && (
             <div className="thumb-row">
               {allImages.map((img: string, idx: number) => (
-                <button key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 60, height: 60, border: `2px solid ${sel === idx ? W : BD}`, borderRadius: 10, overflow: 'hidden', cursor: 'pointer', padding: 0, background: 'none', opacity: sel === idx ? 1 : 0.55, transition: 'all 0.15s' }}>
+                <button aria-label={`${a11y(store).image} ${idx + 1}`} key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 60, height: 60, border: `2px solid ${sel === idx ? W : BD}`, borderRadius: 10, overflow: 'hidden', cursor: 'pointer', padding: 0, background: 'none', opacity: sel === idx ? 1 : 0.55, transition: 'all 0.15s' }}>
                   <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
               ))}
@@ -1433,9 +1433,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <div style={{ marginBottom: '0.875rem' }}>
                 <p style={{ fontSize: '0.7rem', fontWeight: 600, color: SUB, marginBottom: '0.5rem', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>{t.qty}</p>
                 <div style={{ display: 'inline-flex', alignItems: 'center', border: `1.5px solid ${BD}`, borderRadius: 12, overflow: 'hidden', background: CARD }}>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: SUB, borderLeft: `1px solid ${BD}` }}><Minus size={12} /></button>
+                  <button aria-label={a11y(store).decrease} type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: SUB, borderLeft: `1px solid ${BD}` }}><Minus size={12} /></button>
                   <span style={{ width: 40, textAlign: 'center', fontWeight: 700, fontSize: '0.9rem', color: INK }}>{fd.quantity}</span>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: W, borderRight: `1px solid ${BD}` }}><Plus size={12} /></button>
+                  <button aria-label={a11y(store).increase} type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: W, borderRight: `1px solid ${BD}` }}><Plus size={12} /></button>
                 </div>
               </div>
             )}
@@ -1529,7 +1529,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
         <CheckCircle2 size={48} style={{ color: W, display: 'block', margin: '0 auto 1.25rem' }} />
         <h2 style={{ fontSize: '1.75rem', fontWeight: 700, color: INK, marginBottom: '0.5rem' }}>{t.successTitle}</h2>
         <p style={{ color: SUB, lineHeight: 1.75, marginBottom: '2rem', fontSize: '0.9rem' }}>{t.successDesc}</p>
-        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: W, color: '#fff', padding: '0.75rem 2rem', fontWeight: 700, fontSize: '0.875rem', borderRadius: 10 }}>{t.backToShop}</Link>
+        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: W, color: '#2C1810', padding: '0.75rem 2rem', fontWeight: 700, fontSize: '0.875rem', borderRadius: 10 }}>{t.backToShop}</Link>
       </div>
     </div>
   );
@@ -1539,7 +1539,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{ textAlign: 'center', padding: '4rem 2rem', border: `1px solid ${BD}`, borderRadius: 20, maxWidth: 400, width: '100%', background: CARD }}>
         <ShoppingBag size={44} style={{ color: WB, display: 'block', margin: '0 auto 1.25rem' }} />
         <p style={{ color: SUB, fontSize: '0.9rem', marginBottom: '2rem' }}>{t.cartEmpty}</p>
-        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: W, color: '#fff', padding: '0.75rem 1.875rem', fontWeight: 700, fontSize: '0.875rem', borderRadius: 10 }}>{t.shopNow}</Link>
+        <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: W, color: '#2C1810', padding: '0.75rem 1.875rem', fontWeight: 700, fontSize: '0.875rem', borderRadius: 10 }}>{t.shopNow}</Link>
       </div>
     </div>
   );
@@ -1571,7 +1571,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 <p className="price-mono" style={{ fontSize: '1.125rem', fontWeight: 700, color: WD }}>{item.finalPrice?.toLocaleString()} {currencyLabel(t.currency)}</p>
                 <p style={{ fontSize: '0.68rem', color: SUB, marginTop: '0.15rem' }}>{t.qty}: {item.quantity}</p>
               </div>
-              <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: WB, padding: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'flex-start', transition: 'color 0.15s' }}
+              <button aria-label={a11y(store).remove} onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: WB, padding: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'flex-start', transition: 'color 0.15s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = '#DC2626')}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = WB)}>
                 <Trash2 size={15} />
@@ -1693,7 +1693,7 @@ export function Success({ store, order }: { store: any; domain: string; order: a
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: W, color: '#fff', padding: '0.875rem 2rem', borderRadius: 10, fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: W, color: '#2C1810', padding: '0.875rem 2rem', borderRadius: 10, fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none' }}>
             <ShoppingBag size={17} /> {t.shopNow}
           </Link>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.8rem', borderRadius: 10, border: `1px solid ${BD}`, color: SUB, fontWeight: 700, fontSize: '0.85rem', textDecoration: 'none' }}>

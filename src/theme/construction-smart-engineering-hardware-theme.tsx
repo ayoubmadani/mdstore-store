@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -389,7 +389,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
   return (
     <>
       {store?.topBar?.enabled && store?.topBar?.text && (
-        <div style={{ background: A, color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
+        <div style={{ background: A, color: '#1E293B', textAlign: 'center', padding: '8px 16px', fontSize: '0.82rem', fontWeight: 600 }}>
           {store.topBar.text}
         </div>
       )}
@@ -412,7 +412,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 </div>
                 <div>
                   <span style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: SL, lineHeight: 1.1 }}>{store?.name || 'Engineering Tools'}</span>
-                  <span style={{ display: 'block', fontSize: '0.62rem', color: '#94A3B8', fontWeight: 500 }}>Hardware & Safety</span>
+                  <span style={{ display: 'block', fontSize: '0.62rem', color: '#64748B', fontWeight: 500 }}>Hardware & Safety</span>
                 </div>
               </div>
             )}
@@ -424,9 +424,9 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 onMouseEnter={e => (e.currentTarget.style.color = AD)}
                 onMouseLeave={e => (e.currentTarget.style.color = '#64748B')}>{i.l}</Link>
             ))}
-            <button onClick={() => setShowSearch(true)} style={{ height: 36, padding: '0 0.875rem', borderRadius: 8, border: `1px solid ${BD}`, background: BG, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', color: '#94A3B8', fontSize: '0.82rem', transition: 'all 0.2s' }}
+            <button onClick={() => setShowSearch(true)} style={{ height: 36, padding: '0 0.875rem', borderRadius: 8, border: `1px solid ${BD}`, background: BG, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', color: '#64748B', fontSize: '0.82rem', transition: 'all 0.2s' }}
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = A; (e.currentTarget as HTMLButtonElement).style.color = AD; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = BD; (e.currentTarget as HTMLButtonElement).style.color = '#94A3B8'; }}>
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = BD; (e.currentTarget as HTMLButtonElement).style.color = '#64748B'; }}>
               <Search size={14} /> بحث سريع...
             </button>
             {store?.cart !== false && (
@@ -440,7 +440,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
           </div>
 
           <div className="nav-mobile">
-            <button onClick={() => setShowSearch(true)} style={{ width: 38, height: 38, borderRadius: 8, border: `1px solid ${BD}`, background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748B' }}>
+            <button aria-label={a11y(store).search} onClick={() => setShowSearch(true)} style={{ width: 38, height: 38, borderRadius: 8, border: `1px solid ${BD}`, background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748B' }}>
               <Search size={15} />
             </button>
             {store?.cart !== false && (
@@ -449,7 +449,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 {count > 0 && <span style={{ position: 'absolute', top: -5, right: -5, background: A, color: SL, fontSize: 10, fontWeight: 800, width: 17, height: 17, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{count}</span>}
               </Link>
             )}
-            <button onClick={() => setOpen(!open)} style={{ width: 38, height: 38, borderRadius: 8, border: `1px solid ${BD}`, background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748B' }}>
+            <button aria-label={a11y(store).menu} onClick={() => setOpen(!open)} style={{ width: 38, height: 38, borderRadius: 8, border: `1px solid ${BD}`, background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748B' }}>
               {open ? <X size={16} /> : <Menu size={16} />}
             </button>
           </div>
@@ -477,14 +477,14 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 </div>
                 <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748B' }}>البحث في المنتجات</span>
               </div>
-              <button onClick={() => setShowSearch(false)} style={{ width: 34, height: 34, borderRadius: 8, border: `1px solid ${BD}`, background: CARD, color: '#94A3B8', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <button aria-label={a11y(store).close} onClick={() => setShowSearch(false)} style={{ width: 34, height: 34, borderRadius: 8, border: `1px solid ${BD}`, background: CARD, color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
                 <X size={15} />
               </button>
             </div>
             <form className="glb-search-form" onSubmit={handleSearch}>
               <Search size={20} style={{ color: A, flexShrink: 0, marginLeft: 12 }} />
               <input ref={searchInputRef} className="glb-search-input" type="text" placeholder="ابحث عن أداة أو معدة..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
-              {searchQuery && <button type="button" onClick={() => setSearchQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', padding: 0, display: 'flex', alignItems: 'center', flexShrink: 0 }}><X size={14} /></button>}
+              {searchQuery && <button aria-label={a11y(store).clear} type="button" onClick={() => setSearchQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', padding: 0, display: 'flex', alignItems: 'center', flexShrink: 0 }}><X size={14} /></button>}
             </form>
             {loading && <p style={{ textAlign: 'center', color: AD, fontSize: '0.85rem', fontWeight: 600, padding: '2rem' }}>جاري البحث...</p>}
             {!loading && listSearch.length > 0 && (
@@ -532,7 +532,7 @@ export function Footer({ store }: any) {
             <p style={{ fontSize: '0.875rem', lineHeight: 1.8, maxWidth: 300 }}>
               {store?.hero?.subtitle?.substring(0, 100) || 'أدوات قياس وعدة احترافية ومعدات حماية شخصية بأعلى معايير الجودة.'}
             </p>
-            <p style={{ marginTop: '2rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.25)' }}>
+            <p style={{ marginTop: '2rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.55)' }}>
               © {new Date().getFullYear()} {store?.name}. جميع الحقوق محفوظة.
             </p>
           </div>
@@ -614,11 +614,11 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div style={{ marginTop: 'auto' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.375rem', marginBottom: '0.75rem' }}>
             <span className="price-mono" style={{ fontSize: '1.25rem', fontWeight: 800, color: AD }}>{price.toLocaleString()}</span>
-            <span style={{ fontSize: '0.72rem', color: '#94A3B8' }}>{store.currency || 'دج'}</span>
-            {orig > price && <span style={{ fontSize: '0.72rem', color: '#CBD5E1', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
+            <span style={{ fontSize: '0.72rem', color: '#64748B' }}>{store.currency || 'دج'}</span>
+            {orig > price && <span style={{ fontSize: '0.72rem', color: '#6B7280', textDecoration: 'line-through' }}>{orig.toLocaleString()}</span>}
           </div>
           <Link href={`/product/${product.slug || product.id}`}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, width: '100%', padding: '0.6rem', borderRadius: 8, background: AB, color: AD, fontSize: '0.82rem', fontWeight: 600, transition: 'all 0.2s', border: `1px solid rgba(245,158,11,0.25)` }}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, width: '100%', padding: '0.6rem', borderRadius: 8, background: AB, color: '#92400E', fontSize: '0.82rem', fontWeight: 600, transition: 'all 0.2s', border: `1px solid rgba(245,158,11,0.25)` }}
             onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = A; el.style.color = SL; el.style.borderColor = A; }}
             onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = AB; el.style.color = AD; el.style.borderColor = 'rgba(245,158,11,0.25)'; }}>
             {viewDetails} <ArrowLeft size={12} />
@@ -941,7 +941,7 @@ export function Home({ store, page }: any) {
             <div key={i} style={{ padding: '1.125rem 1rem', textAlign: 'center', background: i % 2 === 0 ? '#fff' : BG }}>
               <div style={{ width: 40, height: 40, background: AB, border: `1px solid rgba(245,158,11,0.25)`, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.625rem', color: AD }}>{item.icon}</div>
               <p style={{ fontSize: '0.78rem', fontWeight: 700, color: SL, marginBottom: '0.15rem' }}>{item.t}</p>
-              <p style={{ fontSize: '0.7rem', color: '#94A3B8' }}>{item.d}</p>
+              <p style={{ fontSize: '0.7rem', color: '#64748B' }}>{item.d}</p>
             </div>
           ))}
         </div>
@@ -985,7 +985,7 @@ export function Home({ store, page }: any) {
         {products.length === 0 ? (
           <div style={{ padding: '5rem', textAlign: 'center', border: `1px dashed ${BD}`, borderRadius: 10, background: CARD }}>
             <Settings size={40} color={BD} style={{ margin: '0 auto 1rem' }} />
-            <p style={{ color: '#94A3B8', fontSize: '0.9rem' }}>لا توجد منتجات بعد</p>
+            <p style={{ color: '#64748B', fontSize: '0.9rem' }}>لا توجد منتجات بعد</p>
           </div>
         ) : (
           <div className="products-grid">
@@ -1041,8 +1041,8 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             )}
             {allImages.length > 1 && (
               <>
-                <button onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: SL }}><ChevronRight size={16} /></button>
-                <button onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: SL }}><ChevronLeft size={16} /></button>
+                <button aria-label={a11y(store).prev} onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: SL }}><ChevronRight size={16} /></button>
+                <button aria-label={a11y(store).next} onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.9)', border: `1px solid ${BD}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: SL }}><ChevronLeft size={16} /></button>
               </>
             )}
           </div>
@@ -1050,7 +1050,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           {allImages.length > 1 && (
             <div className="thumb-row">
               {allImages.map((img: string, idx: number) => (
-                <button key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 58, height: 58, borderRadius: 8, overflow: 'hidden', border: `1.5px solid ${sel === idx ? A : BD}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.18s' }}>
+                <button aria-label={`${a11y(store).image} ${idx + 1}`} key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 58, height: 58, borderRadius: 8, overflow: 'hidden', border: `1.5px solid ${sel === idx ? A : BD}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.18s' }}>
                   <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
               ))}
@@ -1071,7 +1071,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               <p style={{ fontSize: '0.65rem', color: AD, fontWeight: 700, marginBottom: '0.2rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>السعر</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
                 <span className="price-mono" style={{ fontSize: '2.5rem', fontWeight: 800, color: AD }}>{finalPrice.toLocaleString()}</span>
-                <span style={{ fontSize: '1rem', fontWeight: 700, color: '#94A3B8' }}>{currencyLabel('دج')}</span>
+                <span style={{ fontSize: '1rem', fontWeight: 700, color: '#64748B' }}>{currencyLabel('دج')}</span>
               </div>
             </div>
             {(product.shippingFree || (store?.supportFreeShipping && store?.freeShippingMinAmount != null)) && (
@@ -1090,8 +1090,8 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                       <input type="radio" name="offer" checked={selectedOffer === o.id} onChange={() => setSelectedOffer(o.id)} style={{ display: 'none' }} />
                       <div>
                         <p style={{ fontWeight: 600, color: SL, fontSize: '0.875rem' }}>{o.name}</p>
-                        {o.subTitle && <p style={{ fontSize: '0.72rem', color: '#94A3B8', marginTop: 2 }}>{o.subTitle}</p>}
-                        <p style={{ fontSize: '0.72rem', color: '#94A3B8' }}>الكمية: {o.quantity}</p>
+                        {o.subTitle && <p style={{ fontSize: '0.72rem', color: '#64748B', marginTop: 2 }}>{o.subTitle}</p>}
+                        <p style={{ fontSize: '0.72rem', color: '#64748B' }}>الكمية: {o.quantity}</p>
                         {o.shippingFree && <p style={{ fontSize: '0.68rem', fontWeight: 700, color: AD, marginTop: 2 }}>🚚 توصيل مجاني</p>}
                       </div>
                     </div>
@@ -1265,7 +1265,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           {product.store.cart && !product.isDigital && (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <p style={{ fontWeight: 600, fontSize: '0.72rem', color: '#64748B', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>بيانات التوصيل</p>
-              {orderNowState && (<button onClick={() => setIsOrderNow(false)} style={{ fontSize: '0.8rem', color: '#94A3B8', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>إلغاء</button>)}
+              {orderNowState && (<button onClick={() => setIsOrderNow(false)} style={{ fontSize: '0.8rem', color: '#64748B', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>إلغاء</button>)}
             </div>
           )}
           <form onSubmit={handleSubmit}>
@@ -1290,7 +1290,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 <div className="form-row-2">
                   <FR error={errors.customerWelaya} label="الولاية">
                     <div style={{ position: 'relative' }}>
-                      <ChevronDown size={12} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8', pointerEvents: 'none' }} />
+                      <ChevronDown size={12} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#64748B', pointerEvents: 'none' }} />
                       <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...inp(!!errors.customerWelaya), paddingRight: 36, fontFamily: 'inherit' }}>
                         <option value="">اختر</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.code ?? w.id} - {w.ar_name}</option>)}
                       </select>
@@ -1298,7 +1298,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                   </FR>
                   <FR error={errors.customerCommune} label="البلدية">
                     <div style={{ position: 'relative' }}>
-                      <ChevronDown size={12} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8', pointerEvents: 'none' }} />
+                      <ChevronDown size={12} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#64748B', pointerEvents: 'none' }} />
                       <select value={fd.customerCommune} disabled={!fd.customerWelaya || loadingC} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inp(!!errors.customerCommune), paddingRight: 36, opacity: (!fd.customerWelaya || loadingC) ? 0.5 : 1, fontFamily: 'inherit' }}>
                         <option value="">{loadingC ? '...' : 'اختر'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                       </select>
@@ -1311,7 +1311,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                     {(['home', 'office'] as const).filter((dt) => deliveryShown(wilayas, fd.customerWelaya, dt, communes, fd.customerCommune)).map(t => (
                       <button data-delivery-option key={t} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: t }))} style={{ padding: '0.75rem', border: `1px solid ${fd.typeLivraison === t ? A : BD}`, borderRadius: 8, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === t ? AB : CARD, transition: 'all 0.18s', fontFamily: 'inherit' }}>
                         <p style={{ fontWeight: 600, fontSize: '0.82rem', marginBottom: 4, color: fd.typeLivraison === t ? AD : '#64748B' }}>{t === 'home' ? 'للبيت' : 'للمكتب'}</p>
-                        {selW && <p className="price-mono" style={{ fontSize: '1rem', fontWeight: 800, color: fd.typeLivraison === t ? AD : '#94A3B8' }}>{orderFreeShipping ? '🚚 توصيل مجاني' : `${(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج`}</p>}
+                        {selW && <p className="price-mono" style={{ fontSize: '1rem', fontWeight: 800, color: fd.typeLivraison === t ? AD : '#64748B' }}>{orderFreeShipping ? '🚚 توصيل مجاني' : `${(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج`}</p>}
                       </button>
                     ))}
                   </div>
@@ -1322,9 +1322,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <div style={{ marginBottom: '0.875rem' }}>
                 <p style={{ fontSize: '0.72rem', fontWeight: 600, color: '#64748B', marginBottom: '0.5rem', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>الكمية</p>
                 <div style={{ display: 'inline-flex', alignItems: 'center', border: `1px solid ${BD}`, borderRadius: 8, overflow: 'hidden', background: CARD }}>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#64748B' }}><Minus size={13} /></button>
+                  <button aria-label={a11y(store).decrease} type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: '#64748B' }}><Minus size={13} /></button>
                   <span style={{ width: 40, textAlign: 'center', fontWeight: 700, fontSize: '0.9rem', color: SL }}>{fd.quantity}</span>
-                  <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: AD }}><Plus size={13} /></button>
+                  <button aria-label={a11y(store).increase} type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: AD }}><Plus size={13} /></button>
                 </div>
               </div>
             )}
@@ -1334,7 +1334,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                 ...(product.isDigital ? [] : [{ l: 'التوصيل', v: !selW ? '—' : orderFreeShipping ? '🚚 توصيل مجاني' : `${getLiv().toLocaleString()} دج` }]),
               ].map(r => (
                 <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: `1px solid rgba(245,158,11,0.2)` }}>
-                  <span style={{ fontSize: '0.82rem', color: '#94A3B8' }}>{r.l}</span>
+                  <span style={{ fontSize: '0.82rem', color: '#64748B' }}>{r.l}</span>
                   <span style={{ fontSize: '0.82rem', fontWeight: 600, color: SL }}>{r.v}</span>
                 </div>
               ))}
@@ -1434,7 +1434,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
     <div dir="rtl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', background: BG }}>
       <div style={{ textAlign: 'center', padding: '4rem 2rem', border: `1px dashed ${BD}`, borderRadius: 12, maxWidth: 440, width: '100%', background: CARD }}>
         <ShoppingBag size={48} style={{ color: BD, display: 'block', margin: '0 auto 1.25rem' }} />
-        <p style={{ color: '#94A3B8', fontSize: '0.95rem', marginBottom: '2rem' }}>السلة فارغة</p>
+        <p style={{ color: '#64748B', fontSize: '0.95rem', marginBottom: '2rem' }}>السلة فارغة</p>
         <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: A, color: SL, padding: '0.75rem 1.75rem', borderRadius: 8, fontWeight: 700, fontSize: '0.875rem' }}>تسوق الآن</Link>
       </div>
     </div>
@@ -1460,9 +1460,9 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               <div style={{ flex: 1 }}>
                 <h4 style={{ fontWeight: 600, color: SL, marginBottom: '0.25rem', fontSize: '0.875rem', lineHeight: 1.4 }}>{item.product?.name}</h4>
                 <p className="price-mono" style={{ fontSize: '1.05rem', fontWeight: 800, color: AD }}>{item.finalPrice?.toLocaleString()} دج</p>
-                <p style={{ fontSize: '0.72rem', color: '#94A3B8', marginTop: '0.2rem' }}>الكمية: {item.quantity}</p>
+                <p style={{ fontSize: '0.72rem', color: '#64748B', marginTop: '0.2rem' }}>الكمية: {item.quantity}</p>
               </div>
-              <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: '#CBD5E1', padding: '0.375rem', borderRadius: 6, background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'center', transition: 'color 0.18s' }}
+              <button aria-label={a11y(store).remove} onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ color: '#CBD5E1', padding: '0.375rem', borderRadius: 6, background: 'none', border: 'none', cursor: 'pointer', alignSelf: 'center', transition: 'color 0.18s' }}
                 onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = '#EF4444')}
                 onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = '#CBD5E1')}>
                 <Trash2 size={16} />
@@ -1485,7 +1485,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
             <div className="form-row-2">
               <FR error={errors.w} label="الولاية">
                 <div style={{ position: 'relative' }}>
-                  <ChevronDown size={12} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8', pointerEvents: 'none' }} />
+                  <ChevronDown size={12} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#64748B', pointerEvents: 'none' }} />
                   <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e => setFd({ ...fd, customerWelaya: e.target.value, customerCommune: '' })} style={{ ...inp(!!errors.w), paddingRight: 34, fontFamily: 'inherit' }}>
                     <option value="">اختر</option>{wilayas.map(w => <option key={w.id} value={w.id}>{w.code ?? w.id} - {w.ar_name}</option>)}
                   </select>
@@ -1493,7 +1493,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               </FR>
               <FR error={errors.c} label="البلدية">
                 <div style={{ position: 'relative' }}>
-                  <ChevronDown size={12} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8', pointerEvents: 'none' }} />
+                  <ChevronDown size={12} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', color: '#64748B', pointerEvents: 'none' }} />
                   <select value={fd.customerCommune} disabled={loadingC || !fd.customerWelaya} onChange={e => setFd({ ...fd, customerCommune: e.target.value })} style={{ ...inp(!!errors.c), paddingRight: 34, opacity: (!fd.customerWelaya || loadingC) ? 0.5 : 1, fontFamily: 'inherit' }}>
                     <option value="">{loadingC ? '...' : 'اختر'}</option>{communes.map(c => <option key={c.id} value={c.id}>{c.ar_name}</option>)}
                   </select>
@@ -1507,7 +1507,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   <button data-delivery-option key={t} type="button" onClick={() => setFd(p => ({ ...p, typeLivraison: t }))} style={{ padding: '0.75rem', border: `1px solid ${fd.typeLivraison === t ? A : BD}`, borderRadius: 8, textAlign: 'center', cursor: 'pointer', background: fd.typeLivraison === t ? AB : CARD, fontFamily: 'inherit', transition: 'all 0.2s' }}>
                     <span style={{ display: 'block', fontSize: '1.125rem', marginBottom: 3 }}>{t === 'home' ? '🏠' : '🏢'}</span>
                     <p style={{ fontWeight: 600, fontSize: '0.78rem', color: fd.typeLivraison === t ? AD : '#64748B' }}>{t === 'home' ? 'للبيت' : 'للمكتب'}</p>
-                    {selW && <p style={{ fontWeight: 800, fontSize: '0.9rem', color: fd.typeLivraison === t ? AD : '#94A3B8', marginTop: 2 }}>{freeShippingReached ? '🚚 توصيل مجاني' : `${(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج`}</p>}
+                    {selW && <p style={{ fontWeight: 800, fontSize: '0.9rem', color: fd.typeLivraison === t ? AD : '#64748B', marginTop: 2 }}>{freeShippingReached ? '🚚 توصيل مجاني' : `${(t === 'home' ? selW.livraisonHome : selW.livraisonOfice).toLocaleString()} دج`}</p>}
                   </button>
                 ))}
               </div>
@@ -1518,7 +1518,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 { l: 'التوصيل', v: !selW ? '—' : freeShippingReached ? '🚚 توصيل مجاني' : `${getLiv().toLocaleString()} دج` },
               ].map(r => (
                 <div key={r.l} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', marginBottom: '0.5rem', borderBottom: `1px solid rgba(245,158,11,0.15)` }}>
-                  <span style={{ fontSize: '0.78rem', color: '#94A3B8' }}>{r.l}</span>
+                  <span style={{ fontSize: '0.78rem', color: '#64748B' }}>{r.l}</span>
                   <span style={{ fontWeight: 600, color: SL, fontSize: '0.875rem' }}>{r.v}</span>
                 </div>
               ))}
@@ -1577,11 +1577,11 @@ export function Success({ store, order }: { store: any; domain: string; order: a
             const Icon = step.icon; const done = i === 0;
             return (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '1rem 1.25rem', borderBottom: i < steps.length - 1 ? `1px solid ${BD}` : 'none', background: done ? AL : 'transparent' }}>
-                <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? A : BG, color: done ? SL : '#94A3B8' }}>
+                <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: done ? A : BG, color: done ? SL : '#64748B' }}>
                   <Icon size={16} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: '0.85rem', fontWeight: 700, color: done ? SL : '#94A3B8', marginBottom: 2 }}>{step.title}</p>
+                  <p style={{ fontSize: '0.85rem', fontWeight: 700, color: done ? SL : '#64748B', marginBottom: 2 }}>{step.title}</p>
                   <p style={{ fontSize: '0.76rem', color: '#64748B' }}>{step.desc}</p>
                 </div>
               </div>
@@ -1691,7 +1691,7 @@ export function Contact({ store }: { store: any }) {
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginBottom: '1rem' }}>
                 <div style={{ width: 38, height: 38, borderRadius: 8, background: AB, border: `1px solid rgba(245,158,11,0.25)`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: AD, flexShrink: 0 }}>{r.icon}</div>
                 <div>
-                  <p style={{ fontSize: '0.65rem', color: '#94A3B8', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginBottom: '0.15rem' }}>{r.label}</p>
+                  <p style={{ fontSize: '0.65rem', color: '#64748B', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginBottom: '0.15rem' }}>{r.label}</p>
                   <p style={{ fontWeight: 600, color: SL, fontSize: '0.875rem' }}>{r.val}</p>
                 </div>
               </div>
@@ -1709,7 +1709,7 @@ export function Contact({ store }: { store: any }) {
               <CheckCircle2 size={40} style={{ color: '#22C55E', display: 'block', margin: '0 auto 1.25rem' }} />
               <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: SL, marginBottom: '0.5rem' }}>تم الإرسال!</h2>
               <p style={{ color: '#64748B', lineHeight: 1.7, marginBottom: '2rem' }}>سنرد عليك في أقرب وقت ممكن.</p>
-              <button onClick={() => setSent(false)} style={{ padding: '0.75rem 1.75rem', borderRadius: 8, border: `1px solid ${A}`, background: AB, color: AD, fontWeight: 700, cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'inherit' }}>إرسال رسالة أخرى</button>
+              <button onClick={() => setSent(false)} style={{ padding: '0.75rem 1.75rem', borderRadius: 8, border: `1px solid ${A}`, background: AB, color: '#92400E', fontWeight: 700, cursor: 'pointer', fontSize: '0.875rem', fontFamily: 'inherit' }}>إرسال رسالة أخرى</button>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>

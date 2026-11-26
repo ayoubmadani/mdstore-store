@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -52,6 +52,8 @@ const CSS = `
     --panel:   #1A1A1A;
     --panel-2: #222222;
     --fire:    #FF4500;
+    --fire-b:  #D63A00;
+    --dim-t:   #868686;
     --fire-2:  #E03800;
     --gold:    #FFB800;
     --gold-2:  #E6A000;
@@ -123,7 +125,7 @@ const CSS = `
   /* Buttons */
   .btn-fire {
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    background: var(--fire); color: white;
+    background: var(--fire-b); color: white;
     font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 800;
     letter-spacing: 0.08em; text-transform: uppercase;
     padding: 13px 32px; border: none; cursor: pointer;
@@ -152,7 +154,7 @@ const CSS = `
     outline: none; transition: border-color 0.2s, box-shadow 0.2s;
   }
   .inp:focus { border-color: var(--fire); box-shadow: 0 0 0 3px rgba(255,69,0,0.15); }
-  .inp::placeholder { color: var(--dim); }
+  .inp::placeholder { color: var(--dim-t); }
   .inp-err { border-color: #ef4444 !important; }
   select.inp { appearance: none; cursor: pointer; }
 
@@ -816,7 +818,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
     
     {/* زر إغلاق القائمة */}
     <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '10px 14px 2px' }}>
-      <button 
+      <button aria-label={a11y(store).close} 
         onClick={() => setSq('')}
         style={{ 
           background: 'rgba(255, 69, 0, 0.1)', 
@@ -925,7 +927,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             </div>
 
             {/* Mobile Search Button */}
-            <button onClick={()=>setShowSearch(!showSearch)} className="lg:hidden" style={{background:'none', border:'none', color:'var(--mid)', cursor:'pointer'}}>
+            <button aria-label={a11y(store).search} onClick={()=>setShowSearch(!showSearch)} className="lg:hidden" style={{background:'none', border:'none', color:'var(--mid)', cursor:'pointer'}}>
               <Search size={20}/>
             </button>
 
@@ -937,7 +939,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 <ShoppingCart size={22}/>
                 {count > 0 && (
                   <span style={{
-                    position:'absolute', top:-6, right:-8, background:'var(--fire)', color:'white', 
+                    position:'absolute', top:-6, right:-8, background:'var(--fire-b)', color:'white', 
                     fontSize:'10px', fontWeight:800, width:'17px', height:'17px', 
                     borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center',
                     border:'2px solid var(--black)'
@@ -947,7 +949,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             )}
 
             {/* Menu Toggle */}
-            <button  onClick={()=>setOpen(!open)} className='lg:hidden' style={{background:'var(--fire)', border:'none', color:'white', padding:'6px', borderRadius:'4px', cursor:'pointer'}}>
+            <button aria-label={a11y(store).menu}  onClick={()=>setOpen(!open)} className='lg:hidden' style={{background:'var(--fire-b)', border:'none', color:'white', padding:'6px', borderRadius:'4px', cursor:'pointer'}}>
               {open ? <X size={20}/> : <Menu size={20}/>}
             </button>
           </div>
@@ -1026,7 +1028,7 @@ export function Footer({ store }: any) {
               <Truck style={{width:'14px',height:'14px',color:'var(--fire)'}}/>
               <span style={{fontSize:'12px',fontWeight:600,color:'var(--gold)'}}>{t.footerDelivery}</span>
             </div>
-            <p style={{fontSize:'11px',color:'var(--dim)',marginTop:'24px'}}>© {new Date().getFullYear()} {store?.name}. {t.rightsReserved}</p>
+            <p style={{fontSize:'11px',color:'var(--dim-t)',marginTop:'24px'}}>© {new Date().getFullYear()} {store?.name}. {t.rightsReserved}</p>
           </div>
 
           {/* قسم 2 — الروابط */}
@@ -1069,7 +1071,7 @@ export function Footer({ store }: any) {
             ))}
             <div style={{marginTop:'14px',padding:'12px 14px',border:'1px solid var(--fire)',background:'rgba(255,69,0,0.07)'}}>
               <p className="bb" style={{fontSize:'1rem',color:'var(--gold)',marginBottom:2}}>{t.footerAvailable}</p>
-              <p style={{fontSize:'11px',color:'var(--dim)'}}>{t.footerReply}</p>
+              <p style={{fontSize:'11px',color:'var(--dim-t)'}}>{t.footerReply}</p>
             </div>
           </div>
 
@@ -1092,9 +1094,9 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         {displayImage
           ? <img src={displayImage} alt={product.name}/>
           : <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}}>
-              <Dumbbell style={{width:'40px',height:'40px',color:'var(--dim)'}}/>
+              <Dumbbell style={{width:'40px',height:'40px',color:'var(--dim-t)'}}/>
             </div>}
-        {discount > 0 && <span className="bc" style={{position:'absolute',top:10,right:10,backgroundColor:'var(--fire)',color:'white',fontSize:'10px',fontWeight:900,padding:'3px 10px',letterSpacing:'0.06em',clipPath:'polygon(0 0,100% 0,94% 100%,0 100%)'}}>-{discount}%</span>}
+        {discount > 0 && <span className="bc" style={{position:'absolute',top:10,right:10,backgroundColor:'var(--fire-b)',color:'white',fontSize:'10px',fontWeight:900,padding:'3px 10px',letterSpacing:'0.06em',clipPath:'polygon(0 0,100% 0,94% 100%,0 100%)'}}>-{discount}%</span>}
         {product?.isDigital ? (
           <span className="bc" style={{position:'absolute',top:10,left:10,backgroundColor:'var(--gold)',color:'var(--black)',fontSize:'10px',fontWeight:900,padding:'3px 9px',display:'flex',alignItems:'center'}}><Download size={12}/></span>
         ) : product?.shippingFree && <span className="bc" style={{position:'absolute',top:10,left:10,backgroundColor:'var(--gold)',color:'var(--black)',fontSize:'10px',fontWeight:900,padding:'3px 9px'}}>🚚</span>}
@@ -1110,7 +1112,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
         <div style={{display:'flex',alignItems:'baseline',gap:'6px',marginTop:'auto'}}>
           <span className="bb" style={{fontSize:'1.4rem',color:'var(--fire)'}}>{price.toLocaleString()}</span>
           <span style={{fontSize:'11px',color:'var(--mid)'}}>{store?.currency || 'DZD'}</span>
-          {orig>price && <span style={{fontSize:'11px',color:'var(--dim)',textDecoration:'line-through'}}>{orig.toLocaleString()}</span>}
+          {orig>price && <span style={{fontSize:'11px',color:'var(--dim-t)',textDecoration:'line-through'}}>{orig.toLocaleString()}</span>}
         </div>
         <Link href={`/product/${product.slug||product.id}`} className="btn-fire" style={{width:'100%',fontSize:'13px',padding:'10px 14px',clipPath:'none',marginTop:'4px'}}>
           {viewDetails||cardT.shopNow}
@@ -1445,7 +1447,7 @@ export function Home({ store, page }: any) {
                 <div style={{color:item.color,flexShrink:0}}>{item.icon}</div>
                 <div style={{textAlign:'right'}}>
                   <p className="bc" style={{fontSize:'13px',fontWeight:700,color:item.color,margin:0,letterSpacing:'0.06em',textTransform:'uppercase'}}>{item.title}</p>
-                  <p style={{fontSize:'11px',color:'var(--dim)',margin:0}}>{item.desc}</p>
+                  <p style={{fontSize:'11px',color:'var(--dim-t)',margin:0}}>{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -1502,13 +1504,13 @@ export function Home({ store, page }: any) {
                 {t.prodHead1} <span style={{color:'var(--fire)'}}>{t.prodHead2}</span>
               </h2>
             </div>
-            <p className="bc" style={{fontSize:'13px',fontWeight:600,color:'var(--dim)',letterSpacing:'0.1em',textTransform:'uppercase'}}>{products.length} {t.prodCountSuffix}</p>
+            <p className="bc" style={{fontSize:'13px',fontWeight:600,color:'var(--dim-t)',letterSpacing:'0.1em',textTransform:'uppercase'}}>{products.length} {t.prodCountSuffix}</p>
           </div>
 
           {products.length === 0 ? (
             <div style={{padding:'80px 0',textAlign:'center',border:'1px dashed var(--dim)'}}>
-              <Dumbbell style={{width:'48px',height:'48px',color:'var(--dim)',margin:'0 auto 16px',opacity:0.4,display:'block'}}/>
-              <p className="bb" style={{fontSize:'1.8rem',color:'var(--dim)'}}>{t.noProds}</p>
+              <Dumbbell style={{width:'48px',height:'48px',color:'var(--dim-t)',margin:'0 auto 16px',opacity:0.4,display:'block'}}/>
+              <p className="bb" style={{fontSize:'1.8rem',color:'var(--dim-t)'}}>{t.noProds}</p>
             </div>
           ) : (
             <div className="prod-grid">
@@ -1599,11 +1601,11 @@ export function Details({ product, store: storeprop, toggleWishlist, isWishliste
                 {allImages.length > 0
                   ? <img src={allImages[sel]} alt={product.name} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
                   : <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}}>
-                      <Dumbbell style={{width:'64px',height:'64px',color:'var(--dim)',opacity:0.3}}/>
+                      <Dumbbell style={{width:'64px',height:'64px',color:'var(--dim-t)',opacity:0.3}}/>
                     </div>}
               </div>
               <div style={{position:'absolute',top:0,left:0,right:0,height:'3px',background:'linear-gradient(90deg,var(--fire),var(--gold))'}}/>
-              {discount > 0 && <div className="bc" style={{position:'absolute',top:14,right:14,backgroundColor:'var(--fire)',color:'white',fontSize:'12px',fontWeight:900,padding:'4px 14px',letterSpacing:'0.06em',clipPath:'polygon(0 0,100% 0,94% 100%,0 100%)'}}>-{discount}%</div>}
+              {discount > 0 && <div className="bc" style={{position:'absolute',top:14,right:14,backgroundColor:'var(--fire-b)',color:'white',fontSize:'12px',fontWeight:900,padding:'4px 14px',letterSpacing:'0.06em',clipPath:'polygon(0 0,100% 0,94% 100%,0 100%)'}}>-{discount}%</div>}
               {!inStock && !autoGen && (
                 <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',backgroundColor:'rgba(10,10,10,0.85)',backdropFilter:'blur(4px)'}}>
                   <span className="bb" style={{fontSize:'2rem',color:'var(--fire)'}}>غير متوفر</span>
@@ -1611,10 +1613,10 @@ export function Details({ product, store: storeprop, toggleWishlist, isWishliste
               )}
               {allImages.length > 1 && (
                 <>
-                  <button onClick={()=>showImage(p=>p===0?allImages.length-1:p-1)} style={{position:'absolute',right:10,top:'50%',transform:'translateY(-50%)',width:'34px',height:'34px',border:'1px solid var(--dim)',backgroundColor:'rgba(10,10,10,0.8)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--fire)'}}>
+                  <button aria-label={a11y(storeprop).prev} onClick={()=>showImage(p=>p===0?allImages.length-1:p-1)} style={{position:'absolute',right:10,top:'50%',transform:'translateY(-50%)',width:'34px',height:'34px',border:'1px solid var(--dim)',backgroundColor:'rgba(10,10,10,0.8)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--fire)'}}>
                     <ChevronRight style={{width:'14px',height:'14px'}}/>
                   </button>
-                  <button onClick={()=>showImage(p=>p===allImages.length-1?0:p+1)} style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',width:'34px',height:'34px',border:'1px solid var(--dim)',backgroundColor:'rgba(10,10,10,0.8)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--fire)'}}>
+                  <button aria-label={a11y(storeprop).next} onClick={()=>showImage(p=>p===allImages.length-1?0:p+1)} style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',width:'34px',height:'34px',border:'1px solid var(--dim)',backgroundColor:'rgba(10,10,10,0.8)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--fire)'}}>
                     <ChevronLeft style={{width:'14px',height:'14px'}}/>
                   </button>
                 </>
@@ -1623,7 +1625,7 @@ export function Details({ product, store: storeprop, toggleWishlist, isWishliste
             {allImages.length > 1 && (
               <div className="thumb-row">
                 {allImages.slice(0,5).map((img:string,idx:number)=>(
-                  <button key={idx} onClick={()=>showImage(idx)} style={{width:'54px',height:'54px',overflow:'hidden',border:`2px solid ${sel===idx?'var(--fire)':'var(--line)'}`,cursor:'pointer',padding:0,background:'none',opacity:sel===idx?1:0.55}}>
+                  <button aria-label={`${a11y(storeprop).image} ${idx + 1}`} key={idx} onClick={()=>showImage(idx)} style={{width:'54px',height:'54px',overflow:'hidden',border:`2px solid ${sel===idx?'var(--fire)':'var(--line)'}`,cursor:'pointer',padding:0,background:'none',opacity:sel===idx?1:0.55}}>
                     <img src={img} alt="" style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
                   </button>
                 ))}
@@ -1651,7 +1653,7 @@ export function Details({ product, store: storeprop, toggleWishlist, isWishliste
                 <span className="bb" style={{fontSize:'3rem',color:'var(--fire)',lineHeight:1}}>{finalPrice.toLocaleString()}</span>
                 <span className="bc" style={{fontSize:'14px',color:'var(--mid)',fontWeight:600}}>{storeprop?.currency || 'DZD'}</span>
                 {product.priceOriginal && parseFloat(product.priceOriginal) > finalPrice && (
-                  <span style={{fontSize:'14px',textDecoration:'line-through',color:'var(--dim)'}}>{parseFloat(product.priceOriginal).toLocaleString()}</span>
+                  <span style={{fontSize:'14px',textDecoration:'line-through',color:'var(--dim-t)'}}>{parseFloat(product.priceOriginal).toLocaleString()}</span>
                 )}
               </div>
             </div>
@@ -1676,7 +1678,7 @@ export function Details({ product, store: storeprop, toggleWishlist, isWishliste
                       <input type="radio" name="offer" checked={selectedOffer===o.id} onChange={()=>setSelectedOffer(o.id)} style={{display:'none'}}/>
                       <div>
                         <p className="bc" style={{fontSize:'14px',fontWeight:700,color:'var(--white)',margin:0,letterSpacing:'0.04em',textTransform:'uppercase'}}>{o.name}</p>
-                        <p style={{fontSize:'11px',color:'var(--dim)',margin:0}}>{t.offerQtyLabel} {o.quantity}{o.subTitle ? ` · ${o.subTitle}` : ''}</p>
+                        <p style={{fontSize:'11px',color:'var(--dim-t)',margin:0}}>{t.offerQtyLabel} {o.quantity}{o.subTitle ? ` · ${o.subTitle}` : ''}</p>
                         {o.shippingFree && (
                           <p style={{display:'flex',alignItems:'center',gap:4,fontSize:'11px',color:'var(--fire)',fontWeight:700,margin:'3px 0 0'}}>
                             <Truck style={{width:'11px',height:'11px'}}/> {t.freeShippingBadge}
@@ -1684,7 +1686,7 @@ export function Details({ product, store: storeprop, toggleWishlist, isWishliste
                         )}
                       </div>
                     </div>
-                    <span className="bb" style={{fontSize:'1.3rem',color:'var(--fire)'}}>{o.price.toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'11px',color:'var(--dim)'}}>{storeprop?.currency || 'DZD'}</span></span>
+                    <span className="bb" style={{fontSize:'1.3rem',color:'var(--fire)'}}>{o.price.toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'11px',color:'var(--dim-t)'}}>{storeprop?.currency || 'DZD'}</span></span>
                   </label>
                 ))}
               </div>
@@ -1890,7 +1892,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
                 <div className="form-2c">
                   <FR error={errors.customerWelaya} label={t.wilaya}>
                     <div style={{position:'relative'}}>
-                      <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
+                      <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim-t)',pointerEvents:'none'}}/>
                       <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})}
                         className={`inp${errors.customerWelaya?' inp-err':''}`} style={isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}}
                         onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerWelaya?'#ef4444':'var(--dim)';}}>
@@ -1900,7 +1902,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
                   </FR>
                   <FR error={errors.customerCommune} label={t.commune}>
                     <div style={{position:'relative'}}>
-                      <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
+                      <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim-t)',pointerEvents:'none'}}/>
                       <select value={fd.customerCommune} disabled={!fd.customerWelaya||loadingC} onChange={e=>setFd({...fd,customerCommune:e.target.value})}
                         className={`inp${errors.customerCommune?' inp-err':''}`} style={{...(isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}),opacity:!fd.customerWelaya?0.4:1}}
                         onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.customerCommune?'#ef4444':'var(--dim)';}}>
@@ -1916,7 +1918,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
                       <button data-delivery-option key={dtype} type="button" onClick={()=>setFd(p=>({...p,typeLivraison:dtype}))}
                         style={{padding:'12px 10px',border:`1.5px solid ${fd.typeLivraison===dtype?'var(--fire)':'var(--dim)'}`,backgroundColor:fd.typeLivraison===dtype?'rgba(255,69,0,0.1)':'transparent',cursor:'pointer',textAlign:'start',transition:'all 0.2s',fontFamily:'inherit'}}>
                         <p className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:fd.typeLivraison===dtype?'var(--fire)':'var(--mid)',margin:'0 0 4px'}}>{dtype==='home'?t.homeDelivLabel:t.officeDelivLabel}</p>
-                        {selW && (orderFreeShipping ? <p className="bb" style={{fontSize:'0.85rem',color:fd.typeLivraison===dtype?'var(--fire)':'var(--dim)',margin:0}}>{t.freeShippingBadge}</p> : <p className="bb" style={{fontSize:'1rem',color:fd.typeLivraison===dtype?'var(--fire)':'var(--dim)',margin:0}}>{(dtype==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'11px',color:'var(--dim)'}}>{storeprop?.currency || 'DZD'}</span></p>)}
+                        {selW && (orderFreeShipping ? <p className="bb" style={{fontSize:'0.85rem',color:fd.typeLivraison===dtype?'var(--fire)':'var(--dim)',margin:0}}>{t.freeShippingBadge}</p> : <p className="bb" style={{fontSize:'1rem',color:fd.typeLivraison===dtype?'var(--fire)':'var(--dim)',margin:0}}>{(dtype==='home'?selW.livraisonHome:selW.livraisonOfice).toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'11px',color:'var(--dim-t)'}}>{storeprop?.currency || 'DZD'}</span></p>)}
                       </button>
                     ))}
                   </div>
@@ -1942,13 +1944,13 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
               </div>
               {[{l:t.productLabel,v:product.name.slice(0,22)+(product.name.length>22?'...':'')},{l:t.price,v:`${fp.toLocaleString()} ${storeprop?.currency||'DZD'}`},{l:t.qty,v:`× ${qty}`},...(product.isDigital?[]:[{l:t.delivery,v:!selW?'—':orderFreeShipping?t.freeShippingBadge:`${getLiv().toLocaleString()} ${storeprop?.currency||'DZD'}`}])].map(row=>(
                 <div key={row.l} style={{display:'flex',justifyContent:'space-between',padding:'7px 14px',borderBottom:'1px solid var(--line)'}}>
-                  <span className="bc" style={{fontSize:'12px',color:'var(--dim)',letterSpacing:'0.06em',textTransform:'uppercase'}}>{row.l}</span>
+                  <span className="bc" style={{fontSize:'12px',color:'var(--dim-t)',letterSpacing:'0.06em',textTransform:'uppercase'}}>{row.l}</span>
                   <span style={{fontSize:'13px',fontWeight:600,color:'var(--mid)'}}>{row.v}</span>
                 </div>
               ))}
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',padding:'12px 14px'}}>
                 <span className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--mid)'}}>{t.total}</span>
-                <span className="bb" style={{fontSize:'1.8rem',color:'var(--fire)'}}>{total().toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'12px',color:'var(--dim)'}}>{storeprop?.currency||'DZD'}</span></span>
+                <span className="bb" style={{fontSize:'1.8rem',color:'var(--fire)'}}>{total().toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'12px',color:'var(--dim-t)'}}>{storeprop?.currency||'DZD'}</span></span>
               </div>
             </div>
 
@@ -1957,7 +1959,7 @@ export function ProductForm({ product, store: storeprop, userId, domain, selecte
             </button>
             <div style={{display:'flex',justifyContent:'center',gap:'16px'}}>
               {[{icon:<Lock style={{width:'11px',height:'11px'}}/>,label:t.secureLabel},{icon:<Truck style={{width:'11px',height:'11px'}}/>,label:t.fastDelivLabel},{icon:<Shield style={{width:'11px',height:'11px'}}/>,label:t.originalLabel}].map((b,i)=>(
-                <div key={i} className="bc" style={{display:'flex',alignItems:'center',gap:'4px',fontSize:'11px',color:'var(--dim)',fontWeight:600,letterSpacing:'0.06em'}}>
+                <div key={i} className="bc" style={{display:'flex',alignItems:'center',gap:'4px',fontSize:'11px',color:'var(--dim-t)',fontWeight:600,letterSpacing:'0.06em'}}>
                   <span style={{color:'var(--fire)'}}>{b.icon}</span> {b.label}
                 </div>
               ))}
@@ -2034,8 +2036,8 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
   if(!items.length) return (
     <div dir={isRTL ? 'rtl' : 'ltr'} style={{minHeight:'60vh',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem',background:'var(--black)'}}>
       <div style={{textAlign:'center',padding:'4rem 2rem',border:'1px dashed var(--dim)',maxWidth:400,width:'100%'}}>
-        <Dumbbell style={{width:'48px',height:'48px',color:'var(--dim)',display:'block',margin:'0 auto 1.25rem',opacity:0.4}}/>
-        <p className="bb" style={{fontSize:'2rem',color:'var(--dim)',marginBottom:'1.75rem'}}>{t.cartEmpty}</p>
+        <Dumbbell style={{width:'48px',height:'48px',color:'var(--dim-t)',display:'block',margin:'0 auto 1.25rem',opacity:0.4}}/>
+        <p className="bb" style={{fontSize:'2rem',color:'var(--dim-t)',marginBottom:'1.75rem'}}>{t.cartEmpty}</p>
         <Link href="/" className="btn-fire" style={{display:'inline-flex',clipPath:'none',padding:'13px 28px'}}>{t.shopNow}</Link>
       </div>
     </div>
@@ -2046,7 +2048,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
       <div style={{maxWidth:1280,margin:'0 auto'}}>
         <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',marginBottom:'2rem',paddingBottom:'1rem',borderBottom:'2px solid var(--fire)'}}>
           <h1 className="bb" style={{fontSize:'clamp(2rem,5vw,3rem)',color:'var(--white)'}}>{t.myCart}</h1>
-          <p className="bc" style={{fontSize:'13px',color:'var(--dim)',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase'}}>{items.length} {t.cartItemsCount}</p>
+          <p className="bc" style={{fontSize:'13px',color:'var(--dim-t)',fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase'}}>{items.length} {t.cartItemsCount}</p>
         </div>
 
         {freeShippingMin != null && (
@@ -2077,7 +2079,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   </div>
                   <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:'8px'}}>
                     <span className="bb" style={{fontSize:'1rem',color:'var(--mid)'}}>× {item.quantity}</span>
-                    <button onClick={()=>update(items.filter((_,idx)=>idx!==i))} className="bc" style={{display:'flex',alignItems:'center',gap:4,padding:'4px 8px',border:'none',background:'transparent',color:'var(--dim)',fontSize:'11px',fontWeight:700,cursor:'pointer',letterSpacing:'0.1em',textTransform:'uppercase',transition:'color 0.15s',fontFamily:'inherit'}}
+                    <button onClick={()=>update(items.filter((_,idx)=>idx!==i))} className="bc" style={{display:'flex',alignItems:'center',gap:4,padding:'4px 8px',border:'none',background:'transparent',color:'var(--dim-t)',fontSize:'11px',fontWeight:700,cursor:'pointer',letterSpacing:'0.1em',textTransform:'uppercase',transition:'color 0.15s',fontFamily:'inherit'}}
                       onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.color='var(--fire)';}}
                       onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.color='var(--dim)';}}>
                       <Trash2 size={12}/> {t.deleteLabel}
@@ -2109,7 +2111,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               <div className="form-2c">
                 <FR error={errors.w} label={t.wilaya}>
                   <div style={{position:'relative'}}>
-                    <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
+                    <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim-t)',pointerEvents:'none'}}/>
                     <select value={fd.customerWelaya} disabled={wilayas.length === 1} onChange={e=>setFd({...fd,customerWelaya:e.target.value,customerCommune:''})} className={`inp${errors.w?' inp-err':''}`} style={isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}}
                       onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.w?'#ef4444':'var(--dim)';}}>
                       <option value="">{t.wilayaPh}</option>{wilayas.map(w=><option key={w.id} value={w.id}>{w.code ?? w.id} - {isRTL?w.ar_name:w.name}</option>)}
@@ -2118,7 +2120,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                 </FR>
                 <FR error={errors.c} label={t.commune}>
                   <div style={{position:'relative'}}>
-                    <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim)',pointerEvents:'none'}}/>
+                    <ChevronDown style={{position:'absolute',...(isRTL?{left:'11px'}:{right:'11px'}),top:'50%',transform:'translateY(-50%)',width:'13px',height:'13px',color:'var(--dim-t)',pointerEvents:'none'}}/>
                     <select value={fd.customerCommune} disabled={loadingC||!fd.customerWelaya} onChange={e=>setFd({...fd,customerCommune:e.target.value})} className={`inp${errors.c?' inp-err':''}`} style={{...(isRTL?{paddingLeft:'32px'}:{paddingRight:'32px'}),opacity:!fd.customerWelaya?0.4:1}}
                       onFocus={e=>{e.target.style.borderColor='var(--fire)';}} onBlur={e=>{e.target.style.borderColor=errors.c?'#ef4444':'var(--dim)';}}>
                       <option value="">{loadingC?t.communeLoading:t.communePh}</option>{communes.map(c=><option key={c.id} value={c.id}>{isRTL?c.ar_name:c.name}</option>)}
@@ -2158,13 +2160,13 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
               <div style={{border:'1px solid var(--line)',borderInlineStart:'3px solid var(--fire)',marginBottom:'14px',overflow:'hidden',background:'var(--panel-2)'}}>
                 {[{l:t.subtotal,v:`${cartTotal.toLocaleString()} ${store?.currency||'DZD'}`},{l:t.delivery,v:!selW?'—':freeShippingReached?t.freeShippingBadge:`${getLiv().toLocaleString()} ${store?.currency||'DZD'}`}].map(row=>(
                   <div key={row.l} style={{display:'flex',justifyContent:'space-between',padding:'7px 14px',borderBottom:'1px solid var(--line)'}}>
-                    <span className="bc" style={{fontSize:'12px',color:'var(--dim)',letterSpacing:'0.06em',textTransform:'uppercase'}}>{row.l}</span>
+                    <span className="bc" style={{fontSize:'12px',color:'var(--dim-t)',letterSpacing:'0.06em',textTransform:'uppercase'}}>{row.l}</span>
                     <span style={{fontSize:'13px',fontWeight:600,color:'var(--mid)'}}>{row.v}</span>
                   </div>
                 ))}
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',padding:'12px 14px'}}>
                   <span className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.14em',textTransform:'uppercase',color:'var(--mid)'}}>{t.total}</span>
-                  <span className="bb" style={{fontSize:'1.8rem',color:'var(--fire)'}}>{finalTotal.toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'12px',color:'var(--dim)'}}>{store?.currency||'DZD'}</span></span>
+                  <span className="bb" style={{fontSize:'1.8rem',color:'var(--fire)'}}>{finalTotal.toLocaleString()} <span style={{fontFamily:"'Barlow',sans-serif",fontWeight:400,fontSize:'12px',color:'var(--dim-t)'}}>{store?.currency||'DZD'}</span></span>
                 </div>
               </div>
 
@@ -2204,7 +2206,7 @@ export function Success({ store, order }: { store: any; domain: string; order: a
 
         {order && (order.productName || order.total != null) && (
           <div style={{background:'var(--panel)',border:'1px solid var(--line)',borderTop:'2px solid var(--fire)',padding:'18px 20px',marginBottom:'1.5rem'}}>
-            <p className="bc" style={{fontSize:11,fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--dim)',marginBottom:10}}>{t.orderInfo}</p>
+            <p className="bc" style={{fontSize:11,fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--dim-t)',marginBottom:10}}>{t.orderInfo}</p>
             {order.productName && (
               <div style={{display:'flex',justifyContent:'space-between',gap:12,padding:'6px 0',borderBottom:'1px solid var(--line)'}}>
                 <span className="bc" style={{color:'var(--mid)',fontSize:13,flexShrink:0}}>{t.productLabel}</span>

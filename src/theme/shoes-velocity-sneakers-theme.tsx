@@ -534,7 +534,7 @@ const THEME_CSS = `
 .vx-cshade { position:absolute; inset:0; background: linear-gradient(180deg, rgba(11,13,16,0) 34%, rgba(11,13,16,.82) 74%, rgba(11,13,16,.96) 100%); }
 .vx-cinfo { position:absolute; inset-inline:0; bottom:0; padding: 14px 15px 15px; }
 .vx-cname { font-size:.92rem; font-weight:600; line-height:1.45; margin:0 0 7px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-.vx-ctag { position:absolute; top:12px; inset-inline-start:12px; background:${A2}; color:#fff; font-size:.7rem; font-weight:800; padding: 6px 11px; border-radius:8px; transform: rotate(-4deg); z-index:2; }
+.vx-ctag { position:absolute; top:12px; inset-inline-start:12px; background:#CF3C28; color:#fff; font-size:.7rem; font-weight:800; padding: 6px 11px; border-radius:8px; transform: rotate(-4deg); z-index:2; }
 .vx-cadd { position:absolute; top:12px; inset-inline-end:12px; width:38px; height:38px; border-radius:999px; background:${A}; color:#0B0D10; display:grid; place-items:center; z-index:2; opacity:0; transform: scale(.7); transition: opacity .25s, transform .25s cubic-bezier(.22,.68,0,1.4); }
 .vx-card:hover .vx-cadd { opacity:1; transform: scale(1); }
 .vx-cfree { position:absolute; top:58px; inset-inline-end:12px; background:${A}; color:#0B0D10; font-size:.7rem; font-weight:800; padding: 6px 9px; border-radius:8px; z-index:2; display:grid; place-items:center; }

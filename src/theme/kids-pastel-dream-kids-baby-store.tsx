@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -673,7 +673,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             boxShadow: '0 16px 48px rgba(196,181,253,0.25)',
             zIndex: 200
         }}>
-            <button
+            <button aria-label={a11y(store).clear}
                 className='absolute cursor-pointer hover:text-red-400 top-3 left-3'
                 onClick={() => setSearchQuery('')}
             >
@@ -785,7 +785,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
                 {/* Mobile */}
                 <div className="nav-mobile-btns">
-                    <button onClick={() => setShowSearch(!showSearch)} style={{ width: 40, height: 40, borderRadius: 12, border: '2px solid var(--lavender-lt)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--lavender-dk)' }}><Search size={17} /></button>
+                    <button aria-label={a11y(store).search} onClick={() => setShowSearch(!showSearch)} style={{ width: 40, height: 40, borderRadius: 12, border: '2px solid var(--lavender-lt)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--lavender-dk)' }}><Search size={17} /></button>
 
                     {store?.cart !== false && (
                         <Link href="/cart" style={{ position: 'relative', width: 40, height: 40, borderRadius: 12, border: '2px solid var(--lavender-lt)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--lavender-dk)' }}>
@@ -794,7 +794,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                         </Link>
                     )}
 
-                    <button onClick={() => setOpen(!open)} style={{ width: 40, height: 40, borderRadius: 12, border: '2px solid var(--lavender-lt)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--lavender-dk)' }}>
+                    <button aria-label={a11y(store).menu} onClick={() => setOpen(!open)} style={{ width: 40, height: 40, borderRadius: 12, border: '2px solid var(--lavender-lt)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--lavender-dk)' }}>
                         {open ? <X size={17} /> : <Menu size={17} />}
                     </button>
                 </div>
@@ -951,7 +951,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
                         🚚
                     </div>
                 )}
-                <button style={{ position: 'absolute', top: 10, left: 10, width: 34, height: 34, borderRadius: '50%', background: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--rose)' }}>
+                <button aria-label={a11y(store).favorite} style={{ position: 'absolute', top: 10, left: 10, width: 34, height: 34, borderRadius: '50%', background: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--rose)' }}>
                     <Heart size={14} />
                 </button>
             </div>
@@ -1418,15 +1418,15 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                             {discount > 0 && <div style={{ position: 'absolute', top: 14, right: 14, background: 'var(--lavender-dk)', color: '#fff', padding: '4px 14px', borderRadius: 50, fontSize: 12, fontWeight: 700 }}>-{discount}%</div>}
                             {allImages.length > 1 && (
                                 <>
-                                    <button onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={18} /></button>
-                                    <button onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={18} /></button>
+                                    <button aria-label={a11y(store).prev} onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={18} /></button>
+                                    <button aria-label={a11y(store).next} onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 12, background: 'rgba(255,255,255,0.9)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={18} /></button>
                                 </>
                             )}
                         </div>
                         {allImages.length > 1 && (
                             <div className="thumb-row">
                                 {allImages.map((img: string, idx: number) => (
-                                    <button key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 62, height: 62, borderRadius: 14, overflow: 'hidden', border: `2px solid ${sel === idx ? 'var(--lavender-dk)' : 'var(--border)'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.2s' }}>
+                                    <button aria-label={`${a11y(store).image} ${idx + 1}`} key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 62, height: 62, borderRadius: 14, overflow: 'hidden', border: `2px solid ${sel === idx ? 'var(--lavender-dk)' : 'var(--border)'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.2s' }}>
                                         <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     </button>
                                 ))}
@@ -1766,9 +1766,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                             <div style={{ marginBottom: '0.875rem' }}>
                                 <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-mid)', marginBottom: '0.5rem' }}>{t.qty}</p>
                                 <div style={{ display: 'inline-flex', alignItems: 'center', border: '2px solid var(--lavender-lt)', borderRadius: 50, overflow: 'hidden', background: '#fff' }}>
-                                    <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--lavender-dk)' }}><Minus size={14} /></button>
+                                    <button aria-label={a11y(store).decrease} type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--lavender-dk)' }}><Minus size={14} /></button>
                                     <span style={{ width: 44, textAlign: 'center', fontFamily: "'Cormorant Garamond', serif", fontSize: '1.25rem', fontWeight: 700 }}>{fd.quantity}</span>
-                                    <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--lavender-dk)' }}><Plus size={14} /></button>
+                                    <button aria-label={a11y(store).increase} type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--lavender-dk)' }}><Plus size={14} /></button>
                                 </div>
                             </div>
                         )}
@@ -1911,7 +1911,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                                     <p className="font-serif" style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--lavender-dk)' }}>{item.finalPrice?.toLocaleString()} {store?.currency || 'DZD'}</p>
                                     <p style={{ fontSize: '0.75rem', color: 'var(--text-soft)', fontWeight: 600, marginTop: '0.2rem' }}>{t.qty}: {item.quantity}</p>
                                 </div>
-                                <button onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ background: 'none', border: 'none', color: 'var(--border)', cursor: 'pointer', alignSelf: 'center', display: 'flex', padding: '0.375rem', borderRadius: 8, transition: 'color 0.2s' }}
+                                <button aria-label={a11y(store).remove} onClick={() => update(items.filter((_, idx) => idx !== i))} style={{ background: 'none', border: 'none', color: 'var(--border)', cursor: 'pointer', alignSelf: 'center', display: 'flex', padding: '0.375rem', borderRadius: 8, transition: 'color 0.2s' }}
                                     onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = 'var(--rose)')}
                                     onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = 'var(--border)')}>
                                     <Trash2 size={16} />

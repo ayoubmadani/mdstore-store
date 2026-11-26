@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 import { ProductAddons, addonsTotal } from '@/components/theme/ProductAddons';
 
 
@@ -485,7 +485,7 @@ html, body { margin: 0; padding: 0; background: ${BG}; color: ${TXT}; font-famil
 .luxe-card-price-row { display: flex; align-items: center; gap: 10px; }
 .luxe-card-price { color: ${A}; font-weight: 800; font-size: 1.1rem; }
 .luxe-card-original { color: rgba(255,255,255,0.5); text-decoration: line-through; font-size: 0.85rem; }
-.luxe-card-discount { background: ${A}; color: ${BG}; font-size: 0.65rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; }
+.luxe-card-discount { background: ${A}; color: #1a1a1a; font-size: 0.65rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; }
 .luxe-card-stars { display: flex; gap: 2px; margin-bottom: 0.5rem; }
 
 /* Pagination */
@@ -799,7 +799,7 @@ export function Navbar({ store, domain }: any) {
           <div className="luxe-mobile-nav-panel">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <span className="luxe-nav-logo">{store?.name || 'Luxe'}</span>
-              <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: TXT, cursor: 'pointer' }}>
+              <button aria-label={a11y(store).close} onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: TXT, cursor: 'pointer' }}>
                 <X size={24} />
               </button>
             </div>
@@ -819,7 +819,7 @@ export function Navbar({ store, domain }: any) {
           <div className="luxe-search-header">
             <Search size={20} color={SUB} />
             <input autoFocus value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder={t.search} />
-            <button onClick={() => { setShowSearch(false); setSearchQuery(''); setListSearch([]); }} style={{ background: 'none', border: 'none', color: TXT, cursor: 'pointer' }}>
+            <button aria-label={a11y(store).close} onClick={() => { setShowSearch(false); setSearchQuery(''); setListSearch([]); }} style={{ background: 'none', border: 'none', color: TXT, cursor: 'pointer' }}>
               <X size={22} />
             </button>
           </div>
@@ -877,9 +877,9 @@ export function Footer({ store }: any) {
           <div>
             <p style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '1rem' }}>{t.legalNav}</p>
             {[{ h: '/Privacy', l: t.privacy }, { h: '/Terms', l: t.terms }, { h: '/cookies', l: t.cookies }].map((lnk, i) => (
-              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', opacity: 0.6, transition: 'opacity 0.15s' }}
+              <Link key={i} href={lnk.h} style={{ display: 'block', fontSize: '0.875rem', color: 'inherit', marginBottom: '0.5rem', opacity: 0.72, transition: 'opacity 0.15s' }}
               onMouseEnter={e => ((e.currentTarget as HTMLElement).style.opacity = '1')}
-              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.6')}>
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.opacity = '0.72')}>
               {lnk.l}
             </Link>
             ))}
@@ -1317,8 +1317,8 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             )}
             {imgs.length > 1 && (
               <>
-                <button className="luxe-gallery-nav luxe-gallery-prev" onClick={() => showImage(s => (s - 1 + imgs.length) % imgs.length)}><ArrowRight size={20} style={{ transform: t.dir === 'rtl' ? 'none' : 'rotate(180deg)' }} /></button>
-                <button className="luxe-gallery-nav luxe-gallery-next" onClick={() => showImage(s => (s + 1) % imgs.length)}><ArrowRight size={20} style={{ transform: t.dir === 'rtl' ? 'rotate(180deg)' : 'none' }} /></button>
+                <button aria-label={a11y(storeprop).prev} className="luxe-gallery-nav luxe-gallery-prev" onClick={() => showImage(s => (s - 1 + imgs.length) % imgs.length)}><ArrowRight size={20} style={{ transform: t.dir === 'rtl' ? 'none' : 'rotate(180deg)' }} /></button>
+                <button aria-label={a11y(storeprop).next} className="luxe-gallery-nav luxe-gallery-next" onClick={() => showImage(s => (s + 1) % imgs.length)}><ArrowRight size={20} style={{ transform: t.dir === 'rtl' ? 'rotate(180deg)' : 'none' }} /></button>
               </>
             )}
           </div>
@@ -1639,9 +1639,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
 
           {supportQty && !product.isDigital && (
             <div className="luxe-qty-row">
-              <button className="luxe-qty-btn" onClick={() => setFd(p => ({...p, quantity: Math.max(1, p.quantity - 1)}))}><Minus size={16} /></button>
+              <button aria-label={a11y(store).decrease} className="luxe-qty-btn" onClick={() => setFd(p => ({...p, quantity: Math.max(1, p.quantity - 1)}))}><Minus size={16} /></button>
               <span className="luxe-qty-val">{fd.quantity}</span>
-              <button className="luxe-qty-btn" onClick={() => setFd(p => ({...p, quantity: p.quantity + 1}))}><Plus size={16} /></button>
+              <button aria-label={a11y(store).increase} className="luxe-qty-btn" onClick={() => setFd(p => ({...p, quantity: p.quantity + 1}))}><Plus size={16} /></button>
             </div>
           )}
 
@@ -1814,7 +1814,7 @@ export function Cart({ domain, store }: any) {
                   <p className="luxe-cart-item-price">{Number(it.finalPrice).toLocaleString()} {store?.currency}</p>
                   <p className="luxe-cart-item-qty">{t.qty}: {it.quantity || 1}</p>
                 </div>
-                <button className="luxe-cart-item-del" onClick={() => removeItem(idx)}><Trash2 size={18} /></button>
+                <button aria-label={a11y(store).remove} className="luxe-cart-item-del" onClick={() => removeItem(idx)}><Trash2 size={18} /></button>
               </div>
             );
           })}

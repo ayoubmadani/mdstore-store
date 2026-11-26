@@ -4,7 +4,7 @@
 // المنطق كله في useBundleOrder (نفسه الذي تستعمله الثيمات من @mdstore/theme-kit).
 
 import { AlertCircle, Building2, Home, ImageIcon, Loader2 } from 'lucide-react';
-import { BundlePage, formatDA, unitPrice } from '@/lib/bundles';
+import { BundlePage, formatDA } from '@/lib/bundles';
 import { firstImage, useBundleOrder } from './useBundleOrder';
 
 interface Props {
@@ -18,7 +18,7 @@ interface Props {
 
 export default function BundleOrder({ bundle, domain, storeId, userId, accent, language = 'ar' }: Props) {
   const o = useBundleOrder({ bundle, domain, store: { id: storeId, language, user: { id: userId } } });
-  const { t, f, ar, digital, needsChoice, variantOf, pick, errors, original, price, form, chooseWilaya,
+  const { t, f, ar, digital, needsChoice, pick, errors, original, price, form, chooseWilaya,
     wilayas, communes, loadingCommunes, wilaya, ship, placeName, submit, submitting } = o;
   const sel: Record<string, Record<string, string>> = Object.fromEntries(
     bundle.products.map((p) => [p.id, Object.fromEntries(o.attrsOf(p).map((a) => [a.name, o.chosen(p, a.name) ?? '']))]),
@@ -72,7 +72,10 @@ export default function BundleOrder({ bundle, domain, storeId, userId, accent, l
               <div className="min-w-0 flex-1" style={col(8)}>
                 <div className="flex items-start justify-between gap-2">
                   <span className="text-sm font-semibold leading-snug">{p.name}</span>
-                  <span className="shrink-0 text-sm text-gray-500">{formatDA(unitPrice(p, variantOf(p)?.id), language)}</span>
+                  <span className="shrink-0 text-end text-sm">
+                    <b className="block">{formatDA(o.priceOf(p), language)}</b>
+                    {o.regularPriceOf(p) > o.priceOf(p) && <s className="block text-xs text-gray-500">{formatDA(o.regularPriceOf(p), language)}</s>}
+                  </span>
                 </div>
                 {needsChoice(p) && (p.attributes ?? []).filter((a) => a.variants?.length).map((a) => (
                   <div key={a.id} style={col(6)}>
@@ -123,7 +126,7 @@ export default function BundleOrder({ bundle, domain, storeId, userId, accent, l
       <section className="rounded-2xl text-sm text-gray-900" style={{ margin: '16px 16px 0', padding: 16, backgroundColor: tint, ...col(6) }}>
         <div className="flex justify-between"><span>{t.original}</span><s className="text-gray-500">{formatDA(original, language)}</s></div>
         <div className="flex justify-between font-bold"><span>{t.bundlePrice}</span><span style={{ color: accent }}>{formatDA(price, language)}</span></div>
-        <div className="flex justify-between font-semibold text-green-700"><span>{t.saved}</span><span>{formatDA(original - price, language)}</span></div>
+        <div className="flex justify-between font-semibold text-green-700"><span>{t.saved}</span><span>{formatDA(o.saving, language)}</span></div>
       </section>
 
       {/* الاستمارة */}

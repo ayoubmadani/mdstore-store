@@ -17,7 +17,7 @@ import {
   Search, ShoppingCart, Trash2, Loader2, Mail, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -58,7 +58,7 @@ const CSS = `
     --light:   #E8ECF0;
     --ink:     #0D1B2A;
     --mid:     #4A5A6A;
-    --dim:     #8A9BAB;
+    --dim:     #65727E;
     --line:    rgba(13,27,42,0.12);
     --line-lt: rgba(255,255,255,0.12);
   }
@@ -836,7 +836,7 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
 
   const Drop=()=>(
     <div style={{position:'absolute',top:'calc(100% + 6px)',right:0,left:0,background:'var(--white)',border:'1px solid var(--line)',boxShadow:'0 12px 36px rgba(13,27,42,0.12)',zIndex:200,overflow:'hidden',borderTop:'2px solid var(--blue)',paddingTop:25}}>
-      <button onClick={()=>setSq('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
+      <button aria-label={a11y(store).close} onClick={()=>setSq('')} className='fixed top-3 left-3 cursor-pointer hover:text-red-400'>
         <X style={{width:'14px',height:'14px'}}/>
       </button>
       {loading ? <div style={{padding:'1rem',textAlign:'center',fontSize:'12px',color:'var(--blue)'}}>{t.searching}</div>
@@ -886,7 +886,7 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
                 </div>
                 <div style={{display:'flex',flexDirection:'column'}}>
                   <span className="bc" style={{fontSize:'1.3rem',fontWeight:900,color:'white',letterSpacing:'0.04em',lineHeight:1}}>{store?.name}</span>
-                  <span style={{fontSize:'9px',fontWeight:700,color:'var(--blue)',letterSpacing:'0.15em',marginTop:'3px',opacity:0.8}}>OFFICIAL STORE</span>
+                  <span style={{fontSize:'9px',fontWeight:700,color:'var(--blue)',letterSpacing:'0.15em',marginTop:'3px'}}>OFFICIAL STORE</span>
                 </div>
               </>
           }
@@ -899,7 +899,7 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
               style={{...INP(),padding:'9px 36px 9px 12px',background:'rgba(255,255,255,0.08)',borderColor:'rgba(255,255,255,0.15)',color:'white',fontSize:'13px'}}
               onFocus={e=>{e.target.style.borderColor='var(--blue)';e.target.style.background='rgba(255,255,255,0.12)';}}
               onBlur={e=>{e.target.style.borderColor='rgba(255,255,255,0.15)';e.target.style.background='rgba(255,255,255,0.08)';}}/>
-            <Search size={14} style={{position:'absolute',top:'50%',transform:'translateY(-50%)',color:'rgba(255,255,255,0.4)',...(isRTL?{right:12}:{left:12})}}/>
+            <Search size={14} style={{position:'absolute',top:'50%',transform:'translateY(-50%)',color:'rgba(255,255,255,0.52)',...(isRTL?{right:12}:{left:12})}}/>
           </form>
           {sq.length>=2 && <Drop/>}
         </div>
@@ -909,7 +909,7 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
           
 
           {/* Search btn */}
-          <button onClick={()=>setShowSearch(!showSearch)} style={{width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.15)',cursor:'pointer',color:'rgba(255,255,255,0.7)',transition:'all 0.2s'}}
+          <button aria-label={a11y(store).search} onClick={()=>setShowSearch(!showSearch)} style={{width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.15)',cursor:'pointer',color:'rgba(255,255,255,0.7)',transition:'all 0.2s'}}
             onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.borderColor='var(--blue)';(e.currentTarget as HTMLElement).style.color='var(--blue)';}}
             onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.borderColor='rgba(255,255,255,0.15)';(e.currentTarget as HTMLElement).style.color='rgba(255,255,255,0.7)';}}>
             <Search style={{width:'15px',height:'15px'}}/>
@@ -926,7 +926,7 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
           )}
 
           {/* Burger */}
-          <button onClick={()=>setOpen(p=>!p)} style={{background:'none',border:'1px solid rgba(255,255,255,0.2)',cursor:'pointer',color:'white',padding:'7px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+          <button aria-label={a11y(store).menu} onClick={()=>setOpen(p=>!p)} style={{background:'none',border:'1px solid rgba(255,255,255,0.2)',cursor:'pointer',color:'white',padding:'7px',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
             {open?<X style={{width:'18px',height:'18px'}}/>:<Menu style={{width:'18px',height:'18px'}}/>}
           </button>
         </div>
@@ -940,7 +940,7 @@ export function Navbar({ store, domain }: { store:any; domain:string }) {
               <input autoFocus type="text" placeholder={t.search} value={sq} onChange={e=>setSq(e.target.value)}
                 style={{...INP(),background:'rgba(255,255,255,0.08)',borderColor:'rgba(255,255,255,0.15)',color:'white',padding:'10px 36px 10px 12px'}}
                 onFocus={e=>{e.target.style.borderColor='var(--blue)';}} onBlur={e=>{e.target.style.borderColor='rgba(255,255,255,0.15)';}}/>
-              <Search size={14} style={{position:'absolute',top:'50%',transform:'translateY(-50%)',color:'rgba(255,255,255,0.4)',...(isRTL?{right:12}:{left:12})}}/>
+              <Search size={14} style={{position:'absolute',top:'50%',transform:'translateY(-50%)',color:'rgba(255,255,255,0.52)',...(isRTL?{right:12}:{left:12})}}/>
             </form>
             {sq.length>=2 && <Drop/>}
           </div>
@@ -995,7 +995,7 @@ export function Footer({ store }: any) {
               }
               <span className="bc" style={{fontSize:'1.4rem',fontWeight:800,color:'white',letterSpacing:'0.05em'}}>{store?.name}</span>
             </Link>
-            <p style={{fontSize:'13px',lineHeight:'1.8',color:'rgba(255,255,255,0.4)',maxWidth:'280px',fontWeight:300}}>
+            <p style={{fontSize:'13px',lineHeight:'1.8',color:'rgba(255,255,255,0.52)',maxWidth:'280px',fontWeight:300}}>
               {store?.hero?.subtitle?.substring(0,90)||store?.description?.substring(0,90)}
             </p>
             <p style={{fontSize:'11px',color:'var(--blue)',letterSpacing:'0.1em',fontWeight:600}}>© {yr} {store?.name}. {t.rightsReserved}</p>
@@ -1064,9 +1064,9 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
           : <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center'}} className="dot-bg">
               <Package style={{width:'40px',height:'40px',color:'var(--dim)',opacity:0.5}}/>
             </div>}
-        {discount>0 && <div style={{position:'absolute',top:'10px',right:'10px',backgroundColor:'var(--blue)',color:'white',fontSize:'11px',fontWeight:700,padding:'3px 9px'}}>-{discount}%</div>}
+        {discount>0 && <div style={{position:'absolute',top:'10px',right:'10px',backgroundColor:'#2563EB',color:'white',fontSize:'11px',fontWeight:700,padding:'3px 9px'}}>-{discount}%</div>}
         {product.isDigital ? (
-          <div style={{position:'absolute',top:'10px',left:'10px',backgroundColor:'var(--blue)',color:'white',fontSize:'10px',fontWeight:700,padding:'3px 8px',display:'flex',alignItems:'center'}}><Download size={12}/></div>
+          <div style={{position:'absolute',top:'10px',left:'10px',backgroundColor:'#2563EB',color:'white',fontSize:'10px',fontWeight:700,padding:'3px 8px',display:'flex',alignItems:'center'}}><Download size={12}/></div>
         ) : product.shippingFree && <div style={{position:'absolute',top:'10px',left:'10px',backgroundColor:'var(--ink)',color:'white',fontSize:'10px',fontWeight:700,padding:'3px 8px'}}>🚚</div>}
         <div style={{position:'absolute',top:0,left:0,right:0,height:'3px',background:'linear-gradient(to right,var(--blue),var(--blue-3))'}}/>
       </div>
@@ -1406,7 +1406,7 @@ export function Home({ store, page }: any) {
                 <div style={{color:'var(--blue)',flexShrink:0}}>{trustIcons[i]}</div>
                 <div>
                   <p className="bc" style={{fontSize:'14px',fontWeight:700,letterSpacing:'0.08em',color:'white',margin:0}}>{item.title}</p>
-                  <p style={{fontSize:'11px',color:'rgba(255,255,255,0.4)',margin:0}}>{item.desc}</p>
+                  <p style={{fontSize:'11px',color:'rgba(255,255,255,0.52)',margin:0}}>{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -1422,7 +1422,7 @@ export function Home({ store, page }: any) {
         <section id="categories" style={{backgroundColor:'var(--white)',borderBottom:'1px solid var(--line)',padding:'60px 0'}}>
           <div style={{maxWidth:'1280px',margin:'0 auto',padding:'0 24px'}}>
             <div style={{marginBottom:'40px',textAlign:'center'}}>
-              <p className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.22em',color:'var(--blue)',marginBottom:'12px'}}>{t.categoriesEyebrow}</p>
+              <p className="bc" style={{fontSize:'12px',fontWeight:700,letterSpacing:'0.22em',color:'#2563EB',marginBottom:'12px'}}>{t.categoriesEyebrow}</p>
               <h2 className="bc" style={{fontSize:'clamp(1.8rem,4vw,2.5rem)',fontWeight:800,color:'var(--navy)',margin:0}}>
                 {t.categoriesTitle} <span style={{color:'var(--blue)'}}>{t.categoriesHighlight}</span>
               </h2>
@@ -1541,7 +1541,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
                 </div>
             }
             <div style={{position:'absolute',top:0,left:0,right:0,height:'3px',background:'linear-gradient(to right,var(--blue),var(--blue-3))'}}/>
-            {discount>0 && <div style={{position:'absolute',top:'12px',right:'12px',backgroundColor:'var(--blue)',color:'white',fontSize:'12px',fontWeight:700,padding:'4px 12px'}}>-{discount}%</div>}
+            {discount>0 && <div style={{position:'absolute',top:'12px',right:'12px',backgroundColor:'#2563EB',color:'white',fontSize:'12px',fontWeight:700,padding:'4px 12px'}}>-{discount}%</div>}
             {allImages.length>1 && (
               <>
                 <button onClick={()=>showImage(p=>p===0?allImages.length-1:p-1)} style={{position:'absolute',right:'10px',top:'50%',transform:'translateY(-50%)',width:'36px',height:'36px',border:'1px solid var(--line)',backgroundColor:'rgba(255,255,255,0.9)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
@@ -1557,7 +1557,7 @@ export function Details({ product, toggleWishlist, isWishlisted, discount, allIm
           {allImages.length>1 && (
             <div style={{display:'flex',gap:'8px',marginTop:'10px',flexWrap:'wrap'}}>
               {allImages.slice(0,5).map((img:string,idx:number)=>(
-                <button key={idx} onClick={()=>showImage(idx)} style={{width:'54px',height:'54px',overflow:'hidden',border:`2px solid ${sel===idx?'var(--blue)':'var(--line)'}`,cursor:'pointer',padding:0,background:'none',opacity:sel===idx?1:0.55}}>
+                <button aria-label={`${a11y(store).image} ${idx + 1}`} key={idx} onClick={()=>showImage(idx)} style={{width:'54px',height:'54px',overflow:'hidden',border:`2px solid ${sel===idx?'var(--blue)':'var(--line)'}`,cursor:'pointer',padding:0,background:'none',opacity:sel===idx?1:0.55}}>
                   <img src={img} alt="" style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}}/>
                 </button>
               ))}
@@ -1863,13 +1863,13 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             {supportQty && !product.isDigital && (
               <FR label={t.qty}>
                 <div style={{display:'inline-flex',alignItems:'center',border:'1.5px solid var(--line)',backgroundColor:'var(--white)'}}>
-                  <button type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderInlineStart:'1px solid var(--line)',background:'transparent',cursor:'pointer',color:'var(--navy)',transition:'background 0.18s'}}
+                  <button aria-label={a11y(store).decrease} type="button" onClick={()=>setFd(p=>({...p,quantity:Math.max(1,p.quantity-1)}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderInlineStart:'1px solid var(--line)',background:'transparent',cursor:'pointer',color:'var(--navy)',transition:'background 0.18s'}}
                     onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--off)';}}
                     onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>
                     <Minus style={{width:'12px',height:'12px'}}/>
                   </button>
                   <span style={{width:'44px',textAlign:'center',fontSize:'1.1rem',fontWeight:700,color:'var(--ink)'}}>{fd.quantity}</span>
-                  <button type="button" onClick={()=>setFd(p=>({...p,quantity:p.quantity+1}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderInlineEnd:'1px solid var(--line)',background:'transparent',cursor:'pointer',color:'var(--navy)',transition:'background 0.18s'}}
+                  <button aria-label={a11y(store).increase} type="button" onClick={()=>setFd(p=>({...p,quantity:p.quantity+1}))} style={{width:'36px',height:'36px',display:'flex',alignItems:'center',justifyContent:'center',border:'none',borderInlineEnd:'1px solid var(--line)',background:'transparent',cursor:'pointer',color:'var(--navy)',transition:'background 0.18s'}}
                     onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.background='var(--off)';}}
                     onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.background='transparent';}}>
                     <Plus style={{width:'12px',height:'12px'}}/>
@@ -2263,7 +2263,7 @@ export function Contact({ store }: { store?:any }) {
         <div style={{maxWidth:'960px',margin:'0 auto',position:'relative',zIndex:2}}>
           <p className="bc" style={{fontSize:'11px',fontWeight:700,letterSpacing:'0.24em',color:'var(--blue)',marginBottom:'10px'}}>{t.contactEyebrow}</p>
           <h1 className="bc" style={{fontSize:'clamp(2.5rem,7vw,6rem)',fontWeight:800,letterSpacing:'0.04em',color:'white',lineHeight:0.88,margin:'0 0 12px'}}>{t.contactTitle}</h1>
-          <p className="bc" style={{fontSize:'14px',fontWeight:600,letterSpacing:'0.14em',color:'rgba(255,255,255,0.4)'}}>{t.contactReplyTime}</p>
+          <p className="bc" style={{fontSize:'14px',fontWeight:600,letterSpacing:'0.14em',color:'rgba(255,255,255,0.52)'}}>{t.contactReplyTime}</p>
         </div>
       </div>
 

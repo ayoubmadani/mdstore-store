@@ -10,7 +10,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import { ShoppingBag, Search, Menu, X, ChevronLeft, ChevronRight, Trash2, Plus, Minus, Check, MapPin, Phone, Mail, Package, Truck, MessageCircle, Download } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -112,7 +112,7 @@ function ThemeStyle() {
         --cotton-300: #C9BCA3;
         --thread-ink: #2E2A24;
         --thread-soft: #6E6457;
-        --thread-red: #B8693F;
+        --thread-red: #A85D36;
         --thread-red-dark: #95502C;
       }
       .pc-root * { box-sizing: border-box; }
@@ -608,7 +608,7 @@ export function Navbar({ store, domain }: any) {
                 style={{ border: 'none', outline: 'none', flex: 1, marginInline: 8, fontSize: 13.5, background: 'transparent', fontFamily: 'inherit' }}
               />
               {searchQuery.length > 0 && (
-                <button className="pc-btn" onClick={() => setSearchQuery('')} style={{ background: 'none', padding: 2, display: 'flex', alignItems: 'center' }}>
+                <button aria-label={a11y(store).clear} className="pc-btn" onClick={() => setSearchQuery('')} style={{ background: 'none', padding: 2, display: 'flex', alignItems: 'center' }}>
                   <X size={15} color="var(--thread-soft)" />
                 </button>
               )}
@@ -663,7 +663,7 @@ export function Navbar({ store, domain }: any) {
                 style={{ border: 'none', outline: 'none', flex: 1, marginInline: 8, fontSize: 13.5, background: 'transparent', fontFamily: 'inherit' }}
               />
               {searchQuery.length > 0 && (
-                <button className="pc-btn" onClick={() => setSearchQuery('')} style={{ background: 'none', padding: 2, display: 'flex', alignItems: 'center' }}>
+                <button aria-label={a11y(store).clear} className="pc-btn" onClick={() => setSearchQuery('')} style={{ background: 'none', padding: 2, display: 'flex', alignItems: 'center' }}>
                   <X size={15} color="var(--thread-soft)" />
                 </button>
               )}
@@ -687,7 +687,7 @@ export function Navbar({ store, domain }: any) {
       {open && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,.4)' }} onClick={() => setOpen(false)}>
           <div onClick={(e) => e.stopPropagation()} style={{ position: 'absolute', top: 0, insetInlineStart: 0, width: '78%', maxWidth: 300, height: '100%', background: 'var(--cotton-50)', padding: 22, display: 'flex', flexDirection: 'column', gap: 22 }}>
-            <button className="pc-btn" onClick={() => setOpen(false)} style={{ background: 'none', alignSelf: 'flex-end' }}><X size={22} /></button>
+            <button aria-label={a11y(store).close} className="pc-btn" onClick={() => setOpen(false)} style={{ background: 'none', alignSelf: 'flex-end' }}><X size={22} /></button>
             <Link href="/" onClick={() => setOpen(false)} style={{ color: 'var(--thread-ink)', textDecoration: 'none', fontSize: 16, fontWeight: 600 }}>{t.home}</Link>
             <Link href="/contact" onClick={() => setOpen(false)} style={{ color: 'var(--thread-ink)', textDecoration: 'none', fontSize: 16, fontWeight: 600 }}>{t.contact}</Link>
             {showCart && <Link href="/cart" onClick={() => setOpen(false)} style={{ color: 'var(--thread-ink)', textDecoration: 'none', fontSize: 16, fontWeight: 600 }}>{t.cart}</Link>}
@@ -1177,15 +1177,15 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           )}
           {images.length > 1 && (
             <>
-              <button className="pc-btn" onClick={() => showImage((s) => (s - 1 + images.length) % images.length)} style={{ position: 'absolute', top: '50%', insetInlineStart: 10, transform: 'translateY(-50%)', background: '#fff', borderRadius: '50%', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={18} /></button>
-              <button className="pc-btn" onClick={() => showImage((s) => (s + 1) % images.length)} style={{ position: 'absolute', top: '50%', insetInlineEnd: 10, transform: 'translateY(-50%)', background: '#fff', borderRadius: '50%', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={18} /></button>
+              <button aria-label={a11y(store).prev} className="pc-btn" onClick={() => showImage((s) => (s - 1 + images.length) % images.length)} style={{ position: 'absolute', top: '50%', insetInlineStart: 10, transform: 'translateY(-50%)', background: '#fff', borderRadius: '50%', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={18} /></button>
+              <button aria-label={a11y(store).next} className="pc-btn" onClick={() => showImage((s) => (s + 1) % images.length)} style={{ position: 'absolute', top: '50%', insetInlineEnd: 10, transform: 'translateY(-50%)', background: '#fff', borderRadius: '50%', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={18} /></button>
             </>
           )}
         </div>
         {images.length > 1 && (
           <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
             {images.map((img, i) => (
-              <button key={i} className="pc-btn" onClick={() => showImage(i)} style={{ padding: 0, width: 64, height: 64, border: i === sel ? '2px solid var(--thread-red)' : '1.5px dashed var(--cotton-300)', borderRadius: 2, overflow: 'hidden', background: 'none' }}>
+              <button aria-label={`${a11y(store).image} ${i + 1}`} key={i} className="pc-btn" onClick={() => showImage(i)} style={{ padding: 0, width: 64, height: 64, border: i === sel ? '2px solid var(--thread-red)' : '1.5px dashed var(--cotton-300)', borderRadius: 2, overflow: 'hidden', background: 'none' }}>
                 <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </button>
             ))}
@@ -1443,7 +1443,7 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <p style={{ fontWeight: 700, fontSize: 14.5 }}>{t.orderFormTitle}</p>
             {orderNowState && (
-              <button className="pc-btn" onClick={() => setIsOrderNow(false)} style={{ background: 'none' }}><X size={18} /></button>
+              <button aria-label={a11y(store).close} className="pc-btn" onClick={() => setIsOrderNow(false)} style={{ background: 'none' }}><X size={18} /></button>
             )}
           </div>
 
@@ -1505,9 +1505,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: 13 }}>{t.qtyLabel}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <button className="pc-btn" onClick={() => setFd({ ...fd, quantity: Math.max(1, fd.quantity - 1) })} style={{ width: 30, height: 30, border: '1.5px solid var(--cotton-300)', background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={14} /></button>
+                  <button aria-label={a11y(store).decrease} className="pc-btn" onClick={() => setFd({ ...fd, quantity: Math.max(1, fd.quantity - 1) })} style={{ width: 30, height: 30, border: '1.5px solid var(--cotton-300)', background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Minus size={14} /></button>
                   <span style={{ minWidth: 20, textAlign: 'center', fontWeight: 700 }}>{fd.quantity}</span>
-                  <button className="pc-btn" onClick={() => setFd({ ...fd, quantity: fd.quantity + 1 })} style={{ width: 30, height: 30, border: '1.5px solid var(--cotton-300)', background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={14} /></button>
+                  <button aria-label={a11y(store).increase} className="pc-btn" onClick={() => setFd({ ...fd, quantity: fd.quantity + 1 })} style={{ width: 30, height: 30, border: '1.5px solid var(--cotton-300)', background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Plus size={14} /></button>
                 </div>
               </div>
             )}
@@ -1665,7 +1665,7 @@ export function Cart({ domain, store }: any) {
                 <p style={{ fontWeight: 600, fontSize: 13.5 }}>{it.product?.name}</p>
                 <p style={{ fontSize: 12.5, color: 'var(--thread-soft)', marginTop: 4 }}>{t.qtyItem} {it.quantity} × {it.finalPrice} {cur}</p>
               </div>
-              <button className="pc-btn" onClick={() => removeItem(idx)} style={{ background: 'none', alignSelf: 'flex-start' }}><Trash2 size={17} color="var(--thread-red)" /></button>
+              <button aria-label={a11y(store).remove} className="pc-btn" onClick={() => removeItem(idx)} style={{ background: 'none', alignSelf: 'flex-start' }}><Trash2 size={17} color="var(--thread-red)" /></button>
             </div>
           ))}
         </div>

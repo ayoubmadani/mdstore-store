@@ -10,7 +10,7 @@ import axios from "axios";
 import { ProductAddons, addonsTotal, addonsLabel } from '@/components/theme/ProductAddons';
 import { useCartStore } from "@/store/useCartStore";
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 import {
   ShoppingCart, Search, Menu, X, ChevronDown, ChevronLeft, ChevronRight,
   Star, Trash2, Phone, Mail, MapPin, Send, AlertCircle, Minus, Plus,
@@ -59,6 +59,7 @@ const C2 = "#1a1a24";
 const C3 = "#252535";
 const C4 = "#3a3a50";
 const A  = "#ff2a6d";
+const AB = "#DB2163"; // darker A: background under white text (contrast)
 const AL = "rgba(255,42,109,0.12)";
 const TXT  = "#e8e8f0";
 const SUB  = "#8b8ba0";
@@ -76,7 +77,7 @@ const inputBase: React.CSSProperties = {
 };
 const btnPrimary: React.CSSProperties = {
   display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
-  padding: "0.875rem 1.5rem", minHeight: 44, background: A, color: "#fff",
+  padding: "0.875rem 1.5rem", minHeight: 44, background: AB, color: "#fff",
   fontWeight: 700, fontSize: "0.9rem", border: "none", borderRadius: 6,
   cursor: "pointer", transition: "opacity 0.2s", fontFamily: "inherit", width: "100%",
 };
@@ -413,7 +414,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       transition: "all .3s",
     }}>
       {/* ticker — always visible */}
-      <div style={{ background: A, color: "#fff", overflow: "hidden", height: 34, display: "flex", alignItems: "center" }}>
+      <div style={{ background: AB, color: "#fff", overflow: "hidden", height: 34, display: "flex", alignItems: "center" }}>
         <div className="g-marquee-track" style={{ fontSize: "0.82rem", fontWeight: 700 }}>
           {Array.from({ length: 8 }).map((_, i) => (
             <span key={i} style={{ padding: "0 48px", display: "inline-flex", alignItems: "center", gap: 10 }}>
@@ -457,7 +458,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 onChange={(e) => { setQuery(e.target.value); setShowDrop(true); }}
                 onFocus={() => query.length >= 2 && setShowDrop(true)}
                 style={{ background: "transparent", border: "none", outline: "none", color: TXT, width: 170, fontSize: "0.85rem", fontFamily: "inherit" }} />
-              {query && <button type="button" onClick={() => { setQuery(""); setResults([]); setShowDrop(false); }}
+              {query && <button aria-label={a11y(store).close} type="button" onClick={() => { setQuery(""); setResults([]); setShowDrop(false); }}
                 style={{ background: "none", border: "none", color: SUB, cursor: "pointer", padding: 0, display: "flex" }}>
                 <X size={14} />
               </button>}
@@ -497,7 +498,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <Link href={cartLink.h} style={{ position: "relative", color: TXT, textDecoration: "none" }}>
               <ShoppingCart size={22} />
               {count > 0 && (
-                <span style={{ position: "absolute", top: -6, insetInlineEnd: -6, background: A, color: "#fff", fontSize: "0.65rem", fontWeight: 800, width: 18, height: 18, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>
+                <span style={{ position: "absolute", top: -6, insetInlineEnd: -6, background: AB, color: "#fff", fontSize: "0.65rem", fontWeight: 800, width: 18, height: 18, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>
               )}
             </Link>
           )}
@@ -509,11 +510,11 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
             <Link href={cartLink.h} style={{ position: "relative", color: TXT, textDecoration: "none" }}>
               <ShoppingCart size={22} />
               {count > 0 && (
-                <span style={{ position: "absolute", top: -6, insetInlineEnd: -6, background: A, color: "#fff", fontSize: "0.65rem", fontWeight: 800, width: 18, height: 18, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>
+                <span style={{ position: "absolute", top: -6, insetInlineEnd: -6, background: AB, color: "#fff", fontSize: "0.65rem", fontWeight: 800, width: 18, height: 18, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>{count}</span>
               )}
             </Link>
           )}
-          <button onClick={() => setOpen(!open)} style={{ background: "none", border: "none", color: TXT, cursor: "pointer", padding: 4, display: "flex" }}>
+          <button aria-label={a11y(store).menu} onClick={() => setOpen(!open)} style={{ background: "none", border: "none", color: TXT, cursor: "pointer", padding: 4, display: "flex" }}>
             {open ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -536,7 +537,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
                 onChange={(e) => { setQuery(e.target.value); setShowDrop(true); }}
                 style={{ background: "transparent", border: "none", outline: "none", color: TXT, flex: 1, fontSize: "0.9rem", fontFamily: "inherit" }} />
               {query && (
-                <button type="button" onClick={() => { setQuery(""); setResults([]); }}
+                <button aria-label={a11y(store).close} type="button" onClick={() => { setQuery(""); setResults([]); }}
                   style={{ background: "none", border: "none", color: SUB, cursor: "pointer", padding: 0, display: "flex" }}>
                   <X size={14} />
                 </button>
@@ -604,7 +605,7 @@ export function Footer({ store }: { store: any }) {
               <span style={{ fontWeight: 800, color: TXT }}>{store?.name || "EPIC STORE"}</span>
             </div>
             <p style={{ color: SUB, fontSize: "0.85rem", lineHeight: 1.7 }}>{t.footerDesc}</p>
-            <p style={{ color: C4, fontSize: "0.75rem", marginTop: 10 }}>© {year} {store?.name || "EPIC STORE"}. {t.rightsReserved}</p>
+            <p style={{ color: "#868696", fontSize: "0.75rem", marginTop: 10 }}>© {year} {store?.name || "EPIC STORE"}. {t.rightsReserved}</p>
           </div>
 
           {/* Quick links */}
@@ -657,7 +658,7 @@ export function Footer({ store }: { store: any }) {
           </div>
         </div>
 
-        <div style={{ borderTop: `1px solid ${BD}`, paddingTop: 12, textAlign: "center", color: C4, fontSize: "0.75rem" }}>
+        <div style={{ borderTop: `1px solid ${BD}`, paddingTop: 12, textAlign: "center", color: "#868696", fontSize: "0.75rem" }}>
           <Flame size={13} style={{ display: "inline", verticalAlign: "middle", marginInlineEnd: 5, color: A }} />
           {t.footerTag}
         </div>
@@ -679,12 +680,12 @@ export function Card({ product, displayImage, discount, store, viewDetails }: { 
       onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = "translateY(-4px)"; (e.currentTarget as HTMLElement).style.boxShadow = `0 10px 30px rgba(255,42,109,.12)`; }}
       onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}>
       {discount > 0 && (
-        <div style={{ position: "absolute", top: 10, insetInlineStart: 10, background: A, color: "#fff", fontSize: "0.7rem", fontWeight: 800, padding: "3px 8px", borderRadius: 4, zIndex: 2 }}>
+        <div style={{ position: "absolute", top: 10, insetInlineStart: 10, background: AB, color: "#fff", fontSize: "0.7rem", fontWeight: 800, padding: "3px 8px", borderRadius: 4, zIndex: 2 }}>
           -{discount}%
         </div>
       )}
       {product.isDigital ? (
-        <div style={{ position: "absolute", top: 10, insetInlineEnd: 10, background: A, color: "#fff", fontSize: "0.7rem", fontWeight: 800, padding: "3px 8px", borderRadius: 4, zIndex: 2, display: "flex", alignItems: "center" }}>
+        <div style={{ position: "absolute", top: 10, insetInlineEnd: 10, background: AB, color: "#fff", fontSize: "0.7rem", fontWeight: 800, padding: "3px 8px", borderRadius: 4, zIndex: 2, display: "flex", alignItems: "center" }}>
           <Download size={12} />
         </div>
       ) : product.shippingFree && (
@@ -710,7 +711,7 @@ export function Card({ product, displayImage, discount, store, viewDetails }: { 
         <h3 style={{ fontSize: "0.875rem", fontWeight: 700, color: TXT, marginBottom: 8, lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{product.name}</h3>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           <span style={{ color: A, fontWeight: 800, fontSize: "0.95rem" }}>{price.toLocaleString()} {currency}</span>
-          {original > price && <span style={{ color: C4, textDecoration: "line-through", fontSize: "0.78rem" }}>{original.toLocaleString()} {currency}</span>}
+          {original > price && <span style={{ color: "#868696", textDecoration: "line-through", fontSize: "0.78rem" }}>{original.toLocaleString()} {currency}</span>}
         </div>
       </div>
     </Link>
@@ -1122,22 +1123,22 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
               )}
               {imgs.length > 1 && (
                 <>
-                  <button onClick={() => { showImage((s) => (s - 1 + imgs.length) % imgs.length); setImgErr(false); }} style={{ position: "absolute", insetInlineStart: 10, top: "50%", transform: "translateY(-50%)", width: 34, height: 34, borderRadius: "50%", background: "rgba(10,10,15,.7)", border: `1px solid ${BD}`, color: TXT, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <button aria-label={a11y(store).prev} onClick={() => { showImage((s) => (s - 1 + imgs.length) % imgs.length); setImgErr(false); }} style={{ position: "absolute", insetInlineStart: 10, top: "50%", transform: "translateY(-50%)", width: 34, height: 34, borderRadius: "50%", background: "rgba(10,10,15,.7)", border: `1px solid ${BD}`, color: TXT, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     {t.dir === "rtl" ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
                   </button>
-                  <button onClick={() => { showImage((s) => (s + 1) % imgs.length); setImgErr(false); }} style={{ position: "absolute", insetInlineEnd: 10, top: "50%", transform: "translateY(-50%)", width: 34, height: 34, borderRadius: "50%", background: "rgba(10,10,15,.7)", border: `1px solid ${BD}`, color: TXT, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <button aria-label={a11y(store).next} onClick={() => { showImage((s) => (s + 1) % imgs.length); setImgErr(false); }} style={{ position: "absolute", insetInlineEnd: 10, top: "50%", transform: "translateY(-50%)", width: 34, height: 34, borderRadius: "50%", background: "rgba(10,10,15,.7)", border: `1px solid ${BD}`, color: TXT, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     {t.dir === "rtl" ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
                   </button>
                 </>
               )}
               {discount > 0 && (
-                <div style={{ position: "absolute", top: 10, insetInlineStart: 10, background: A, color: "#fff", fontSize: "0.78rem", fontWeight: 800, padding: "4px 10px", borderRadius: 4 }}>-{discount}%</div>
+                <div style={{ position: "absolute", top: 10, insetInlineStart: 10, background: AB, color: "#fff", fontSize: "0.78rem", fontWeight: 800, padding: "4px 10px", borderRadius: 4 }}>-{discount}%</div>
               )}
             </div>
             {imgs.length > 1 && (
               <div style={{ display: "flex", gap: 6, flexWrap: 'wrap', paddingBottom: 4 }}>
                 {imgs.map((url: string, i: number) => (
-                  <button key={i} onClick={() => { showImage(i); setImgErr(false); }} style={{ width: 64, height: 64, borderRadius: 6, overflow: "hidden", border: `2px solid ${sel === i ? A : BD}`, padding: 0, cursor: "pointer", flexShrink: 0, background: C2 }}>
+                  <button aria-label={`${a11y(store).image} ${i + 1}`} key={i} onClick={() => { showImage(i); setImgErr(false); }} style={{ width: 64, height: 64, borderRadius: 6, overflow: "hidden", border: `2px solid ${sel === i ? A : BD}`, padding: 0, cursor: "pointer", flexShrink: 0, background: C2 }}>
                     <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   </button>
                 ))}
@@ -1153,7 +1154,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
             <h1 style={{ fontSize: "clamp(1.15rem,2.5vw,1.6rem)", fontWeight: 800, color: TXT, lineHeight: 1.3 }}>{product.name}</h1>
             <div style={{ display: "flex", alignItems: "baseline", gap: 14, flexWrap: "wrap" }}>
               <span style={{ fontSize: "1.6rem", fontWeight: 900, color: A }}>{Number(finalPrice).toLocaleString()} {currency}</span>
-              {discount > 0 && <span style={{ fontSize: "1rem", color: C4, textDecoration: "line-through" }}>{Number(product.priceOriginal).toLocaleString()} {currency}</span>}
+              {discount > 0 && <span style={{ fontSize: "1rem", color: "#868696", textDecoration: "line-through" }}>{Number(product.priceOriginal).toLocaleString()} {currency}</span>}
             </div>
 
             {(product.shippingFree || (store?.supportFreeShipping && store?.freeShippingMinAmount != null)) && (
@@ -1200,7 +1201,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
                           <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} title={v.value} style={{ width: 30, height: 30, borderRadius: "50%", background: v.value, border: `2px solid ${isSel ? A : "transparent"}`, outline: isSel ? `2px solid ${A}` : "none", outlineOffset: 2, cursor: available ? "pointer" : "not-allowed", padding: 0, opacity: available ? 1 : 0.35 }} />
                         );
                         if (attr.displayMode === "image") return (
-                          <button key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: 64, height: 64, borderRadius: 6, overflow: "hidden", border: `3px solid ${isSel ? A : BD}`, boxShadow: isSel ? `0 0 0 2px #fff, 0 0 0 4px ${A}` : 'none', padding: 0, cursor: available ? "pointer" : "not-allowed", opacity: available ? 1 : 0.35 }}>
+                          <button aria-label={a11y(store).image} key={v.id} onClick={() => available && handleVariantSelection(attr.name, v.value)} style={{ width: 64, height: 64, borderRadius: 6, overflow: "hidden", border: `3px solid ${isSel ? A : BD}`, boxShadow: isSel ? `0 0 0 2px #fff, 0 0 0 4px ${A}` : 'none', padding: 0, cursor: available ? "pointer" : "not-allowed", opacity: available ? 1 : 0.35 }}>
                             <img src={v.value} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                           </button>
                         );
@@ -1363,9 +1364,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: C2, borderRadius: 8, padding: "9px 12px", border: `1px solid ${BD}` }}>
               <span style={{ color: SUB, fontSize: "0.82rem" }}>{t.qty}</span>
               <div style={{ display: "flex", alignItems: "center", border: `1px solid ${BD}`, borderRadius: 6, overflow: "hidden" }}>
-                <button onClick={() => setFd((f) => ({ ...f, quantity: Math.max(1, f.quantity - 1) }))} style={{ width: 34, height: 34, background: C3, border: "none", color: TXT, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Minus size={13} /></button>
+                <button aria-label={a11y(store).decrease} onClick={() => setFd((f) => ({ ...f, quantity: Math.max(1, f.quantity - 1) }))} style={{ width: 34, height: 34, background: C3, border: "none", color: TXT, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Minus size={13} /></button>
                 <span style={{ width: 40, textAlign: "center", fontWeight: 700, color: TXT }}>{fd.quantity}</span>
-                <button onClick={() => setFd((f) => ({ ...f, quantity: f.quantity + 1 }))} style={{ width: 34, height: 34, background: C3, border: "none", color: TXT, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Plus size={13} /></button>
+                <button aria-label={a11y(store).increase} onClick={() => setFd((f) => ({ ...f, quantity: f.quantity + 1 }))} style={{ width: 34, height: 34, background: C3, border: "none", color: TXT, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Plus size={13} /></button>
               </div>
             </div>
           )}
@@ -1463,9 +1464,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: C2, borderRadius: 8, padding: "9px 12px", border: `1px solid ${BD}` }}>
               <span style={{ color: SUB, fontSize: "0.82rem" }}>{t.qty}</span>
               <div style={{ display: "flex", alignItems: "center", border: `1px solid ${BD}`, borderRadius: 6, overflow: "hidden" }}>
-                <button type="button" onClick={() => setFd((f) => ({ ...f, quantity: Math.max(1, f.quantity - 1) }))} style={{ width: 34, height: 34, background: C3, border: "none", color: TXT, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Minus size={13} /></button>
+                <button aria-label={a11y(store).decrease} type="button" onClick={() => setFd((f) => ({ ...f, quantity: Math.max(1, f.quantity - 1) }))} style={{ width: 34, height: 34, background: C3, border: "none", color: TXT, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Minus size={13} /></button>
                 <span style={{ width: 40, textAlign: "center", fontWeight: 700, color: TXT }}>{fd.quantity}</span>
-                <button type="button" onClick={() => setFd((f) => ({ ...f, quantity: f.quantity + 1 }))} style={{ width: 34, height: 34, background: C3, border: "none", color: TXT, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Plus size={13} /></button>
+                <button aria-label={a11y(store).increase} type="button" onClick={() => setFd((f) => ({ ...f, quantity: f.quantity + 1 }))} style={{ width: 34, height: 34, background: C3, border: "none", color: TXT, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Plus size={13} /></button>
               </div>
             </div>
           )}
@@ -1627,7 +1628,7 @@ export function Cart({ domain, store }: { domain: string; store: any }) {
                   <div style={{ color: SUB, fontSize: "0.78rem", marginBottom: 3 }}>{t.qty}: {item.quantity || 1}</div>
                   <div style={{ color: A, fontWeight: 800 }}>{(Number(item.finalPrice) * (item.quantity || 1)).toLocaleString()} {currency}</div>
                 </div>
-                <button onClick={() => removeItem(idx)} style={{ background: "none", border: "none", color: "#EF4444", cursor: "pointer", padding: 6, borderRadius: 6, display: "flex" }}
+                <button aria-label={a11y(store).remove} onClick={() => removeItem(idx)} style={{ background: "none", border: "none", color: "#EF4444", cursor: "pointer", padding: 6, borderRadius: 6, display: "flex" }}
                   onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(239,68,68,.1)")}
                   onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}>
                   <Trash2 size={16} />

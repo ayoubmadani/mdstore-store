@@ -19,7 +19,7 @@ import {
   Leaf, Flower2, Droplets, MessageCircle, Download,
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -58,7 +58,7 @@ const CSS = `
     --tan:     #E8DCC8;
     --white:   #FFFFFF;
     --mid:     #5C4A3A;
-    --dim:     #A09280;
+    --dim:     #796E61;
     --line:    #E8DCC8;
     --red:     #C0392B;
     --amber:   #C9952C;
@@ -706,7 +706,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
       zIndex:200, overflow:'hidden', boxShadow:'0 12px 40px rgba(201,149,44,0.12)'
     }} className="fi">
       <div style={{ display:'flex', justifyContent:'flex-end', padding:'8px 12px 2px' }}>
-        <button onClick={() => setSq('')} style={{
+        <button aria-label={a11y(store).close} onClick={() => setSq('')} style={{
           background:'var(--gold-lt)', border:'none', borderRadius:'50%',
           width:24, height:24, display:'flex', alignItems:'center',
           justifyContent:'center', cursor:'pointer', color:'var(--gold)'
@@ -802,7 +802,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               ))}
             </div>
 
-            <button onClick={() => setShowSearch(!showSearch)} className="lg:hidden"
+            <button aria-label={a11y(store).search} onClick={() => setShowSearch(!showSearch)} className="lg:hidden"
               style={{ background:'none', border:'none', color:'var(--warm)', cursor:'pointer' }}>
               <Search size={20} />
             </button>
@@ -823,7 +823,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
               </Link>
             )}
 
-            <button onClick={() => setOpen(!open)} className="lg:hidden"
+            <button aria-label={a11y(store).menu} onClick={() => setOpen(!open)} className="lg:hidden"
               style={{
                 background:'var(--green)', border:'none', color:'white', padding:'6px',
                 borderRadius:'8px', cursor:'pointer'
@@ -904,7 +904,7 @@ export function Footer({ store }: any) {
               <Truck size={14} style={{ color:'var(--gold)' }} />
               <span style={{ fontSize:'12px', fontWeight:600, color:'var(--gold)' }}>{t.footerDelivery}</span>
             </div>
-            <p style={{ fontSize:'11px', color:'rgba(255,255,255,0.4)', marginTop:'24px' }}>
+            <p style={{ fontSize:'11px', color:'rgba(255,255,255,0.55)', marginTop:'24px' }}>
               &copy; {new Date().getFullYear()} {store?.name}. {t.rightsReserved}.
             </p>
           </div>
@@ -1591,13 +1591,13 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
               )}
               {allImages.length > 1 && (
                 <>
-                  <button onClick={() => showImage(p => p===0?allImages.length-1:p-1)} style={{
+                  <button aria-label={a11y(store).prev} onClick={() => showImage(p => p===0?allImages.length-1:p-1)} style={{
                     position:'absolute', right:10, top:'50%', transform:'translateY(-50%)',
                     width:'34px', height:'34px', border:'1px solid var(--tan)', borderRadius:'50%',
                     background:'rgba(255,255,255,0.9)', cursor:'pointer', display:'flex',
                     alignItems:'center', justifyContent:'center', color:'var(--green)'
                   }}><ChevronRight size={14} /></button>
-                  <button onClick={() => showImage(p => p===allImages.length-1?0:p+1)} style={{
+                  <button aria-label={a11y(store).next} onClick={() => showImage(p => p===allImages.length-1?0:p+1)} style={{
                     position:'absolute', left:10, top:'50%', transform:'translateY(-50%)',
                     width:'34px', height:'34px', border:'1px solid var(--tan)', borderRadius:'50%',
                     background:'rgba(255,255,255,0.9)', cursor:'pointer', display:'flex',
@@ -1609,7 +1609,7 @@ export function Details({ product, toggleWishlist, isWishlisted, handleShare, di
             {allImages.length > 1 && (
               <div className="thumb-row">
                 {allImages.slice(0,5).map((img:string, idx:number) => (
-                  <button key={idx} onClick={() => showImage(idx)} style={{
+                  <button aria-label={`${a11y(store).image} ${idx + 1}`} key={idx} onClick={() => showImage(idx)} style={{
                     width:'54px', height:'54px', overflow:'hidden', borderRadius:'10px',
                     border:`2px solid ${sel===idx?'var(--gold)':'var(--tan)'}`,
                     cursor:'pointer', padding:0, background:'none', opacity:sel===idx?1:0.6

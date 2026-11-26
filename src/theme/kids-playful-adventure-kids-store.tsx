@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import * as __bk from '@/components/bundles/useBundleOrder'; // منطق الأطقم مدمج داخل الثيم (مستقل عن المتجر)
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -50,7 +50,7 @@ const CSS = `
     --yellow:   #FFE000;
     --yellow-dk:#CC9500;
     --yellow-lt:#FFFDE7;
-    --blue:     #0066FF;
+    --blue:     #005CE6;
     --blue-lt:  #E3F2FD;
     --blue-dk:  #0047CC;
     --green:    #00C851;
@@ -67,7 +67,7 @@ const CSS = `
     --white:    #FFFFFF;
     --text:     #1A1A2E;
     --mid:      #4A5568;
-    --soft:     #8896A5;
+    --soft:     #6A7581;
     --border:   #E2E8F0;
   }
 
@@ -641,7 +641,7 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
         }}>
             {/* زر الإغلاق الثابت في الأعلى */}
             <div style={{ position: 'sticky', top: 0, background: '#fff', zIndex: 10, padding: '10px 15px' }}>
-                <button
+                <button aria-label={a11y(store).close}
                     className='cursor-pointer hover:text-red-400'
                     onClick={() => setSq('')}
                     style={{ background: 'none', border: 'none', padding: 0 }}
@@ -744,9 +744,9 @@ export function Navbar({ store, domain }: { store: any; domain: string }) {
 
                 {/* Mobile */}
                 <div className="nav-m-btns">
-                    <button onClick={() => setShowSearch(!showSearch)} style={{ width: 40, height: 40, borderRadius: 10, border: '2.5px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--blue)' }}><Search size={18} /></button>
+                    <button aria-label={a11y(store).search} onClick={() => setShowSearch(!showSearch)} style={{ width: 40, height: 40, borderRadius: 10, border: '2.5px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--blue)' }}><Search size={18} /></button>
 
-                    <button onClick={() => setOpen(!open)} style={{ width: 40, height: 40, borderRadius: 10, border: '2.5px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--dark)' }}>
+                    <button aria-label={a11y(store).menu} onClick={() => setOpen(!open)} style={{ width: 40, height: 40, borderRadius: 10, border: '2.5px solid var(--border)', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--dark)' }}>
                         {open ? <X size={18} /> : <Menu size={18} />}
                     </button>
                 </div>
@@ -817,7 +817,7 @@ export function Footer({ store }: any) {
                                 <span key={i} style={{ animation: `float ${2.5 + i * 0.4}s ${i * 0.25}s ease-in-out infinite`, display: 'inline-block' }}>{e}</span>
                             ))}
                         </div>
-                        <p style={{ marginTop: '2rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.2)' }}>© {new Date().getFullYear()} {store?.name}. {t.rightsReserved}.</p>
+                        <p style={{ marginTop: '2rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.55)' }}>© {new Date().getFullYear()} {store?.name}. {t.rightsReserved}.</p>
                     </div>
 
                     {/* قسم 2 */}
@@ -857,7 +857,7 @@ export function Footer({ store }: any) {
                                 <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--green)', boxShadow: '0 0 8px var(--green)', display: 'inline-block' }} />
                                 <span className="font-boogaloo" style={{ fontSize: '1rem', color: '#fff' }}>{t.readyNow} ⚡</span>
                             </div>
-                            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>{t.replyHours}</p>
+                            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>{t.replyHours}</p>
                         </div>
                     </div>
 
@@ -871,7 +871,7 @@ export function Footer({ store }: any) {
    CARD
 ══════════════════════════════════════════════════════════════ */
 const PALETTES = [
-    { border: '#0066FF', bg: '#E3F2FD', accent: '#0066FF', tag: 'var(--blue)' },
+    { border: '#005CE6', bg: '#E3F2FD', accent: '#005CE6', tag: 'var(--blue)' },
     { border: '#00C851', bg: '#E8F5E9', accent: '#009A3D', tag: 'var(--green)' },
     { border: '#FF6B00', bg: '#FFF3E0', accent: '#CC5500', tag: 'var(--orange)' },
     { border: '#7B2FBE', bg: '#F3E8FD', accent: '#7B2FBE', tag: '#7B2FBE' },
@@ -888,10 +888,10 @@ export function Card({ product, displayImage, discount, store, viewDetails }: an
     // 2. تعريف الألوان محلياً إذا لم تكن مستوردة (PALETTES)
     // ملاحظة: تأكد من وجود هذه المصفوفة في ملفك أو استيرادها
     const palettesList = [
-        { bg: '#FFF5F5', border: '#FEB2B2', accent: '#F56565' },
-        { bg: '#F0FFF4', border: '#9AE6B4', accent: '#48BB78' },
-        { bg: '#EBF8FF', border: '#90CDF4', accent: '#4299E1' },
-        { bg: '#FAF5FF', border: '#D6BCFA', accent: '#9F7AEA' },
+        { bg: '#FFF5F5', border: '#FEB2B2', accent: '#C53030' },
+        { bg: '#F0FFF4', border: '#9AE6B4', accent: '#317F52' },
+        { bg: '#EBF8FF', border: '#90CDF4', accent: '#2B6CB0' },
+        { bg: '#FAF5FF', border: '#D6BCFA', accent: '#6B46C1' },
     ];
 
     // 3. حساب الاختيار مع حماية كاملة ضد القيم الفارغة أو النصوص
@@ -1424,15 +1424,15 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, in
                             {discount > 0 && <div style={{ position: 'absolute', top: 14, right: 14, background: pal.accent, color: '#fff', padding: '4px 14px', borderRadius: 8, fontFamily: "'Boogaloo',cursive", fontSize: '1rem' }}>{discount}% خصم</div>}
                             {allImages.length > 1 && (
                                 <>
-                                    <button onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,0.9)', border: `2px solid ${pal.border}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={18} /></button>
-                                    <button onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,0.9)', border: `2px solid ${pal.border}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={18} /></button>
+                                    <button aria-label={a11y(store).prev} onClick={() => showImage(p => p === 0 ? allImages.length - 1 : p - 1)} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,0.9)', border: `2px solid ${pal.border}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronRight size={18} /></button>
+                                    <button aria-label={a11y(store).next} onClick={() => showImage(p => p === allImages.length - 1 ? 0 : p + 1)} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,0.9)', border: `2px solid ${pal.border}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChevronLeft size={18} /></button>
                                 </>
                             )}
                         </div>
                         {allImages.length > 1 && (
                             <div className="thumb-row">
                                 {allImages.map((img: string, idx: number) => (
-                                    <button key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 62, height: 62, borderRadius: 12, overflow: 'hidden', border: `3px solid ${sel === idx ? pal.border : 'var(--border)'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.2s' }}>
+                                    <button aria-label={`${a11y(store).image} ${idx + 1}`} key={idx} onClick={() => showImage(idx)} style={{ flexShrink: 0, width: 62, height: 62, borderRadius: 12, overflow: 'hidden', border: `3px solid ${sel === idx ? pal.border : 'var(--border)'}`, opacity: sel === idx ? 1 : 0.55, cursor: 'pointer', padding: 0, background: 'none', transition: 'all 0.2s' }}>
                                         <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     </button>
                                 ))}
@@ -1750,9 +1750,9 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
                             <div style={{ marginBottom: '0.875rem' }}>
                                 <p style={{ fontSize: '0.78rem', fontWeight: 900, color: 'var(--mid)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>🔢 {t.qty}</p>
                                 <div style={{ display: 'inline-flex', alignItems: 'center', border: '3px solid var(--border)', borderRadius: 12, overflow: 'hidden', background: '#fff' }}>
-                                    <button type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--blue)' }}><Minus size={16} /></button>
+                                    <button aria-label={a11y(store).decrease} type="button" onClick={() => setFd(p => ({ ...p, quantity: Math.max(1, p.quantity - 1) }))} style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--blue)' }}><Minus size={16} /></button>
                                     <span className="font-boogaloo" style={{ width: 46, textAlign: 'center', fontSize: '1.375rem', color: 'var(--text)' }}>{fd.quantity}</span>
-                                    <button type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--blue)' }}><Plus size={16} /></button>
+                                    <button aria-label={a11y(store).increase} type="button" onClick={() => setFd(p => ({ ...p, quantity: p.quantity + 1 }))} style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--blue)' }}><Plus size={16} /></button>
                                 </div>
                             </div>
                         )}

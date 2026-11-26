@@ -23,7 +23,7 @@ import {
   ChevronLeft, ChevronRight, Star, Trash2, Plus, Minus, Check, AlertCircle,
   Truck, ShieldCheck, CreditCard, Headphones, Smartphone, Send, Cpu, Package, Download,
 } from 'lucide-react';
-import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear } from '@/components/theme/storeContact';
+import { WhatsAppOrderButton, WhatsAppGlyph, comingSoon, storeWhatsappHref, LogoWithName, imageIndexForSelection, variantForImage, HeroShade, heroTextClear, a11y } from '@/components/theme/storeContact';
 
 
 // اسم اللون المختار (أحمر) بجانب اسم الخاصية — إن كتبه التاجر للون أو الصورة
@@ -715,7 +715,7 @@ export function Navbar({ store, domain }: any) {
           <div style={{ position: 'absolute', top: 0, insetInlineEnd: 0, height: '100%', width: 'min(320px, 82vw)', background: CARD, padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: 4 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
               <span style={{ fontWeight: 900, fontSize: '1.1rem' }}>{store?.name}</span>
-              <button onClick={() => setOpen(false)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: TXT }}><X size={24} /></button>
+              <button aria-label={a11y(store).close} onClick={() => setOpen(false)} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: TXT }}><X size={24} /></button>
             </div>
             {mobileLinks.map((l) => (
               <Link key={l.h} href={l.h} onClick={() => setOpen(false)}
@@ -737,7 +737,7 @@ export function Navbar({ store, domain }: any) {
               onKeyDown={(e) => { if (e.key === 'Enter') goSearch(); }}
               placeholder={t.search}
               style={{ flex: 1, border: 'none', outline: 'none', fontSize: '1rem', color: TXT, fontFamily: 'inherit' }} />
-            <button onClick={() => { setShowSearch(false); setSearchQuery(''); setListSearch([]); }}
+            <button aria-label={a11y(store).close} onClick={() => { setShowSearch(false); setSearchQuery(''); setListSearch([]); }}
               style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: TXT }}><X size={22} /></button>
           </div>
           <div style={{ flex: 1, overflowY: 'auto', background: CARD, marginTop: 1 }}>
@@ -1310,7 +1310,7 @@ export function Details({ product, discount, allImages, allAttrs, finalPrice, se
           {images.length > 1 && (
             <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap', paddingBottom: 4 }}>
               {images.map((im, i) => (
-                <button key={i} onClick={() => showImage(i)}
+                <button aria-label={`${a11y(store).image} ${i + 1}`} key={i} onClick={() => showImage(i)}
                   style={{ width: 72, height: 72, borderRadius: 12, overflow: 'hidden', flexShrink: 0, padding: 0, cursor: 'pointer', border: `2px solid ${i === sel ? A : BD}`, background: BG }}>
                   <img src={im} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 </button>
@@ -1581,10 +1581,10 @@ export function ProductForm({ product, userId, domain, selectedOffer, setSelecte
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
           <span style={{ fontWeight: 800, fontSize: '0.95rem' }}>{t.qty}</span>
           <div style={{ display: 'inline-flex', alignItems: 'center', border: `1.5px solid ${BD}`, borderRadius: 12, overflow: 'hidden' }}>
-            <button onClick={() => set('quantity', Math.max(1, fd.quantity - 1))}
+            <button aria-label={a11y(store).decrease} onClick={() => set('quantity', Math.max(1, fd.quantity - 1))}
               style={{ width: 40, height: 40, border: 'none', background: BG, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: TXT }}><Minus size={16} /></button>
             <span className="pt-mono" style={{ width: 48, textAlign: 'center', fontWeight: 800 }}>{fd.quantity}</span>
-            <button onClick={() => set('quantity', fd.quantity + 1)}
+            <button aria-label={a11y(store).increase} onClick={() => set('quantity', fd.quantity + 1)}
               style={{ width: 40, height: 40, border: 'none', background: BG, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: TXT }}><Plus size={16} /></button>
           </div>
         </div>
